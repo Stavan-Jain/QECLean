@@ -110,7 +110,6 @@ theorem horizontalLoopChain_edgeWeight_eq_L (L : ℕ) [Fact (2 ≤ L)] :
     _ = L := hcard
 
 /-- Section-8 upper-bound witness packaged as a nontrivial X logical of weight `L`. -/
-
 theorem exists_nontrivial_x_logical_weight_eq_L (L : ℕ) [Fact (2 ≤ L)] :
     ∃ g : NQubitPauliGroupElement (numQubits L),
       NQubitPauliGroupElement.IsXTypeElement g ∧

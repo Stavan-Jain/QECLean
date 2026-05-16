@@ -124,16 +124,13 @@ lemma encodeVec_norm (v : QubitVec) :
               simp [Finset.sum_add_distrib]
         _ = ‖v 0‖ ^ 2 + ‖v 1‖ ^ 2 := by
               simp
-
     -- Now compute the RHS sum (over `Fin 2`).
     have hR :
         (∑ q : QubitBasis, ‖v q‖ ^ 2) = (‖v 0‖ ^ 2 + ‖v 1‖ ^ 2) := by
       -- `QubitBasis` is `Fin 2`.
       simp [QubitBasis, Fin.sum_univ_two]
-
     -- Combine.
     linarith [hL, hR]
-
   -- Finish by unfolding `norm` and rewriting the sum under the square root.
   simp [norm, hsum]
 
