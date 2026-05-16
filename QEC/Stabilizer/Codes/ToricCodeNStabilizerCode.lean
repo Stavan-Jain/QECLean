@@ -840,6 +840,8 @@ private lemma toric_logicalOps_one (L : ℕ) [Fact (2 ≤ L)] :
     toric_logicalOps L 1 = logicalQubit1 L := rfl
 
 set_option maxHeartbeats 800000 in
+-- maxHeartbeats bumped: triple ∀-quantified commutation produces four cases per
+-- logical pair (XX, XZ, ZX, ZZ).
 /-- Cross-commutation of the logical operators. -/
 private theorem toric_logical_commute_cross (L : ℕ) [Fact (2 ≤ L)] :
     ∀ ℓ ℓ', ℓ ≠ ℓ' →

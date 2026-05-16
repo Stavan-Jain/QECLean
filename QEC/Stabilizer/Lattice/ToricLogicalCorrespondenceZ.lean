@@ -158,6 +158,8 @@ def zIsStarProduct (L : ℕ) [Fact (2 ≤ L)] (c : C1 L) : Prop :=
 -- ---------------------------------------------------------------------------
 
 set_option maxHeartbeats 800000 in
+-- maxHeartbeats bumped: pointwise commutation reasoning over all qubits in the lattice,
+-- with `simp_all +decide` over many `PauliOperator` cases.
 /-- Single-face commutation criterion: `toricZOperatorOfChain c` commutes with
     `faceStab x y` iff the dual-boundary value at `(x,y)` is zero. -/
 theorem faceCheckCommutes_iff_dualBoundaryAt
@@ -345,6 +347,8 @@ lemma toricZOperatorOfChain_zero (L : ℕ) :
   aesop
 
 set_option maxHeartbeats 1000000 in
+-- maxHeartbeats bumped: chain → Pauli homomorphism unfolding produces a goal with
+-- per-qubit case splits over `PauliOperator.mulOp`.
 /-- `toricZOperatorOfChain` maps chain addition to Pauli multiplication. -/
 lemma toricZOperatorOfChain_add (L : ℕ) (c c' : C1 L) :
     toricZOperatorOfChain L (c + c') =
@@ -396,6 +400,8 @@ private lemma c0_eq_sum_singleVtx (L : ℕ) (s : C0 L) :
     first | rfl | exact absurd rfl ‹_›
 
 set_option maxHeartbeats 800000 in
+-- maxHeartbeats bumped: equality on n-qubit Pauli elements after unfolding the cut map
+-- and the singleVtx indicator across 2·L² edges.
 /-- `toricZOperatorOfChain` applied to `toricVertexCutMap (singleVtx (xv, yv))`
     equals the vertex stabilizer at `(xv, yv)`. -/
 lemma toricZOperatorOfChain_cutMap_singleVtx (L : ℕ) [Fact (2 ≤ L)]
@@ -649,6 +655,8 @@ private lemma zTypeOps_in_stabilizer_has_phase_zero
   exact hz_ty
 
 set_option maxHeartbeats 1000000 in
+-- maxHeartbeats bumped: closure-membership argument reduces to commutation checks
+-- across the full Z-generator set.
 /-- Any Z-type element of the stabilizer is in `closure(ZGenerators)`. -/
 lemma zType_in_stabilizerGroup_implies_in_ZClosure
     (L : ℕ) [Fact (2 ≤ L)]
@@ -724,6 +732,8 @@ lemma stabilizer_same_ops_implies_dualBoundary
 -- ---------------------------------------------------------------------------
 
 set_option maxHeartbeats 1000000 in
+-- maxHeartbeats bumped: chains both directions of the iff through several
+-- `IsNontrivialLogicalOperator` unfoldings.
 /-- Z nontrivial logical iff corresponding chain is a dual-cycle-not-dual-boundary. -/
 theorem zNontrivialLogical_iff_dualCycle_not_dualBoundary
     (L : ℕ) [Fact (2 ≤ L)] (c : C1 L) :
