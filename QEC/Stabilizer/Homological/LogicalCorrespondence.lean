@@ -160,7 +160,7 @@ private lemma c2_eq_sum_singleFace_filter (f : X.C2 → ZMod 2) :
   · rw [Finset.sum_eq_single q]
     · simp [singleFace, hq]
     · intros r _ hne
-      simp [singleFace, Pi.single_apply, hne.symm]
+      simp [singleFace, hne.symm]
     · intro hcontra
       exact absurd (Finset.mem_filter.mpr ⟨Finset.mem_univ q, hq⟩) hcontra
   · have hq0 : f q = 0 := (zmod2_dichotomy_local (f q)).resolve_right hq
@@ -169,7 +169,7 @@ private lemma c2_eq_sum_singleFace_filter (f : X.C2 → ZMod 2) :
     intros r hr
     rw [Finset.mem_filter] at hr
     have hne : r ≠ q := fun heq => hq (heq ▸ hr.2)
-    simp [singleFace, Pi.single_apply, hne]
+    simp [singleFace, hne]
 
 /-- For any 2-chain `f`, `chainXOperator (∂₂ f)` is in the X-closure. -/
 lemma chainXOperator_boundary2_mem_XClosure (f : X.C2 → ZMod 2) :
@@ -411,7 +411,7 @@ private lemma c0_eq_sum_singleVtx_filter (s : X.C0 → ZMod 2) :
   · rw [Finset.sum_eq_single q]
     · simp [singleVtx, hq]
     · intros r _ hne
-      simp [singleVtx, Pi.single_apply, hne.symm]
+      simp [singleVtx, hne.symm]
     · intro hcontra
       exact absurd (Finset.mem_filter.mpr ⟨Finset.mem_univ q, hq⟩) hcontra
   · have hq0 : s q = 0 := (zmod2_dichotomy_local (s q)).resolve_right hq
@@ -420,7 +420,7 @@ private lemma c0_eq_sum_singleVtx_filter (s : X.C0 → ZMod 2) :
     intros r hr
     rw [Finset.mem_filter] at hr
     have hne : r ≠ q := fun heq => hq (heq ▸ hr.2)
-    simp [singleVtx, Pi.single_apply, hne]
+    simp [singleVtx, hne]
 
 /-- For any 0-chain `s`, `chainZOperator (cutMap s)` is in the Z-closure. -/
 lemma chainZOperator_cutMap_mem_ZClosure (s : X.C0 → ZMod 2) :

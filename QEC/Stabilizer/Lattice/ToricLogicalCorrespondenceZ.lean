@@ -282,8 +282,7 @@ theorem faceCheckCommutes_iff_dualBoundaryAt
     clear hfilt_eq hanti_iff
     split_ifs <;>
       simp_all +decide [Finset.filter_eq', Finset.filter_or, Finset.card_insert_of_notMem,
-        Finset.mem_insert, Finset.mem_singleton,
-        hd1, hd2, hd3, hd4, hd5, hd6, hd1', hd2', hd3', hd4', hd5', hd6']
+        Finset.mem_insert, Finset.mem_singleton]
   -- Parity bridge: even indicator sum ↔ ZMod 2 sum = 0
   have hbridge : ∀ (a b c d : ZMod 2),
       Even (((if a = 1 then 1 else 0) + (if b = 1 then 1 else 0) +
@@ -413,7 +412,7 @@ lemma toricZOperatorOfChain_cutMap_singleVtx (L : ℕ) [Fact (2 ≤ L)]
     rcases e with ⟨ex, ey⟩ | ⟨ex, ey⟩
     · -- h-edge case: cutMap (singleVtx (xv,yv)) at h(ex,ey) = 1 means
       -- ((ex,ey) = (xv,yv)) XOR (next L ex = xv ∧ ey = yv)
-      simp only [toricVertexCutMap, singleVtx] at he
+      simp only [toricVertexCutMap] at he
       have hxL : (xv : ℕ) < L := xv.isLt
       have hyL : (yv : ℕ) < L := yv.isLt
       have hexL : (ex : ℕ) < L := ex.isLt
@@ -441,7 +440,7 @@ lemma toricZOperatorOfChain_cutMap_singleVtx (L : ℕ) [Fact (2 ≤ L)]
           simp [h1, h2] at he
     · -- v-edge case: cutMap (singleVtx (xv,yv)) at v(ex,ey) = 1 means
       -- ((ex,ey) = (xv,yv)) XOR (ex = xv ∧ next L ey = yv)
-      simp only [toricVertexCutMap, singleVtx] at he
+      simp only [toricVertexCutMap] at he
       have hxL : (xv : ℕ) < L := xv.isLt
       have hyL : (yv : ℕ) < L := yv.isLt
       have hexL : (ex : ℕ) < L := ex.isLt
@@ -474,14 +473,14 @@ lemma toricZOperatorOfChain_cutMap_singleVtx (L : ℕ) [Fact (2 ≤ L)]
       · have hne : (StabilizerGroup.ToricCodeN.prev L yv) ≠ yv :=
           Stabilizer.Lattice.prev_ne_self L yv
         simp [toricVertexCutMap, singleVtx, StabilizerGroup.ToricCodeN.prev,
-          Stabilizer.Lattice.next_prev, hne, hne.symm]
+          Stabilizer.Lattice.next_prev, hne]
     · rename_i h₁ h₂ h₃
       contrapose! h₁
       refine ⟨EdgeIdx.v xv yv, ?_, ?_⟩
       · rfl
       · have hne : StabilizerGroup.ToricCodeN.next L yv ≠ yv :=
           Stabilizer.Lattice.next_ne_self L yv
-        simp [toricVertexCutMap, singleVtx, hne, hne.symm]
+        simp [toricVertexCutMap, singleVtx, hne]
     · rename_i h₁ h₂ h₃ h₄
       contrapose! h₁
       refine ⟨EdgeIdx.h (StabilizerGroup.ToricCodeN.prev L xv) yv, ?_, ?_⟩
@@ -489,14 +488,14 @@ lemma toricZOperatorOfChain_cutMap_singleVtx (L : ℕ) [Fact (2 ≤ L)]
       · have hne : (StabilizerGroup.ToricCodeN.prev L xv) ≠ xv :=
           Stabilizer.Lattice.prev_ne_self L xv
         simp [toricVertexCutMap, singleVtx, StabilizerGroup.ToricCodeN.prev,
-          Stabilizer.Lattice.next_prev, hne, hne.symm]
+          Stabilizer.Lattice.next_prev, hne]
     · rename_i h₁ h₂ h₃ h₄ h₅
       contrapose! h₁
       refine ⟨EdgeIdx.h xv yv, ?_, ?_⟩
       · rfl
       · have hne : StabilizerGroup.ToricCodeN.next L xv ≠ xv :=
           Stabilizer.Lattice.next_ne_self L xv
-        simp [toricVertexCutMap, singleVtx, hne, hne.symm]
+        simp [toricVertexCutMap, singleVtx, hne]
     · unfold NQubitPauliOperator.identity; aesop
 
 /-- Z-chain is a star product iff the chain is a dual boundary. -/
@@ -533,9 +532,9 @@ theorem zIsStarProduct_iff_mem_toricDualBoundaries (L : ℕ) [Fact (2 ≤ L)] (c
     simp only [map_sum]
     induction' (Finset.univ.filter fun v : VtxIdx L => s v = 1) using Finset.induction
       with a fs ha ih
-    · simp only [Finset.sum_empty, map_zero, toricZOperatorOfChain_zero]
+    · simp only [Finset.sum_empty, toricZOperatorOfChain_zero]
       exact OneMemClass.one_mem _
-    · simp only [Finset.sum_insert ha, map_add, toricZOperatorOfChain_add]
+    · simp only [Finset.sum_insert ha, toricZOperatorOfChain_add]
       exact Subgroup.mul_mem _
         (by rcases a with ⟨xv, yv⟩
             rw [toricZOperatorOfChain_cutMap_singleVtx]

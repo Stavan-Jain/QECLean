@@ -121,7 +121,7 @@ private lemma edgeToQubitIdx_surjective (L : ℕ) [Fact (0 < L)] :
   classical
   have hcard_edge : Fintype.card (Stabilizer.Lattice.EdgeIdx L) =
       Fintype.card (Fin (Stabilizer.Lattice.toricNumQubits L)) := by
-    simp [Stabilizer.Lattice.toricNumQubits, two_mul, mul_comm]
+    simp [Stabilizer.Lattice.toricNumQubits, mul_comm]
   exact (Fintype.bijective_iff_injective_and_card _).mpr
     ⟨Stabilizer.Lattice.edgeToQubitIdx_injective L, hcard_edge⟩ |>.2
 
@@ -175,7 +175,7 @@ private lemma anticommutesAt_vertexStab_g_iff_xChain
       simp [PauliOperator.mulOp]
   · simp only [NQubitPauliGroupElement.anticommutesAt, hZ, heq]
     cases hgi : g.operators i <;>
-      simp [PauliOperator.mulOp, hgi]
+      simp [PauliOperator.mulOp]
 
 /-- The Z-only encoding `toricZOperatorOfChain (zChainOf g)` has, at each qubit, a Z
 exactly when `g` has Z or Y. -/
@@ -227,7 +227,7 @@ private lemma anticommutesAt_faceStab_g_iff_zChain
       simp [PauliOperator.mulOp]
   · simp only [NQubitPauliGroupElement.anticommutesAt, hX, heq]
     cases hgi : g.operators i <;>
-      simp [PauliOperator.mulOp, hgi]
+      simp [PauliOperator.mulOp]
 
 /-- If `g` is in the centralizer, its X-chain is a primal cycle. -/
 private lemma xChain_mem_toricCycles_of_centralizer (L : ℕ) [Fact (2 ≤ L)]
