@@ -54,11 +54,13 @@ variable [Fact (0 < L)]
 -- 2.  Independence on dual cycles
 -- ---------------------------------------------------------------------------
 
+omit [Fact (0 < L)] in
 /-- `hRowAt` is linear in the chain. -/
 theorem hRowAt_linear (y0 : Fin L) :
     ∀ c d : C1 L, hRowAt (L := L) y0 (c + d) = hRowAt (L := L) y0 c + hRowAt (L := L) y0 d := by
   intro c d; simp [hRowAt, Finset.sum_add_distrib]
 
+omit [Fact (0 < L)] in
 /-- `vColAt` is linear in the chain. -/
 theorem vColAt_linear (x0 : Fin L) :
     ∀ c d : C1 L, vColAt (L := L) x0 (c + d) = vColAt (L := L) x0 c + vColAt (L := L) x0 d := by

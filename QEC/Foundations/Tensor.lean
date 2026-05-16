@@ -33,11 +33,8 @@ open Kronecker
 @[simp]
 theorem star_kron
   {α β : Type*}
-  [DecidableEq α] [Fintype α]
-  [DecidableEq β] [Fintype β]
   (a : Matrix α α ℂ) (b : Matrix β β ℂ) :
   star (a ⊗ₖ b) = (star a) ⊗ₖ (star b) := by
-  classical
   ext i j
   simp
 
