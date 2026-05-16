@@ -222,7 +222,7 @@ theorem four_filter_card_eq_indicator_sum
       incidentQubitIdx2 L xv yv ≠ incidentQubitIdx3 L xv yv ∧
       incidentQubitIdx2 L xv yv ≠ incidentQubitIdx4 L xv yv ∧
       incidentQubitIdx3 L xv yv ≠ incidentQubitIdx4 L xv yv := by
-    refine' ⟨_, _, _, _, _, _⟩
+    refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
       <;> intro h
       <;> simp_all +decide
         [Fin.ext_iff, StabilizerGroup.ToricCodeN.hEdge, StabilizerGroup.ToricCodeN.vEdge]
@@ -534,7 +534,7 @@ lemma toricXOperatorOfChain_mem_centralizer_iff_cycle
         fun h => by
           rw [StabilizerGroup.ToricCodeN.stabilizerGroup_toSubgroup_eq] at h
           exact h
-    refine' Subgroup.closure_induction ( fun x hx => _ ) _ _ _ h_closure;
+    refine Subgroup.closure_induction ( fun x hx => ?_ ) ?_ ?_ ?_ h_closure;
     · cases hx with
       | inl hx => exact h_comm x hx
       | inr hx =>
@@ -689,7 +689,7 @@ theorem xNontrivialLogical_iff_cycle_not_boundary (L : ℕ) [Fact (2 ≤ L)] (c 
       have h_in_stabilizer :
           toricXOperatorOfChain L c ∈
             (StabilizerGroup.ToricCodeN.stabilizerGroup L).toSubgroup := by
-        refine' Subgroup.closure_induction ( fun x hx => _ ) _ _ _ h_plaquette;
+        refine Subgroup.closure_induction ( fun x hx => ?_ ) ?_ ?_ ?_ h_plaquette;
         · exact Subgroup.subset_closure
             (by
               rw [StabilizerGroup.ToricCodeN.listToSet_generatorsList]

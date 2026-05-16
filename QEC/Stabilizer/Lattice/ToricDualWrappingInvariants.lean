@@ -246,9 +246,9 @@ theorem phiDual_surjective :
     obtain ⟨c, hc⟩ : ∃ c : C1 L,
         (∑ x : Fin L, c (EdgeIdx.h x (zeroCoord L))) = a ∧
           (∑ y : Fin L, c (EdgeIdx.v (zeroCoord L) y)) = b := by
-      refine' ⟨ fun e =>
+      refine ⟨ fun e =>
         if e = EdgeIdx.h ( zeroCoord L ) ( zeroCoord L ) then a
-        else if e = EdgeIdx.v ( zeroCoord L ) ( zeroCoord L ) then b else 0, _, _ ⟩ <;>
+        else if e = EdgeIdx.v ( zeroCoord L ) ( zeroCoord L ) then b else 0, ?_, ?_ ⟩ <;>
         simp +decide
     generalize_proofs at *; (
     -- Define the chain $c'$ such that it has $a$ horizontal edges and $b$ vertical edges.
@@ -256,9 +256,9 @@ theorem phiDual_surjective :
         (∀ x y, c' (EdgeIdx.h x y) = c (EdgeIdx.h x (zeroCoord L))) ∧
           (∀ x y, c' (EdgeIdx.v x y) = c (EdgeIdx.v (zeroCoord L) y)) ∧
             (∀ p : FaceIdx L, toricDualBoundary L c' p = 0) := by
-      refine' ⟨ fun e => match e with
+      refine ⟨ fun e => match e with
         | EdgeIdx.h x y => c ( EdgeIdx.h x ( zeroCoord L ) )
-        | EdgeIdx.v x y => c ( EdgeIdx.v ( zeroCoord L ) y ), _, _, _ ⟩ <;>
+        | EdgeIdx.v x y => c ( EdgeIdx.v ( zeroCoord L ) y ), ?_, ?_, ?_ ⟩ <;>
         simp +decide [ toricDualBoundary ];
       grind +ring
     generalize_proofs at *; (
@@ -315,7 +315,7 @@ theorem toric_finrank_dualBoundaries :
   rw [ h_dualBoundaries_range ];
   have := LinearMap.finrank_range_add_finrank_ker ( toricVertexCutMap ( L := L ) );
   rw [ show Module.finrank ( ZMod 2 ) ( C0 L ) = L * L from ?_ ] at this;
-  · refine' eq_tsub_of_add_eq _;
+  · refine eq_tsub_of_add_eq ?_;
     convert this;
     exact?;
   · simp +decide [ C0, Module.finrank ]
