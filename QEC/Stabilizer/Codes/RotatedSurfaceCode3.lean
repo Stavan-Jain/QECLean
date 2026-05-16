@@ -494,11 +494,13 @@ theorem no_weight_1_logical (g : NQubitPauliGroupElement 9)
   have h_cent := (IsNontrivialLogicalOperator_iff g stabilizerGroup).mp h_nontrivial |>.1
   exact weight_1_not_centralizer g hg h_cent
 
--- native_decide checks all (i,j,pi,pj) combinations: 9×8×3×3 = 648 cases,
--- each checking commutation with generators and existence of span coefficients.
+set_option linter.style.nativeDecide false in
 set_option maxRecDepth 16384 in
 set_option maxHeartbeats 4000000 in
--- The finite exhaustive search over weight-2 cases requires a large heartbeat budget.
+-- native_decide checks all (i,j,pi,pj) combinations: 9×8×3×3 = 648 cases,
+-- each checking commutation with generators and existence of span coefficients.
+-- We accept the compiler trust assumption here: this is a finite exhaustive check
+-- whose `decide` form would not terminate within any reasonable heartbeat budget.
 private lemma weight_2_pairs_span_coeffs :
     ∀ (i j : Fin 9), i ≠ j → ∀ (pi pj : PauliOperator), pi ≠ .I → pj ≠ .I →
     let op : NQubitPauliOperator 9 := fun k => if k = i then pi else if k = j then pj else .I
