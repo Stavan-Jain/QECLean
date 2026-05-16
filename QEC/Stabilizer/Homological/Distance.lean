@@ -99,7 +99,7 @@ lemma weight_ge_chainWeight_xChainOf (g : NQubitPauliGroupElement X.numQubits) :
     have h_op : g.operators (X.edgeEquiv e) = PauliOperator.X ∨
         g.operators (X.edgeEquiv e) = PauliOperator.Y := by
       by_contra hcontr
-      push_neg at hcontr
+      push Not at hcontr
       simp [xChainOf, hcontr.1, hcontr.2] at hne
     rcases h_op with hX | hY
     · simp [NQubitPauliOperator.support, hX]
@@ -124,7 +124,7 @@ lemma weight_ge_chainWeight_zChainOf (g : NQubitPauliGroupElement X.numQubits) :
     have h_op : g.operators (X.edgeEquiv e) = PauliOperator.Z ∨
         g.operators (X.edgeEquiv e) = PauliOperator.Y := by
       by_contra hcontr
-      push_neg at hcontr
+      push Not at hcontr
       simp [zChainOf, hcontr.1, hcontr.2] at hne
     rcases h_op with hZ | hY
     · simp [NQubitPauliOperator.support, hZ]
@@ -156,7 +156,7 @@ lemma chainXOperator_xChainOf_op_at
       simp [hxy]
     have hex : ∃ e' : X.C1, X.edgeEquiv e' = i ∧ X.xChainOf g e' = 1 := ⟨e, hei, hx1⟩
     rw [if_pos hex, if_pos hxy]
-  · push_neg at hxy
+  · push Not at hxy
     have hex : ¬ ∃ e' : X.C1, X.edgeEquiv e' = i ∧ X.xChainOf g e' = 1 := by
       rintro ⟨e', hei, he1⟩
       have h0 : X.xChainOf g e' = 0 := by
@@ -167,7 +167,7 @@ lemma chainXOperator_xChainOf_op_at
       exact absurd he1 (by decide)
     rw [if_neg hex]
     rw [if_neg]
-    push_neg
+    push Not
     exact hxy
 
 /-- Z-only mirror. -/
@@ -187,7 +187,7 @@ lemma chainZOperator_zChainOf_op_at
       simp [hzy]
     have hex : ∃ e' : X.C1, X.edgeEquiv e' = i ∧ X.zChainOf g e' = 1 := ⟨e, hei, hz1⟩
     rw [if_pos hex, if_pos hzy]
-  · push_neg at hzy
+  · push Not at hzy
     have hex : ¬ ∃ e' : X.C1, X.edgeEquiv e' = i ∧ X.zChainOf g e' = 1 := by
       rintro ⟨e', hei, he1⟩
       have h0 : X.zChainOf g e' = 0 := by
@@ -198,7 +198,7 @@ lemma chainZOperator_zChainOf_op_at
       exact absurd he1 (by decide)
     rw [if_neg hex]
     rw [if_neg]
-    push_neg
+    push Not
     exact hzy
 
 /-! ## not_both_boundary_of_nontrivial

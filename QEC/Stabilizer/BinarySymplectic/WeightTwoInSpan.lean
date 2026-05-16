@@ -63,7 +63,7 @@ theorem weight_2_pair_by_enum (L : List (NQubitPauliGroupElement n)) (i j : Fin 
     · by_cases hkj : k = j
       · subst hkj; simp [hki]
       · have hk_not_supp : k ∉ NQubitPauliOperator.support op := by
-          rw [h_supp, Finset.mem_insert, Finset.mem_singleton]; push_neg; exact ⟨hki, hkj⟩
+          rw [h_supp, Finset.mem_insert, Finset.mem_singleton]; push Not; exact ⟨hki, hkj⟩
         have : op k = .I := by
           by_contra h_ne; exact hk_not_supp ((NQubitPauliOperator.mem_support op k).mpr h_ne)
         simp [hki, hkj, this]

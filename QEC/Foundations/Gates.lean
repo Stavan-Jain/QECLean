@@ -330,7 +330,7 @@ by
     -- Since $G$ is unitary, we have $G.val * star G.val = 1$, which implies
     -- that $(star G.val) * G.val = 1$ as well.
     have h_unitary : (star G.val) * G.val = 1 := by
-      convert Matrix.mul_eq_one_comm.mp ( G.2.2 ) using 1;
+      convert mul_eq_one_comm.mp ( G.2.2 ) using 1;
     exact fun v => by rw [ Matrix.mulVec_mulVec, h_unitary, Matrix.one_mulVec ] ;
   -- By definition of norm, we have that ‖Gv‖^2 = ⟨Gv, Gv⟩.
   have h_norm_sq : ∀ (v : Quantum.Vector α),
@@ -422,7 +422,7 @@ lemma involutary_inv_eq
   M⁻¹ = M := by
   have h_mul : M * M = 1 := h
   have h_unit : IsUnit M.det :=
-    (Matrix.isUnit_iff_isUnit_det M).1 (Matrix.isUnit_of_right_inverse h_mul)
+    (Matrix.isUnit_iff_isUnit_det M).1 (IsUnit.of_mul_eq_one M h_mul)
   calc M⁻¹
       = M⁻¹ * 1 := by rw [mul_one]
     _ = M⁻¹ * (M * M) := by rw [← h_mul]

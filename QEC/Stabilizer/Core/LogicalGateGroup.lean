@@ -178,7 +178,7 @@ private lemma maps_to_codespace_of_conjugation (U : NQubitGate n) (S : Stabilize
   have h_conj : ∀ ψ : NQubitState n, IsInCodespace ψ S → IsInCodespace (U • ψ) S := by
     apply Classical.byContradiction
     intro h_contra;
-    push_neg at h_contra;
+    push Not at h_contra;
     obtain ⟨ ψ, hψ₁, hψ₂ ⟩ := h_contra;
     apply hψ₂;
     convert StabilizerGroup.conjugation_iff_maps_codespace U S |>.1 _ ψ hψ₁ using 1;
