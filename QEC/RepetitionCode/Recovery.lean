@@ -241,18 +241,14 @@ lemma recoverVec_X_q1_3_encodeVec (v : QubitVec) :
   have henc : encodeVec v =
       (v 0) • basisVec (0,0,0) + (v 1) • basisVec (1,1,1) := by
     simpa using encodeVec_eq_lincomb (v := v)
-
   -- Define the linear operator G := recoverVec ∘ (X_q1_3.mulVec)
   let G : ThreeQubitVec → ThreeQubitVec :=
     fun w => recoverVec ((X_q1_3.val).mulVec w)
-
   -- Linearity of G (comes from linearity of mulVec and recoverVec)
   have G_add (w₁ w₂ : ThreeQubitVec) : G (w₁ + w₂) = G w₁ + G w₂ := by
     simp [G, Matrix.mulVec_add]
-
   have G_smul (a : ℂ) (w : ThreeQubitVec) : G (a • w) = a • G w := by
     simp [G, Matrix.mulVec_smul]
-
   -- Basis facts: G fixes |000⟩ and |111⟩ (these are the only generators we need)
   have G_basis_000 : G (basisVec (0,0,0)) = basisVec (0,0,0) := by
     -- X sends |000⟩ to |100⟩, then recoverVec sends |100⟩ back to |000⟩
@@ -262,7 +258,6 @@ lemma recoverVec_X_q1_3_encodeVec (v : QubitVec) :
     · by_cases h1 : ijk = (1,1,1)
       · simp [G, h1, maj1_amp]
       · simp [G, recoverVec, h0, h1]
-
   have G_basis_111 : G (basisVec (1,1,1)) = basisVec (1,1,1) := by
     -- X sends |111⟩ to |011⟩, then recoverVec sends |011⟩ back to |111⟩
     ext ijk
@@ -271,7 +266,6 @@ lemma recoverVec_X_q1_3_encodeVec (v : QubitVec) :
     · by_cases h1 : ijk = (1,1,1)
       · simp [G, h1, maj1_amp]
       · simp [G, recoverVec, h0, h1]
-
   -- Now finish by linearity: reduce to the two basis cases
   calc
     recoverVec ((X_q1_3.val).mulVec (encodeVec v))

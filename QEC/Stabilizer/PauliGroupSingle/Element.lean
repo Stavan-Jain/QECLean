@@ -76,7 +76,6 @@ theorem mul_assoc (p q r : PauliGroupElement) : (p * q) * r = p * (q * r) := by
   have h_op : ((p.operator.mulOp q.operator).operator.mulOp r.operator).operator =
               (p.operator.mulOp (q.operator.mulOp r.operator).operator).operator :=
     PauliOperator.mul_assoc_op p.operator q.operator r.operator
-
   have h_phase : ((p.phasePower + q.phasePower + (p.operator.mulOp q.operator).phasePower) +
                   r.phasePower +
                   ((p.operator.mulOp q.operator).operator.mulOp r.operator).phasePower) =
@@ -85,7 +84,6 @@ theorem mul_assoc (p q r : PauliGroupElement) : (p * q) * r = p * (q * r) := by
                   (p.operator.mulOp (q.operator.mulOp r.operator).operator).phasePower) := by
     simp [add_assoc, add_comm, add_left_comm]
     cases p.operator <;> cases q.operator <;> cases r.operator <;> simp
-
   apply PauliGroupElement.ext
   · exact h_phase
   · exact h_op

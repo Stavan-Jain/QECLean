@@ -103,7 +103,6 @@ lemma F_correct (v : QubitVec) :
   -- expand `v` in the {ket0, ket1} basis
   have hv : v = (v 0) • ket0.val + (v 1) • ket1.val := by
     simpa using qubitVec_eq_lincomb_kets (v := v)
-
   calc
     F v
         = F ((v 0) • ket0.val + (v 1) • ket1.val) := by

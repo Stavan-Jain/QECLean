@@ -268,7 +268,6 @@ macro_rules
 
 open Lean.Parser.Tactic in
 open Lean in
-
 /--
 `vec_expand`:
 - turns equality between vectors (functions) into pointwise goals with `ext`,
