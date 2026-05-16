@@ -66,7 +66,7 @@ def generatorsListPackaged (L : ℕ) [Fact (0 < L)] :
 
 /-- The (untrimmed) coords list has length `L²`. -/
 private lemma coords_length (L : ℕ) : (coords L).length = L * L := by
-  show ((List.finRange L).product (List.finRange L)).length = L * L
+  change ((List.finRange L).product (List.finRange L)).length = L * L
   unfold List.product
   simp [List.length_flatMap]
 
@@ -76,10 +76,10 @@ private lemma coordsTrimmed_length (L : ℕ) [Fact (0 < L)] :
   classical
   have hL : 0 < L := Fact.out
   have hnodup : (coords L).Nodup := by
-    show ((List.finRange L).product (List.finRange L)).Nodup
+    change ((List.finRange L).product (List.finRange L)).Nodup
     exact List.Nodup.product (List.nodup_finRange L) (List.nodup_finRange L)
   have horigin_mem : originCoord L ∈ coords L := by
-    show originCoord L ∈ (List.finRange L).product (List.finRange L)
+    change originCoord L ∈ (List.finRange L).product (List.finRange L)
     rcases h : originCoord L with ⟨x, y⟩
     simp
   have hnodup_trim : (coordsTrimmed L).Nodup := hnodup.filter _
@@ -94,7 +94,7 @@ private lemma coordsTrimmed_length (L : ℕ) [Fact (0 < L)] :
     · intro hne
       refine ⟨?_, hne⟩
       rcases p with ⟨x, y⟩
-      show (x, y) ∈ (List.finRange L).product (List.finRange L)
+      change (x, y) ∈ (List.finRange L).product (List.finRange L)
       simp
   rw [← List.toFinset_card_of_nodup hnodup_trim, h_trim_set,
       Finset.card_erase_of_mem (Finset.mem_univ _)]
@@ -225,7 +225,7 @@ private lemma sum_singleVtx_coords (L : ℕ) [Fact (0 < L)] :
     ((coords L).map (fun p => Stabilizer.Lattice.singleVtx (L := L) p)).sum =
       (fun _ => (1 : ZMod 2)) := by
   have h_nodup : (coords L).Nodup := by
-    show ((List.finRange L).product (List.finRange L)).Nodup
+    change ((List.finRange L).product (List.finRange L)).Nodup
     exact List.Nodup.product (List.nodup_finRange L) (List.nodup_finRange L)
   have h_finset_eq : (coords L).toFinset = (Finset.univ : Finset (Fin L × Fin L)) := by
     ext p
@@ -249,7 +249,7 @@ private lemma sum_singleFace_coords (L : ℕ) [Fact (0 < L)] :
     ((coords L).map (fun p => Stabilizer.Lattice.singleFace (L := L) p)).sum =
       (fun _ => (1 : ZMod 2)) := by
   have h_nodup : (coords L).Nodup := by
-    show ((List.finRange L).product (List.finRange L)).Nodup
+    change ((List.finRange L).product (List.finRange L)).Nodup
     exact List.Nodup.product (List.nodup_finRange L) (List.nodup_finRange L)
   have h_finset_eq : (coords L).toFinset = (Finset.univ : Finset (Fin L × Fin L)) := by
     ext p
@@ -272,7 +272,7 @@ private lemma sum_singleVtx_coords_eq_trimmed_add_origin (L : ℕ) [Fact (0 < L)
       ((coordsTrimmed L).map (fun p => Stabilizer.Lattice.singleVtx (L := L) p)).sum
         + Stabilizer.Lattice.singleVtx (L := L) (originCoord L) := by
   have h_nodup : (coords L).Nodup := by
-    show ((List.finRange L).product (List.finRange L)).Nodup
+    change ((List.finRange L).product (List.finRange L)).Nodup
     exact List.Nodup.product (List.nodup_finRange L) (List.nodup_finRange L)
   have h_finset_eq : (coords L).toFinset = (Finset.univ : Finset (Fin L × Fin L)) := by
     ext p
@@ -306,7 +306,7 @@ private lemma sum_singleFace_coords_eq_trimmed_add_origin (L : ℕ) [Fact (0 < L
       ((coordsTrimmed L).map (fun p => Stabilizer.Lattice.singleFace (L := L) p)).sum
         + Stabilizer.Lattice.singleFace (L := L) (originCoord L) := by
   have h_nodup : (coords L).Nodup := by
-    show ((List.finRange L).product (List.finRange L)).Nodup
+    change ((List.finRange L).product (List.finRange L)).Nodup
     exact List.Nodup.product (List.nodup_finRange L) (List.nodup_finRange L)
   have h_finset_eq : (coords L).toFinset = (Finset.univ : Finset (Fin L × Fin L)) := by
     ext p
@@ -497,7 +497,7 @@ lemma closure_packaged_eq_full (L : ℕ) [Fact (2 ≤ L)] :
         refine List.mem_map.mpr ⟨(x, y), ?_, rfl⟩
         unfold coordsTrimmed
         refine List.mem_filter.mpr ⟨?_, by simpa using h_orig⟩
-        show (x, y) ∈ (List.finRange L).product (List.finRange L)
+        change (x, y) ∈ (List.finRange L).product (List.finRange L)
         simp
     · -- g is a face stab faceStab L x y
       rcases hX with ⟨⟨x, y⟩, rfl⟩
@@ -510,7 +510,7 @@ lemma closure_packaged_eq_full (L : ℕ) [Fact (2 ≤ L)] :
         refine List.mem_map.mpr ⟨(x, y), ?_, rfl⟩
         unfold coordsTrimmed
         refine List.mem_filter.mpr ⟨?_, by simpa using h_orig⟩
-        show (x, y) ∈ (List.finRange L).product (List.finRange L)
+        change (x, y) ∈ (List.finRange L).product (List.finRange L)
         simp
 
 /-- `-I` is not in the closure of the packaged generator list. -/
@@ -539,7 +539,7 @@ private noncomputable def packagedStabilizerGroup (L : ℕ) [Fact (2 ≤ L)] :
 /-- The packaged stabilizer group has the same toSubgroup as the canonical one. -/
 private lemma packagedStabilizerGroup_toSubgroup_eq (L : ℕ) [Fact (2 ≤ L)] :
     (packagedStabilizerGroup L).toSubgroup = (stabilizerGroup L).toSubgroup := by
-  show Subgroup.closure (listToSet (generatorsListPackaged L)) = _
+  change Subgroup.closure (listToSet (generatorsListPackaged L)) = _
   exact closure_packaged_eq_full L
 
 /-- The two logical X-chains have disjoint support (one has h-edges only, the other has
@@ -1036,11 +1036,11 @@ private lemma get_packaged_Z (L : ℕ) [Fact (0 < L)]
     (hk : k.val < (generatorsListPackaged L).length) :
     (generatorsListPackaged L).get ⟨k.val, hk⟩ =
       vertexStab L ((coordsTrimmed L).get k).1 ((coordsTrimmed L).get k).2 := by
-  show (generatorsListZTrimmed L ++ generatorsListXTrimmed L).get ⟨k.val, hk⟩ = _
+  change (generatorsListZTrimmed L ++ generatorsListXTrimmed L).get ⟨k.val, hk⟩ = _
   have h_lt : k.val < (generatorsListZTrimmed L).length := by
     rw [generatorsListZTrimmed_length]; exact k.isLt
   rw [List.get_eq_getElem, List.getElem_append_left h_lt]
-  show (generatorsListZTrimmed L)[k.val]'h_lt = _
+  change (generatorsListZTrimmed L)[k.val]'h_lt = _
   unfold generatorsListZTrimmed
   rw [List.getElem_map]
   rfl
@@ -1054,7 +1054,7 @@ private lemma get_packaged_X (L : ℕ) [Fact (0 < L)]
     (generatorsListPackaged L).get ⟨j, hj⟩ =
       faceStab L ((coordsTrimmed L)[j - (coordsTrimmed L).length]'hsub).1
                  ((coordsTrimmed L)[j - (coordsTrimmed L).length]'hsub).2 := by
-  show (generatorsListZTrimmed L ++ generatorsListXTrimmed L).get ⟨j, hj⟩ = _
+  change (generatorsListZTrimmed L ++ generatorsListXTrimmed L).get ⟨j, hj⟩ = _
   have hZge : (generatorsListZTrimmed L).length ≤ j := by
     rw [generatorsListZTrimmed_length]; exact hge
   rw [List.get_eq_getElem, List.getElem_append_right hZge]
@@ -1077,7 +1077,7 @@ private lemma coordsTrimmed_nodup (L : ℕ) [Fact (0 < L)] :
     (coordsTrimmed L).Nodup := by
   unfold coordsTrimmed
   apply List.Nodup.filter
-  show ((List.finRange L).product (List.finRange L)).Nodup
+  change ((List.finRange L).product (List.finRange L)).Nodup
   exact List.Nodup.product (List.nodup_finRange L) (List.nodup_finRange L)
 
 /-- `coordsTrimmed L` does not contain the origin. -/
@@ -1109,7 +1109,7 @@ private lemma trimmed_combo_singleVtx_eq_zero (L : ℕ) [Fact (0 < L)]
       intro heq
       rw [heq] at this
       exact coordsTrimmed_not_mem_origin L this
-    show c i * Stabilizer.Lattice.singleVtx (L := L) ((coordsTrimmed L).get i)
+    change c i * Stabilizer.Lattice.singleVtx (L := L) ((coordsTrimmed L).get i)
         (originCoord L) = 0
     rw [Stabilizer.Lattice.singleVtx_apply_ne (Ne.symm h_get_ne)]
     ring
@@ -1128,7 +1128,7 @@ private lemma trimmed_combo_singleVtx_eq_zero (L : ℕ) [Fact (0 < L)]
     rw [h_sum_zero]; rfl
   rw [Finset.sum_apply] at h_at_j
   rw [Finset.sum_eq_single j] at h_at_j
-  · show c j = 0
+  · change c j = 0
     have : c j * Stabilizer.Lattice.singleVtx (L := L) ((coordsTrimmed L).get j)
         ((coordsTrimmed L).get j) = 0 := h_at_j
     rw [Stabilizer.Lattice.singleVtx_apply_self] at this
@@ -1137,7 +1137,7 @@ private lemma trimmed_combo_singleVtx_eq_zero (L : ℕ) [Fact (0 < L)]
     have hne : (coordsTrimmed L).get i ≠ (coordsTrimmed L).get j := by
       intro heq
       exact hij (List.nodup_iff_injective_get.mp (coordsTrimmed_nodup L) heq)
-    show c i * Stabilizer.Lattice.singleVtx (L := L) ((coordsTrimmed L).get i)
+    change c i * Stabilizer.Lattice.singleVtx (L := L) ((coordsTrimmed L).get i)
         ((coordsTrimmed L).get j) = 0
     rw [Stabilizer.Lattice.singleVtx_apply_ne (Ne.symm hne)]
     ring
@@ -1162,7 +1162,7 @@ private lemma trimmed_combo_singleFace_eq_zero (L : ℕ) [Fact (0 < L)]
       intro heq
       rw [heq] at this
       exact coordsTrimmed_not_mem_origin L this
-    show c i * Stabilizer.Lattice.singleFace (L := L) ((coordsTrimmed L).get i)
+    change c i * Stabilizer.Lattice.singleFace (L := L) ((coordsTrimmed L).get i)
         (originCoord L) = 0
     rw [Stabilizer.Lattice.singleFace_apply_ne (Ne.symm h_get_ne)]
     ring
@@ -1187,7 +1187,7 @@ private lemma trimmed_combo_singleFace_eq_zero (L : ℕ) [Fact (0 < L)]
     have hne : (coordsTrimmed L).get i ≠ (coordsTrimmed L).get j := by
       intro heq
       exact hij (List.nodup_iff_injective_get.mp (coordsTrimmed_nodup L) heq)
-    show c i * Stabilizer.Lattice.singleFace (L := L) ((coordsTrimmed L).get i)
+    change c i * Stabilizer.Lattice.singleFace (L := L) ((coordsTrimmed L).get i)
         ((coordsTrimmed L).get j) = 0
     rw [Stabilizer.Lattice.singleFace_apply_ne (Ne.symm hne)]
     ring
@@ -1314,7 +1314,7 @@ private theorem rowsLinearIndependent_generatorsListPackaged (L : ℕ) [Fact (2 
     apply Finset.sum_congr rfl
     intro k _
     rw [LinearMap.map_smul]
-    show cZ k • Stabilizer.Lattice.toricVertexCutMap (L := L)
+    change cZ k • Stabilizer.Lattice.toricVertexCutMap (L := L)
         (Stabilizer.Lattice.singleVtx (L := L) ((coordsTrimmed L).get k)) e =
       cZ k * Stabilizer.Lattice.toricVertexCutMap (L := L)
         (Stabilizer.Lattice.singleVtx (L := L) ((coordsTrimmed L).get k)) e
@@ -1405,7 +1405,7 @@ private theorem rowsLinearIndependent_generatorsListPackaged (L : ℕ) [Fact (2 
         have h_fin_eq : (⟨nZ + (a.val - nZ), by have := a.isLt; omega⟩ :
             Fin (generatorsListPackaged L).length) = a := by
           apply Fin.ext
-          show nZ + (a.val - nZ) = a.val
+          change nZ + (a.val - nZ) = a.val
           omega
         rw [h_fin_eq]
     rw [hsum_split] at h_col
@@ -1445,7 +1445,7 @@ private theorem rowsLinearIndependent_generatorsListPackaged (L : ℕ) [Fact (2 
     apply Finset.sum_congr rfl
     intro k _
     rw [LinearMap.map_smul]
-    show cX k • Stabilizer.Lattice.toricBoundary2 (L := L)
+    change cX k • Stabilizer.Lattice.toricBoundary2 (L := L)
         (Stabilizer.Lattice.singleFace (L := L) ((coordsTrimmed L).get k)) e =
       cX k * Stabilizer.Lattice.toricBoundary2 (L := L)
         (Stabilizer.Lattice.singleFace (L := L) ((coordsTrimmed L).get k)) e
@@ -1455,7 +1455,7 @@ private theorem rowsLinearIndependent_generatorsListPackaged (L : ℕ) [Fact (2 
   by_cases h : j.val < (coordsTrimmed L).length
   · -- Z-block index
     have hzj := hZ_zero ⟨j.val, h⟩
-    show f j = 0
+    change f j = 0
     have hj_eq : (⟨j.val, j.isLt⟩ : Fin (generatorsListPackaged L).length) = j := Fin.ext rfl
     rw [← hj_eq]
     exact hzj
@@ -1468,11 +1468,11 @@ private theorem rowsLinearIndependent_generatorsListPackaged (L : ℕ) [Fact (2 
     have hjlt : j.val - (coordsTrimmed L).length < (coordsTrimmed L).length := by
       have := j.isLt; omega
     have hxj := hX_zero ⟨j.val - (coordsTrimmed L).length, hjlt⟩
-    show f j = 0
+    change f j = 0
     have hj_eq : (⟨(coordsTrimmed L).length + (j.val - (coordsTrimmed L).length),
         by have := j.isLt; omega⟩ : Fin (generatorsListPackaged L).length) = j := by
       apply Fin.ext
-      show (coordsTrimmed L).length + (j.val - (coordsTrimmed L).length) = j.val
+      change (coordsTrimmed L).length + (j.val - (coordsTrimmed L).length) = j.val
       omega
     rw [← hj_eq]
     exact hxj
@@ -1511,7 +1511,7 @@ noncomputable def toricStabilizerCode (L : ℕ) [Fact (2 ≤ L)] :
 /-- The toric stabilizer code's subgroup matches the canonical `stabilizerGroup L`. -/
 theorem toricStabilizerCode_subgroup_eq (L : ℕ) [Fact (2 ≤ L)] :
     (toricStabilizerCode L).toStabilizerGroup.toSubgroup = (stabilizerGroup L).toSubgroup := by
-  show Subgroup.closure (listToSet (generatorsListPackaged L)) = _
+  change Subgroup.closure (listToSet (generatorsListPackaged L)) = _
   exact closure_packaged_eq_full L
 
 end ToricCodeN

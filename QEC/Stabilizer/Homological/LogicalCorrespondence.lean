@@ -146,7 +146,7 @@ lemma chainXOperator_inv (c : X.C1 → ZMod 2) :
     (X.chainXOperator c)⁻¹ = X.chainXOperator c := by
   apply NQubitPauliGroupElement.ext
   · -- phase: -0 = 0 in Fin 4
-    show (-(0 : Fin 4)) = 0
+    change (-(0 : Fin 4)) = 0
     decide
   · rfl
 
@@ -277,7 +277,7 @@ lemma chainXOperator_mem_centralizer_iff_mem_cycles
       · exact h_commZ y hy
       · rcases hy with ⟨f, rfl⟩
         exact chainXOperator_commutes_faceStabOf c f
-    · show (1 : NQubitPauliGroupElement X.numQubits) * X.chainXOperator c =
+    · change (1 : NQubitPauliGroupElement X.numQubits) * X.chainXOperator c =
         X.chainXOperator c * 1
       rw [one_mul, mul_one]
     · intros y₁ y₂ _ _ hy₁ hy₂
@@ -397,7 +397,7 @@ transpose relation `boundary2_dualBoundary_transpose` from the head of this file
 lemma chainZOperator_inv (c : X.C1 → ZMod 2) :
     (X.chainZOperator c)⁻¹ = X.chainZOperator c := by
   apply NQubitPauliGroupElement.ext
-  · show (-(0 : Fin 4)) = 0
+  · change (-(0 : Fin 4)) = 0
     decide
   · rfl
 
@@ -576,7 +576,7 @@ lemma chainZOperator_mem_centralizer_iff_mem_dualCycles
       · rcases hy with ⟨v, rfl⟩
         exact chainZOperator_commutes_vertexStabOf c v
       · exact h_commX y hy
-    · show (1 : NQubitPauliGroupElement X.numQubits) * X.chainZOperator c =
+    · change (1 : NQubitPauliGroupElement X.numQubits) * X.chainZOperator c =
         X.chainZOperator c * 1
       rw [one_mul, mul_one]
     · intros y₁ y₂ _ _ hy₁ hy₂

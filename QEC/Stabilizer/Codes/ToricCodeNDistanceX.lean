@@ -384,7 +384,7 @@ theorem verticalLoopChain_mem_toricCycles (L : ℕ) [Fact (2 ≤ L)] :
     verticalLoopChain]
   by_cases hx : xv = Stabilizer.Lattice.zeroCoord L
   · subst hx
-    show (0 : ZMod 2) + 0 + 1 + 1 = 0
+    change (0 : ZMod 2) + 0 + 1 + 1 = 0
     decide
   · simp [hx]
 

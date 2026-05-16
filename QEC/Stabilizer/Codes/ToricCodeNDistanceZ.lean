@@ -70,7 +70,7 @@ theorem verticalVRowChain_mem_toricDualCycles (L : ℕ) [Fact (2 ≤ L)] :
     verticalVRowChain]
   by_cases hy : y = Stabilizer.Lattice.zeroCoord L
   · subst hy
-    show (0 : ZMod 2) + 0 + 1 + 1 = 0
+    change (0 : ZMod 2) + 0 + 1 + 1 = 0
     decide
   · simp [hy]
 
@@ -441,7 +441,7 @@ theorem horizontalHRowChain_mem_toricDualCycles (L : ℕ) [Fact (2 ≤ L)] :
     horizontalHRowChain]
   by_cases hx : x = Stabilizer.Lattice.zeroCoord L
   · subst hx
-    show (1 : ZMod 2) + 1 + 0 + 0 = 0
+    change (1 : ZMod 2) + 1 + 0 + 0 = 0
     decide
   · simp [hx]
 
