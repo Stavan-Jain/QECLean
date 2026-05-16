@@ -595,7 +595,8 @@ private lemma toricXZ_commute_of_disjoint_supports (L : ℕ) [Fact (0 < L)]
         Stabilizer.Lattice.toricXOperatorOfChain L cX := by
   apply NQubitPauliGroupElement.commutes_of_componentwise_commutes
   intro q
-  rw [Stabilizer.Lattice.toricXOperatorOfChain_op_at, Stabilizer.Lattice.toricZOperatorOfChain_op_at]
+  rw [Stabilizer.Lattice.toricXOperatorOfChain_op_at,
+    Stabilizer.Lattice.toricZOperatorOfChain_op_at]
   by_cases hX : ∃ e, Stabilizer.Lattice.edgeToQubitIdx L e = q ∧ cX e = 1
   · by_cases hZ : ∃ e, Stabilizer.Lattice.edgeToQubitIdx L e = q ∧ cZ e = 1
     · -- both X and Z at q: derive contradiction from disjoint supports
@@ -661,7 +662,8 @@ private theorem horizontalLoopX_anticommute_horizontalHRowZ (L : ℕ) [Fact (2 �
     simp only [Finset.mem_filter, Finset.mem_singleton, Finset.mem_univ, true_and]
     unfold NQubitPauliGroupElement.anticommutesAt
     unfold horizontalLoopXOperator horizontalHRowZOperator
-    rw [Stabilizer.Lattice.toricXOperatorOfChain_op_at, Stabilizer.Lattice.toricZOperatorOfChain_op_at]
+    rw [Stabilizer.Lattice.toricXOperatorOfChain_op_at,
+      Stabilizer.Lattice.toricZOperatorOfChain_op_at]
     by_cases hX : ∃ e, Stabilizer.Lattice.edgeToQubitIdx L e = q ∧ horizontalLoopChain L e = 1
     · by_cases hZ : ∃ e, Stabilizer.Lattice.edgeToQubitIdx L e = q ∧
           horizontalHRowChain L e = 1
@@ -726,7 +728,8 @@ private theorem verticalLoopX_anticommute_verticalVRowZ (L : ℕ) [Fact (2 ≤ L
     simp only [Finset.mem_filter, Finset.mem_singleton, Finset.mem_univ, true_and]
     unfold NQubitPauliGroupElement.anticommutesAt
     unfold verticalLoopXOperator verticalVRowZOperator
-    rw [Stabilizer.Lattice.toricXOperatorOfChain_op_at, Stabilizer.Lattice.toricZOperatorOfChain_op_at]
+    rw [Stabilizer.Lattice.toricXOperatorOfChain_op_at,
+      Stabilizer.Lattice.toricZOperatorOfChain_op_at]
     by_cases hX : ∃ e, Stabilizer.Lattice.edgeToQubitIdx L e = q ∧ verticalLoopChain L e = 1
     · by_cases hZ : ∃ e, Stabilizer.Lattice.edgeToQubitIdx L e = q ∧
           verticalVRowChain L e = 1
@@ -1248,7 +1251,8 @@ private theorem rowsLinearIndependent_generatorsListPackaged (L : ℕ) [Fact (2 
           (Finset.univ.filter (fun k => ¬ k.val < nZ)) := by
         rw [Finset.filter_union_filter_not_eq]
       have hdisj : Disjoint
-          ((Finset.univ : Finset (Fin (generatorsListPackaged L).length)).filter (fun k => k.val < nZ))
+          ((Finset.univ : Finset (Fin (generatorsListPackaged L).length)).filter
+            (fun k => k.val < nZ))
           (Finset.univ.filter (fun k => ¬ k.val < nZ)) :=
         Finset.disjoint_filter_filter_not _ _ _
       rw [hpartition, Finset.sum_union hdisj]
@@ -1357,7 +1361,8 @@ private theorem rowsLinearIndependent_generatorsListPackaged (L : ℕ) [Fact (2 
           (Finset.univ.filter (fun k => ¬ k.val < nZ)) := by
         rw [Finset.filter_union_filter_not_eq]
       have hdisj : Disjoint
-          ((Finset.univ : Finset (Fin (generatorsListPackaged L).length)).filter (fun k => k.val < nZ))
+          ((Finset.univ : Finset (Fin (generatorsListPackaged L).length)).filter
+            (fun k => k.val < nZ))
           (Finset.univ.filter (fun k => ¬ k.val < nZ)) :=
         Finset.disjoint_filter_filter_not _ _ _
       rw [hpartition, Finset.sum_union hdisj]

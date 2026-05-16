@@ -644,7 +644,8 @@ private lemma zTypeOps_in_stabilizer_has_phase_zero
           cases hsi with
           | inl h => simp [PauliOperator.mulOp] at h
           | inr h => simp [PauliOperator.mulOp] at h
-    exact NQubitPauliGroupElement.ext x 1 hx_ty.1 (by ext i; simp [NQubitPauliOperator.identity, hx_ops_I i])
+    exact NQubitPauliGroupElement.ext x 1 hx_ty.1
+      (by ext i; simp [NQubitPauliOperator.identity, hx_ops_I i])
   rw [hzx, hx_id, mul_one]
   exact hz_ty
 
