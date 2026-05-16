@@ -905,7 +905,7 @@ private lemma edgeToQubitIdx_bijective (L : ℕ) [Fact (0 < L)] :
     Function.Bijective (Stabilizer.Lattice.edgeToQubitIdx L) := by
   rw [Fintype.bijective_iff_injective_and_card]
   refine ⟨Stabilizer.Lattice.edgeToQubitIdx_injective L, ?_⟩
-  simp [numQubits, Stabilizer.Lattice.toricNumQubits]
+  simp [Stabilizer.Lattice.toricNumQubits]
 
 /-- The right-inverse of `edgeToQubitIdx`: maps a qubit back to its edge. -/
 private noncomputable def qubitToEdgeIdx (L : ℕ) [Fact (0 < L)] :
@@ -1279,7 +1279,7 @@ private theorem rowsLinearIndependent_generatorsListPackaged (L : ℕ) [Fact (2 
         simp at hab
         exact Fin.ext hab
       · intros b _
-        refine ⟨⟨b.val, ?_⟩, ?_, by simp [Fin.ext_iff]⟩
+        refine ⟨⟨b.val, ?_⟩, ?_, by simp⟩
         · have hb_lt := b.isLt
           have : nZ + nZ = (generatorsListPackaged L).length := hlen.symm
           omega
@@ -1426,7 +1426,7 @@ private theorem rowsLinearIndependent_generatorsListPackaged (L : ℕ) [Fact (2 
       -- Align indices: nZ + k.val - nZ = k.val.
       have hidx_eq : (⟨nZ + k.val - nZ, hsub⟩ : Fin nZ) = k := by
         apply Fin.ext
-        simp [Nat.add_sub_cancel_left]
+        simp
       have hcoord_eq : (coordsTrimmed L)[nZ + k.val - nZ]'hsub = (coordsTrimmed L).get k := by
         rw [List.get_eq_getElem]
         congr 1

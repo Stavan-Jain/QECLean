@@ -106,7 +106,7 @@ theorem vColAt_independent_on_dualCycles (c : toricDualCycles (L := L)) (x0 x1 :
       exact Finset.sum_eq_zero fun y _ => h_sum y;
     simp_all +decide [ Finset.sum_add_distrib, vColAt ];
     have h_sum_h : ∑ y : Fin L, c.val (EdgeIdx.h x y) = ∑ y : Fin L, c.val (EdgeIdx.h x (next L y)) := by
-      rcases L with ( _ | _ | L ) <;> simp_all +decide [ Finset.sum_add_distrib, Finset.mul_sum _ _ _, Finset.sum_mul _ _ _, next ];
+      rcases L with ( _ | _ | L ) <;> simp_all +decide [ next ];
       rw [ ← Equiv.sum_comp ( Equiv.addRight 1 ) ] ; norm_num [ Fin.add_def, Nat.mod_eq_of_lt ];
     grind;
   -- By induction on $k$, we can show that $vColAt x = vColAt (x + k)$ for any $k$.
@@ -214,7 +214,7 @@ theorem phiDual_surjective :
   obtain ⟨c, hc⟩ : ∃ c : toricDualCycles (L := L), hRowAt (L := L) (zeroCoord L) c.1 = a ∧ vColAt (L := L) (zeroCoord L) c.1 = b := by
     -- Define the chain $c$ such that it has $a$ horizontal edges and $b$ vertical edges.
     obtain ⟨c, hc⟩ : ∃ c : C1 L, (∑ x : Fin L, c (EdgeIdx.h x (zeroCoord L))) = a ∧ (∑ y : Fin L, c (EdgeIdx.v (zeroCoord L) y)) = b := by
-      refine' ⟨ fun e => if e = EdgeIdx.h ( zeroCoord L ) ( zeroCoord L ) then a else if e = EdgeIdx.v ( zeroCoord L ) ( zeroCoord L ) then b else 0, _, _ ⟩ <;> simp +decide [ Finset.sum_ite, Finset.filter_eq', Finset.filter_ne' ]
+      refine' ⟨ fun e => if e = EdgeIdx.h ( zeroCoord L ) ( zeroCoord L ) then a else if e = EdgeIdx.v ( zeroCoord L ) ( zeroCoord L ) then b else 0, _, _ ⟩ <;> simp +decide
     generalize_proofs at *; (
     -- Define the chain $c'$ such that it has $a$ horizontal edges and $b$ vertical edges.
     obtain ⟨c', hc'⟩ : ∃ c' : C1 L, (∀ x y, c' (EdgeIdx.h x y) = c (EdgeIdx.h x (zeroCoord L))) ∧ (∀ x y, c' (EdgeIdx.v x y) = c (EdgeIdx.v (zeroCoord L) y)) ∧ (∀ p : FaceIdx L, toricDualBoundary L c' p = 0) := by
@@ -233,7 +233,7 @@ Dimension of the dual cycle space.
 -/
 theorem toric_finrank_dualCycles :
     Module.finrank (ZMod 2) (toricDualCycles (L := L)) = L * L + 1 := by
-  have := LinearMap.finrank_range_add_finrank_ker ( toricDualBoundary L ) ; simp_all +decide [ toric_finrank_C1 ] ;
+  have := LinearMap.finrank_range_add_finrank_ker ( toricDualBoundary L ) ; simp_all +decide ;
   have h_dual_boundary_range : Module.finrank (ZMod 2) (LinearMap.range (toricDualBoundary L)) = Module.finrank (ZMod 2) (LinearMap.range (toricBoundary2 (L := L))) := by
     have h_dual_boundary : LinearMap.rank (toricDualBoundary L) = LinearMap.rank (toricBoundary2 (L := L)) := by
       have h_dual_boundary : (toricDualBoundary L).toMatrix' = (toricBoundary2 (L := L)).toMatrix'.transpose := by
@@ -248,7 +248,7 @@ theorem toric_finrank_dualCycles :
       simp +decide [ ← Module.finrank_eq_rank ];
       convert Iff.rfl;
       all_goals ext; simp +decide [ LinearMap.toMatrix' ];
-    simp +decide [ Module.finrank, Cardinal.mk_fintype ];
+    simp +decide [ Module.finrank ];
     grind +splitImp;
   have := toric_finrank_boundaries ( L := L ) ; simp_all +decide [ mul_assoc ] ;
   linarith! [ Nat.sub_add_cancel ( show 1 ≤ L * L from Nat.mul_pos ( Fact.out ) ( Fact.out ) ) ]

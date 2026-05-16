@@ -219,7 +219,7 @@ lemma commutes_iff_even_anticommutes (p q : NQubitPauliGroupElement n) :
         erw [ Fin.val_mk ];
         induction Exists.choose (even_iff_two_dvd.mp h_even) with
         | zero => simp_all [nsmulRec];
-        | succ k ih => simp_all [Nat.mul_succ, nsmulRec];  omega
+        | succ k ih => simp_all [nsmulRec];  omega
     exact (commutes_iff_mulOp_phasePower p q).mpr h_cancel
 
 /-!
@@ -304,7 +304,7 @@ lemma anticommutes_iff_odd_anticommutes (p q : NQubitPauliGroupElement n) :
       erw [ Fin.val_mk ] at * ; simp_all ;
       erw [ show ( nsmulRec ( 2 * k ) 2 : Fin 4 ) = 0 from
       by exact Nat.recOn k ( by rfl ) fun n ihn => by simp_all
-      [ Nat.mul_succ, nsmulRec ] ] at * ;
+      [ nsmulRec ] ] at * ;
       simp_all
     convert h_odd using 4
   · intro h_odd
@@ -331,7 +331,7 @@ lemma anticommutes_iff_odd_anticommutes (p q : NQubitPauliGroupElement n) :
     2 then 1 else 0 ) 2 ] ; simp_all ;
     simp_all  [ Fin.ext_iff, Quantum.NQubitPauliGroupElement.anticommutesAt ];
     erw [ Fin.val_mk ];
-    induction ( Finset.card _ / 2 ) <;> simp_all  [ Nat.mul_succ, nsmulRec ];
+    induction ( Finset.card _ / 2 ) <;> simp_all  [ nsmulRec ];
     simp_all  [ Fin.val_add]
 
 /-- Symmetry of anticommutation: if P anticommutes with Q, then Q anticommutes with P. -/
