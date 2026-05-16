@@ -73,7 +73,7 @@ private lemma weight_ge_edgeWeight_xChain (L : ℕ) [Fact (2 ≤ L)]
     have : g.operators (Stabilizer.Lattice.edgeToQubitIdx L e) = PauliOperator.X ∨
         g.operators (Stabilizer.Lattice.edgeToQubitIdx L e) = PauliOperator.Y := by
       by_contra h
-      push_neg at h
+      push Not at h
       simp [xChainOf, h.1, h.2] at hne
     rcases this with hX | hY
     · simp [NQubitPauliOperator.support, hX]
@@ -103,7 +103,7 @@ private lemma weight_ge_edgeWeight_zChain (L : ℕ) [Fact (2 ≤ L)]
     have : g.operators (Stabilizer.Lattice.edgeToQubitIdx L e) = PauliOperator.Z ∨
         g.operators (Stabilizer.Lattice.edgeToQubitIdx L e) = PauliOperator.Y := by
       by_contra h
-      push_neg at h
+      push Not at h
       simp [zChainOf, h.1, h.2] at hne
     rcases this with hZ | hY
     · simp [NQubitPauliOperator.support, hZ]
@@ -142,7 +142,7 @@ private lemma toricXOf_xChain_operators_eq (L : ℕ) [Fact (0 < L)]
     have hex : ∃ e : Stabilizer.Lattice.EdgeIdx L,
         Stabilizer.Lattice.edgeToQubitIdx L e = i ∧ xChainOf L g e = 1 := ⟨e, hei, he1⟩
     simp [Stabilizer.Lattice.toricXOperatorOfChain, hex, hxy]
-  · push_neg at hxy
+  · push Not at hxy
     have hex : ¬ ∃ e : Stabilizer.Lattice.EdgeIdx L,
         Stabilizer.Lattice.edgeToQubitIdx L e = i ∧ xChainOf L g e = 1 := by
       rintro ⟨e, hei, he1⟩
@@ -194,7 +194,7 @@ private lemma toricZOf_zChain_operators_eq (L : ℕ) [Fact (0 < L)]
     have hex : ∃ e : Stabilizer.Lattice.EdgeIdx L,
         Stabilizer.Lattice.edgeToQubitIdx L e = i ∧ zChainOf L g e = 1 := ⟨e, hei, he1⟩
     simp [Stabilizer.Lattice.toricZOperatorOfChain, hex, hzy]
-  · push_neg at hzy
+  · push Not at hzy
     have hex : ¬ ∃ e : Stabilizer.Lattice.EdgeIdx L,
         Stabilizer.Lattice.edgeToQubitIdx L e = i ∧ zChainOf L g e = 1 := by
       rintro ⟨e, hei, he1⟩
@@ -586,7 +586,7 @@ theorem toricCodeN_distance_eq_min_dX_dZ (L dX dZ : ℕ) [Fact (2 ≤ L)]
     · obtain ⟨g, _, hg_logical, hg_weight⟩ := hxWit
       refine ⟨g, (h_iff g).mpr hg_logical, ?_⟩
       rw [hg_weight]; exact (Nat.min_eq_left hle).symm
-    · push_neg at hle
+    · push Not at hle
       obtain ⟨g, _, hg_logical, hg_weight⟩ := hzWit
       refine ⟨g, (h_iff g).mpr hg_logical, ?_⟩
       rw [hg_weight]; exact (Nat.min_eq_right (le_of_lt hle)).symm

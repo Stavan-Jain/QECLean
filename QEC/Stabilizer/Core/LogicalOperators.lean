@@ -51,7 +51,7 @@ lemma anticommutes_imp_not_isPauliLogicalOperator (g : NQubitPauliGroupElement n
       ¬IsInCodespace ψ S ∨ ¬IsInCodespace (g.toGate • ψ) S := by
     intro ψ
     by_contra h_contra
-    push_neg at h_contra
+    push Not at h_contra
     obtain ⟨hψ, hgψ⟩ := h_contra
     unfold NQubitPauliGroupElement.Anticommute at h_anti
     have h_sg := NQubitPauliGroupElement.Anticommute.toMatrix_mul_neg s g h_anti

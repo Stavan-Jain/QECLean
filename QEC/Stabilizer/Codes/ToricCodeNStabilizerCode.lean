@@ -1246,11 +1246,11 @@ private theorem rowsLinearIndependent_generatorsListPackaged (L : ℕ) [Fact (2 
       have hpartition : (Finset.univ : Finset (Fin (generatorsListPackaged L).length)) =
           (Finset.univ.filter (fun k => k.val < nZ)) ∪
           (Finset.univ.filter (fun k => ¬ k.val < nZ)) := by
-        rw [Finset.filter_union_filter_neg_eq]
+        rw [Finset.filter_union_filter_not_eq]
       have hdisj : Disjoint
           ((Finset.univ : Finset (Fin (generatorsListPackaged L).length)).filter (fun k => k.val < nZ))
           (Finset.univ.filter (fun k => ¬ k.val < nZ)) :=
-        Finset.disjoint_filter_filter_neg _ _ _
+        Finset.disjoint_filter_filter_not _ _ _
       rw [hpartition, Finset.sum_union hdisj]
       -- The "right" sum (X-block) is 0.
       have hX_zero : ∑ k ∈ (Finset.univ : Finset (Fin (generatorsListPackaged L).length)).filter
@@ -1355,11 +1355,11 @@ private theorem rowsLinearIndependent_generatorsListPackaged (L : ℕ) [Fact (2 
       have hpartition : (Finset.univ : Finset (Fin (generatorsListPackaged L).length)) =
           (Finset.univ.filter (fun k => k.val < nZ)) ∪
           (Finset.univ.filter (fun k => ¬ k.val < nZ)) := by
-        rw [Finset.filter_union_filter_neg_eq]
+        rw [Finset.filter_union_filter_not_eq]
       have hdisj : Disjoint
           ((Finset.univ : Finset (Fin (generatorsListPackaged L).length)).filter (fun k => k.val < nZ))
           (Finset.univ.filter (fun k => ¬ k.val < nZ)) :=
-        Finset.disjoint_filter_filter_neg _ _ _
+        Finset.disjoint_filter_filter_not _ _ _
       rw [hpartition, Finset.sum_union hdisj]
       -- The "left" sum (Z-block) is 0 in X-half.
       have hZ_zero : ∑ k ∈ (Finset.univ : Finset (Fin (generatorsListPackaged L).length)).filter
@@ -1460,7 +1460,7 @@ private theorem rowsLinearIndependent_generatorsListPackaged (L : ℕ) [Fact (2 
     rw [← hj_eq]
     exact hzj
   · -- X-block index
-    push_neg at h
+    push Not at h
     have hlen : (generatorsListPackaged L).length =
         (coordsTrimmed L).length + (coordsTrimmed L).length := by
       unfold generatorsListPackaged
