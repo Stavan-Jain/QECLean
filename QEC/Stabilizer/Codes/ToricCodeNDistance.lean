@@ -452,7 +452,7 @@ private lemma not_both_boundary_of_nontrivial (L : ℕ) [Fact (2 ≤ L)]
     ext i
     have hX_i := toricXOf_xChain_operators_eq L g i
     have hZ_i := toricZOf_zChain_operators_eq L g i
-    show ((g_X.operators i).mulOp (g_Z.operators i)).operator = g.operators i
+    change ((g_X.operators i).mulOp (g_Z.operators i)).operator = g.operators i
     rw [hX_i, hZ_i]
     cases hgi : g.operators i <;>
       simp [PauliOperator.mulOp]
@@ -515,7 +515,7 @@ theorem toricCodeN_distance_eq_min_dX_dZ (L dX dZ : ℕ) [Fact (2 ≤ L)]
               exact h0
             have hzChain_zero : zChainOf L g = 0 := by
               funext e
-              show zChainOf L g e = 0
+              change zChainOf L g e = 0
               by_contra hne
               have hmem : e ∈ Stabilizer.Lattice.edgeSupport (L := L) (zChainOf L g) := by
                 simp [Stabilizer.Lattice.mem_edgeSupport, hne]
@@ -561,7 +561,7 @@ theorem toricCodeN_distance_eq_min_dX_dZ (L dX dZ : ℕ) [Fact (2 ≤ L)]
             exact h0
           have hxChain_zero : xChainOf L g = 0 := by
             funext e
-            show xChainOf L g e = 0
+            change xChainOf L g e = 0
             by_contra hne
             have hmem : e ∈ Stabilizer.Lattice.edgeSupport (L := L) (xChainOf L g) := by
               simp [Stabilizer.Lattice.mem_edgeSupport, hne]

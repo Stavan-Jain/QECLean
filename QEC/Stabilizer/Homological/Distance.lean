@@ -250,7 +250,7 @@ theorem not_both_boundary_of_nontrivial
   -- Operators of g_X * g_Z match g.operators qubitwise.
   have hops_eq : (g_X * g_Z).operators = g.operators := by
     ext i
-    show ((g_X.operators i).mulOp (g_Z.operators i)).operator = g.operators i
+    change ((g_X.operators i).mulOp (g_Z.operators i)).operator = g.operators i
     exact chainOps_xz_combine_eq g i
   -- Use the third condition of IsNontrivialLogicalOperator
   rw [Quantum.StabilizerGroup.IsNontrivialLogicalOperator_iff] at hg
