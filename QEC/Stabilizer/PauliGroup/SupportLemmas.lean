@@ -1,6 +1,6 @@
 import Mathlib.Tactic
 import QEC.Stabilizer.PauliGroup.NQubitOperator
-import QEC.Stabilizer.Core.CSS
+import QEC.Stabilizer.Core.CSSPredicates
 import QEC.Stabilizer.PauliGroup.Commutation
 
 namespace Quantum

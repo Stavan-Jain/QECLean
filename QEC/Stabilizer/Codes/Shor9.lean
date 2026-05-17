@@ -1,7 +1,7 @@
 import Mathlib.Tactic
 import QEC.Stabilizer.Core.StabilizerGroup
 import QEC.Stabilizer.Core.SubgroupLemmas
-import QEC.Stabilizer.Core.CSS
+import QEC.Stabilizer.Core.CSSPredicates
 import QEC.Stabilizer.Core.CSSNoNegI
 import QEC.Stabilizer.Core.CSSCommutationLemmas
 import QEC.Stabilizer.PauliGroup.Commutation
