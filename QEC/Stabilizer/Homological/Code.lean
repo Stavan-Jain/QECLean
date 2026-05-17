@@ -95,6 +95,16 @@ theorem boundaries_le_cycles : X.boundaries ≤ X.cycles := by
   rcases hc with ⟨f, rfl⟩
   exact X.boundary_comp_apply f
 
+/-- Cycle membership unfolds to `∂₁ c = 0`. -/
+@[simp] theorem mem_cycles_iff (c : X.C1 → ZMod 2) :
+    c ∈ X.cycles ↔ X.boundary1 c = 0 :=
+  LinearMap.mem_ker
+
+/-- Boundary membership unfolds to existence of a 2-chain witness. -/
+theorem mem_boundaries_iff (c : X.C1 → ZMod 2) :
+    c ∈ X.boundaries ↔ ∃ f : X.C2 → ZMod 2, X.boundary2 f = c :=
+  Iff.rfl
+
 /-- `B₁` viewed as a submodule of `Z₁`. -/
 abbrev boundarySubmoduleInCycles : Submodule (ZMod 2) X.cycles :=
   Submodule.comap X.cycles.subtype X.boundaries
@@ -178,6 +188,21 @@ noncomputable def cutMap : (X.C0 → ZMod 2) →ₗ[ZMod 2] (X.C1 → ZMod 2) wh
 @[simp] theorem cutMap_apply (s : X.C0 → ZMod 2) (e : X.C1) :
     X.cutMap s e = ∑ v : X.C0, s v * X.boundary1 (Pi.single e 1) v := rfl
 
+/-- Pointwise expansion of `∂₁` via the standard basis on `C₁`.
+
+`(∂₁ c) v = ∑ e, c e · (∂₁ δ_e) v` where `δ_e := Pi.single e 1`.  This lets
+downstream code reason about per-vertex boundary values without re-deriving
+the basis expansion.  Used in `boundary1_cutMap_transpose`, and in the toric
+bridge that identifies `(toricHomologicalCode L).cutMap` with the lattice-
+specific `toricVertexCutMap`. -/
+theorem boundary1_apply_eq_sum (c : X.C1 → ZMod 2) (v : X.C0) :
+    X.boundary1 c v = ∑ e : X.C1, c e * X.boundary1 (Pi.single e 1) v := by
+  have hc : c = ∑ e : X.C1, c e • (Pi.single e (1 : ZMod 2)) := by
+    ext e
+    simp [Finset.sum_apply, Pi.single_apply]
+  conv_lhs => rw [hc]
+  simp [map_sum, map_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
+
 /-- Symmetric pairing form of the transpose property.
 
 `⟨∂₁ c, s⟩ = ⟨c, cutMap s⟩` over `𝔽₂` with the standard pairing
@@ -185,14 +210,12 @@ noncomputable def cutMap : (X.C0 → ZMod 2) →ₗ[ZMod 2] (X.C1 → ZMod 2) wh
 theorem boundary1_cutMap_transpose (c : X.C1 → ZMod 2) (s : X.C0 → ZMod 2) :
     ∑ v : X.C0, X.boundary1 c v * s v =
       ∑ e : X.C1, c e * X.cutMap s e := by
-  -- Expand `c = ∑ e, c e • Pi.single e 1` and push the sum through `boundary1`.
-  have hc : c = ∑ e : X.C1, c e • (Pi.single e (1 : ZMod 2)) := by
-    ext e
-    simp [Finset.sum_apply, Pi.single_apply]
-  conv_lhs => rw [hc]
-  simp only [map_sum, map_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul,
-    Finset.sum_mul]
-  rw [Finset.sum_comm]
+  have hlhs :
+      ∑ v : X.C0, X.boundary1 c v * s v =
+        ∑ v : X.C0, ∑ e : X.C1, c e * X.boundary1 (Pi.single e 1) v * s v := by
+    refine Finset.sum_congr rfl fun v _ => ?_
+    rw [boundary1_apply_eq_sum, Finset.sum_mul]
+  rw [hlhs, Finset.sum_comm]
   refine Finset.sum_congr rfl fun e _ => ?_
   rw [cutMap_apply, Finset.mul_sum]
   refine Finset.sum_congr rfl fun v _ => ?_

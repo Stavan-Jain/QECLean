@@ -1,7 +1,8 @@
 import Mathlib.Tactic
-import QEC.Stabilizer.Lattice.ToricOperatorChains
+import QEC.Stabilizer.Lattice.ToricChainOps
 import QEC.Stabilizer.Lattice.ToricH1Dimension
-import QEC.Stabilizer.Codes.ToricCodeN
+import QEC.Stabilizer.Lattice.ToricChainComplex
+import QEC.Stabilizer.Homological.LogicalCorrespondence
 import QEC.Stabilizer.Core.LogicalOperators
 
 namespace Quantum
@@ -30,84 +31,8 @@ Dual boundaries = range(toricVertexCutMap) = Z-chains that are products of verte
 -/
 
 -- ---------------------------------------------------------------------------
--- 1.  Z-operator encoding
--- ---------------------------------------------------------------------------
-
-/-- Build a Z-type Pauli element from a 1-chain (dual to `toricXOperatorOfChain`). -/
-def toricZOperatorOfChain (L : ℕ) (c : C1 L) :
-    NQubitPauliGroupElement (toricNumQubits L) :=
-  ⟨0, fun q =>
-    if ∃ e : EdgeIdx L, edgeToQubitIdx L e = q ∧ c e = 1
-    then PauliOperator.Z else PauliOperator.I⟩
-
-/-- Recover a 1-chain from a Z-type Pauli element. -/
-def chainOfZOperator (L : ℕ) (g : NQubitPauliGroupElement (toricNumQubits L)) : C1 L :=
-  fun e => if g.operators (edgeToQubitIdx L e) = PauliOperator.Z then 1 else 0
-
-/-- Roundtrip: chain → Z-operator → chain. -/
-theorem chainOfZOperator_toricZOperatorOfChain (L : ℕ) (c : C1 L) :
-    chainOfZOperator L (toricZOperatorOfChain L c) = c := by
-  by_cases hL : 0 < L
-  · letI : Fact (0 < L) := ⟨hL⟩
-    ext e
-    by_cases hce : c e = 1
-    · have hex : ∃ e' : EdgeIdx L, edgeToQubitIdx L e' = edgeToQubitIdx L e ∧ c e' = 1 :=
-        ⟨e, rfl, hce⟩
-      simp [chainOfZOperator, toricZOperatorOfChain, hex, hce]
-    · have hnot :
-          ¬ ∃ e' : EdgeIdx L, edgeToQubitIdx L e' = edgeToQubitIdx L e ∧ c e' = 1 := by
-        intro hx
-        rcases hx with ⟨e', heq, he1⟩
-        exact hce ((edgeToQubitIdx_injective (L := L) heq) ▸ he1)
-      have hce0 : c e = 0 := by
-        rcases Nat.le_one_iff_eq_zero_or_eq_one.mp (Nat.le_of_lt_succ (c e).val_lt) with h0 | h1
-        · calc c e = ((c e).val : ZMod 2) := (ZMod.natCast_zmod_val (c e)).symm
-               _ = 0 := by simp [h0]
-        · exact absurd (by calc
-              c e = ((c e).val : ZMod 2) := (ZMod.natCast_zmod_val (c e)).symm
-              _ = 1 := by simp [h1]) hce
-      simp [chainOfZOperator, toricZOperatorOfChain, hnot, hce0]
-  · have hL0 : L = 0 := Nat.eq_zero_of_not_pos hL
-    subst hL0
-    ext e
-    cases e with
-    | h x y => exact (Fin.elim0 x)
-    | v x y => exact (Fin.elim0 x)
-
-/-- Support membership of `toricZOperatorOfChain` at an indexed edge qubit. -/
-lemma mem_support_toricZOperatorOfChain_edgeToQubitIdx_iff
-    (L : ℕ) [Fact (0 < L)] (c : C1 L) (e : EdgeIdx L) :
-    edgeToQubitIdx L e ∈ (toricZOperatorOfChain L c).operators.support ↔ c e = 1 := by
-  constructor
-  · intro hmem
-    by_contra hne
-    have hnot :
-        ¬ ∃ e' : EdgeIdx L, edgeToQubitIdx L e' = edgeToQubitIdx L e ∧ c e' = 1 := by
-      intro hex
-      rcases hex with ⟨e', heq, he1⟩
-      have he' : e' = e := edgeToQubitIdx_injective L heq
-      exact hne (he' ▸ he1)
-    have hI : (toricZOperatorOfChain L c).operators (edgeToQubitIdx L e) = PauliOperator.I := by
-      simp [toricZOperatorOfChain, hnot]
-    have hneqI : (toricZOperatorOfChain L c).operators (edgeToQubitIdx L e) ≠ PauliOperator.I := by
-      simpa [NQubitPauliOperator.support] using hmem
-    exact hneqI hI
-  · intro he1
-    have hex : ∃ e' : EdgeIdx L, edgeToQubitIdx L e' = edgeToQubitIdx L e ∧ c e' = 1 :=
-      ⟨e, rfl, he1⟩
-    have hZ : (toricZOperatorOfChain L c).operators (edgeToQubitIdx L e) = PauliOperator.Z := by
-      simp [toricZOperatorOfChain, hex]
-    simp [NQubitPauliOperator.support, hZ]
-
-/-- The Z-operator-of-chain at qubit `q` is `Z` if some edge mapping to `q` has `c e = 1`,
-else `I`. -/
-lemma toricZOperatorOfChain_op_at (L : ℕ) (c : C1 L) (q : Fin (toricNumQubits L)) :
-    (toricZOperatorOfChain L c).operators q =
-      if ∃ e, edgeToQubitIdx L e = q ∧ c e = 1
-        then PauliOperator.Z else PauliOperator.I := rfl
-
--- ---------------------------------------------------------------------------
--- 2.  Dual cycle map and submodules
+-- 1.  Dual cycle map and submodules (Z-operator encoding lives in
+--     `ToricChainOps.lean` so the bridges in `ToricChainComplex.lean` can use it).
 -- ---------------------------------------------------------------------------
 
 /-- `toricDualBoundary`: the transpose of ∂₂, checking commutation with face stabs.
@@ -138,6 +63,182 @@ theorem toricDualBoundaries_le_toricDualCycles (L : ℕ) [Fact (0 < L)] :
   -- Each edge-value appears twice in the sum; a + a = 0 in ZMod 2.
   simp [toricDualBoundary, toricVertexCutMap]
   grind
+
+/-! ## §E bridges: lattice ↔ abstract dual structures
+
+These bridges allow Z-side iff theorems to be delegated to the generic
+`Homological.LogicalCorrespondence` theorems.  The bridges live here (rather
+than in `ToricChainComplex.lean`) because `toricDualBoundary`,
+`toricDualCycles`, `toricDualBoundaries` are defined in this file. -/
+
+section DualBridges
+
+variable (L : ℕ) [Fact (0 < L)]
+
+/-- Bridge: the abstract `dualBoundaries` (range of `cutMap`) equals the lattice
+`toricDualBoundaries` (range of `toricVertexCutMap`).  Follows directly from
+`toricHomologicalCode_cutMap_eq`. -/
+theorem toricHomologicalCode_dualBoundaries_eq :
+    (toricHomologicalCode L).dualBoundaries = toricDualBoundaries (L := L) := by
+  unfold Homological.HomologicalCode.dualBoundaries toricDualBoundaries
+  rw [toricHomologicalCode_cutMap_eq]
+  rfl
+
+/-- Bridge: the abstract `dualBoundary` linear map equals the lattice
+`toricDualBoundary`.
+
+Both are the `𝔽₂`-transpose of `toricBoundary2`.  The abstract one is defined
+as `c ↦ λ p, ∑ e, c e * ∂₂(δ_p)(e)`; the toric one is the explicit 4-term sum
+`c (h x y) + c (h x (next y)) + c (v x y) + c (v (next x) y)`.  We prove the
+equality pointwise by splitting `EdgeIdx` into h-edges and v-edges and
+identifying the four nonzero `∂₂(Pi.single (x, y) 1)` contributions. -/
+theorem toricHomologicalCode_dualBoundary_eq :
+    (toricHomologicalCode L).dualBoundary = toricDualBoundary (L := L) := by
+  classical
+  refine LinearMap.ext fun c => ?_
+  funext ⟨x, y⟩
+  -- LHS = ∑ e, c e * toricBoundary2 (Pi.single (x, y) 1) e
+  -- RHS = c (h x y) + c (h x (next y)) + c (v x y) + c (v (next x) y)
+  -- Strategy: split EdgeIdx into h and v via `edgeIdxEquivSum`, expand
+  -- `toricBoundary2 (Pi.single (x, y) 1)` pointwise, and identify the 4 nonzero terms.
+  change ∑ e : EdgeIdx L,
+        c e * toricBoundary2 (L := L) (Pi.single (x, y) (1 : ZMod 2)) e
+    = c (EdgeIdx.h x y) + c (EdgeIdx.h x (StabilizerGroup.ToricCodeN.next L y))
+      + c (EdgeIdx.v x y) + c (EdgeIdx.v (StabilizerGroup.ToricCodeN.next L x) y)
+  -- Step 1: rewrite the EdgeIdx-sum as a `Sum`-sum via `edgeIdxEquivSum`.
+  rw [← Equiv.sum_comp (edgeIdxEquivSum L).symm
+        (fun e : EdgeIdx L =>
+          c e * toricBoundary2 (L := L) (Pi.single (x, y) (1 : ZMod 2)) e),
+      Fintype.sum_sum_type]
+  -- Step 2: reduce each VtxIdx-sum.
+  -- h-edges:
+  --   ∑ p, c (h p.1 p.2) * (Pi.single (x, y) 1 (p.1, p.2) +
+  --                          Pi.single (x, y) 1 (p.1, prev p.2))
+  --   = c (h x y) + c (h x (next y))   (by Pi.single isolates one term in each)
+  have h_eq_prev_iff : ∀ {a b : Fin L},
+      StabilizerGroup.ToricCodeN.prev L a = b
+        ↔ a = StabilizerGroup.ToricCodeN.next L b := by
+    intros a b
+    constructor
+    · intro h
+      subst h
+      exact (Stabilizer.Lattice.next_prev L a).symm
+    · intro h
+      subst h
+      exact Stabilizer.Lattice.prev_next L b
+  have hh :
+      ∑ p : VtxIdx L,
+          (fun e : EdgeIdx L =>
+              c e * toricBoundary2 (L := L) (Pi.single (x, y) (1 : ZMod 2)) e)
+            ((edgeIdxEquivSum L).symm (Sum.inl p))
+      = c (EdgeIdx.h x y) + c (EdgeIdx.h x (StabilizerGroup.ToricCodeN.next L y)) := by
+    -- Rewrite `(edgeIdxEquivSum L).symm (Sum.inl p) = h p.1 p.2`
+    simp only [show ∀ p : VtxIdx L,
+        (edgeIdxEquivSum L).symm (Sum.inl p) = EdgeIdx.h p.1 p.2 by
+      rintro ⟨_, _⟩; rfl]
+    -- Unfold `toricBoundary2 (Pi.single (x, y) 1) (h p.1 p.2)`.
+    have heval : ∀ p : VtxIdx L,
+        toricBoundary2 (L := L) (Pi.single (x, y) (1 : ZMod 2)) (EdgeIdx.h p.1 p.2)
+          = (if (p.1, p.2) = (x, y) then (1 : ZMod 2) else 0)
+            + (if (p.1, StabilizerGroup.ToricCodeN.prev L p.2) = (x, y)
+                then 1 else 0) := by
+      intro p; simp [toricBoundary2, Pi.single_apply]
+    simp_rw [heval, mul_add, Finset.sum_add_distrib]
+    -- Now we have two sums to evaluate.
+    -- First: ∑ p, c (h p.1 p.2) * [(p.1, p.2) = (x, y)] = c (h x y)
+    have h1 :
+        ∑ p : VtxIdx L,
+            c (EdgeIdx.h p.1 p.2) * (if (p.1, p.2) = (x, y) then (1 : ZMod 2) else 0)
+        = c (EdgeIdx.h x y) := by
+      rw [Finset.sum_eq_single ((x, y) : VtxIdx L)]
+      · simp
+      · intros p _ hne; rw [if_neg hne]; ring
+      · intro h; exact absurd (Finset.mem_univ _) h
+    -- Second: ∑ p, c (h p.1 p.2) * [(p.1, prev p.2) = (x, y)] = c (h x (next y))
+    have h2 :
+        ∑ p : VtxIdx L,
+            c (EdgeIdx.h p.1 p.2)
+              * (if (p.1, StabilizerGroup.ToricCodeN.prev L p.2) = (x, y)
+                  then (1 : ZMod 2) else 0)
+        = c (EdgeIdx.h x (StabilizerGroup.ToricCodeN.next L y)) := by
+      rw [Finset.sum_eq_single ((x, StabilizerGroup.ToricCodeN.next L y) : VtxIdx L)]
+      · -- The indicator at (x, next y) is 1 (since prev (next y) = y).
+        rw [if_pos]
+        · ring
+        · refine Prod.mk.injEq _ _ _ _ |>.mpr ⟨rfl, ?_⟩
+          exact Stabilizer.Lattice.prev_next L y
+      · intros p _ hne
+        rw [if_neg]
+        · ring
+        · intro hcontra
+          apply hne
+          have hp1 : p.1 = x := (Prod.mk.injEq _ _ _ _).mp hcontra |>.1
+          have hp2 : StabilizerGroup.ToricCodeN.prev L p.2 = y :=
+            (Prod.mk.injEq _ _ _ _).mp hcontra |>.2
+          refine Prod.mk.injEq _ _ _ _ |>.mpr ⟨hp1, ?_⟩
+          exact h_eq_prev_iff.mp hp2
+      · intro h; exact absurd (Finset.mem_univ _) h
+    rw [h1, h2]
+  -- v-edges: symmetric.
+  have hv :
+      ∑ p : VtxIdx L,
+          (fun e : EdgeIdx L =>
+              c e * toricBoundary2 (L := L) (Pi.single (x, y) (1 : ZMod 2)) e)
+            ((edgeIdxEquivSum L).symm (Sum.inr p))
+      = c (EdgeIdx.v x y) + c (EdgeIdx.v (StabilizerGroup.ToricCodeN.next L x) y) := by
+    simp only [show ∀ p : VtxIdx L,
+        (edgeIdxEquivSum L).symm (Sum.inr p) = EdgeIdx.v p.1 p.2 by
+      rintro ⟨_, _⟩; rfl]
+    have heval : ∀ p : VtxIdx L,
+        toricBoundary2 (L := L) (Pi.single (x, y) (1 : ZMod 2)) (EdgeIdx.v p.1 p.2)
+          = (if (p.1, p.2) = (x, y) then (1 : ZMod 2) else 0)
+            + (if (StabilizerGroup.ToricCodeN.prev L p.1, p.2) = (x, y)
+                then 1 else 0) := by
+      intro p; simp [toricBoundary2, Pi.single_apply]
+    simp_rw [heval, mul_add, Finset.sum_add_distrib]
+    have h1 :
+        ∑ p : VtxIdx L,
+            c (EdgeIdx.v p.1 p.2) * (if (p.1, p.2) = (x, y) then (1 : ZMod 2) else 0)
+        = c (EdgeIdx.v x y) := by
+      rw [Finset.sum_eq_single ((x, y) : VtxIdx L)]
+      · simp
+      · intros p _ hne; rw [if_neg hne]; ring
+      · intro h; exact absurd (Finset.mem_univ _) h
+    have h2 :
+        ∑ p : VtxIdx L,
+            c (EdgeIdx.v p.1 p.2)
+              * (if (StabilizerGroup.ToricCodeN.prev L p.1, p.2) = (x, y)
+                  then (1 : ZMod 2) else 0)
+        = c (EdgeIdx.v (StabilizerGroup.ToricCodeN.next L x) y) := by
+      rw [Finset.sum_eq_single ((StabilizerGroup.ToricCodeN.next L x, y) : VtxIdx L)]
+      · rw [if_pos]
+        · ring
+        · refine Prod.mk.injEq _ _ _ _ |>.mpr ⟨?_, rfl⟩
+          exact Stabilizer.Lattice.prev_next L x
+      · intros p _ hne
+        rw [if_neg]
+        · ring
+        · intro hcontra
+          apply hne
+          have hp1 : StabilizerGroup.ToricCodeN.prev L p.1 = x :=
+            (Prod.mk.injEq _ _ _ _).mp hcontra |>.1
+          have hp2 : p.2 = y := (Prod.mk.injEq _ _ _ _).mp hcontra |>.2
+          refine Prod.mk.injEq _ _ _ _ |>.mpr ⟨?_, hp2⟩
+          exact h_eq_prev_iff.mp hp1
+      · intro h; exact absurd (Finset.mem_univ _) h
+    rw [h1, h2]
+  rw [hh, hv]
+  ring
+
+/-- Bridge: the abstract `dualCycles` (kernel of abstract `dualBoundary`) equals
+the lattice `toricDualCycles` (kernel of `toricDualBoundary`). -/
+theorem toricHomologicalCode_dualCycles_eq :
+    (toricHomologicalCode L).dualCycles = toricDualCycles (L := L) := by
+  unfold Homological.HomologicalCode.dualCycles toricDualCycles
+  rw [toricHomologicalCode_dualBoundary_eq]
+  rfl
+
+end DualBridges
 
 -- ---------------------------------------------------------------------------
 -- 3.  Z-type predicates
@@ -330,65 +431,20 @@ theorem dualBoundary_pointwise_zero_iff_mem_toricDualCycles
   · intro h p
     exact congrArg (fun f => f p) h
 
-/-- Z-chain commutes with all face checks iff it is a dual cycle. -/
+/-- Z-chain commutes with all face checks iff it is a dual cycle.
+
+Delegates to the generic `chainZOperator_commutes_XGenerators_iff_mem_dualCycles`
+via the X-generator and dual-cycle bridges. -/
 theorem zCommutesWithXChecks_iff_mem_toricDualCycles (L : ℕ) [Fact (2 ≤ L)] (c : C1 L) :
-    zCommutesWithXChecks L c ↔ c ∈ toricDualCycles (L := L) :=
-  (zCommutesWithXChecks_iff_dualBoundary_pointwise_zero L c).trans
-    (dualBoundary_pointwise_zero_iff_mem_toricDualCycles L c)
+    zCommutesWithXChecks L c ↔ c ∈ toricDualCycles (L := L) := by
+  haveI : Fact (0 < L) := ⟨Nat.lt_of_lt_of_le (by decide : 0 < 2) Fact.out⟩
+  unfold zCommutesWithXChecks
+  rw [← toricHomologicalCode_XGenerators_eq, ← toricHomologicalCode_dualCycles_eq]
+  exact (toricHomologicalCode L).chainZOperator_commutes_XGenerators_iff_mem_dualCycles c
 
 -- ---------------------------------------------------------------------------
 -- 6.  Vertex-stabilizer criterion (star product ↔ dual boundary)
 -- ---------------------------------------------------------------------------
-
-/-- `toricZOperatorOfChain` maps the zero chain to the identity element. -/
-lemma toricZOperatorOfChain_zero (L : ℕ) :
-    toricZOperatorOfChain L 0 = 1 := by
-  unfold toricZOperatorOfChain
-  aesop
-
-set_option maxHeartbeats 1000000 in
--- maxHeartbeats bumped: chain → Pauli homomorphism unfolding produces a goal with
--- per-qubit case splits over `PauliOperator.mulOp`.
-/-- `toricZOperatorOfChain` maps chain addition to Pauli multiplication. -/
-lemma toricZOperatorOfChain_add (L : ℕ) (c c' : C1 L) :
-    toricZOperatorOfChain L (c + c') =
-      toricZOperatorOfChain L c * toricZOperatorOfChain L c' := by
-  simp [toricZOperatorOfChain] at *
-  simp +decide [NQubitPauliGroupElement.mul, NQubitPauliGroupElement.mulOp]
-  constructor
-  · rw [Finset.sum_eq_zero]; aesop
-  · ext q
-    split_ifs <;> simp_all +decide [Fin.ext_iff, ZMod]
-    · rename_i h₁ h₂ h₃
-      obtain ⟨e₁, he₁, he₂⟩ := h₁
-      obtain ⟨e₂, he₃, he₄⟩ := h₂
-      obtain ⟨e₃, he₅, he₆⟩ := h₃
-      have h_eq : e₁ = e₂ ∧ e₂ = e₃ := by
-        have h_eq : ∀ e₁ e₂ : EdgeIdx L,
-            edgeToQubitIdx L e₁ = edgeToQubitIdx L e₂ → e₁ = e₂ := by
-          intros e₁ e₂ h_eq
-          have h_eq' : edgeToQubitIdx L e₁ = edgeToQubitIdx L e₂ := h_eq
-          simp [edgeToQubitIdx] at h_eq'
-          rcases e₁ with (_ | _) <;> rcases e₂ with (_ | _) <;> norm_num at h_eq' ⊢
-          · rename_i a b c d
-            have h_eq' : b = d := by
-              exact Fin.ext (by nlinarith [Fin.is_lt a, Fin.is_lt b, Fin.is_lt c, Fin.is_lt d])
-            aesop
-          · rename_i a b c d
-            exact absurd h_eq'
-              (by nlinarith only [Fin.is_lt a, Fin.is_lt b, Fin.is_lt c, Fin.is_lt d])
-          · rename_i a b c d
-            exact absurd h_eq'
-              (by nlinarith [Fin.is_lt a, Fin.is_lt b, Fin.is_lt c, Fin.is_lt d])
-          · rename_i a b c d
-            have h_eq' : b = d := by
-              exact Fin.ext (by nlinarith [Fin.is_lt a, Fin.is_lt b, Fin.is_lt c, Fin.is_lt d])
-            aesop
-        exact ⟨h_eq e₁ e₂ (Fin.ext <| by aesop), h_eq e₂ e₃ (Fin.ext <| by aesop)⟩
-      grind
-    · grind
-    · grind
-    · grind
 
 /-- Helper: every 0-chain is a sum of single-vertex indicators. -/
 private lemma c0_eq_sum_singleVtx (L : ℕ) (s : C0 L) :
@@ -399,157 +455,16 @@ private lemma c0_eq_sum_singleVtx (L : ℕ) (s : C0 L) :
     split_ifs <;> simp_all (config := {decide := true}) <;>
     first | rfl | exact absurd rfl ‹_›
 
-set_option maxHeartbeats 800000 in
--- maxHeartbeats bumped: equality on n-qubit Pauli elements after unfolding the cut map
--- and the singleVtx indicator across 2·L² edges.
-/-- `toricZOperatorOfChain` applied to `toricVertexCutMap (singleVtx (xv, yv))`
-    equals the vertex stabilizer at `(xv, yv)`. -/
-lemma toricZOperatorOfChain_cutMap_singleVtx (L : ℕ) [Fact (2 ≤ L)]
-    (xv yv : Fin L) :
-    toricZOperatorOfChain L (toricVertexCutMap (L := L) (singleVtx (xv, yv))) =
-      StabilizerGroup.ToricCodeN.vertexStab L xv yv := by
-  have hL0 : 0 < L := Nat.lt_of_lt_of_le (by decide : 0 < 2) (Fact.out : 2 ≤ L)
-  haveI : Fact (0 < L) := ⟨hL0⟩
-  unfold toricZOperatorOfChain StabilizerGroup.ToricCodeN.vertexStab
-  congr with q
-  split_ifs <;> simp_all +decide [NQubitPauliOperator.set]
-  · rename_i h
-    obtain ⟨e, rfl, he⟩ := h
-    rcases e with ⟨ex, ey⟩ | ⟨ex, ey⟩
-    · -- h-edge case: cutMap (singleVtx (xv,yv)) at h(ex,ey) = 1 means
-      -- ((ex,ey) = (xv,yv)) XOR (next L ex = xv ∧ ey = yv)
-      simp only [toricVertexCutMap] at he
-      have hxL : (xv : ℕ) < L := xv.isLt
-      have hyL : (yv : ℕ) < L := yv.isLt
-      have hexL : (ex : ℕ) < L := ex.isLt
-      have heyL : (ey : ℕ) < L := ey.isLt
-      -- he is essentially Σ over the 2 disjuncts, but in ZMod 2.
-      -- Decompose into cases by `decide`.
-      by_cases h1 : (ex, ey) = (xv, yv)
-      · obtain ⟨hex, hey⟩ := Prod.mk_inj.mp h1
-        subst hex; subst hey
-        unfold edgeToQubitIdx
-        simp_all +decide [Fin.ext_iff, StabilizerGroup.ToricCodeN.hEdge,
-          StabilizerGroup.ToricCodeN.vEdge, StabilizerGroup.ToricCodeN.prev,
-          NQubitPauliOperator.identity]
-      · by_cases h2 : (StabilizerGroup.ToricCodeN.next L ex, ey) = (xv, yv)
-        · obtain ⟨hnex, hey⟩ := Prod.mk_inj.mp h2
-          subst hey
-          have hex_eq : ex = StabilizerGroup.ToricCodeN.prev L xv :=
-            (Stabilizer.Lattice.eq_prev_iff_next_eq L ex xv).mpr hnex
-          subst hex_eq
-          unfold edgeToQubitIdx
-          simp_all +decide [Fin.ext_iff, StabilizerGroup.ToricCodeN.hEdge,
-            StabilizerGroup.ToricCodeN.vEdge, StabilizerGroup.ToricCodeN.prev,
-            NQubitPauliOperator.identity]
-        · exfalso
-          simp [h1, h2] at he
-    · -- v-edge case: cutMap (singleVtx (xv,yv)) at v(ex,ey) = 1 means
-      -- ((ex,ey) = (xv,yv)) XOR (ex = xv ∧ next L ey = yv)
-      simp only [toricVertexCutMap] at he
-      have hxL : (xv : ℕ) < L := xv.isLt
-      have hyL : (yv : ℕ) < L := yv.isLt
-      have hexL : (ex : ℕ) < L := ex.isLt
-      have heyL : (ey : ℕ) < L := ey.isLt
-      by_cases h1 : (ex, ey) = (xv, yv)
-      · obtain ⟨hex, hey⟩ := Prod.mk_inj.mp h1
-        subst hex; subst hey
-        unfold edgeToQubitIdx
-        simp_all +decide [Fin.ext_iff, StabilizerGroup.ToricCodeN.hEdge,
-          StabilizerGroup.ToricCodeN.vEdge, StabilizerGroup.ToricCodeN.prev,
-          NQubitPauliOperator.identity]
-      · by_cases h2 : (ex, StabilizerGroup.ToricCodeN.next L ey) = (xv, yv)
-        · obtain ⟨hex, hney⟩ := Prod.mk_inj.mp h2
-          subst hex
-          have hey_eq : ey = StabilizerGroup.ToricCodeN.prev L yv :=
-            (Stabilizer.Lattice.eq_prev_iff_next_eq L ey yv).mpr hney
-          subst hey_eq
-          unfold edgeToQubitIdx
-          simp_all +decide [Fin.ext_iff, StabilizerGroup.ToricCodeN.hEdge,
-            StabilizerGroup.ToricCodeN.vEdge, StabilizerGroup.ToricCodeN.prev,
-            NQubitPauliOperator.identity]
-        · exfalso
-          simp [h1, h2] at he
-  · -- neg case: q not in support of cutMap(singleVtx), must show vertexStab q = I
-    split_ifs <;> simp_all +decide [toricNumQubits]
-    · rename_i h₁ h₂
-      contrapose! h₁
-      refine ⟨EdgeIdx.v xv (StabilizerGroup.ToricCodeN.prev L yv), ?_, ?_⟩
-      · rfl
-      · have hne : (StabilizerGroup.ToricCodeN.prev L yv) ≠ yv :=
-          Stabilizer.Lattice.prev_ne_self L yv
-        simp [toricVertexCutMap, singleVtx, StabilizerGroup.ToricCodeN.prev,
-          Stabilizer.Lattice.next_prev, hne]
-    · rename_i h₁ h₂ h₃
-      contrapose! h₁
-      refine ⟨EdgeIdx.v xv yv, ?_, ?_⟩
-      · rfl
-      · have hne : StabilizerGroup.ToricCodeN.next L yv ≠ yv :=
-          Stabilizer.Lattice.next_ne_self L yv
-        simp [toricVertexCutMap, singleVtx, hne]
-    · rename_i h₁ h₂ h₃ h₄
-      contrapose! h₁
-      refine ⟨EdgeIdx.h (StabilizerGroup.ToricCodeN.prev L xv) yv, ?_, ?_⟩
-      · rfl
-      · have hne : (StabilizerGroup.ToricCodeN.prev L xv) ≠ xv :=
-          Stabilizer.Lattice.prev_ne_self L xv
-        simp [toricVertexCutMap, singleVtx, StabilizerGroup.ToricCodeN.prev,
-          Stabilizer.Lattice.next_prev, hne]
-    · rename_i h₁ h₂ h₃ h₄ h₅
-      contrapose! h₁
-      refine ⟨EdgeIdx.h xv yv, ?_, ?_⟩
-      · rfl
-      · have hne : StabilizerGroup.ToricCodeN.next L xv ≠ xv :=
-          Stabilizer.Lattice.next_ne_self L xv
-        simp [toricVertexCutMap, singleVtx, hne]
-    · unfold NQubitPauliOperator.identity; aesop
+/-- Z-chain is a star product iff the chain is a dual boundary.
 
-/-- Z-chain is a star product iff the chain is a dual boundary. -/
+Delegates to the generic `chainZOperator_mem_ZClosure_iff_mem_dualBoundaries`
+via the Z-generator and dual-boundary bridges. -/
 theorem zIsStarProduct_iff_mem_toricDualBoundaries (L : ℕ) [Fact (2 ≤ L)] (c : C1 L) :
     zIsStarProduct L c ↔ c ∈ toricDualBoundaries (L := L) := by
-  constructor <;> intro hc <;>
-    simp_all +decide [zIsStarProduct, toricDualBoundaries]
-  · -- → direction: from closure(ZGen) to range(cutMap)
-    have h_closure :
-        ∀ g ∈ Subgroup.closure (StabilizerGroup.ToricCodeN.ZGenerators L),
-          ∃ s : C0 L, toricZOperatorOfChain L (toricVertexCutMap (L := L) s) = g := by
-      intro g hg
-      induction hg using Subgroup.closure_induction with
-      | mem g hg =>
-          rcases hg with ⟨⟨xv, yv⟩, rfl⟩
-          exact ⟨singleVtx (xv, yv), toricZOperatorOfChain_cutMap_singleVtx L xv yv⟩
-      | one =>
-          use 0
-          simp only [map_zero, toricZOperatorOfChain_zero]
-      | mul x y hx hy ihx ihy =>
-          obtain ⟨s₁, hs₁⟩ := ihx
-          obtain ⟨s₂, hs₂⟩ := ihy
-          use s₁ + s₂
-          simp only [map_add]
-          simp +decide [hs₁, hs₂, toricZOperatorOfChain_add]
-      | inv x hx ih =>
-          obtain ⟨s, hs⟩ := ih
-          use s
-          simp_all +decide [toricZOperatorOfChain]
-          rw [← hs]
-          ext <;> simp +decide [NQubitPauliGroupElement.inv]
-    have hroundtrip := @chainOfZOperator_toricZOperatorOfChain L
-    grind +splitImp
-  · -- ← direction: from range(cutMap) to closure(ZGen)
-    obtain ⟨s, rfl⟩ := hc
-    rw [c0_eq_sum_singleVtx L s]
-    simp only [map_sum]
-    induction (Finset.univ.filter fun v : VtxIdx L => s v = 1) using Finset.induction with
-    | empty =>
-        simp only [Finset.sum_empty, toricZOperatorOfChain_zero]
-        exact OneMemClass.one_mem _
-    | insert a fs ha ih =>
-        simp only [Finset.sum_insert ha, toricZOperatorOfChain_add]
-        exact Subgroup.mul_mem _
-          (by rcases a with ⟨xv, yv⟩
-              rw [toricZOperatorOfChain_cutMap_singleVtx]
-              exact Subgroup.subset_closure ⟨(xv, yv), rfl⟩)
-          ih
+  haveI : Fact (0 < L) := ⟨Nat.lt_of_lt_of_le (by decide : 0 < 2) Fact.out⟩
+  unfold zIsStarProduct
+  rw [← toricHomologicalCode_ZGenerators_eq, ← toricHomologicalCode_dualBoundaries_eq]
+  exact (toricHomologicalCode L).chainZOperator_mem_ZClosure_iff_mem_dualBoundaries c
 
 -- ---------------------------------------------------------------------------
 -- 7.  Centralizer membership
@@ -736,45 +651,26 @@ lemma stabilizer_same_ops_implies_dualBoundary
 -- 9.  Nontrivial logical ↔ dual cycle but not dual boundary
 -- ---------------------------------------------------------------------------
 
-set_option maxHeartbeats 1000000 in
--- maxHeartbeats bumped: chains both directions of the iff through several
--- `IsNontrivialLogicalOperator` unfoldings.
-/-- Z nontrivial logical iff corresponding chain is a dual-cycle-not-dual-boundary. -/
+/-- Z nontrivial logical iff corresponding chain is a dual-cycle-not-dual-boundary.
+
+Delegates to the generic `chainZOperator_isNontrivialLogical_iff` via the
+stabilizer-subgroup bridge and the dual cycle/boundary bridges. -/
 theorem zNontrivialLogical_iff_dualCycle_not_dualBoundary
     (L : ℕ) [Fact (2 ≤ L)] (c : C1 L) :
     StabilizerGroup.IsNontrivialLogicalOperator
         (toricZOperatorOfChain L c) (StabilizerGroup.ToricCodeN.stabilizerGroup L) ↔
       c ∈ toricDualCycles (L := L) ∧ c ∉ toricDualBoundaries (L := L) := by
-  constructor <;> intro h
-  · -- mp: nontrivial logical → dual cycle not dual boundary
-    rw [StabilizerGroup.IsNontrivialLogicalOperator_iff] at h
-    constructor
-    · exact toricZOperatorOfChain_mem_centralizer_iff_dualCycle L c |>.1 h.1
-    · intro hc
-      have h_star :
-          toricZOperatorOfChain L c ∈
-            Subgroup.closure (StabilizerGroup.ToricCodeN.ZGenerators L) :=
-        (zIsStarProduct_iff_mem_toricDualBoundaries L c).2 hc
-      have h_in_stab :
-          toricZOperatorOfChain L c ∈
-            (StabilizerGroup.ToricCodeN.stabilizerGroup L).toSubgroup := by
-        refine Subgroup.closure_induction (fun x hx => ?_) ?_ ?_ ?_ h_star
-        · exact Subgroup.subset_closure
-            (by rw [StabilizerGroup.ToricCodeN.listToSet_generatorsList]
-                exact Set.mem_union_left _ hx)
-        · exact OneMemClass.one_mem _
-        · exact fun x y _ _ hx hy => Subgroup.mul_mem _ hx hy
-        · exact fun x _ hx => Subgroup.inv_mem _ hx
-      exact h.2.1 h_in_stab
-  · -- mpr: dual cycle not dual boundary → nontrivial logical
-    rw [StabilizerGroup.IsNontrivialLogicalOperator_iff]
-    refine ⟨?_, ?_, ?_⟩
-    · exact toricZOperatorOfChain_mem_centralizer_iff_dualCycle L c |>.2 h.1
-    · intro hg
-      exact h.2 (stabilizer_same_ops_implies_dualBoundary L c
-        (toricZOperatorOfChain L c) hg rfl)
-    · intro s hs hEq
-      exact h.2 (stabilizer_same_ops_implies_dualBoundary L c s hs hEq)
+  haveI : Fact (0 < L) := ⟨Nat.lt_of_lt_of_le (by decide : 0 < 2) Fact.out⟩
+  -- Translate the lattice `IsNontrivialLogicalOperator` to the abstract one
+  -- via the subgroup bridge.
+  have h_sub_eq :
+      (StabilizerGroup.ToricCodeN.stabilizerGroup L).toSubgroup =
+        (toricHomologicalCode L).homologicalStabilizerGroup.toSubgroup :=
+    (toricHomologicalCode_homologicalStabilizerGroup_toSubgroup_eq L).symm
+  rw [StabilizerGroup.IsNontrivialLogicalOperator_of_toSubgroup_eq _ h_sub_eq,
+      ← toricHomologicalCode_dualCycles_eq, ← toricHomologicalCode_dualBoundaries_eq]
+  -- `toricZOperatorOfChain L c = (toricHomologicalCode L).chainZOperator c` by `rfl`.
+  exact (toricHomologicalCode L).chainZOperator_isNontrivialLogical_iff c
 
 end Lattice
 end Stabilizer
