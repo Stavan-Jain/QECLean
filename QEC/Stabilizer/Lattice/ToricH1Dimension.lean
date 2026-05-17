@@ -136,7 +136,7 @@ theorem toricBoundary1_cutMap_transpose (c : C1 L) (s : C0 L) :
         intro x
         rw [← Equiv.sum_comp
           (Equiv.ofBijective (fun y : Fin L => next L y) ⟨fun x y hxy => ?_, fun x => ?_⟩)]
-        norm_num [prev_next, next_prev]
+        · norm_num [prev_next, next_prev]
         · exact prev_next L x ▸ prev_next L y ▸ congr_arg (fun z => prev L z) hxy ▸ rfl
         · exact ⟨ prev L x, by simp +decide [ next_prev ] ⟩
       generalize_proofs at *; (
@@ -168,12 +168,13 @@ theorem toric_rank_boundary1_eq_rank_cutMap :
         Finset.mul_sum _ _ _];
   any_goals intros; ext; simp +decide [ Finset.mul_sum _ _ _ ];
   all_goals norm_num [ Function.Injective, Function.Surjective ];
-  · obtain ⟨ y, hy ⟩ := x.2;
-    refine ⟨?_, ?_⟩;
-    exact ∑ v : VtxIdx L, y v • ( LinearMap.proj v );
-    ext c; simp +decide [ ← hy ] ;
-    convert toricBoundary1_cutMap_transpose L ( Pi.single c 1 ) y using 1;
-    ac_rfl;
+  · obtain ⟨ y, hy ⟩ := x.2
+    refine ⟨?_, ?_⟩
+    · exact ∑ v : VtxIdx L, y v • ( LinearMap.proj v )
+    · ext c
+      simp +decide [ ← hy ]
+      convert toricBoundary1_cutMap_transpose L ( Pi.single c 1 ) y using 1
+      ac_rfl
   · intro a b h
     ext x
     replace h := congr_fun h (fun y => if y = x then 1 else 0)
