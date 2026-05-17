@@ -5,6 +5,7 @@ import QEC.Stabilizer.Codes.RotatedSurfaceCode3
 import QEC.Stabilizer.Codes.RotatedSurfaceCodeN
 import QEC.Stabilizer.Codes.RotatedSurfaceCodeNStabilizerCode
 import QEC.Stabilizer.Codes.RotatedSurfaceCodeNDistanceX
+import QEC.Stabilizer.Codes.RotatedSurfaceCodeNDistanceZ
 import QEC.Stabilizer.Codes.ToricCodeN
 import QEC.Stabilizer.Codes.ToricCodeNDistanceX
 import QEC.Stabilizer.Codes.ToricCodeNDistanceZ
