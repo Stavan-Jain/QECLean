@@ -217,7 +217,7 @@ theorem hammingRowDot_eq_zero (hr : 3 ≤ r) (a b : Fin r) :
     rw [dif_pos hbit_a]
     ext
     change ((k.val + 1 ^^^ 2 ^ c) - 1 + 1 ^^^ 2 ^ c) - 1 = k.val
-    rw [Nat.sub_one_add_one_eq_of_pos hxor_pos, Nat.xor_cancel_right]; omega
+    rw [Nat.sub_one_add_one_eq_of_pos hxor_pos, Nat.xor_xor_cancel_right]; omega
   -- f has no fixed points on S
   · intro k hk
     simp only [S, Finset.mem_filter, Finset.mem_univ, true_and] at hk
@@ -229,7 +229,7 @@ theorem hammingRowDot_eq_zero (hr : 3 ≤ r) (a b : Fin r) :
     simp only [xorFlip] at heq
     have hxor_pos := xor_pos_of_testBit hca.symm hka
     have h1 : k.val + 1 ^^^ 2 ^ c = k.val + 1 := by omega
-    have h2 := Nat.xor_cancel_left (k.val + 1) (2 ^ c)
+    have h2 := Nat.xor_xor_cancel_left (k.val + 1) (2 ^ c)
     rw [h1, Nat.xor_self] at h2
     exact absurd h2.symm (by positivity)
 
