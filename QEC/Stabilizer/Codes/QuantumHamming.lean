@@ -590,7 +590,9 @@ private lemma sum_checkMatrix_Z_eq
     intro x; simp [s, p, Finset.mem_filter]
   simp +zetaDelta only [Finset.univ_eq_attach, add_zero] at *
   refine Finset.sum_bij (fun x _ => ⟨x.val, by grind +qlia⟩) ?_ ?_ ?_ ?_ <;>
-    simp_all +decide
+    simp_all +decide only [Fin.natAdd_eq_addNat, Finset.mem_attach, Finset.mem_univ,
+      Fin.mk.injEq, forall_const, Subtype.forall, Subtype.mk.injEq, exists_const,
+      Subtype.exists, Fin.eta, implies_true]
   · exact fun a ha b hb hab => Fin.ext hab
   · exact fun b => ⟨⟨b, by rw [generatorsList_length]; linarith [Fin.is_lt b]⟩,
       by simp +decide⟩
@@ -628,7 +630,10 @@ private lemma sum_checkMatrix_X_eq
     have hxlt : x.val < (generatorsList r).length := x.1.isLt
     have hlen : (generatorsList r).length = 2 * r := generatorsList_length r
     have hxlt' : x.val < 2 * r := by simpa [hlen] using hxlt
-    omega⟩) ?_ ?_ ?_ ?_ <;> simp +decide
+    omega⟩) ?_ ?_ ?_ ?_ <;>
+    simp +decide only [Finset.mem_attach, Finset.mem_univ, implies_true, Fin.mk.injEq,
+      forall_const, Subtype.forall, not_lt, Finset.mem_filter, true_and, Subtype.mk.injEq,
+      exists_const, Subtype.exists, mul_eq_mul_right_iff]
   · exact fun a ha b hb hab =>
       Fin.ext <| by linarith [Nat.sub_add_cancel ha, Nat.sub_add_cancel hb]
   · intro b; use ⟨r + b, by rw [generatorsList_length]; linarith [Fin.is_lt b]⟩; aesop
