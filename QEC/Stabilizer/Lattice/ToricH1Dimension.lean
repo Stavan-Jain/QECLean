@@ -158,10 +158,10 @@ theorem toric_rank_boundary1_eq_rank_cutMap :
   rw [ ← LinearMap.finrank_range_dualMap_eq_finrank_range ];
   fapply LinearEquiv.finrank_eq;
   symm;
-  refine' ( LinearEquiv.ofBijective _ ⟨ _, _ ⟩ );
-  refine' { .. };
-  refine' fun x => ⟨ _, _ ⟩;
-  refine' { toFun := fun c => ∑ e : EdgeIdx L, c e * x.val e, map_add' := _, map_smul' := _ };
+  refine LinearEquiv.ofBijective ?_ ⟨?_, ?_⟩;
+  refine { toFun := ?_, map_add' := ?_, map_smul' := ?_ };
+  refine fun x => ⟨?_, ?_⟩;
+  refine { toFun := fun c => ∑ e : EdgeIdx L, c e * x.val e, map_add' := ?_, map_smul' := ?_ };
   all_goals
     norm_num
       [funext_iff, Finset.sum_add_distrib, mul_add, add_mul, mul_assoc, mul_left_comm,
@@ -169,7 +169,7 @@ theorem toric_rank_boundary1_eq_rank_cutMap :
   any_goals intros; ext; simp +decide [ Finset.mul_sum _ _ _ ];
   all_goals norm_num [ Function.Injective, Function.Surjective ];
   · obtain ⟨ y, hy ⟩ := x.2;
-    refine' ⟨ _, _ ⟩;
+    refine ⟨?_, ?_⟩;
     exact ∑ v : VtxIdx L, y v • ( LinearMap.proj v );
     ext c; simp +decide [ ← hy ] ;
     convert toricBoundary1_cutMap_transpose L ( Pi.single c 1 ) y using 1;
@@ -179,8 +179,7 @@ theorem toric_rank_boundary1_eq_rank_cutMap :
     replace h := congr_fun h (fun y => if y = x then 1 else 0)
     aesop
   · intro a;
-    refine' ⟨ _, ⟨ _, rfl ⟩, _ ⟩;
-    exact fun v => a ( fun u => if u = v then 1 else 0 );
+    refine ⟨_, ⟨fun v => a (fun u => if u = v then 1 else 0), rfl⟩, ?_⟩;
     ext c; simp +decide ;
     convert (toricBoundary1_cutMap_transpose L (Pi.single c 1)
       (fun v => a (fun u => if u = v then 1 else 0))).symm using 1;

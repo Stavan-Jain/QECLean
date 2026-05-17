@@ -589,7 +589,7 @@ lemma toricZOperatorOfChain_mem_centralizer_iff_dualCycle
         g ∈ Subgroup.closure (StabilizerGroup.ToricCodeN.generators L) := by
       rw [StabilizerGroup.ToricCodeN.stabilizerGroup_toSubgroup_eq] at hg
       exact hg
-    refine' Subgroup.closure_induction (fun x hx => _) _ _ _ h_closure
+    refine Subgroup.closure_induction (fun x hx => ?_) ?_ ?_ ?_ h_closure
     · cases hx with
       | inl hx =>
           obtain ⟨⟨xv, yv⟩, rfl⟩ := hx
@@ -754,7 +754,7 @@ theorem zNontrivialLogical_iff_dualCycle_not_dualBoundary
       have h_in_stab :
           toricZOperatorOfChain L c ∈
             (StabilizerGroup.ToricCodeN.stabilizerGroup L).toSubgroup := by
-        refine' Subgroup.closure_induction (fun x hx => _) _ _ _ h_star
+        refine Subgroup.closure_induction (fun x hx => ?_) ?_ ?_ ?_ h_star
         · exact Subgroup.subset_closure
             (by rw [StabilizerGroup.ToricCodeN.listToSet_generatorsList]
                 exact Set.mem_union_left _ hx)
