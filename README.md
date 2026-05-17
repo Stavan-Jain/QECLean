@@ -73,6 +73,18 @@ lake build
 - Use `#check` and `#eval` commands in Lean to explore definitions
 - Run `lake build` after making changes to verify your code compiles
 
+#### Claude Code users (optional)
+
+This repo ships a project-scoped MCP configuration in `.mcp.json` that wires
+up the [lean-lsp MCP server](https://github.com/oOo0oOo/lean-lsp-mcp), giving
+[Claude Code](https://claude.com/claude-code) agents in-editor access to live
+proof states, mathlib search (LeanSearch, Loogle, Lean Hammer), and Lean
+diagnostics. Claude Code will prompt you to approve the server on first launch.
+
+Requirements: [`uv`](https://docs.astral.sh/uv/) on `PATH` (provides `uvx`).
+[`ripgrep`](https://github.com/BurntSushi/ripgrep) is recommended for the
+local-search tool. See [`CLAUDE.md`](CLAUDE.md) for the agent-side workflow.
+
 ## Contributing
 
 Contributions are welcome! If you add new modules or definitions, please:

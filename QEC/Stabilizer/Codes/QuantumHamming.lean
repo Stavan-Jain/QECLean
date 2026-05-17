@@ -69,10 +69,11 @@ def hammingRowDot (a b : Fin r) : ZMod 2 :=
   ∑ k : Fin (2 ^ r - 1), hammingEntry r a k * hammingEntry r b k
 
 /-- Even cardinality from a fixed-point-free involution on a Finset. -/
-private lemma even_card_of_fpf_involution {α : Type*} [DecidableEq α]
+private lemma even_card_of_fpf_involution {α : Type*}
     (S : Finset α) (f : α → α) (hf_mem : ∀ x ∈ S, f x ∈ S)
     (hf_inv : ∀ x ∈ S, f (f x) = x) (hf_ne : ∀ x ∈ S, f x ≠ x) :
     Even S.card := by
+  classical
   induction S using Finset.strongInduction with
   | H S ih =>
     by_cases hS : S = ∅
@@ -139,7 +140,7 @@ private lemma xor_flip_val_lt {r c : ℕ} (hc : c < r) {k : Fin (2 ^ r - 1)}
     have hbad : (k.val + 1 ^^^ 2 ^ c).testBit a = (k.val + 1).testBit a :=
       testBit_xor_two_pow _ _ _ hac
     rw [h] at hbad
-    simp at hbad
+    simp only [Nat.zero_testBit] at hbad
     rw [ha] at hbad
     exact absurd hbad (by simp)
   omega
@@ -155,7 +156,10 @@ private lemma xor_pos_of_testBit {m c a : ℕ} (hac : a ≠ c)
   rw [Nat.pos_iff_ne_zero]
   intro h
   have := testBit_xor_two_pow m c a hac
-  rw [h] at this; simp at this; rw [ha] at this; simp at this
+  rw [h] at this
+  simp only [Nat.zero_testBit] at this
+  rw [ha] at this
+  exact Bool.false_ne_true this
 
 /-- The dot product of any two rows of the Hamming parity-check matrix is 0 (mod 2)
     for `r ≥ 3`.
@@ -177,7 +181,7 @@ theorem hammingRowDot_eq_zero (hr : 3 ≤ r) (a b : Fin r) :
   rw [ZMod.natCast_eq_zero_iff_even]
   -- Step 2: Find bit c < r with c ≠ a and c ≠ b (possible since r ≥ 3)
   have hc_exists : ∃ c : ℕ, c < r ∧ c ≠ a.val ∧ c ≠ b.val := by
-    by_contra hall; push_neg at hall
+    by_contra hall; push Not at hall
     have h0 := hall 0 (by omega); have h1 := hall 1 (by omega); have h2 := hall 2 (by omega)
     omega
   obtain ⟨c, hc_lt, hca, hcb⟩ := hc_exists
@@ -217,7 +221,7 @@ theorem hammingRowDot_eq_zero (hr : 3 ≤ r) (a b : Fin r) :
     rw [dif_pos hbit_a]
     ext
     change ((k.val + 1 ^^^ 2 ^ c) - 1 + 1 ^^^ 2 ^ c) - 1 = k.val
-    rw [Nat.sub_one_add_one_eq_of_pos hxor_pos, Nat.xor_cancel_right]; omega
+    rw [Nat.sub_one_add_one_eq_of_pos hxor_pos, Nat.xor_xor_cancel_right]; omega
   -- f has no fixed points on S
   · intro k hk
     simp only [S, Finset.mem_filter, Finset.mem_univ, true_and] at hk
@@ -229,7 +233,7 @@ theorem hammingRowDot_eq_zero (hr : 3 ≤ r) (a b : Fin r) :
     simp only [xorFlip] at heq
     have hxor_pos := xor_pos_of_testBit hca.symm hka
     have h1 : k.val + 1 ^^^ 2 ^ c = k.val + 1 := by omega
-    have h2 := Nat.xor_cancel_left (k.val + 1) (2 ^ c)
+    have h2 := Nat.xor_xor_cancel_left (k.val + 1) (2 ^ c)
     rw [h1, Nat.xor_self] at h2
     exact absurd h2.symm (by positivity)
 
@@ -584,11 +588,12 @@ private lemma sum_checkMatrix_Z_eq
     Finset.filter p Finset.univ
   have hs : ∀ x : Fin (generatorsList r).length, x ∈ s ↔ p x := by
     intro x; simp [s, p, Finset.mem_filter]
-  simp +zetaDelta at *;
-  refine' Finset.sum_bij ( fun x hx => ⟨ x.val, by
-    grind +qlia ⟩ ) _ _ _ _ <;> simp_all +decide;
-  · exact fun a ha b hb hab => Fin.ext hab;
-  · exact fun b => ⟨ ⟨ b, by rw [ generatorsList_length ] ; linarith [ Fin.is_lt b ] ⟩, by simp +decide ⟩
+  simp +zetaDelta only [Finset.univ_eq_attach, add_zero] at *
+  refine Finset.sum_bij (fun x _ => ⟨x.val, by grind +qlia⟩) ?_ ?_ ?_ ?_ <;>
+    simp_all +decide
+  · exact fun a ha b hb hab => Fin.ext hab
+  · exact fun b => ⟨⟨b, by rw [generatorsList_length]; linarith [Fin.is_lt b]⟩,
+      by simp +decide⟩
 
 /-- The sum ∑_{idx} f(idx) * checkMatrix(idx, X-col k) = ∑_{a:Fin r} f(r+a) * hammingEntry(a,k). -/
 private lemma sum_checkMatrix_X_eq
@@ -616,17 +621,19 @@ private lemma sum_checkMatrix_X_eq
     Finset.filter p Finset.univ
   have hs : ∀ x : Fin (generatorsList r).length, x ∈ s ↔ p x := by
     intro x; simp [s, p, Finset.mem_filter]
-  simp;
-  refine' Finset.sum_bij ( fun x _ => ⟨ x.val - r, by
+  simp only [Finset.univ_eq_attach, zero_add]
+  refine Finset.sum_bij (fun x _ => ⟨x.val - r, by
     have hxge : r ≤ x.val := by
       exact le_of_not_gt (by simpa [p] using x.property)
     have hxlt : x.val < (generatorsList r).length := x.1.isLt
     have hlen : (generatorsList r).length = 2 * r := generatorsList_length r
     have hxlt' : x.val < 2 * r := by simpa [hlen] using hxlt
-    omega⟩ ) _ _ _ _ <;> simp +decide;
-  · exact fun a ha b hb hab => Fin.ext <| by linarith [ Nat.sub_add_cancel ha, Nat.sub_add_cancel hb ] ;
-  · intro b; use ⟨ r + b, by rw [ generatorsList_length ] ; linarith [ Fin.is_lt b ] ⟩ ; aesop;
-  · exact fun a ha => Or.inl <| congr_arg f <| Fin.ext <| by simp +decide [ Nat.add_sub_of_le ha ] ;
+    omega⟩) ?_ ?_ ?_ ?_ <;> simp +decide
+  · exact fun a ha b hb hab =>
+      Fin.ext <| by linarith [Nat.sub_add_cancel ha, Nat.sub_add_cancel hb]
+  · intro b; use ⟨r + b, by rw [generatorsList_length]; linarith [Fin.is_lt b]⟩; aesop
+  · exact fun a ha =>
+      Or.inl <| congr_arg f <| Fin.ext <| by simp +decide [Nat.add_sub_of_le ha]
 
 /-- The check-matrix rows of the quantum Hamming generators are linearly independent. -/
 theorem rowsLinearIndependent_generatorsList :

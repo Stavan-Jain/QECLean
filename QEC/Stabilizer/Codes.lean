@@ -1,5 +1,6 @@
 import QEC.Stabilizer.Codes.RepetitionCode3
 import QEC.Stabilizer.Codes.RepetitionCodeN
+import QEC.Stabilizer.Codes.QuantumHamming
 import QEC.Stabilizer.Codes.RotatedSurfaceCode3
 import QEC.Stabilizer.Codes.ToricCode8
 import QEC.Stabilizer.Codes.ToricCodeN
