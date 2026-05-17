@@ -83,29 +83,33 @@ noncomputable def rscQubitEquiv [Fact (0 < L)] :
 
 /-! ## The `HomologicalCode` instance -/
 
+/-- Positivity of `L` follows from `Fact (3 ≤ L)`.  Registered as an instance
+so the qubit-equivalence and other `[Fact (0 < L)]`-requiring lemmas resolve
+automatically downstream. -/
+instance pos_of_three_le {L : ℕ} [Fact (3 ≤ L)] : Fact (0 < L) :=
+  ⟨lt_of_lt_of_le (by decide : 0 < 3) Fact.out⟩
+
 /-- The rotated-surface-code chain complex packaged as a generic
 `HomologicalCode`.  Consumers of `Homological.HomologicalCode`'s API
 (generic stabilizer construction, CSS distance bridge, etc.) can
 operate on this without re-deriving any lattice-specific facts. -/
 noncomputable def rotatedSurfaceHomologicalCode [Fact (Odd L)] [Fact (3 ≤ L)] :
-    Quantum.Stabilizer.Homological.HomologicalCode := by
-  haveI : Fact (0 < L) := ⟨by have := (Fact.out : (3 ≤ L)); omega⟩
-  exact
-    { C0 := ZFaceIdx L
-      C1 := VtxIdx L
-      C2 := XFaceIdx L
-      decEq0 := inferInstance
-      decEq1 := inferInstance
-      decEq2 := inferInstance
-      fin0 := inferInstance
-      fin1 := inferInstance
-      fin2 := inferInstance
-      boundary1 := rscBoundary1 L
-      boundary2 := rscBoundary2 L
-      boundary_comp := rscBoundary_comp_zero L
-      numQubits := L * L
-      numQubits_eq := by simp [Fintype.card_prod, Fintype.card_fin]
-      edgeEquiv := rscQubitEquiv L }
+    Quantum.Stabilizer.Homological.HomologicalCode where
+  C0 := ZFaceIdx L
+  C1 := VtxIdx L
+  C2 := XFaceIdx L
+  decEq0 := inferInstance
+  decEq1 := inferInstance
+  decEq2 := inferInstance
+  fin0 := inferInstance
+  fin1 := inferInstance
+  fin2 := inferInstance
+  boundary1 := rscBoundary1 L
+  boundary2 := rscBoundary2 L
+  boundary_comp := rscBoundary_comp_zero L
+  numQubits := L * L
+  numQubits_eq := by simp [Fintype.card_prod, Fintype.card_fin]
+  edgeEquiv := rscQubitEquiv L
 
 /-! ## RFL bridges
 
