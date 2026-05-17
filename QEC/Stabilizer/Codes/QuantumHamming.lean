@@ -563,14 +563,6 @@ private lemma checkMatrix_generatorsList_X
       simp [show ¬(idx.val < r) from hlt]
     rw [this, dif_neg hlt, checkMatrix_XGen_X_part]
 
--- Note: `linter.flexible` is suppressed on the two `sum_checkMatrix_*_eq` lemmas below.
--- The closing `simp_all +decide` / `simp +decide` after `refine Finset.sum_bij ... <;>`
--- is the workhorse closing several sum_bij subgoals (left-membership, value-equality) by
--- different paths than the trailing bullets, and the linter's suggested `simp_all only [...]`
--- / `simp only [...]` rewrites are too weak. Per-subgoal restructuring is a significant
--- refactor that doesn't materially improve readability.
-
-set_option linter.flexible false in
 /-- The sum ∑_{idx} f(idx) * checkMatrix(idx, Z-col k) = ∑_{a:Fin r} f(a) * hammingEntry(a,k). -/
 private lemma sum_checkMatrix_Z_eq
     (f : Fin (generatorsList r).length → ZMod 2)
@@ -603,7 +595,6 @@ private lemma sum_checkMatrix_Z_eq
   · exact fun b => ⟨⟨b, by rw [generatorsList_length]; linarith [Fin.is_lt b]⟩,
       by simp +decide⟩
 
-set_option linter.flexible false in
 /-- The sum ∑_{idx} f(idx) * checkMatrix(idx, X-col k) = ∑_{a:Fin r} f(r+a) * hammingEntry(a,k). -/
 private lemma sum_checkMatrix_X_eq
     (f : Fin (generatorsList r).length → ZMod 2)
