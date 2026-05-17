@@ -3,6 +3,8 @@ import QEC.Stabilizer.Codes.ToricCodeNDistanceX
 import QEC.Stabilizer.Codes.ToricCodeNDistanceZ
 import QEC.Stabilizer.Codes.ToricCodeNStabilizerCode
 import QEC.Stabilizer.Lattice.ToricLogicalCorrespondenceZ
+import QEC.Stabilizer.Lattice.ToricChainComplex
+import QEC.Stabilizer.Homological.Distance
 import QEC.Stabilizer.PauliGroup.NQubitElement
 import QEC.Stabilizer.Core.CodeDistance
 
@@ -419,7 +421,14 @@ private lemma weight_toricZOperatorOfChain_eq (L : ℕ) [Fact (0 < L)]
       have hspec := Classical.choose_spec hex
       exact Stabilizer.Lattice.edgeToQubitIdx_injective L hspec.1
 
-/-- For a nontrivial logical `g`, the X-chain and Z-chain cannot both be boundaries. -/
+/-- For a nontrivial logical `g`, the X-chain and Z-chain cannot both be boundaries.
+
+Delegates to the generic CSS bridge
+`Homological.HomologicalCode.not_both_boundary_of_nontrivial` on `toricHomologicalCode L`,
+via the subgroup bridge (`toricHomologicalCode_homologicalStabilizerGroup_toSubgroup_eq`)
+and the `dualBoundaries` bridge (`toricHomologicalCode_dualBoundaries_eq`).  The
+`xChainOf`/`zChainOf`-side bridges are `rfl` since both definitions share
+`edgeToQubitIdx` as their qubit-indexing equivalence. -/
 private lemma not_both_boundary_of_nontrivial (L : ℕ) [Fact (2 ≤ L)]
     (g : NQubitPauliGroupElement (numQubits L))
     (hg : IsNontrivialLogicalOperator g (stabilizerGroup L)) :
@@ -427,39 +436,27 @@ private lemma not_both_boundary_of_nontrivial (L : ℕ) [Fact (2 ≤ L)]
       zChainOf L g ∈ Stabilizer.Lattice.toricDualBoundaries (L := L)) := by
   have hL0 : 0 < L := Nat.lt_of_lt_of_le (by decide : 0 < 2) (Fact.out : 2 ≤ L)
   haveI : Fact (0 < L) := ⟨hL0⟩
+  -- Translate the lattice `IsNontrivialLogicalOperator` to the abstract one
+  -- via the subgroup bridge.
+  have h_sub_eq :
+      (stabilizerGroup L).toSubgroup =
+        (Stabilizer.Lattice.toricHomologicalCode L).homologicalStabilizerGroup.toSubgroup :=
+    (Stabilizer.Lattice.toricHomologicalCode_homologicalStabilizerGroup_toSubgroup_eq L).symm
+  have hg_abs :
+      IsNontrivialLogicalOperator g
+        (Stabilizer.Lattice.toricHomologicalCode L).homologicalStabilizerGroup :=
+    (IsNontrivialLogicalOperator_of_toSubgroup_eq g h_sub_eq).mp hg
+  -- Now invoke the generic `not_both_boundary_of_nontrivial`.
+  -- The toric `xChainOf` matches `(toricHomologicalCode L).xChainOf` by definition
+  -- (both use `edgeToQubitIdx L` via the `edgeEquiv` field).
+  -- Same for `zChainOf` and `toricBoundaries = (toricHomologicalCode L).boundaries` (rfl).
+  -- `toricDualBoundaries` matches via `toricHomologicalCode_dualBoundaries_eq`.
   rintro ⟨hxBnd, hzBnd⟩
-  -- Define X-only and Z-only encodings of g
-  set g_X := Stabilizer.Lattice.toricXOperatorOfChain L (xChainOf L g) with hg_X
-  set g_Z := Stabilizer.Lattice.toricZOperatorOfChain L (zChainOf L g) with hg_Z
-  -- Each is in the appropriate generator closure (hence in the stabilizer subgroup)
-  have hgX_mem : g_X ∈ (stabilizerGroup L).toSubgroup := by
-    rw [stabilizerGroup_toSubgroup_eq, subgroup]
-    have : g_X ∈ Subgroup.closure (XGenerators L) :=
-      (Stabilizer.Lattice.xIsPlaquetteProduct_iff_mem_toricBoundaries L (xChainOf L g)).mpr hxBnd
-    apply Subgroup.closure_mono _ this
-    intro x hx; right; exact hx
-  have hgZ_mem : g_Z ∈ (stabilizerGroup L).toSubgroup := by
-    rw [stabilizerGroup_toSubgroup_eq, subgroup]
-    have : g_Z ∈ Subgroup.closure (ZGenerators L) :=
-      (Stabilizer.Lattice.zIsStarProduct_iff_mem_toricDualBoundaries L (zChainOf L g)).mpr hzBnd
-    apply Subgroup.closure_mono _ this
-    intro x hx; left; exact hx
-  -- Their product is also in the stabilizer
-  have hprod_mem : g_X * g_Z ∈ (stabilizerGroup L).toSubgroup :=
-    (stabilizerGroup L).toSubgroup.mul_mem hgX_mem hgZ_mem
-  -- (g_X * g_Z).operators = g.operators (computed per-qubit)
-  have hops_eq : (g_X * g_Z).operators = g.operators := by
-    ext i
-    have hX_i := toricXOf_xChain_operators_eq L g i
-    have hZ_i := toricZOf_zChain_operators_eq L g i
-    change ((g_X.operators i).mulOp (g_Z.operators i)).operator = g.operators i
-    rw [hX_i, hZ_i]
-    cases hgi : g.operators i <;>
-      simp [PauliOperator.mulOp]
-  -- Apply the third condition of IsNontrivialLogicalOperator
-  rw [IsNontrivialLogicalOperator_iff] at hg
-  obtain ⟨_, _, h_no_phase_dup⟩ := hg
-  exact h_no_phase_dup (g_X * g_Z) hprod_mem hops_eq
+  apply (Stabilizer.Lattice.toricHomologicalCode L).not_both_boundary_of_nontrivial g hg_abs
+  refine ⟨?_, ?_⟩
+  · exact hxBnd
+  · rw [← Stabilizer.Lattice.toricHomologicalCode_dualBoundaries_eq L] at hzBnd
+    exact hzBnd
 
 /-- CSS bridge: full distance = min(dX, dZ). -/
 theorem toricCodeN_distance_eq_min_dX_dZ (L dX dZ : ℕ) [Fact (2 ≤ L)]

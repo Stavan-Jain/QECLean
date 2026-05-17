@@ -6,6 +6,8 @@ import QEC.Stabilizer.Core.LogicalOperators
 import QEC.Stabilizer.Lattice.ToricH1Dimension
 import QEC.Stabilizer.Lattice.ToricLogicalCorrespondenceX
 import QEC.Stabilizer.Lattice.ToricLogicalCorrespondenceZ
+import QEC.Stabilizer.Lattice.ToricChainComplex
+import QEC.Stabilizer.Homological.StabGroup
 
 /-!
 # Toric code as `StabilizerCode (2L², 2)`
@@ -154,14 +156,25 @@ lemma listToSet_packaged_subset_full (L : ℕ) [Fact (0 < L)] :
   · exact Or.inl (listToSet_genListZTrimmed_subset L hZ)
   · exact Or.inr (listToSet_genListXTrimmed_subset L hX)
 
-/-- The packaged generators pairwise commute (subset of full generators which commute). -/
+/-- The packaged generators pairwise commute.
+
+Delegates to the generic `Homological.HomologicalCode.homologicalGenerators_commute`
+on `Stabilizer.Lattice.toricHomologicalCode L`, via the generator-set bridges. -/
 lemma generators_commute_packaged (L : ℕ) [Fact (2 ≤ L)] :
     ∀ g ∈ listToSet (generatorsListPackaged L),
     ∀ h ∈ listToSet (generatorsListPackaged L), g * h = h * g := by
   haveI : Fact (0 < L) := ⟨lt_of_lt_of_le (by decide : 0 < 2) Fact.out⟩
+  -- Bridge: `generators L = (toricHomologicalCode L).homologicalGenerators`.
+  have h_gens_eq : generators L =
+      (Stabilizer.Lattice.toricHomologicalCode L).homologicalGenerators := by
+    unfold generators Quantum.Stabilizer.Homological.HomologicalCode.homologicalGenerators
+    rw [Stabilizer.Lattice.toricHomologicalCode_ZGenerators_eq,
+        Stabilizer.Lattice.toricHomologicalCode_XGenerators_eq]
+    rfl
   intro g hg h hh
-  exact generators_commute L g (listToSet_packaged_subset_full L hg)
-    h (listToSet_packaged_subset_full L hh)
+  apply (Stabilizer.Lattice.toricHomologicalCode L).homologicalGenerators_commute
+  · rw [← h_gens_eq]; exact listToSet_packaged_subset_full L hg
+  · rw [← h_gens_eq]; exact listToSet_packaged_subset_full L hh
 
 -- ---------------------------------------------------------------------------
 -- Phase 1.3 / 1.4: Homological identities
@@ -513,12 +526,24 @@ lemma closure_packaged_eq_full (L : ℕ) [Fact (2 ≤ L)] :
         change (x, y) ∈ (List.finRange L).product (List.finRange L)
         simp
 
-/-- `-I` is not in the closure of the packaged generator list. -/
+/-- `-I` is not in the closure of the packaged generator list.
+
+Delegates to the generic `negIdentity_not_mem_closure_homologicalGenerators` on
+`Stabilizer.Lattice.toricHomologicalCode L`, via the generator-set bridges and the
+`closure_packaged_eq_full` identity. -/
 lemma negIdentity_not_mem_packaged (L : ℕ) [Fact (2 ≤ L)] :
     StabilizerGroup.negIdentity (numQubits L) ∉
       Subgroup.closure (listToSet (generatorsListPackaged L)) := by
+  have h_gens_eq : generators L =
+      (Stabilizer.Lattice.toricHomologicalCode L).homologicalGenerators := by
+    unfold generators Quantum.Stabilizer.Homological.HomologicalCode.homologicalGenerators
+    rw [Stabilizer.Lattice.toricHomologicalCode_ZGenerators_eq,
+        Stabilizer.Lattice.toricHomologicalCode_XGenerators_eq]
+    rfl
   rw [closure_packaged_eq_full L, stabilizerGroup_toSubgroup_eq]
-  exact negIdentity_not_mem L
+  change StabilizerGroup.negIdentity (numQubits L) ∉ Subgroup.closure (generators L)
+  rw [h_gens_eq]
+  exact (Stabilizer.Lattice.toricHomologicalCode L).negIdentity_not_mem_closure_homologicalGenerators
 
 -- ---------------------------------------------------------------------------
 -- Phase 2: Logical operators (with logical-qubit-ops construction)
@@ -1520,6 +1545,19 @@ theorem toricStabilizerCode_subgroup_eq (L : ℕ) [Fact (2 ≤ L)] :
     (toricStabilizerCode L).toStabilizerGroup.toSubgroup = (stabilizerGroup L).toSubgroup := by
   change Subgroup.closure (listToSet (generatorsListPackaged L)) = _
   exact closure_packaged_eq_full L
+
+/-- Chain bridge: the toric stabilizer code's subgroup matches the abstract
+`(toricHomologicalCode L).homologicalStabilizerGroup`'s subgroup.
+
+Useful for delegating `IsNontrivialLogicalOperator` and centralizer membership
+through the generic `HomologicalCode` API.  Chains `toricStabilizerCode_subgroup_eq`
+with `Stabilizer.Lattice.toricHomologicalCode_homologicalStabilizerGroup_toSubgroup_eq`. -/
+theorem toricStabilizerCode_toSubgroup_eq_homologicalStabilizerGroup
+    (L : ℕ) [Fact (2 ≤ L)] :
+    (toricStabilizerCode L).toStabilizerGroup.toSubgroup =
+      (Stabilizer.Lattice.toricHomologicalCode L).homologicalStabilizerGroup.toSubgroup := by
+  rw [toricStabilizerCode_subgroup_eq,
+      ← Stabilizer.Lattice.toricHomologicalCode_homologicalStabilizerGroup_toSubgroup_eq]
 
 end ToricCodeN
 end StabilizerGroup

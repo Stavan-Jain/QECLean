@@ -1,7 +1,8 @@
 import Mathlib.Tactic
-import QEC.Stabilizer.Lattice.ToricOperatorChains
+import QEC.Stabilizer.Lattice.ToricChainOps
 import QEC.Stabilizer.Lattice.ToricHomology
-import QEC.Stabilizer.Codes.ToricCodeN
+import QEC.Stabilizer.Lattice.ToricChainComplex
+import QEC.Stabilizer.Homological.LogicalCorrespondence
 import QEC.Stabilizer.Core.LogicalOperators
 
 
@@ -329,109 +330,16 @@ theorem boundary1_pointwise_zero_iff_mem_toricCycles
   · intro h v
     exact congrArg (fun f => f v) h
 
-/-- Commutation criterion: X-chain commutes with all Z checks iff it is a cycle. -/
+/-- Commutation criterion: X-chain commutes with all Z checks iff it is a cycle.
+
+This delegates to the generic `chainXOperator_commutes_ZGenerators_iff_mem_cycles`
+via the toric `HomologicalCode` instance and the lattice/abstract generator-set bridge. -/
 theorem xCommutesWithZChecks_iff_mem_toricCycles (L : ℕ) [Fact (2 ≤ L)] (c : C1 L) :
     xCommutesWithZChecks L c ↔ c ∈ toricCycles (L := L) := by
-  exact
-    (xCommutesWithZChecks_iff_boundary1_pointwise_zero L c).trans
-      (boundary1_pointwise_zero_iff_mem_toricCycles L c)
-
-/-
-`toricXOperatorOfChain` maps the zero chain to the identity Pauli element.
--/
-lemma toricXOperatorOfChain_zero (L : ℕ) :
-    toricXOperatorOfChain L 0 = 1 := by
-  unfold toricXOperatorOfChain;
-  aesop
-
-/-
-`toricXOperatorOfChain` maps chain addition to Pauli multiplication (ZMod 2 ↔ X²=I).
--/
-set_option maxHeartbeats 1000000 in
--- This pointwise-to-global proof unfolds many dependent equalities and case splits.
-lemma toricXOperatorOfChain_add (L : ℕ) (c c' : C1 L) :
-    toricXOperatorOfChain L (c + c') =
-      toricXOperatorOfChain L c * toricXOperatorOfChain L c' := by
-  -- By definition of toricXOperatorOfChain, the operators are determined by input 1-entries.
-  simp [toricXOperatorOfChain] at *;
-  simp +decide [ NQubitPauliGroupElement.mul, NQubitPauliGroupElement.mulOp ];
-  constructor;
-  · rw [ Finset.sum_eq_zero ] ; aesop;
-  · ext q;
-    split_ifs <;> simp_all +decide [ Fin.ext_iff, ZMod ];
-    · rename_i h₁ h₂ h₃;
-      obtain ⟨ e₁, he₁, he₂ ⟩ := h₁
-      obtain ⟨ e₂, he₃, he₄ ⟩ := h₂
-      obtain ⟨ e₃, he₅, he₆ ⟩ := h₃
-      have h_eq : e₁ = e₂ ∧ e₂ = e₃ := by
-        have h_eq : ∀ e₁ e₂ : EdgeIdx L, edgeToQubitIdx L e₁ = edgeToQubitIdx L e₂ → e₁ = e₂ := by
-          intros e₁ e₂ h_eq
-          have h_eq' : edgeToQubitIdx L e₁ = edgeToQubitIdx L e₂ := h_eq
-          simp [edgeToQubitIdx] at h_eq';
-          rcases e₁ with ( _ | _ ) <;> rcases e₂ with ( _ | _ ) <;> norm_num at h_eq' ⊢;
-          · rename_i a b c d;
-            have h_eq' : b = d := by
-              exact Fin.ext ( by nlinarith [ Fin.is_lt a, Fin.is_lt b, Fin.is_lt c, Fin.is_lt d ] );
-            aesop;
-          · rename_i a b c d
-            exact absurd h_eq'
-              (by nlinarith only [Fin.is_lt a, Fin.is_lt b, Fin.is_lt c, Fin.is_lt d])
-          · rename_i a b c d
-            exact absurd h_eq'
-              (by nlinarith [Fin.is_lt a, Fin.is_lt b, Fin.is_lt c, Fin.is_lt d])
-          · rename_i a b c d;
-            have h_eq' : b = d := by
-              exact Fin.ext ( by nlinarith [ Fin.is_lt a, Fin.is_lt b, Fin.is_lt c, Fin.is_lt d ] );
-            aesop;
-        exact ⟨ h_eq e₁ e₂ ( Fin.ext <| by aesop ), h_eq e₂ e₃ ( Fin.ext <| by aesop ) ⟩;
-      grind;
-    · grind;
-    · grind;
-    · grind
-
-/-
-`toricXOperatorOfChain` maps the boundary of a single face to the corresponding face stabilizer.
--/
-lemma toricXOperatorOfChain_boundary_singleFace (L : ℕ) [Fact (2 ≤ L)] (x y : Fin L) :
-    toricXOperatorOfChain L (toricBoundary2 (L := L) (singleFace (x, y))) =
-      StabilizerGroup.ToricCodeN.faceStab L x y := by
-  unfold toricXOperatorOfChain StabilizerGroup.ToricCodeN.faceStab;
-  congr with q;
-  split_ifs <;> simp_all +decide [ NQubitPauliOperator.set ];
-  · rename_i h
-    obtain ⟨e, rfl, he⟩ := h
-    rcases e with (_ | _) <;> simp_all +decide [toricBoundary2, singleFace]
-    · unfold edgeToQubitIdx; split_ifs at he <;> simp_all +decide [ Fin.ext_iff ] ;
-    · split_ifs at he <;> simp_all +decide [ Fin.ext_iff, StabilizerGroup.ToricCodeN.next ];
-  · split_ifs <;> simp_all +decide [ toricNumQubits ];
-    · rename_i h₁ h₂;
-      contrapose! h₁;
-      use EdgeIdx.v (StabilizerGroup.ToricCodeN.next L x) y;
-      unfold edgeToQubitIdx; simp +decide [ StabilizerGroup.ToricCodeN.next ] ;
-      constructor;
-      · exact rfl
-      · exact next_ne_self L x
-    · rename_i h₁ h₂ h₃;
-      contrapose! h₁;
-      use EdgeIdx.v x y;
-      unfold edgeToQubitIdx; simp +decide [ StabilizerGroup.ToricCodeN.vEdge ] ;
-      grind;
-    · rename_i h₁ h₂ h₃ h₄;
-      contrapose! h₁;
-      use EdgeIdx.h x (StabilizerGroup.ToricCodeN.next L y); simp +decide [ edgeToQubitIdx ] ;
-      unfold StabilizerGroup.ToricCodeN.next; simp +decide [ Fin.ext_iff ] ;
-      by_cases hy : y.val = L - 1;
-      · rcases L with ( _ | _ | L ) <;> simp_all +decide;
-        exact absurd ( Fact.out ( p := 2 ≤ 0 + 1 ) ) ( by decide );
-      · rw [ Nat.mod_eq_of_lt ] <;> omega;
-    · rename_i h₁ h₂ h₃ h₄ h₅;
-      contrapose! h₁;
-      use EdgeIdx.h x y;
-      unfold toricBoundary2; simp +decide [ singleFace ] ;
-      exact
-        Decidable.not_imp_iff_and_not.mp fun a ↦
-          h₄ (congrArg (StabilizerGroup.ToricCodeN.hEdge L x) (a rfl));
-    · unfold NQubitPauliOperator.identity; aesop;
+  haveI : Fact (0 < L) := ⟨Nat.lt_of_lt_of_le (by decide : 0 < 2) Fact.out⟩
+  unfold xCommutesWithZChecks
+  rw [← toricHomologicalCode_ZGenerators_eq]
+  exact (toricHomologicalCode L).chainXOperator_commutes_ZGenerators_iff_mem_cycles c
 
 /-
 Every 2-chain is a sum of single-face indicators.
@@ -444,49 +352,16 @@ lemma c2_eq_sum_singleFace (L : ℕ) (f : C2 L) :
     split_ifs <;> simp_all (config := {decide := true}) <;>
     first | rfl | exact absurd rfl ‹_›
 
-/-
-Stabilizer criterion: X-chain is plaquette product iff it is a boundary.
--/
+/-- Stabilizer criterion: X-chain is plaquette product iff it is a boundary.
+
+Delegates to `chainXOperator_mem_XClosure_iff_mem_boundaries` on the toric
+`HomologicalCode` instance via the X-generator bridge. -/
 theorem xIsPlaquetteProduct_iff_mem_toricBoundaries (L : ℕ) [Fact (2 ≤ L)] (c : C1 L) :
     xIsPlaquetteProduct L c ↔ c ∈ toricBoundaries (L := L) := by
-  constructor <;> intro hc <;> simp_all +decide [ xIsPlaquetteProduct, toricBoundaries ];
-  · have h_closure :
-        ∀ g ∈ Subgroup.closure (StabilizerGroup.ToricCodeN.XGenerators L),
-          ∃ f : C2 L, toricXOperatorOfChain L (toricBoundary2 (L := L) f) = g := by
-      intro g hg
-      induction hg using Subgroup.closure_induction with
-      | mem g hg =>
-          rcases hg with ⟨⟨x, y⟩, rfl⟩
-          exact ⟨singleFace (x, y), toricXOperatorOfChain_boundary_singleFace L x y⟩
-      | one => use 0; simp [toricXOperatorOfChain_zero]
-      | mul x y hx hy ihx ihy =>
-          obtain ⟨f₁, hf₁⟩ := ihx
-          obtain ⟨f₂, hf₂⟩ := ihy
-          use f₁ + f₂
-          simp +decide [hf₁, hf₂, toricXOperatorOfChain_add]
-      | inv x hx ih =>
-          obtain ⟨f, hf⟩ := ih
-          use f
-          simp_all +decide [toricXOperatorOfChain]
-          rw [← hf]
-          ext <;> simp +decide [NQubitPauliGroupElement.inv]
-    have := @chainOfXOperator_toricXOperatorOfChain L;
-    grind +splitImp;
-  · obtain ⟨ f, rfl ⟩ := hc;
-    rw [ c2_eq_sum_singleFace L f ];
-    induction (Finset.univ.filter fun p : FaceIdx L => f p = 1) using Finset.induction with
-    | empty =>
-        simp_all +decide
-        rw [ toricXOperatorOfChain_zero ]
-        exact OneMemClass.one_mem _
-    | insert a s has ih =>
-        simp_all +decide [Finset.sum_insert]
-        rw [ toricXOperatorOfChain_add ]
-        exact Subgroup.mul_mem _
-          (by
-            rw [toricXOperatorOfChain_boundary_singleFace]
-            exact Subgroup.subset_closure <| Set.mem_range_self _)
-          ih
+  haveI : Fact (0 < L) := ⟨Nat.lt_of_lt_of_le (by decide : 0 < 2) Fact.out⟩
+  unfold xIsPlaquetteProduct
+  rw [← toricHomologicalCode_XGenerators_eq]
+  exact (toricHomologicalCode L).chainXOperator_mem_XClosure_iff_mem_boundaries c
 
 /-
 X-type operators commute with the toric X-type chain encoding.
@@ -675,45 +550,29 @@ lemma stabilizer_same_ops_implies_boundary
   rw [h_eq] at hxcl
   exact (xIsPlaquetteProduct_iff_mem_toricBoundaries L c).mp hxcl
 
-/-
-X nontrivial logical iff corresponding chain is cycle-not-boundary.
--/
-set_option maxHeartbeats 1000000 in
--- This theorem combines closure induction with nontrivial-coset conditions.
+/-- X nontrivial logical iff corresponding chain is cycle-not-boundary.
+
+Delegates to the generic `chainXOperator_isNontrivialLogical_iff` via the
+shared underlying subgroup of the toric and abstract stabilizer groups. -/
 theorem xNontrivialLogical_iff_cycle_not_boundary (L : ℕ) [Fact (2 ≤ L)] (c : C1 L) :
     StabilizerGroup.IsNontrivialLogicalOperator
         (toricXOperatorOfChain L c) (StabilizerGroup.ToricCodeN.stabilizerGroup L) ↔
       c ∈ toricCycles (L := L) ∧ c ∉ toricBoundaries (L := L) := by
-  constructor <;> intro h;
-  · constructor;
-    · exact toricXOperatorOfChain_mem_centralizer_iff_cycle L c |>.1 h.1;
-    · intro hc
-      have h_plaquette :
-          toricXOperatorOfChain L c ∈
-            Subgroup.closure (StabilizerGroup.ToricCodeN.XGenerators L) := by
-        exact xIsPlaquetteProduct_iff_mem_toricBoundaries L c |>.2 hc
-      have h_in_stabilizer :
-          toricXOperatorOfChain L c ∈
-            (StabilizerGroup.ToricCodeN.stabilizerGroup L).toSubgroup := by
-        refine Subgroup.closure_induction ( fun x hx => ?_ ) ?_ ?_ ?_ h_plaquette;
-        · exact Subgroup.subset_closure
-            (by
-              rw [StabilizerGroup.ToricCodeN.listToSet_generatorsList]
-              exact Set.mem_union_right _ hx)
-        · exact OneMemClass.one_mem _;
-        · exact fun x y hx hy hx' hy' => Subgroup.mul_mem _ hx' hy';
-        · exact fun x hx₁ hx₂ => Subgroup.inv_mem _ hx₂
-      exact h.2.1 h_in_stabilizer;
-  · constructor;
-    · exact toricXOperatorOfChain_mem_centralizer_iff_cycle L c |>.2 h.1;
-    · have h_1 := h.1
-      have h_2 := h.2
-      constructor;
-      · intro hg
-        exact h_2 (stabilizer_same_ops_implies_boundary L c
-          (toricXOperatorOfChain L c) hg rfl)
-      · intro s hs hEq
-        exact h_2 (stabilizer_same_ops_implies_boundary L c s hs hEq)
+  haveI : Fact (0 < L) := ⟨Nat.lt_of_lt_of_le (by decide : 0 < 2) Fact.out⟩
+  -- The toric and abstract stabilizer groups have the same underlying subgroup
+  -- once we translate the lattice generator sets via the §E bridges.
+  have h_subgroup_eq :
+      (StabilizerGroup.ToricCodeN.stabilizerGroup L).toSubgroup =
+        (toricHomologicalCode L).homologicalStabilizerGroup.toSubgroup := by
+    rw [StabilizerGroup.ToricCodeN.stabilizerGroup_toSubgroup_eq]
+    change Subgroup.closure (StabilizerGroup.ToricCodeN.generators L) =
+      Subgroup.closure (toricHomologicalCode L).homologicalGenerators
+    unfold StabilizerGroup.ToricCodeN.generators Homological.HomologicalCode.homologicalGenerators
+    rw [toricHomologicalCode_ZGenerators_eq, toricHomologicalCode_XGenerators_eq]
+    rfl
+  rw [StabilizerGroup.IsNontrivialLogicalOperator_of_toSubgroup_eq _ h_subgroup_eq]
+  -- The toric `chainXOperator c` is `toricXOperatorOfChain L c` by `rfl`-bridge.
+  exact (toricHomologicalCode L).chainXOperator_isNontrivialLogical_iff c
 
 
 end Lattice

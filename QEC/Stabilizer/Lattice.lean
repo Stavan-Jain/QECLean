@@ -7,6 +7,7 @@ import QEC.Stabilizer.Lattice.ToricHomology
 import QEC.Stabilizer.Lattice.ToricH1Dimension
 import QEC.Stabilizer.Lattice.ToricWrappingInvariants
 import QEC.Stabilizer.Lattice.ToricOperatorChains
+import QEC.Stabilizer.Lattice.ToricChainOps
 import QEC.Stabilizer.Lattice.ToricLogicalCorrespondenceX
 import QEC.Stabilizer.Lattice.ToricLogicalCorrespondenceZ
 import QEC.Stabilizer.Lattice.ToricDualWrappingInvariants
