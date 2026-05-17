@@ -15,4 +15,5 @@ import QEC.Stabilizer.Lattice.ToricChainComplex
 import QEC.Stabilizer.Lattice.RotatedSurfaceCellComplex
 import QEC.Stabilizer.Lattice.RotatedSurfaceBoundaryMaps
 import QEC.Stabilizer.Lattice.RotatedSurfaceChainComplex
+import QEC.Stabilizer.Lattice.RotatedSurfaceH1Dimension
 
