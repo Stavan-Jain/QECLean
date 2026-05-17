@@ -146,11 +146,14 @@ theorem vAt_independent_on_cycles (c : toricCycles (L := L)) (y0 y1 : Fin L) :
       vAt (L := L) y (c.1) =
         vAt (L := L) (Fin.mk ((y.val + k) % L) (Nat.mod_lt _ (Fact.out : 0 < L))) (c.1) := by
     intro k y
-    induction' k with k ih <;> simp +decide [Nat.add_mod, Nat.mod_eq_of_lt]
-    simp +decide [ih]
-    convert h_B1_gen _ |> Eq.symm using 2
-    norm_num [add_assoc, Nat.mod_eq_of_lt]
-    norm_num [← add_assoc, next]
+    induction k with
+    | zero => simp +decide [Nat.mod_eq_of_lt]
+    | succ k ih =>
+        simp +decide [Nat.add_mod, Nat.mod_eq_of_lt]
+        simp +decide [ih]
+        convert h_B1_gen _ |> Eq.symm using 2
+        norm_num [add_assoc, Nat.mod_eq_of_lt]
+        norm_num [← add_assoc, next]
   convert h_ind ( y1.val + L - y0.val ) y0 using 1;
   simp +decide [add_tsub_cancel_of_le
     (show (y0 : ℕ) ≤ y1 + L from by linarith [Fin.is_lt y0, Fin.is_lt y1]), Nat.mod_eq_of_lt]

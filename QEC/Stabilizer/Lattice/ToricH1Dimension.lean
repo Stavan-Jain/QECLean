@@ -224,15 +224,16 @@ theorem mem_ker_cutMap_iff (s : C0 L) :
               s (⟨0, by linarith [Fact.out (p := 0 < L)]⟩,
                 ⟨0, by linarith [Fact.out (p := 0 < L)]⟩) := by
         intro y
-        induction' y with y ih;
-        induction' y with y ih;
-        · rfl;
-        · specialize h_const
-            ⟨0, by linarith [Fact.out (p := 0 < L)]⟩
-            ⟨y, by linarith [Fact.out (p := 0 < L)]⟩
-          simp_all +decide [ next ];
-          simp_all +decide [ Nat.mod_eq_of_lt ( by linarith : y + 1 < L ) ];
-          grind
+        obtain ⟨y, ih⟩ := y
+        induction y with
+        | zero => rfl
+        | succ y ih_step =>
+            specialize h_const
+              ⟨0, by linarith [Fact.out (p := 0 < L)]⟩
+              ⟨y, by linarith [Fact.out (p := 0 < L)]⟩
+            simp_all +decide [ next ]
+            simp_all +decide [ Nat.mod_eq_of_lt ( by linarith : y + 1 < L ) ]
+            grind
       exact h_const_x x ▸ h_const_y y ▸ rfl
     obtain ⟨c, hc⟩ := h_const_val
     exact ⟨c, funext fun p => by simp [hc]⟩
@@ -310,13 +311,15 @@ theorem mem_ker_boundary2_iff (f : C2 L) :
             rw [← two_smul (ZMod 2) _]
             simp +decide)]
     have h_ind : ∀ x y, f (x, y) = f (x, ⟨0, by linarith [Fact.out (p := 0 < L)]⟩) := by
-      intro x y; induction' y with y ih;
-      induction' y with y ih;
-      · rfl;
-      · convert h_const x ⟨ y, by linarith ⟩ using 1;
-        · congr;
-          norm_num [ Fin.val_add, Nat.mod_eq_of_lt ih ];
-        · exact Eq.symm ( by solve_by_elim [ Nat.lt_of_succ_lt ] );
+      intro x y
+      obtain ⟨y, ih⟩ := y
+      induction y with
+      | zero => rfl
+      | succ y ih_step =>
+          convert h_const x ⟨ y, by linarith ⟩ using 1
+          · congr
+            norm_num [ Fin.val_add, Nat.mod_eq_of_lt ih ]
+          · exact Eq.symm ( by solve_by_elim [ Nat.lt_of_succ_lt ] )
     have h_const_x :
         ∀ x, f (next L x, ⟨0, by linarith [Fact.out (p := 0 < L)]⟩) =
           f (x, ⟨0, by linarith [Fact.out (p := 0 < L)]⟩) := by
@@ -340,12 +343,13 @@ theorem mem_ker_boundary2_iff (f : C2 L) :
           f (⟨0, by linarith [Fact.out (p := 0 < L)]⟩,
             ⟨0, by linarith [Fact.out (p := 0 < L)]⟩) := by
       intro x
-      induction' x with x ih;
-      induction' x with x ih;
-      · rfl;
-      · convert h_const_x ⟨ x, by linarith ⟩ using 1;
-        · exact Fin.ext ( by simp +decide [ next, Nat.mod_eq_of_lt ih ] );
-        · exact Eq.symm ( by solve_by_elim [ Nat.lt_of_succ_lt ] );
+      obtain ⟨x, ih⟩ := x
+      induction x with
+      | zero => rfl
+      | succ x ih_step =>
+          convert h_const_x ⟨ x, by linarith ⟩ using 1
+          · exact Fin.ext ( by simp +decide [ next, Nat.mod_eq_of_lt ih ] )
+          · exact Eq.symm ( by solve_by_elim [ Nat.lt_of_succ_lt ] )
     exact
       ⟨f (⟨0, by linarith [Fact.out (p := 0 < L)]⟩, ⟨0, by linarith [Fact.out (p := 0 < L)]⟩),
         funext fun x => by aesop⟩

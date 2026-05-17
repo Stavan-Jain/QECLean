@@ -514,38 +514,42 @@ theorem zIsStarProduct_iff_mem_toricDualBoundaries (L : ℕ) [Fact (2 ≤ L)] (c
         ∀ g ∈ Subgroup.closure (StabilizerGroup.ToricCodeN.ZGenerators L),
           ∃ s : C0 L, toricZOperatorOfChain L (toricVertexCutMap (L := L) s) = g := by
       intro g hg
-      induction' hg using Subgroup.closure_induction with g hg ih
-      · rcases hg with ⟨⟨xv, yv⟩, rfl⟩
-        exact ⟨singleVtx (xv, yv), toricZOperatorOfChain_cutMap_singleVtx L xv yv⟩
-      · use 0
-        simp only [map_zero, toricZOperatorOfChain_zero]
-      · rename_i h₁ h₂ h₃ h₄
-        obtain ⟨s₁, hs₁⟩ := h₃
-        obtain ⟨s₂, hs₂⟩ := h₄
-        use s₁ + s₂
-        simp only [map_add]
-        simp +decide [hs₁, hs₂, toricZOperatorOfChain_add]
-      · obtain ⟨s, hs⟩ := ‹_›
-        use s
-        simp_all +decide [toricZOperatorOfChain]
-        rw [← hs]
-        ext <;> simp +decide [NQubitPauliGroupElement.inv]
+      induction hg using Subgroup.closure_induction with
+      | mem g hg =>
+          rcases hg with ⟨⟨xv, yv⟩, rfl⟩
+          exact ⟨singleVtx (xv, yv), toricZOperatorOfChain_cutMap_singleVtx L xv yv⟩
+      | one =>
+          use 0
+          simp only [map_zero, toricZOperatorOfChain_zero]
+      | mul x y hx hy ihx ihy =>
+          obtain ⟨s₁, hs₁⟩ := ihx
+          obtain ⟨s₂, hs₂⟩ := ihy
+          use s₁ + s₂
+          simp only [map_add]
+          simp +decide [hs₁, hs₂, toricZOperatorOfChain_add]
+      | inv x hx ih =>
+          obtain ⟨s, hs⟩ := ih
+          use s
+          simp_all +decide [toricZOperatorOfChain]
+          rw [← hs]
+          ext <;> simp +decide [NQubitPauliGroupElement.inv]
     have hroundtrip := @chainOfZOperator_toricZOperatorOfChain L
     grind +splitImp
   · -- ← direction: from range(cutMap) to closure(ZGen)
     obtain ⟨s, rfl⟩ := hc
     rw [c0_eq_sum_singleVtx L s]
     simp only [map_sum]
-    induction' (Finset.univ.filter fun v : VtxIdx L => s v = 1) using Finset.induction
-      with a fs ha ih
-    · simp only [Finset.sum_empty, toricZOperatorOfChain_zero]
-      exact OneMemClass.one_mem _
-    · simp only [Finset.sum_insert ha, toricZOperatorOfChain_add]
-      exact Subgroup.mul_mem _
-        (by rcases a with ⟨xv, yv⟩
-            rw [toricZOperatorOfChain_cutMap_singleVtx]
-            exact Subgroup.subset_closure ⟨(xv, yv), rfl⟩)
-        ih
+    induction (Finset.univ.filter fun v : VtxIdx L => s v = 1) using Finset.induction with
+    | empty =>
+        simp only [Finset.sum_empty, toricZOperatorOfChain_zero]
+        exact OneMemClass.one_mem _
+    | insert a fs ha ih =>
+        simp only [Finset.sum_insert ha, toricZOperatorOfChain_add]
+        exact Subgroup.mul_mem _
+          (by rcases a with ⟨xv, yv⟩
+              rw [toricZOperatorOfChain_cutMap_singleVtx]
+              exact Subgroup.subset_closure ⟨(xv, yv), rfl⟩)
+          ih
 
 -- ---------------------------------------------------------------------------
 -- 7.  Centralizer membership

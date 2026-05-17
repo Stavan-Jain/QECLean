@@ -95,9 +95,13 @@ theorem hRowAt_independent_on_dualCycles (c : toricDualCycles (L := L)) (y0 y1 :
   have h_induction : ∀ k : ℕ, ∀ y : Fin L,
       hRowAt L y c.1 =
         hRowAt L (Fin.mk ((y.val + k) % L) (Nat.mod_lt _ (Fact.out))) c.1 := by
-    intro k y; induction' k with k ih <;> simp_all +decide [ ← add_assoc, Nat.mod_eq_of_lt ] ;
-    specialize h_row_eq ⟨ ( y + k ) % L, Nat.mod_lt _ ( Fact.out ) ⟩ ;
-    simp_all +decide [ ← eq_sub_iff_add_eq', next ] ;
+    intro k y
+    induction k with
+    | zero => simp_all +decide [ Nat.mod_eq_of_lt ]
+    | succ k ih =>
+        simp_all +decide [ ← add_assoc ]
+        specialize h_row_eq ⟨ ( y + k ) % L, Nat.mod_lt _ ( Fact.out ) ⟩
+        simp_all +decide [ ← eq_sub_iff_add_eq', next ]
   convert h_induction ( y1.val + L - y0.val ) y0 using 1;
   simp +decide [ add_tsub_cancel_of_le
     ( show ( y0 : ℕ ) ≤ y1 + L from by linarith [ Fin.is_lt y0, Fin.is_lt y1 ] ),
