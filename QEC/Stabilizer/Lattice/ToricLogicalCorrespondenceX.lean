@@ -454,33 +454,39 @@ theorem xIsPlaquetteProduct_iff_mem_toricBoundaries (L : ℕ) [Fact (2 ≤ L)] (
         ∀ g ∈ Subgroup.closure (StabilizerGroup.ToricCodeN.XGenerators L),
           ∃ f : C2 L, toricXOperatorOfChain L (toricBoundary2 (L := L) f) = g := by
       intro g hg
-      induction' hg using Subgroup.closure_induction with g hg ih;
-      · rcases hg with ⟨⟨x, y⟩, rfl⟩
-        exact ⟨singleFace (x, y), toricXOperatorOfChain_boundary_singleFace L x y⟩
-      · use 0; simp [toricXOperatorOfChain_zero];
-      · rename_i h₁ h₂ h₃ h₄
-        obtain ⟨f₁, hf₁⟩ := h₃
-        obtain ⟨f₂, hf₂⟩ := h₄
-        use f₁ + f₂
-        simp +decide [hf₁, hf₂, toricXOperatorOfChain_add]
-      · obtain ⟨f, hf⟩ := ‹_›
-        use f
-        simp_all +decide [toricXOperatorOfChain]
-        rw [← hf]
-        ext <;> simp +decide [NQubitPauliGroupElement.inv]
+      induction hg using Subgroup.closure_induction with
+      | mem g hg =>
+          rcases hg with ⟨⟨x, y⟩, rfl⟩
+          exact ⟨singleFace (x, y), toricXOperatorOfChain_boundary_singleFace L x y⟩
+      | one => use 0; simp [toricXOperatorOfChain_zero]
+      | mul x y hx hy ihx ihy =>
+          obtain ⟨f₁, hf₁⟩ := ihx
+          obtain ⟨f₂, hf₂⟩ := ihy
+          use f₁ + f₂
+          simp +decide [hf₁, hf₂, toricXOperatorOfChain_add]
+      | inv x hx ih =>
+          obtain ⟨f, hf⟩ := ih
+          use f
+          simp_all +decide [toricXOperatorOfChain]
+          rw [← hf]
+          ext <;> simp +decide [NQubitPauliGroupElement.inv]
     have := @chainOfXOperator_toricXOperatorOfChain L;
     grind +splitImp;
   · obtain ⟨ f, rfl ⟩ := hc;
     rw [ c2_eq_sum_singleFace L f ];
-    induction' (Finset.univ.filter fun p : FaceIdx L => f p = 1) using Finset.induction <;>
-      simp_all +decide [Finset.sum_insert]
-    · rw [ toricXOperatorOfChain_zero ] ; exact OneMemClass.one_mem _;
-    · rw [ toricXOperatorOfChain_add ];
-      exact Subgroup.mul_mem _
-        (by
-          rw [toricXOperatorOfChain_boundary_singleFace]
-          exact Subgroup.subset_closure <| Set.mem_range_self _)
-        ‹_›
+    induction (Finset.univ.filter fun p : FaceIdx L => f p = 1) using Finset.induction with
+    | empty =>
+        simp_all +decide
+        rw [ toricXOperatorOfChain_zero ]
+        exact OneMemClass.one_mem _
+    | insert a s has ih =>
+        simp_all +decide [Finset.sum_insert]
+        rw [ toricXOperatorOfChain_add ]
+        exact Subgroup.mul_mem _
+          (by
+            rw [toricXOperatorOfChain_boundary_singleFace]
+            exact Subgroup.subset_closure <| Set.mem_range_self _)
+          ih
 
 /-
 X-type operators commute with the toric X-type chain encoding.
