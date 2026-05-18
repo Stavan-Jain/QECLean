@@ -201,6 +201,209 @@ lemma chainZOperator_zChainOf_op_at
     push Not
     exact hzy
 
+/-! ## Weight of the X- / Z-only encodings
+
+The qubit support of `chainXOperator c` (resp. `chainZOperator c`) is in
+bijection with `chainSupport c` via `edgeEquiv`, hence the operator
+weight equals the chain weight. -/
+
+/-- `weight (chainXOperator c) = chainWeight c`. -/
+lemma weight_chainXOperator (c : X.C1 → ZMod 2) :
+    NQubitPauliGroupElement.weight (X.chainXOperator c) = X.chainWeight c := by
+  classical
+  unfold NQubitPauliGroupElement.weight NQubitPauliOperator.weight
+    chainWeight chainSupport
+  symm
+  apply Finset.card_bij (fun v _ => X.edgeEquiv v)
+  · intro v hv
+    rw [Finset.mem_filter] at hv
+    have h1 : c v = 1 :=
+      (zmod2_dichotomy_local (c v)).resolve_left hv.2
+    exact (mem_support_chainXOperator_iff c v).mpr h1
+  · intros v₁ _ v₂ _ heq
+    exact X.edgeEquiv.injective heq
+  · intros q hq
+    refine ⟨X.edgeEquiv.symm q, ?_, by simp⟩
+    rw [Finset.mem_filter]
+    refine ⟨Finset.mem_univ _, ?_⟩
+    have h_iff := mem_support_chainXOperator_iff (X := X) c (X.edgeEquiv.symm q)
+    rw [Equiv.apply_symm_apply] at h_iff
+    have : c (X.edgeEquiv.symm q) = 1 := h_iff.mp hq
+    rw [this]; decide
+
+/-- Mirror: `weight (chainZOperator c) = chainWeight c`. -/
+lemma weight_chainZOperator (c : X.C1 → ZMod 2) :
+    NQubitPauliGroupElement.weight (X.chainZOperator c) = X.chainWeight c := by
+  classical
+  unfold NQubitPauliGroupElement.weight NQubitPauliOperator.weight
+    chainWeight chainSupport
+  symm
+  apply Finset.card_bij (fun v _ => X.edgeEquiv v)
+  · intro v hv
+    rw [Finset.mem_filter] at hv
+    have h1 : c v = 1 :=
+      (zmod2_dichotomy_local (c v)).resolve_left hv.2
+    exact (mem_support_chainZOperator_iff c v).mpr h1
+  · intros v₁ _ v₂ _ heq
+    exact X.edgeEquiv.injective heq
+  · intros q hq
+    refine ⟨X.edgeEquiv.symm q, ?_, by simp⟩
+    rw [Finset.mem_filter]
+    refine ⟨Finset.mem_univ _, ?_⟩
+    have h_iff := mem_support_chainZOperator_iff (X := X) c (X.edgeEquiv.symm q)
+    rw [Equiv.apply_symm_apply] at h_iff
+    have : c (X.edgeEquiv.symm q) = 1 := h_iff.mp hq
+    rw [this]; decide
+
+/-! ## Qubit-wise anticommutation bridges
+
+For any qubit `i`, the qubit-wise anticommutation of `g` against a Z-type
+generator (`vertexStabOf v`) is determined entirely by `g`'s X-content at `i`,
+i.e. matches that of `chainXOperator (xChainOf g)`.  Mirror on the Z side.
+These let centralizer-style arguments on `g` transfer to its X-only / Z-only
+encoding without redoing the Pauli case analysis. -/
+
+/-- Anticommutation against the Z-type vertex stab matches between `g` and
+its X-only encoding `chainXOperator (xChainOf g)`. -/
+lemma anticommutesAt_vertexStabOf_iff_xChainOf
+    (g : NQubitPauliGroupElement X.numQubits) (v : X.C0)
+    (i : Fin X.numQubits) :
+    NQubitPauliGroupElement.anticommutesAt (X.vertexStabOf v).operators
+        g.operators i ↔
+      NQubitPauliGroupElement.anticommutesAt (X.vertexStabOf v).operators
+        (X.chainXOperator (X.xChainOf g)).operators i := by
+  have hZ : (X.vertexStabOf v).operators i = PauliOperator.I ∨
+      (X.vertexStabOf v).operators i = PauliOperator.Z :=
+    (vertexStabOf_isZType v).2 i
+  have heq := chainXOperator_xChainOf_op_at (X := X) g i
+  rcases hZ with hI | hZ
+  · simp only [NQubitPauliGroupElement.anticommutesAt, hI]
+    cases hgi : g.operators i <;>
+      cases hxi : (X.chainXOperator (X.xChainOf g)).operators i <;>
+      simp [PauliOperator.mulOp]
+  · simp only [NQubitPauliGroupElement.anticommutesAt, hZ, heq]
+    cases hgi : g.operators i <;>
+      simp [PauliOperator.mulOp]
+
+/-- Mirror: anticommutation against the X-type face stab matches between
+`g` and its Z-only encoding `chainZOperator (zChainOf g)`. -/
+lemma anticommutesAt_faceStabOf_iff_zChainOf
+    (g : NQubitPauliGroupElement X.numQubits) (f : X.C2)
+    (i : Fin X.numQubits) :
+    NQubitPauliGroupElement.anticommutesAt (X.faceStabOf f).operators
+        g.operators i ↔
+      NQubitPauliGroupElement.anticommutesAt (X.faceStabOf f).operators
+        (X.chainZOperator (X.zChainOf g)).operators i := by
+  have hX : (X.faceStabOf f).operators i = PauliOperator.I ∨
+      (X.faceStabOf f).operators i = PauliOperator.X :=
+    (faceStabOf_isXType f).2 i
+  have heq := chainZOperator_zChainOf_op_at (X := X) g i
+  rcases hX with hI | hX
+  · simp only [NQubitPauliGroupElement.anticommutesAt, hI]
+    cases hgi : g.operators i <;>
+      cases hzi : (X.chainZOperator (X.zChainOf g)).operators i <;>
+      simp [PauliOperator.mulOp]
+  · simp only [NQubitPauliGroupElement.anticommutesAt, hX, heq]
+    cases hgi : g.operators i <;>
+      simp [PauliOperator.mulOp]
+
+/-! ## Centralizer → cycle bridges
+
+These complete the qubit-level commutation story: if `g` commutes with every
+stabilizer, then its X-chain is a 1-cycle (resp. Z-chain is a dual 1-cycle).
+The bridge runs through `chainXOperator_mem_centralizer_iff_mem_cycles` from
+`LogicalCorrespondence.lean`. -/
+
+/-- For `g ∈ centralizer`, `xChainOf g` is a 1-cycle. -/
+lemma xChainOf_mem_cycles_of_centralizer
+    (g : NQubitPauliGroupElement X.numQubits)
+    (hg : g ∈ Quantum.StabilizerGroup.centralizer X.homologicalStabilizerGroup) :
+    X.xChainOf g ∈ X.cycles := by
+  apply (chainXOperator_mem_centralizer_iff_mem_cycles (X.xChainOf g)).mp
+  intro s hs
+  refine Subgroup.closure_induction
+    (p := fun y _ => y * X.chainXOperator (X.xChainOf g) =
+      X.chainXOperator (X.xChainOf g) * y) ?_ ?_ ?_ ?_ hs
+  · rintro y (⟨v, rfl⟩ | ⟨f, rfl⟩)
+    · -- y = vertexStabOf v (Z-type generator)
+      have hmem : X.vertexStabOf v ∈ X.homologicalStabilizerGroup.toSubgroup :=
+        Subgroup.subset_closure (Or.inl ⟨v, rfl⟩)
+      have hcomm_g : X.vertexStabOf v * g = g * X.vertexStabOf v :=
+        (Quantum.StabilizerGroup.mem_centralizer_iff g _).mp hg _ hmem
+      rw [NQubitPauliGroupElement.commutes_iff_even_anticommutes] at hcomm_g ⊢
+      classical
+      have hfilter_eq :
+          Finset.univ.filter (NQubitPauliGroupElement.anticommutesAt
+              (X.vertexStabOf v).operators
+              (X.chainXOperator (X.xChainOf g)).operators) =
+            Finset.univ.filter (NQubitPauliGroupElement.anticommutesAt
+              (X.vertexStabOf v).operators g.operators) := by
+        ext i
+        simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+        exact (anticommutesAt_vertexStabOf_iff_xChainOf (X := X) g v i).symm
+      rw [hfilter_eq]
+      exact hcomm_g
+    · -- y = faceStabOf f (X-type generator) — X-X commutes
+      exact chainXOperator_commutes_faceStabOf (X := X) (X.xChainOf g) f
+  · change (1 : NQubitPauliGroupElement X.numQubits) *
+        X.chainXOperator (X.xChainOf g) =
+        X.chainXOperator (X.xChainOf g) * 1
+    rw [_root_.one_mul, _root_.mul_one]
+  · intros y₁ y₂ _ _ hy₁ hy₂
+    calc (y₁ * y₂) * X.chainXOperator (X.xChainOf g)
+        = y₁ * (y₂ * X.chainXOperator (X.xChainOf g)) := _root_.mul_assoc _ _ _
+      _ = y₁ * (X.chainXOperator (X.xChainOf g) * y₂) := by rw [hy₂]
+      _ = (y₁ * X.chainXOperator (X.xChainOf g)) * y₂ := (_root_.mul_assoc _ _ _).symm
+      _ = (X.chainXOperator (X.xChainOf g) * y₁) * y₂ := by rw [hy₁]
+      _ = X.chainXOperator (X.xChainOf g) * (y₁ * y₂) := _root_.mul_assoc _ _ _
+  · intros y _ hy
+    exact (show Commute y _ from hy).inv_left.eq
+
+/-- Mirror: for `g ∈ centralizer`, `zChainOf g` is a dual 1-cycle. -/
+lemma zChainOf_mem_dualCycles_of_centralizer
+    (g : NQubitPauliGroupElement X.numQubits)
+    (hg : g ∈ Quantum.StabilizerGroup.centralizer X.homologicalStabilizerGroup) :
+    X.zChainOf g ∈ X.dualCycles := by
+  apply (chainZOperator_mem_centralizer_iff_mem_dualCycles (X.zChainOf g)).mp
+  intro s hs
+  refine Subgroup.closure_induction
+    (p := fun y _ => y * X.chainZOperator (X.zChainOf g) =
+      X.chainZOperator (X.zChainOf g) * y) ?_ ?_ ?_ ?_ hs
+  · rintro y (⟨v, rfl⟩ | ⟨f, rfl⟩)
+    · -- y = vertexStabOf v (Z-type generator) — Z-Z commutes
+      exact chainZOperator_commutes_vertexStabOf (X := X) (X.zChainOf g) v
+    · -- y = faceStabOf f (X-type generator)
+      have hmem : X.faceStabOf f ∈ X.homologicalStabilizerGroup.toSubgroup :=
+        Subgroup.subset_closure (Or.inr ⟨f, rfl⟩)
+      have hcomm_g : X.faceStabOf f * g = g * X.faceStabOf f :=
+        (Quantum.StabilizerGroup.mem_centralizer_iff g _).mp hg _ hmem
+      rw [NQubitPauliGroupElement.commutes_iff_even_anticommutes] at hcomm_g ⊢
+      classical
+      have hfilter_eq :
+          Finset.univ.filter (NQubitPauliGroupElement.anticommutesAt
+              (X.faceStabOf f).operators
+              (X.chainZOperator (X.zChainOf g)).operators) =
+            Finset.univ.filter (NQubitPauliGroupElement.anticommutesAt
+              (X.faceStabOf f).operators g.operators) := by
+        ext i
+        simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+        exact (anticommutesAt_faceStabOf_iff_zChainOf (X := X) g f i).symm
+      rw [hfilter_eq]
+      exact hcomm_g
+  · change (1 : NQubitPauliGroupElement X.numQubits) *
+        X.chainZOperator (X.zChainOf g) =
+        X.chainZOperator (X.zChainOf g) * 1
+    rw [_root_.one_mul, _root_.mul_one]
+  · intros y₁ y₂ _ _ hy₁ hy₂
+    calc (y₁ * y₂) * X.chainZOperator (X.zChainOf g)
+        = y₁ * (y₂ * X.chainZOperator (X.zChainOf g)) := _root_.mul_assoc _ _ _
+      _ = y₁ * (X.chainZOperator (X.zChainOf g) * y₂) := by rw [hy₂]
+      _ = (y₁ * X.chainZOperator (X.zChainOf g)) * y₂ := (_root_.mul_assoc _ _ _).symm
+      _ = (X.chainZOperator (X.zChainOf g) * y₁) * y₂ := by rw [hy₁]
+      _ = X.chainZOperator (X.zChainOf g) * (y₁ * y₂) := _root_.mul_assoc _ _ _
+  · intros y _ hy
+    exact (show Commute y _ from hy).inv_left.eq
+
 /-! ## not_both_boundary_of_nontrivial
 
 Note: the Z-side closure helpers (`chainZOperator_cutMap_mem_ZClosure`,
