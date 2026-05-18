@@ -16,9 +16,10 @@ QEC/
     ├── Core/                # StabilizerGroup, Codespace, Centralizer,
     │                        # LogicalGates, CSS, CodeDistance abstractions
     ├── Codes/               # Concrete codes: Shor9, Steane7, Repetition*,
-    │                        # Toric*, RotatedSurface3, QuantumHamming
-    └── Lattice/             # Toric code lattice geometry, chains,
-                             # boundary maps, homology, H¹ dimension
+    │                        # Toric*, RotatedSurface3, RotatedSurfaceN*,
+    │                        # QuantumHamming
+    └── Lattice/             # Toric & rotated-surface lattice geometry,
+                             # chains, boundary maps, homology, H¹ dimension
 ```
 
 Top-level umbrella `.lean` files (e.g. `QEC/Stabilizer/Stabilizer.lean`,
@@ -62,6 +63,31 @@ content there.
     if a hypothesis is a `↔` like `hfilt_eq : P ↔ Q`, `simp_all` may rewrite
     `Q` back to `P` in a subgoal you wanted to keep simplified. Workaround:
     `clear hfilt_eq` (or rename to a one-shot `have`) before `simp_all`.
+  - **High-frequency mechanical fixes worth recognizing immediately**:
+    - **Ambiguous overloaded name** (e.g. `mul_assoc` between `_root_.mul_assoc`
+      and `NQubitPauliGroupElement.mul_assoc` when `open NQubitPauliGroupElement`
+      is in scope): qualify with `_root_.` (or the specific namespace).
+      Trigger: `open NQubitPauliGroupElement` near the top of a `Codes/*.lean`
+      file shadows several mathlib names. Same applies to `one_mul` / `mul_one`.
+    - **`rw [one_mul, mul_one]` (or any rewrite) fails after
+      `Subgroup.closure_induction`**: the goal is `(fun y _ => …) 1 ⋯`,
+      unreduced. Add a `change` step to beta-reduce first — see
+      `Homological/LogicalCorrespondence.lean:280-282` for the canonical
+      pattern:
+      ```lean
+      · change (1 : NQubitPauliGroupElement X.numQubits) * X.chainXOperator c =
+          X.chainXOperator c * 1
+        rw [one_mul, mul_one]
+      ```
+    - **`HMul` instance failure between two defeq Pauli types** (e.g.
+      `NQubitPauliGroupElement (numQubits L)` vs.
+      `NQubitPauliGroupElement (rotatedSurfaceHomologicalCode L).numQubits`):
+      `*` resolves by syntactic type match, not defeq through abbreviations.
+      Fix by typing the local lemma signature consistently with whichever form
+      the proof body uses more. When the proof body multiplies abstract
+      `vertexStabOf`/`faceStabOf` against a parameter `g`, declare `g` at
+      `(rotatedSurfaceHomologicalCode L).numQubits` — callers can pass
+      `NQubitPauliGroupElement (numQubits L)` (defeq).
 - **Sorry markers**: `sorry  -- TODO(<short-tag>): <one-line note about goal shape>`.
   Always tag so the next session can grep for them.
 
@@ -198,7 +224,11 @@ Claude Code prompts to approve it on first launch. Once approved, the agent
 gets live LSP access — proof states, diagnostics, hover docs, mathlib
 search, multi-tactic attempts — without round-tripping through `lake build`.
 
-**Prefer these MCP tools over the documented fallbacks elsewhere in this file:**
+**The MCP tools are your default interface to the Lean compiler, not a
+fallback.** Reach for `lake build` only as a final confirmation before commit —
+not while iterating on a proof. The documented fallbacks elsewhere in this
+file (`(try sorry)` rebuilds, greping build logs) are for when the MCP is
+genuinely unavailable.
 
 - `lean_goal` — proof state at a `(file, line[, column])`. Use instead of
   the `(try sorry)` rebuild trick.
@@ -206,7 +236,9 @@ search, multi-tactic attempts — without round-tripping through `lake build`.
   Use instead of greping build logs.
 - `lean_multi_attempt` — try several tactics at one position in a single
   call. Use instead of the edit / `lake build` / repeat loop when probing
-  candidate closers.
+  candidate closers. **Reach for this when you have 3+ candidate tactics
+  or want to compare goal states across them. For a single likely tactic,
+  just edit + re-diagnose — that loop is faster.**
   - **`linter.flexible` union trick**: at a flagged `<;> simp_all +decide`
     site, call `lean_multi_attempt` with `["simp_all? +decide"]`. Lean
     prints separate `simp_all +decide only [...]` suggestions for each
@@ -224,12 +256,34 @@ search, multi-tactic attempts — without round-tripping through `lake build`.
   API at a symbol (rename- and deprecation-safe).
 - `lean_local_search` — ripgrep over project + stdlib, scoped by the LSP.
 
+**Default debug workflow when a proof doesn't close:**
+
+1. **`lean_diagnostic_messages`** with `severity: error` to localize. Read
+   the *first* error before the rest — later errors are often cascade noise.
+2. For each error: if the diagnostic embeds the goal but it looks
+   pre-tactic-application (e.g. wrapped in an unreduced `(fun y _ => ...) 1`
+   from `closure_induction`), call **`lean_goal`** at the position to see
+   the cleaner before/after split.
+3. If you have 2+ candidate tactics and aren't sure which closes the goal,
+   **`lean_multi_attempt`** at the position. Don't waste edits guessing.
+4. Edit (via the Edit tool), then re-run `lean_diagnostic_messages` on
+   just the changed file.
+5. Only when all diagnostics are clean: one `lake build` as commit-time
+   confirmation.
+
+Do not run `lake build` between steps 4 and 5 — diagnostics already gave
+you the answer, and a redundant build burns the workspace lock for minutes.
+
 **Caveats for this repo:**
 
 - The MCP's LSP shares the workspace lock with `lake build` (see "Never
-  run two lake processes concurrently" below). Don't fire off a parallel
-  build while it's serving.
-- External search tools rate-limit to 3 requests / 30s. Batch queries.
+  run two lake processes concurrently" below). Concretely: do not kick
+  off a background `lake build` while iterating with the MCP — the LSP
+  will hang waiting for the lock and the next `lean_diagnostic_messages`
+  call will time out. Pick one mode at a time.
+- External search tools rate-limit to 3 requests / 30s. Batch queries,
+  and prefer `lean_local_search` first — it's not rate-limited and most
+  "does this lemma exist" questions are answered locally.
 - The MCP **does not edit files**. Use the Edit tool to apply tactics that
   `lean_multi_attempt` validated.
 - If the LSP fails to start under the MCP, `bash scripts/prune-stale-ileans.sh`
@@ -274,6 +328,10 @@ If you're upgrading the toolchain, see `TOOLCHAIN_UPGRADE.md` (gitignored,
 local runbook).
 
 ## Things that broke recently in v4.30 (be aware)
+
+**Maintenance:** when you discover an idiom or workaround during proof work,
+add a one-line entry here. This is the single most-consulted section by the
+next session, so keeping it current pays compound interest.
 
 - `Subgroup.normalizer` takes `Set G`, not `Subgroup G` — no dot notation.
   Write `Subgroup.normalizer S.toSubgroup` not `S.toSubgroup.normalizer`.
