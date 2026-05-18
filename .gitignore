@@ -22,3 +22,6 @@ TOOLCHAIN_UPGRADE.md
 scripts/prune-stale-ileans.sh
 
 project_aristotle
+
+# Local-only reference PDFs (not part of the formalization)
+*.pdf
