@@ -60,47 +60,28 @@ lemma generators_no_Y :
 def swapXZ_element (g : NQubitPauliGroupElement 7) : NQubitPauliGroupElement 7 :=
   ⟨g.phasePower, NQubitPauliOperator.transversalSwapXZ g.operators⟩
 
-/-- swapXZ (Z↔X) sends Z-generators to X-generators: swapXZ_element Z1 = X1, etc. -/
-private lemma swapXZ_element_Z1_eq_X1 : swapXZ_element Z1 = X1 := by
-  unfold swapXZ_element; congr 2; ext i; fin_cases i <;>
-    simp [Z1, NQubitPauliOperator.transversalSwapXZ, PauliOperator.swapXZ,
-      NQubitPauliOperator.set, NQubitPauliOperator.identity]
-private lemma swapXZ_element_Z2_eq_X2 : swapXZ_element Z2 = X2 := by
-  unfold swapXZ_element; congr 2; ext i; fin_cases i <;>
-    simp [Z2, NQubitPauliOperator.transversalSwapXZ, PauliOperator.swapXZ,
-      NQubitPauliOperator.set, NQubitPauliOperator.identity]
-private lemma swapXZ_element_Z3_eq_X3 :
-    swapXZ_element Z3 = X3 := by
-  unfold swapXZ_element; congr 2; ext i; fin_cases i <;>
-    simp [Z3, NQubitPauliOperator.transversalSwapXZ, PauliOperator.swapXZ,
-      NQubitPauliOperator.set, NQubitPauliOperator.identity]
-private lemma swapXZ_element_X1_eq_Z1 : swapXZ_element X1 = Z1 := by
-  unfold swapXZ_element; congr 2; ext i; fin_cases i <;>
-    simp [X1, NQubitPauliOperator.transversalSwapXZ, PauliOperator.swapXZ,
-      NQubitPauliOperator.set, NQubitPauliOperator.identity]
-private lemma swapXZ_element_X2_eq_Z2 : swapXZ_element X2 = Z2 := by
-  unfold swapXZ_element; congr 2; ext i; fin_cases i <;>
-    simp [X2, NQubitPauliOperator.transversalSwapXZ, PauliOperator.swapXZ,
-      NQubitPauliOperator.set, NQubitPauliOperator.identity]
-private lemma swapXZ_element_X3_eq_Z3 : swapXZ_element X3 = Z3 := by
-  unfold swapXZ_element; congr 2; ext i; fin_cases i <;>
-    simp [X3, NQubitPauliOperator.transversalSwapXZ, PauliOperator.swapXZ,
-      NQubitPauliOperator.set, NQubitPauliOperator.identity]
+/-- `swapXZ_element` pairwise swaps the Steane X- and Z-generators. -/
+private lemma swapXZ_element_swaps_generators :
+    swapXZ_element Z1 = X1 ∧ swapXZ_element Z2 = X2 ∧ swapXZ_element Z3 = X3 ∧
+      swapXZ_element X1 = Z1 ∧ swapXZ_element X2 = Z2 ∧ swapXZ_element X3 = Z3 := by
+  refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩ <;>
+    (unfold swapXZ_element; congr 2; ext i; fin_cases i <;>
+      simp [Z1, Z2, Z3, X1, X2, X3, NQubitPauliOperator.transversalSwapXZ,
+        PauliOperator.swapXZ, NQubitPauliOperator.set, NQubitPauliOperator.identity])
 
 /-- Swapping X↔Z on any Steane generator yields an element of the stabilizer subgroup. -/
 lemma transversalSwapXZ_mem_subgroup
     (g : NQubitPauliGroupElement 7) (hg : g ∈ generatorsList) :
     (⟨g.phasePower, NQubitPauliOperator.transversalSwapXZ g.operators⟩ :
       NQubitPauliGroupElement 7) ∈ subgroup := by
+  obtain ⟨hZ1, hZ2, hZ3, hX1, hX2, hX3⟩ := swapXZ_element_swaps_generators
   change swapXZ_element g ∈ subgroup
   rcases (by simpa [generatorsList] using hg) with
     (rfl | rfl | rfl | rfl | rfl | rfl)
   all_goals
     unfold subgroup
     refine Subgroup.subset_closure ?_
-    simp [generators, ZGenerators, XGenerators,
-      swapXZ_element_Z1_eq_X1, swapXZ_element_Z2_eq_X2, swapXZ_element_Z3_eq_X3,
-      swapXZ_element_X1_eq_Z1, swapXZ_element_X2_eq_Z2, swapXZ_element_X3_eq_Z3]
+    simp [generators, ZGenerators, XGenerators, hZ1, hZ2, hZ3, hX1, hX2, hX3]
 
 /-- Conjugating a Pauli group element (no Y) by transversal H gives the swapXZ element (U P U†). -/
 lemma transversalH_conjugates_element
@@ -232,110 +213,56 @@ lemma transversalS_conjugates_Z_generator_gate
   simpa [conjByGate_val, NQubitPauliGroupElement.gate_val] using
     transversalS_conjugates_Z_generator g hg
 
-/-- `X1` is phase-0 and X/I-valued. -/
-private lemma X1_phase0_and_XI :
-    X1.phasePower = 0 ∧ ∀ i, X1.operators i = .X ∨ X1.operators i = .I := by
-  constructor
-  · rfl
-  · intro i
-    fin_cases i <;> simp [X1, NQubitPauliOperator.set, NQubitPauliOperator.identity]
-
-/-- `X2` is phase-0 and X/I-valued. -/
-private lemma X2_phase0_and_XI :
-    X2.phasePower = 0 ∧ ∀ i, X2.operators i = .X ∨ X2.operators i = .I := by
-  constructor
-  · rfl
-  · intro i
-    fin_cases i <;> simp [X2, NQubitPauliOperator.set, NQubitPauliOperator.identity]
-
-/-- `X3` is phase-0 and X/I-valued. -/
-private lemma X3_phase0_and_XI :
-    X3.phasePower = 0 ∧ ∀ i, X3.operators i = .X ∨ X3.operators i = .I := by
-  constructor
-  · rfl
-  · intro i
-    fin_cases i <;> simp [X3, NQubitPauliOperator.set, NQubitPauliOperator.identity]
-
-/-- The scalar in `invSConjXIScalar` for `X1` is 1. -/
-private lemma invSConjXIScalar_X1_eq_one : invSConjXIScalar X1.operators = 1 := by
-  have hcard : (xSupport X1.operators).card = 4 := by
-    unfold xSupport X1
-    decide
-  rw [invSConjXIScalar_eq_negOne_pow_xSupportCard, hcard]
-  norm_num
-
-/-- The scalar in `invSConjXIScalar` for `X2` is 1. -/
-private lemma invSConjXIScalar_X2_eq_one : invSConjXIScalar X2.operators = 1 := by
-  have hcard : (xSupport X2.operators).card = 4 := by
-    unfold xSupport X2
-    decide
-  rw [invSConjXIScalar_eq_negOne_pow_xSupportCard, hcard]
-  norm_num
-
-/-- The scalar in `invSConjXIScalar` for `X3` is 1. -/
-private lemma invSConjXIScalar_X3_eq_one : invSConjXIScalar X3.operators = 1 := by
-  have hcard : (xSupport X3.operators).card = 4 := by
-    unfold xSupport X3
-    decide
-  rw [invSConjXIScalar_eq_negOne_pow_xSupportCard, hcard]
-  norm_num
-
-/-- `invSConjXIImage` on `X1` matches the operator part of `X1 * Z1`. -/
-private lemma invSConjXIImage_X1_eq_mul :
-    invSConjXIImage X1.operators = (X1 * Z1).operators := by
-  ext i
-  fin_cases i <;>
-    simp [invSConjXIImage, X1, Z1, NQubitPauliOperator.set, NQubitPauliOperator.identity,
-      NQubitPauliGroupElement.mul, NQubitPauliGroupElement.mulOp, PauliOperator.mulOp]
-
-/-- `invSConjXIImage` on `X2` matches the operator part of `X2 * Z2`. -/
-private lemma invSConjXIImage_X2_eq_mul :
-    invSConjXIImage X2.operators = (X2 * Z2).operators := by
-  ext i
-  fin_cases i <;>
-    simp [invSConjXIImage, X2, Z2, NQubitPauliOperator.set, NQubitPauliOperator.identity,
-      NQubitPauliGroupElement.mul, NQubitPauliGroupElement.mulOp, PauliOperator.mulOp]
-
-/-- `invSConjXIImage` on `X3` matches the operator part of `X3 * Z3`. -/
-private lemma invSConjXIImage_X3_eq_mul :
-    invSConjXIImage X3.operators = (X3 * Z3).operators := by
-  ext i
-  fin_cases i <;>
-    simp [invSConjXIImage, X3, Z3, NQubitPauliOperator.set, NQubitPauliOperator.identity,
-      NQubitPauliGroupElement.mul, NQubitPauliGroupElement.mulOp, PauliOperator.mulOp]
+/-- Generic gate-level helper: transversal `inv_S` conjugation for a phase-0 X/I generator
+with X-support of size 4 sends `g` to `h` whenever `invSConjXIImage` matches `h.operators`
+and `h.phasePower = 0`. Specializations follow for each Steane X-generator. -/
+private lemma transversalS_conjugates_XI_phase0_card4_gate
+    {g h : NQubitPauliGroupElement 7}
+    (hphase_g : g.phasePower = 0) (hphase_h : h.phasePower = 0)
+    (hXI : ∀ i, g.operators i = .X ∨ g.operators i = .I)
+    (hcard : (xSupport g.operators).card = 4)
+    (himage : invSConjXIImage g.operators = h.operators) :
+    conjByGate transversalS_Steane7 g.gate = h.gate := by
+  apply Subtype.ext
+  have hscalar : invSConjXIScalar g.operators = 1 := by
+    rw [invSConjXIScalar_eq_negOne_pow_xSupportCard, hcard]; norm_num
+  have hconj := uniformTransversalGateMatrix_inv_S_conj_element_XI_phase0 7 g hphase_g hXI
+  simpa [conjByGate_val, transversalS_Steane7, NQubitPauliGroupElement.gate_val,
+    himage, hscalar, NQubitPauliGroupElement.toMatrix, hphase_h, hphase_g,
+    PauliGroupElement.phasePowerToComplex] using hconj
 
 /-- Gate-level `inv_S` conjugation for `X1`: `X1 ↦ X1*Z1`. -/
 lemma transversalS_conjugates_X1_gate :
-    conjByGate transversalS_Steane7 X1.gate = (X1 * Z1).gate := by
-  apply Subtype.ext
-  rcases X1_phase0_and_XI with ⟨hphase, hXI⟩
-  have hscalar : invSConjXIScalar X1.operators = 1 := invSConjXIScalar_X1_eq_one
-  have hconj :=
-    uniformTransversalGateMatrix_inv_S_conj_element_XI_phase0 7 X1 hphase hXI
-  simpa [conjByGate_val, transversalS_Steane7, NQubitPauliGroupElement.gate_val,
-    invSConjXIImage_X1_eq_mul, hscalar] using hconj
+    conjByGate transversalS_Steane7 X1.gate = (X1 * Z1).gate :=
+  transversalS_conjugates_XI_phase0_card4_gate rfl (by decide)
+    (fun i => by fin_cases i <;>
+      simp [X1, NQubitPauliOperator.set, NQubitPauliOperator.identity])
+    (by unfold xSupport X1; decide)
+    (by ext i; fin_cases i <;>
+      simp [invSConjXIImage, X1, Z1, NQubitPauliOperator.set, NQubitPauliOperator.identity,
+        NQubitPauliGroupElement.mul, NQubitPauliGroupElement.mulOp, PauliOperator.mulOp])
 
 /-- Gate-level `inv_S` conjugation for `X2`: `X2 ↦ X2*Z2`. -/
 lemma transversalS_conjugates_X2_gate :
-    conjByGate transversalS_Steane7 X2.gate = (X2 * Z2).gate := by
-  apply Subtype.ext
-  rcases X2_phase0_and_XI with ⟨hphase, hXI⟩
-  have hscalar : invSConjXIScalar X2.operators = 1 := invSConjXIScalar_X2_eq_one
-  have hconj :=
-    uniformTransversalGateMatrix_inv_S_conj_element_XI_phase0 7 X2 hphase hXI
-  simpa [conjByGate_val, transversalS_Steane7, NQubitPauliGroupElement.gate_val,
-    invSConjXIImage_X2_eq_mul, hscalar] using hconj
+    conjByGate transversalS_Steane7 X2.gate = (X2 * Z2).gate :=
+  transversalS_conjugates_XI_phase0_card4_gate rfl (by decide)
+    (fun i => by fin_cases i <;>
+      simp [X2, NQubitPauliOperator.set, NQubitPauliOperator.identity])
+    (by unfold xSupport X2; decide)
+    (by ext i; fin_cases i <;>
+      simp [invSConjXIImage, X2, Z2, NQubitPauliOperator.set, NQubitPauliOperator.identity,
+        NQubitPauliGroupElement.mul, NQubitPauliGroupElement.mulOp, PauliOperator.mulOp])
 
 /-- Gate-level `inv_S` conjugation for `X3`: `X3 ↦ X3*Z3`. -/
 lemma transversalS_conjugates_X3_gate :
-    conjByGate transversalS_Steane7 X3.gate = (X3 * Z3).gate := by
-  apply Subtype.ext
-  rcases X3_phase0_and_XI with ⟨hphase, hXI⟩
-  have hscalar : invSConjXIScalar X3.operators = 1 := invSConjXIScalar_X3_eq_one
-  have hconj :=
-    uniformTransversalGateMatrix_inv_S_conj_element_XI_phase0 7 X3 hphase hXI
-  simpa [conjByGate_val, transversalS_Steane7, NQubitPauliGroupElement.gate_val,
-    invSConjXIImage_X3_eq_mul, hscalar] using hconj
+    conjByGate transversalS_Steane7 X3.gate = (X3 * Z3).gate :=
+  transversalS_conjugates_XI_phase0_card4_gate rfl (by decide)
+    (fun i => by fin_cases i <;>
+      simp [X3, NQubitPauliOperator.set, NQubitPauliOperator.identity])
+    (by unfold xSupport X3; decide)
+    (by ext i; fin_cases i <;>
+      simp [invSConjXIImage, X3, Z3, NQubitPauliOperator.set, NQubitPauliOperator.identity,
+        NQubitPauliGroupElement.mul, NQubitPauliGroupElement.mulOp, PauliOperator.mulOp])
 
 /-- Transversal S conjugates X1 to X1*Z1 (matrix bridge). -/
 lemma transversalS_conjugates_X1 :
