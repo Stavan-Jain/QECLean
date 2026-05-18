@@ -88,11 +88,7 @@ lemma transversalH_conjugates_element
     (g : NQubitPauliGroupElement 7) (h_no_Y : ∀ i, g.operators i ≠ .Y) :
     (uniformTransversalGateMatrix 7 H) * g.toMatrix * star (uniformTransversalGateMatrix 7 H) =
     (swapXZ_element g).toMatrix := by
-  have h_conj :
-      (uniformTransversalGateMatrix 7 H) * g.operators.toMatrix *
-        star (uniformTransversalGateMatrix 7 H) =
-      (NQubitPauliOperator.transversalSwapXZ g.operators).toMatrix := by
-    exact uniformTransversalGateMatrix_H_conj_op 7 g.operators h_no_Y
+  have h_conj := uniformTransversalGateMatrix_H_conj_op 7 g.operators h_no_Y
   unfold NQubitPauliGroupElement.toMatrix swapXZ_element
   simp [h_conj]
 
@@ -158,12 +154,10 @@ private lemma swapXZ_element_logicalZ_eq_logicalX :
 
 /-- Steane logical X has no Y components. -/
 private lemma logicalX_no_Y : ∀ i, logicalX.operators i ≠ PauliOperator.Y := by
-  intro i
   simp [logicalX, NQubitPauliOperator.X]
 
 /-- Steane logical Z has no Y components. -/
 private lemma logicalZ_no_Y : ∀ i, logicalZ.operators i ≠ PauliOperator.Y := by
-  intro i
   simp [logicalZ, NQubitPauliOperator.Z]
 
 /-- Transversal Hadamard acts as logical Hadamard on the canonical Steane logical pair. -/
@@ -191,19 +185,13 @@ Z-generators are fixed; X-generators go to X*Z (in the stabilizer).
 
 lemma transversalS_conjugates_Z_generator (g : NQubitPauliGroupElement 7) (hg : g ∈ ZGenerators) :
     transversalS_Steane7.val * g.toMatrix * star transversalS_Steane7.val = g.toMatrix := by
-  convert uniformTransversalGateMatrix_inv_S_conj_Z_op 7 g.operators _ using 1;
-  · unfold NQubitPauliGroupElement.toMatrix;
-    have h_phase : g.phasePower = 0 := by
-      cases hg <;> aesop;
-    unfold Quantum.PauliGroupElement.phasePowerToComplex; aesop;
-  · simp [NQubitPauliGroupElement.toMatrix];
-    rcases hg with ( rfl | rfl | rfl );
-    · unfold Quantum.StabilizerGroup.Steane7.Z1; norm_num;
-    · erw [ show Quantum.StabilizerGroup.Steane7.Z2.phasePower = 0 from rfl ] ;
-        norm_num [ Quantum.PauliGroupElement.phasePowerToComplex ] ;
-    · erw [ show ( Quantum.StabilizerGroup.Steane7.Z3.phasePower : Fin 4 ) = 0 from rfl ] ;
-        norm_num [ Quantum.PauliGroupElement.phasePowerToComplex ];
-  · rcases hg with ( rfl | rfl | rfl ) <;> simp +decide
+  have hZ : ∀ i, g.operators i = .Z ∨ g.operators i = .I := by
+    rcases hg with rfl | rfl | rfl <;> intro i <;> fin_cases i <;> decide
+  have hphase : g.phasePower = 0 := by
+    rcases hg with rfl | rfl | rfl <;> decide
+  simpa [transversalS_Steane7, NQubitPauliGroupElement.toMatrix,
+         PauliGroupElement.phasePowerToComplex, hphase] using
+    uniformTransversalGateMatrix_inv_S_conj_Z_op 7 g.operators hZ
 
 /-- Gate-level version: transversal `inv_S` fixes each Steane Z-generator. -/
 lemma transversalS_conjugates_Z_generator_gate
@@ -292,11 +280,8 @@ theorem transversalS_Steane7_isLogicalGate :
       stabilizerGroup.toSubgroup =
         Subgroup.closure (NQubitPauliGroupElement.listToSet generatorsList) := by
     simp [stabilizerGroup_toSubgroup_eq, subgroup, listToSet_generatorsList]
-  have hmemGen : ∀ x ∈ generatorsList, x ∈ stabilizerGroup.toSubgroup := by
-    intro x hx
-    have hx' : x ∈ Subgroup.closure (NQubitPauliGroupElement.listToSet generatorsList) := by
-      exact Subgroup.subset_closure (by simpa [NQubitPauliGroupElement.listToSet] using hx)
-    simpa [hS] using hx'
+  have hmemGen : ∀ x ∈ generatorsList, x ∈ stabilizerGroup.toSubgroup := fun x hx =>
+    hS ▸ Subgroup.subset_closure (by simpa [NQubitPauliGroupElement.listToSet] using hx)
   refine isLogicalGate_of_generator_set_conjugation transversalS_Steane7 stabilizerGroup
     (NQubitPauliGroupElement.listToSet generatorsList) hS ?_
   intro x hx
@@ -342,7 +327,7 @@ theorem transversalS_Steane7_isLogicalS :
     simpa [conjByGate_val, NQubitPauliGroupElement.gate_val,
       logicalZ, NQubitPauliGroupElement.toMatrix, PauliGroupElement.phasePowerToComplex] using
       (uniformTransversalGateMatrix_inv_S_conj_Z_op 7 (NQubitPauliOperator.Z 7)
-        (by intro i; exact Or.inl rfl))
+        (fun _ => Or.inl rfl))
   · apply Subtype.ext
     have hXY : (uniformTransversalGateMatrix 7 inv_S) * logicalX.toMatrix *
         star (uniformTransversalGateMatrix 7 inv_S) = logicalY.toMatrix := by
