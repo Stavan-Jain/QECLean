@@ -556,146 +556,84 @@ theorem colParity_eq_one_of_nontrivial
   rw [colParity_eq_zero_of_mem_dualBoundaries L h_diff_rsc x]
   ring
 
-/-! ## §F — Weight ≥ L for non-trivial Z-logicals -/
+/-! ## §F — Weight ≥ L for non-trivial Z-cycles
 
-omit [Fact (Odd L)] in
-/-- The chain support of `c` is `{v : c v = 1}`. -/
-private def dualChainSupport (c : RotatedSurface.VtxIdx L → ZMod 2) :
-    Finset (RotatedSurface.VtxIdx L) :=
-  Finset.univ.filter (fun v => c v = 1)
+The col-parity invariant from §A–E gives a per-column lower bound of 1 on the
+dual chain support, hence the abstract `chainWeight` (from
+`Stabilizer.Homological.Distance`) is ≥ L for every non-trivial dual cycle. -/
 
-/-- `weight (chainZOperator c) = (dualChainSupport c).card`. -/
-private lemma weight_chainZOperator_eq_dualChainSupport_card
-    (c : RotatedSurface.VtxIdx L → ZMod 2) :
-    NQubitPauliGroupElement.weight
-      ((RotatedSurface.rotatedSurfaceHomologicalCode L).chainZOperator c) =
-    (dualChainSupport L c).card := by
-  classical
-  symm
-  unfold NQubitPauliGroupElement.weight NQubitPauliOperator.weight
-  apply Finset.card_bij (fun v _ => RotatedSurface.rscQubitEquiv L v)
-  · intro v hv
-    rw [dualChainSupport, Finset.mem_filter] at hv
-    have h_iff :=
-      (Quantum.Stabilizer.Homological.HomologicalCode.mem_support_chainZOperator_iff
-        (X := RotatedSurface.rotatedSurfaceHomologicalCode L) c v).mpr hv.2
-    change (RotatedSurface.rscQubitEquiv L) v ∈ _ at h_iff
-    exact h_iff
-  · intros v1 _ v2 _ heq
-    exact (RotatedSurface.rscQubitEquiv L).injective heq
-  · intros q hq
-    set v := (RotatedSurface.rscQubitEquiv L).symm q
-    have h_q : RotatedSurface.rscQubitEquiv L v = q := Equiv.apply_symm_apply _ _
-    refine ⟨v, ?_, h_q⟩
-    rw [dualChainSupport, Finset.mem_filter]
-    refine ⟨Finset.mem_univ _, ?_⟩
-    have h_iff :=
-      Quantum.Stabilizer.Homological.HomologicalCode.mem_support_chainZOperator_iff
-        (X := RotatedSurface.rotatedSurfaceHomologicalCode L) c v
-    change (RotatedSurface.rscQubitEquiv L) v ∈ _ ↔ _ at h_iff
-    rw [h_q] at h_iff
-    exact h_iff.mp hq
+open Quantum.Stabilizer.Homological.HomologicalCode
 
 omit [Fact (Odd L)] [Fact (3 ≤ L)] in
-/-- `colParity c x = (filter (c (x, ·) = 1) univ).card` cast to `ZMod 2`. -/
+/-- `colParity c x = (#{y : c (x, y) ≠ 0} mod 2)`.
+
+Equivalent to the count of `c (x, y) = 1` for `ZMod 2`-valued `c`, stated in
+terms of `≠ 0` so it dovetails with the generic
+`HomologicalCode.chainSupport` predicate. -/
 private lemma colParity_eq_col_card_cast
     (c : RotatedSurface.VtxIdx L → ZMod 2) (x : Fin L) :
     colParity L c x =
-      (((Finset.univ : Finset (Fin L)).filter (fun y => c (x, y) = 1)).card : ZMod 2) := by
+      (((Finset.univ : Finset (Fin L)).filter (fun y => c (x, y) ≠ 0)).card : ZMod 2) := by
   classical
   unfold colParity
   rw [Finset.card_filter, Nat.cast_sum]
   apply Finset.sum_congr rfl
   intro y _
-  by_cases hxy : c (x, y) = 1
+  by_cases hxy : c (x, y) = 0
   · rw [hxy]; simp
-  · have h0 : c (x, y) = 0 := by
+  · have h1 : c (x, y) = 1 := by
       rcases Fin.exists_fin_two.mp ⟨c (x, y), rfl⟩ with h | h
-      · exact h
       · exact absurd h hxy
-    rw [h0]; simp
+      · exact h
+    rw [h1]; simp
 
-omit [Fact (Odd L)] [Fact (3 ≤ L)] in
-/-- The dual-chain support card decomposes column by column. -/
-private lemma dualChainSupport_card_eq_sum_col_card
+/-- The generic chain support card decomposes column by column. -/
+private lemma chainSupport_card_eq_sum_col_card
     (c : RotatedSurface.VtxIdx L → ZMod 2) :
-    (dualChainSupport L c).card =
-      ∑ x : Fin L, ((Finset.univ : Finset (Fin L)).filter (fun y => c (x, y) = 1)).card := by
+    ((RotatedSurface.rotatedSurfaceHomologicalCode L).chainSupport c).card =
+      ∑ x : Fin L, ((Finset.univ : Finset (Fin L)).filter (fun y => c (x, y) ≠ 0)).card := by
   classical
-  unfold dualChainSupport
+  change (Finset.univ.filter (fun v : RotatedSurface.VtxIdx L => c v ≠ 0)).card = _
   rw [Finset.card_filter]
-  rw [show ∑ v : RotatedSurface.VtxIdx L, (if c v = 1 then (1 : ℕ) else 0) =
-      ∑ x : Fin L, ∑ y : Fin L, (if c (x, y) = 1 then (1 : ℕ) else 0)
+  -- ∑ v : VtxIdx L, if c v ≠ 0 then 1 else 0 — split prod (column-first this time).
+  rw [show ∑ v : RotatedSurface.VtxIdx L, (if c v ≠ 0 then (1 : ℕ) else 0) =
+      ∑ x : Fin L, ∑ y : Fin L, (if c (x, y) ≠ 0 then (1 : ℕ) else 0)
     from Fintype.sum_prod_type (fun v : RotatedSurface.VtxIdx L =>
-      (if c v = 1 then (1 : ℕ) else 0))]
+      (if c v ≠ 0 then (1 : ℕ) else 0))]
   apply Finset.sum_congr rfl
   intro x _
   rw [Finset.card_filter]
 
-/-- For any non-trivial dual cycle `c`, dual chain support has cardinality ≥ L. -/
-theorem dualChainSupport_card_ge_L_of_nontrivial
+/-- For non-trivial dual cycle `c`, the abstract `chainWeight` is ≥ L. -/
+theorem dual_chainWeight_ge_L_of_nontrivial
     {c : RotatedSurface.VtxIdx L → ZMod 2}
     (hc_cycle : c ∈ (RotatedSurface.rotatedSurfaceHomologicalCode L).dualCycles)
     (hc_nontrivial : c ∉ (RotatedSurface.rotatedSurfaceHomologicalCode L).dualBoundaries) :
-    L ≤ (dualChainSupport L c).card := by
-  rw [dualChainSupport_card_eq_sum_col_card]
+    L ≤ (RotatedSurface.rotatedSurfaceHomologicalCode L).chainWeight c := by
+  -- chainWeight c = (chainSupport c).card; column decomposition + per-column ≥ 1.
+  change L ≤ ((RotatedSurface.rotatedSurfaceHomologicalCode L).chainSupport c).card
+  rw [chainSupport_card_eq_sum_col_card]
   have h_each_col : ∀ x : Fin L,
-      1 ≤ ((Finset.univ : Finset (Fin L)).filter (fun y => c (x, y) = 1)).card := by
+      1 ≤ ((Finset.univ : Finset (Fin L)).filter (fun y => c (x, y) ≠ 0)).card := by
     intro x
+    -- colParity c x = 1 (§E, since c is non-trivial)
     have h_cp := colParity_eq_one_of_nontrivial L hc_cycle hc_nontrivial x
     rw [colParity_eq_col_card_cast] at h_cp
     by_contra h_lt
     push Not at h_lt
-    interval_cases (((Finset.univ : Finset (Fin L)).filter (fun y => c (x, y) = 1)).card)
+    interval_cases (((Finset.univ : Finset (Fin L)).filter (fun y => c (x, y) ≠ 0)).card)
     rw [Nat.cast_zero] at h_cp
     exact (by decide : (1 : ZMod 2) ≠ 0) h_cp.symm
   calc L = ∑ _ : Fin L, 1 := by simp
     _ ≤ ∑ x : Fin L,
-        ((Finset.univ : Finset (Fin L)).filter (fun y => c (x, y) = 1)).card :=
+        ((Finset.univ : Finset (Fin L)).filter (fun y => c (x, y) ≠ 0)).card :=
       Finset.sum_le_sum (fun x _ => h_each_col x)
 
-/-- Weight ≥ L for non-trivial Z-cycle. -/
-theorem weight_chainZOperator_ge_L_of_nontrivial
-    {c : RotatedSurface.VtxIdx L → ZMod 2}
-    (hc_cycle : c ∈ (RotatedSurface.rotatedSurfaceHomologicalCode L).dualCycles)
-    (hc_nontrivial : c ∉ (RotatedSurface.rotatedSurfaceHomologicalCode L).dualBoundaries) :
-    L ≤ NQubitPauliGroupElement.weight
-      ((RotatedSurface.rotatedSurfaceHomologicalCode L).chainZOperator c) := by
-  rw [weight_chainZOperator_eq_dualChainSupport_card]
-  exact dualChainSupport_card_ge_L_of_nontrivial L hc_cycle hc_nontrivial
-
-/-- For Z-type elements, the chain ↔ operator roundtrip. -/
-private lemma chainZOperator_chainOfZOperator_of_isZType
-    (g : NQubitPauliGroupElement (numQubits L))
-    (hgZ : NQubitPauliGroupElement.IsZTypeElement g) :
-    (RotatedSurface.rotatedSurfaceHomologicalCode L).chainZOperator
-      ((RotatedSurface.rotatedSurfaceHomologicalCode L).chainOfZOperator g) = g := by
-  apply NQubitPauliGroupElement.ext
-  · change (0 : Fin 4) = g.phasePower
-    exact hgZ.1.symm
-  · funext q
-    rcases hgZ.2 q with hI | hZ
-    · change (if ∃ e, _ ∧ _ then PauliOperator.Z else PauliOperator.I) = _
-      rw [if_neg]
-      · rw [hI]
-      rintro ⟨e, heq, hc⟩
-      simp only [Quantum.Stabilizer.Homological.HomologicalCode.chainOfZOperator] at hc
-      split_ifs at hc with hgz
-      · rw [heq, hI] at hgz
-        exact (by decide : PauliOperator.I ≠ PauliOperator.Z) hgz
-      · exact (by decide : (0 : ZMod 2) ≠ 1) hc
-    · change (if ∃ e, _ ∧ _ then PauliOperator.Z else PauliOperator.I) = _
-      rw [if_pos]
-      · rw [hZ]
-      set e := (RotatedSurface.rscQubitEquiv L).symm q
-      refine ⟨e, ?_, ?_⟩
-      · change RotatedSurface.rscQubitEquiv L
-            ((RotatedSurface.rscQubitEquiv L).symm q) = q
-        exact Equiv.apply_symm_apply _ _
-      · change (if g.operators (RotatedSurface.rscQubitEquiv L e) = PauliOperator.Z
-              then (1 : ZMod 2) else 0) = 1
-        rw [show RotatedSurface.rscQubitEquiv L e = q from Equiv.apply_symm_apply _ _, hZ]
-        exact if_pos rfl
+/-! Z-mirror of the X-side proof in `RotatedSurfaceCodeNDistanceX`:
+`weight_ge_chainWeight_zChainOf`, `zChainOf_mem_dualCycles_of_centralizer`, and
+`not_both_boundary_of_nontrivial` from the abstract CSS bridge. For a Z-type
+`g`, `xChainOf g = 0` (no X- or Y-components), trivially in `boundaries`, so
+the bridge forces `zChainOf g ∉ dualBoundaries`. -/
 
 /-- Any non-trivial Z-type logical of the rotated surface stabilizer code has weight ≥ L. -/
 theorem weight_ge_L_of_nontrivial_Z_logical
@@ -704,30 +642,63 @@ theorem weight_ge_L_of_nontrivial_Z_logical
     (hgLogical : Quantum.StabilizerGroup.IsNontrivialLogicalOperator g
       (rotatedSurfaceStabilizerCode L).toStabilizerGroup) :
     L ≤ NQubitPauliGroupElement.weight g := by
-  set c := (RotatedSurface.rotatedSurfaceHomologicalCode L).chainOfZOperator g
-  have h_g_eq : (RotatedSurface.rotatedSurfaceHomologicalCode L).chainZOperator c = g :=
-    chainZOperator_chainOfZOperator_of_isZType L g hgZ
+  -- Translate the non-trivial-logical predicate to the homological group.
   have h_subg_eq := rotatedSurfaceStabilizerCode_subgroup_eq_homological L
-  have h_logical_hom : Quantum.StabilizerGroup.IsNontrivialLogicalOperator g
+  have hg_hom : Quantum.StabilizerGroup.IsNontrivialLogicalOperator g
       (RotatedSurface.rotatedSurfaceHomologicalCode L).homologicalStabilizerGroup :=
     (Quantum.StabilizerGroup.IsNontrivialLogicalOperator_of_toSubgroup_eq g
       h_subg_eq).mp hgLogical
-  rw [← h_g_eq] at h_logical_hom
-  have h_iff := (RotatedSurface.rotatedSurfaceHomologicalCode L)
-    |>.chainZOperator_isNontrivialLogical_iff c
-  obtain ⟨hc_cycle, hc_not_boundary⟩ := h_iff.mp h_logical_hom
-  rw [← h_g_eq]
-  exact weight_chainZOperator_ge_L_of_nontrivial L hc_cycle hc_not_boundary
+  have hg_cent_hom : g ∈ Quantum.StabilizerGroup.centralizer
+      (RotatedSurface.rotatedSurfaceHomologicalCode L).homologicalStabilizerGroup :=
+    ((Quantum.StabilizerGroup.IsNontrivialLogicalOperator_iff g _).mp hg_hom).1
+  -- Generic: `zChainOf g` is a dual 1-cycle.
+  have hz_cyc :
+      (RotatedSurface.rotatedSurfaceHomologicalCode L).zChainOf g ∈
+        (RotatedSurface.rotatedSurfaceHomologicalCode L).dualCycles :=
+    zChainOf_mem_dualCycles_of_centralizer
+      (X := RotatedSurface.rotatedSurfaceHomologicalCode L) g hg_cent_hom
+  -- For Z-type `g`, `xChainOf g = 0` everywhere, hence ∈ boundaries.
+  have hx_zero :
+      (RotatedSurface.rotatedSurfaceHomologicalCode L).xChainOf g = 0 := by
+    funext e
+    simp only [Quantum.Stabilizer.Homological.HomologicalCode.xChainOf, Pi.zero_apply]
+    rcases hgZ.2 ((RotatedSurface.rotatedSurfaceHomologicalCode L).edgeEquiv e) with hI | hZ
+    · simp [hI]
+    · simp [hZ]
+  have hx_bnd :
+      (RotatedSurface.rotatedSurfaceHomologicalCode L).xChainOf g ∈
+        (RotatedSurface.rotatedSurfaceHomologicalCode L).boundaries := by
+    rw [hx_zero]; exact Submodule.zero_mem _
+  -- CSS bridge: ¬ (X-chain ∈ boundaries ∧ Z-chain ∈ dualBoundaries).
+  have h_not_both :=
+    not_both_boundary_of_nontrivial
+      (X := RotatedSurface.rotatedSurfaceHomologicalCode L) g hg_hom
+  have hz_not_bnd :
+      (RotatedSurface.rotatedSurfaceHomologicalCode L).zChainOf g ∉
+        (RotatedSurface.rotatedSurfaceHomologicalCode L).dualBoundaries :=
+    fun h => h_not_both ⟨hx_bnd, h⟩
+  -- Surface-specific weight bound on the Z-chain + generic weight ≥ chainWeight.
+  have h_chain : L ≤
+      (RotatedSurface.rotatedSurfaceHomologicalCode L).chainWeight
+        ((RotatedSurface.rotatedSurfaceHomologicalCode L).zChainOf g) :=
+    dual_chainWeight_ge_L_of_nontrivial L hz_cyc hz_not_bnd
+  have h_weight :=
+    weight_ge_chainWeight_zChainOf
+      (X := RotatedSurface.rotatedSurfaceHomologicalCode L) g
+  exact h_chain.trans h_weight
 
 /-- The logical Z has weight exactly `L`. -/
 theorem logicalZ_weight_eq_L :
     NQubitPauliGroupElement.weight (logicalZ L) = L := by
+  -- `logicalZ L = chainZOperator (middleRowChain L)`; reduce weight to chainWeight.
   change NQubitPauliGroupElement.weight
     ((RotatedSurface.rotatedSurfaceHomologicalCode L).chainZOperator (middleRowChain L)) = L
-  rw [weight_chainZOperator_eq_dualChainSupport_card]
-  unfold dualChainSupport
+  rw [weight_chainZOperator]
+  -- Direct count: chainSupport (middleRowChain L) ≃ Fin L via x ↦ (x, midIdx L).
+  change (Finset.univ.filter (fun v : RotatedSurface.VtxIdx L =>
+      middleRowChain L v ≠ 0)).card = L
   rw [show (Finset.univ.filter (fun v : RotatedSurface.VtxIdx L =>
-      middleRowChain L v = 1)) =
+      middleRowChain L v ≠ 0)) =
       (Finset.univ : Finset (Fin L)).image (fun x : Fin L => (x, midIdx L)) by
     ext v
     simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_image]
