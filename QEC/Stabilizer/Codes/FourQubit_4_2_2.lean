@@ -6,6 +6,7 @@ import QEC.Stabilizer.Core.CSSNoNegI
 import QEC.Stabilizer.Core.Centralizer
 import QEC.Stabilizer.Core.CSSCommutationLemmas
 import QEC.Stabilizer.Core.CodeDistance
+import QEC.Stabilizer.Core.CSSDistance
 import QEC.Stabilizer.Core.LogicalOperators
 import QEC.Stabilizer.Core.StabilizerCode
 import QEC.Stabilizer.PauliGroup.Commutation
@@ -454,25 +455,94 @@ noncomputable def stabilizerCode : StabilizerCode 4 2 where
   closure_no_neg_identity := by rw [listToSet_generatorsList]; exact negIdentity_not_mem
   logicalOps := logicalOps4_2_2
   logical_commute_cross := by
-    sorry
-    -- TODO(stab_4_2_2-T12): case-split on (ℓ, ℓ' : Fin 2). The only non-trivial cases
-    -- are (0, 1) and (1, 0). In each case unfold logicalOps4_2_2 and dispatch the
-    -- ∧-of-4 equations to the four off-diagonal lemmas T9a–T9d plus their `.symm`.
+    intro ℓ ℓ' hne
+    fin_cases ℓ <;> fin_cases ℓ'
+    · exact (hne rfl).elim
+    · refine ⟨logicalX_1_commutes_logicalX_2, logicalX_1_commutes_logicalZ_2, ?_, ?_⟩
+      · exact logicalX_2_commutes_logicalZ_1.symm
+      · exact logicalZ_1_commutes_logicalZ_2
+    · refine ⟨logicalX_1_commutes_logicalX_2.symm, logicalX_2_commutes_logicalZ_1, ?_, ?_⟩
+      · exact logicalX_1_commutes_logicalZ_2.symm
+      · exact logicalZ_1_commutes_logicalZ_2.symm
+    · exact (hne rfl).elim
 
 /-! ## Code distance = 2 -/
+
+/-- The stabilizer code subgroup is the closure of the (set-form) generators. -/
+private lemma stabilizerCode_toSubgroup_eq :
+    stabilizerCode.toStabilizerGroup.toSubgroup = Subgroup.closure generators := by
+  change (Subgroup.closure (NQubitPauliGroupElement.listToSet generatorsList) : _) =
+    Subgroup.closure generators
+  rw [listToSet_generatorsList]
+
+/-- Anticommute witness for the [[4,2,2]] code: every weight-1 Pauli anticommutes
+with either `ZZZZ` (when the local Pauli is X or Y) or `XXXX` (when the local Pauli
+is Z or Y). -/
+private lemma weight_one_anticomm_witness :
+    ∀ i : Fin 4, ∀ P : PauliOperator, P ≠ PauliOperator.I →
+      ∃ g ∈ generators, NQubitPauliGroupElement.Anticommute
+        (weightOneAt i P) g := by
+  intro i P hP
+  -- For each non-identity Pauli at qubit i, exhibit Z1 or X1 as the anticommuting witness.
+  -- X anticommutes with Z; Y anticommutes with both X and Z; Z anticommutes with X.
+  match P, hP with
+  | PauliOperator.X, _ =>
+    refine ⟨Z1, by simp [generators, ZGenerators], ?_⟩
+    classical
+    pauli_anticomm_odd_anticommutes
+    have hfilter :
+        (Finset.univ.filter
+              (NQubitPauliGroupElement.anticommutesAt (n := 4)
+                (weightOneAt i PauliOperator.X).operators Z1.operators)) =
+          ({i} : Finset (Fin 4)) := by
+      ext j; fin_cases i <;> fin_cases j <;>
+        simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt,
+          weightOneAt, NQubitPauliGroupElement.ofOperator,
+          Z1, NQubitPauliOperator.set, PauliOperator.mulOp]
+    rw [hfilter]; simp +decide
+  | PauliOperator.Y, _ =>
+    refine ⟨Z1, by simp [generators, ZGenerators], ?_⟩
+    classical
+    pauli_anticomm_odd_anticommutes
+    have hfilter :
+        (Finset.univ.filter
+              (NQubitPauliGroupElement.anticommutesAt (n := 4)
+                (weightOneAt i PauliOperator.Y).operators Z1.operators)) =
+          ({i} : Finset (Fin 4)) := by
+      ext j; fin_cases i <;> fin_cases j <;>
+        simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt,
+          weightOneAt, NQubitPauliGroupElement.ofOperator,
+          Z1, NQubitPauliOperator.set, PauliOperator.mulOp]
+    rw [hfilter]; simp +decide
+  | PauliOperator.Z, _ =>
+    refine ⟨X1, by simp [generators, XGenerators], ?_⟩
+    classical
+    pauli_anticomm_odd_anticommutes
+    have hfilter :
+        (Finset.univ.filter
+              (NQubitPauliGroupElement.anticommutesAt (n := 4)
+                (weightOneAt i PauliOperator.Z).operators X1.operators)) =
+          ({i} : Finset (Fin 4)) := by
+      ext j; fin_cases i <;> fin_cases j <;>
+        simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt,
+          weightOneAt, NQubitPauliGroupElement.ofOperator,
+          X1, NQubitPauliOperator.set, PauliOperator.mulOp]
+    rw [hfilter]; simp +decide
+  | PauliOperator.I, hP => exact (hP rfl).elim
 
 /-- The [[4, 2, 2]] code has distance 2: every weight-1 single-qubit Pauli
 anticommutes with at least one of `ZZZZ` or `XXXX`, and `X̄₁ = IXIX` is a
 nontrivial logical operator of weight exactly 2. -/
 theorem code_has_distance_two : HasCodeDistance stabilizerCode 2 := by
-  sorry
-  -- TODO(stab_4_2_2-T13): apply hasCodeDistance_of with:
-  --   hd: 2 ≥ 1 by decide;
-  --   h_witness: X̄₁ at weight 2 (LogicalQubitOps.xOp_nontrivial of logicalOps4_2_2 0);
-  --   h_min: enumerate 12 weight-1 Paulis (3 Paulis × 4 qubits) → each anticommutes with
-  --     XXXX or ZZZZ → not in centralizer → not nontrivial logical.
-  -- Try `native_decide` over the full `h_min` predicate first; fall back to
-  -- per-case anticommutes_imp_not_isPauliLogicalOperator if needed.
+  refine hasCodeDistance_of stabilizerCode 2 (by decide)
+    ⟨logicalX_1, (logicalOps4_2_2 0).xOp_nontrivial, by decide⟩ ?_
+  intro w hw_pos hw_lt g hg_weight h_nontrivial
+  interval_cases w
+  -- w = 1: g has weight 1; we show g is not in the centralizer.
+  rcases (IsNontrivialLogicalOperator_iff g stabilizerCode.toStabilizerGroup).mp h_nontrivial
+    with ⟨h_cent, _, _⟩
+  exact no_weight_one_mem_centralizer_of_anticommute_witness stabilizerCode.toStabilizerGroup
+    generators stabilizerCode_toSubgroup_eq weight_one_anticomm_witness g hg_weight h_cent
 
 end FourQubit_4_2_2
 end StabilizerGroup
