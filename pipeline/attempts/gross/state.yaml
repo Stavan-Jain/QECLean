@@ -5,17 +5,19 @@ group: 'Z_12 x Z_6'
 polynomials:
   A: 'x^3 + y + y^2'        # in F_2[Z_12 x Z_6]
   B: 'y^3 + x + x^2'        # in F_2[Z_12 x Z_6]
-status: approach-a-partial
+status: approach-b-negative-result
 track: moonshot
 started_at: 2026-05-22
-worktree_branch: worktree-agent-ab4a093de37f3f9ed
+worktree_branch: worktree-agent-a8fc8cfd557f7cc4a
 estimated_loc: 3500
 phase: stage-4-research
-current_approach: A_camion_bch
+current_approach: B_lifted_product
 approach_started_at: 2026-05-22
 approach_finished_at: 2026-05-22
+# --- Approach A (closed, partial-c) ---
 approach_a_outcome: partial-c
 approach_a_hours_spent: 4.5
+approach_a_finished_at: 2026-05-22
 approach_a_summary: |
   Delivered: BB chain complex framework (`QEC/Stabilizer/Homological/BBChainComplex.lean`)
   + abstract distance bridge (`chainWeight_lower_bound_transfers`) + gross instantiation.
@@ -24,6 +26,33 @@ approach_a_summary: |
   against true d = 12.  Camion is fundamentally loose for this code.
   Approach A's *tight* goal is unreachable; partial-C infrastructure
   delivered.  Recommend: pivot to Approach B (lifted-product) next session.
+# --- Approach B (closed, negative result) ---
+approach_b_outcome: negative-result
+approach_b_hours_spent: 4.75
+approach_b_target: |
+  Lin-Pryadko (arXiv:2306.16400) Statement 12 / Tillich-Zémor analog:
+  d(LP[a, b]) >= ⌈min(d_A^⊥, d_B^⊥) / c⌉ where c = |G_a ∩ G_b|.
+  For Gross: G_a ∩ G_b = Z_4 × Z_2 = order 8, so denominator is 8.
+approach_b_summary: |
+  RIGOROUS NEGATIVE RESULT.  Per Lin-Pryadko Sec. IV.F, the
+  Statement-12 lower bound satisfies the structural ceiling
+  `d_0 ≤ min([G_a : N], [G_b : N])`.  For Gross polynomials,
+  the verified subgroups G_a = Z_4 × Z_6, G_b = Z_12 × Z_2,
+  N = G_a ∩ G_b = Z_4 × Z_2 give [G_a : N] = [G_b : N] = 3.
+  So Statement 12 cannot certify d >= 4 on the Gross code,
+  let alone d = 12.  Approach B is *fundamentally loose* on Gross.
+
+  Lean evidence delivered: attempt.lean (~230 LoC) mechanically
+  verifies the subgroup arithmetic and the index parameters via
+  `decide`-closed lemmas.  Conditional theorem `gross_TZ_loose`
+  formalizes "if Statement 12 holds, then d_0 < 12".
+
+  Combined with Approach A (Camion heuristically loose at ≤ 9),
+  the two natural algebraic-bound approaches both demonstrably
+  fail for the Gross polynomial pair.  This documents a literature
+  gap: no algebraic technique is known to certify d ≥ 4 analytically
+  on engineered BB codes.
 covering_lean_file: 'QEC/Stabilizer/Homological/BBChainComplex.lean'
 introduced_refs:
   - 'arXiv:2308.07915 (Bravyi-Cross-Gambetta-Maslov-Rall-Yoder, Nature 2024)'
+  - 'arXiv:2306.16400 (Lin-Pryadko 2023, Quantum two-block group algebra codes)'
