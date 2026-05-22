@@ -129,40 +129,95 @@ mirroring `Steane7.lean`'s `Zᵢ_comm_Xⱼ` pattern.
 -/
 
 private lemma g1_comm_g2 : g1 * g2 = g2 * g1 := by
-  sorry -- TODO(stab_5_1_3-T1.12): pauli_comm_even_anticommutes; filter = {1, 3}
+  classical
+  pauli_comm_even_anticommutes
+  have hfilter :
+      (Finset.univ.filter
+            (NQubitPauliGroupElement.anticommutesAt (n := 5) g1.operators g2.operators)) =
+        ({1, 3} : Finset (Fin 5)) := by
+    ext i; fin_cases i <;>
+      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, g1, g2,
+        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
+  rw [hfilter]; decide
 
 private lemma g1_comm_g3 : g1 * g3 = g3 * g1 := by
-  sorry -- TODO(stab_5_1_3-T1.13): pauli_comm_even_anticommutes; filter = {2, 3}
+  classical
+  pauli_comm_even_anticommutes
+  have hfilter :
+      (Finset.univ.filter
+            (NQubitPauliGroupElement.anticommutesAt (n := 5) g1.operators g3.operators)) =
+        ({2, 3} : Finset (Fin 5)) := by
+    ext i; fin_cases i <;>
+      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, g1, g3,
+        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
+  rw [hfilter]; decide
 
 private lemma g1_comm_g4 : g1 * g4 = g4 * g1 := by
-  sorry -- TODO(stab_5_1_3-T1.14): pauli_comm_even_anticommutes; filter = {0, 1}
+  classical
+  pauli_comm_even_anticommutes
+  have hfilter :
+      (Finset.univ.filter
+            (NQubitPauliGroupElement.anticommutesAt (n := 5) g1.operators g4.operators)) =
+        ({0, 1} : Finset (Fin 5)) := by
+    ext i; fin_cases i <;>
+      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, g1, g4,
+        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
+  rw [hfilter]; decide
 
 private lemma g2_comm_g3 : g2 * g3 = g3 * g2 := by
-  sorry -- TODO(stab_5_1_3-T1.23): pauli_comm_even_anticommutes; filter = {2, 4}
+  classical
+  pauli_comm_even_anticommutes
+  have hfilter :
+      (Finset.univ.filter
+            (NQubitPauliGroupElement.anticommutesAt (n := 5) g2.operators g3.operators)) =
+        ({2, 4} : Finset (Fin 5)) := by
+    ext i; fin_cases i <;>
+      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, g2, g3,
+        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
+  rw [hfilter]; decide
 
 private lemma g2_comm_g4 : g2 * g4 = g4 * g2 := by
-  sorry -- TODO(stab_5_1_3-T1.24): pauli_comm_even_anticommutes; filter = {3, 4}
+  classical
+  pauli_comm_even_anticommutes
+  have hfilter :
+      (Finset.univ.filter
+            (NQubitPauliGroupElement.anticommutesAt (n := 5) g2.operators g4.operators)) =
+        ({3, 4} : Finset (Fin 5)) := by
+    ext i; fin_cases i <;>
+      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, g2, g4,
+        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
+  rw [hfilter]; decide
 
 private lemma g3_comm_g4 : g3 * g4 = g4 * g3 := by
-  sorry -- TODO(stab_5_1_3-T1.34): pauli_comm_even_anticommutes; filter = {0, 3}
+  classical
+  pauli_comm_even_anticommutes
+  have hfilter :
+      (Finset.univ.filter
+            (NQubitPauliGroupElement.anticommutesAt (n := 5) g3.operators g4.operators)) =
+        ({0, 3} : Finset (Fin 5)) := by
+    ext i; fin_cases i <;>
+      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, g3, g4,
+        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
+  rw [hfilter]; decide
 
 /-! ## §5 — All-pair commutation (full stabilizer abelianness) -/
 
 /-- All four generators pairwise commute. -/
 theorem generators_commute :
     ∀ g ∈ generators, ∀ h ∈ generators, g * h = h * g := by
-  sorry
-  -- TODO(stab_5_1_3-T1): classical; intro g hg h hh;
-  --   simp only [generators, Set.mem_insert_iff, Set.mem_singleton_iff] at hg hh;
-  --   rcases hg with rfl | rfl | rfl | rfl <;>
-  --     rcases hh with rfl | rfl | rfl | rfl <;>
-  --     (try rfl) <;>
-  --     first | exact g1_comm_g2 | exact g1_comm_g2.symm
-  --           | exact g1_comm_g3 | exact g1_comm_g3.symm
-  --           | exact g1_comm_g4 | exact g1_comm_g4.symm
-  --           | exact g2_comm_g3 | exact g2_comm_g3.symm
-  --           | exact g2_comm_g4 | exact g2_comm_g4.symm
-  --           | exact g3_comm_g4 | exact g3_comm_g4.symm
+  classical
+  intro g hg h hh
+  simp only [generators, Set.mem_insert_iff, Set.mem_singleton_iff] at hg hh
+  rcases hg with rfl | rfl | rfl | rfl <;>
+    rcases hh with rfl | rfl | rfl | rfl <;>
+    first
+      | rfl
+      | exact g1_comm_g2 | exact g1_comm_g2.symm
+      | exact g1_comm_g3 | exact g1_comm_g3.symm
+      | exact g1_comm_g4 | exact g1_comm_g4.symm
+      | exact g2_comm_g3 | exact g2_comm_g3.symm
+      | exact g2_comm_g4 | exact g2_comm_g4.symm
+      | exact g3_comm_g4 | exact g3_comm_g4.symm
 
 /-! ## §7 — Generator list and `listToSet` equality
 
@@ -177,28 +232,26 @@ def generatorsList : List (NQubitPauliGroupElement 5) :=
 /-- The list-form generators have the same elements as the set-form `generators`. -/
 lemma listToSet_generatorsList :
     NQubitPauliGroupElement.listToSet generatorsList = generators := by
-  sorry
-  -- TODO(stab_5_1_3-T_listToSet): simp only [generatorsList, generators,
-  --   NQubitPauliGroupElement.listToSet_cons, NQubitPauliGroupElement.listToSet_nil];
-  --   ext g; simp only [Set.mem_insert_iff, Set.mem_singleton_iff, Set.mem_empty_iff_false,
-  --                     or_false, or_assoc]
+  simp only [generatorsList, generators,
+    NQubitPauliGroupElement.listToSet_cons, NQubitPauliGroupElement.listToSet_nil]
+  ext g
+  simp only [Set.mem_insert_iff, Set.mem_singleton_iff, Set.mem_empty_iff_false,
+    or_false]
 
 /-! ## §9 — Phase-zero and generator independence -/
 
 /-- Every element of the generators list has phase power 0. -/
 lemma AllPhaseZero_generatorsList :
     NQubitPauliGroupElement.AllPhaseZero generatorsList := by
-  sorry
-  -- TODO(stab_5_1_3-T3): rw [generatorsList, NQubitPauliGroupElement.AllPhaseZero_cons];
-  --   exact ⟨rfl, (NQubitPauliGroupElement.AllPhaseZero_cons _ _).mpr
-  --     ⟨rfl, (NQubitPauliGroupElement.AllPhaseZero_cons _ _).mpr
-  --       ⟨rfl, (NQubitPauliGroupElement.AllPhaseZero_cons _ _).mpr
-  --         ⟨rfl, NQubitPauliGroupElement.AllPhaseZero_nil⟩⟩⟩⟩
+  rw [generatorsList, NQubitPauliGroupElement.AllPhaseZero_cons]
+  exact ⟨rfl, (NQubitPauliGroupElement.AllPhaseZero_cons _ _).mpr
+    ⟨rfl, (NQubitPauliGroupElement.AllPhaseZero_cons _ _).mpr
+      ⟨rfl, (NQubitPauliGroupElement.AllPhaseZero_cons _ _).mpr
+        ⟨rfl, NQubitPauliGroupElement.AllPhaseZero_nil⟩⟩⟩⟩
 
 /-- The check-matrix rows of the four generators are linearly independent. -/
 theorem rowsLinearIndependent_generatorsList :
-    NQubitPauliGroupElement.rowsLinearIndependent generatorsList := by
-  sorry -- TODO(stab_5_1_3-T4): decide (or native_decide if too slow)
+    NQubitPauliGroupElement.rowsLinearIndependent generatorsList := by decide
 
 /-- The generator list is an independent generating set. -/
 theorem GeneratorsIndependent_5_generatorsList :
@@ -218,13 +271,7 @@ helper lands, this proof is `sorry`.
 /-- `−I` is not in the [[5, 1, 3]] stabilizer subgroup. -/
 theorem negIdentity_not_mem :
     negIdentity 5 ∉ subgroup := by
-  sorry
-  -- TODO(stab_5_1_3-T2): NON-CSS — needs general-form lemma
-  --   `negIdentity_not_mem_of_independent_phase_zero` in
-  --   Core/SubgroupLemmas.lean. Proof outline: phase-0 + symplectic-row
-  --   independence ⇒ closure is elementary abelian 2-group; (−I).operators
-  --   = identity ⇒ symplectic combination is 0 ⇒ all coeffs 0 ⇒ product
-  --   is 1 ≠ −I. See gap_audit.md Gap 1.
+  sorry -- TODO(stab_5_1_3-T2): WIP — see Core helper plan below.
 
 /-! ## §8 — Bundled `StabilizerGroup 5` -/
 
@@ -266,9 +313,8 @@ For all-X / all-Z logicals, the dedicated lemma
 
 /-- `X̄` and `Z̄` anticommute (since `n = 5` is odd). -/
 theorem logicalX_anticommutes_logicalZ :
-    NQubitPauliGroupElement.Anticommute logicalX logicalZ := by
-  sorry
-  -- TODO(stab_5_1_3-T5): exact NQubitPauliOperator.allX_allZ_anticommute 5 (by decide)
+    NQubitPauliGroupElement.Anticommute logicalX logicalZ :=
+  NQubitPauliOperator.allX_allZ_anticommute 5 (by decide)
 
 /-! ## §12 — Logicals in centralizer
 
@@ -278,48 +324,134 @@ Finset. Then bundled via `Subgroup.forall_comm_closure_iff`.
 -/
 
 private lemma logicalX_commutes_g1 : logicalX * g1 = g1 * logicalX := by
-  sorry -- TODO(stab_5_1_3-T6.X.1): pauli_comm_even_anticommutes; filter = {1, 2}
+  classical
+  pauli_comm_even_anticommutes
+  have hfilter :
+      (Finset.univ.filter
+            (NQubitPauliGroupElement.anticommutesAt (n := 5) logicalX.operators g1.operators)) =
+        ({1, 2} : Finset (Fin 5)) := by
+    ext i; fin_cases i <;>
+      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, logicalX, g1,
+        NQubitPauliOperator.X, NQubitPauliOperator.set, NQubitPauliOperator.identity,
+        PauliOperator.mulOp]
+  rw [hfilter]; decide
 
 private lemma logicalX_commutes_g2 : logicalX * g2 = g2 * logicalX := by
-  sorry -- TODO(stab_5_1_3-T6.X.2): pauli_comm_even_anticommutes; filter = {2, 3}
+  classical
+  pauli_comm_even_anticommutes
+  have hfilter :
+      (Finset.univ.filter
+            (NQubitPauliGroupElement.anticommutesAt (n := 5) logicalX.operators g2.operators)) =
+        ({2, 3} : Finset (Fin 5)) := by
+    ext i; fin_cases i <;>
+      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, logicalX, g2,
+        NQubitPauliOperator.X, NQubitPauliOperator.set, NQubitPauliOperator.identity,
+        PauliOperator.mulOp]
+  rw [hfilter]; decide
 
 private lemma logicalX_commutes_g3 : logicalX * g3 = g3 * logicalX := by
-  sorry -- TODO(stab_5_1_3-T6.X.3): pauli_comm_even_anticommutes; filter = {3, 4}
+  classical
+  pauli_comm_even_anticommutes
+  have hfilter :
+      (Finset.univ.filter
+            (NQubitPauliGroupElement.anticommutesAt (n := 5) logicalX.operators g3.operators)) =
+        ({3, 4} : Finset (Fin 5)) := by
+    ext i; fin_cases i <;>
+      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, logicalX, g3,
+        NQubitPauliOperator.X, NQubitPauliOperator.set, NQubitPauliOperator.identity,
+        PauliOperator.mulOp]
+  rw [hfilter]; decide
 
 private lemma logicalX_commutes_g4 : logicalX * g4 = g4 * logicalX := by
-  sorry -- TODO(stab_5_1_3-T6.X.4): pauli_comm_even_anticommutes; filter = {0, 4}
+  classical
+  pauli_comm_even_anticommutes
+  have hfilter :
+      (Finset.univ.filter
+            (NQubitPauliGroupElement.anticommutesAt (n := 5) logicalX.operators g4.operators)) =
+        ({0, 4} : Finset (Fin 5)) := by
+    ext i; fin_cases i <;>
+      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, logicalX, g4,
+        NQubitPauliOperator.X, NQubitPauliOperator.set, NQubitPauliOperator.identity,
+        PauliOperator.mulOp]
+  rw [hfilter]; decide
 
 private lemma logicalZ_commutes_g1 : logicalZ * g1 = g1 * logicalZ := by
-  sorry -- TODO(stab_5_1_3-T6.Z.1): pauli_comm_even_anticommutes; filter = {0, 3}
+  classical
+  pauli_comm_even_anticommutes
+  have hfilter :
+      (Finset.univ.filter
+            (NQubitPauliGroupElement.anticommutesAt (n := 5) logicalZ.operators g1.operators)) =
+        ({0, 3} : Finset (Fin 5)) := by
+    ext i; fin_cases i <;>
+      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, logicalZ, g1,
+        NQubitPauliOperator.Z, NQubitPauliOperator.set, NQubitPauliOperator.identity,
+        PauliOperator.mulOp]
+  rw [hfilter]; decide
 
 private lemma logicalZ_commutes_g2 : logicalZ * g2 = g2 * logicalZ := by
-  sorry -- TODO(stab_5_1_3-T6.Z.2): pauli_comm_even_anticommutes; filter = {1, 4}
+  classical
+  pauli_comm_even_anticommutes
+  have hfilter :
+      (Finset.univ.filter
+            (NQubitPauliGroupElement.anticommutesAt (n := 5) logicalZ.operators g2.operators)) =
+        ({1, 4} : Finset (Fin 5)) := by
+    ext i; fin_cases i <;>
+      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, logicalZ, g2,
+        NQubitPauliOperator.Z, NQubitPauliOperator.set, NQubitPauliOperator.identity,
+        PauliOperator.mulOp]
+  rw [hfilter]; decide
 
 private lemma logicalZ_commutes_g3 : logicalZ * g3 = g3 * logicalZ := by
-  sorry -- TODO(stab_5_1_3-T6.Z.3): pauli_comm_even_anticommutes; filter = {0, 2}
+  classical
+  pauli_comm_even_anticommutes
+  have hfilter :
+      (Finset.univ.filter
+            (NQubitPauliGroupElement.anticommutesAt (n := 5) logicalZ.operators g3.operators)) =
+        ({0, 2} : Finset (Fin 5)) := by
+    ext i; fin_cases i <;>
+      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, logicalZ, g3,
+        NQubitPauliOperator.Z, NQubitPauliOperator.set, NQubitPauliOperator.identity,
+        PauliOperator.mulOp]
+  rw [hfilter]; decide
 
 private lemma logicalZ_commutes_g4 : logicalZ * g4 = g4 * logicalZ := by
-  sorry -- TODO(stab_5_1_3-T6.Z.4): pauli_comm_even_anticommutes; filter = {1, 3}
+  classical
+  pauli_comm_even_anticommutes
+  have hfilter :
+      (Finset.univ.filter
+            (NQubitPauliGroupElement.anticommutesAt (n := 5) logicalZ.operators g4.operators)) =
+        ({1, 3} : Finset (Fin 5)) := by
+    ext i; fin_cases i <;>
+      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, logicalZ, g4,
+        NQubitPauliOperator.Z, NQubitPauliOperator.set, NQubitPauliOperator.identity,
+        PauliOperator.mulOp]
+  rw [hfilter]; decide
 
 /-- `X̄` commutes with every element of the stabilizer. -/
 theorem logicalX_mem_centralizer :
     logicalX ∈ centralizer stabilizerGroup := by
-  sorry
-  -- TODO(stab_5_1_3-T6.X): rw [StabilizerGroup.mem_centralizer_iff,
-  --   stabilizerGroup_toSubgroup_eq, subgroup, Subgroup.forall_comm_closure_iff];
-  --   intro s hs; simp only [generators, Set.mem_insert_iff, Set.mem_singleton_iff] at hs;
-  --   rcases hs with rfl | rfl | rfl | rfl;
-  --   · exact logicalX_commutes_g1.symm
-  --   · exact logicalX_commutes_g2.symm
-  --   · exact logicalX_commutes_g3.symm
-  --   · exact logicalX_commutes_g4.symm
+  rw [StabilizerGroup.mem_centralizer_iff, stabilizerGroup_toSubgroup_eq, subgroup]
+  rw [Subgroup.forall_comm_closure_iff]
+  intro s hs
+  simp only [generators, Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+  rcases hs with rfl | rfl | rfl | rfl
+  · exact logicalX_commutes_g1.symm
+  · exact logicalX_commutes_g2.symm
+  · exact logicalX_commutes_g3.symm
+  · exact logicalX_commutes_g4.symm
 
 /-- `Z̄` commutes with every element of the stabilizer. -/
 theorem logicalZ_mem_centralizer :
     logicalZ ∈ centralizer stabilizerGroup := by
-  sorry
-  -- TODO(stab_5_1_3-T6.Z): symmetric to logicalX_mem_centralizer with the
-  --   logicalZ_commutes_g{i} lemmas above.
+  rw [StabilizerGroup.mem_centralizer_iff, stabilizerGroup_toSubgroup_eq, subgroup]
+  rw [Subgroup.forall_comm_closure_iff]
+  intro s hs
+  simp only [generators, Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+  rcases hs with rfl | rfl | rfl | rfl
+  · exact logicalZ_commutes_g1.symm
+  · exact logicalZ_commutes_g2.symm
+  · exact logicalZ_commutes_g3.symm
+  · exact logicalZ_commutes_g4.symm
 
 /-! ## §13 — `StabilizerCode 5 1` packaging -/
 
@@ -377,17 +509,7 @@ works.
 
 /-- The [[5, 1, 3]] five-qubit perfect code has distance 3. -/
 theorem code_has_distance_three : HasCodeDistance stabilizerCode 3 := by
-  sorry
-  -- TODO(stab_5_1_3-T9): try `native_decide` first.
-  -- If that fails, switch to `hasCodeDistance_of stabilizerCode 3 (by decide)`
-  -- with:
-  --   * weight-3 witness: `logicalX * g1` (operators IYYIX, weight 3) —
-  --     needs IsNontrivialLogicalOperator helper (gap_audit Gap 3).
-  --   * lower bound w = 1: no_weight_one_mem_centralizer_of_anticommute_witness
-  --     + per-(qubit, Pauli) anti-witness table (see plan.md).
-  --   * lower bound w = 2: no_weight_two_mem_centralizer_of_anticommute_witness
-  --     (new helper — gap_audit Gap 2) + per-(qubit-pair, Pauli-pair)
-  --     anti-witness table.
+  sorry -- TODO(stab_5_1_3-T9): WIP — distance proof; try native_decide first.
 
 end FiveQubit_5_1_3
 end StabilizerGroup
