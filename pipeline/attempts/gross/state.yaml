@@ -1,0 +1,16 @@
+code_id: gross
+display_name: '\([[144,12,12]]\) gross code (IBM Bivariate Bicycle)'
+parameters: {n: 144, k: 12, d: 12}
+group: 'Z_12 x Z_6'
+polynomials:
+  A: 'x^3 + y + y^2'        # in F_2[Z_12 x Z_6]
+  B: 'y^3 + x + x^2'        # in F_2[Z_12 x Z_6]
+status: hypothesis-approved
+track: moonshot
+started_at: 2026-05-22
+worktree_branch: worktree-agent-ab4a093de37f3f9ed
+estimated_loc: 3500
+phase: stage-2-hypothesis
+covering_lean_file: null      # to be created during approach execution
+introduced_refs:
+  - 'arXiv:2308.07915 (Bravyi-Cross-Gambetta-Maslov-Rall-Yoder, Nature 2024)'
