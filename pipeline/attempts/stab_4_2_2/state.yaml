@@ -1,11 +1,15 @@
 code_id: stab_4_2_2
 display_name: '\([[4,2,2]]\) Four-qubit code'
 parameters: {n: 4, k: 2, d: 2}
-status: formalization
+status: pr-ready
 track: engineering
 started_at: 2026-05-22
 formalization_started_at: 2026-05-22
+formalization_completed_at: 2026-05-22
 worktree_branch: worktree-agent-ac5625df7d5252c92
 estimated_loc: 300
+actual_loc: 547
 phase: stage-4-formalization
 covering_lean_file: QEC/Stabilizer/Codes/FourQubit_4_2_2.lean
+sorries_closed: 22
+sorries_blocked: 0
