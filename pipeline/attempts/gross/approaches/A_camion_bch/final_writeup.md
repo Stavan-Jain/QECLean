@@ -3,19 +3,38 @@
 ## Status
 
 **Partial — Partial-C** per the calibration in `success_criterion.md`:
-infrastructure delivered, Camion bound itself not formalized.
+infrastructure delivered, Camion bound itself not formalized, and no
+Lean theorem about `grossCode.distance` was produced.
 
-The headline finding: a careful spectral analysis (see
-`spectral_analysis.md`) predicts that **even a fully formalized
-Camion theorem would give the gross code at most `d ≥ 9`, and more
-realistically `d ≥ 4`–`6`**, against the known true `d = 12`.  Camion
-is *fundamentally loose* on this polynomial pair, so the
-formalization cost (~30+ hours of group-algebra infrastructure for a
-modular Camion theorem) cannot deliver the tight result this approach
-was named for.
+The qualitative finding: a hand-computed spectral analysis (see
+`spectral_analysis.md`) identifies a small joint-vanishing structure
+(`Z(A, B) = {1,2} × {1,2}` — a 2×2 box) for the Gross polynomial pair
+under the F₂-character group of `Z_12 × Z_6`. Heuristically, this
+structure suggests that any multivariate-BCH apparent-distance bound
+derivable from this consecutive-zero pattern would land well below
+the empirical `d = 12` — **single-digit values are plausible, but the
+precise bound is not derived in this writeup**.
 
-This is a **clean, honest negative-leaning partial result for the
-*tight* target**, combined with **infrastructure delivery** for any
+This finding is **qualitatively consistent with folklore**: BB-code
+distances are routinely certified by SAT/MIP solvers rather than
+algebraic arguments (cf. Otjens 2025, arXiv:2502.17052, which
+explicitly notes no closed-form analytical lower bound for BB codes),
+so the broader claim "algebraic bounds are loose on numerically-
+optimized BB codes" is widely understood. What this analysis adds is
+the **specific zero-pattern computation** for the Gross polynomials;
+it does **not** add a rigorous numerical upper bound on the
+apparent distance, because the modular multivariate-Camion theory
+(needed when `char(F) | |G|`, as here with `2 | 72`) has not been
+worked out in published form.
+
+The pragmatic conclusion (driving this approach's closure): even with
+the multivariate-modular theory rigorously developed (~30+ hours of
+group-algebra infrastructure), the structural prediction is that
+Camion would not reach `d ≥ 12`. Continuing to formalize a bound
+heuristically expected to be loose is a poor use of moonshot budget.
+
+This is a **negative-leaning partial result for the tight target**,
+combined with **durable Lean infrastructure delivery** for any
 downstream BB-code analysis.
 
 ## What was attempted
@@ -44,12 +63,16 @@ downstream BB-code analysis.
    `grossHomologicalCode.numQubits = 144` (by `decide`).
 
 5. **Step 3 (alternative path): spectral analysis instead of Lean
-   formalization.**  Computed by hand the modular character vanishing
-   set `Z(A, B) = {(1,1), (1,2), (2,1), (2,2)}` of the gross polynomials
-   over the semisimple quotient `F_2 × F_4` of `F_2[Z_12] / Jac` (and
-   similarly for `Z_6`).  Used `1 + ω + ω^2 = 0` in `F_4` and `ω^3 = 1`
-   throughout.  Concluded the Camion bound is loose by at least 3
-   distance units even in the most optimistic interpretation.
+   formalization.**  Computed by hand the joint character vanishing
+   set `Z(A, B) = {(1,1), (1,2), (2,1), (2,2)}` of the Gross
+   polynomials over the semisimple quotient `F_2 × F_4` of
+   `F_2[Z_12] / Jac` (and similarly for `Z_6`). Used
+   `1 + ω + ω^2 = 0` in `F_4` and `ω^3 = 1` throughout. The
+   computation itself is rigorous and easily verifiable; the
+   **heuristic conclusion** that the resulting Camion apparent
+   distance lands in single digits (and so cannot match the
+   empirical `d = 12`) follows folklore reasoning but is **not
+   derived as a theorem here** — see the "Limitations" section.
 
 ## What worked
 
@@ -68,30 +91,52 @@ downstream BB-code analysis.
   * `grossA`, `grossB`, `grossHomologicalCode`
   * `grossHomologicalCode_numQubits` (= 144)
 
-**The spectral analysis** confirmed our hypothesis that Camion is
-loose, and tells us *by how much*:
+**The spectral analysis** computed the joint vanishing set of the
+Gross polynomials under the F₂-Fourier transform:
 
 ```
 Z(A, B) = {(a, b) : Â(χ_a, ψ_b) = 0 ∧ B̂(χ_a, ψ_b) = 0}
         = {(1, 1), (1, 2), (2, 1), (2, 2)}   (4 character orbits)
 ```
 
-This is a 2 × 2 box in the cyclotomic-coset index space, giving a
-multivariate-BCH apparent distance in the optimistic range
-`(2+1)(2+1) = 9` or the conservative range `2·2+1 = 5`.  Either way,
-**strictly less than 12**.
+This `Z(A, B)` computation is **rigorous and verifiable**: it follows
+mechanically from `u³ = 1` for all `u ∈ {1, ω, ω²} ⊆ F₄` (since F₄
+has 3 nonzero elements) plus `1 + ω + ω² = 0` in F₄, giving
+`Â = 1 + v + v²` (independent of `u`) and symmetrically
+`B̂ = 1 + u + u²` (independent of `v`). The joint-vanishing
+structure is then a 2 × 2 box.
 
-**This calibrates the partial-value claim with mathematical
-precision**: it's not "we ran out of time", it's "the Camion bound
-itself is at most 9 on this code".
+What the 2 × 2 box **suggests heuristically**: a multivariate-BCH
+apparent distance derived from a consecutive-zero pattern of this
+small size would land in the single digits — `spectral_analysis.md`
+gives a heuristic range of `[3, 9]` based on the cyclotomic-coset
+structure, with most-likely value `4`–`6`. The exact numerical
+bound is **not derived**; it is estimated from the structural pattern.
+
+What the 2 × 2 box does **not** rigorously give: a derived numerical
+upper bound on the modular-Camion apparent distance. The classical
+Camion theorem requires `gcd(char(F), |G|) = 1` for its semisimple
+Fourier setup; here `2 | 72 = |Z_12 × Z_6|`, so a modular version of
+multivariate BCH is needed, and (per the literature dive) this
+modular case has not been worked out in published form.
+
+**Qualitative reading**: the small `Z(A, B)` is consistent with
+folklore that algebraic bounds are loose on the Gross code — but
+"loose by at least 3 distance units" is a folklore-grade statement,
+not a derived theorem of this analysis.
 
 ## What didn't work
 
-1. **The Camion bound, even hand-computed, doesn't reach `d = 12`.**
-   The gross polynomials' specific exponent structure
+1. **The Camion bound is heuristically too small to reach `d = 12`.**
+   The Gross polynomials' specific exponent structure
    (`A = x^3 + y + y^2`, `B = y^3 + x + x^2`) yields only a 2 × 2
-   consecutive zero pattern.  No formalization of Camion in Lean could
-   produce a tighter bound from this pattern.
+   consecutive zero pattern, which (consistent with folklore on
+   abelian-code algebraic bounds) heuristically constrains the
+   apparent-distance derivation to small values. We did not formalize
+   the multivariate-modular Camion theorem far enough to produce a
+   rigorous numerical upper bound, so the "Camion can't reach 12"
+   claim rests on the structural intuition, not a theorem in this
+   writeup.
 
 2. **The modular characteristic obstruction** (`char F_2 | |G|`) means
    the *classical* Camion theorem cannot be applied directly.  Even
@@ -115,18 +160,26 @@ itself is at most 9 on this code".
 
 ## Is the obstacle fundamental or surmountable?
 
-**For the tight `d ≥ 12` goal: fundamental**, in the sense that
-*Camion alone cannot prove it*.  The spectral analysis is unambiguous:
-the apparent distance derived from `Z(A, B) = {1,2}×{1,2}` cannot
-exceed 9 by any standard formulation of Camion's bound.
+**For the tight `d ≥ 12` goal: heuristically fundamental.** The
+spectral analysis identifies a 2 × 2 zero structure in the joint
+vanishing set, and standard multivariate-BCH apparent-distance bounds
+derived from such small consecutive-zero patterns produce single-digit
+values. We do not have a rigorous theorem proving "Camion cannot
+exceed 9 on this code" — we have a structural prediction consistent
+with folklore.
 
 **For a partial `d ≥ K` Camion result for `K ∈ {4, 6, 8, 9}`:
-surmountable** — requires the 3300+ LOC of infrastructure described
-above.  Not infeasible, but a multi-month engineering project.
+surmountable but expensive** — requires the 3300+ LOC of
+infrastructure described above, which also includes formalizing the
+modular multivariate-Camion theory (not yet in published form). Not
+infeasible, but a multi-month engineering project producing a result
+*heuristically expected* to be much smaller than 12.
 
 **For the *framework* / scaffolding contribution**: already delivered.
-`BBChainComplex.lean` and `chainWeight_lower_bound_transfers` are
-permanent additions that unblock downstream work.
+`BBChainComplex.lean` and the `chainWeight_lower_bound_transfers`
+combinator (now lifted to `Homological/Distance.lean`) are permanent
+additions that unblock downstream work, independent of any specific
+distance bound.
 
 ## Suggested follow-ups
 
@@ -195,8 +248,10 @@ In rough priority order:
 * **`daily_log.md`** — session-by-session progress
 * **`obstacle_diary.md`** — 5 obstacle entries (2 mathematical, 3
   Lean-API)
-* **`spectral_analysis.md`** — the hand-computed modular character
-  analysis demonstrating Camion's loss-of-tightness on the gross code
+* **`spectral_analysis.md`** — the hand-computed character analysis
+  of the joint vanishing set `Z(grossA, grossB)`, plus a heuristic
+  estimate (not a derived theorem) of the corresponding multivariate-
+  BCH apparent-distance range
 
 ## Build status
 
@@ -226,8 +281,49 @@ per-approach budgets.
 ## Recommendation
 
 The Approach-A budget should be marked **closed** at this point.
-Continuing to pursue Camion-on-gross would burn ~30 h of infrastructure
-work for a result that is *known in advance* to be loose.
+Continuing to pursue Camion-on-Gross would burn ~30 h of
+infrastructure work for a result that is *heuristically expected in
+advance* to be loose. The structural prediction is folklore-grade
+rather than theorem-grade, but it's consistent enough with the
+broader literature on BB-code algebraic bounds (Otjens 2025,
+Lin-Pryadko 2023) that investing further in this specific approach
+is hard to justify.
 
 The next session should pivot to **Approach B (lifted-product /
 Tillich-Zémor)** with the BB chain-complex framework now in place.
+
+## Limitations of this analysis
+
+To be explicit about what this writeup does and does not claim:
+
+- The `Z(grossA, grossB)` calculation is **rigorous** and easily
+  verifiable. Anyone with the F₂-Fourier framework can reproduce it
+  in ~30 minutes. It is not a novel mathematical technique; it is a
+  routine application of decades-old machinery (Camion 1971;
+  Bernal-Bueno-Carreño-Simón 2014–2024 multivariate BCH) to a
+  specific polynomial pair. As a written-down result for the Gross
+  polynomials specifically, it does not appear in the literature my
+  dive surfaced, but the surrounding folklore is well-established.
+- The qualitative conclusion "Camion is loose on the Gross code" is
+  **consistent with folklore but not derived as a theorem here**.
+  Researchers working on BB codes informally understand algebraic
+  bounds don't reach numerical distances — IBM's MIP-based
+  certification of `d = 12` is the standard, and no closed-form
+  analytical lower bound is known.
+- The specific numerical claim "Camion ≤ 9 on Gross" is a
+  **heuristic estimate**, not a theorem. A rigorous derivation would
+  require the modular multivariate-Camion theory worked out
+  explicitly (the classical theorem requires `gcd(char(F), |G|) = 1`,
+  which fails here), which has not been done in published form. The
+  `[3, 9]` heuristic range in `spectral_analysis.md` is a structural
+  intuition, not a theorem.
+- **No Lean theorem about `grossHomologicalCode.distance` was
+  produced.** The Lean artifacts are infrastructure (BB chain complex
+  + abstract CSS-bridge combinator), not distance results.
+
+A future, more rigorous version of this analysis would either:
+(a) work out the modular multivariate-Camion bound and derive a
+rigorous numerical upper bound, then formalize in Lean; or
+(b) be content with the folklore framing and proceed directly to
+Approach B without further investment in Camion-specific machinery.
+This writeup commits to (b).

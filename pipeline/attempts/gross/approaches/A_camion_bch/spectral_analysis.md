@@ -1,12 +1,33 @@
 # Spectral analysis of the gross polynomials for Camion's bound
 
-This document records the **modular character analysis** of the gross
-polynomial pair, predicting what Camion's apparent-distance bound would
-give *if* fully formalized.  The conclusion (committed to upfront, to
-avoid hypothesis drift): the Camion bound on the gross code is at most
-in the range `[3, 9]`, far from the true `d = 12`.  The Camion approach
-is therefore **loose by a factor of at least 1.3×** on this specific
-polynomial pair.
+This document records a **character analysis** of the Gross polynomial
+pair, computing the joint vanishing set `Z(A, B)` under the F₂-Fourier
+transform on `Z_12 × Z_6` and discussing — heuristically — what a
+multivariate-BCH apparent-distance bound built on this consecutive-zero
+structure would plausibly give.
+
+The two parts of this document have **different epistemic statuses**:
+
+- The `Z(A, B) = {(1,1), (1,2), (2,1), (2,2)}` calculation
+  (§"Computing Â, B̂" and §"Joint vanishing set") is **rigorous and
+  easily verifiable**. It follows from `u³ = 1` for `u ∈ {1, ω, ω²} ⊆
+  F₄` plus `1 + ω + ω² = 0`, giving `Â = 1 + v + v²` (independent of
+  `u`) and symmetrically for `B̂`.
+- The conclusion that the resulting Camion apparent distance lands in
+  the range `[3, 9]` (§"Best-case Camion bound" and §"Realistic
+  Camion bound estimate") is **heuristic, not derived**. The classical
+  Camion theorem requires `gcd(char(F), |G|) = 1`; here `2 | 72`, so
+  a modular multivariate-BCH theory is needed, and per the literature
+  dive that modular case has not been worked out in published form.
+  The "Camion is loose by factor 1.3× or more" framing is
+  **folklore-grade, not theorem-grade**.
+
+The pragmatic takeaway for Approach A: the heuristic structural
+prediction is enough to make pursuing the full Lean formalization of
+a modular multivariate-Camion theorem a poor budget allocation. But
+"Camion gives at most 9 on Gross" should be read as a structural
+prediction consistent with folklore on BB-code algebraic bounds, **not
+a derived numerical upper bound from this document**.
 
 ## Setting
 
