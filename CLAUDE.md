@@ -363,6 +363,59 @@ next session, so keeping it current pays compound interest.
   (when the list is `Nodup`) and `Finset.card_erase_of_mem` —
   see `coordsTrimmed_length` in `ToricCodeNStabilizerCode.lean` for the pattern.
 
+## Formalization pipeline
+
+This repo has a catalog-driven pipeline for prioritizing and formalizing
+new QEC codes. Three documents define it:
+
+- **`docs/pipeline-usage.md`** — task-oriented recipes. Start here if you
+  want to *do* something: weekly triage, start a new code, review a
+  skeleton, run Stage 4, open a PR, refresh the catalog, initialize a
+  moonshot. Quick-reference table at the top maps every workflow to a
+  recipe.
+- **`docs/pipeline.md`** — architectural overview: stages, scoring rubric,
+  what each artifact contains. Read after the usage guide if you want to
+  understand *why* the pipeline is shaped the way it is.
+- **`.claude/agents/qec-{prioritizer,skeleton-drafter,formalization-runner,moonshot}.md`**
+  — operating specs for the four pipeline agents. Read these when
+  modifying agent behavior, not for normal day-to-day use.
+
+Key artifacts at a glance:
+
+- `catalog/zoo.yaml` — 267 quantum codes from the Error Correction Zoo
+- `catalog/scoring.yaml` — per-code formalization-priority scores
+- `pipeline/queue.md` — top-of-queue + tracks (engineering / moonshot /
+  defer / skip)
+- `pipeline/attempts/<code_id>/` — per-code formalization state
+- `pipeline/research_log.md` — index of moonshot attempts (including
+  failures, which are first-class outputs)
+
+## Canonical CSS code structure (`_TEMPLATE.lean`)
+
+`QEC/Stabilizer/Codes/_TEMPLATE.lean` is the canonical structural reference
+for formalizing a new CSS stabilizer code. It documents the standard
+§1–§14 section breakdown (generators → generator sets → typing → cross-
+commutation → all-pair commutation → −I lemma → generator list →
+`StabilizerGroup` → independence → logical operators → anticommutation →
+centralizer → `StabilizerCode` → distance), with variant notes for `k ≥ 2`
+codes, non-CSS codes, and parametric families.
+
+Before drafting a new code file by hand or via the
+`qec-skeleton-drafter` agent, **read `_TEMPLATE.lean` first**. The
+embedded code samples there are copy-paste-ready and capture the v4.30-era
+tactic patterns (notably the `_root_.mul_assoc` / `_root_.one_mul`
+qualification trick and the `change` step before `rw` after
+`closure_induction`).
+
+Concrete instantiations of the template:
+
+- `Steane7.lean` — k = 1, n = 7, fully-supported all-X / all-Z logicals
+- `Shor9.lean` — k = 1, n = 9, repetition-of-cat encoding
+- `RepetitionCode{3,N}.lean` — degenerate distance-1 cases
+- `RotatedSurfaceCodeN*.lean` — parametric family; distance proof
+  in sibling files using the homological framework
+- `ToricCodeN*.lean` — parametric family with trimmed-generator packaging
+
 ## Stabilizer-code packaging (trimmed generator lists)
 
 `StabilizerCode n k` requires `generatorsList.length = n - k` via its

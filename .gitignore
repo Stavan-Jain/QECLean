@@ -2,15 +2,24 @@
 .gauss/
 .DS_Store
 
-# Docs (Aristotle prompts, evaluations, guides) — but keep the published proof.
+# Docs (Aristotle prompts, evaluations, guides) — but keep the published proof
+# and the formalization pipeline docs.
 docs/*
 !docs/distance_proof.md
+!docs/pipeline.md
+!docs/pipeline-usage.md
 
 # Cursor local state and continual-learning index
 .cursor/
 
-# Claude Code local state
-.claude/
+# Claude Code local state — but track shared agent definitions so the
+# formalization pipeline is reproducible across collaborators.
+.claude/*
+!.claude/agents/
+
+# Pipeline cache: the eczoo_data snapshot itself is gitignored (reproducible
+# from PIN.md's git SHA). PIN.md stays tracked.
+pipeline/cache/eczoo_data/
 
 # Learned preferences/facts (optional: keep local only)
 AGENTS.md

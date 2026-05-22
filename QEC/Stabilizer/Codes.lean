@@ -1,3 +1,4 @@
+import QEC.Stabilizer.Codes._TEMPLATE
 import QEC.Stabilizer.Codes.RepetitionCode3
 import QEC.Stabilizer.Codes.RepetitionCodeN
 import QEC.Stabilizer.Codes.QuantumHamming
