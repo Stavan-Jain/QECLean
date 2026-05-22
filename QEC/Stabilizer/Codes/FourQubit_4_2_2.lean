@@ -475,59 +475,57 @@ private lemma stabilizerCode_toSubgroup_eq :
     Subgroup.closure generators
   rw [listToSet_generatorsList]
 
+/-- Helper: a weight-1 Pauli with local Pauli `P` at qubit `i` anticommutes with
+the all-Z stabilizer `Z1` provided `P ∈ {X, Y}` (the cases where Z anticommutes locally). -/
+private lemma weightOneAt_anticomm_Z1 (i : Fin 4) (P : PauliOperator)
+    (hP : P = PauliOperator.X ∨ P = PauliOperator.Y) :
+    NQubitPauliGroupElement.Anticommute (weightOneAt i P) Z1 := by
+  classical
+  pauli_anticomm_odd_anticommutes
+  have hfilter :
+      (Finset.univ.filter
+            (NQubitPauliGroupElement.anticommutesAt (n := 4)
+              (weightOneAt i P).operators Z1.operators)) =
+        ({i} : Finset (Fin 4)) := by
+    ext j; fin_cases i <;> fin_cases j <;>
+      rcases hP with rfl | rfl <;>
+        simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt,
+          weightOneAt, NQubitPauliGroupElement.ofOperator,
+          Z1, NQubitPauliOperator.set, PauliOperator.mulOp]
+  rw [hfilter]; simp +decide
+
+/-- Helper: a weight-1 Pauli with local Pauli `Z` at qubit `i` anticommutes with
+the all-X stabilizer `X1`. -/
+private lemma weightOneAt_Z_anticomm_X1 (i : Fin 4) :
+    NQubitPauliGroupElement.Anticommute (weightOneAt i PauliOperator.Z) X1 := by
+  classical
+  pauli_anticomm_odd_anticommutes
+  have hfilter :
+      (Finset.univ.filter
+            (NQubitPauliGroupElement.anticommutesAt (n := 4)
+              (weightOneAt i PauliOperator.Z).operators X1.operators)) =
+        ({i} : Finset (Fin 4)) := by
+    ext j; fin_cases i <;> fin_cases j <;>
+      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt,
+        weightOneAt, NQubitPauliGroupElement.ofOperator,
+        X1, NQubitPauliOperator.set, PauliOperator.mulOp]
+  rw [hfilter]; simp +decide
+
 /-- Anticommute witness for the [[4,2,2]] code: every weight-1 Pauli anticommutes
 with either `ZZZZ` (when the local Pauli is X or Y) or `XXXX` (when the local Pauli
-is Z or Y). -/
+is Z). -/
 private lemma weight_one_anticomm_witness :
     ∀ i : Fin 4, ∀ P : PauliOperator, P ≠ PauliOperator.I →
       ∃ g ∈ generators, NQubitPauliGroupElement.Anticommute
         (weightOneAt i P) g := by
   intro i P hP
-  -- For each non-identity Pauli at qubit i, exhibit Z1 or X1 as the anticommuting witness.
-  -- X anticommutes with Z; Y anticommutes with both X and Z; Z anticommutes with X.
   match P, hP with
   | PauliOperator.X, _ =>
-    refine ⟨Z1, by simp [generators, ZGenerators], ?_⟩
-    classical
-    pauli_anticomm_odd_anticommutes
-    have hfilter :
-        (Finset.univ.filter
-              (NQubitPauliGroupElement.anticommutesAt (n := 4)
-                (weightOneAt i PauliOperator.X).operators Z1.operators)) =
-          ({i} : Finset (Fin 4)) := by
-      ext j; fin_cases i <;> fin_cases j <;>
-        simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt,
-          weightOneAt, NQubitPauliGroupElement.ofOperator,
-          Z1, NQubitPauliOperator.set, PauliOperator.mulOp]
-    rw [hfilter]; simp +decide
+    exact ⟨Z1, by simp [generators, ZGenerators], weightOneAt_anticomm_Z1 i _ (Or.inl rfl)⟩
   | PauliOperator.Y, _ =>
-    refine ⟨Z1, by simp [generators, ZGenerators], ?_⟩
-    classical
-    pauli_anticomm_odd_anticommutes
-    have hfilter :
-        (Finset.univ.filter
-              (NQubitPauliGroupElement.anticommutesAt (n := 4)
-                (weightOneAt i PauliOperator.Y).operators Z1.operators)) =
-          ({i} : Finset (Fin 4)) := by
-      ext j; fin_cases i <;> fin_cases j <;>
-        simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt,
-          weightOneAt, NQubitPauliGroupElement.ofOperator,
-          Z1, NQubitPauliOperator.set, PauliOperator.mulOp]
-    rw [hfilter]; simp +decide
+    exact ⟨Z1, by simp [generators, ZGenerators], weightOneAt_anticomm_Z1 i _ (Or.inr rfl)⟩
   | PauliOperator.Z, _ =>
-    refine ⟨X1, by simp [generators, XGenerators], ?_⟩
-    classical
-    pauli_anticomm_odd_anticommutes
-    have hfilter :
-        (Finset.univ.filter
-              (NQubitPauliGroupElement.anticommutesAt (n := 4)
-                (weightOneAt i PauliOperator.Z).operators X1.operators)) =
-          ({i} : Finset (Fin 4)) := by
-      ext j; fin_cases i <;> fin_cases j <;>
-        simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt,
-          weightOneAt, NQubitPauliGroupElement.ofOperator,
-          X1, NQubitPauliOperator.set, PauliOperator.mulOp]
-    rw [hfilter]; simp +decide
+    exact ⟨X1, by simp [generators, XGenerators], weightOneAt_Z_anticomm_X1 i⟩
   | PauliOperator.I, hP => exact (hP rfl).elim
 
 /-- The [[4, 2, 2]] code has distance 2: every weight-1 single-qubit Pauli
