@@ -5,12 +5,25 @@ group: 'Z_12 x Z_6'
 polynomials:
   A: 'x^3 + y + y^2'        # in F_2[Z_12 x Z_6]
   B: 'y^3 + x + x^2'        # in F_2[Z_12 x Z_6]
-status: hypothesis-approved
+status: approach-a-partial
 track: moonshot
 started_at: 2026-05-22
 worktree_branch: worktree-agent-ab4a093de37f3f9ed
 estimated_loc: 3500
-phase: stage-2-hypothesis
-covering_lean_file: null      # to be created during approach execution
+phase: stage-4-research
+current_approach: A_camion_bch
+approach_started_at: 2026-05-22
+approach_finished_at: 2026-05-22
+approach_a_outcome: partial-c
+approach_a_hours_spent: 4.5
+approach_a_summary: |
+  Delivered: BB chain complex framework (`QEC/Stabilizer/Homological/BBChainComplex.lean`)
+  + abstract distance bridge (`chainWeight_lower_bound_transfers`) + gross instantiation.
+  Spectral analysis (hand-computed) shows Camion's bound for the gross
+  polynomials would yield at most d ≥ 9, more realistically d ≥ 4-6,
+  against true d = 12.  Camion is fundamentally loose for this code.
+  Approach A's *tight* goal is unreachable; partial-C infrastructure
+  delivered.  Recommend: pivot to Approach B (lifted-product) next session.
+covering_lean_file: 'QEC/Stabilizer/Homological/BBChainComplex.lean'
 introduced_refs:
   - 'arXiv:2308.07915 (Bravyi-Cross-Gambetta-Maslov-Rall-Yoder, Nature 2024)'

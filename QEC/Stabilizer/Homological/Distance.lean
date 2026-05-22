@@ -460,6 +460,70 @@ theorem not_both_boundary_of_nontrivial
   obtain ⟨_, _, h_no_phase_dup⟩ := hg
   exact h_no_phase_dup (g_X * g_Z) hprod_mem hops_eq
 
+/-! ## Chain-weight → Pauli-weight distance bridge (combinator)
+
+Packages the abstract CSS bridge into a single statement that downstream
+homological-code distance proofs can call directly. Given lower bounds on
+non-boundary X-cycles' chain weight (`hX`) and non-dual-boundary Z-cycles'
+chain weight (`hZ`), every non-trivial logical Pauli has weight ≥ the
+respective bound.
+
+Combines:
+- `xChainOf_mem_cycles_of_centralizer` / `zChainOf_mem_dualCycles_of_centralizer`
+- `not_both_boundary_of_nontrivial`
+- `weight_ge_chainWeight_xChainOf` / `weight_ge_chainWeight_zChainOf`
+
+This is the natural CSS-bridge entry point for new code families with
+parametric chain-weight bounds (BB codes, hypergraph products, etc.). The
+existing rotated-surface and toric distance proofs predate this combinator
+and inline the case-split; they could be refactored to use this directly,
+but that's left as a future cleanup. -/
+
+/-- Symmetric form: a single lower bound `K` on both X- and Z-cycle chain
+weights yields a lower bound on every non-trivial logical's Pauli weight. -/
+theorem chainWeight_lower_bound_transfers
+    (X : HomologicalCode) (K : ℕ)
+    (hX : ∀ c ∈ X.cycles, c ∉ X.boundaries → K ≤ X.chainWeight c)
+    (hZ : ∀ c ∈ X.dualCycles, c ∉ X.dualBoundaries → K ≤ X.chainWeight c)
+    (g : NQubitPauliGroupElement X.numQubits)
+    (hg : Quantum.StabilizerGroup.IsNontrivialLogicalOperator g
+            X.homologicalStabilizerGroup) :
+    K ≤ NQubitPauliGroupElement.weight g := by
+  have hg_centralizer : g ∈ Quantum.StabilizerGroup.centralizer
+      X.homologicalStabilizerGroup := by
+    rw [Quantum.StabilizerGroup.IsNontrivialLogicalOperator_iff] at hg
+    exact hg.1
+  have hxCyc : X.xChainOf g ∈ X.cycles :=
+    xChainOf_mem_cycles_of_centralizer g hg_centralizer
+  have hzCyc : X.zChainOf g ∈ X.dualCycles :=
+    zChainOf_mem_dualCycles_of_centralizer g hg_centralizer
+  have hnot_both := not_both_boundary_of_nontrivial g hg
+  rcases Classical.em (X.xChainOf g ∈ X.boundaries) with hxBnd | hxNotBnd
+  · have hzNotBnd : X.zChainOf g ∉ X.dualBoundaries := by
+      intro hzBnd
+      exact hnot_both ⟨hxBnd, hzBnd⟩
+    exact (hZ _ hzCyc hzNotBnd).trans (weight_ge_chainWeight_zChainOf g)
+  · exact (hX _ hxCyc hxNotBnd).trans (weight_ge_chainWeight_xChainOf g)
+
+/-- Asymmetric form: separate `K_X` and `K_Z` lower bounds, conclusion uses
+`min K_X K_Z`. Useful when the two sides of a CSS code have genuinely
+different chain-weight bounds. -/
+theorem chainWeight_lower_bound_transfers_asymmetric
+    (X : HomologicalCode) (K_X K_Z : ℕ)
+    (hX : ∀ c ∈ X.cycles, c ∉ X.boundaries → K_X ≤ X.chainWeight c)
+    (hZ : ∀ c ∈ X.dualCycles, c ∉ X.dualBoundaries → K_Z ≤ X.chainWeight c)
+    (g : NQubitPauliGroupElement X.numQubits)
+    (hg : Quantum.StabilizerGroup.IsNontrivialLogicalOperator g
+            X.homologicalStabilizerGroup) :
+    min K_X K_Z ≤ NQubitPauliGroupElement.weight g := by
+  have hX' : ∀ c ∈ X.cycles, c ∉ X.boundaries →
+      min K_X K_Z ≤ X.chainWeight c := fun c hc hnb =>
+    (min_le_left _ _).trans (hX c hc hnb)
+  have hZ' : ∀ c ∈ X.dualCycles, c ∉ X.dualBoundaries →
+      min K_X K_Z ≤ X.chainWeight c := fun c hc hnb =>
+    (min_le_right _ _).trans (hZ c hc hnb)
+  exact chainWeight_lower_bound_transfers X _ hX' hZ' g hg
+
 end HomologicalCode
 
 end Homological
