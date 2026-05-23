@@ -233,6 +233,42 @@ qubit positions where the single-qubit factors anticommute is odd.
 def Anticommute (p q : NQubitPauliGroupElement n) : Prop :=
   p * q = minusOne n * (q * p)
 
+/-! ### Decidability of equality and `Anticommute`
+
+The default `DecidableEq (NQubitPauliOperator n)` set in `Representation.lean`
+uses `Classical.decEq`, which is noncomputable and blocks `decide` from
+reducing equality of n-qubit Pauli operators. We provide a high-priority
+computable instance here by reducing to the underlying function type
+`Fin n → PauliOperator` (which is `Fintype × DecidableEq`-derivable).
+
+From there, we derive `DecidableEq (NQubitPauliGroupElement n)` and finally
+`Decidable (Anticommute p q)` — the latter is `noncomputable` because the
+`Mul` instance on `NQubitPauliGroupElement` is noncomputable, but the
+kernel can still reduce `decide` through it. (`native_decide` does not work
+for the same reason, so prefer `decide`.) -/
+
+/-- Computable `DecidableEq` on `NQubitPauliOperator n`, overriding the
+`Classical.decEq` instance from `Representation.lean`. Enables `decide` on
+equalities of n-qubit Pauli operators. -/
+instance (priority := high) instDecidableEqNQubitPauliOperatorComputable (n : ℕ) :
+    DecidableEq (NQubitPauliOperator n) :=
+  inferInstanceAs (DecidableEq (Fin n → PauliOperator))
+
+/-- `DecidableEq` on `NQubitPauliGroupElement n` via field-wise decision. -/
+instance instDecidableEqNQubitPauliGroupElement (n : ℕ) :
+    DecidableEq (NQubitPauliGroupElement n) := fun p q =>
+  decidable_of_iff (p.phasePower = q.phasePower ∧ p.operators = q.operators)
+    ⟨fun ⟨h1, h2⟩ => by cases p; cases q; simp_all,
+     fun h => by cases h; exact ⟨rfl, rfl⟩⟩
+
+/-- `Decidable (Anticommute p q)`: unfolds to equality of two Pauli group
+elements and decides via `DecidableEq`. Marked `noncomputable` because `*`
+on `NQubitPauliGroupElement` is noncomputable, but `decide` still reduces
+through the kernel. -/
+noncomputable instance decidableAnticommute (p q : NQubitPauliGroupElement n) :
+    Decidable (Anticommute p q) :=
+  show Decidable (p * q = minusOne n * (q * p)) from inferInstance
+
 /-- Anticommutation reduces to the mulOp phase differing by 2 (mod 4). -/
 lemma anticommutes_iff_mulOp_phasePower (p q : NQubitPauliGroupElement n) :
   Anticommute p q ↔
