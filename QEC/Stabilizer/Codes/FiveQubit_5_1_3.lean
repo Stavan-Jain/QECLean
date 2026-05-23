@@ -268,10 +268,18 @@ helper `negIdentity_not_mem_of_independent_phase_zero` (to be added in
 helper lands, this proof is `sorry`.
 -/
 
-/-- `−I` is not in the [[5, 1, 3]] stabilizer subgroup. -/
+/-- `−I` is not in the [[5, 1, 3]] stabilizer subgroup.
+
+Non-CSS argument via the general helper
+`NQubitPauliGroupElement.negIdentity_not_mem_of_indep_phase_zero_commute` in
+`BinarySymplectic/SymplecticSpan.lean`. The first non-CSS code in the repo
+exercises this helper. -/
 theorem negIdentity_not_mem :
     negIdentity 5 ∉ subgroup := by
-  sorry -- TODO(stab_5_1_3-T2): WIP — see Core helper plan below.
+  rw [subgroup, ← listToSet_generatorsList]
+  refine NQubitPauliGroupElement.negIdentity_not_mem_of_indep_phase_zero_commute
+    generatorsList AllPhaseZero_generatorsList rowsLinearIndependent_generatorsList ?_
+  rw [listToSet_generatorsList]; exact generators_commute
 
 /-! ## §8 — Bundled `StabilizerGroup 5` -/
 
@@ -507,9 +515,26 @@ sorries, so Stage 4 can swap in `native_decide` at the top if that
 works.
 -/
 
-/-- The [[5, 1, 3]] five-qubit perfect code has distance 3. -/
+/-- The [[5, 1, 3]] five-qubit perfect code has distance 3.
+
+The full distance proof requires (1) a weight-3 nontrivial-logical witness
+constructed as `logicalX * g₁` (operators `IYYIX`, weight 3) and (2) a
+lower-bound argument ruling out weight-1 and weight-2 nontrivial logicals.
+
+Weight-1 routes through the existing
+`StabilizerGroup.no_weight_one_mem_centralizer_of_anticommute_witness` helper
+in `Core/CSSDistance.lean`. Weight-2 requires a new helper
+`no_weight_two_mem_centralizer_of_anticommute_witness` (`gap_audit.md` Gap 2)
+plus a 90-case anti-witness table. The witness construction also needs
+`IsNontrivialLogicalOperator.mul_mem_subgroup` (`gap_audit.md` Gap 3) to
+transfer non-triviality from `logicalX` (weight 5) to `logicalX * g₁`
+(weight 3).
+
+Out of scope for this Stage-4 attempt; deferred along with `negIdentity_not_mem`.
+See `result.md` for the follow-up plan. -/
 theorem code_has_distance_three : HasCodeDistance stabilizerCode 3 := by
-  sorry -- TODO(stab_5_1_3-T9): WIP — distance proof; try native_decide first.
+  sorry -- BLOCKED(stab_5_1_3-T9): see docstring above; needs Gap 2 + Gap 3 helpers
+        -- in Core plus weight-3 witness anti-witness tables. Standalone follow-up.
 
 end FiveQubit_5_1_3
 end StabilizerGroup
