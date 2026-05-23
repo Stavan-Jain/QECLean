@@ -632,6 +632,87 @@ private lemma weight_one_anticomm_witness :
       | exact ⟨g3, by simp [generators], by decide⟩
     | PauliOperator.I, hP => exact (hP rfl).elim)
 
+/-! ### Weight-2 anticomm witness
+
+For every distinct qubit pair `(i, j)` with `i ≠ j` and every pair of
+non-identity Paulis `(P, Q)`, some generator anticommutes with
+`weightTwoAt i j P Q`. Same structure as the weight-1 witness, but
+nested: `match` on `(P, Q)` then `fin_cases i <;> fin_cases j` and
+backtrack over generators by `first`. The `i = j` subgoals discharge
+via `exact absurd rfl hij`. Unused generator branches per `(P, Q)`
+case are trimmed (`g₄` is not needed for `(X, X)`, `(Y, Z)`, `(Z, Y)`)
+to avoid `linter.unusedTactic` warnings. -/
+
+private lemma weight_two_anticomm_witness :
+    ∀ i j : Fin 5, i ≠ j → ∀ P Q : PauliOperator, P ≠ PauliOperator.I →
+        Q ≠ PauliOperator.I →
+      ∃ g ∈ generators, NQubitPauliGroupElement.Anticommute
+        (weightTwoAt i j P Q) g := by
+  intro i j hij P Q hP hQ
+  match P, Q, hP, hQ with
+  | PauliOperator.I, _, hP, _ => exact (hP rfl).elim
+  | _, PauliOperator.I, _, hQ => exact (hQ rfl).elim
+  | PauliOperator.X, PauliOperator.X, _, _ =>
+      fin_cases i <;> fin_cases j <;> first
+        | exact absurd rfl hij
+        | exact ⟨g1, by simp [generators], by decide⟩
+        | exact ⟨g2, by simp [generators], by decide⟩
+        | exact ⟨g3, by simp [generators], by decide⟩
+  | PauliOperator.X, PauliOperator.Y, _, _ =>
+      fin_cases i <;> fin_cases j <;> first
+        | exact absurd rfl hij
+        | exact ⟨g1, by simp [generators], by decide⟩
+        | exact ⟨g2, by simp [generators], by decide⟩
+        | exact ⟨g3, by simp [generators], by decide⟩
+        | exact ⟨g4, by simp [generators], by decide⟩
+  | PauliOperator.X, PauliOperator.Z, _, _ =>
+      fin_cases i <;> fin_cases j <;> first
+        | exact absurd rfl hij
+        | exact ⟨g1, by simp [generators], by decide⟩
+        | exact ⟨g2, by simp [generators], by decide⟩
+        | exact ⟨g3, by simp [generators], by decide⟩
+        | exact ⟨g4, by simp [generators], by decide⟩
+  | PauliOperator.Y, PauliOperator.X, _, _ =>
+      fin_cases i <;> fin_cases j <;> first
+        | exact absurd rfl hij
+        | exact ⟨g1, by simp [generators], by decide⟩
+        | exact ⟨g2, by simp [generators], by decide⟩
+        | exact ⟨g3, by simp [generators], by decide⟩
+        | exact ⟨g4, by simp [generators], by decide⟩
+  | PauliOperator.Y, PauliOperator.Y, _, _ =>
+      fin_cases i <;> fin_cases j <;> first
+        | exact absurd rfl hij
+        | exact ⟨g1, by simp [generators], by decide⟩
+        | exact ⟨g2, by simp [generators], by decide⟩
+        | exact ⟨g3, by simp [generators], by decide⟩
+        | exact ⟨g4, by simp [generators], by decide⟩
+  | PauliOperator.Y, PauliOperator.Z, _, _ =>
+      fin_cases i <;> fin_cases j <;> first
+        | exact absurd rfl hij
+        | exact ⟨g1, by simp [generators], by decide⟩
+        | exact ⟨g2, by simp [generators], by decide⟩
+        | exact ⟨g3, by simp [generators], by decide⟩
+  | PauliOperator.Z, PauliOperator.X, _, _ =>
+      fin_cases i <;> fin_cases j <;> first
+        | exact absurd rfl hij
+        | exact ⟨g1, by simp [generators], by decide⟩
+        | exact ⟨g2, by simp [generators], by decide⟩
+        | exact ⟨g3, by simp [generators], by decide⟩
+        | exact ⟨g4, by simp [generators], by decide⟩
+  | PauliOperator.Z, PauliOperator.Y, _, _ =>
+      fin_cases i <;> fin_cases j <;> first
+        | exact absurd rfl hij
+        | exact ⟨g1, by simp [generators], by decide⟩
+        | exact ⟨g2, by simp [generators], by decide⟩
+        | exact ⟨g3, by simp [generators], by decide⟩
+  | PauliOperator.Z, PauliOperator.Z, _, _ =>
+      fin_cases i <;> fin_cases j <;> first
+        | exact absurd rfl hij
+        | exact ⟨g1, by simp [generators], by decide⟩
+        | exact ⟨g2, by simp [generators], by decide⟩
+        | exact ⟨g3, by simp [generators], by decide⟩
+        | exact ⟨g4, by simp [generators], by decide⟩
+
 /-- The [[5, 1, 3]] five-qubit perfect code has distance 3. -/
 theorem code_has_distance_three : HasCodeDistance stabilizerCode 3 := by
   sorry -- TODO(stab_5_1_3-T9): combine weight-1 + weight-2 witnesses with logicalX_w3
