@@ -1,0 +1,18 @@
+code_id: css_4_1_2
+display_name: '[[4,1,2]] Leung-Nielsen-Chuang-Yamamoto (LNCY) code'
+parameters:
+  n: 4
+  k: 1
+  d: 2
+status: pr-ready
+track: engineering
+started_at: 2026-05-23
+formalization_started_at: 2026-05-23
+formalization_completed_at: 2026-05-23
+worktree_branch: worktree-agent-a69575ef21a590b75
+estimated_loc: 300
+final_loc: 505
+sorries_closed: 26
+sorries_blocked: 0
+phase: stage-4-formalization
+covering_lean_file: QEC/Stabilizer/Codes/Small/CSS_4_1_2.lean
