@@ -63,14 +63,17 @@ content there.
     if a hypothesis is a `↔` like `hfilt_eq : P ↔ Q`, `simp_all` may rewrite
     `Q` back to `P` in a subgoal you wanted to keep simplified. Workaround:
     `clear hfilt_eq` (or rename to a one-shot `have`) before `simp_all`.
-  - **`Anticommute p q` via `by decide`**: a computable `DecidableEq
-    (NQubitPauliGroupElement n)` and a noncomputable `Decidable
-    Anticommute` instance live in `PauliGroup/Commutation.lean`. So
-    `Anticommute p q` for concrete Pauli group elements closes by `by
-    decide` in the kernel. `native_decide` does **not** work (because
-    `Mul` is noncomputable) — prefer `decide`. For backtracking
-    generator-search witness tables (e.g. "for every weight-1 Pauli,
-    some generator anticommutes"), the standard pattern is
+  - **`Anticommute p q` via `by decide`** (for non-CSS distance proofs): a
+    computable `DecidableEq (NQubitPauliGroupElement n)` and a `noncomputable`
+    `Decidable Anticommute` instance let `decide` reduce `Anticommute p q` for
+    concrete Pauli group elements. **`native_decide` does NOT work** here
+    (because `Mul` on `NQubitPauliGroupElement` is `noncomputable`) — prefer
+    `decide`. These instances live as `local instance` in
+    `Codes/FiveQubit_5_1_3.lean` to avoid global synthesis pollution; copy them
+    into any new non-CSS code file that needs them.
+  - **Backtracking witness search for non-CSS distance proofs**: when proving
+    "for every weight-`k` Pauli, some generator anticommutes", the standard
+    pattern is
 
     ```lean
     fin_cases i <;>
@@ -83,10 +86,11 @@ content there.
        | .I, hP => exact (hP rfl).elim)
     ```
 
-    Trim unused generator branches per `(P, …)` case (those flagged by
-    `linter.unusedTactic`) to keep the file lint-clean. See
-    `FiveQubit_5_1_3.lean`'s `weight_one_anticomm_witness` /
-    `weight_two_anticomm_witness` for the canonical use site.
+    `first` backtracks across generators by `decide`. Trim unused generator
+    branches per `(P, …)` case (flagged by `linter.unusedTactic`) to keep
+    the file lint-clean. See `FiveQubit_5_1_3.lean`'s
+    `weight_one_anticomm_witness` and `weight_two_anticomm_witness` for the
+    canonical use sites.
   - **High-frequency mechanical fixes worth recognizing immediately**:
     - **Ambiguous overloaded name** (e.g. `mul_assoc` between `_root_.mul_assoc`
       and `NQubitPauliGroupElement.mul_assoc` when `open NQubitPauliGroupElement`
@@ -114,6 +118,18 @@ content there.
       `NQubitPauliGroupElement (numQubits L)` (defeq).
 - **Sorry markers**: `sorry  -- TODO(<short-tag>): <one-line note about goal shape>`.
   Always tag so the next session can grep for them.
+- **Global vs. `local instance` discipline**: by default, declare typeclass
+  instances that service a single concrete code as `local instance` *inside
+  that code's file* (e.g. `Codes/FiveQubit_5_1_3.lean`). Reserve global
+  instances in `PauliGroup/`, `Core/`, `BinarySymplectic/`, `Homological/`
+  for genuinely reusable typeclass content. **Always run a whole-repo
+  `lake build` after adding a global instance** — the typeclass synthesizer
+  can take very different paths once a new instance enters the global pool,
+  and unrelated proofs (especially `native_decide` ones) can break. The
+  failure mode is distinctive: `failed to synthesize Decidable (∀-∃
+  proposition)` on a proof that previously closed. See
+  `pipeline/attempts/stab_5_1_3/result.md` § "Lessons learned" for a
+  concrete worked example of this footgun and the locality fix.
 
 ## Linter policy
 
@@ -396,6 +412,18 @@ next session, so keeping it current pays compound interest.
   `(L.filter p).length` arithmetic, route through `List.toFinset_card_of_nodup`
   (when the list is `Nodup`) and `Finset.card_erase_of_mem` —
   see `coordsTrimmed_length` in `ToricCodeNStabilizerCode.lean` for the pattern.
+- **Adding a global typeclass instance can break unrelated `native_decide`
+  proofs.** In Stage 4 of `stab_5_1_3` we added global
+  `instDecidableEqNQubitPauliGroupElement` and `decidableAnticommute` to
+  `PauliGroup/Commutation.lean`, intending broad reuse. It silently broke
+  `RotatedSurfaceCode3.lean`'s `weight_2_pairs_span_coeffs` proof: the new
+  instance disrupted the `Decidable (∀-∃ proposition)` synthesis path the
+  `native_decide` was relying on, even though the proposition has no
+  `NQubitPauliGroupElement` equality in it. **Resolution**: scope the new
+  instances as `local instance` inside `Codes/FiveQubit_5_1_3.lean`. See the
+  "Global vs. `local instance` discipline" bullet in the naming-and-style
+  section above, and `pipeline/attempts/stab_5_1_3/result.md` § "Lessons
+  learned" for the worked diagnosis.
 
 ## Formalization pipeline
 
