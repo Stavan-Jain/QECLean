@@ -67,9 +67,10 @@ neither `IsZTypeElement` nor `IsXTypeElement`. Consequently:
 * Bennett, DiVincenzo, Smolin, Wootters, `arxiv:quant-ph/9604024`
 * EC Zoo `stab_5_1_3`, cross-referenced with Qiskit `preset:qiskit ID 21`
 
-This file is a **Stage-2 skeleton**: every theorem ends in a `sorry`
-tagged `TODO(stab_5_1_3-T<n>): …`. Stage 4 closes them per the plan in
-`pipeline/attempts/stab_5_1_3/plan.md`.
+Stage 4 closed all 23 sorries from the original skeleton; the file
+compiles to `lake build` without warnings other than mathlib-style
+lints inherited from upstream files. See
+`pipeline/attempts/stab_5_1_3/result.md` for the full session log.
 -/
 
 open NQubitPauliGroupElement
@@ -262,10 +263,10 @@ theorem GeneratorsIndependent_5_generatorsList :
 /-! ## §6 — `−I` is not in the stabilizer subgroup
 
 **Non-CSS divergence**: cannot use
-`CSS.negIdentity_not_mem_closure_union`. We rely on a general-form
-helper `negIdentity_not_mem_of_independent_phase_zero` (to be added in
-`Core/SubgroupLemmas.lean` — see `gap_audit.md` Gap 1). Until that
-helper lands, this proof is `sorry`.
+`CSS.negIdentity_not_mem_closure_union`. We rely on the general-form
+helper `negIdentity_not_mem_of_indep_phase_zero_commute` in
+`BinarySymplectic/SymplecticSpan.lean` (added during Stage-4 of this
+code's formalization; see `gap_audit.md` Gap 1).
 -/
 
 /-- `−I` is not in the [[5, 1, 3]] stabilizer subgroup.
@@ -713,9 +714,26 @@ private lemma weight_two_anticomm_witness :
         | exact ⟨g3, by simp [generators], by decide⟩
         | exact ⟨g4, by simp [generators], by decide⟩
 
-/-- The [[5, 1, 3]] five-qubit perfect code has distance 3. -/
+/-- The [[5, 1, 3]] five-qubit perfect code has distance 3.
+
+Combines the weight-1 and weight-2 anti-witness tables above (which rule
+out nontrivial logical operators of weight `< 3`) with the explicit
+weight-3 witness `logicalX_w3 = IYYIX` and its non-triviality proof. -/
 theorem code_has_distance_three : HasCodeDistance stabilizerCode 3 := by
-  sorry -- TODO(stab_5_1_3-T9): combine weight-1 + weight-2 witnesses with logicalX_w3
+  refine hasCodeDistance_of stabilizerCode 3 (by decide)
+    ⟨logicalX_w3, logicalX_w3_isNontrivial, by decide⟩ ?_
+  intro w hw_pos hw_lt g hg_weight h_nontrivial
+  rcases (IsNontrivialLogicalOperator_iff g stabilizerCode.toStabilizerGroup).mp h_nontrivial
+    with ⟨h_cent, _, _⟩
+  interval_cases w
+  · -- w = 1: no weight-1 nontrivial logical operator
+    exact no_weight_one_mem_centralizer_of_anticommute_witness
+      stabilizerCode.toStabilizerGroup generators stabilizerCode_toSubgroup_eq
+      weight_one_anticomm_witness g hg_weight h_cent
+  · -- w = 2: no weight-2 nontrivial logical operator
+    exact no_weight_two_mem_centralizer_of_anticommute_witness
+      stabilizerCode.toStabilizerGroup generators stabilizerCode_toSubgroup_eq
+      weight_two_anticomm_witness g hg_weight h_cent
 
 end FiveQubit_5_1_3
 end StabilizerGroup
