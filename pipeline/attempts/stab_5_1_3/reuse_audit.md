@@ -2,7 +2,7 @@
 
 ## Directly applicable (use as-is)
 
-### From `QEC/Stabilizer/PauliGroup/`
+### From `QEC/Stabilizer/Foundations/PauliGroup/`
 
 - `NQubitPauliGroupElement n` — 5-qubit Pauli group elements with
   phasePower : Fin 4 and operators : NQubitPauliOperator n
@@ -31,7 +31,7 @@
   (`BinarySymplectic/SymplecticInner.lean:106`) — closes
   `logicalX_anticommutes_logicalZ` in one line with `(by decide : Odd 5)`.
 
-### From `QEC/Stabilizer/Core/`
+### From `QEC/Stabilizer/Framework/Core/`
 
 - `StabilizerGroup n`, `.toSubgroup`, `.is_abelian`,
   `.no_neg_identity` (`Core/StabilizerGroup.lean:107`) — target
@@ -64,7 +64,7 @@
   (`Core/CSSDistance.lean:25`) — single-qubit-supported Pauli, used
   in the weight-1 anti-witness construction
 
-### From `QEC/Stabilizer/BinarySymplectic/`
+### From `QEC/Stabilizer/Foundations/BinarySymplectic/`
 
 - `NQubitPauliGroupElement.AllPhaseZero` and its `_cons` / `_nil`
   lemmas (`BinarySymplectic/IndependentEquiv.lean:45, 88, 98`) —

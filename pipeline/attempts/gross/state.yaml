@@ -19,7 +19,7 @@ approach_a_outcome: partial-c
 approach_a_hours_spent: 4.5
 approach_a_finished_at: 2026-05-22
 approach_a_summary: |
-  Delivered: BB chain complex framework (`QEC/Stabilizer/Homological/BBChainComplex.lean`)
+  Delivered: BB chain complex framework (`QEC/Stabilizer/Framework/Homological/BBChainComplex.lean`)
   + abstract distance bridge (`chainWeight_lower_bound_transfers`) + gross instantiation.
   Spectral analysis (hand-computed) shows Camion's bound for the gross
   polynomials would yield at most d ≥ 9, more realistically d ≥ 4-6,
@@ -52,7 +52,7 @@ approach_b_summary: |
   fail for the Gross polynomial pair.  This documents a literature
   gap: no algebraic technique is known to certify d ≥ 4 analytically
   on engineered BB codes.
-covering_lean_file: 'QEC/Stabilizer/Homological/BBChainComplex.lean'
+covering_lean_file: 'QEC/Stabilizer/Framework/Homological/BBChainComplex.lean'
 introduced_refs:
   - 'arXiv:2308.07915 (Bravyi-Cross-Gambetta-Maslov-Rall-Yoder, Nature 2024)'
   - 'arXiv:2306.16400 (Lin-Pryadko 2023, Quantum two-block group algebra codes)'

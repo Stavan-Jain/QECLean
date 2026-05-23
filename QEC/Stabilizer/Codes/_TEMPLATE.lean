@@ -1,21 +1,21 @@
 import Mathlib.Tactic
-import QEC.Stabilizer.Core.StabilizerGroup
-import QEC.Stabilizer.Core.StabilizerCode
-import QEC.Stabilizer.Core.SubgroupLemmas
-import QEC.Stabilizer.Core.CSSPredicates
-import QEC.Stabilizer.Core.CSSNoNegI
-import QEC.Stabilizer.Core.CSSCommutationLemmas
-import QEC.Stabilizer.Core.Centralizer
-import QEC.Stabilizer.Core.CodeDistance
-import QEC.Stabilizer.Core.LogicalOperators
-import QEC.Stabilizer.PauliGroup.Commutation
-import QEC.Stabilizer.PauliGroup.CommutationTactics
-import QEC.Stabilizer.PauliGroup.NQubitOperator
-import QEC.Stabilizer.PauliGroup.NQubitElement
-import QEC.Stabilizer.BinarySymplectic.Core
-import QEC.Stabilizer.BinarySymplectic.CheckMatrix
-import QEC.Stabilizer.BinarySymplectic.CheckMatrixDecidable
-import QEC.Stabilizer.BinarySymplectic.IndependentEquiv
+import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
+import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
+import QEC.Stabilizer.Framework.Core.Stabilizer.SubgroupLemmas
+import QEC.Stabilizer.Framework.Core.CSS.CSSPredicates
+import QEC.Stabilizer.Framework.Core.CSS.CSSNoNegI
+import QEC.Stabilizer.Framework.Core.CSS.CSSCommutationLemmas
+import QEC.Stabilizer.Framework.Core.Stabilizer.Centralizer
+import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
+import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
+import QEC.Stabilizer.Foundations.PauliGroup.Commutation
+import QEC.Stabilizer.Foundations.PauliGroup.CommutationTactics
+import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
+import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
+import QEC.Stabilizer.Foundations.BinarySymplectic.Core
+import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrix
+import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrixDecidable
+import QEC.Stabilizer.Framework.Symplectic.IndependentEquiv
 
 /-!
 # Template — standard CSS stabilizer-code formalization

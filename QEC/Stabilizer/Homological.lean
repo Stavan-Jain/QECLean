@@ -1,7 +1,2 @@
-import QEC.Stabilizer.Homological.Code
-import QEC.Stabilizer.Homological.CSS
-import QEC.Stabilizer.Homological.Generators
-import QEC.Stabilizer.Homological.StabGroup
-import QEC.Stabilizer.Homological.LogicalCorrespondence
-import QEC.Stabilizer.Homological.Distance
-import QEC.Stabilizer.Homological.BBChainComplex
+-- Deprecated: this module moved to `QEC.Stabilizer.Framework.Homological`. This shim will be removed in a follow-up release.
+import QEC.Stabilizer.Framework.Homological

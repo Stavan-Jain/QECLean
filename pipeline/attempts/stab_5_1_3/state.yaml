@@ -12,7 +12,7 @@ worktree_branch: worktree-agent-aa2f5308c26453301
 estimated_loc: 650
 actual_loc: 740
 phase: stage-4-closed
-covering_lean_file: QEC/Stabilizer/Codes/FiveQubit_5_1_3.lean
+covering_lean_file: QEC/Stabilizer/Codes/Small/FiveQubit_5_1_3.lean
 family: non-CSS
 sorries_total: 23
 sorries_closed: 23

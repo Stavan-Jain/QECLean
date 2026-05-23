@@ -22,7 +22,7 @@ infrastructure or evidence that contributes to the broader picture.
 `grossHomologicalCode.distance ≥ 12` was produced.**
 
 Approach A delivered durable infrastructure
-(`QEC/Stabilizer/Homological/BBChainComplex.lean`, the abstract
+(`QEC/Stabilizer/Framework/Homological/BBChainComplex.lean`, the abstract
 `chainWeight_lower_bound_transfers` combinator) but not a specific
 numerical bound.
 
@@ -126,12 +126,12 @@ suitable for a research-note or workshop-track contribution.
 
 ### Promoted to the repo (durable infrastructure, on main)
 
-* `QEC/Stabilizer/Homological/BBChainComplex.lean` (~285 LoC)
+* `QEC/Stabilizer/Framework/Homological/BBChainComplex.lean` (~285 LoC)
   Generic BB chain complex over finite abelian `G`.
-* `QEC/Stabilizer/Homological/Distance.lean` (extended)
+* `QEC/Stabilizer/Framework/Homological/Distance.lean` (extended)
   Added `chainWeight_lower_bound_transfers` and asymmetric variant.
-* `QEC/Stabilizer/Homological.lean` (umbrella)
-  Added `import QEC.Stabilizer.Homological.BBChainComplex`.
+* `QEC/Stabilizer/Framework/Homological.lean` (umbrella)
+  Added `import QEC.Stabilizer.Framework.Homological.BBChainComplex`.
 
 ### Approach-local (exploration / verification)
 

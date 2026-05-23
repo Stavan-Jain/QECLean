@@ -59,16 +59,16 @@ Composite ≥ 5.0 but prerequisites < 5.  Each line lists the dominant blocker.
 
 ## Done / in-flight
 
-- ✓ `quantum_hamming` (\([[2^r, 2^r-r-2, 3]]\) Gottesman code) — QEC/Stabilizer/Codes/QuantumHamming.lean
-- ✓ `quantum_repetition` (Quantum repetition code) — QEC/Stabilizer/Codes/RepetitionCode{3,N}.lean
-- ✓ `qubit_stabilizer` (Qubit stabilizer code) — QEC/Stabilizer/Core/StabilizerGroup.lean + StabilizerCode.lean
-- ✓ `rotated_surface` (Rotated surface code) — QEC/Stabilizer/Codes/RotatedSurfaceCode*.lean
-- ✓ `shor_nine` (\([[9,1,3]]\) Shor code) — QEC/Stabilizer/Codes/Shor9.lean
-- ✓ `stab_15_7_3` (\([[15, 7, 3]]\) quantum Hamming code) — QEC/Stabilizer/Codes/QuantumHamming.lean (r=4 instance)
-- ✓ `stab_4_2_2` (\([[4,2,2]]\) Four-qubit code) — QEC/Stabilizer/Codes/FourQubit_4_2_2.lean (PR #22, merged 2026-05-22)
-- ✓ `steane` (\([[7,1,3]]\) Steane code) — QEC/Stabilizer/Codes/Steane7.lean
-- ✓ `surface-17` (\([[9,1,3]]\) Surface-17 code) — QEC/Stabilizer/Codes/RotatedSurfaceCodeN.lean (L=3 instance)
-- ✓ `toric` (Toric code) — QEC/Stabilizer/Codes/ToricCodeN*.lean
+- ✓ `quantum_hamming` (\([[2^r, 2^r-r-2, 3]]\) Gottesman code) — QEC/Stabilizer/Codes/Small/QuantumHamming.lean
+- ✓ `quantum_repetition` (Quantum repetition code) — QEC/Stabilizer/Codes/Repetition/{Three,N}.lean
+- ✓ `qubit_stabilizer` (Qubit stabilizer code) — QEC/Stabilizer/Framework/Core/Stabilizer/StabilizerGroup.lean + StabilizerCode.lean
+- ✓ `rotated_surface` (Rotated surface code) — QEC/Stabilizer/Codes/RotatedSurface/*.lean
+- ✓ `shor_nine` (\([[9,1,3]]\) Shor code) — QEC/Stabilizer/Codes/Small/Shor9.lean
+- ✓ `stab_15_7_3` (\([[15, 7, 3]]\) quantum Hamming code) — QEC/Stabilizer/Codes/Small/QuantumHamming.lean (r=4 instance)
+- ✓ `stab_4_2_2` (\([[4,2,2]]\) Four-qubit code) — QEC/Stabilizer/Codes/Small/FourQubit_4_2_2.lean (PR #22, merged 2026-05-22)
+- ✓ `steane` (\([[7,1,3]]\) Steane code) — QEC/Stabilizer/Codes/Small/Steane7.lean
+- ✓ `surface-17` (\([[9,1,3]]\) Surface-17 code) — QEC/Stabilizer/Codes/RotatedSurface/N.lean (L=3 instance)
+- ✓ `toric` (Toric code) — QEC/Stabilizer/Codes/Toric/CodeN*.lean
 
 ### In-flight attempts
 

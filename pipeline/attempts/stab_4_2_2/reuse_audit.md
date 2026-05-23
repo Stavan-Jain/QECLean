@@ -3,47 +3,47 @@
 ## Directly applicable (use as-is)
 
 - `NQubitPauliGroupElement n` and its `mul`, `Anticommute`, `weight`, `support`
-  — `QEC/Stabilizer/PauliGroup/NQubitElement.lean`.
+  — `QEC/Stabilizer/Foundations/PauliGroup/NQubitElement.lean`.
 - `NQubitPauliOperator.identity`, `.set`, `.X`, `.Z`, `.weight` — same place.
 - `PauliOperator.IsZType`, `IsXType`, `mulOp` —
-  `QEC/Stabilizer/PauliGroup/SingleQubit/*` (Pauli single-qubit).
+  `QEC/Stabilizer/Foundations/PauliGroup/SingleQubit/*` (Pauli single-qubit).
 - `NQubitPauliGroupElement.IsZTypeElement`, `IsXTypeElement` —
-  `QEC/Stabilizer/Core/CSSPredicates.lean`.
+  `QEC/Stabilizer/Framework/Core/CSS/CSSPredicates.lean`.
 - `StabilizerGroup`, `.toSubgroup`, `negIdentity` —
-  `QEC/Stabilizer/Core/StabilizerGroup.lean`.
+  `QEC/Stabilizer/Framework/Core/Stabilizer/StabilizerGroup.lean`.
 - `StabilizerCode n k` structure and its fields/accessors —
-  `QEC/Stabilizer/Core/StabilizerCode.lean`.
+  `QEC/Stabilizer/Framework/Core/Stabilizer/StabilizerCode.lean`.
 - `LogicalQubitOps`, `.xOp_nontrivial`, `.zOp_nontrivial`,
-  `.xOp_IsPauliLogicalOperator` — `QEC/Stabilizer/Core/LogicalOperators.lean`.
+  `.xOp_IsPauliLogicalOperator` — `QEC/Stabilizer/Framework/Core/Logical/LogicalOperators.lean`.
 - `IsNontrivialLogicalOperator`, `IsNontrivialLogicalOperator_iff` —
   same file.
 - `HasCodeDistance`, `hasCodeDistance_of`, `HasCodeDistance.min_weight` —
-  `QEC/Stabilizer/Core/CodeDistance.lean`.
+  `QEC/Stabilizer/Framework/Core/Logical/CodeDistance.lean`.
 - `centralizer`, `mem_centralizer_iff`, `mem_centralizer_iff_closure` —
-  `QEC/Stabilizer/Core/Centralizer.lean`.
+  `QEC/Stabilizer/Framework/Core/Stabilizer/Centralizer.lean`.
 - `CSS.negIdentity_not_mem_closure_union` —
-  `QEC/Stabilizer/Core/CSSNoNegI.lean`. **Direct fit for T5** since our
+  `QEC/Stabilizer/Framework/Core/CSS/CSSNoNegI.lean`. **Direct fit for T5** since our
   generator set is a union of one Z-type and one X-type generator.
 - `CSSCommutationLemmas.ZType_commutes`, `XType_commutes` —
-  `QEC/Stabilizer/Core/CSSCommutationLemmas.lean`. **Direct fit for T4** to
+  `QEC/Stabilizer/Framework/Core/CSS/CSSCommutationLemmas.lean`. **Direct fit for T4** to
   combine T1 + T2 + T3 into the full pairwise-commute conclusion.
 - `NQubitPauliGroupElement.AllPhaseZero`, `AllPhaseZero_cons`,
   `AllPhaseZero_nil` — same file as `NQubitElement`.
 - `NQubitPauliGroupElement.rowsLinearIndependent`,
   `rowsLinearIndependent_implies_independentGenerators`,
   `GeneratorsIndependent_of_rowsLinearIndependent` —
-  `QEC/Stabilizer/BinarySymplectic/IndependentEquiv.lean`.
+  `QEC/Stabilizer/Framework/Symplectic/IndependentEquiv.lean`.
 - `NQubitPauliGroupElement.listToSet`, `listToSet_cons`, `listToSet_nil` —
-  `QEC/Stabilizer/PauliGroup/NQubitElement.lean`.
-- `mkStabilizerFromGenerators` — `QEC/Stabilizer/Core/StabilizerCode.lean`.
+  `QEC/Stabilizer/Foundations/PauliGroup/NQubitElement.lean`.
+- `mkStabilizerFromGenerators` — `QEC/Stabilizer/Framework/Core/Stabilizer/StabilizerCode.lean`.
 - `pauli_comm_even_anticommutes`, `pauli_comm_componentwise` (tactics) —
-  `QEC/Stabilizer/PauliGroup/CommutationTactics.lean`.
+  `QEC/Stabilizer/Foundations/PauliGroup/CommutationTactics.lean`.
 - `NQubitPauliGroupElement.anticommutesAt`,
   `commutes_iff_even_anticommutes` —
-  `QEC/Stabilizer/PauliGroup/Commutation.lean`.
+  `QEC/Stabilizer/Foundations/PauliGroup/Commutation.lean`.
 - `anticommutes_imp_not_isPauliLogicalOperator`,
   `isPauliLogicalOperator_iff_mem_centralizer` —
-  `QEC/Stabilizer/Core/LogicalOperators.lean`. **Needed for T13** to rule
+  `QEC/Stabilizer/Framework/Core/Logical/LogicalOperators.lean`. **Needed for T13** to rule
   out weight-1 logicals.
 
 ## Lightly adapted (existing pattern, new instance)

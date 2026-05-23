@@ -134,12 +134,12 @@ lemma IsNontrivialLogicalOperator_mul_mem_subgroup
 
 **Search results.**
 
-- `QEC/Stabilizer/Core/LogicalOperators.lean` — no such lemma found.
-- `QEC/Stabilizer/Core/LogicalOperatorCoset.lean` — file exists; this
+- `QEC/Stabilizer/Framework/Core/Logical/LogicalOperators.lean` — no such lemma found.
+- `QEC/Stabilizer/Framework/Core/Logical/LogicalOperatorCoset.lean` — file exists; this
   is the most likely home if it's already there. Stage-4 should
   `grep "IsNontrivialLogicalOperator" Core/LogicalOperatorCoset.lean`
   before writing it.
-- `QEC/Stabilizer/Core/LogicalOperators.lean:327-332` —
+- `QEC/Stabilizer/Framework/Core/Logical/LogicalOperators.lean:327-332` —
   `xOp_IsNontrivialLogicalOperator` exists at the `LogicalQubitOps`
   level (logical-X is nontrivial), but no general
   "multiply-by-stab" lemma.

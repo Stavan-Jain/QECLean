@@ -316,8 +316,8 @@ Three sub-goals via `hasCodeDistance_of`:
 - Bennett, DiVincenzo, Smolin, Wootters `arxiv:quant-ph/9604024`
   (not fetched; cross-referenced via EC Zoo)
 - Gottesman thesis Table 3.4 (re-derivable convention)
-- `QEC/Stabilizer/Codes/Steane7.lean` — k = 1, all-X / all-Z logicals,
+- `QEC/Stabilizer/Codes/Small/Steane7.lean` — k = 1, all-X / all-Z logicals,
   the closest structural sibling
-- `QEC/Stabilizer/Codes/FourQubit_4_2_2.lean` — k = 2 reference,
+- `QEC/Stabilizer/Codes/Small/FourQubit_4_2_2.lean` — k = 2 reference,
   source of the `weightOneAt_anticomm_*` pattern and
   `no_weight_one_mem_centralizer_of_anticommute_witness` usage

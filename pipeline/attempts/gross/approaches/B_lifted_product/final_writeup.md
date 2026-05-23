@@ -235,7 +235,7 @@ In rough priority order:
   for the concrete Gross verification.  Future work.
 * **No full Statement-12 formalization in Lean.**  Estimated ~500
   LoC; cost/benefit explicitly negative given the ceiling result.
-* **No infrastructure promoted to `QEC/Stabilizer/Homological/`.**
+* **No infrastructure promoted to `QEC/Stabilizer/Framework/Homological/`.**
   Approach A already delivered the BB chain complex framework
   (`BBChainComplex.lean`); Approach B's contribution is purely
   the negative result + documentation + the `attempt.lean` artifact.

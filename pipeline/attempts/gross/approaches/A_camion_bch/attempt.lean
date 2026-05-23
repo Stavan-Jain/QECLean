@@ -2,11 +2,11 @@
 # Approach A — Camion BCH multivariate apparent-distance bound
 
 This file is the **exploration entry point** for Approach A.  The
-core abstractions live in `QEC/Stabilizer/Homological/BBChainComplex.lean`
+core abstractions live in `QEC/Stabilizer/Framework/Homological/BBChainComplex.lean`
 (promoted there because they are durable repo infrastructure rather
 than throwaway scratch). The abstract chain-weight → Pauli-weight
 distance bridge `chainWeight_lower_bound_transfers` was also promoted
-into `QEC/Stabilizer/Homological/Distance.lean` (where its building
+into `QEC/Stabilizer/Framework/Homological/Distance.lean` (where its building
 blocks already lived) — see the symmetric and asymmetric variants there.
 
 ## What this file contains
@@ -30,7 +30,7 @@ a Partial-C outcome (BB chain-complex scaffolding + abstract distance
 bridge in Lean), not Partial-A.
 -/
 
-import QEC.Stabilizer.Homological
+import QEC.Stabilizer.Framework.Homological
 
 namespace Quantum
 namespace Stabilizer
