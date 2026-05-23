@@ -16,4 +16,5 @@ import QEC.Stabilizer.Codes.Shor9
 import QEC.Stabilizer.Codes.Steane7
 import QEC.Stabilizer.Codes.Steane7TransversalGates
 import QEC.Stabilizer.Codes.FourQubit_4_2_2
+import QEC.Stabilizer.Codes.FiveQubit_5_1_3
 

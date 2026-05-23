@@ -63,6 +63,30 @@ content there.
     if a hypothesis is a `↔` like `hfilt_eq : P ↔ Q`, `simp_all` may rewrite
     `Q` back to `P` in a subgoal you wanted to keep simplified. Workaround:
     `clear hfilt_eq` (or rename to a one-shot `have`) before `simp_all`.
+  - **`Anticommute p q` via `by decide`**: a computable `DecidableEq
+    (NQubitPauliGroupElement n)` and a noncomputable `Decidable
+    Anticommute` instance live in `PauliGroup/Commutation.lean`. So
+    `Anticommute p q` for concrete Pauli group elements closes by `by
+    decide` in the kernel. `native_decide` does **not** work (because
+    `Mul` is noncomputable) — prefer `decide`. For backtracking
+    generator-search witness tables (e.g. "for every weight-1 Pauli,
+    some generator anticommutes"), the standard pattern is
+
+    ```lean
+    fin_cases i <;>
+      (match P, hP with
+       | .X, _ => first
+         | exact ⟨g₁, by simp [generators], by decide⟩
+         | exact ⟨g₂, by simp [generators], by decide⟩
+         | …
+       | .Y, _ => …
+       | .I, hP => exact (hP rfl).elim)
+    ```
+
+    Trim unused generator branches per `(P, …)` case (those flagged by
+    `linter.unusedTactic`) to keep the file lint-clean. See
+    `FiveQubit_5_1_3.lean`'s `weight_one_anticomm_witness` /
+    `weight_two_anticomm_witness` for the canonical use site.
   - **High-frequency mechanical fixes worth recognizing immediately**:
     - **Ambiguous overloaded name** (e.g. `mul_assoc` between `_root_.mul_assoc`
       and `NQubitPauliGroupElement.mul_assoc` when `open NQubitPauliGroupElement`
@@ -144,6 +168,16 @@ These are local to this codebase — search here before assuming mathlib has the
 - `NQubitPauliGroupElement.commutes_iff_even_anticommutes` — main parity-based
   commutation lemma for general Paulis (the "count of anticommuting qubits is
   even" characterization)
+- **`Decidable (NQubitPauliGroupElement.Anticommute p q)`** (in
+  `PauliGroup/Commutation.lean`) — closes `Anticommute p q` goals via
+  `by decide`. The instance is `noncomputable` because `Mul` on
+  `NQubitPauliGroupElement` is itself noncomputable, but `decide` still
+  reduces through the kernel. `native_decide` does **not** work for
+  the same reason — prefer `decide`. Builds on the computable
+  `DecidableEq (NQubitPauliOperator n)` from `Representation.lean`
+  (the `Classical.decEq` override has been removed). Used heavily by
+  the [[5,1,3]] distance proof for the 105-case weight-{1,2}
+  anti-witness tables.
 - `StabilizerGroup`, `.toSubgroup`, `.is_abelian`, `.one_mem`,
   `.neg_identity_not_mem`, `.codespaceSubmodule`
 - `IsNontrivialLogicalOperator` has **three** conditions (see

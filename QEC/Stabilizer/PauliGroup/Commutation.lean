@@ -233,6 +233,23 @@ qubit positions where the single-qubit factors anticommute is odd.
 def Anticommute (p q : NQubitPauliGroupElement n) : Prop :=
   p * q = minusOne n * (q * p)
 
+/-! ### Decidability of equality and `Anticommute`
+
+`DecidableEq (NQubitPauliOperator n)` is computable (via the underlying
+function type `Fin n → PauliOperator`, see `Representation.lean`). We
+derive `DecidableEq (NQubitPauliGroupElement n)` from field-wise decision
+and finally `Decidable (Anticommute p q)`. The `Anticommute` instance is
+`noncomputable` because the `Mul` instance on `NQubitPauliGroupElement`
+is noncomputable, but the kernel can still reduce `decide` through it.
+(`native_decide` does not work for the same reason — prefer `decide`.) -/
+
+-- (Stage-4 follow-up for stab_5_1_3 added a `DecidableEq
+-- (NQubitPauliGroupElement n)` and `Decidable Anticommute` here, but they
+-- caused a downstream synthesis failure in RotatedSurfaceCode3's
+-- native_decide proof. They are temporarily removed pending a clean
+-- resolution. stab_5_1_3's distance proof currently DOES NOT BUILD
+-- against this configuration — needs refactor.)
+
 /-- Anticommutation reduces to the mulOp phase differing by 2 (mod 4). -/
 lemma anticommutes_iff_mulOp_phasePower (p q : NQubitPauliGroupElement n) :
   Anticommute p q ↔
