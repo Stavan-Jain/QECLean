@@ -1,6 +1,7 @@
 # Quantum Error Correction in Lean
 
 [![Lean V4](https://img.shields.io/badge/Lean-V4-blueviolet)](https://lean-lang.org/)
+[![Dashboard](https://img.shields.io/badge/pipeline%20dashboard-live-success)](https://stavan-jain.github.io/QECLean/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
 This project formalizes foundational concepts in quantum error correction using the Lean 4 proof assistant, with the long-term goal of a broad formalization of Stabilizer Codes.
@@ -43,6 +44,10 @@ Every step of the homological distance argument is mechanized — no `sorry`s an
 - **CSS bridge.** `d = min(d_X, d_Z)`; both equal `L` by symmetry.
 
 The accompanying expository proof is available as an [interactive write-up](https://stavan-jain.github.io/DistanceBlog/) with diagrams (or [`docs/distance_proof.md`](docs/distance_proof.md) for the in-repo version).
+
+## Pipeline dashboard
+
+A [live dashboard](https://stavan-jain.github.io/QECLean/) tracks formalization progress across all 267 codes in the [Error Correction Zoo](https://errorcorrectionzoo.org/) catalog — which codes are done, in-flight, queued by priority, or deliberately deferred. The dashboard also surfaces moonshot-track research attempts (codes with no known clean distance proof), where failure write-ups are first-class outputs alongside any successes. See [`docs/pipeline.md`](docs/pipeline.md) for the architecture and [`docs/pipeline-usage.md`](docs/pipeline-usage.md) for the operator's manual.
 
 ## Project Structure
 
