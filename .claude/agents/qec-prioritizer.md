@@ -147,6 +147,7 @@ as of this prompt write-up:
 | `RotatedSurfaceCode3.lean`, `RotatedSurfaceCode*N*.lean` | `rotated_surface` |
 | `ToricCodeN*.lean` | `toric` (also covers `surface` partially) |
 | `QuantumHamming.lean` | `quantum_hamming` |
+| `FourQubit_4_2_2.lean` | `stab_4_2_2` |
 | `Core/StabilizerGroup.lean`, `Core/StabilizerCode.lean` | `qubit_stabilizer` (abstract class) |
 
 Re-verify this mapping by reading `QEC/Stabilizer/Codes/Codes.lean` if it

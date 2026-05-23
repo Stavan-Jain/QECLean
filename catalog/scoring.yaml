@@ -13,16 +13,16 @@ metadata:
     prerequisites: 0.2
     effort: 0.1
   total_scored: 267
-  done: 9
-  in_flight: 0
-  not_started: 257
+  done: 10
+  in_flight: 1
+  not_started: 255
   out_of_scope: 1
   audit_applied_on: '2026-05-22'
-  audit_corrections: 4
+  audit_corrections: 5
 entries:
 - code_id: stab_4_2_2
   name: \([[4,2,2]]\) Four-qubit code
-  status: not_started
+  status: done
   axes:
     reuse: 10
     canonicality: 7
@@ -30,9 +30,12 @@ entries:
     tractability: 10
     prerequisites: 10
     effort: 9
-  composite: 9.3
-  proposed_track: engineering
-  rationale: '[[4,2,2]] self-dual CSS detection code, the smallest two-logical-qubit code; ubiquitous in hardware demos (9
+  composite: -1.0
+  proposed_track: skip
+  rationale: 'Audit override: formalized in QEC/Stabilizer/Codes/FourQubit_4_2_2.lean (PR #22, merged 2026-05-22). Direct instance of the existing CSS / StabilizerGroup machinery; distance-2 proof by enumeration. 547 LoC, 22 sorries closed.
+
+
+    Previous rationale: [[4,2,2]] self-dual CSS detection code, the smallest two-logical-qubit code; ubiquitous in hardware demos (9
     realizations). Trivial generator set (XXXX, ZZZZ). Direct instance of existing CSS / StabilizerGroup machinery; distance-2
     proof by enumeration. ~300 LoC.'
   blockers: []
@@ -140,13 +143,13 @@ entries:
   name: \([[8, 3, 3]]\) Eight-qubit Gottesman code
   status: not_started
   axes:
-    reuse: 9
+    reuse: 10
     canonicality: 6
     hardware: 5
     tractability: 9
     prerequisites: 10
     effort: 8
-  composite: 8.05
+  composite: 8.3
   proposed_track: engineering
   rationale: '[[8,3,3]] CSS code; multi-logical-qubit distance-3 example. Good stress test of the CSS distance proof for k>1.
     Existing infrastructure applies.'
@@ -288,13 +291,13 @@ entries:
   name: \([[8,2,3]]\) Hermitian code
   status: not_started
   axes:
-    reuse: 9
+    reuse: 10
     canonicality: 5
     hardware: 4
     tractability: 9
     prerequisites: 10
     effort: 8
-  composite: 7.75
+  composite: 8.0
   proposed_track: engineering
   rationale: '[[8,2,3]] CSS code: another small CSS example, mostly useful as a stepping stone before tackling larger codes.
     Existing infrastructure applies; distance by enumeration.'
@@ -337,13 +340,13 @@ entries:
   name: \([[10,2,3]]\) binarized Galois-qudit code
   status: not_started
   axes:
-    reuse: 9
+    reuse: 10
     canonicality: 4
     hardware: 3
     tractability: 8
     prerequisites: 10
     effort: 7
-  composite: 7.2
+  composite: 7.45
   proposed_track: engineering
   rationale: '[[10,2,3]] small non-CSS code. Direct instance, finite enumeration.'
   blockers: []
@@ -352,13 +355,13 @@ entries:
   name: \([[9,3,3]]\) Quadric code
   status: not_started
   axes:
-    reuse: 9
+    reuse: 10
     canonicality: 4
     hardware: 3
     tractability: 8
     prerequisites: 10
     effort: 7
-  composite: 7.2
+  composite: 7.45
   proposed_track: engineering
   rationale: '[[9,3,3]] non-CSS code: small distance-3 example. Direct instance of existing stabilizer infra; distance by
     enumeration.'
@@ -498,13 +501,13 @@ entries:
   name: \([[16,6,4]]\) Tesseract color code
   status: not_started
   axes:
-    reuse: 8
+    reuse: 9
     canonicality: 4
     hardware: 3
     tractability: 7
     prerequisites: 10
     effort: 6
-  composite: 6.7
+  composite: 6.95
   proposed_track: engineering
   rationale: '[[16,6,4]] multi-logical-qubit distance-4 code. Existing infra applies; distance proof somewhat heavier than
     distance-3 cases.'
@@ -591,13 +594,13 @@ entries:
   name: \(((6,2,3))\) transversal-\(\mathbb{Z}_{10}\) code
   status: not_started
   axes:
-    reuse: 8
+    reuse: 9
     canonicality: 3
     hardware: 2
     tractability: 9
     prerequisites: 8
     effort: 8
-  composite: 6.5
+  composite: 6.75
   proposed_track: engineering
   rationale: '[[6,2,3]] small enumerated code.'
   blockers: []
@@ -621,13 +624,13 @@ entries:
   name: \(((8,16,2))\) \(PG(3,2)\) code
   status: not_started
   axes:
-    reuse: 8
+    reuse: 9
     canonicality: 3
     hardware: 2
     tractability: 9
     prerequisites: 8
     effort: 8
-  composite: 6.5
+  composite: 6.75
   proposed_track: engineering
   rationale: '[[8,4,2]] small enumerated code.'
   blockers: []
@@ -1021,7 +1024,7 @@ entries:
   estimated_loc: 1000
 - code_id: gross
   name: \([[144,12,12]]\) gross code
-  status: not_started
+  status: in_flight
   axes:
     reuse: 5
     canonicality: 8
