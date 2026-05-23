@@ -197,9 +197,12 @@ theorem toricCodeN_distance_eq_L :
   have hz : HasToricZDistance L L := toricCodeN_dZ_eq_L L
   simpa using toricCodeN_distance_eq_min_dX_dZ L L L hx hz
 
--- (Parameter packaging: `n = 2L²` is the unfolding of `numQubits L`,
--- `k = 2` is encoded in `toricStabilizerCode L : StabilizerCode _ 2`,
--- and `d = L` is `toricCodeN_distance_eq_L`. No separate alias needed.)
+/-- The toric code on an `L × L` lattice packaged as a `[[2L², 2, L]]`
+stabilizer code with distance. -/
+noncomputable def toricStabilizerCodeWithDistance :
+    StabilizerCodeWithDistance (numQubits L) 2 L where
+  toStabilizerCode := toricStabilizerCode L
+  hasDistance      := toricCodeN_distance_eq_L L
 
 end ToricCodeN
 end StabilizerGroup

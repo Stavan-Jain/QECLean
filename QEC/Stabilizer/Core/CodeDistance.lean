@@ -64,5 +64,47 @@ theorem hasCodeDistance_of (C : StabilizerCode n k) (d : ℕ)
     exact absurd hg_nontrivial (h_min (weight g) h1 h g rfl)
   · omega
 
+/-!
+## `StabilizerCodeWithDistance`: full `[[n, k, d]]` packaging
+
+`StabilizerCode n k` captures the first two parameters of the standard
+`[[n, k, d]]` notation. Distance is layered on as a separate `Prop`
+(`HasCodeDistance`) so that codes whose distance is not yet known (e.g.,
+research-track codes whose minimum-weight nontrivial logical is unproven)
+can still be formalized as stabilizer codes. This wrapper bundles the
+two for codes where distance *is* established, giving a single object
+that carries all three parameters in its type.
+-/
+
+/-- A stabilizer code together with a proof that its distance equals `d`.
+    Use this when a code's `[[n, k, d]]` parameters are all formalized. -/
+structure StabilizerCodeWithDistance (n k d : ℕ) extends StabilizerCode n k where
+  /-- Proof that the underlying stabilizer code has distance exactly `d`. -/
+  hasDistance : HasCodeDistance toStabilizerCode d
+
+namespace StabilizerCodeWithDistance
+
+variable {n k d : ℕ}
+
+/-- A code with distance `d` satisfies `d ≥ 1`. -/
+theorem one_le_d (C : StabilizerCodeWithDistance n k d) : 1 ≤ d :=
+  C.hasDistance.1
+
+/-- Every nontrivial logical operator with positive weight has weight ≥ d. -/
+theorem min_weight (C : StabilizerCodeWithDistance n k d)
+    (g : NQubitPauliGroupElement n)
+    (hg : IsNontrivialLogicalOperator g C.toStabilizerCode.toStabilizerGroup)
+    (hw : 0 < weight g) :
+    weight g ≥ d :=
+  C.hasDistance.2.1 g hg hw
+
+/-- There exists a nontrivial logical of weight exactly `d`. -/
+theorem exists_weight_eq (C : StabilizerCodeWithDistance n k d) :
+    ∃ g, IsNontrivialLogicalOperator g C.toStabilizerCode.toStabilizerGroup ∧
+         weight g = d :=
+  C.hasDistance.2.2
+
+end StabilizerCodeWithDistance
+
 end StabilizerGroup
 end Quantum

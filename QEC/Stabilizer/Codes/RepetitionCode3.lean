@@ -327,6 +327,11 @@ theorem repetitionCode3_min_weight_nontrivial_logical (g : NQubitPauliGroupEleme
     NQubitPauliGroupElement.weight g ≥ 1 :=
   HasCodeDistance.min_weight stabilizerCode 1 repetitionCode3_has_distance_one g hg hw
 
+/-- The 3-qubit repetition code as a `[[3, 1, 1]]` stabilizer code with distance. -/
+noncomputable def stabilizerCodeWithDistance : StabilizerCodeWithDistance 3 1 1 where
+  toStabilizerCode := stabilizerCode
+  hasDistance      := repetitionCode3_has_distance_one
+
 end RepetitionCode3
 end StabilizerGroup
 
