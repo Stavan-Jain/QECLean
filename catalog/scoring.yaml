@@ -4,7 +4,7 @@
 # Audit corrections applied via scripts/patch_scoring.py.
 
 metadata:
-  generated_on: '2026-05-22'
+  generated_on: '2026-05-23'
   weights:
     reuse: 0.25
     canonicality: 0.15
@@ -13,12 +13,12 @@ metadata:
     prerequisites: 0.2
     effort: 0.1
   total_scored: 267
-  done: 10
+  done: 11
   in_flight: 1
-  not_started: 255
+  not_started: 254
   out_of_scope: 1
-  audit_applied_on: '2026-05-22'
-  audit_corrections: 5
+  audit_applied_on: '2026-05-23'
+  audit_corrections: 4
 entries:
 - code_id: stab_4_2_2
   name: \([[4,2,2]]\) Four-qubit code
@@ -32,17 +32,24 @@ entries:
     effort: 9
   composite: -1.0
   proposed_track: skip
-  rationale: 'Audit override: formalized in QEC/Stabilizer/Codes/FourQubit_4_2_2.lean (PR #22, merged 2026-05-22). Direct instance of the existing CSS / StabilizerGroup machinery; distance-2 proof by enumeration. 547 LoC, 22 sorries closed.
+  rationale: 'Audit override: formalized in QEC/Stabilizer/Codes/FourQubit_4_2_2.lean. [[4,2,2]] four-qubit code (PR #22,
+    merged 2026-05-22). Direct instance of the existing CSS / StabilizerGroup machinery; distance-2 proof by enumeration.
+    547 LoC, 22 sorries closed.
 
 
-    Previous rationale: [[4,2,2]] self-dual CSS detection code, the smallest two-logical-qubit code; ubiquitous in hardware demos (9
-    realizations). Trivial generator set (XXXX, ZZZZ). Direct instance of existing CSS / StabilizerGroup machinery; distance-2
-    proof by enumeration. ~300 LoC.'
+    Previous rationale: Audit override: formalized in QEC/Stabilizer/Codes/FourQubit_4_2_2.lean (PR #22, merged 2026-05-22).
+    Direct instance of the existing CSS / StabilizerGroup machinery; distance-2 proof by enumeration. 547 LoC, 22 sorries
+    closed.
+
+
+    Previous rationale: [[4,2,2]] self-dual CSS detection code, the smallest two-logical-qubit code; ubiquitous in hardware
+    demos (9 realizations). Trivial generator set (XXXX, ZZZZ). Direct instance of existing CSS / StabilizerGroup machinery;
+    distance-2 proof by enumeration. ~300 LoC.'
   blockers: []
   estimated_loc: 300
 - code_id: stab_5_1_3
   name: \([[5,1,3]]\) Five-qubit perfect code
-  status: not_started
+  status: done
   axes:
     reuse: 9
     canonicality: 10
@@ -50,11 +57,19 @@ entries:
     tractability: 10
     prerequisites: 10
     effort: 8
-  composite: 9.1
-  proposed_track: engineering
-  rationale: 'Five-qubit perfect code: smallest stabilizer code, in every QEC syllabus. Non-CSS: an excellent forcing function
-    to exercise this repo''s general n-qubit Pauli group infrastructure outside the CSS comfort zone. Distance proof is finite-case
-    enumeration; recoverable. Tableau is five lines. ~600 LoC.'
+  composite: -1.0
+  proposed_track: skip
+  rationale: 'Audit override: formalized in QEC/Stabilizer/Codes/FiveQubit_5_1_3.lean. [[5,1,3]] five-qubit perfect code (PR
+    #24, merged 2026-05-23). First non-CSS code in the repo, fully formalized end-to-end including the distance-3 lower bound.
+    Three Core helpers added during Stage 4: (1) `negIdentity_not_mem_of_indep_phase_zero_commute` in BinarySymplectic/SymplecticSpan.lean
+    (general-form -I not in closure); (2) `no_weight_two_mem_centralizer_of_anticommute_witness` + `weightTwoAt` in Core/CSSDistance.lean
+    (weight-2 ruling out for d=3); (3) `local instance` `DecidableEq (NQubitPauliGroupElement n)` + noncomputable `Decidable
+    (Anticommute p q)` in the code file (reusable template -- see Group A re-scoring above).
+
+
+    Previous rationale: Five-qubit perfect code: smallest stabilizer code, in every QEC syllabus. Non-CSS: an excellent forcing
+    function to exercise this repo''s general n-qubit Pauli group infrastructure outside the CSS comfort zone. Distance proof
+    is finite-case enumeration; recoverable. Tableau is five lines. ~600 LoC.'
   blockers: []
   estimated_loc: 600
 - code_id: surface-17
@@ -70,6 +85,14 @@ entries:
   composite: -1.0
   proposed_track: skip
   rationale: 'Audit override: explicitly a [[9,1,3]] rotated surface code — the L=3 instance of QEC/Stabilizer/Codes/RotatedSurfaceCodeN.lean
+    (with stabilizer-code packaging in RotatedSurfaceCodeNStabilizerCode.lean and distance proof in RotatedSurfaceCodeNDistance*.lean).
+
+
+    Previous rationale: Audit override: explicitly a [[9,1,3]] rotated surface code — the L=3 instance of QEC/Stabilizer/Codes/RotatedSurfaceCodeN.lean
+    (with stabilizer-code packaging in RotatedSurfaceCodeNStabilizerCode.lean and distance proof in RotatedSurfaceCodeNDistance*.lean).
+
+
+    Previous rationale: Audit override: explicitly a [[9,1,3]] rotated surface code — the L=3 instance of QEC/Stabilizer/Codes/RotatedSurfaceCodeN.lean
     (with stabilizer-code packaging in RotatedSurfaceCodeNStabilizerCode.lean and distance proof in RotatedSurfaceCodeNDistance*.lean).
 
 
@@ -172,6 +195,16 @@ entries:
     structurally outside the framework. Reclassified to skip; revisit if/when the framework is extended.
 
 
+    Previous rationale: Audit override: a [[5,1,2]] degenerate rotated-surface variant ("rotated surface code on one rung
+    of a ladder"). The parametric RotatedSurfaceCodeN formalization requires [Fact (3 ≤ L)] and L odd, so this ladder-geometry
+    variant is structurally outside the framework. Reclassified to skip; revisit if/when the framework is extended.
+
+
+    Previous rationale: Audit override: a [[5,1,2]] degenerate rotated-surface variant ("rotated surface code on one rung
+    of a ladder"). The parametric RotatedSurfaceCodeN formalization requires [Fact (3 ≤ L)] and L odd, so this ladder-geometry
+    variant is structurally outside the framework. Reclassified to skip; revisit if/when the framework is extended.
+
+
     Previous rationale: [[5,1,2]] CSS detection code; smaller cousin of the 5-qubit perfect code. Direct fit for existing
     infrastructure; trivial enumeration.'
   blockers: []
@@ -189,6 +222,14 @@ entries:
   composite: -1.0
   proposed_track: skip
   rationale: 'Audit override: the abstract qubit-stabilizer-code class. Already implemented as the Stabilizer/Core/StabilizerGroup
+    + Stabilizer/Core/StabilizerCode infrastructure in this repo — not a concrete code to be formalized separately.
+
+
+    Previous rationale: Audit override: the abstract qubit-stabilizer-code class. Already implemented as the Stabilizer/Core/StabilizerGroup
+    + Stabilizer/Core/StabilizerCode infrastructure in this repo — not a concrete code to be formalized separately.
+
+
+    Previous rationale: Audit override: the abstract qubit-stabilizer-code class. Already implemented as the Stabilizer/Core/StabilizerGroup
     + Stabilizer/Core/StabilizerCode infrastructure in this repo — not a concrete code to be formalized separately.
 
 
@@ -307,16 +348,24 @@ entries:
   name: XZZX surface code
   status: not_started
   axes:
-    reuse: 8
+    reuse: 9
     canonicality: 7
     hardware: 8
-    tractability: 8
+    tractability: 9
     prerequisites: 8
-    effort: 7
-  composite: 7.75
+    effort: 8
+  composite: 8.25
   proposed_track: engineering
-  rationale: 'XZZX surface code: a Clifford-twisted variant of the rotated surface code; non-CSS but generated by uniform
-    XZZX plaquettes. Existing rotated-surface lattice and homological infrastructure should largely apply with a generator
+  rationale: 'Re-scored 2026-05-23: XZZX is a parametric surface variant, so its distance proof remains homological (per the
+    rotated-surface playbook), not by `decide` enumeration. But the new general non-CSS Pauli infrastructure -- `negIdentity_not_mem_of_indep_phase_zero_commute`
+    (BinarySymplectic/SymplecticSpan.lean), `no_weight_two_mem_centralizer_of_anticommute_witness` (Core/CSSDistance.lean),
+    and the `local instance` `Decidable (Anticommute p q)` template from FiveQubit_5_1_3 -- substantially reduces the witness-plumbing
+    effort for the non-CSS pieces of the proof. Tractability bumped to 9 (homological with low-rank H^1, like rotated_surface
+    but with Clifford-twisted plaquettes), effort bumped to 8.
+
+
+    Previous rationale: XZZX surface code: a Clifford-twisted variant of the rotated surface code; non-CSS but generated by
+    uniform XZZX plaquettes. Existing rotated-surface lattice and homological infrastructure should largely apply with a generator
     redefinition. Two hardware demos. Modest extension.'
   blockers: []
   estimated_loc: 700
@@ -324,16 +373,23 @@ entries:
   name: \([[4,1,2]]\) twist-defect code
   status: not_started
   axes:
-    reuse: 8
+    reuse: 9
     canonicality: 4
     hardware: 5
-    tractability: 9
+    tractability: 10
     prerequisites: 9
-    effort: 8
-  composite: 7.3
+    effort: 10
+  composite: 7.9
   proposed_track: engineering
-  rationale: '[[4,1,2]] twist-defect / smallest triangular color code variant. Non-CSS but tiny; exercises Pauli-only stabilizer
-    machinery. Distance-2 enumeration. Modest canonicality and hardware presence.'
+  rationale: 'Re-scored 2026-05-23: the new `local instance` `DecidableEq (NQubitPauliGroupElement n)` + `Decidable (Anticommute
+    p q)` pattern from FiveQubit_5_1_3 (template; copy-paste-ready) closes weight-{1,2} anti-witness tables by `by decide`
+    instead of ~7-10 LoC per case. Combined with `no_weight_two_mem_centralizer_of_anticommute_witness` (Core/CSSDistance.lean)
+    and `negIdentity_not_mem_of_indep_phase_zero_commute` (BinarySymplectic/SymplecticSpan.lean), non-CSS d=3 codes are now
+    ~100 LoC instead of ~1000 LoC.
+
+
+    Previous rationale: [[4,1,2]] twist-defect / smallest triangular color code variant. Non-CSS but tiny; exercises Pauli-only
+    stabilizer machinery. Distance-2 enumeration. Modest canonicality and hardware presence.'
   blockers: []
   estimated_loc: 350
 - code_id: stab_10_2_3
@@ -343,12 +399,19 @@ entries:
     reuse: 10
     canonicality: 4
     hardware: 3
-    tractability: 8
+    tractability: 10
     prerequisites: 10
-    effort: 7
-  composite: 7.45
+    effort: 9
+  composite: 7.95
   proposed_track: engineering
-  rationale: '[[10,2,3]] small non-CSS code. Direct instance, finite enumeration.'
+  rationale: 'Re-scored 2026-05-23: the new `local instance` `DecidableEq (NQubitPauliGroupElement n)` + `Decidable (Anticommute
+    p q)` pattern from FiveQubit_5_1_3 (template; copy-paste-ready) closes weight-{1,2} anti-witness tables by `by decide`
+    instead of ~7-10 LoC per case. Combined with `no_weight_two_mem_centralizer_of_anticommute_witness` (Core/CSSDistance.lean)
+    and `negIdentity_not_mem_of_indep_phase_zero_commute` (BinarySymplectic/SymplecticSpan.lean), non-CSS d=3 codes are now
+    ~100 LoC instead of ~1000 LoC.
+
+
+    Previous rationale: [[10,2,3]] small non-CSS code. Direct instance, finite enumeration.'
   blockers: []
   estimated_loc: 400
 - code_id: stab_9_3_3
@@ -358,43 +421,64 @@ entries:
     reuse: 10
     canonicality: 4
     hardware: 3
-    tractability: 8
+    tractability: 10
     prerequisites: 10
-    effort: 7
-  composite: 7.45
+    effort: 9
+  composite: 7.95
   proposed_track: engineering
-  rationale: '[[9,3,3]] non-CSS code: small distance-3 example. Direct instance of existing stabilizer infra; distance by
-    enumeration.'
+  rationale: 'Re-scored 2026-05-23: the new `local instance` `DecidableEq (NQubitPauliGroupElement n)` + `Decidable (Anticommute
+    p q)` pattern from FiveQubit_5_1_3 (template; copy-paste-ready) closes weight-{1,2} anti-witness tables by `by decide`
+    instead of ~7-10 LoC per case. Combined with `no_weight_two_mem_centralizer_of_anticommute_witness` (Core/CSSDistance.lean)
+    and `negIdentity_not_mem_of_indep_phase_zero_commute` (BinarySymplectic/SymplecticSpan.lean), non-CSS d=3 codes are now
+    ~100 LoC instead of ~1000 LoC.
+
+
+    Previous rationale: [[9,3,3]] non-CSS code: small distance-3 example. Direct instance of existing stabilizer infra; distance
+    by enumeration.'
   blockers: []
   estimated_loc: 400
 - code_id: stab_11_1_5
   name: \([[11,1,5]]\) quantum dodecacode
   status: not_started
   axes:
-    reuse: 9
+    reuse: 10
     canonicality: 5
     hardware: 3
-    tractability: 7
+    tractability: 9
     prerequisites: 10
-    effort: 6
-  composite: 7.1
+    effort: 8
+  composite: 7.85
   proposed_track: engineering
-  rationale: '[[11,1,5]] small distance-5 code. Direct instance but distance-5 enumeration is bulkier than distance-3.'
+  rationale: 'Re-scored 2026-05-23: the new `local instance` `DecidableEq (NQubitPauliGroupElement n)` + `Decidable (Anticommute
+    p q)` pattern from FiveQubit_5_1_3 (template; copy-paste-ready) closes weight-{1,2} anti-witness tables by `by decide`
+    instead of ~7-10 LoC per case. Combined with `no_weight_two_mem_centralizer_of_anticommute_witness` (Core/CSSDistance.lean)
+    and `negIdentity_not_mem_of_indep_phase_zero_commute` (BinarySymplectic/SymplecticSpan.lean), non-CSS d=3 codes are now
+    ~100 LoC instead of ~1000 LoC.
+
+
+    Previous rationale: [[11,1,5]] small distance-5 code. Direct instance but distance-5 enumeration is bulkier than distance-3.'
   blockers: []
   estimated_loc: 500
 - code_id: stab_13_1_5
   name: \([[13,1,5]]\) twisted toric code
   status: not_started
   axes:
-    reuse: 9
+    reuse: 10
     canonicality: 5
     hardware: 3
-    tractability: 7
+    tractability: 9
     prerequisites: 10
-    effort: 6
-  composite: 7.1
+    effort: 8
+  composite: 7.85
   proposed_track: engineering
-  rationale: '[[13,1,5]] small distance-5 stabilizer code. Direct instance, distance enumeration.'
+  rationale: 'Re-scored 2026-05-23: the new `local instance` `DecidableEq (NQubitPauliGroupElement n)` + `Decidable (Anticommute
+    p q)` pattern from FiveQubit_5_1_3 (template; copy-paste-ready) closes weight-{1,2} anti-witness tables by `by decide`
+    instead of ~7-10 LoC per case. Combined with `no_weight_two_mem_centralizer_of_anticommute_witness` (Core/CSSDistance.lean)
+    and `negIdentity_not_mem_of_indep_phase_zero_commute` (BinarySymplectic/SymplecticSpan.lean), non-CSS d=3 codes are now
+    ~100 LoC instead of ~1000 LoC.
+
+
+    Previous rationale: [[13,1,5]] small distance-5 stabilizer code. Direct instance, distance enumeration.'
   blockers: []
   estimated_loc: 500
 - code_id: stab_15_7_3
@@ -413,6 +497,14 @@ entries:
     defines parametrically for r ≥ 3.
 
 
+    Previous rationale: Audit override: [[15,7,3]] is the r=4 instance of the quantum Hamming family [[2^r-1, 2^r-1-2r, 3]]
+    that QEC/Stabilizer/Codes/QuantumHamming.lean defines parametrically for r ≥ 3.
+
+
+    Previous rationale: Audit override: [[15,7,3]] is the r=4 instance of the quantum Hamming family [[2^r-1, 2^r-1-2r, 3]]
+    that QEC/Stabilizer/Codes/QuantumHamming.lean defines parametrically for r ≥ 3.
+
+
     Previous rationale: [[15,7,3]] quantum Hamming code: high-rate distance-3 CSS code; cousin of the already-formalized [[2^r,2^r-r-2,3]]
     family. Likely a direct corollary of the existing QuantumHamming construction.'
   blockers: []
@@ -421,15 +513,22 @@ entries:
   name: \([[17,1,5]]\) 4.8.8 color code
   status: not_started
   axes:
-    reuse: 9
+    reuse: 10
     canonicality: 5
     hardware: 3
-    tractability: 7
+    tractability: 9
     prerequisites: 10
-    effort: 6
-  composite: 7.1
+    effort: 8
+  composite: 7.85
   proposed_track: engineering
-  rationale: '[[17,1,5]] small distance-5 stabilizer code. Direct instance.'
+  rationale: 'Re-scored 2026-05-23: the new `local instance` `DecidableEq (NQubitPauliGroupElement n)` + `Decidable (Anticommute
+    p q)` pattern from FiveQubit_5_1_3 (template; copy-paste-ready) closes weight-{1,2} anti-witness tables by `by decide`
+    instead of ~7-10 LoC per case. Combined with `no_weight_two_mem_centralizer_of_anticommute_witness` (Core/CSSDistance.lean)
+    and `negIdentity_not_mem_of_indep_phase_zero_commute` (BinarySymplectic/SymplecticSpan.lean), non-CSS d=3 codes are now
+    ~100 LoC instead of ~1000 LoC.
+
+
+    Previous rationale: [[17,1,5]] small distance-5 stabilizer code. Direct instance.'
   blockers: []
   estimated_loc: 500
 - code_id: cubic_surface
@@ -1068,11 +1167,17 @@ entries:
     canonicality: 4
     hardware: 3
     tractability: 7
-    prerequisites: 6
+    prerequisites: 7
     effort: 6
-  composite: 5.15
-  proposed_track: engineering
-  rationale: '[[7,2,2]] small hypergraph product code; small enough to enumerate without the full HGP framework.'
+  composite: 5.35
+  proposed_track: defer
+  rationale: 'Re-scored 2026-05-23: the abelian chain-complex pattern in `QEC/Stabilizer/Homological/BBChainComplex.lean`
+    is a starting point (BB is a special case of lifted product), so prerequisites bumped +1. Hypergraph product remains structurally
+    distinct (requires a generic two-classical-code product) and still warrants `defer` until a dedicated hypergraph-product
+    abstraction lands.
+
+
+    Previous rationale: [[7,2,2]] small hypergraph product code; small enough to enumerate without the full HGP framework.'
   blockers: []
   estimated_loc: 800
 - code_id: phantom_14_3_3
@@ -1325,12 +1430,19 @@ entries:
     canonicality: 6
     hardware: 8
     tractability: 2
-    prerequisites: 4
+    prerequisites: 6
     effort: 3
-  composite: 4.75
-  proposed_track: defer
-  rationale: '[[72,12,6]] BB6 code, IBM hardware-relevant precursor to gross. Same group-algebra blocker; concrete enough
-    that a partial homological bound might land.'
+  composite: 5.15
+  proposed_track: moonshot
+  rationale: 'Re-scored 2026-05-23: `QEC/Stabilizer/Homological/BBChainComplex.lean` (~285 LoC, on main from the gross moonshot
+    Approach A) now provides the generic BB chain complex framework for any finite abelian G + polynomial pair (A,B) in F_2[G],
+    plus convolution algebra and the abstract `chainWeight_lower_bound_transfers` distance-bridge combinator. Prerequisites
+    bumped from 4 -> 6 (partial unblock). Distance-bound machinery (tight algebraic / homological argument) is still open
+    per the gross Approach A + B negative results, so tractability remains low.
+
+
+    Previous rationale: [[72,12,6]] BB6 code, IBM hardware-relevant precursor to gross. Same group-algebra blocker; concrete
+    enough that a partial homological bound might land.'
   blockers:
   - Stabilizer/BBCode
   estimated_loc: 3500
@@ -1521,11 +1633,17 @@ entries:
     canonicality: 7
     hardware: 5
     tractability: 4
-    prerequisites: 4
+    prerequisites: 5
     effort: 2
-  composite: 4.4
-  proposed_track: defer
-  rationale: 'Hypergraph product code: classical-codes -> qLDPC; foundational construction. Needs a chain-complex-product
+  composite: 4.6
+  proposed_track: skip
+  rationale: 'Re-scored 2026-05-23: the abelian chain-complex pattern in `QEC/Stabilizer/Homological/BBChainComplex.lean`
+    is a starting point (BB is a special case of lifted product), so prerequisites bumped +1. Hypergraph product remains structurally
+    distinct (requires a generic two-classical-code product) and still warrants `defer` until a dedicated hypergraph-product
+    abstraction lands.
+
+
+    Previous rationale: Hypergraph product code: classical-codes -> qLDPC; foundational construction. Needs a chain-complex-product
     abstraction.'
   blockers:
   - Stabilizer/HypergraphProduct
@@ -2382,11 +2500,18 @@ entries:
     canonicality: 4
     hardware: 5
     tractability: 2
-    prerequisites: 3
+    prerequisites: 5
     effort: 2
-  composite: 3.2
+  composite: 3.6
   proposed_track: skip
-  rationale: '[[108,8,10]] BB code. Same blocker.'
+  rationale: 'Re-scored 2026-05-23: `QEC/Stabilizer/Homological/BBChainComplex.lean` (~285 LoC, on main from the gross moonshot
+    Approach A) now provides the generic BB chain complex framework for any finite abelian G + polynomial pair (A,B) in F_2[G],
+    plus convolution algebra and the abstract `chainWeight_lower_bound_transfers` distance-bridge combinator. Prerequisites
+    bumped from 4 -> 6 (partial unblock). Distance-bound machinery (tight algebraic / homological argument) is still open
+    per the gross Approach A + B negative results, so tractability remains low.
+
+
+    Previous rationale: [[108,8,10]] BB code. Same blocker.'
   blockers:
   - Stabilizer/BBCode
   estimated_loc: 3000
@@ -2398,11 +2523,18 @@ entries:
     canonicality: 4
     hardware: 5
     tractability: 2
-    prerequisites: 3
+    prerequisites: 5
     effort: 2
-  composite: 3.2
+  composite: 3.6
   proposed_track: skip
-  rationale: Larger BB code. Same blocker.
+  rationale: 'Re-scored 2026-05-23: `QEC/Stabilizer/Homological/BBChainComplex.lean` (~285 LoC, on main from the gross moonshot
+    Approach A) now provides the generic BB chain complex framework for any finite abelian G + polynomial pair (A,B) in F_2[G],
+    plus convolution algebra and the abstract `chainWeight_lower_bound_transfers` distance-bridge combinator. Prerequisites
+    bumped from 4 -> 6 (partial unblock). Distance-bound machinery (tight algebraic / homological argument) is still open
+    per the gross Approach A + B negative results, so tractability remains low.
+
+
+    Previous rationale: Larger BB code. Same blocker.'
   blockers:
   - Stabilizer/BBCode
   estimated_loc: 3000
@@ -2414,11 +2546,18 @@ entries:
     canonicality: 4
     hardware: 5
     tractability: 2
-    prerequisites: 3
+    prerequisites: 5
     effort: 2
-  composite: 3.2
+  composite: 3.6
   proposed_track: skip
-  rationale: Small BB code instance. Same blocker.
+  rationale: 'Re-scored 2026-05-23: `QEC/Stabilizer/Homological/BBChainComplex.lean` (~285 LoC, on main from the gross moonshot
+    Approach A) now provides the generic BB chain complex framework for any finite abelian G + polynomial pair (A,B) in F_2[G],
+    plus convolution algebra and the abstract `chainWeight_lower_bound_transfers` distance-bridge combinator. Prerequisites
+    bumped from 4 -> 6 (partial unblock). Distance-bound machinery (tight algebraic / homological argument) is still open
+    per the gross Approach A + B negative results, so tractability remains low.
+
+
+    Previous rationale: Small BB code instance. Same blocker.'
   blockers:
   - Stabilizer/BBCode
   estimated_loc: 3000
@@ -2430,11 +2569,18 @@ entries:
     canonicality: 4
     hardware: 5
     tractability: 2
-    prerequisites: 3
+    prerequisites: 5
     effort: 2
-  composite: 3.2
+  composite: 3.6
   proposed_track: skip
-  rationale: '[[90,8,10]] BB code, hardware-relevant. Same blocker.'
+  rationale: 'Re-scored 2026-05-23: `QEC/Stabilizer/Homological/BBChainComplex.lean` (~285 LoC, on main from the gross moonshot
+    Approach A) now provides the generic BB chain complex framework for any finite abelian G + polynomial pair (A,B) in F_2[G],
+    plus convolution algebra and the abstract `chainWeight_lower_bound_transfers` distance-bridge combinator. Prerequisites
+    bumped from 4 -> 6 (partial unblock). Distance-bound machinery (tight algebraic / homological argument) is still open
+    per the gross Approach A + B negative results, so tractability remains low.
+
+
+    Previous rationale: [[90,8,10]] BB code, hardware-relevant. Same blocker.'
   blockers:
   - Stabilizer/BBCode
   estimated_loc: 3000
@@ -2785,11 +2931,17 @@ entries:
     canonicality: 4
     hardware: 3
     tractability: 3
-    prerequisites: 3
+    prerequisites: 4
     effort: 2
-  composite: 3.05
+  composite: 3.25
   proposed_track: skip
-  rationale: Tillich-Zemor (hypergraph product) construction.
+  rationale: 'Re-scored 2026-05-23: the abelian chain-complex pattern in `QEC/Stabilizer/Homological/BBChainComplex.lean`
+    is a starting point (BB is a special case of lifted product), so prerequisites bumped +1. Hypergraph product remains structurally
+    distinct (requires a generic two-classical-code product) and still warrants `defer` until a dedicated hypergraph-product
+    abstraction lands.
+
+
+    Previous rationale: Tillich-Zemor (hypergraph product) construction.'
   blockers:
   - Stabilizer/HypergraphProduct
   estimated_loc: 3000
@@ -3382,11 +3534,17 @@ entries:
     canonicality: 3
     hardware: 2
     tractability: 3
-    prerequisites: 3
+    prerequisites: 4
     effort: 2
-  composite: 2.75
+  composite: 2.95
   proposed_track: skip
-  rationale: Multisector hypergraph product code.
+  rationale: 'Re-scored 2026-05-23: the abelian chain-complex pattern in `QEC/Stabilizer/Homological/BBChainComplex.lean`
+    is a starting point (BB is a special case of lifted product), so prerequisites bumped +1. Hypergraph product remains structurally
+    distinct (requires a generic two-classical-code product) and still warrants `defer` until a dedicated hypergraph-product
+    abstraction lands.
+
+
+    Previous rationale: Multisector hypergraph product code.'
   blockers:
   - Stabilizer/HypergraphProduct
   estimated_loc: 3000
@@ -3558,11 +3716,18 @@ entries:
     canonicality: 4
     hardware: 5
     tractability: 2
-    prerequisites: 2
+    prerequisites: 4
     effort: 1
-  composite: 2.65
+  composite: 3.05
   proposed_track: skip
-  rationale: Quasi-cyclic group-algebra code framework. Parent of BB codes.
+  rationale: 'Re-scored 2026-05-23: `QEC/Stabilizer/Homological/BBChainComplex.lean` (~285 LoC, on main from the gross moonshot
+    Approach A) now provides the generic BB chain complex framework for any finite abelian G + polynomial pair (A,B) in F_2[G],
+    plus convolution algebra and the abstract `chainWeight_lower_bound_transfers` distance-bridge combinator. Prerequisites
+    bumped from 4 -> 6 (partial unblock). Distance-bound machinery (tight algebraic / homological argument) is still open
+    per the gross Approach A + B negative results, so tractability remains low.
+
+
+    Previous rationale: Quasi-cyclic group-algebra code framework. Parent of BB codes.'
   blockers:
   - Stabilizer/BBCode
   - group-algebra chain complex
@@ -3677,11 +3842,17 @@ entries:
     canonicality: 4
     hardware: 2
     tractability: 4
-    prerequisites: 2
+    prerequisites: 3
     effort: 1
-  composite: 2.5
+  composite: 2.7
   proposed_track: skip
-  rationale: Subsystem hypergraph-product code. Needs subsystem + hypergraph product.
+  rationale: 'Re-scored 2026-05-23: the abelian chain-complex pattern in `QEC/Stabilizer/Homological/BBChainComplex.lean`
+    is a starting point (BB is a special case of lifted product), so prerequisites bumped +1. Hypergraph product remains structurally
+    distinct (requires a generic two-classical-code product) and still warrants `defer` until a dedicated hypergraph-product
+    abstraction lands.
+
+
+    Previous rationale: Subsystem hypergraph-product code. Needs subsystem + hypergraph product.'
   blockers:
   - Stabilizer/Subsystem
   - Stabilizer/HypergraphProduct

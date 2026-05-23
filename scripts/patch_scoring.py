@@ -102,7 +102,7 @@ def main() -> int:
     data["metadata"]["in_flight"] = sum(1 for s in statuses if s == "in_flight")
     data["metadata"]["not_started"] = sum(1 for s in statuses if s == "not_started")
     data["metadata"]["out_of_scope"] = sum(1 for s in statuses if s == "out_of_scope")
-    data["metadata"]["audit_applied_on"] = "2026-05-22"
+    data["metadata"]["audit_applied_on"] = "2026-05-23"
     data["metadata"]["audit_corrections"] = applied
 
     with open(SCORING_PATH, "w", encoding="utf-8") as f:
