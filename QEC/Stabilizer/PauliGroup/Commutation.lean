@@ -243,20 +243,12 @@ and finally `Decidable (Anticommute p q)`. The `Anticommute` instance is
 is noncomputable, but the kernel can still reduce `decide` through it.
 (`native_decide` does not work for the same reason — prefer `decide`.) -/
 
-/-- `DecidableEq` on `NQubitPauliGroupElement n` via field-wise decision. -/
-instance instDecidableEqNQubitPauliGroupElement (n : ℕ) :
-    DecidableEq (NQubitPauliGroupElement n) := fun p q =>
-  decidable_of_iff (p.phasePower = q.phasePower ∧ p.operators = q.operators)
-    ⟨fun ⟨h1, h2⟩ => by cases p; cases q; simp_all,
-     fun h => by cases h; exact ⟨rfl, rfl⟩⟩
-
-/-- `Decidable (Anticommute p q)`: unfolds to equality of two Pauli group
-elements and decides via `DecidableEq`. Marked `noncomputable` because `*`
-on `NQubitPauliGroupElement` is noncomputable, but `decide` still reduces
-through the kernel. -/
-noncomputable instance decidableAnticommute (p q : NQubitPauliGroupElement n) :
-    Decidable (Anticommute p q) :=
-  show Decidable (p * q = minusOne n * (q * p)) from inferInstance
+-- (Stage-4 follow-up for stab_5_1_3 added a `DecidableEq
+-- (NQubitPauliGroupElement n)` and `Decidable Anticommute` here, but they
+-- caused a downstream synthesis failure in RotatedSurfaceCode3's
+-- native_decide proof. They are temporarily removed pending a clean
+-- resolution. stab_5_1_3's distance proof currently DOES NOT BUILD
+-- against this configuration — needs refactor.)
 
 /-- Anticommutation reduces to the mulOp phase differing by 2 (mod 4). -/
 lemma anticommutes_iff_mulOp_phasePower (p q : NQubitPauliGroupElement n) :
