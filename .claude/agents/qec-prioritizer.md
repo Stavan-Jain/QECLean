@@ -234,12 +234,12 @@ _Last scored: <ISO date>._
 
 ## Done / in-flight
 
-- ✓ `shor_nine` — `QEC/Stabilizer/Codes/Shor9.lean`
-- ✓ `steane` — `QEC/Stabilizer/Codes/Steane7.lean`
-- ✓ `rotated_surface` — `QEC/Stabilizer/Codes/RotatedSurfaceCodeN*.lean`
-- ✓ `toric` — `QEC/Stabilizer/Codes/ToricCodeN*.lean`
+- ✓ `shor_nine` — `QEC/Stabilizer/Codes/Small/Shor9.lean`
+- ✓ `steane` — `QEC/Stabilizer/Codes/Small/Steane7.lean`
+- ✓ `rotated_surface` — `QEC/Stabilizer/Codes/RotatedSurface/N*.lean`
+- ✓ `toric` — `QEC/Stabilizer/Codes/Toric/CodeN*.lean`
 - ✓ `quantum_repetition` — `QEC/Stabilizer/Codes/RepetitionCode*.lean`
-- ✓ `quantum_hamming` — `QEC/Stabilizer/Codes/QuantumHamming.lean`
+- ✓ `quantum_hamming` — `QEC/Stabilizer/Codes/Small/QuantumHamming.lean`
 - → (any `pipeline/attempts/<name>/` in-flight)
 
 ## Scoring metadata

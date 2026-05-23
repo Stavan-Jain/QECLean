@@ -1,20 +1,17 @@
 import QEC.Stabilizer.Codes._TEMPLATE
-import QEC.Stabilizer.Codes.RepetitionCode3
-import QEC.Stabilizer.Codes.RepetitionCodeN
-import QEC.Stabilizer.Codes.QuantumHamming
-import QEC.Stabilizer.Codes.RotatedSurfaceCode3
-import QEC.Stabilizer.Codes.RotatedSurfaceCodeN
-import QEC.Stabilizer.Codes.RotatedSurfaceCodeNStabilizerCode
-import QEC.Stabilizer.Codes.RotatedSurfaceCodeNDistanceX
-import QEC.Stabilizer.Codes.RotatedSurfaceCodeNDistanceZ
-import QEC.Stabilizer.Codes.RotatedSurfaceCodeNDistance
-import QEC.Stabilizer.Codes.ToricCodeN
-import QEC.Stabilizer.Codes.ToricCodeNDistanceX
-import QEC.Stabilizer.Codes.ToricCodeNDistanceZ
-import QEC.Stabilizer.Codes.ToricCodeNDistance
-import QEC.Stabilizer.Codes.Shor9
-import QEC.Stabilizer.Codes.Steane7
-import QEC.Stabilizer.Codes.Steane7TransversalGates
-import QEC.Stabilizer.Codes.FourQubit_4_2_2
-import QEC.Stabilizer.Codes.FiveQubit_5_1_3
+import QEC.Stabilizer.Codes.Toric
+import QEC.Stabilizer.Codes.RotatedSurface
+import QEC.Stabilizer.Codes.Repetition
+import QEC.Stabilizer.Codes.Small
 
+/-!
+# Codes
+
+Concrete stabilizer codes, organized by family:
+- `Toric`          — parametric toric code (code + lattice + homology)
+- `RotatedSurface` — rotated surface code (code + lattice + homology)
+- `Repetition`     — classical repetition codes
+- `Small`          — single-instance codes (Shor9, Steane7, [[5,1,3]], …)
+
+`_TEMPLATE.lean` is the canonical structural reference for drafting new codes.
+-/

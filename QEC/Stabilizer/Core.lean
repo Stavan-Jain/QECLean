@@ -1,7 +1,2 @@
-import QEC.Stabilizer.Core.StabilizerGroup
-import QEC.Stabilizer.Core.SubgroupLemmas
-import QEC.Stabilizer.Core.CSSPredicates
-import QEC.Stabilizer.Core.CSSNoNegI
-import QEC.Stabilizer.Core.StabilizerCode
-import QEC.Stabilizer.Core.LogicalCliffordAction
-import QEC.Stabilizer.Core.CodeDistance
+-- Deprecated: this module moved to `QEC.Stabilizer.Framework.Core`. This shim will be removed in a follow-up release.
+import QEC.Stabilizer.Framework.Core

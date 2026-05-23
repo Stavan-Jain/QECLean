@@ -33,7 +33,7 @@ CORRECTIONS: list[dict] = [
         "new_track": "skip",
         "audit_note": (
             "Audit override: explicitly a [[9,1,3]] rotated surface code — "
-            "the L=3 instance of QEC/Stabilizer/Codes/RotatedSurfaceCodeN.lean "
+            "the L=3 instance of QEC/Stabilizer/Codes/RotatedSurface/N.lean "
             "(with stabilizer-code packaging in RotatedSurfaceCodeNStabilizerCode.lean "
             "and distance proof in RotatedSurfaceCodeNDistance*.lean)."
         ),
@@ -66,7 +66,7 @@ CORRECTIONS: list[dict] = [
         "new_track": "skip",
         "audit_note": (
             "Audit override: [[15,7,3]] is the r=4 instance of the quantum Hamming "
-            "family [[2^r-1, 2^r-1-2r, 3]] that QEC/Stabilizer/Codes/QuantumHamming.lean "
+            "family [[2^r-1, 2^r-1-2r, 3]] that QEC/Stabilizer/Codes/Small/QuantumHamming.lean "
             "defines parametrically for r ≥ 3."
         ),
     },

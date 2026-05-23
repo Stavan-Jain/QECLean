@@ -78,12 +78,12 @@ downstream BB-code analysis.
 
 **The infrastructure landed.**  Lean artifacts produced:
 
-- `QEC/Stabilizer/Homological/BBChainComplex.lean` (~285 LOC):
+- `QEC/Stabilizer/Framework/Homological/BBChainComplex.lean` (~285 LOC):
   * `conv` convolution + 7 algebraic lemmas
   * `bbBoundary1`, `bbBoundary2` as `LinearMap`s
   * `bbBoundary_comp : bbBoundary1 ∘ bbBoundary2 = 0`
   * `bbChainComplex : HomologicalCode`
-- Updated umbrella `QEC/Stabilizer/Homological.lean` to import the new
+- Updated umbrella `QEC/Stabilizer/Framework/Homological.lean` to import the new
   module.
 - `pipeline/attempts/gross/approaches/A_camion_bch/attempt.lean`:
   * `chainWeight_lower_bound_transfers` (abstract distance bridge)
@@ -219,7 +219,7 @@ In rough priority order:
 
 ### Promoted to the repo (durable infrastructure)
 
-* **`QEC/Stabilizer/Homological/BBChainComplex.lean`** (~285 LOC)
+* **`QEC/Stabilizer/Framework/Homological/BBChainComplex.lean`** (~285 LOC)
   Generic BB chain complex over any finite abelian `G`.
   Contains:
   - `conv` group-algebra convolution
@@ -230,8 +230,8 @@ In rough priority order:
   - `bbBoundary_comp : ∂₁ ∘ ∂₂ = 0` chain-complex law
   - `bbChainComplex : HomologicalCode` packaging
 
-* **`QEC/Stabilizer/Homological.lean`** (umbrella update)
-  Added `import QEC.Stabilizer.Homological.BBChainComplex`.
+* **`QEC/Stabilizer/Framework/Homological.lean`** (umbrella update)
+  Added `import QEC.Stabilizer.Framework.Homological.BBChainComplex`.
 
 ### Approach-local (exploration / instantiation)
 
@@ -256,8 +256,8 @@ In rough priority order:
 ## Build status
 
 All files compile cleanly:
-- `lake build QEC.Stabilizer.Homological.BBChainComplex` — succeeds
-- `lake build QEC.Stabilizer.Homological` — succeeds
+- `lake build QEC.Stabilizer.Framework.Homological.BBChainComplex` — succeeds
+- `lake build QEC.Stabilizer.Framework.Homological` — succeeds
 - `lake env lean pipeline/attempts/gross/approaches/A_camion_bch/attempt.lean` — exit 0
 
 No `sorry` markers, no `axiom`s introduced beyond mathlib's trusted

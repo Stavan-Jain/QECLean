@@ -50,8 +50,8 @@ Two refactors landed:
 1. **Promoted `BBChainComplex.lean`** from
    `pipeline/attempts/gross/approaches/A_camion_bch/` (where it would
    be unimportable from other Lean files) into the repo proper at
-   `QEC/Stabilizer/Homological/BBChainComplex.lean`.  Added to the
-   umbrella `QEC/Stabilizer/Homological.lean`.  This is the durable
+   `QEC/Stabilizer/Framework/Homological/BBChainComplex.lean`.  Added to the
+   umbrella `QEC/Stabilizer/Framework/Homological.lean`.  This is the durable
    abstraction layer: any BB code over `F_2[Z_ℓ × Z_m]` now packages as
    a `HomologicalCode` in one call to `bbChainComplex`.
 
@@ -65,7 +65,7 @@ Time so far: ~2.5h.
 
 ### What's been built (committable)
 
-- `QEC/Stabilizer/Homological/BBChainComplex.lean` (272 lines):
+- `QEC/Stabilizer/Framework/Homological/BBChainComplex.lean` (272 lines):
   generic BB chain complex packaging, parametric in `(G, A, B)`.
 - `pipeline/attempts/gross/approaches/A_camion_bch/attempt.lean`:
   abstract distance bridge `chainWeight_lower_bound_transfers` +

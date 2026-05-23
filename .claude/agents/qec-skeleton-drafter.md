@@ -26,12 +26,12 @@ Given a `code_id` (e.g. `stab_4_2_2`):
      full §1–§14 section breakdown, conventions, and variant notes for
      `k ≥ 2` / non-CSS / parametric families. The structure of your skeleton
      should match it.
-   - `QEC/Stabilizer/Codes/Steane7.lean` — concrete k = 1 CSS instantiation,
+   - `QEC/Stabilizer/Codes/Small/Steane7.lean` — concrete k = 1 CSS instantiation,
      useful as a copy-paste source for tactical patterns
-   - `QEC/Stabilizer/Codes/Shor9.lean` — alternative reference for n > 7
-   - `QEC/Stabilizer/Core/StabilizerGroup.lean`, `Core/StabilizerCode.lean` — the targets you instantiate
-   - `QEC/Stabilizer/Core/CSSPredicates.lean` — `IsXTypeElement`, `IsZTypeElement`
-   - `QEC/Stabilizer/Homological/` — the abstract `HomologicalCode` framework
+   - `QEC/Stabilizer/Codes/Small/Shor9.lean` — alternative reference for n > 7
+   - `QEC/Stabilizer/Framework/Core/Stabilizer/StabilizerGroup.lean`, `Core/StabilizerCode.lean` — the targets you instantiate
+   - `QEC/Stabilizer/Framework/Core/CSS/CSSPredicates.lean` — `IsXTypeElement`, `IsZTypeElement`
+   - `QEC/Stabilizer/Framework/Homological/` — the abstract `HomologicalCode` framework
    - `CLAUDE.md` — project-wide conventions (naming, tactics, linter rules)
 
 ## Outputs (all created in `pipeline/attempts/<code-name>/` unless noted)
@@ -203,8 +203,8 @@ Structure of the Lean file should mirror `Steane7.lean`:
 
 ```lean
 import Mathlib.Tactic
-import QEC.Stabilizer.Core.StabilizerGroup
-import QEC.Stabilizer.Core.StabilizerCode
+import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
+import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
 -- (...minimal set of imports...)
 
 namespace Quantum
@@ -298,7 +298,7 @@ When invoked with a `code_id`:
    concrete instantiation of the template (and `Shor9.lean` as an alternative
    reference). Match the template's section structure in your skeleton.
 
-5. **Read existing abstractions.** Scan `QEC/Stabilizer/Core/*.lean` for
+5. **Read existing abstractions.** Scan `QEC/Stabilizer/Framework/Core/*.lean` for
    anything you'll use. Especially:
    - `StabilizerCode` definition + required fields
    - `IsXTypeElement`, `IsZTypeElement` predicates

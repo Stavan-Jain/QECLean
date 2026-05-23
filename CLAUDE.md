@@ -9,22 +9,59 @@ quantum error correction. The active math is in `QEC/`. Build with `lake build`.
 QEC/
 ├── Foundations/         # Hilbert spaces, vectors, gates, tensor product
 ├── RepetitionCode/      # Classical repetition code recovery (older module)
-└── Stabilizer/          # Main formalization
-    ├── PauliGroupSingle/    # Single-qubit Pauli operators (X, Y, Z, I, phases)
-    ├── PauliGroup/          # n-qubit Pauli group + commutation theory
-    ├── BinarySymplectic/    # Symplectic representation, check matrices
-    ├── Core/                # StabilizerGroup, Codespace, Centralizer,
-    │                        # LogicalGates, CSS, CodeDistance abstractions
-    ├── Codes/               # Concrete codes: Shor9, Steane7, Repetition*,
-    │                        # Toric*, RotatedSurface3, RotatedSurfaceN*,
-    │                        # QuantumHamming
-    └── Lattice/             # Toric & rotated-surface lattice geometry,
-                             # chains, boundary maps, homology, H¹ dimension
+└── Stabilizer/          # Main formalization, organized into 4 clusters
+    ├── Foundations/         # Pauli + binary-symplectic algebra (the floor)
+    │   ├── PauliGroupSingle/    # Single-qubit Pauli operators (X, Y, Z, I, phases)
+    │   ├── PauliGroup/          # n-qubit Pauli group + commutation theory
+    │   └── BinarySymplectic/    # Symplectic representation, check matrices,
+    │                            # span and weight-two structure
+    ├── Framework/           # Abstract stabilizer + homological theory
+    │   ├── Core/                # General stabilizer formalism, split three ways:
+    │   │   ├── Stabilizer/          # StabilizerGroup, Codespace, Centralizer,
+    │   │   │                        # SubgroupLemmas, StabilizerCode
+    │   │   ├── Logical/             # LogicalOperators, LogicalGates, LogicalCliffordAction,
+    │   │   │                        # CodeDistance (distance lives with logicals)
+    │   │   └── CSS/                 # CSSPredicates, CSSNoNegI, CSSCommutationLemmas,
+    │   │                            # CSSDistance
+    │   ├── Symplectic/          # Stabilizer ↔ symplectic bridge: IndependentEquiv,
+    │   │                        # SymplecticOrthogonal, SupportLemmas (these import
+    │   │                        # Core; they are NOT in Foundations)
+    │   └── Homological/         # Abstract chain-complex / CSS framework:
+    │                            # Code, CSS, Generators, StabGroup,
+    │                            # LogicalCorrespondence, Distance, BBChainComplex
+    ├── Geometry/            # Lattice-family-agnostic primitives:
+    │                        # FinPeriodic, GridIndexing, CellComplexTypes
+    └── Codes/               # Concrete codes, organized by family:
+        ├── _TEMPLATE.lean       # Canonical structural reference for new CSS codes
+        ├── Toric/               # Parametric L×L toric code: CodeN, Chains,
+        │                        # BoundaryMaps, Homology, H1Dimension,
+        │                        # LogicalCorrespondence{X,Z}, ChainComplex,
+        │                        # Distance{,X,Z}, StabilizerCode (16 files)
+        ├── RotatedSurface/      # 3×3 special case + parametric N (10 files,
+        │                        # same shape as Toric)
+        ├── Repetition/          # Three.lean (3-qubit) + N.lean (parametric)
+        └── Small/               # Single-instance codes: Shor9, Steane7,
+                                 # Steane7TransversalGates, FourQubit_4_2_2,
+                                 # QuantumHamming, FiveQubit_5_1_3 (first non-CSS)
 ```
 
-Top-level umbrella `.lean` files (e.g. `QEC/Stabilizer/Stabilizer.lean`,
-`Codes.lean`, `Lattice.lean`) just re-export submodules — don't put real
-content there.
+**Layering** (lower can be imported by higher; not the reverse):
+
+```
+Foundations  <  {Geometry, Framework.Core}  <  Framework.{Symplectic, Homological}  <  Codes
+```
+
+Top-level umbrella `.lean` files at the *sibling* level of each directory
+(`QEC/Stabilizer/Foundations.lean`, `Framework.lean`, `Geometry.lean`,
+`Codes.lean`, `Stabilizer.lean`) just re-export submodules — don't put real
+content there. Same convention for the sub-umbrellas
+(`Framework/Core/Stabilizer.lean`, etc.).
+
+**Compatibility shims**: every old leaf path (e.g.
+`QEC.Stabilizer.Codes.ToricCodeN`, `QEC.Stabilizer.Core.StabilizerGroup`,
+`QEC.Stabilizer.Lattice.ToricChainComplex`) still resolves via a 1-line
+re-export at the old path. These shims will be removed in a follow-up
+release; new code should import the new paths directly.
 
 ## Naming and style conventions
 
@@ -139,9 +176,10 @@ warning is either fixed cleanly or left visible. Don't reach for
 accept the visible warning and document it as out-of-scope.
 
 The only category currently treated as out-of-scope is `linter.flexible`
-on the toric `Lattice/` and `Codes/` proofs (the `simp_all +decide [...]`
-/ `simp +decide [...]` family). Don't introduce new sites; existing ones
-will be cleaned up in a dedicated batch via the MCP union trick above.
+on the toric proofs under `Codes/Toric/` and the rotated-surface proofs
+under `Codes/RotatedSurface/` (the `simp_all +decide [...]` / `simp +decide [...]`
+family). Don't introduce new sites; existing ones will be cleaned up
+in a dedicated batch via the MCP union trick above.
 
 ## Linter-clean idioms
 
@@ -227,7 +265,7 @@ These are local to this codebase — search here before assuming mathlib has the
 
 ```
 lake build                                    # whole repo (~10 min cold)
-lake build QEC.Stabilizer.Core.Codespace      # one module
+lake build QEC.Stabilizer.Framework.Core.Stabilizer.Codespace      # one module
 lake env lean /tmp/probe.lean                 # one-off file check
 ```
 
@@ -509,13 +547,16 @@ intact instead of forcing a downstream rewrite.
 
 ## Umbrella files (orphan-module trap)
 
-New modules under `Codes/`, `Lattice/`, etc. **must be imported in the
-sibling umbrella file** (`QEC/Stabilizer/Codes.lean`, `Lattice.lean`,
-…). Files not in any umbrella are unreachable from the default `lake
-build` target — never compiled, never linted, errors silently hidden.
-`QuantumHamming.lean` sat in this orphan state with two stale
-`Nat.xor_*` references that `lake build` never surfaced. When adding
-a module, also append the import.
+New modules under `Codes/<family>/`, `Geometry/`, `Framework/Core/<bucket>/`,
+etc. **must be imported in the relevant umbrella files**: the per-family /
+per-bucket umbrella (e.g. `QEC/Stabilizer/Codes/Toric.lean`,
+`Framework/Core/Stabilizer.lean`) AND, transitively, the cluster-level
+umbrella (`Codes.lean`, `Framework.lean`, …). Files not in any umbrella
+are unreachable from the default `lake build` target — never compiled,
+never linted, errors silently hidden. `QuantumHamming.lean` sat in this
+orphan state with two stale `Nat.xor_*` references that `lake build`
+never surfaced. When adding a module, append the import to the immediate
+umbrella; the chain to `Stabilizer.lean` takes care of itself.
 
 ## Cleanup recipes
 
