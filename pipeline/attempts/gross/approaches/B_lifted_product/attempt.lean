@@ -54,7 +54,7 @@ approach, parallel to Approach A's calibrated Camion-loose finding.
 import Mathlib.Algebra.Group.Subgroup.Basic
 import Mathlib.Data.ZMod.Basic
 import Mathlib.Data.Finset.Card
-import QEC.Stabilizer.Homological
+import QEC.Stabilizer.Framework.Homological
 
 namespace Quantum
 namespace Stabilizer

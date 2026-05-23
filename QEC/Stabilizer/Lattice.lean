@@ -1,19 +1,6 @@
-import QEC.Stabilizer.Lattice.FinPeriodic
-import QEC.Stabilizer.Lattice.GridIndexing
-import QEC.Stabilizer.Lattice.CellComplexTypes
-import QEC.Stabilizer.Lattice.ToricChains
-import QEC.Stabilizer.Lattice.ToricBoundaryMaps
-import QEC.Stabilizer.Lattice.ToricHomology
-import QEC.Stabilizer.Lattice.ToricH1Dimension
-import QEC.Stabilizer.Lattice.ToricWrappingInvariants
-import QEC.Stabilizer.Lattice.ToricOperatorChains
-import QEC.Stabilizer.Lattice.ToricChainOps
-import QEC.Stabilizer.Lattice.ToricLogicalCorrespondenceX
-import QEC.Stabilizer.Lattice.ToricLogicalCorrespondenceZ
-import QEC.Stabilizer.Lattice.ToricDualWrappingInvariants
-import QEC.Stabilizer.Lattice.ToricChainComplex
-import QEC.Stabilizer.Lattice.RotatedSurfaceCellComplex
-import QEC.Stabilizer.Lattice.RotatedSurfaceBoundaryMaps
-import QEC.Stabilizer.Lattice.RotatedSurfaceChainComplex
-import QEC.Stabilizer.Lattice.RotatedSurfaceH1Dimension
-
+-- Deprecated: `QEC.Stabilizer.Lattice` was split across `QEC.Stabilizer.Geometry`
+-- (lattice-agnostic primitives) and `QEC.Stabilizer.Codes.{Toric,RotatedSurface}`
+-- (family-specific lattice content). This shim will be removed in a follow-up release.
+import QEC.Stabilizer.Geometry
+import QEC.Stabilizer.Codes.Toric
+import QEC.Stabilizer.Codes.RotatedSurface

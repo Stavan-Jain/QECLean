@@ -2,9 +2,9 @@
 
 **Status:** `pr-ready`
 **Branch:** `worktree-agent-aa2f5308c26453301`
-**Final file:** `QEC/Stabilizer/Codes/FiveQubit_5_1_3.lean` (740 LoC)
+**Final file:** `QEC/Stabilizer/Codes/Small/FiveQubit_5_1_3.lean` (740 LoC)
 **Sorries closed:** 23 / 23 (0 blocked)
-**Build:** `lake build QEC.Stabilizer.Codes.FiveQubit_5_1_3` clean
+**Build:** `lake build QEC.Stabilizer.Codes.Small.FiveQubit_5_1_3` clean
 
 ## What was formalized
 
@@ -34,7 +34,7 @@ non-CSS codes.
 
 ### 1. `negIdentity_not_mem_of_indep_phase_zero_commute` (Gap 1)
 
-**Where:** `QEC/Stabilizer/BinarySymplectic/SymplecticSpan.lean`
+**Where:** `QEC/Stabilizer/Framework/Symplectic/SymplecticSpan.lean`
 
 The CSS argument `CSS.negIdentity_not_mem_closure_union` only handles
 generator sets that split cleanly into commuting Z-type / X-type subsets.
@@ -46,7 +46,7 @@ This is what the [[5,1,3]] §6 proof now calls.
 
 ### 2. `weightTwoAt` + `no_weight_two_mem_centralizer_of_anticommute_witness` (Gap 2)
 
-**Where:** `QEC/Stabilizer/Core/CSSDistance.lean`
+**Where:** `QEC/Stabilizer/Framework/Core/CSS/CSSDistance.lean`
 
 The pre-existing `no_weight_one_*` helper handles d = 2 (e.g.
 [[4,2,2]]). For d = 3 we additionally rule out weight-2 centralizer
@@ -58,10 +58,10 @@ with `g` contradicts `g ∈ centralizer`.
 ### 3. Computable `DecidableEq` + `Decidable Anticommute` (Stage-4 follow-up)
 
 **Where:**
-- `QEC/Stabilizer/PauliGroup/Representation.lean` — the *operator-level*
+- `QEC/Stabilizer/Foundations/PauliGroup/Representation.lean` — the *operator-level*
   `DecidableEq (NQubitPauliOperator n)`, **global** instance (clean
   computable replacement of the previous `Classical.decEq`).
-- `QEC/Stabilizer/Codes/FiveQubit_5_1_3.lean` — the *group-element-level*
+- `QEC/Stabilizer/Codes/Small/FiveQubit_5_1_3.lean` — the *group-element-level*
   `DecidableEq (NQubitPauliGroupElement n)` and `Decidable (Anticommute p q)`,
   **`local instance`** declarations scoped to this file only.
 
@@ -164,11 +164,11 @@ discharged by `exact absurd rfl hij`.
 
 | File | Change | LoC delta |
 |------|--------|-----------|
-| `QEC/Stabilizer/PauliGroup/Representation.lean` | computable `DecidableEq` on `NQubitPauliOperator` (global) | +3 / -2 |
-| `QEC/Stabilizer/PauliGroup/Commutation.lean` | net no-op after locality fix; carries a comment explaining why | +6 / 0 |
-| `QEC/Stabilizer/BinarySymplectic/SymplecticSpan.lean` | Gap 1 (non-CSS −I lemma) | (in previous Stage-4 session) |
-| `QEC/Stabilizer/Core/CSSDistance.lean` | Gap 2 (weight-2 witness helper) | (in previous Stage-4 session) |
-| `QEC/Stabilizer/Codes/FiveQubit_5_1_3.lean` | full Stage-4 closure (T2, T9) + local `DecidableEq`/`Anticommute` instances | +179 |
+| `QEC/Stabilizer/Foundations/PauliGroup/Representation.lean` | computable `DecidableEq` on `NQubitPauliOperator` (global) | +3 / -2 |
+| `QEC/Stabilizer/Foundations/PauliGroup/Commutation.lean` | net no-op after locality fix; carries a comment explaining why | +6 / 0 |
+| `QEC/Stabilizer/Framework/Symplectic/SymplecticSpan.lean` | Gap 1 (non-CSS −I lemma) | (in previous Stage-4 session) |
+| `QEC/Stabilizer/Framework/Core/CSS/CSSDistance.lean` | Gap 2 (weight-2 witness helper) | (in previous Stage-4 session) |
+| `QEC/Stabilizer/Codes/Small/FiveQubit_5_1_3.lean` | full Stage-4 closure (T2, T9) + local `DecidableEq`/`Anticommute` instances | +179 |
 
 ## Commits on branch
 
