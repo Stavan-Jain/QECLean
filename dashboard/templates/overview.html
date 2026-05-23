@@ -74,7 +74,9 @@
 
 <section class="counts">
   <div class="count"><div class="count-num">{{ total }}</div><div class="count-label">Total scored</div></div>
-  <div class="count"><div class="count-num">{{ done | length }}</div><div class="count-label">Done</div></div>
+  <a class="count count-link" href="done/index.html">
+    <div class="count-num">{{ done | length }}</div><div class="count-label">Done →</div>
+  </a>
   <div class="count"><div class="count-num">{{ in_flight | length }}</div><div class="count-label">In-flight</div></div>
   <div class="count"><div class="count-num">{{ by_track.engineering | length }}</div><div class="count-label">Engineering</div></div>
   <div class="count"><div class="count-num">{{ by_track.moonshot | length }}</div><div class="count-label">Moonshot</div></div>
