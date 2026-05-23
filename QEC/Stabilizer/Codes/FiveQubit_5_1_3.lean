@@ -763,6 +763,11 @@ theorem code_has_distance_three : HasCodeDistance stabilizerCode 3 := by
       stabilizerCode.toStabilizerGroup generators stabilizerCode_toSubgroup_eq
       weight_two_anticomm_witness g hg_weight h_cent
 
+/-- The [[5, 1, 3]] perfect code packaged with its distance. -/
+noncomputable def stabilizerCodeWithDistance : StabilizerCodeWithDistance 5 1 3 where
+  toStabilizerCode := stabilizerCode
+  hasDistance      := code_has_distance_three
+
 end FiveQubit_5_1_3
 end StabilizerGroup
 end Quantum

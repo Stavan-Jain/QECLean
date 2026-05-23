@@ -542,6 +542,11 @@ theorem code_has_distance_two : HasCodeDistance stabilizerCode 2 := by
   exact no_weight_one_mem_centralizer_of_anticommute_witness stabilizerCode.toStabilizerGroup
     generators stabilizerCode_toSubgroup_eq weight_one_anticomm_witness g hg_weight h_cent
 
+/-- The [[4, 2, 2]] code packaged with its distance. -/
+noncomputable def stabilizerCodeWithDistance : StabilizerCodeWithDistance 4 2 2 where
+  toStabilizerCode := stabilizerCode
+  hasDistance      := code_has_distance_two
+
 end FourQubit_4_2_2
 end StabilizerGroup
 end Quantum

@@ -556,6 +556,11 @@ theorem rotatedSurfaceCode3_has_distance_three : HasCodeDistance stabilizerCode 
       · exact (Iff.not (IsNontrivialLogicalOperator_of_toSubgroup_eq g h_subgroup_eq)).2
           (no_weight_2_logical g hw))
 
+/-- The 3×3 rotated surface code as a `[[9, 1, 3]]` stabilizer code with distance. -/
+noncomputable def stabilizerCodeWithDistance : StabilizerCodeWithDistance 9 1 3 where
+  toStabilizerCode := stabilizerCode
+  hasDistance      := rotatedSurfaceCode3_has_distance_three
+
 end RotatedSurfaceCode3
 end StabilizerGroup
 end Quantum

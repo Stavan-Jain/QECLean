@@ -136,6 +136,13 @@ theorem rotatedSurfaceCodeN_distance_eq_L :
       exact (h_iff_NL (logicalX L)).mpr hlogX_nl_hom
     · exact logicalX_weight_eq_L L
 
+/-- The rotated surface code on an `L × L` lattice packaged as a
+`[[L*L, 1, L]]` stabilizer code with distance. -/
+noncomputable def rotatedSurfaceStabilizerCodeWithDistance :
+    StabilizerCodeWithDistance (numQubits L) 1 L where
+  toStabilizerCode := rotatedSurfaceStabilizerCode L
+  hasDistance      := rotatedSurfaceCodeN_distance_eq_L L
+
 end RotatedSurfaceCodeN
 end StabilizerGroup
 end Quantum
