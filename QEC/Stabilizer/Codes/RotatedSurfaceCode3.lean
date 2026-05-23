@@ -185,9 +185,8 @@ All X-generators are X-type elements.
 -/
 lemma XGenerators_are_XType :
     ∀ g, g ∈ XGenerators → NQubitPauliGroupElement.IsXTypeElement g := by
-  unfold XGenerators
-  simp +decide [NQubitPauliGroupElement.IsXTypeElement, NQubitPauliOperator.IsXType,
-    PauliOperator.IsXType]
+  unfold XGenerators; simp +decide [NQubitPauliGroupElement.IsXTypeElement]
+  unfold NQubitPauliOperator.IsXType; simp +decide [X0, X1, X2, X3, PauliOperator.IsXType]
 
 /-
 The stabilizer subgroup: closure of the 8 generators.

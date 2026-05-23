@@ -4,24 +4,35 @@ parameters:
   n: 5
   k: 1
   d: 3
-status: formalization
+status: pr-ready
 track: engineering
 started_at: 2026-05-22T13:55:47Z
+completed_at: 2026-05-23T00:00:00Z
 worktree_branch: worktree-agent-aa2f5308c26453301
 estimated_loc: 650
-phase: stage-2-skeleton
+actual_loc: 740
+phase: stage-4-closed
 covering_lean_file: QEC/Stabilizer/Codes/FiveQubit_5_1_3.lean
 family: non-CSS
+sorries_total: 23
+sorries_closed: 23
+sorries_blocked: 0
 notes: |
-  First non-CSS code in the repo. Standard CSS shortcuts in
-  Core/CSSCommutationLemmas / Core/CSSNoNegI do NOT apply because the
-  four generators (cyclic shifts of XZZXI) each carry both X and Z
-  factors on different qubits. See gap_audit.md for the resulting
-  helper-lemma asks, particularly:
-    1. negIdentity_not_mem_of_independent_phase_zero in
-       Core/SubgroupLemmas.lean (general-form replacement for
-       CSS.negIdentity_not_mem_closure_union), and
-    2. no_weight_two_mem_centralizer_of_anticommute_witness in
-       Core/CSSDistance.lean (extension of the weight-1 helper).
-  Stage-3 review should verify the weight-3 logical witness story
-  (XXXXX has weight 5; we need a weight-3 representative of X̄'s coset).
+  First non-CSS code in the repo, fully formalized end-to-end including
+  the distance-3 lower bound. Three Core helpers added during Stage 4:
+
+    1. negIdentity_not_mem_of_indep_phase_zero_commute in
+       BinarySymplectic/SymplecticSpan.lean (Gap 1: general-form
+       replacement for CSS.negIdentity_not_mem_closure_union).
+    2. no_weight_two_mem_centralizer_of_anticommute_witness +
+       weightTwoAt in Core/CSSDistance.lean (Gap 2: extension of the
+       weight-1 helper).
+    3. DecidableEq (NQubitPauliGroupElement n) + noncomputable Decidable
+       Anticommute in PauliGroup/Commutation.lean (Stage-4 follow-up:
+       turn the `Classical.decEq` on NQubitPauliOperator into a
+       computable instance, so `decide` reduces equalities of n-qubit
+       Pauli operators in the kernel).
+
+  Distance witness is logicalX_w3 = IYYIX (the operator-part of
+  logicalX * g1, with phase 2). All 105 weight-{1,2} anticomm witness
+  cases close by `decide` thanks to (3).
