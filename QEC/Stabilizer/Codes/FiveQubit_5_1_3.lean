@@ -492,49 +492,158 @@ private lemma stabilizerCode_toSubgroup_eq :
 
 /-! ## §14 — Code distance = 3
 
-Strategy (preferred, in order of decreasing optimism):
+The Core infrastructure for this proof has been added (Gap 1:
+`negIdentity_not_mem_of_indep_phase_zero_commute` in `SymplecticSpan.lean`;
+Gap 2: `weightTwoAt` + `no_weight_two_mem_centralizer_of_anticommute_witness`
+in `Core/CSSDistance.lean`). What remains is the in-file enumeration of the
+anticomm-witness table — 15 weight-1 cases and 90 weight-2 cases. Each case
+needs an explicit Finset computation because the parity-based `Anticommute`
+characterization uses `Classical.propDecidable` and the wrong-generator
+branches need a clean failure path.
 
-1. **Optimistic**: `native_decide` on the full `HasCodeDistance` predicate.
-   For `n = 5`, the universe is `4 × 4^5 = 4096` group elements; with
-   the 16-element stabilizer subgroup and 4 generators, total work is
-   ~262k operations. Likely closes in seconds.
-
-2. **Manual enumeration**: via `hasCodeDistance_of`, splitting into
-   - `d ≥ 1` (decide),
-   - weight-3 witness (`logicalX_weight3 := logicalX * g1`,
-     non-trivial by a "mul-by-stab preserves non-triviality" lemma —
-     see `gap_audit.md` Gap 3),
-   - lower bound: no weight-1 or weight-2 Pauli is in the centralizer.
-     Weight-1 via the existing helper
-     `no_weight_one_mem_centralizer_of_anticommute_witness`; weight-2
-     via a new helper `no_weight_two_mem_centralizer_of_anticommute_witness`
-     (`gap_audit.md` Gap 2).
-
-The skeleton below shows the manual-enumeration shape with explicit
-sorries, so Stage 4 can swap in `native_decide` at the top if that
-works.
+This is mechanical work (~300-500 LoC) deferred to a follow-up session;
+the structure is documented below and in `gap_audit.md`.
 -/
+
+/-- Anticommutation depends only on the operator-parts (not phases): if two
+elements have the same operator-part, they anticommute with the same things.
+Promoted to `Core` if useful, but kept local here for now. -/
+private lemma anticommute_of_operators_eq
+    (p q r : NQubitPauliGroupElement 5) (h : p.operators = q.operators)
+    (h_ac : NQubitPauliGroupElement.Anticommute p r) :
+    NQubitPauliGroupElement.Anticommute q r := by
+  rw [anticommutes_iff_odd_anticommutes] at h_ac ⊢
+  classical
+  have : Finset.univ.filter
+        (NQubitPauliGroupElement.anticommutesAt q.operators r.operators) =
+      Finset.univ.filter
+        (NQubitPauliGroupElement.anticommutesAt p.operators r.operators) := by
+    ext i
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+    rw [h]
+  rw [this]
+  exact h_ac
+
+/-- The weight-3 distance witness, defined directly with operators `I, Y, Y,
+I, X` and phase power 2. This is the operator-part of `logicalX * g1` (see
+`logicalX_w3_eq_mul` below for the equivalence). Defined explicitly (not via
+the `*` of noncomputable group operations) so that `decide` can reduce it. -/
+def logicalX_w3 : NQubitPauliGroupElement 5 :=
+  ⟨2,
+    (((NQubitPauliOperator.identity 5).set 1 PauliOperator.Y).set 2
+      PauliOperator.Y).set 4 PauliOperator.X⟩
+
+/-- Sanity check: the explicit definition matches `logicalX * g1`. -/
+lemma logicalX_w3_eq_mul : logicalX_w3 = logicalX * g1 := by
+  apply NQubitPauliGroupElement.ext
+  · decide
+  · funext i; fin_cases i <;> decide
+
+/-- `logicalX_w3` has weight 3. -/
+@[simp] lemma logicalX_w3_weight :
+    NQubitPauliGroupElement.weight logicalX_w3 = 3 := by
+  decide
+
+/-- `logicalX_w3` anticommutes with `logicalZ`. By the parity criterion, the
+overlap pattern `IYYIX` vs `ZZZZZ` anticommutes at qubits 1, 2, 4 (odd count). -/
+private lemma logicalX_w3_anticomm_logicalZ :
+    NQubitPauliGroupElement.Anticommute logicalX_w3 logicalZ := by
+  change logicalX_w3 * logicalZ = NQubitPauliGroupElement.minusOne 5 * (logicalZ * logicalX_w3)
+  apply NQubitPauliGroupElement.ext
+  · decide
+  · funext i; fin_cases i <;> decide
+
+/-- `logicalX_w3 ∈ centralizer (stabilizerCode.toStabilizerGroup)`. Use the
+equivalence `logicalX_w3 = logicalX * g1`: `logicalX` is in the centralizer
+(it's the StabilizerCode's logical X), `g1` is in the stabilizer (which is
+contained in the centralizer because the stabilizer is abelian), and the
+centralizer is closed under multiplication. -/
+private lemma logicalX_w3_mem_centralizer :
+    logicalX_w3 ∈ centralizer stabilizerCode.toStabilizerGroup := by
+  rw [logicalX_w3_eq_mul]
+  apply (centralizer stabilizerCode.toStabilizerGroup).mul_mem
+  · exact (logicalOps5_1_3 0).x_mem_centralizer
+  · apply stabilizer_le_centralizer
+    rw [stabilizerCode_toSubgroup_eq]
+    exact Subgroup.subset_closure (by simp [generators])
+
+/-- `logicalX_w3 ∉ stabilizerCode.toStabilizerGroup.toSubgroup`. Since it
+anticommutes with `logicalZ` (a centralizer element), it cannot itself be
+in the stabilizer. -/
+private lemma logicalX_w3_not_mem_subgroup :
+    logicalX_w3 ∉ stabilizerCode.toStabilizerGroup.toSubgroup := by
+  apply not_mem_stabilizer_of_anticommutes_centralizer _ logicalX_w3 logicalZ
+  · exact (logicalOps5_1_3 0).z_mem_centralizer
+  · exact logicalX_w3_anticomm_logicalZ
+
+/-- No stabilizer element shares `logicalX_w3`'s operator-part. If one did,
+that element would anticommute with `logicalZ` (anticommutation depends only
+on operators), but it commutes with `logicalZ` by virtue of being in the
+abelian stabilizer subgroup. -/
+private lemma logicalX_w3_no_stab_same_operators :
+    ∀ s ∈ stabilizerCode.toStabilizerGroup.toSubgroup,
+      s.operators ≠ logicalX_w3.operators := by
+  intro s hs h_ops
+  have hs_anti : NQubitPauliGroupElement.Anticommute s logicalZ :=
+    anticommute_of_operators_eq logicalX_w3 s logicalZ h_ops.symm logicalX_w3_anticomm_logicalZ
+  exact not_mem_stabilizer_of_anticommutes_centralizer
+    stabilizerCode.toStabilizerGroup s logicalZ
+    (logicalOps5_1_3 0).z_mem_centralizer hs_anti hs
+
+/-- `logicalX_w3` is a non-trivial logical operator of `stabilizerCode`. -/
+private lemma logicalX_w3_isNontrivial :
+    IsNontrivialLogicalOperator logicalX_w3 stabilizerCode.toStabilizerGroup :=
+  ⟨logicalX_w3_mem_centralizer, logicalX_w3_not_mem_subgroup,
+   logicalX_w3_no_stab_same_operators⟩
+
+-- Anticomm-witness tables for weight-1 and weight-2 Paulis are deferred.
+-- See the BLOCKED note on `code_has_distance_three` below.
 
 /-- The [[5, 1, 3]] five-qubit perfect code has distance 3.
 
-The full distance proof requires (1) a weight-3 nontrivial-logical witness
-constructed as `logicalX * g₁` (operators `IYYIX`, weight 3) and (2) a
-lower-bound argument ruling out weight-1 and weight-2 nontrivial logicals.
+**Status: BLOCKED on a tactic-engineering issue.** The Core
+infrastructure is fully in place:
 
-Weight-1 routes through the existing
-`StabilizerGroup.no_weight_one_mem_centralizer_of_anticommute_witness` helper
-in `Core/CSSDistance.lean`. Weight-2 requires a new helper
-`no_weight_two_mem_centralizer_of_anticommute_witness` (`gap_audit.md` Gap 2)
-plus a 90-case anti-witness table. The witness construction also needs
-`IsNontrivialLogicalOperator.mul_mem_subgroup` (`gap_audit.md` Gap 3) to
-transfer non-triviality from `logicalX` (weight 5) to `logicalX * g₁`
-(weight 3).
+- The weight-3 witness `logicalX_w3` (and its `IsNontrivialLogicalOperator`)
+  is defined and proven non-trivial above.
+- The weight-1 lower-bound helper
+  `no_weight_one_mem_centralizer_of_anticommute_witness` exists in
+  `Core/CSSDistance.lean`.
+- The weight-2 lower-bound helper
+  `no_weight_two_mem_centralizer_of_anticommute_witness` was added to
+  `Core/CSSDistance.lean` in this Stage-4 session.
 
-Out of scope for this Stage-4 attempt; deferred along with `negIdentity_not_mem`.
-See `result.md` for the follow-up plan. -/
+What remains is the explicit anticomm-witness *tables* — one for
+weight-1 (15 cases: `Fin 5 × {X, Y, Z}`) and one for weight-2 (90 cases:
+pairs `Fin 5 × Fin 5` with distinct qubits, times pairs `{X,Y,Z}²`).
+
+The obstacle: `Anticommute p q` (defined as `p * q = minusOne * (q * p)`)
+is not directly `decide`-able when applied to elements of
+`NQubitPauliGroupElement` because the `Group` instance from mathlib is
+`noncomputable`. The standard `pauli_anticomm_odd_anticommutes` tactic
+converts to `Odd (Finset.univ.filter (anticommutesAt ...)).card`, but the
+`anticommutes_iff_odd_anticommutes` lemma uses `by classical exact ...`
+in its statement, baking in `Classical.propDecidable` — which then makes
+`decide` / `native_decide` fail on the resulting goal.
+
+The existing `FourQubit_4_2_2.lean` works around this with explicit
+`have hfilter : Finset.univ.filter (...) = (concrete Finset) := by ...`
+computations per case — but for 105 cases here, that's ~1000 LoC of
+mechanical filter computations.
+
+The proper fix is either:
+1. Add a `DecidableEq`-based `Decidable` instance for `Anticommute` to
+   `PauliGroup/Commutation.lean` that doesn't go through the Classical
+   detour, then close all 105 cases via `decide` (~5 LoC).
+2. Rewrite `anticommutes_iff_odd_anticommutes` to avoid `by classical
+   exact` in its RHS.
+
+Either fix is a focused ~30-minute task once someone has the bandwidth
+to investigate the Core. Deferred from this Stage-4 session. -/
 theorem code_has_distance_three : HasCodeDistance stabilizerCode 3 := by
-  sorry -- BLOCKED(stab_5_1_3-T9): see docstring above; needs Gap 2 + Gap 3 helpers
-        -- in Core plus weight-3 witness anti-witness tables. Standalone follow-up.
+  sorry -- BLOCKED(stab_5_1_3-T9): see docstring above. The Core helpers are
+        -- in place; remaining work is the 15+90 anticomm-witness table,
+        -- gated on a Decidable Anticommute instance.
 
 end FiveQubit_5_1_3
 end StabilizerGroup
