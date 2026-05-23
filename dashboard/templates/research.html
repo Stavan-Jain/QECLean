@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+
+{% block content %}
+<h1 class="page-title">Research log</h1>
+<p class="subtitle">
+  Moonshot-track attempts on codes with no known clean distance proof.
+  <strong>Failures are first-class outputs</strong> — every approach produces a write-up regardless of outcome.
+</p>
+
+<div class="panel">
+  <div class="md-body">{{ research_log_md | render_md | safe }}</div>
+</div>
+
+<h2 style="margin-top: 32px;">Moonshot candidates</h2>
+
+{% for code in moonshots %}
+<div class="panel">
+  <div class="code-header">
+    <h2 style="margin: 0;">{{ code.code_id }}</h2>
+    {% if code.parameters %}<span class="code-params">{{ code.parameters | format_parameters }}</span>{% endif %}
+    {{ m.status_badge(code.status) }}
+  </div>
+  <p>{{ code.name }}</p>
+  <p class="note">{{ code.rationale }}</p>
+
+  {% if code.attempt %}
+    {% if code.attempt.state.approach_a_outcome or code.attempt.state.approach_b_outcome %}
+    <h3>Approaches attempted</h3>
+    <table>
+      <thead><tr><th>Approach</th><th>Outcome</th><th>Hours</th><th>Summary</th></tr></thead>
+      <tbody>
+        {% if code.attempt.state.approach_a_outcome %}
+        <tr>
+          <td><strong>A</strong></td>
+          <td>{{ m.status_badge(code.attempt.state.approach_a_outcome) }}</td>
+          <td class="num">{{ code.attempt.state.approach_a_hours_spent or '?' }}</td>
+          <td>{{ code.attempt.state.approach_a_summary or '' }}</td>
+        </tr>
+        {% endif %}
+        {% if code.attempt.state.approach_b_outcome %}
+        <tr>
+          <td><strong>B</strong></td>
+          <td>{{ m.status_badge(code.attempt.state.approach_b_outcome) }}</td>
+          <td class="num">{{ code.attempt.state.approach_b_hours_spent or '?' }}</td>
+          <td>{{ code.attempt.state.approach_b_summary or '' }}</td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+    {% endif %}
+  {% endif %}
+
+  <p><a href="{{ root_prefix }}code/{{ code.code_id | code_slug }}/index.html">Full detail →</a></p>
+</div>
+{% endfor %}
+
+{% endblock %}

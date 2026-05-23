@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+
+{% block content %}
+<h1 class="page-title">Queue · {{ entries | length }} codes</h1>
+<p class="subtitle">All scored codes. Click any row for the detail page; filter by track or search by code id / name.</p>
+
+<div class="filter-bar">
+  <input type="search" id="search" placeholder="Search code_id, name, rationale…">
+  <span class="chip active" data-track="all">all</span>
+  <span class="chip" data-track="engineering">engineering</span>
+  <span class="chip" data-track="moonshot">moonshot</span>
+  <span class="chip" data-track="defer">defer</span>
+  <span class="chip" data-track="skip">skip</span>
+  <span class="chip" data-status="done">done</span>
+  <span class="chip" data-status="in_flight">in-flight</span>
+</div>
+
+<div class="panel" style="padding: 0; overflow-x: auto;">
+  <table id="queue-table">
+    <thead>
+      <tr>
+        <th class="sortable" data-sort="rank">#</th>
+        <th class="sortable" data-sort="code_id">Code</th>
+        <th class="sortable" data-sort="name">Name</th>
+        <th class="sortable sorted-desc num" data-sort="composite">Score</th>
+        <th class="sortable num" data-sort="reuse">Reuse</th>
+        <th class="sortable num" data-sort="canonicality">Canon</th>
+        <th class="sortable num" data-sort="hardware">HW</th>
+        <th class="sortable num" data-sort="tractability">Tract</th>
+        <th class="sortable num" data-sort="prerequisites">Prereq</th>
+        <th class="sortable num" data-sort="effort">Effort</th>
+        <th>Track</th>
+        <th>Status</th>
+        <th>Rationale</th>
+      </tr>
+    </thead>
+    <tbody id="queue-tbody">
+      {# Populated by JS from window.queueData #}
+    </tbody>
+  </table>
+</div>
+
+<p class="note" id="row-count" style="margin-top: 12px;"></p>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.queueData = {{ queue_json | safe }};
+</script>
+<script src="{{ root_prefix }}static/queue.js"></script>
+{% endblock %}

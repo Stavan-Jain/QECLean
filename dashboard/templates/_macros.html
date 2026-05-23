@@ -1,0 +1,33 @@
+{# Reusable rendering bits. #}
+
+{% macro track_badge(track) %}
+  <span class="badge {{ track }}">{{ track }}</span>
+{% endmacro %}
+
+{% macro status_badge(status) %}
+  <span class="badge {{ status }}">{{ status | replace('_', ' ') }}</span>
+{% endmacro %}
+
+{% macro axis_bars(axes) %}
+  <span class="axes-row" title="reuse·canon·hardware·tract·prereq·effort">
+    {% for axis in axis_order %}
+      {% set v = axes.get(axis) or 0 %}
+      <span class="axis-bar" title="{{ axis_labels[axis] }}: {{ v }}/10"><span class="fill-{{ v }}"></span></span>
+    {% endfor %}
+  </span>
+{% endmacro %}
+
+{% macro code_link(code, root_prefix='') %}
+  <a href="{{ root_prefix }}code/{{ code.code_id | code_slug }}/index.html">{{ code.code_id }}</a>
+{% endmacro %}
+
+{% macro queue_row(code, root_prefix='') %}
+  <tr>
+    <td class="code-id">{{ code_link(code, root_prefix) }}</td>
+    <td>{{ code.name }}{% if code.parameters %} <code>{{ code.parameters | format_parameters }}</code>{% endif %}</td>
+    <td class="num"><strong>{{ '%.2f' | format(code.composite) }}</strong></td>
+    <td>{{ axis_bars(code.axes) }}</td>
+    <td>{{ track_badge(code.proposed_track) }}</td>
+    <td>{{ status_badge(code.status) }}</td>
+  </tr>
+{% endmacro %}
