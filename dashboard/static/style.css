@@ -185,6 +185,96 @@ main {
 }
 .count-num { font-size: 22px; font-weight: 600; }
 .count-label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+a.count-link {
+  text-decoration: none;
+  color: var(--text);
+  display: block;
+  transition: border-color 120ms, background 120ms;
+}
+a.count-link:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+a.count-link:hover .count-label { color: var(--accent); }
+
+/* ---- Done page ---- */
+.done-section-title {
+  font-size: 15px;
+  margin: 8px 0 2px;
+  color: var(--text);
+}
+
+.done-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.done-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color 120ms, box-shadow 120ms;
+}
+.done-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 1px 2px rgba(42, 95, 165, 0.08);
+}
+
+.done-card-header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.done-code-id {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--accent);
+  text-decoration: none;
+}
+.done-code-id:hover { text-decoration: underline; }
+.done-params {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+.done-name {
+  margin: 0;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--text);
+}
+.done-summary {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+.done-card-footer {
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  font-size: 12px;
+}
+.done-source code {
+  font-size: 11px;
+  background: #f0efea;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+.done-source { color: var(--text); text-decoration: none; }
+.done-source:hover code { background: var(--accent-soft); color: var(--accent); }
+.done-attempt { font-weight: 500; }
 
 /* ---- Panels ---- */
 .panel {

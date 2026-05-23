@@ -38,6 +38,27 @@ QUEUE_MD_PATH = REPO_ROOT / "pipeline" / "queue.md"
 
 GITHUB_REPO = "Stavan-Jain/QECLean"
 
+# Manually curated map of done codes → their primary Lean file(s) in the
+# repo. Used to render reliable source links on the /done/ page. Some
+# rationales contain wildcards/braces (toric, repetition, RSC) that don't
+# parse as clean URLs, so we maintain this list by hand.
+DONE_LEAN_PATHS: dict[str, list[str]] = {
+    "stab_4_2_2":         ["QEC/Stabilizer/Codes/Small/FourQubit_4_2_2.lean"],
+    "stab_5_1_3":         ["QEC/Stabilizer/Codes/Small/FiveQubit_5_1_3.lean"],
+    "shor_nine":          ["QEC/Stabilizer/Codes/Small/Shor9.lean"],
+    "steane":             ["QEC/Stabilizer/Codes/Small/Steane7.lean"],
+    "quantum_hamming":    ["QEC/Stabilizer/Codes/Small/QuantumHamming.lean"],
+    "stab_15_7_3":        ["QEC/Stabilizer/Codes/Small/QuantumHamming.lean"],
+    "quantum_repetition": [
+        "QEC/Stabilizer/Codes/Repetition/Three.lean",
+        "QEC/Stabilizer/Codes/Repetition/N.lean",
+    ],
+    "toric":              ["QEC/Stabilizer/Codes/Toric/"],
+    "rotated_surface":    ["QEC/Stabilizer/Codes/RotatedSurface/"],
+    "surface-17":         ["QEC/Stabilizer/Codes/RotatedSurface/N.lean"],
+    "qubit_stabilizer":   ["QEC/Stabilizer/Core/"],
+}
+
 
 # ---------------------------------------------------------------------------
 # Data loading
@@ -233,6 +254,37 @@ def strip_math_delims(text: str) -> str:
     return text
 
 
+RATIONALE_PREFIX_RE = re.compile(
+    r"^(Audit override:\s*|Already formalized:\s*)", re.IGNORECASE,
+)
+
+
+def done_summary(rationale: str, max_len: int = 220) -> str:
+    """Extract a short summary from a done-code's rationale.
+
+    Strips the "Audit override:" / "Already formalized:" prefix and any
+    "Previous rationale: ..." trailer, then truncates to max_len.
+    """
+    if not rationale:
+        return ""
+    text = RATIONALE_PREFIX_RE.sub("", rationale.strip())
+    # Some rationales have a "Previous rationale:" trailer — drop it.
+    idx = text.find("Previous rationale:")
+    if idx != -1:
+        text = text[:idx].rstrip().rstrip(".")
+    text = " ".join(text.split())  # collapse newlines/whitespace
+    if len(text) > max_len:
+        text = text[: max_len - 1].rstrip() + "…"
+    return text
+
+
+def basename(path: str) -> str:
+    """Filename portion of a path, or the path itself if it ends with /."""
+    if path.endswith("/"):
+        return path
+    return path.rsplit("/", 1)[-1]
+
+
 def render_md(text: str | None) -> str:
     if not text:
         return ""
@@ -323,6 +375,9 @@ def build():
     env.filters["render_md"] = render_md
     env.filters["format_parameters"] = format_parameters
     env.filters["code_slug"] = code_slug
+    env.filters["done_summary"] = done_summary
+    env.filters["basename"] = basename
+    env.globals["done_lean_paths"] = DONE_LEAN_PATHS
 
     by_track: dict[str, list[CodeEntry]] = {"engineering": [], "moonshot": [], "defer": [], "skip": []}
     for e in entries:
@@ -375,6 +430,27 @@ def build():
         root_prefix="../",
         entries=entries,
         queue_json=json.dumps(queue_json),
+    ))
+
+    # --- Done ---
+    print("[build] rendering done")
+    done_tmpl = env.get_template("done.html")
+    # Split done into concrete (has parameters.n) and parametric/abstract; within each
+    # group, sort by n ascending (concrete) or alphabetically (parametric).
+    done_concrete = sorted(
+        [e for e in done if e.parameters.get("n")],
+        key=lambda e: (e.parameters.get("n"), e.parameters.get("k", 0), e.code_id),
+    )
+    done_parametric = sorted(
+        [e for e in done if not e.parameters.get("n")],
+        key=lambda e: e.code_id,
+    )
+    write(DIST_DIR / "done" / "index.html", done_tmpl.render(
+        title="Done",
+        active="done",
+        root_prefix="../",
+        done_concrete=done_concrete,
+        done_parametric=done_parametric,
     ))
 
     # --- Research log ---
