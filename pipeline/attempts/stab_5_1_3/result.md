@@ -57,9 +57,22 @@ with `g` contradicts `g ∈ centralizer`.
 
 ### 3. Computable `DecidableEq` + `Decidable Anticommute` (Stage-4 follow-up)
 
-**Where:** `QEC/Stabilizer/PauliGroup/Representation.lean` (the operator
-DecidableEq) and `QEC/Stabilizer/PauliGroup/Commutation.lean` (the
-Pauli group element DecidableEq + Anticommute Decidable).
+**Where:**
+- `QEC/Stabilizer/PauliGroup/Representation.lean` — the *operator-level*
+  `DecidableEq (NQubitPauliOperator n)`, **global** instance (clean
+  computable replacement of the previous `Classical.decEq`).
+- `QEC/Stabilizer/Codes/FiveQubit_5_1_3.lean` — the *group-element-level*
+  `DecidableEq (NQubitPauliGroupElement n)` and `Decidable (Anticommute p q)`,
+  **`local instance`** declarations scoped to this file only.
+
+The group-element instances were originally placed globally in
+`PauliGroup/Commutation.lean`, but that **broke** the `native_decide`
+synthesis in `RotatedSurfaceCode3.lean`'s `weight_2_pairs_span_coeffs`
+proof — adding a global `DecidableEq (NQubitPauliGroupElement n)`
+disrupted the standard Pi-decidability chain that RSC3's synthesis was
+silently relying on. They were moved to `local instance` in the
+follow-up fix commit `df35c94`. See the "Lessons learned" section
+below.
 
 The previous `noncomputable instance : DecidableEq (NQubitPauliOperator
 n) := Classical.decEq _` was replaced by the natural computable
@@ -151,15 +164,17 @@ discharged by `exact absurd rfl hij`.
 
 | File | Change | LoC delta |
 |------|--------|-----------|
-| `QEC/Stabilizer/PauliGroup/Representation.lean` | computable `DecidableEq` on `NQubitPauliOperator` | +3 / -2 |
-| `QEC/Stabilizer/PauliGroup/Commutation.lean` | `DecidableEq` on `NQubitPauliGroupElement` + `Decidable Anticommute` | +20 / 0 |
+| `QEC/Stabilizer/PauliGroup/Representation.lean` | computable `DecidableEq` on `NQubitPauliOperator` (global) | +3 / -2 |
+| `QEC/Stabilizer/PauliGroup/Commutation.lean` | net no-op after locality fix; carries a comment explaining why | +6 / 0 |
 | `QEC/Stabilizer/BinarySymplectic/SymplecticSpan.lean` | Gap 1 (non-CSS −I lemma) | (in previous Stage-4 session) |
 | `QEC/Stabilizer/Core/CSSDistance.lean` | Gap 2 (weight-2 witness helper) | (in previous Stage-4 session) |
-| `QEC/Stabilizer/Codes/FiveQubit_5_1_3.lean` | full Stage-4 closure (T2, T9 specifically) | +145 |
+| `QEC/Stabilizer/Codes/FiveQubit_5_1_3.lean` | full Stage-4 closure (T2, T9) + local `DecidableEq`/`Anticommute` instances | +179 |
 
 ## Commits on branch
 
 ```
+df35c94 fix(stab_5_1_3): scope Decidable instances locally to unblock RSC3 build
+69f8ea3 fix(RotatedSurfaceCode3): split XGenerators_are_XType simp call
 33dd7be feat(stab_5_1_3): close T9 — five-qubit perfect code has distance 3
 d822ac5 feat(stab_5_1_3): weight-2 anticomm witness (90 cases)
 46ee4a3 feat(stab_5_1_3): computable DecidableEq + weight-1 anticomm witness
@@ -169,6 +184,65 @@ d822ac5 feat(stab_5_1_3): weight-2 anticomm witness (90 cases)
 2c370a7 wip(stab_5_1_3): close 21/23 sorries (warm-ups + commutations + centralizer)
 eb8ea80 skeleton(stab_5_1_3): Stage-2 baseline (23 sorries, 394 LoC, first non-CSS code)
 ```
+
+## Lessons learned
+
+### Global vs. local typeclass instances — when to scope `local`
+
+The most consequential lesson of this pilot. The Stage-4 agent added
+`instDecidableEqNQubitPauliGroupElement` and `decidableAnticommute` as
+**global** instances in `PauliGroup/Commutation.lean`, intending them to
+service any future non-CSS code's distance proof. Both instances are
+well-typed and themselves computable (for `DecidableEq`) or noncomputable
+(for `Anticommute`, by design).
+
+What went wrong: the addition of a global `DecidableEq
+(NQubitPauliGroupElement n)` perturbed Lean's typeclass synthesis for a
+seemingly unrelated proposition in `RotatedSurfaceCode3.lean`. The
+`weight_2_pairs_span_coeffs` proof there uses `native_decide` on a
+`∀-∃` proposition whose body involves only `Fin n → ZMod 2` equality
+— no `NQubitPauliGroupElement` equality whatsoever. Yet the new
+instance, by entering the global pool, disrupted the synthesis path
+that RSC3's `native_decide` was silently relying on, causing it to fail
+to synthesise a `Decidable` instance at all.
+
+The signature of the failure was distinctive: not "instance is
+noncomputable", not "`Classical.choice` stuck during reduction", but
+"failed to synthesize Decidable" — the synthesizer couldn't even start.
+Running `classical decide` revealed that with `Classical.propDecidable`
+in scope a `Decidable` was found, but reduction hit `Classical.choice`.
+
+**Rule of thumb:** if an instance services exactly one concrete code
+file's proof, declare it `local instance` inside that file. Reserve
+global instances in `PauliGroup/`, `Core/`, `BinarySymplectic/` for
+genuinely reusable typeclass content. **Always run a whole-repo
+`lake build` after adding a global instance**, not just the affected
+file's build — global instance changes have non-local effects on
+typeclass synthesis.
+
+The locality fix is in commit `df35c94`. See also the new entry
+in `CLAUDE.md` under "Things that broke recently in v4.30".
+
+### Decidable Anticommute requires a careful balance
+
+The Stage-4 [[5,1,3]] proof uses `by decide` on `Anticommute p q` for
+concrete Pauli group elements. This requires a `Decidable Anticommute`
+instance backed by a *computable* `DecidableEq (NQubitPauliGroupElement n)`,
+which in turn requires a computable `DecidableEq (NQubitPauliOperator n)`.
+
+The chain works, but only when:
+1. `DecidableEq (NQubitPauliOperator n)` is computable (it now is, in
+   `Representation.lean`, globally — this is safe);
+2. `DecidableEq (NQubitPauliGroupElement n)` is computable AND in scope
+   (now `local` in `FiveQubit_5_1_3.lean`);
+3. `Decidable (Anticommute p q)` is in scope (now `local` in the same
+   file).
+
+For future non-CSS codes that want the same shortcut, copy the two
+`local instance` blocks from `FiveQubit_5_1_3.lean`'s preamble.
+Eventually a cleaner abstraction is worth designing (e.g., a `local`
+opener pattern via `open scoped`), but for now the literal copy is the
+right call.
 
 ## Next steps
 
