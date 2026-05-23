@@ -596,54 +596,45 @@ private lemma logicalX_w3_isNontrivial :
   ⟨logicalX_w3_mem_centralizer, logicalX_w3_not_mem_subgroup,
    logicalX_w3_no_stab_same_operators⟩
 
--- Anticomm-witness tables for weight-1 and weight-2 Paulis are deferred.
--- See the BLOCKED note on `code_has_distance_three` below.
+/-! ### Weight-1 anticomm witness
 
-/-- The [[5, 1, 3]] five-qubit perfect code has distance 3.
+For every qubit `i ∈ Fin 5` and every non-identity single-qubit Pauli `P`,
+some generator anticommutes with `weightOneAt i P`. We use the
+high-priority computable `DecidableEq` and `Decidable Anticommute`
+instances from `PauliGroup/Commutation.lean` to close each case by
+`decide`, with `first` backtracking across the four generators.
 
-**Status: BLOCKED on a tactic-engineering issue.** The Core
-infrastructure is fully in place:
+Generator local Paulis (for reference):
+* `g₁ = X Z Z X I`
+* `g₂ = I X Z Z X`
+* `g₃ = X I X Z Z`
+* `g₄ = Z X I X Z`
+-/
 
-- The weight-3 witness `logicalX_w3` (and its `IsNontrivialLogicalOperator`)
-  is defined and proven non-trivial above.
-- The weight-1 lower-bound helper
-  `no_weight_one_mem_centralizer_of_anticommute_witness` exists in
-  `Core/CSSDistance.lean`.
-- The weight-2 lower-bound helper
-  `no_weight_two_mem_centralizer_of_anticommute_witness` was added to
-  `Core/CSSDistance.lean` in this Stage-4 session.
+private lemma weight_one_anticomm_witness :
+    ∀ i : Fin 5, ∀ P : PauliOperator, P ≠ PauliOperator.I →
+      ∃ g ∈ generators, NQubitPauliGroupElement.Anticommute
+        (weightOneAt i P) g := by
+  intro i P hP
+  fin_cases i <;>
+    (match P, hP with
+    | PauliOperator.X, _ => first
+      | exact ⟨g1, by simp [generators], by decide⟩
+      | exact ⟨g2, by simp [generators], by decide⟩
+      | exact ⟨g3, by simp [generators], by decide⟩
+      | exact ⟨g4, by simp [generators], by decide⟩
+    | PauliOperator.Y, _ => first
+      | exact ⟨g1, by simp [generators], by decide⟩
+      | exact ⟨g2, by simp [generators], by decide⟩
+    | PauliOperator.Z, _ => first
+      | exact ⟨g1, by simp [generators], by decide⟩
+      | exact ⟨g2, by simp [generators], by decide⟩
+      | exact ⟨g3, by simp [generators], by decide⟩
+    | PauliOperator.I, hP => exact (hP rfl).elim)
 
-What remains is the explicit anticomm-witness *tables* — one for
-weight-1 (15 cases: `Fin 5 × {X, Y, Z}`) and one for weight-2 (90 cases:
-pairs `Fin 5 × Fin 5` with distinct qubits, times pairs `{X,Y,Z}²`).
-
-The obstacle: `Anticommute p q` (defined as `p * q = minusOne * (q * p)`)
-is not directly `decide`-able when applied to elements of
-`NQubitPauliGroupElement` because the `Group` instance from mathlib is
-`noncomputable`. The standard `pauli_anticomm_odd_anticommutes` tactic
-converts to `Odd (Finset.univ.filter (anticommutesAt ...)).card`, but the
-`anticommutes_iff_odd_anticommutes` lemma uses `by classical exact ...`
-in its statement, baking in `Classical.propDecidable` — which then makes
-`decide` / `native_decide` fail on the resulting goal.
-
-The existing `FourQubit_4_2_2.lean` works around this with explicit
-`have hfilter : Finset.univ.filter (...) = (concrete Finset) := by ...`
-computations per case — but for 105 cases here, that's ~1000 LoC of
-mechanical filter computations.
-
-The proper fix is either:
-1. Add a `DecidableEq`-based `Decidable` instance for `Anticommute` to
-   `PauliGroup/Commutation.lean` that doesn't go through the Classical
-   detour, then close all 105 cases via `decide` (~5 LoC).
-2. Rewrite `anticommutes_iff_odd_anticommutes` to avoid `by classical
-   exact` in its RHS.
-
-Either fix is a focused ~30-minute task once someone has the bandwidth
-to investigate the Core. Deferred from this Stage-4 session. -/
+/-- The [[5, 1, 3]] five-qubit perfect code has distance 3. -/
 theorem code_has_distance_three : HasCodeDistance stabilizerCode 3 := by
-  sorry -- BLOCKED(stab_5_1_3-T9): see docstring above. The Core helpers are
-        -- in place; remaining work is the 15+90 anticomm-witness table,
-        -- gated on a Decidable Anticommute instance.
+  sorry -- TODO(stab_5_1_3-T9): combine weight-1 + weight-2 witnesses with logicalX_w3
 
 end FiveQubit_5_1_3
 end StabilizerGroup

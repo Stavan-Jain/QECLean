@@ -235,24 +235,13 @@ def Anticommute (p q : NQubitPauliGroupElement n) : Prop :=
 
 /-! ### Decidability of equality and `Anticommute`
 
-The default `DecidableEq (NQubitPauliOperator n)` set in `Representation.lean`
-uses `Classical.decEq`, which is noncomputable and blocks `decide` from
-reducing equality of n-qubit Pauli operators. We provide a high-priority
-computable instance here by reducing to the underlying function type
-`Fin n → PauliOperator` (which is `Fintype × DecidableEq`-derivable).
-
-From there, we derive `DecidableEq (NQubitPauliGroupElement n)` and finally
-`Decidable (Anticommute p q)` — the latter is `noncomputable` because the
-`Mul` instance on `NQubitPauliGroupElement` is noncomputable, but the
-kernel can still reduce `decide` through it. (`native_decide` does not work
-for the same reason, so prefer `decide`.) -/
-
-/-- Computable `DecidableEq` on `NQubitPauliOperator n`, overriding the
-`Classical.decEq` instance from `Representation.lean`. Enables `decide` on
-equalities of n-qubit Pauli operators. -/
-instance (priority := high) instDecidableEqNQubitPauliOperatorComputable (n : ℕ) :
-    DecidableEq (NQubitPauliOperator n) :=
-  inferInstanceAs (DecidableEq (Fin n → PauliOperator))
+`DecidableEq (NQubitPauliOperator n)` is computable (via the underlying
+function type `Fin n → PauliOperator`, see `Representation.lean`). We
+derive `DecidableEq (NQubitPauliGroupElement n)` from field-wise decision
+and finally `Decidable (Anticommute p q)`. The `Anticommute` instance is
+`noncomputable` because the `Mul` instance on `NQubitPauliGroupElement`
+is noncomputable, but the kernel can still reduce `decide` through it.
+(`native_decide` does not work for the same reason — prefer `decide`.) -/
 
 /-- `DecidableEq` on `NQubitPauliGroupElement n` via field-wise decision. -/
 instance instDecidableEqNQubitPauliGroupElement (n : ℕ) :

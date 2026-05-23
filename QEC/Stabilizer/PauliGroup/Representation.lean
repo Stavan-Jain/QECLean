@@ -214,7 +214,10 @@ lemma NQubitPauliOperator.trace_matrix_mul (p q : NQubitPauliOperator n) :
 
 
 -- Provide decidable equality to state lemmas using `if p = q then ... else ...`.
-noncomputable instance : DecidableEq (NQubitPauliOperator n) := Classical.decEq _
+-- This is a computable instance via the underlying `Fin n → PauliOperator` function type,
+-- so `decide` can reduce equalities on Pauli operators (used by the [[5,1,3]] distance proof).
+instance : DecidableEq (NQubitPauliOperator n) :=
+  inferInstanceAs (DecidableEq (Fin n → PauliOperator))
 /-
 The trace of the product of two n-qubit Pauli operator matrices is 2^n if the
 operators are equal, and 0 otherwise.
