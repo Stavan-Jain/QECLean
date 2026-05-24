@@ -2,12 +2,14 @@
 .gauss/
 .DS_Store
 
-# Docs (Aristotle prompts, evaluations, guides) — but keep the published proof
-# and the formalization pipeline docs.
+# Docs (Aristotle prompts, evaluations, guides) — but keep the published proof,
+# the formalization pipeline docs, and the agent-facing reference docs.
 docs/*
 !docs/distance_proof.md
 !docs/pipeline.md
 !docs/pipeline-usage.md
+!docs/lean-patterns.md
+!docs/mathlib-version-quirks.md
 
 # Cursor local state and continual-learning index
 .cursor/

@@ -3,6 +3,31 @@
 This is a Lean 4 / mathlib formalization of the stabilizer formalism for
 quantum error correction. The active math is in `QEC/`. Build with `lake build`.
 
+## Where to look for what
+
+CLAUDE.md is the small must-read on every invocation. It carries
+codebase-wide orientation, naming/style policy, layering rules, and
+build/MCP workflow. Volatile or topic-scoped knowledge lives elsewhere:
+
+- **[`docs/lean-patterns.md`](docs/lean-patterns.md)** — tactical
+  patterns by code shape (CSS distance, non-CSS distance, parametric
+  families, mechanical fixes). Reach for this when your current code
+  matches one of its sections; add new patterns here when they're
+  code-shape-specific rather than codebase-wide.
+- **[`docs/mathlib-version-quirks.md`](docs/mathlib-version-quirks.md)**
+  — mathlib API drift (deprecations, renames, signature changes),
+  grouped by version. Add new entries here when you work around a
+  mathlib version-specific quirk.
+- **[`docs/pipeline.md`](docs/pipeline.md)** and
+  **[`docs/pipeline-usage.md`](docs/pipeline-usage.md)** — the
+  formalization-pipeline architecture and recipes (weekly triage,
+  Stage 2/3/4/5/6 workflows).
+- **[`pipeline/attempts/<code_id>/result.md`](pipeline/attempts/)** —
+  per-code Stage-4 write-ups, including "Patterns discovered" sections.
+  Patterns that generalize get promoted to `lean-patterns.md` or
+  CLAUDE.md at Stage 6 (post-merge); see `pipeline-usage.md` § Recipe:
+  post-merge reflection.
+
 ## Project tour
 
 ```
@@ -80,105 +105,18 @@ release; new code should import the new paths directly.
   - `simp +decide` is preferred over hand-written `decide` (and avoids the
     "expected type must not contain free variables" trap).
   - `native_decide` is allowed (per user preference).
-  - When closing residual `if c then 1 else 0`-style goals after `simp`,
-    `split_ifs <;> simp_all (config := {decide := true}) <;> first | rfl |
-    exact absurd rfl ‹_›` is the common closer.
   - **Probing residual goals**: prefer the `lean_goal` MCP tool (see "Agent
     tooling" below) — it returns the live `goals_before` / `goals_after` at
     a position without any edit or rebuild. Fallback when the MCP isn't
     available: replace the failing tactic tail with `(try sorry)` and
     rebuild; the "declaration uses sorry" warning includes the residual
     goal state.
-  - **`Finset.card` of `{a, b, c, d}` with all-pairwise-distinct hypotheses**:
-    `simp_all +decide [Finset.filter_eq', Finset.filter_or,
-    Finset.card_insert_of_notMem, Finset.mem_insert, Finset.mem_singleton]`
-    — as of mathlib v4.30 `simp_all` picks up the `Ne` hypotheses (in both
-    directions) from context automatically. The older guidance to pass
-    `h₁, h₂.symm, …` explicitly is stale and now triggers
-    `linter.unusedSimpArgs`.
-  - **`simp_all` with bidirectional hypotheses can erase what you need**:
-    if a hypothesis is a `↔` like `hfilt_eq : P ↔ Q`, `simp_all` may rewrite
-    `Q` back to `P` in a subgoal you wanted to keep simplified. Workaround:
-    `clear hfilt_eq` (or rename to a one-shot `have`) before `simp_all`.
-  - **`Anticommute p q` via `by decide`** (for non-CSS distance proofs): a
-    computable `DecidableEq (NQubitPauliGroupElement n)` and a `noncomputable`
-    `Decidable Anticommute` instance let `decide` reduce `Anticommute p q` for
-    concrete Pauli group elements. **`native_decide` does NOT work** here
-    (because `Mul` on `NQubitPauliGroupElement` is `noncomputable`) — prefer
-    `decide`. These instances live as `local instance` in
-    `Codes/FiveQubit_5_1_3.lean` to avoid global synthesis pollution; copy them
-    into any new non-CSS code file that needs them.
-  - **Backtracking witness search for non-CSS distance proofs**: when proving
-    "for every weight-`k` Pauli, some generator anticommutes", the standard
-    pattern is
-
-    ```lean
-    fin_cases i <;>
-      (match P, hP with
-       | .X, _ => first
-         | exact ⟨g₁, by simp [generators], by decide⟩
-         | exact ⟨g₂, by simp [generators], by decide⟩
-         | …
-       | .Y, _ => …
-       | .I, hP => exact (hP rfl).elim)
-    ```
-
-    `first` backtracks across generators by `decide`. Trim unused generator
-    branches per `(P, …)` case (flagged by `linter.unusedTactic`) to keep
-    the file lint-clean. See `FiveQubit_5_1_3.lean`'s
-    `weight_one_anticomm_witness` and `weight_two_anticomm_witness` for the
-    canonical use sites.
-  - **CSS distance proofs with multiple Z-generators (or multiple X-generators)
-    covering disjoint qubit subsets**: factor the "which generator covers `i`"
-    dichotomy out once and reuse across the `P = X` and `P = Y` match arms
-    rather than re-doing `by_cases` in each:
-
-    ```lean
-    have hi_dichotomy : (i = 0 ∨ i = 1) ∨ (i = 2 ∨ i = 3) := by
-      fin_cases i <;> tauto
-    ```
-
-    In each per-generator filter-equality helper, dispatch `rcases hi <;>
-    rcases hP` *inside* the `ext` proof before `fin_cases j` — keeps the
-    helper universally quantified over `i` instead of forcing per-case
-    specializations:
-
-    ```lean
-    have hfilter :
-        (Finset.univ.filter (anticommutesAt (weightOneAt i P) S_Z1)) =
-          ({i} : Finset (Fin 4)) := by
-      ext j; rcases hi with rfl | rfl <;> rcases hP with rfl | rfl <;>
-        fin_cases j <;> simp [...]
-    ```
-
-    Canonical use site: `CSS_4_1_2.lean`'s `weight_one_anticomm_witness`
-    (T19). Generalizes to larger CSS codes; the iceberg family
-    `[[2m, 2m-2, 2]]` will exercise this at scale.
-  - **High-frequency mechanical fixes worth recognizing immediately**:
-    - **Ambiguous overloaded name** (e.g. `mul_assoc` between `_root_.mul_assoc`
-      and `NQubitPauliGroupElement.mul_assoc` when `open NQubitPauliGroupElement`
-      is in scope): qualify with `_root_.` (or the specific namespace).
-      Trigger: `open NQubitPauliGroupElement` near the top of a `Codes/*.lean`
-      file shadows several mathlib names. Same applies to `one_mul` / `mul_one`.
-    - **`rw [one_mul, mul_one]` (or any rewrite) fails after
-      `Subgroup.closure_induction`**: the goal is `(fun y _ => …) 1 ⋯`,
-      unreduced. Add a `change` step to beta-reduce first — see
-      `Homological/LogicalCorrespondence.lean:280-282` for the canonical
-      pattern:
-      ```lean
-      · change (1 : NQubitPauliGroupElement X.numQubits) * X.chainXOperator c =
-          X.chainXOperator c * 1
-        rw [one_mul, mul_one]
-      ```
-    - **`HMul` instance failure between two defeq Pauli types** (e.g.
-      `NQubitPauliGroupElement (numQubits L)` vs.
-      `NQubitPauliGroupElement (rotatedSurfaceHomologicalCode L).numQubits`):
-      `*` resolves by syntactic type match, not defeq through abbreviations.
-      Fix by typing the local lemma signature consistently with whichever form
-      the proof body uses more. When the proof body multiplies abstract
-      `vertexStabOf`/`faceStabOf` against a parameter `g`, declare `g` at
-      `(rotatedSurfaceHomologicalCode L).numQubits` — callers can pass
-      `NQubitPauliGroupElement (numQubits L)` (defeq).
+  - **For code-shape-specific tactical patterns** (CSS distance-2 closer,
+    multi-Z anti-witness, parametric `Fin n` workarounds, backtracking
+    witness search for non-CSS distance, `_root_` qualification, mechanical
+    fixes), see [`docs/lean-patterns.md`](docs/lean-patterns.md). Add new
+    patterns there, not here, unless they generalize across multiple
+    code shapes.
 - **Sorry markers**: `sorry  -- TODO(<short-tag>): <one-line note about goal shape>`.
   Always tag so the next session can grep for them.
 - **Global vs. `local instance` discipline**: by default, declare typeclass
@@ -238,15 +176,10 @@ mathlib linter; don't introduce new violations):
   `linter.style.maxHeartbeats`. The same ordering rule applies to
   `omit [Fact ...] in`: the doc-comment must come AFTER `... in`, or the
   parser rejects the intervening doc-comment.
-- **`NQubitPauliOperator.identity` in simp sets** for CSS generator
-  equality lemmas: drop `identity` from the simp set when a generator's
-  `.set` chain *fully covers* every `Fin n` position (e.g.
-  `S_X1 = ...set 0 X.set 1 X.set 2 X.set 3 X` on `Fin 4`). Keep
-  `identity` for partial-coverage generators (e.g.
-  `S_Z1 = ...set 0 Z.set 1 Z` on `Fin 4` — qubits 2 and 3 fall through
-  to `identity`). `linter.unusedSimpArgs` flags the wrong choice. First
-  hit: `CSS_4_1_2.lean`'s T1 (`ZGenerators_are_ZType`) vs. T2
-  (`XGenerators_are_XType`).
+
+For CSS-specific simp-set idioms (e.g. when to drop
+`NQubitPauliOperator.identity`), see
+[`docs/lean-patterns.md`](docs/lean-patterns.md) § CSS distance proofs.
 
 ## Project-specific helpers (NOT mathlib)
 
@@ -450,53 +383,20 @@ stale build artifacts that crash `lake serve`:
 If you're upgrading the toolchain, see `TOOLCHAIN_UPGRADE.md` (gitignored,
 local runbook).
 
-## Things that broke recently in v4.30 (be aware)
+## Mathlib version drift
 
-**Maintenance:** when you discover an idiom or workaround during proof work,
-add a one-line entry here. This is the single most-consulted section by the
-next session, so keeping it current pays compound interest.
+For workarounds to mathlib API drift (deprecations, renames, signature
+changes encountered during version bumps), see
+[`docs/mathlib-version-quirks.md`](docs/mathlib-version-quirks.md). Add new
+entries there when you hit a version-specific quirk; don't add them to
+this file (CLAUDE.md is the small must-read doc, the quirks file is the
+version-grouped reference).
 
-- `Subgroup.normalizer` takes `Set G`, not `Subgroup G` — no dot notation.
-  Write `Subgroup.normalizer S.toSubgroup` not `S.toSubgroup.normalizer`.
-- `simp [ZMod, ← even_iff_two_dvd]` no longer turns `(c : ZMod 2) = 0` into
-  `Even c`. Use `Finset.sum_boole` + `ZMod.natCast_eq_zero_iff_even` instead.
-- `Matrix.mulVec_smul` rewrites can fail to unify when scalar type and
-  matrix-entry type differ (`ℝ` vs `ℂ`). Workaround: wrap in an explicit
-  `show ∀ (M : Matrix _ _ ℂ) (b : ℝ) (w : NQubitVec n), M.mulVec (b • w) =
-  b • M.mulVec w from fun _ _ _ => Matrix.mulVec_smul _ _ _`.
-- `push_neg` is deprecated — prefer `push Not`.
-- mathlib's `Matrix.mul_eq_one_comm`, `Matrix.isUnit_of_right_inverse` are
-  deprecated; use `mul_eq_one_comm` and `IsUnit.of_mul_eq_one`.
-  **Signature gotcha**: `IsUnit.of_mul_eq_one` is `(b : M) (h : a * b = 1)`
-  — the right-hand operand is explicit. For a square `h_mul : M * M = 1`
-  write `IsUnit.of_mul_eq_one M h_mul`, not `IsUnit.of_mul_eq_one h_mul`.
-- `Finset.filter_union_filter_neg_eq` → `Finset.filter_union_filter_not_eq`
-  (`neg` → `not`). Same renaming on `Finset.disjoint_filter_filter_neg` →
-  `Finset.disjoint_filter_filter_not`.
-- `Nat.xor_cancel_left` / `Nat.xor_cancel_right` don't exist under those
-  names — they're in Batteries as `Nat.xor_xor_cancel_left` /
-  `Nat.xor_xor_cancel_right` (note the extra `xor_`). Used in
-  `QuantumHamming.lean`'s involution proof.
-- `Prod.mk.inj_iff` is gone — use `Prod.mk_inj`.
-- `((List.finRange L).product (List.finRange L)).length = L * L` doesn't
-  reduce by `simp` directly. Workaround: `unfold List.product; simp [List.length_flatMap]`.
-- The `List.countP_eq_count_of_decide_iff`, `List.countP_add_countP_eq_length`,
-  `List.length_filter_eq_countP` family doesn't exist (or moved). For
-  `(L.filter p).length` arithmetic, route through `List.toFinset_card_of_nodup`
-  (when the list is `Nodup`) and `Finset.card_erase_of_mem` —
-  see `coordsTrimmed_length` in `ToricCodeNStabilizerCode.lean` for the pattern.
-- **Adding a global typeclass instance can break unrelated `native_decide`
-  proofs.** In Stage 4 of `stab_5_1_3` we added global
-  `instDecidableEqNQubitPauliGroupElement` and `decidableAnticommute` to
-  `PauliGroup/Commutation.lean`, intending broad reuse. It silently broke
-  `RotatedSurfaceCode3.lean`'s `weight_2_pairs_span_coeffs` proof: the new
-  instance disrupted the `Decidable (∀-∃ proposition)` synthesis path the
-  `native_decide` was relying on, even though the proposition has no
-  `NQubitPauliGroupElement` equality in it. **Resolution**: scope the new
-  instances as `local instance` inside `Codes/FiveQubit_5_1_3.lean`. See the
-  "Global vs. `local instance` discipline" bullet in the naming-and-style
-  section above, and `pipeline/attempts/stab_5_1_3/result.md` § "Lessons
-  learned" for the worked diagnosis.
+The "global typeclass instance can break unrelated `native_decide` proofs"
+footgun is documented in the "Global vs. `local instance` discipline"
+bullet in the *Naming and style conventions* section above — that's the
+canonical location for the rule and its worked example
+(`pipeline/attempts/stab_5_1_3/result.md` § "Lessons learned").
 
 ## Formalization pipeline
 

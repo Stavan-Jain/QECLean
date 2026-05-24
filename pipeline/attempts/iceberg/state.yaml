@@ -4,7 +4,7 @@ parameters: {n: '2m', k: '2m-2', d: 2}
 parametric: true
 parameter: m
 parameter_constraint: 'm >= 2 (Fact (2 <= m))'
-status: pr-ready
+status: done
 track: engineering
 started_at: '2026-05-24'
 worktree_branch: worktree-agent-a87ccc1c921287d7a
@@ -12,9 +12,11 @@ estimated_loc: 500
 final_loc: 765
 sorries_closed: 24
 sorries_blocked: 0
-phase: stage-4-formalization
+phase: stage-6-reflection
 formalization_started_at: '2026-05-24'
 formalization_completed_at: '2026-05-24'
+merged_at: '2026-05-24'
+merged_pr: 36
 covering_lean_file: QEC/Stabilizer/Codes/Iceberg/N.lean
 umbrella_file: QEC/Stabilizer/Codes/Iceberg.lean
 specializes_to:
