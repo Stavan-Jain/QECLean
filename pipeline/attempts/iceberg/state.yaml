@@ -1,0 +1,23 @@
+code_id: iceberg
+display_name: '\([[2m, 2m-2, 2]]\) error-detecting code (iceberg / generalized parity)'
+parameters: {n: '2m', k: '2m-2', d: 2}
+parametric: true
+parameter: m
+parameter_constraint: 'm >= 2 (Fact (2 <= m))'
+status: formalization
+track: engineering
+started_at: '2026-05-24'
+worktree_branch: worktree-agent-a87ccc1c921287d7a
+estimated_loc: 500
+phase: stage-4-formalization
+formalization_started_at: '2026-05-24'
+covering_lean_file: QEC/Stabilizer/Codes/Iceberg/N.lean
+umbrella_file: QEC/Stabilizer/Codes/Iceberg.lean
+specializes_to:
+  m_2: 'separate formalization at QEC/Stabilizer/Codes/Small/FourQubit_4_2_2.lean (same code, different logical-operator labeling)'
+introduced_refs:
+  - 'arxiv:quant-ph/9605021 (Steane 1996, "Simple Quantum Error Correcting Codes")'
+  - 'arxiv:quant-ph/9702029 (Gottesman 1997, "A Theory of Fault-Tolerant Quantum Computation")'
+  - 'arxiv:quant-ph/9809071 (Viola-Knill-Lloyd 1998, "Dynamical Decoupling")'
+ec_zoo_url: 'https://errorcorrectionzoo.org/c/iceberg'
+distance_helper_used: 'hasCodeDistance_two_of_anticommute_witness (PR #34 helper)'
