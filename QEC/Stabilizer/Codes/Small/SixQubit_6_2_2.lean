@@ -642,9 +642,9 @@ noncomputable def stabilizerCode : StabilizerCode 6 2 where
 /-- The stabilizer-code subgroup equals the closure of the (set-form) generators. -/
 private lemma stabilizerCode_toSubgroup_eq :
     stabilizerCode.toStabilizerGroup.toSubgroup = Subgroup.closure generators := by
-  -- TODO(stab_6_2_2-T30): change + rw [listToSet_generatorsList].
-  -- Copy CSS_4_1_2.stabilizerCode_toSubgroup_eq verbatim.
-  sorry
+  change (Subgroup.closure (NQubitPauliGroupElement.listToSet generatorsList) : _) =
+    Subgroup.closure generators
+  rw [listToSet_generatorsList]
 
 /-- Helper: a weight-1 Pauli with local Pauli `P ∈ {X, Y}` at qubit `i ∈ {0,1,2,3}`
 (the support of `S_Z1`) anticommutes with `S_Z1 = ZZZZ II`. -/
@@ -652,11 +652,19 @@ private lemma weightOneAt_anticomm_S_Z1 (i : Fin 6) (P : PauliOperator)
     (hi : i = 0 ∨ i = 1 ∨ i = 2 ∨ i = 3)
     (hP : P = PauliOperator.X ∨ P = PauliOperator.Y) :
     NQubitPauliGroupElement.Anticommute (weightOneAt i P) S_Z1 := by
-  -- TODO(stab_6_2_2-T31a): pauli_anticomm_odd_anticommutes; ext j;
-  -- rcases hi (4-disjunction) <;> rcases hP <;> fin_cases j <;>
-  -- simp [..., weightOneAt, ofOperator, S_Z1, ..., mulOp].
-  -- Filter Finset {i} (size 1, odd).
-  sorry
+  classical
+  pauli_anticomm_odd_anticommutes
+  have hfilter :
+      (Finset.univ.filter
+            (NQubitPauliGroupElement.anticommutesAt (n := 6)
+              (weightOneAt i P).operators S_Z1.operators)) =
+        ({i} : Finset (Fin 6)) := by
+    ext j
+    rcases hi with rfl | rfl | rfl | rfl <;> rcases hP with rfl | rfl <;> fin_cases j <;>
+      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt,
+        weightOneAt, NQubitPauliGroupElement.ofOperator,
+        S_Z1, NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
+  rw [hfilter]; simp +decide
 
 /-- Helper: a weight-1 Pauli with local Pauli `P ∈ {X, Y}` at qubit `i ∈ {0,1,4,5}`
 (the support of `S_Z2`) anticommutes with `S_Z2 = ZZ II ZZ`. -/
@@ -664,28 +672,57 @@ private lemma weightOneAt_anticomm_S_Z2 (i : Fin 6) (P : PauliOperator)
     (hi : i = 0 ∨ i = 1 ∨ i = 4 ∨ i = 5)
     (hP : P = PauliOperator.X ∨ P = PauliOperator.Y) :
     NQubitPauliGroupElement.Anticommute (weightOneAt i P) S_Z2 := by
-  -- TODO(stab_6_2_2-T31b): same shape as T31a but with S_Z2.
-  -- Filter Finset {i} (size 1, odd).
-  sorry
+  classical
+  pauli_anticomm_odd_anticommutes
+  have hfilter :
+      (Finset.univ.filter
+            (NQubitPauliGroupElement.anticommutesAt (n := 6)
+              (weightOneAt i P).operators S_Z2.operators)) =
+        ({i} : Finset (Fin 6)) := by
+    ext j
+    rcases hi with rfl | rfl | rfl | rfl <;> rcases hP with rfl | rfl <;> fin_cases j <;>
+      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt,
+        weightOneAt, NQubitPauliGroupElement.ofOperator,
+        S_Z2, NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
+  rw [hfilter]; simp +decide
 
 /-- Helper: a weight-1 Pauli with local Pauli `Z` at qubit `i ∈ {0,1,2,3}`
 (the support of `S_X1`) anticommutes with `S_X1 = XXXX II`. -/
 private lemma weightOneAt_Z_anticomm_S_X1 (i : Fin 6)
     (hi : i = 0 ∨ i = 1 ∨ i = 2 ∨ i = 3) :
     NQubitPauliGroupElement.Anticommute (weightOneAt i PauliOperator.Z) S_X1 := by
-  -- TODO(stab_6_2_2-T31c): pauli_anticomm_odd_anticommutes; ext j;
-  -- rcases hi (4-disjunction) <;> fin_cases j <;> simp [...].
-  -- Filter Finset {i} (size 1, odd).
-  sorry
+  classical
+  pauli_anticomm_odd_anticommutes
+  have hfilter :
+      (Finset.univ.filter
+            (NQubitPauliGroupElement.anticommutesAt (n := 6)
+              (weightOneAt i PauliOperator.Z).operators S_X1.operators)) =
+        ({i} : Finset (Fin 6)) := by
+    ext j
+    rcases hi with rfl | rfl | rfl | rfl <;> fin_cases j <;>
+      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt,
+        weightOneAt, NQubitPauliGroupElement.ofOperator,
+        S_X1, NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
+  rw [hfilter]; simp +decide
 
 /-- Helper: a weight-1 Pauli with local Pauli `Z` at qubit `i ∈ {0,1,4,5}`
 (the support of `S_X2`) anticommutes with `S_X2 = XX II XX`. -/
 private lemma weightOneAt_Z_anticomm_S_X2 (i : Fin 6)
     (hi : i = 0 ∨ i = 1 ∨ i = 4 ∨ i = 5) :
     NQubitPauliGroupElement.Anticommute (weightOneAt i PauliOperator.Z) S_X2 := by
-  -- TODO(stab_6_2_2-T31d): same shape as T31c but with S_X2.
-  -- Filter Finset {i} (size 1, odd).
-  sorry
+  classical
+  pauli_anticomm_odd_anticommutes
+  have hfilter :
+      (Finset.univ.filter
+            (NQubitPauliGroupElement.anticommutesAt (n := 6)
+              (weightOneAt i PauliOperator.Z).operators S_X2.operators)) =
+        ({i} : Finset (Fin 6)) := by
+    ext j
+    rcases hi with rfl | rfl | rfl | rfl <;> fin_cases j <;>
+      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt,
+        weightOneAt, NQubitPauliGroupElement.ofOperator,
+        S_X2, NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
+  rw [hfilter]; simp +decide
 
 /-- Anticommute witness for the C_6 code: every weight-1 Pauli anticommutes
 with at least one stabilizer generator.
@@ -705,38 +742,58 @@ private lemma weight_one_anticomm_witness :
     ∀ i : Fin 6, ∀ P : PauliOperator, P ≠ PauliOperator.I →
       ∃ g ∈ generators, NQubitPauliGroupElement.Anticommute
         (weightOneAt i P) g := by
-  -- TODO(stab_6_2_2-T31): intro i P hP;
-  -- have hi_trichotomy : (i = 0 ∨ i = 1) ∨ (i = 2 ∨ i = 3)
-  --                       ∨ (i = 4 ∨ i = 5) := by fin_cases i <;> tauto.
-  -- Then:
-  --   match P, hP with
-  --   | .X, _ => rcases hi_trichotomy with hi | hi | hi
-  --     · exact ⟨S_Z1, by simp [generators, ZGenerators],
-  --         weightOneAt_anticomm_S_Z1 i _ <build 4-disj from hi>
-  --           (Or.inl rfl)⟩
-  --     · exact ⟨S_Z1, ..., weightOneAt_anticomm_S_Z1 i _ ...
-  --         (Or.inl rfl)⟩
-  --     · exact ⟨S_Z2, by simp [generators, ZGenerators],
-  --         weightOneAt_anticomm_S_Z2 i _ ... (Or.inl rfl)⟩
-  --   | .Y, _ => same as .X but (Or.inr rfl) for hP.
-  --   | .Z, _ => rcases hi_trichotomy with hi | hi | hi
-  --     · exact ⟨S_X1, ..., weightOneAt_Z_anticomm_S_X1 i ...⟩
-  --     · exact ⟨S_X1, ..., weightOneAt_Z_anticomm_S_X1 i ...⟩
-  --     · exact ⟨S_X2, by simp [generators, XGenerators],
-  --         weightOneAt_Z_anticomm_S_X2 i ...⟩
-  --   | .I, hP => exact (hP rfl).elim
-  sorry
+  intro i P hP
+  -- 3-way trichotomy: i ∈ {0,1} (both Z-stabs cover; pick S_Z1) |
+  --                   i ∈ {2,3} (only S_Z1) | i ∈ {4,5} (only S_Z2).
+  -- Dual partition holds for the X-stabs.
+  have hi_trichotomy : (i = 0 ∨ i = 1) ∨ (i = 2 ∨ i = 3) ∨ (i = 4 ∨ i = 5) := by
+    fin_cases i <;> tauto
+  match P, hP with
+  | PauliOperator.X, _ =>
+    rcases hi_trichotomy with hi | hi | hi
+    · -- i ∈ {0,1}: pick S_Z1 (also covers).
+      refine ⟨S_Z1, by simp [generators, ZGenerators], ?_⟩
+      exact weightOneAt_anticomm_S_Z1 i _
+        (by rcases hi with rfl | rfl <;> tauto) (Or.inl rfl)
+    · -- i ∈ {2,3}: pick S_Z1 (only one that covers).
+      refine ⟨S_Z1, by simp [generators, ZGenerators], ?_⟩
+      exact weightOneAt_anticomm_S_Z1 i _
+        (by rcases hi with rfl | rfl <;> tauto) (Or.inl rfl)
+    · -- i ∈ {4,5}: pick S_Z2 (only one that covers).
+      refine ⟨S_Z2, by simp [generators, ZGenerators], ?_⟩
+      exact weightOneAt_anticomm_S_Z2 i _
+        (by rcases hi with rfl | rfl <;> tauto) (Or.inl rfl)
+  | PauliOperator.Y, _ =>
+    rcases hi_trichotomy with hi | hi | hi
+    · refine ⟨S_Z1, by simp [generators, ZGenerators], ?_⟩
+      exact weightOneAt_anticomm_S_Z1 i _
+        (by rcases hi with rfl | rfl <;> tauto) (Or.inr rfl)
+    · refine ⟨S_Z1, by simp [generators, ZGenerators], ?_⟩
+      exact weightOneAt_anticomm_S_Z1 i _
+        (by rcases hi with rfl | rfl <;> tauto) (Or.inr rfl)
+    · refine ⟨S_Z2, by simp [generators, ZGenerators], ?_⟩
+      exact weightOneAt_anticomm_S_Z2 i _
+        (by rcases hi with rfl | rfl <;> tauto) (Or.inr rfl)
+  | PauliOperator.Z, _ =>
+    rcases hi_trichotomy with hi | hi | hi
+    · -- i ∈ {0,1}: pick S_X1.
+      refine ⟨S_X1, by simp [generators, XGenerators], ?_⟩
+      exact weightOneAt_Z_anticomm_S_X1 i (by rcases hi with rfl | rfl <;> tauto)
+    · -- i ∈ {2,3}: pick S_X1 (only one that covers).
+      refine ⟨S_X1, by simp [generators, XGenerators], ?_⟩
+      exact weightOneAt_Z_anticomm_S_X1 i (by rcases hi with rfl | rfl <;> tauto)
+    · -- i ∈ {4,5}: pick S_X2 (only one that covers).
+      refine ⟨S_X2, by simp [generators, XGenerators], ?_⟩
+      exact weightOneAt_Z_anticomm_S_X2 i (by rcases hi with rfl | rfl <;> tauto)
+  | PauliOperator.I, hP => exact (hP rfl).elim
 
 /-- The C_6 [[6, 2, 2]] code has distance 2: every weight-1 single-qubit Pauli
 anticommutes with at least one stabilizer generator (T31), and `X̄_1 = IIXXII`
 is a nontrivial logical operator of weight exactly 2. -/
-theorem code_has_distance_two : HasCodeDistance stabilizerCode 2 := by
-  -- TODO(stab_6_2_2-T32): one-line via
-  --   hasCodeDistance_two_of_anticommute_witness stabilizerCode
-  --     generators stabilizerCode_toSubgroup_eq
-  --     weight_one_anticomm_witness
-  --     ⟨logicalX_1, (logicalOps6_2_2 0).xOp_nontrivial, by decide⟩
-  sorry
+theorem code_has_distance_two : HasCodeDistance stabilizerCode 2 :=
+  hasCodeDistance_two_of_anticommute_witness stabilizerCode generators
+    stabilizerCode_toSubgroup_eq weight_one_anticomm_witness
+    ⟨logicalX_1, (logicalOps6_2_2 0).xOp_nontrivial, by decide⟩
 
 /-- The C_6 [[6, 2, 2]] code packaged with its distance. -/
 noncomputable def stabilizerCodeWithDistance : StabilizerCodeWithDistance 6 2 2 where
