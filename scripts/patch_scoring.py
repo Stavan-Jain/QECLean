@@ -70,6 +70,16 @@ CORRECTIONS: list[dict] = [
             "defines parametrically for r ≥ 3."
         ),
     },
+    {
+        "code_id": "stab_6_4_2",
+        "new_status": "done",
+        "new_track": "skip",
+        "audit_note": (
+            "Audit override: [[6,4,2]] is the m=3 instance of the parametric iceberg "
+            "family [[2m, 2m-2, 2]] that QEC/Stabilizer/Codes/Iceberg/N.lean defines "
+            "for m ≥ 2 (PR #36, merged 2026-05-24)."
+        ),
+    },
 ]
 
 
