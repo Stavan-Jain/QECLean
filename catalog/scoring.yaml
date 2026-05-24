@@ -4,7 +4,7 @@
 # Audit corrections applied via scripts/patch_scoring.py.
 
 metadata:
-  generated_on: '2026-05-23'
+  generated_on: '2026-05-24'
   weights:
     reuse: 0.25
     canonicality: 0.15
@@ -13,12 +13,14 @@ metadata:
     prerequisites: 0.2
     effort: 0.1
   total_scored: 267
-  done: 11
+  done: 12
   in_flight: 1
-  not_started: 254
+  not_started: 253
   out_of_scope: 1
   audit_applied_on: '2026-05-23'
   audit_corrections: 4
+  done_overrides_on: '2026-05-24'
+  done_overrides: 1
 entries:
 - code_id: stab_4_2_2
   name: \([[4,2,2]]\) Four-qubit code
@@ -32,9 +34,8 @@ entries:
     effort: 9
   composite: -1.0
   proposed_track: skip
-  rationale: 'Audit override: formalized in QEC/Stabilizer/Codes/Small/FourQubit_4_2_2.lean (PR #22, merged 2026-05-22).
-    Direct instance of the existing CSS / StabilizerGroup machinery; distance-2 proof by enumeration. 547 LoC, 22 sorries
-    closed.
+  rationale: 'Audit override: formalized in QEC/Stabilizer/Codes/Small/FourQubit_4_2_2.lean (PR #22, merged 2026-05-22). Direct
+    instance of the existing CSS / StabilizerGroup machinery; distance-2 proof by enumeration. 547 LoC, 22 sorries closed.
 
 
     Previous rationale: Audit override: formalized in QEC/Stabilizer/Codes/FourQubit_4_2_2.lean (PR #22, merged 2026-05-22).
@@ -59,12 +60,12 @@ entries:
     effort: 8
   composite: -1.0
   proposed_track: skip
-  rationale: 'Audit override: formalized in QEC/Stabilizer/Codes/Small/FiveQubit_5_1_3.lean (PR #24, merged 2026-05-23).
-    First non-CSS code in the repo, fully formalized end-to-end including the distance-3 lower bound.
-    Three Core helpers added during Stage 4: (1) `negIdentity_not_mem_of_indep_phase_zero_commute` in BinarySymplectic/SymplecticSpan.lean
-    (general-form -I not in closure); (2) `no_weight_two_mem_centralizer_of_anticommute_witness` + `weightTwoAt` in Core/CSSDistance.lean
-    (weight-2 ruling out for d=3); (3) `local instance` `DecidableEq (NQubitPauliGroupElement n)` + noncomputable `Decidable
-    (Anticommute p q)` in the code file (reusable template -- see Group A re-scoring above).
+  rationale: 'Audit override: formalized in QEC/Stabilizer/Codes/Small/FiveQubit_5_1_3.lean (PR #24, merged 2026-05-23). First
+    non-CSS code in the repo, fully formalized end-to-end including the distance-3 lower bound. Three Core helpers added during
+    Stage 4: (1) `negIdentity_not_mem_of_indep_phase_zero_commute` in BinarySymplectic/SymplecticSpan.lean (general-form -I
+    not in closure); (2) `no_weight_two_mem_centralizer_of_anticommute_witness` + `weightTwoAt` in Core/CSSDistance.lean (weight-2
+    ruling out for d=3); (3) `local instance` `DecidableEq (NQubitPauliGroupElement n)` + noncomputable `Decidable (Anticommute
+    p q)` in the code file (reusable template -- see Group A re-scoring above).
 
 
     Previous rationale: Five-qubit perfect code: smallest stabilizer code, in every QEC syllabus. Non-CSS: an excellent forcing
@@ -88,6 +89,10 @@ entries:
     (with stabilizer-code packaging in RotatedSurfaceCodeNStabilizerCode.lean and distance proof in RotatedSurfaceCodeNDistance*.lean).
 
 
+    Previous rationale: Audit override: explicitly a [[9,1,3]] rotated surface code — the L=3 instance of QEC/Stabilizer/Codes/RotatedSurface/N.lean
+    (with stabilizer-code packaging in RotatedSurfaceCodeNStabilizerCode.lean and distance proof in RotatedSurfaceCodeNDistance*.lean).
+
+
     Previous rationale: Audit override: explicitly a [[9,1,3]] rotated surface code — the L=3 instance of QEC/Stabilizer/Codes/RotatedSurfaceCodeN.lean
     (with stabilizer-code packaging in RotatedSurfaceCodeNStabilizerCode.lean and distance proof in RotatedSurfaceCodeNDistance*.lean).
 
@@ -102,7 +107,7 @@ entries:
   estimated_loc: 200
 - code_id: css_4_1_2
   name: \([[4,1,2]]\) Leung-Nielsen-Chuang-Yamamoto (LNCY) code
-  status: not_started
+  status: done
   axes:
     reuse: 10
     canonicality: 6
@@ -110,10 +115,16 @@ entries:
     tractability: 10
     prerequisites: 10
     effort: 9
-  composite: 9.0
-  proposed_track: engineering
-  rationale: '[[4,1,2]] LNCY code, the unique 4-qubit CSS detection code with these parameters; many hardware demos. Generators
-    are four-qubit Pauli strings; distance bound by exhaustion. Direct fit for current CSS infrastructure.'
+  composite: -1.0
+  proposed_track: skip
+  rationale: 'Already formalized: QEC/Stabilizer/Codes/Small/CSS_4_1_2.lean (PR #32, merged 2026-05-23). 505 LoC, 26 sorries
+    closed in two stages. The [[4,1,2]] LNCY code, the unique 4-qubit CSS detection code. Direct instance of existing CSS
+    / StabilizerGroup machinery; distance-2 proof by enumeration. Notable: T19 demonstrated a generalizable pattern for CSS
+    distance-2 proofs with multiple Z-generators covering disjoint qubit subsets — promoted to CLAUDE.md.
+
+
+    Previous rationale: [[4,1,2]] LNCY code, the unique 4-qubit CSS detection code with these parameters; many hardware demos.
+    Generators are four-qubit Pauli strings; distance bound by exhaustion. Direct fit for current CSS infrastructure.'
   blockers: []
   estimated_loc: 300
 - code_id: iceberg
@@ -205,6 +216,11 @@ entries:
     variant is structurally outside the framework. Reclassified to skip; revisit if/when the framework is extended.
 
 
+    Previous rationale: Audit override: a [[5,1,2]] degenerate rotated-surface variant ("rotated surface code on one rung
+    of a ladder"). The parametric RotatedSurfaceCodeN formalization requires [Fact (3 ≤ L)] and L odd, so this ladder-geometry
+    variant is structurally outside the framework. Reclassified to skip; revisit if/when the framework is extended.
+
+
     Previous rationale: [[5,1,2]] CSS detection code; smaller cousin of the 5-qubit perfect code. Direct fit for existing
     infrastructure; trivial enumeration.'
   blockers: []
@@ -222,6 +238,10 @@ entries:
   composite: -1.0
   proposed_track: skip
   rationale: 'Audit override: the abstract qubit-stabilizer-code class. Already implemented as the Stabilizer/Core/StabilizerGroup
+    + Stabilizer/Core/StabilizerCode infrastructure in this repo — not a concrete code to be formalized separately.
+
+
+    Previous rationale: Audit override: the abstract qubit-stabilizer-code class. Already implemented as the Stabilizer/Core/StabilizerGroup
     + Stabilizer/Core/StabilizerCode infrastructure in this repo — not a concrete code to be formalized separately.
 
 
@@ -495,6 +515,10 @@ entries:
   proposed_track: skip
   rationale: 'Audit override: [[15,7,3]] is the r=4 instance of the quantum Hamming family [[2^r-1, 2^r-1-2r, 3]] that QEC/Stabilizer/Codes/Small/QuantumHamming.lean
     defines parametrically for r ≥ 3.
+
+
+    Previous rationale: Audit override: [[15,7,3]] is the r=4 instance of the quantum Hamming family [[2^r-1, 2^r-1-2r, 3]]
+    that QEC/Stabilizer/Codes/Small/QuantumHamming.lean defines parametrically for r ≥ 3.
 
 
     Previous rationale: Audit override: [[15,7,3]] is the r=4 instance of the quantum Hamming family [[2^r-1, 2^r-1-2r, 3]]
@@ -1178,7 +1202,8 @@ entries:
 
 
     Previous rationale: [[7,2,2]] small hypergraph product code; small enough to enumerate without the full HGP framework.'
-  blockers: []
+  blockers:
+  - Stabilizer/HypergraphProduct
   estimated_loc: 800
 - code_id: phantom_14_3_3
   name: \([[14,3,3]]\) CSS phantom code
