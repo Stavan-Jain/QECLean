@@ -1,0 +1,13 @@
+code_id: stab_6_2_2
+display_name: '[[6,2,2]] C_6 code (Knill 2004)'
+parameters:
+  n: 6
+  k: 2
+  d: 2
+status: skeleton-review
+track: engineering
+started_at: 2026-05-24
+worktree_branch: worktree-agent-ab542b9c2a5d7f5b4
+estimated_loc: 500
+phase: stage-2-skeleton
+covering_lean_file: QEC/Stabilizer/Codes/Small/SixQubit_6_2_2.lean
