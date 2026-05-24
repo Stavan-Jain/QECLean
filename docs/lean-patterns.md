@@ -73,6 +73,71 @@ have hfilter :
 
 Canonical use site: `CSS_4_1_2.lean`'s `weight_one_anticomm_witness` (T19).
 
+### Multiple Z-generators (or X-generators) with **overlapping** qubit supports
+
+When the Z-stabilizer supports do *not* partition the qubits — they overlap
+on some shared subset — the `hi_dichotomy` pattern above extends to a
+**trichotomy**: one branch for the shared region (where either Z-stab works
+as the witness), plus one branch for each "private" region.
+
+Canonical use site: `SixQubit_6_2_2.lean`'s `weight_one_anticomm_witness`
+(T31). The Knill C_6 Z-stabilizers `S_Z1 = ZZZZII` (qubits {0,1,2,3}) and
+`S_Z2 = ZZIIZZ` (qubits {0,1,4,5}) **overlap at {0,1}**, so:
+
+```lean
+have hi_trichotomy :
+    (i = 0 ∨ i = 1) ∨ (i = 2 ∨ i = 3) ∨ (i = 4 ∨ i = 5) := by
+  fin_cases i <;> tauto
+```
+
+Within the shared region, **pick one Z-stab consistently** (e.g. always
+use `S_Z1` when `i ∈ {0, 1}`) so downstream proofs of
+`weight_one_anticomm_witness` aren't case-fragile. The trichotomy lifts to
+the broader disjunction the per-generator helpers take via
+`rcases hi with rfl | rfl <;> tauto`.
+
+### Multi-logical-qubit (`k ≥ 2`) `logical_commute_cross` dispatch
+
+For the `logical_commute_cross` field of `StabilizerCode n k` when `Fin k`
+is **concrete** (e.g. `Fin 2` for `k = 2`), the natural dispatch is
+`fin_cases ℓ <;> fin_cases ℓ'`, which produces `k²` cases per direction
+(4 for `k = 2`). The standard arrangement:
+
+```lean
+refine ⟨?_, ?_, ?_, ?_⟩
+· -- ∀ ℓ ℓ', X̄_ℓ * X̄_ℓ' = X̄_ℓ' * X̄_ℓ  (both X-type, all 4 cases)
+  intro ℓ ℓ'; fin_cases ℓ <;> fin_cases ℓ' <;>
+    first | rfl | exact X1X2_comm | exact X1X2_comm.symm
+· -- analogous for both Z-type
+· -- ∀ ℓ ℓ', ℓ ≠ ℓ' → X̄_ℓ * Z̄_ℓ' = Z̄_ℓ' * X̄_ℓ  (diagonal cases discharged)
+  intro ℓ ℓ' hℓℓ'; fin_cases ℓ <;> fin_cases ℓ' <;>
+    first | exact (hℓℓ' rfl).elim | exact X1Z2_comm | exact X2Z1_comm.symm
+· -- analogous for Z̄_ℓ * X̄_ℓ'
+```
+
+The `.symm` arrangement is needed for the `(ℓ', ℓ)` direction (where the
+previously-proved lemma was stated in the other order). The
+`(hℓℓ' rfl).elim` disposes of the `ℓ = ℓ'` diagonal cases for cross-type
+commutation. Canonical use sites: `FourQubit_4_2_2.lean` (first k=2
+instance) and `SixQubit_6_2_2.lean` (second).
+
+For **parametric** `Fin k` where `fin_cases` doesn't work, see
+"Bypassing `fin_cases ℓ <;> fin_cases ℓ'` for parametric `Fin n`" under
+§ Parametric code families — `Iceberg/N.lean` uses a structural-refine
+workaround instead.
+
+### `pauli_comm_componentwise` handles disjoint-support mixed-type cases
+
+When two Pauli operators have *disjoint* supports (no qubit where both
+are non-I), their product commutes for free via
+`pauli_comm_componentwise` — no need for `pauli_comm_even_anticommutes`
+or filter-cardinality arguments, even when one is X-type and the other
+is Z-type. The `gap_audit.md` for `SixQubit_6_2_2` flagged this as a
+risk for T18 (`logicalX_1` at {2,3} vs `logicalZ_2` at {4,5}, mixed
+types but disjoint); it didn't materialize. Closing tactic was a
+one-line `pauli_comm_componentwise`. Don't reach for the parity-based
+helpers when supports don't overlap.
+
 ### Anti-witness function when all generators have full support
 
 The counter-pattern to the multi-Z dichotomy above. When the all-X
