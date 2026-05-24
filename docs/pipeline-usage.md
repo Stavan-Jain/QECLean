@@ -367,11 +367,31 @@ partially-closed file with structured BLOCKED markers + a detailed
 
 **Steps:**
 
-1. **Update CLAUDE.md** with any patterns from `result.md`'s "Patterns
-   discovered" section. This is the single most-consulted file by future
-   agent sessions — additions here compound.
+1. **Promote patterns from `result.md`'s "Patterns discovered" section.**
+   Use the tiered destination rule — most patterns are NOT CLAUDE.md
+   material:
+
+   - **`docs/lean-patterns.md`** (default destination): patterns
+     specific to a code shape (CSS distance, non-CSS distance,
+     parametric family, mechanical fixes). The vast majority of
+     promoted patterns end up here.
+   - **`docs/mathlib-version-quirks.md`**: mathlib API drift you worked
+     around during the formalization (deprecations, renames, signature
+     changes). Date the entry.
+   - **`CLAUDE.md`** (highest bar): only patterns that either generalize
+     across ≥ 2 different code shapes OR are pure codebase-wide
+     policy/style. If you're tempted to add to CLAUDE.md, ask whether
+     `lean-patterns.md` would be the better home — usually yes.
+   - **Stay in `result.md`** (no promotion): one-off observations,
+     patterns that haven't recurred yet, or notes too narrow to
+     generalize.
+
+   The rationale: CLAUDE.md is pulled by every agent on every
+   invocation. Each line costs tokens forever. Keep it small and
+   high-signal; let `docs/*.md` carry the long tail.
 
 2. **Update `pipeline/attempts/<code_id>/state.yaml`** to `status: done`.
+   Add `merged_at` and `merged_pr` fields.
 
 3. **Re-run the prioritizer** if the merge added a new abstraction that
    shifts `reuse` scores — see [#rescoring](#recipe-re-score-the-queue).
@@ -387,8 +407,14 @@ partially-closed file with structured BLOCKED markers + a detailed
    Or leave it — the disk space is small and an in-place worktree is
    sometimes useful for follow-ups.
 
-**Expected outcome:** Repo state updated; future skeleton-drafter runs
-benefit from any new patterns documented in `CLAUDE.md`.
+5. **(Periodic) Audit CLAUDE.md size.** Every ~5 merges, or when
+   CLAUDE.md crosses ~500 lines, scan for entries that haven't been
+   referenced in subsequent `result.md` files and consider moving them
+   to `lean-patterns.md` or pruning. The point of the split is to keep
+   CLAUDE.md sustainably small.
+
+**Expected outcome:** Repo state updated; new patterns landed in the
+appropriate tier; CLAUDE.md stayed small.
 
 ---
 
