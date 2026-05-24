@@ -1,0 +1,36 @@
+code_id: goy
+display_name: '\([[6r, 2r, 2]]\) Ganti-Onunkwo-Young code'
+parameters: {n: '6r', k: '2r', d: 2}
+status: skeleton-review
+track: engineering             # overrides catalog (composite 3.45, proposed_track: skip)
+                               # — see informal_spec.md for justification
+started_at: '2026-05-24'
+worktree_branch: worktree-agent-ad4da537b27c8fd80
+estimated_loc: 850
+phase: stage-2-skeleton
+covering_lean_file: QEC/Stabilizer/Codes/GOY/N.lean
+umbrella_file: QEC/Stabilizer/Codes/GOY.lean
+
+# Parametric family metadata
+parametric: true
+parameter: r
+parameter_constraint: 'r >= 1 (Fact (1 <= r))'
+
+# Specializations
+specializes_to:
+  r_1: 'separate formalization at QEC/Stabilizer/Codes/Small/SixQubit_6_2_2.lean (same code as r=1, Knill C_6 presentation; this file uses GOY natural presentation with 2 weight-2 + 2 weight-4 generators)'
+
+# Source references
+introduced_refs:
+  - 'arxiv:1309.1674 (Ganti-Onunkwo-Young 2013)'
+ec_zoo_url: 'https://errorcorrectionzoo.org/c/goy'
+
+# Stage-2 notes
+catalog_override_rationale: |
+  The catalog scores GOY at composite 3.45 (proposed_track: skip). The user
+  has approved formalizing this parametrically as engineering-track because:
+  (1) r=1 case is the already-formalized C_6, validating that the abstractions
+  apply; (2) family generalizes to all [[6r, 2r, 2]] — first known
+  parametric multi-logical-qubit family with variable-weight stabilizers;
+  (3) hasCodeDistance_two_of_anticommute_witness (PR #34) applies directly;
+  (4) reuse_audit estimates ~70-80% structural overlap with Iceberg/N.lean.
