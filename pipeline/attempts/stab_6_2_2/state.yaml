@@ -4,10 +4,11 @@ parameters:
   n: 6
   k: 2
   d: 2
-status: skeleton-review
+status: formalization
 track: engineering
 started_at: 2026-05-24
 worktree_branch: worktree-agent-ab542b9c2a5d7f5b4
 estimated_loc: 500
-phase: stage-2-skeleton
+phase: stage-4-formalization
 covering_lean_file: QEC/Stabilizer/Codes/Small/SixQubit_6_2_2.lean
+formalization_started_at: 2026-05-24

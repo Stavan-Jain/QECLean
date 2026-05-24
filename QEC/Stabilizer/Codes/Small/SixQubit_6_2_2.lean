@@ -131,20 +131,32 @@ noncomputable def subgroup : Subgroup (NQubitPauliGroupElement 6) :=
 /-- Each Z-generator is Z-type (I or Z on every qubit). -/
 lemma ZGenerators_are_ZType :
     ∀ g, g ∈ ZGenerators → NQubitPauliGroupElement.IsZTypeElement g := by
-  -- TODO(stab_6_2_2-T1): rcases hg with rfl | rfl; per-generator
-  -- fin_cases i + simp [PauliOperator.IsZType, S_Z1/S_Z2,
-  -- NQubitPauliOperator.set, NQubitPauliOperator.identity].
-  -- Partial-support generators: keep `identity` in simp set.
-  sorry
+  classical
+  intro g hg
+  rcases (by simpa [ZGenerators] using hg) with rfl | rfl
+  · refine ⟨rfl, ?_⟩
+    intro i
+    fin_cases i <;>
+      simp [PauliOperator.IsZType, S_Z1, NQubitPauliOperator.set, NQubitPauliOperator.identity]
+  · refine ⟨rfl, ?_⟩
+    intro i
+    fin_cases i <;>
+      simp [PauliOperator.IsZType, S_Z2, NQubitPauliOperator.set, NQubitPauliOperator.identity]
 
 /-- Each X-generator is X-type (I or X on every qubit). -/
 lemma XGenerators_are_XType :
     ∀ g, g ∈ XGenerators → NQubitPauliGroupElement.IsXTypeElement g := by
-  -- TODO(stab_6_2_2-T2): rcases hg with rfl | rfl; per-generator
-  -- fin_cases i + simp [PauliOperator.IsXType, S_X1/S_X2,
-  -- NQubitPauliOperator.set, NQubitPauliOperator.identity].
-  -- Partial-support generators: keep `identity` in simp set.
-  sorry
+  classical
+  intro g hg
+  rcases (by simpa [XGenerators] using hg) with rfl | rfl
+  · refine ⟨rfl, ?_⟩
+    intro i
+    fin_cases i <;>
+      simp [PauliOperator.IsXType, S_X1, NQubitPauliOperator.set, NQubitPauliOperator.identity]
+  · refine ⟨rfl, ?_⟩
+    intro i
+    fin_cases i <;>
+      simp [PauliOperator.IsXType, S_X2, NQubitPauliOperator.set, NQubitPauliOperator.identity]
 
 /-! ## §4 — Cross-commutation (Z-generators commute with X-generators)
 
@@ -156,31 +168,65 @@ Pairwise overlap counts (all even ⇒ all commute):
 -/
 
 private lemma S_Z1_comm_S_X1 : S_Z1 * S_X1 = S_X1 * S_Z1 := by
-  -- TODO(stab_6_2_2-T3): pauli_comm_even_anticommutes; explicit
-  -- filter Finset {0,1,2,3} on Fin 6 (size 4 = even).
-  sorry
+  classical
+  pauli_comm_even_anticommutes
+  have hfilter :
+      (Finset.univ.filter
+            (NQubitPauliGroupElement.anticommutesAt (n := 6) S_Z1.operators S_X1.operators)) =
+        ({0, 1, 2, 3} : Finset (Fin 6)) := by
+    ext i; fin_cases i <;>
+      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, S_Z1, S_X1,
+        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
+  rw [hfilter]; decide
 
 private lemma S_Z1_comm_S_X2 : S_Z1 * S_X2 = S_X2 * S_Z1 := by
-  -- TODO(stab_6_2_2-T4): pauli_comm_even_anticommutes; explicit
-  -- filter Finset {0,1} on Fin 6 (size 2 = even).
-  sorry
+  classical
+  pauli_comm_even_anticommutes
+  have hfilter :
+      (Finset.univ.filter
+            (NQubitPauliGroupElement.anticommutesAt (n := 6) S_Z1.operators S_X2.operators)) =
+        ({0, 1} : Finset (Fin 6)) := by
+    ext i; fin_cases i <;>
+      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, S_Z1, S_X2,
+        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
+  rw [hfilter]; decide
 
 private lemma S_Z2_comm_S_X1 : S_Z2 * S_X1 = S_X1 * S_Z2 := by
-  -- TODO(stab_6_2_2-T5): pauli_comm_even_anticommutes; explicit
-  -- filter Finset {0,1} on Fin 6 (size 2 = even).
-  sorry
+  classical
+  pauli_comm_even_anticommutes
+  have hfilter :
+      (Finset.univ.filter
+            (NQubitPauliGroupElement.anticommutesAt (n := 6) S_Z2.operators S_X1.operators)) =
+        ({0, 1} : Finset (Fin 6)) := by
+    ext i; fin_cases i <;>
+      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, S_Z2, S_X1,
+        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
+  rw [hfilter]; decide
 
 private lemma S_Z2_comm_S_X2 : S_Z2 * S_X2 = S_X2 * S_Z2 := by
-  -- TODO(stab_6_2_2-T6): pauli_comm_even_anticommutes; explicit
-  -- filter Finset {0,1,4,5} on Fin 6 (size 4 = even).
-  sorry
+  classical
+  pauli_comm_even_anticommutes
+  have hfilter :
+      (Finset.univ.filter
+            (NQubitPauliGroupElement.anticommutesAt (n := 6) S_Z2.operators S_X2.operators)) =
+        ({0, 1, 4, 5} : Finset (Fin 6)) := by
+    ext i; fin_cases i <;>
+      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, S_Z2, S_X2,
+        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
+  rw [hfilter]; decide
 
 /-- Every Z-generator commutes with every X-generator. -/
 lemma ZGenerators_commute_XGenerators :
     ∀ z ∈ ZGenerators, ∀ x ∈ XGenerators, z * x = x * z := by
-  -- TODO(stab_6_2_2-T7): rcases over ZGenerators / XGenerators;
-  -- 4 cases, exact T3/T4/T5/T6.
-  sorry
+  classical
+  intro z hz x hx
+  rcases (by simpa [ZGenerators] using hz) with rfl | rfl
+  · rcases (by simpa [XGenerators] using hx) with rfl | rfl
+    · exact S_Z1_comm_S_X1
+    · exact S_Z1_comm_S_X2
+  · rcases (by simpa [XGenerators] using hx) with rfl | rfl
+    · exact S_Z2_comm_S_X1
+    · exact S_Z2_comm_S_X2
 
 /-! ## §5 — All-pair commutation -/
 
@@ -199,19 +245,26 @@ private lemma XType_commutes {g h : NQubitPauliGroupElement 6}
 /-- All generators of the [[6, 2, 2]] code pairwise commute. -/
 theorem generators_commute :
     ∀ g ∈ generators, ∀ h ∈ generators, g * h = h * g := by
-  -- TODO(stab_6_2_2-T8): standard CSS 4-way case split:
-  -- (ZZ → ZType_commutes), (ZX → T7), (XZ → T7.symm),
-  -- (XX → XType_commutes). Copy FourQubit_4_2_2.generators_commute.
-  sorry
+  classical
+  intro g hg h hh
+  have hg' : g ∈ ZGenerators ∨ g ∈ XGenerators := by simpa [generators] using hg
+  have hh' : h ∈ ZGenerators ∨ h ∈ XGenerators := by simpa [generators] using hh
+  rcases hg' with hgZ | hgX <;> rcases hh' with hhZ | hhX
+  · exact ZType_commutes (ZGenerators_are_ZType g hgZ) (ZGenerators_are_ZType h hhZ)
+  · exact ZGenerators_commute_XGenerators g hgZ h hhX
+  · simpa using (ZGenerators_commute_XGenerators h hhZ g hgX).symm
+  · exact XType_commutes (XGenerators_are_XType g hgX) (XGenerators_are_XType h hhX)
 
 /-! ## §6 — `−I` is not in the stabilizer subgroup -/
 
 /-- The [[6, 2, 2]] C_6 stabilizer subgroup does not contain `−I` (CSS argument). -/
 theorem negIdentity_not_mem :
     negIdentity 6 ∉ subgroup := by
-  -- TODO(stab_6_2_2-T9): CSS.negIdentity_not_mem_closure_union fed
-  -- T1/T2/T7. Copy FourQubit_4_2_2.negIdentity_not_mem verbatim.
-  sorry
+  have hZX : ∀ z ∈ ZGenerators, ∀ x ∈ XGenerators, z * x = x * z :=
+    ZGenerators_commute_XGenerators
+  simpa [subgroup, generators] using
+    (CSS.negIdentity_not_mem_closure_union (n := 6) ZGenerators XGenerators
+      ZGenerators_are_ZType XGenerators_are_XType hZX)
 
 /-! ## §7 — Generator list & symplectic-side independence -/
 
@@ -222,24 +275,29 @@ def generatorsList : List (NQubitPauliGroupElement 6) :=
 /-- The list of generators has the same elements as the generator set. -/
 lemma listToSet_generatorsList :
     NQubitPauliGroupElement.listToSet generatorsList = generators := by
-  -- TODO(stab_6_2_2-T10): ext g; simp after unfold; 4 list elements,
-  -- 4 set elements (2 Z + 2 X union).
-  sorry
+  simp only [generatorsList, generators, ZGenerators, XGenerators,
+    NQubitPauliGroupElement.listToSet_cons, NQubitPauliGroupElement.listToSet_nil]
+  ext g
+  simp only [Set.mem_insert_iff, Set.mem_union, Set.mem_singleton_iff, Set.mem_empty_iff_false,
+    or_false, or_assoc]
 
 /-! ## §8 — Phase-zero + symplectic independence -/
 
 /-- All four generators have phase 0 (no `i` or `−1` factor). -/
 lemma AllPhaseZero_generatorsList :
     NQubitPauliGroupElement.AllPhaseZero generatorsList := by
-  -- TODO(stab_6_2_2-T11): chain of AllPhaseZero_cons.mpr ⟨rfl, ...⟩,
-  -- four levels of nesting (one per generator).
-  sorry
+  rw [generatorsList, NQubitPauliGroupElement.AllPhaseZero_cons]
+  refine ⟨rfl, ?_⟩
+  rw [NQubitPauliGroupElement.AllPhaseZero_cons]
+  refine ⟨rfl, ?_⟩
+  rw [NQubitPauliGroupElement.AllPhaseZero_cons]
+  refine ⟨rfl, ?_⟩
+  rw [NQubitPauliGroupElement.AllPhaseZero_cons]
+  exact ⟨rfl, NQubitPauliGroupElement.AllPhaseZero_nil⟩
 
 /-- The check-matrix rows of the four generators are linearly independent over GF(2). -/
 theorem rowsLinearIndependent_generatorsList :
-    NQubitPauliGroupElement.rowsLinearIndependent generatorsList := by
-  -- TODO(stab_6_2_2-T12): by decide on the 4×12 GF(2) check matrix.
-  sorry
+    NQubitPauliGroupElement.rowsLinearIndependent generatorsList := by decide
 
 /-- The generator list is an independent generating set. -/
 theorem GeneratorsIndependent_6_generatorsList :
@@ -259,9 +317,8 @@ noncomputable def stabilizerGroup : StabilizerGroup 6 :=
 `generators`. -/
 lemma stabilizerGroup_toSubgroup_eq :
     stabilizerGroup.toSubgroup = subgroup := by
-  -- TODO(stab_6_2_2-T14): simp + rewrite via listToSet_generatorsList.
-  -- Copy CSS_4_1_2.stabilizerGroup_toSubgroup_eq verbatim.
-  sorry
+  simp only [stabilizerGroup, mkStabilizerFromGenerators, subgroup]
+  rw [listToSet_generatorsList]
 
 /-! ## §10 — Logical operators
 
