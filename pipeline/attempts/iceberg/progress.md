@@ -20,4 +20,17 @@
 - T8 (rowsLinearIndependent_generatorsList): **parametric** column-evaluation argument.
   Key idea: peel off f at each row by evaluating hf at one Z-column (extracts f 0) and one X-column (extracts f 1).
   ~60 LoC, harder than the [[4,2,2]] `by decide` but much cleaner than RepetitionN's approach.
+- T10 (stabilizerGroup_toSubgroup_eq): standard.
+- T11 (logicalX_anticommutes_logicalZ_diag): parametric `by_cases` on logIdx/xAnchor/zAnchor/else.
+  Filter = {logIdx i}, cardinality 1, odd. Introduced 3 anchor-distinct helper lemmas.
+- T12a (logicalX_commutes_logicalX): `commutes_of_componentwise_commutes` + split_ifs +
+  `simp [PauliOperator.mulOp]`. Bypasses `pauli_comm_componentwise`'s `fin_cases i`.
+- T12b (logicalZ_commutes_logicalZ): mirror of T12a.
+- T12c (logicalX_commutes_logicalZ_offdiag for i ≠ j): split_ifs + simp_all on
+  mulOp; ~20 LoC. The `simp_all` resolves all cases since the supports are
+  fully disjoint (no shared qubit).
+- T13-helpers (logicalX_commutes_S_Z, logicalX_commutes_S_X): one parametric
+  filter (`{logIdx i, xAnchor m}`, count 2 even); one componentwise commute.
+- T14-helpers (logicalZ_commutes_S_Z, logicalZ_commutes_S_X): mirror of T13-helpers.
+- T13, T14 (logicalX/Z_mem_centralizer): standard `forall_comm_closure_iff` dispatch.
 

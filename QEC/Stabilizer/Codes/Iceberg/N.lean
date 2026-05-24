@@ -367,8 +367,8 @@ noncomputable def stabilizerGroup (m : ℕ) [Fact (2 ≤ m)] :
 /-- T10: the bundled stabilizer group's subgroup equals the set-form closure. -/
 lemma stabilizerGroup_toSubgroup_eq (m : ℕ) [Fact (2 ≤ m)] :
     (stabilizerGroup m).toSubgroup = subgroup m := by
-  sorry -- TODO(iceberg-T10): simp on stabilizerGroup, mkStabilizerFromGenerators, subgroup;
-        --   rw [listToSet_generatorsList]. Mirror FourQubit_4_2_2.lean:212.
+  simp only [stabilizerGroup, mkStabilizerFromGenerators, subgroup]
+  rw [listToSet_generatorsList]
 
 /-! ## §10 — Logical operators
 
@@ -393,34 +393,105 @@ def logicalZ (m : ℕ) [Fact (2 ≤ m)] (i : Fin (2 * m - 2)) :
 
 /-! ## §11 — Logical (anti)commutation -/
 
+/-- Internal helper: the three anchor positions are pairwise distinct. -/
+private lemma logIdx_ne_xAnchor (m : ℕ) [Fact (2 ≤ m)] (i : Fin (2 * m - 2)) :
+    logIdx i ≠ xAnchor m := by
+  have h : 2 ≤ m := Fact.out
+  intro heq
+  have := congrArg Fin.val heq
+  simp [logIdx, xAnchor] at this
+  omega
+
+private lemma logIdx_ne_zAnchor (m : ℕ) [Fact (2 ≤ m)] (i : Fin (2 * m - 2)) :
+    logIdx i ≠ zAnchor m := by
+  have h : 2 ≤ m := Fact.out
+  intro heq
+  have := congrArg Fin.val heq
+  simp [logIdx, zAnchor] at this
+  omega
+
+private lemma xAnchor_ne_zAnchor (m : ℕ) [Fact (2 ≤ m)] :
+    xAnchor m ≠ zAnchor m := by
+  have h : 2 ≤ m := Fact.out
+  intro heq
+  have := congrArg Fin.val heq
+  simp [xAnchor, zAnchor] at this
+  omega
+
 /-- T11: diagonal anticommutation `X̄_i Z̄_i = − Z̄_i X̄_i`. -/
 theorem logicalX_anticommutes_logicalZ_diag (m : ℕ) [Fact (2 ≤ m)]
     (i : Fin (2 * m - 2)) :
     NQubitPauliGroupElement.Anticommute (logicalX m i) (logicalZ m i) := by
-  sorry -- TODO(iceberg-T11): pauli_anticomm_odd_anticommutes; show filter = {logIdx i};
-        --   per-qubit by_cases on j = logIdx i / zAnchor / xAnchor / other. count = 1, odd.
+  classical
+  pauli_anticomm_odd_anticommutes
+  have hxa : logIdx i ≠ xAnchor m := logIdx_ne_xAnchor m i
+  have hza : logIdx i ≠ zAnchor m := logIdx_ne_zAnchor m i
+  have hax : xAnchor m ≠ zAnchor m := xAnchor_ne_zAnchor m
+  have hfilter :
+      (Finset.univ.filter
+        (NQubitPauliGroupElement.anticommutesAt (n := 2 * m)
+          (logicalX m i).operators (logicalZ m i).operators)) =
+        ({logIdx i} : Finset (Fin (2 * m))) := by
+    ext j
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_singleton,
+      NQubitPauliGroupElement.anticommutesAt, logicalX, logicalZ,
+      NQubitPauliOperator.set, NQubitPauliOperator.identity]
+    by_cases hj1 : j = logIdx i
+    · subst hj1
+      simp [PauliOperator.mulOp]
+    · by_cases hj2 : j = xAnchor m
+      · subst hj2
+        simp [hax, PauliOperator.mulOp,
+          (show (xAnchor m : Fin (2 * m)) ≠ logIdx i from fun h => hxa h.symm)]
+      · by_cases hj3 : j = zAnchor m
+        · subst hj3
+          simp [PauliOperator.mulOp,
+            (show (zAnchor m : Fin (2 * m)) ≠ logIdx i from fun h => hza h.symm),
+            (show (zAnchor m : Fin (2 * m)) ≠ xAnchor m from fun h => hax h.symm)]
+        · simp [hj1, hj2, hj3, PauliOperator.mulOp]
+  rw [hfilter, Finset.card_singleton]
+  decide
 
 /-- T12a: X̄_i and X̄_j always commute (both X-type). -/
 theorem logicalX_commutes_logicalX (m : ℕ) [Fact (2 ≤ m)]
     (i j : Fin (2 * m - 2)) :
     logicalX m i * logicalX m j = logicalX m j * logicalX m i := by
-  sorry -- TODO(iceberg-T12a): pauli_comm_componentwise or unfold + show all X-vs-X / X-vs-I
-        --   commute.
+  apply NQubitPauliGroupElement.commutes_of_componentwise_commutes
+  intro k
+  -- At every qubit, both operators are I or X. I·X = X·I, X·X = X·X.
+  simp only [logicalX, NQubitPauliOperator.set, NQubitPauliOperator.identity]
+  split_ifs <;> simp [PauliOperator.mulOp]
 
 /-- T12b: Z̄_i and Z̄_j always commute (both Z-type). -/
 theorem logicalZ_commutes_logicalZ (m : ℕ) [Fact (2 ≤ m)]
     (i j : Fin (2 * m - 2)) :
     logicalZ m i * logicalZ m j = logicalZ m j * logicalZ m i := by
-  sorry -- TODO(iceberg-T12b): mirror of T12a.
+  apply NQubitPauliGroupElement.commutes_of_componentwise_commutes
+  intro k
+  simp only [logicalZ, NQubitPauliOperator.set, NQubitPauliOperator.identity]
+  split_ifs <;> simp [PauliOperator.mulOp]
 
 /-- T12c: X̄_i and Z̄_j commute when i ≠ j (disjoint supports). -/
 theorem logicalX_commutes_logicalZ_offdiag (m : ℕ) [Fact (2 ≤ m)]
     {i j : Fin (2 * m - 2)} (hij : i ≠ j) :
     logicalX m i * logicalZ m j = logicalZ m j * logicalX m i := by
-  sorry -- TODO(iceberg-T12c): pauli_comm_even_anticommutes; show filter = ∅;
-        --   per-qubit by_cases: no qubit has both non-I (since logIdx i ≠ logIdx j when
-        --   i ≠ j, and xAnchor / zAnchor are different qubits — X̄ has I at zAnchor,
-        --   Z̄ has I at xAnchor). card = 0, even (via even_zero).
+  apply NQubitPauliGroupElement.commutes_of_componentwise_commutes
+  intro k
+  -- At every qubit, only one of {X̄ at logIdx i / xAnchor} or {Z̄ at logIdx j / zAnchor}
+  -- can be non-I (since their supports are disjoint when i ≠ j).
+  have hij_idx : logIdx i ≠ logIdx j := by
+    intro heq
+    apply hij
+    have := congrArg Fin.val heq
+    simp [logIdx] at this
+    exact Fin.ext this
+  have hxa_i : logIdx i ≠ xAnchor m := logIdx_ne_xAnchor m i
+  have hxa_j : logIdx j ≠ xAnchor m := logIdx_ne_xAnchor m j
+  have hza_i : logIdx i ≠ zAnchor m := logIdx_ne_zAnchor m i
+  have hza_j : logIdx j ≠ zAnchor m := logIdx_ne_zAnchor m j
+  have hax : xAnchor m ≠ zAnchor m := xAnchor_ne_zAnchor m
+  simp only [logicalX, logicalZ, NQubitPauliOperator.set, NQubitPauliOperator.identity]
+  split_ifs <;> simp_all [PauliOperator.mulOp]
 
 /-! ## §12 — Logicals in the centralizer
 
@@ -430,39 +501,104 @@ Per-generator commutation lemmas — used by T13 and T14 below.
 private lemma logicalX_commutes_S_Z (m : ℕ) [Fact (2 ≤ m)]
     (i : Fin (2 * m - 2)) :
     logicalX m i * S_Z m = S_Z m * logicalX m i := by
-  sorry -- TODO(iceberg-T13-helper-XZ): pauli_comm_even_anticommutes;
-        --   filter = {logIdx i, xAnchor m}; count 2, even.
-        --   Per-qubit by_cases on j = logIdx i / xAnchor / else (zAnchor is "else").
+  classical
+  pauli_comm_even_anticommutes
+  have hxa : logIdx i ≠ xAnchor m := logIdx_ne_xAnchor m i
+  have hfilter :
+      (Finset.univ.filter
+        (NQubitPauliGroupElement.anticommutesAt (n := 2 * m)
+          (logicalX m i).operators (S_Z m).operators)) =
+        ({logIdx i, xAnchor m} : Finset (Fin (2 * m))) := by
+    ext k
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_insert,
+      Finset.mem_singleton,
+      NQubitPauliGroupElement.anticommutesAt, logicalX, S_Z,
+      NQubitPauliOperator.set, NQubitPauliOperator.identity, NQubitPauliOperator.Z]
+    by_cases hj1 : k = logIdx i
+    · subst hj1
+      simp [hxa.symm, PauliOperator.mulOp]
+    · by_cases hj2 : k = xAnchor m
+      · subst hj2
+        simp [PauliOperator.mulOp,
+          (show (xAnchor m : Fin (2 * m)) ≠ logIdx i from fun h => hxa h.symm)]
+      · simp [hj1, hj2, PauliOperator.mulOp]
+  rw [hfilter]
+  rw [Finset.card_insert_of_notMem (by simp [hxa]), Finset.card_singleton]
+  exact even_two
 
 private lemma logicalX_commutes_S_X (m : ℕ) [Fact (2 ≤ m)]
     (i : Fin (2 * m - 2)) :
     logicalX m i * S_X m = S_X m * logicalX m i := by
-  sorry -- TODO(iceberg-T13-helper-XX): pauli_comm_componentwise — both X-type at every qubit.
+  apply NQubitPauliGroupElement.commutes_of_componentwise_commutes
+  intro k
+  simp only [logicalX, S_X, NQubitPauliOperator.set, NQubitPauliOperator.identity,
+    NQubitPauliOperator.X]
+  split_ifs <;> simp [PauliOperator.mulOp]
 
 private lemma logicalZ_commutes_S_Z (m : ℕ) [Fact (2 ≤ m)]
     (i : Fin (2 * m - 2)) :
     logicalZ m i * S_Z m = S_Z m * logicalZ m i := by
-  sorry -- TODO(iceberg-T14-helper-ZZ): pauli_comm_componentwise — both Z-type at every qubit.
+  apply NQubitPauliGroupElement.commutes_of_componentwise_commutes
+  intro k
+  simp only [logicalZ, S_Z, NQubitPauliOperator.set, NQubitPauliOperator.identity,
+    NQubitPauliOperator.Z]
+  split_ifs <;> simp [PauliOperator.mulOp]
 
 private lemma logicalZ_commutes_S_X (m : ℕ) [Fact (2 ≤ m)]
     (i : Fin (2 * m - 2)) :
     logicalZ m i * S_X m = S_X m * logicalZ m i := by
-  sorry -- TODO(iceberg-T14-helper-ZX): pauli_comm_even_anticommutes;
-        --   filter = {logIdx i, zAnchor m}; count 2, even.
+  classical
+  pauli_comm_even_anticommutes
+  have hza : logIdx i ≠ zAnchor m := logIdx_ne_zAnchor m i
+  have hfilter :
+      (Finset.univ.filter
+        (NQubitPauliGroupElement.anticommutesAt (n := 2 * m)
+          (logicalZ m i).operators (S_X m).operators)) =
+        ({logIdx i, zAnchor m} : Finset (Fin (2 * m))) := by
+    ext k
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_insert,
+      Finset.mem_singleton,
+      NQubitPauliGroupElement.anticommutesAt, logicalZ, S_X,
+      NQubitPauliOperator.set, NQubitPauliOperator.identity, NQubitPauliOperator.X]
+    by_cases hj1 : k = logIdx i
+    · subst hj1
+      simp [hza.symm, PauliOperator.mulOp]
+    · by_cases hj2 : k = zAnchor m
+      · subst hj2
+        simp [PauliOperator.mulOp,
+          (show (zAnchor m : Fin (2 * m)) ≠ logIdx i from fun h => hza h.symm)]
+      · simp [hj1, hj2, PauliOperator.mulOp]
+  rw [hfilter]
+  rw [Finset.card_insert_of_notMem (by simp [hza]), Finset.card_singleton]
+  exact even_two
 
 /-- T13: every `logicalX m i` is in the centralizer of the stabilizer. -/
 theorem logicalX_mem_centralizer (m : ℕ) [Fact (2 ≤ m)]
     (i : Fin (2 * m - 2)) :
     logicalX m i ∈ centralizer (stabilizerGroup m) := by
-  sorry -- TODO(iceberg-T13): mem_centralizer_iff_closure; intro s hs; rcases Z/X-gen;
-        --   exact logicalX_commutes_S_Z m i .symm / logicalX_commutes_S_X m i .symm.
-        --   Mirror FourQubit_4_2_2.lean:384.
+  rw [StabilizerGroup.mem_centralizer_iff, stabilizerGroup_toSubgroup_eq, subgroup]
+  rw [Subgroup.forall_comm_closure_iff]
+  intro s hs
+  simp only [generators, Set.mem_union] at hs
+  rcases hs with hgZ | hgX
+  · rcases (by simpa [ZGenerators] using hgZ) with rfl
+    exact (logicalX_commutes_S_Z m i).symm
+  · rcases (by simpa [XGenerators] using hgX) with rfl
+    exact (logicalX_commutes_S_X m i).symm
 
 /-- T14: every `logicalZ m i` is in the centralizer of the stabilizer. -/
 theorem logicalZ_mem_centralizer (m : ℕ) [Fact (2 ≤ m)]
     (i : Fin (2 * m - 2)) :
     logicalZ m i ∈ centralizer (stabilizerGroup m) := by
-  sorry -- TODO(iceberg-T14): symmetric to T13, with S_Z / S_X swapped.
+  rw [StabilizerGroup.mem_centralizer_iff, stabilizerGroup_toSubgroup_eq, subgroup]
+  rw [Subgroup.forall_comm_closure_iff]
+  intro s hs
+  simp only [generators, Set.mem_union] at hs
+  rcases hs with hgZ | hgX
+  · rcases (by simpa [ZGenerators] using hgZ) with rfl
+    exact (logicalZ_commutes_S_Z m i).symm
+  · rcases (by simpa [XGenerators] using hgX) with rfl
+    exact (logicalZ_commutes_S_X m i).symm
 
 /-! ## §13 — `StabilizerCode (2 * m) (2 * m - 2)` packaging -/
 
