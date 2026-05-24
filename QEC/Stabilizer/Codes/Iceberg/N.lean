@@ -483,7 +483,7 @@ theorem logicalX_commutes_logicalZ_offdiag (m : ℕ) [Fact (2 ≤ m)]
     intro heq
     apply hij
     have := congrArg Fin.val heq
-    simp [logIdx] at this
+    simp only [logIdx] at this
     exact Fin.ext this
   have hxa_i : logIdx i ≠ xAnchor m := logIdx_ne_xAnchor m i
   have hxa_j : logIdx j ≠ xAnchor m := logIdx_ne_xAnchor m j
@@ -516,7 +516,7 @@ private lemma logicalX_commutes_S_Z (m : ℕ) [Fact (2 ≤ m)]
       NQubitPauliOperator.set, NQubitPauliOperator.identity, NQubitPauliOperator.Z]
     by_cases hj1 : k = logIdx i
     · subst hj1
-      simp [hxa.symm, PauliOperator.mulOp]
+      simp [PauliOperator.mulOp]
     · by_cases hj2 : k = xAnchor m
       · subst hj2
         simp [PauliOperator.mulOp,
@@ -562,7 +562,7 @@ private lemma logicalZ_commutes_S_X (m : ℕ) [Fact (2 ≤ m)]
       NQubitPauliOperator.set, NQubitPauliOperator.identity, NQubitPauliOperator.X]
     by_cases hj1 : k = logIdx i
     · subst hj1
-      simp [hza.symm, PauliOperator.mulOp]
+      simp [PauliOperator.mulOp]
     · by_cases hj2 : k = zAnchor m
       · subst hj2
         simp [PauliOperator.mulOp,
@@ -627,12 +627,10 @@ noncomputable def stabilizerCode (m : ℕ) [Fact (2 ≤ m)] :
     rw [listToSet_generatorsList]; exact negIdentity_not_mem m
   logicalOps := logicalOpsIceberg m
   logical_commute_cross := by
-    sorry -- TODO(iceberg-T15): no fin_cases over Fin (2m-2) symbolically.
-          -- Build the 4-tuple via T12 lemmas, parameterized by `ℓ ≠ ℓ'`:
-          --   refine ⟨logicalX_commutes_logicalX m ℓ ℓ',
-          --     logicalX_commutes_logicalZ_offdiag m hne,
-          --     (logicalX_commutes_logicalZ_offdiag m hne.symm).symm,
-          --     logicalZ_commutes_logicalZ m ℓ ℓ'⟩
+    intro ℓ ℓ' hne
+    refine ⟨logicalX_commutes_logicalX m ℓ ℓ', ?_, ?_, logicalZ_commutes_logicalZ m ℓ ℓ'⟩
+    · exact logicalX_commutes_logicalZ_offdiag m hne
+    · exact (logicalX_commutes_logicalZ_offdiag m (Ne.symm hne)).symm
 
 /-! ## §14 — Code distance = 2 -/
 
@@ -640,8 +638,70 @@ noncomputable def stabilizerCode (m : ℕ) [Fact (2 ≤ m)] :
 private lemma stabilizerCode_toSubgroup_eq (m : ℕ) [Fact (2 ≤ m)] :
     (stabilizerCode m).toStabilizerGroup.toSubgroup =
       Subgroup.closure (generators m) := by
-  sorry -- TODO(iceberg-T16): change (closure listToSet ...) = closure generators;
-        --   rw [listToSet_generatorsList]. Mirror FourQubit_4_2_2.lean:472.
+  change (Subgroup.closure (NQubitPauliGroupElement.listToSet (generatorsList m)) : _) =
+    Subgroup.closure (generators m)
+  rw [listToSet_generatorsList]
+
+/-- Weight-1 X-anchored Pauli at qubit `i` anticommutes with `S_Z m` (all-Z).
+The anticomm filter is exactly `{i}`, cardinality 1, odd. -/
+private lemma weightOneAt_X_anticomm_S_Z (m : ℕ) [Fact (2 ≤ m)] (i : Fin (2 * m)) :
+    NQubitPauliGroupElement.Anticommute (weightOneAt i PauliOperator.X) (S_Z m) := by
+  classical
+  pauli_anticomm_odd_anticommutes
+  have hfilter :
+      (Finset.univ.filter
+        (NQubitPauliGroupElement.anticommutesAt (n := 2 * m)
+          (weightOneAt i PauliOperator.X).operators (S_Z m).operators)) =
+        ({i} : Finset (Fin (2 * m))) := by
+    ext k
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_singleton,
+      NQubitPauliGroupElement.anticommutesAt, weightOneAt,
+      NQubitPauliGroupElement.ofOperator_operators, S_Z, NQubitPauliOperator.Z]
+    by_cases hk : k = i
+    · subst hk; simp [PauliOperator.mulOp]
+    · simp [hk, PauliOperator.mulOp]
+  rw [hfilter, Finset.card_singleton]
+  decide
+
+/-- Weight-1 Y-anchored Pauli at qubit `i` anticommutes with `S_Z m`. -/
+private lemma weightOneAt_Y_anticomm_S_Z (m : ℕ) [Fact (2 ≤ m)] (i : Fin (2 * m)) :
+    NQubitPauliGroupElement.Anticommute (weightOneAt i PauliOperator.Y) (S_Z m) := by
+  classical
+  pauli_anticomm_odd_anticommutes
+  have hfilter :
+      (Finset.univ.filter
+        (NQubitPauliGroupElement.anticommutesAt (n := 2 * m)
+          (weightOneAt i PauliOperator.Y).operators (S_Z m).operators)) =
+        ({i} : Finset (Fin (2 * m))) := by
+    ext k
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_singleton,
+      NQubitPauliGroupElement.anticommutesAt, weightOneAt,
+      NQubitPauliGroupElement.ofOperator_operators, S_Z, NQubitPauliOperator.Z]
+    by_cases hk : k = i
+    · subst hk; simp [PauliOperator.mulOp]
+    · simp [hk, PauliOperator.mulOp]
+  rw [hfilter, Finset.card_singleton]
+  decide
+
+/-- Weight-1 Z-anchored Pauli at qubit `i` anticommutes with `S_X m` (all-X). -/
+private lemma weightOneAt_Z_anticomm_S_X (m : ℕ) [Fact (2 ≤ m)] (i : Fin (2 * m)) :
+    NQubitPauliGroupElement.Anticommute (weightOneAt i PauliOperator.Z) (S_X m) := by
+  classical
+  pauli_anticomm_odd_anticommutes
+  have hfilter :
+      (Finset.univ.filter
+        (NQubitPauliGroupElement.anticommutesAt (n := 2 * m)
+          (weightOneAt i PauliOperator.Z).operators (S_X m).operators)) =
+        ({i} : Finset (Fin (2 * m))) := by
+    ext k
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_singleton,
+      NQubitPauliGroupElement.anticommutesAt, weightOneAt,
+      NQubitPauliGroupElement.ofOperator_operators, S_X, NQubitPauliOperator.X]
+    by_cases hk : k = i
+    · subst hk; simp [PauliOperator.mulOp]
+    · simp [hk, PauliOperator.mulOp]
+  rw [hfilter, Finset.card_singleton]
+  decide
 
 /-- T17: every weight-1 single-qubit Pauli anticommutes with one of the
 two generators. Z-anchored Pauli at any qubit anticomms with `S_X m`;
@@ -650,31 +710,49 @@ private lemma weight_one_anticomm_witness (m : ℕ) [Fact (2 ≤ m)] :
     ∀ i : Fin (2 * m), ∀ P : PauliOperator, P ≠ PauliOperator.I →
       ∃ g ∈ generators m, NQubitPauliGroupElement.Anticommute
         (weightOneAt i P) g := by
-  sorry -- TODO(iceberg-T17): match P, hP with
-        --   | .X, _ => ⟨S_Z m, by simp [generators, ZGenerators], <weightOneAt_X_anticomm_S_Z m i>⟩
-        --   | .Y, _ => ⟨S_Z m, by simp [generators, ZGenerators], <weightOneAt_Y_anticomm_S_Z m i>⟩
-        --   | .Z, _ => ⟨S_X m, by simp [generators, XGenerators], <weightOneAt_Z_anticomm_S_X m i>⟩
-        --   | .I, hP => (hP rfl).elim
-        --
-        -- Three private helpers per direction:
-        --   weightOneAt_X_anticomm_S_Z m i : Anticommute (weightOneAt i .X) (S_Z m)
-        --     pauli_anticomm_odd_anticommutes; filter = {i}; count 1, odd.
-        --   weightOneAt_Y_anticomm_S_Z m i : Anticommute (weightOneAt i .Y) (S_Z m)
-        --     same shape (Y · Z anticommutes locally).
-        --   weightOneAt_Z_anticomm_S_X m i : Anticommute (weightOneAt i .Z) (S_X m)
-        --     symmetric.
+  intro i P hP
+  match P, hP with
+  | PauliOperator.X, _ =>
+    exact ⟨S_Z m, by simp [generators, ZGenerators], weightOneAt_X_anticomm_S_Z m i⟩
+  | PauliOperator.Y, _ =>
+    exact ⟨S_Z m, by simp [generators, ZGenerators], weightOneAt_Y_anticomm_S_Z m i⟩
+  | PauliOperator.Z, _ =>
+    exact ⟨S_X m, by simp [generators, XGenerators], weightOneAt_Z_anticomm_S_X m i⟩
+  | PauliOperator.I, hP => exact (hP rfl).elim
+
+/-- Weight of `logicalX m i` equals 2 (parametric — the support is exactly
+`{logIdx i, xAnchor m}` and these are distinct). -/
+private lemma weight_logicalX (m : ℕ) [Fact (2 ≤ m)] (i : Fin (2 * m - 2)) :
+    NQubitPauliGroupElement.weight (logicalX m i) = 2 := by
+  classical
+  have hxa : logIdx i ≠ xAnchor m := logIdx_ne_xAnchor m i
+  -- Compute the support: precisely {logIdx i, xAnchor m}.
+  have hsupp : NQubitPauliOperator.support (logicalX m i).operators =
+      ({logIdx i, xAnchor m} : Finset (Fin (2 * m))) := by
+    ext k
+    simp only [NQubitPauliOperator.mem_support, Finset.mem_insert, Finset.mem_singleton,
+      logicalX, NQubitPauliOperator.set, NQubitPauliOperator.identity]
+    by_cases hk1 : k = logIdx i
+    · subst hk1; simp
+    · by_cases hk2 : k = xAnchor m
+      · subst hk2; simp
+      · simp [hk1, hk2]
+  -- The support has cardinality 2.
+  change NQubitPauliOperator.weight (logicalX m i).operators = 2
+  unfold NQubitPauliOperator.weight
+  rw [hsupp]
+  rw [Finset.card_insert_of_notMem (by simp [hxa]), Finset.card_singleton]
 
 /-- T18: the iceberg `[[2m, 2m − 2, 2]]` code has distance exactly 2. -/
 theorem code_has_distance_two (m : ℕ) [Fact (2 ≤ m)] :
     HasCodeDistance (stabilizerCode m) 2 := by
-  sorry -- TODO(iceberg-T18): apply hasCodeDistance_two_of_anticommute_witness
-        -- with (stabilizerCode m), (generators m), stabilizerCode_toSubgroup_eq m,
-        -- weight_one_anticomm_witness m, and the witness
-        -- ⟨logicalX m ⟨0, by have : Fact (2 ≤ m) := inferInstance; omega⟩,
-        --   (logicalOpsIceberg m _).xOp_nontrivial,
-        --   <weight = 2 proof>⟩.
-        -- The weight=2 proof needs a parametric weight helper —
-        -- see gap_audit.md Gap 2.
+  have h2 : 2 ≤ m := Fact.out
+  have h0lt : 0 < 2 * m - 2 := by omega
+  refine hasCodeDistance_two_of_anticommute_witness (stabilizerCode m) (generators m)
+    (stabilizerCode_toSubgroup_eq m) (weight_one_anticomm_witness m) ?_
+  refine ⟨logicalX m ⟨0, h0lt⟩, ?_, ?_⟩
+  · exact (logicalOpsIceberg m ⟨0, h0lt⟩).xOp_nontrivial
+  · exact weight_logicalX m ⟨0, h0lt⟩
 
 /-- T19: the iceberg code packaged with its distance. -/
 noncomputable def stabilizerCodeWithDistance (m : ℕ) [Fact (2 ≤ m)] :

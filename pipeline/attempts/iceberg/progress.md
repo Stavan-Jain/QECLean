@@ -33,4 +33,31 @@
   filter (`{logIdx i, xAnchor m}`, count 2 even); one componentwise commute.
 - T14-helpers (logicalZ_commutes_S_Z, logicalZ_commutes_S_X): mirror of T13-helpers.
 - T13, T14 (logicalX/Z_mem_centralizer): standard `forall_comm_closure_iff` dispatch.
+- T15 (stabilizerCode): structure literal — `logical_commute_cross` via
+  structural `refine ⟨_, _, _, _⟩` consuming T12a/T12b/T12c + `by_cases`
+  on `ℓ = ℓ'` (since `fin_cases ℓ <;> fin_cases ℓ'` is unavailable for
+  parametric `Fin (2m − 2)`).
+- T16 (stabilizerCode_toSubgroup_eq): `change` + `rw [listToSet_generatorsList]`.
+- T17 (weight_one_anticomm_witness): clean 3-way `match P, hP`. No
+  `hi_dichotomy` needed — both stabilizers have full support.
+- weight_logicalX helper: parametric support computation, used by T18.
+- T18 (code_has_distance_two): one-liner via
+  `hasCodeDistance_two_of_anticommute_witness` (PR #34 helper).
+- T19 (stabilizerCodeWithDistance): structure literal packaging.
 
+### Cleanup (post-T19, agent killed mid-cleanup; spawning agent finished)
+
+- 3 linter warnings on N.lean resolved:
+  - Line 565: dropped unused `hza.symm` from `simp [hza.symm, PauliOperator.mulOp]`
+  - Line 736: dropped unused `hxa.symm` from `simp [hxa.symm]`
+  - Line 741: `show` → `change` (tactic actually rewrites the goal)
+  - Line 486: `simp [logIdx]` → `simp only [logIdx]` (new `linter.flexible`
+    site introduced post-cleanup; resolved before commit)
+- Stage-2 baseline files committed alongside Stage-4 wrap-up (oversight:
+  Stage 2 produced them in the worktree but didn't commit them):
+  - `QEC/Stabilizer/Codes/Iceberg.lean` (family umbrella)
+  - `pipeline/attempts/iceberg/{informal_spec, plan, reuse_audit, gap_audit}.md`
+- `state.yaml`: `status` flipped `formalization → pr-ready`,
+  `formalization_completed_at` set, `final_loc` recorded.
+- `lake build` clean repo-wide (3341 jobs); no new linter warnings on the
+  new file.
