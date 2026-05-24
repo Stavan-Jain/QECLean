@@ -1,5 +1,6 @@
 import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
 import QEC.Stabilizer.Framework.Core.Stabilizer.Centralizer
+import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
 import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
 import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
 import QEC.Stabilizer.Foundations.PauliGroup.Commutation
@@ -138,6 +139,44 @@ theorem no_weight_two_mem_centralizer_of_anticommute_witness (S : StabilizerGrou
       _ = (s * g) * (s * g)⁻¹ := by rw [← H]
       _ = 1 := by rw [mul_inv_cancel]
   exact negIdentity_ne_one n h_neg
+
+/-! ## Distance-2 packaging
+
+Combines `hasCodeDistance_of` (the general "prove distance by witness + min-weight"
+schema in `Framework/Core/Logical/CodeDistance.lean`) with the weight-1 anticommute
+helper above, specialized to `d = 2`. The only positive weight strictly less than 2
+is `w = 1`, so a single anticommute-witness function suffices to rule out the
+nontrivial-low-weight side, and a single explicit weight-2 logical handles the
+realizer side.
+
+Saves the `interval_cases w; rcases (IsNontrivialLogicalOperator_iff …).mp …; exact`
+boilerplate that every distance-2 CSS code instantiates verbatim.
+
+Use sites: `Codes/Small/FourQubit_4_2_2.lean` ([[4,2,2]]),
+`Codes/Small/CSS_4_1_2.lean` ([[4,1,2]] LNCY), and any future small CSS
+detection code (the iceberg family `[[2m, 2m-2, 2]]` is next in the engineering
+queue). -/
+
+/-- Distance-2 from an anticommute witness. Given a CSS-style stabilizer code
+`C`, a generating set `genSet` whose closure is `C.toStabilizerGroup`, a witness
+function ruling out weight-1 elements in the centralizer (the `h_anticomm`
+predicate, same as for `no_weight_one_mem_centralizer_of_anticommute_witness`),
+and an explicit weight-2 nontrivial logical, conclude `HasCodeDistance C 2`. -/
+theorem hasCodeDistance_two_of_anticommute_witness {k : ℕ} (C : StabilizerCode n k)
+    (genSet : Set (NQubitPauliGroupElement n))
+    (h_closure : C.toStabilizerGroup.toSubgroup = Subgroup.closure genSet)
+    (h_anticomm : ∀ i : Fin n, ∀ P : PauliOperator, P ≠ .I →
+      ∃ g ∈ genSet, Anticommute (weightOneAt i P) g)
+    (h_witness : ∃ g, IsNontrivialLogicalOperator g C.toStabilizerGroup ∧ weight g = 2) :
+    HasCodeDistance C 2 := by
+  refine hasCodeDistance_of C 2 (by decide) h_witness ?_
+  intro w hw_pos hw_lt g hg_weight h_nontrivial
+  interval_cases w
+  -- w = 1: g has weight 1; show g cannot lie in the centralizer.
+  rcases (IsNontrivialLogicalOperator_iff g C.toStabilizerGroup).mp h_nontrivial
+    with ⟨h_cent, _, _⟩
+  exact no_weight_one_mem_centralizer_of_anticommute_witness C.toStabilizerGroup
+    genSet h_closure h_anticomm g hg_weight h_cent
 
 end StabilizerGroup
 end Quantum

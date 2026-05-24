@@ -484,16 +484,10 @@ private lemma weight_one_anticomm_witness :
 /-- The [[4, 1, 2]] LNCY code has distance 2: every weight-1 single-qubit Pauli
 anticommutes with at least one stabilizer generator, and `X̄ = XXII` is a
 nontrivial logical operator of weight exactly 2. -/
-theorem code_has_distance_two : HasCodeDistance stabilizerCode 2 := by
-  refine hasCodeDistance_of stabilizerCode 2 (by decide)
-    ⟨logicalX, (logicalOpsCSS_4_1_2 0).xOp_nontrivial, by decide⟩ ?_
-  intro w hw_pos hw_lt g hg_weight h_nontrivial
-  interval_cases w
-  -- w = 1: g has weight 1; show g is not in the centralizer.
-  rcases (IsNontrivialLogicalOperator_iff g stabilizerCode.toStabilizerGroup).mp h_nontrivial
-    with ⟨h_cent, _, _⟩
-  exact no_weight_one_mem_centralizer_of_anticommute_witness stabilizerCode.toStabilizerGroup
-    generators stabilizerCode_toSubgroup_eq weight_one_anticomm_witness g hg_weight h_cent
+theorem code_has_distance_two : HasCodeDistance stabilizerCode 2 :=
+  hasCodeDistance_two_of_anticommute_witness stabilizerCode generators
+    stabilizerCode_toSubgroup_eq weight_one_anticomm_witness
+    ⟨logicalX, (logicalOpsCSS_4_1_2 0).xOp_nontrivial, by decide⟩
 
 /-- The [[4, 1, 2]] LNCY code packaged with its distance. -/
 noncomputable def stabilizerCodeWithDistance : StabilizerCodeWithDistance 4 1 2 where
