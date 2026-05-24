@@ -128,6 +128,32 @@ release; new code should import the new paths directly.
     the file lint-clean. See `FiveQubit_5_1_3.lean`'s
     `weight_one_anticomm_witness` and `weight_two_anticomm_witness` for the
     canonical use sites.
+  - **CSS distance proofs with multiple Z-generators (or multiple X-generators)
+    covering disjoint qubit subsets**: factor the "which generator covers `i`"
+    dichotomy out once and reuse across the `P = X` and `P = Y` match arms
+    rather than re-doing `by_cases` in each:
+
+    ```lean
+    have hi_dichotomy : (i = 0 ∨ i = 1) ∨ (i = 2 ∨ i = 3) := by
+      fin_cases i <;> tauto
+    ```
+
+    In each per-generator filter-equality helper, dispatch `rcases hi <;>
+    rcases hP` *inside* the `ext` proof before `fin_cases j` — keeps the
+    helper universally quantified over `i` instead of forcing per-case
+    specializations:
+
+    ```lean
+    have hfilter :
+        (Finset.univ.filter (anticommutesAt (weightOneAt i P) S_Z1)) =
+          ({i} : Finset (Fin 4)) := by
+      ext j; rcases hi with rfl | rfl <;> rcases hP with rfl | rfl <;>
+        fin_cases j <;> simp [...]
+    ```
+
+    Canonical use site: `CSS_4_1_2.lean`'s `weight_one_anticomm_witness`
+    (T19). Generalizes to larger CSS codes; the iceberg family
+    `[[2m, 2m-2, 2]]` will exercise this at scale.
   - **High-frequency mechanical fixes worth recognizing immediately**:
     - **Ambiguous overloaded name** (e.g. `mul_assoc` between `_root_.mul_assoc`
       and `NQubitPauliGroupElement.mul_assoc` when `open NQubitPauliGroupElement`
@@ -212,6 +238,15 @@ mathlib linter; don't introduce new violations):
   `linter.style.maxHeartbeats`. The same ordering rule applies to
   `omit [Fact ...] in`: the doc-comment must come AFTER `... in`, or the
   parser rejects the intervening doc-comment.
+- **`NQubitPauliOperator.identity` in simp sets** for CSS generator
+  equality lemmas: drop `identity` from the simp set when a generator's
+  `.set` chain *fully covers* every `Fin n` position (e.g.
+  `S_X1 = ...set 0 X.set 1 X.set 2 X.set 3 X` on `Fin 4`). Keep
+  `identity` for partial-coverage generators (e.g.
+  `S_Z1 = ...set 0 Z.set 1 Z` on `Fin 4` — qubits 2 and 3 fall through
+  to `identity`). `linter.unusedSimpArgs` flags the wrong choice. First
+  hit: `CSS_4_1_2.lean`'s T1 (`ZGenerators_are_ZType`) vs. T2
+  (`XGenerators_are_XType`).
 
 ## Project-specific helpers (NOT mathlib)
 
