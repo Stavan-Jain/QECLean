@@ -82,12 +82,6 @@ Top-level umbrella `.lean` files at the *sibling* level of each directory
 content there. Same convention for the sub-umbrellas
 (`Framework/Core/Stabilizer.lean`, etc.).
 
-**Compatibility shims**: every old leaf path (e.g.
-`QEC.Stabilizer.Codes.ToricCodeN`, `QEC.Stabilizer.Core.StabilizerGroup`,
-`QEC.Stabilizer.Lattice.ToricChainComplex`) still resolves via a 1-line
-re-export at the old path. These shims will be removed in a follow-up
-release; new code should import the new paths directly.
-
 ## Naming and style conventions
 
 - **Lemmas / theorems**: `snake_case`. Use `theorem` for top-level results,
