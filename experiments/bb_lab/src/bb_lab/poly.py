@@ -35,26 +35,37 @@ _CONST_RE = re.compile(r"\A\s*1\s*\Z")
 
 
 def _parse_term(term: str, group: AbelianGroup) -> tuple[int, ...]:
-    """Parse a single monomial like 'x', 'x^3', '1' into a group element."""
+    """Parse a monomial: a `*`-separated product of single-variable powers.
+
+    Examples:  '1', 'x', 'y^3', 'x*y', 'x^2*y^3'.
+    The constant 1 is the empty product. Implicit products like 'xy'
+    (without a `*`) are *not* accepted — raise to avoid silently
+    misparsing `state.yaml` inputs.
+    """
+    term = term.strip()
     if _CONST_RE.match(term):
         return tuple(0 for _ in group.orders)
-    m = _TERM_RE.match(term)
-    if not m:
-        raise ValueError(
-            f"poly parser: cannot parse monomial {term!r}; v0 only supports "
-            "single-variable powers like 'x', 'y^3', or the constant '1'. "
-            "Products like 'xy' or 'x^2 y' are unsupported."
-        )
-    var = m.group("var").lower()
-    if var not in _VAR_NAMES[: group.rank]:
-        raise ValueError(
-            f"poly parser: variable {var!r} out of range for group of rank "
-            f"{group.rank} (allowed: {list(_VAR_NAMES[: group.rank])})"
-        )
-    axis = _VAR_NAMES.index(var)
-    exp = int(m.group("exp") or "1")
+    factors = [f.strip() for f in term.split("*") if f.strip()]
     out = [0] * group.rank
-    out[axis] = exp % group.orders[axis]
+    for f in factors:
+        if _CONST_RE.match(f):
+            continue
+        m = _TERM_RE.match(f)
+        if not m:
+            raise ValueError(
+                f"poly parser: cannot parse factor {f!r} (in term {term!r}). "
+                "Factors must be single-variable powers like 'x', 'y^3', or '1'. "
+                "Implicit products like 'xy' (no '*') are unsupported."
+            )
+        var = m.group("var").lower()
+        if var not in _VAR_NAMES[: group.rank]:
+            raise ValueError(
+                f"poly parser: variable {var!r} out of range for group of rank "
+                f"{group.rank} (allowed: {list(_VAR_NAMES[: group.rank])})"
+            )
+        axis = _VAR_NAMES.index(var)
+        exp = int(m.group("exp") or "1")
+        out[axis] = (out[axis] + exp) % group.orders[axis]
     return tuple(out)
 
 

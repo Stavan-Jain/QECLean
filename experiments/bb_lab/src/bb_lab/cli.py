@@ -207,6 +207,122 @@ def enumerate_cmd(
         click.echo(f"    k={k:3d}: {k_dist[k]} codes")
 
 
+@main.command(name="fill-distances")
+@click.option(
+    "--db", type=click.Path(path_type=Path), default=None,
+    help="DuckDB store path (default: data/bb_instances.duckdb).",
+)
+@click.option(
+    "--max-n", type=int, default=48,
+    help="Skip instances with n > this (SAT cost ≈ exponential in d).",
+)
+@click.option(
+    "--min-k", type=int, default=2,
+    help="Skip instances with k < this (no logicals to find).",
+)
+@click.option(
+    "--limit", type=int, default=None,
+    help="Stop after this many instances.",
+)
+@click.option(
+    "--timeout-per-instance", type=int, default=120,
+    help="Per-instance wall-time cap; instances exceeding this get d_ub recorded.",
+)
+def fill_distances(
+    db: Path | None, max_n: int, min_k: int, limit: int | None,
+    timeout_per_instance: int,
+) -> None:
+    """Compute exact SAT distance for corpus instances without a stored
+    `d_exact`. Walks `bb_instances` in (n, k) order so the cheap ones
+    land first."""
+    import multiprocessing as _mp
+    import time
+    from .checks import bb_check_matrices
+    from .group import ZmZn
+    from .poly import Poly
+    from .sat_distance import x_distance
+    from .store import connect
+
+    db_path = db or (LAB_ROOT / "data" / "bb_instances.duckdb")
+    if not db_path.exists():
+        raise click.ClickException(
+            f"corpus DB {db_path} not found — run `bb-lab enumerate` first"
+        )
+
+    with connect(db_path) as con:
+        rows = con.execute(
+            """
+            SELECT instance_id, group_struct, ell, m, A_poly, B_poly, n, k
+              FROM bb_instances
+             WHERE d_exact IS NULL
+               AND n <= ?
+               AND k >= ?
+             ORDER BY n, k
+            """,
+            [max_n, min_k],
+        ).fetchall()
+        if limit is not None:
+            rows = rows[:limit]
+        click.echo(f"  pending: {len(rows)} instances (n ≤ {max_n}, k ≥ {min_k})")
+        n_done = 0
+        n_timeout = 0
+        for iid, gstruct, ell, m_, A_str, B_str, n_q, k_q in rows:
+            G = ZmZn(ell, m_)
+            A = Poly.from_string(A_str, G)
+            B = Poly.from_string(B_str, G)
+            checks = bb_check_matrices(A, B)
+
+            # Subprocess for hard timeout; SAT can be long-tailed even
+            # for "small" n.
+            t = time.time()
+            try:
+                with _mp.get_context("spawn").Pool(processes=1) as pool:
+                    res = pool.apply_async(_sat_d_worker, (checks.H_X, checks.H_Z))
+                    distance = res.get(timeout=timeout_per_instance)
+            except _mp.TimeoutError:
+                con.execute(
+                    "UPDATE bb_instances SET d_method = ?, updated_at = now() WHERE instance_id = ?",
+                    [f"sat-timeout@{timeout_per_instance}s", iid],
+                )
+                n_timeout += 1
+                click.echo(f"  TIMEOUT  [[{n_q},{k_q}]]  G={gstruct}  iid={iid[:8]}")
+                continue
+            dt = time.time() - t
+
+            con.execute(
+                """
+                UPDATE bb_instances
+                   SET d_exact = ?, d_method = ?, updated_at = now()
+                 WHERE instance_id = ?
+                """,
+                [distance, "sat-cadical@1.9.5 (pysat)", iid],
+            )
+            n_done += 1
+            click.echo(
+                f"  OK      [[{n_q},{k_q},{distance}]]  G={gstruct}  ({dt:5.1f}s)"
+            )
+        click.echo(f"\n  done: {n_done} solved, {n_timeout} timed out")
+
+
+def _sat_d_worker(H_X, H_Z) -> int:
+    """Top-level worker so multiprocessing can pickle it."""
+    from .checks import CheckMatrices
+    from .group import AbelianGroup
+    import numpy as np
+    n_qubits = H_X.shape[1]
+    # We don't have the AbelianGroup back here, but x_distance only
+    # uses its cardinality (via checks.num_qubits) and shape — so build
+    # a stub CheckMatrices with a placeholder group of the right size.
+    stub_G = AbelianGroup((n_qubits // 2,))  # rank-1 group of right cardinality
+    cm = CheckMatrices(
+        group=stub_G,
+        H_X=np.ascontiguousarray(H_X, dtype=np.uint8),
+        H_Z=np.ascontiguousarray(H_Z, dtype=np.uint8),
+    )
+    from .sat_distance import x_distance
+    return x_distance(cm).distance
+
+
 @main.command(name="verify-cert")
 @click.argument("cert_path", type=click.Path(exists=True, path_type=Path))
 @click.option(
