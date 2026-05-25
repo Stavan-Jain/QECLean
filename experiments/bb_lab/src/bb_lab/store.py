@@ -106,19 +106,50 @@ def connect(db_path: str | Path = DEFAULT_DB) -> Iterator[duckdb.DuckDBPyConnect
 
 
 def upsert_instance(con: duckdb.DuckDBPyConnection, inst: StoredInstance) -> None:
-    """Insert or update `inst` keyed by `instance_id`."""
+    """Insert or update `inst` keyed by `instance_id`.
+
+    Distance fields (`d_lb`, `d_ub`, `d_exact`, `d_method`, `cert_path`)
+    use COALESCE on conflict: a None passed in does NOT clobber an
+    existing non-None value. This keeps `bb-lab enumerate` safe to re-
+    run over a corpus that already has SAT distances filled in.
+    Structural fields (group, n, k, polys, ranks) always get the new
+    value on conflict.
+    """
     now = _dt.datetime.now(_dt.UTC)
     con.execute(
         """
-        INSERT OR REPLACE INTO bb_instances (
+        INSERT INTO bb_instances (
           instance_id, code_id, group_struct, ell, m, n, k,
           A_poly, B_poly, A_weight, B_weight,
           rank_HX, rank_HZ, dim_ker_A, dim_ker_B, orbit_size,
           d_lb, d_ub, d_exact, d_method, cert_path,
           inserted_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                  COALESCE((SELECT inserted_at FROM bb_instances WHERE instance_id = ?), ?),
-                  ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT (instance_id) DO UPDATE SET
+          code_id      = excluded.code_id,
+          group_struct = excluded.group_struct,
+          ell          = excluded.ell,
+          m            = excluded.m,
+          n            = excluded.n,
+          k            = excluded.k,
+          A_poly       = excluded.A_poly,
+          B_poly       = excluded.B_poly,
+          A_weight     = excluded.A_weight,
+          B_weight     = excluded.B_weight,
+          rank_HX      = excluded.rank_HX,
+          rank_HZ      = excluded.rank_HZ,
+          dim_ker_A    = excluded.dim_ker_A,
+          dim_ker_B    = excluded.dim_ker_B,
+          orbit_size   = excluded.orbit_size,
+          -- Distance fields: COALESCE preserves the existing value if
+          -- the new row passes NULL. fill-distances passes non-NULL to
+          -- update; enumerate passes NULL to avoid clobbering.
+          d_lb         = COALESCE(excluded.d_lb, bb_instances.d_lb),
+          d_ub         = COALESCE(excluded.d_ub, bb_instances.d_ub),
+          d_exact      = COALESCE(excluded.d_exact, bb_instances.d_exact),
+          d_method     = COALESCE(excluded.d_method, bb_instances.d_method),
+          cert_path    = COALESCE(excluded.cert_path, bb_instances.cert_path),
+          updated_at   = excluded.updated_at
         """,
         [
             inst.instance_id, inst.code_id, inst.group_struct,
@@ -126,7 +157,7 @@ def upsert_instance(con: duckdb.DuckDBPyConnection, inst: StoredInstance) -> Non
             inst.A_poly, inst.B_poly, inst.A_weight, inst.B_weight,
             inst.rank_HX, inst.rank_HZ, inst.dim_ker_A, inst.dim_ker_B, inst.orbit_size,
             inst.d_lb, inst.d_ub, inst.d_exact, inst.d_method, inst.cert_path,
-            inst.instance_id, now, now,
+            now, now,
         ],
     )
 

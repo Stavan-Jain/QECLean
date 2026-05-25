@@ -501,5 +501,200 @@ def verify_cert(cert_path: Path, instances: Path | None, drat_trim: str | None, 
         )
 
 
+def _orbit_contains_no_swap(
+    target_supp: frozenset, candidate_supp: frozenset, G, auts,
+) -> bool:
+    """Return True iff `target_supp` is in the orbit of `candidate_supp`
+    under translations + automorphisms ALONE (block-swap excluded).
+
+    Used to detect, after a `canonical_pair` migration, whether the new
+    A-poly's support comes from the old A-poly's orbit (no swap) or
+    from the old B-poly's orbit (swap happened — the A/B-asymmetric
+    fields then need transposition).
+    """
+    for phi in auts:
+        phi_supp = phi.apply_support(candidate_supp)
+        for h in G:
+            shifted = frozenset(G.add(g, h) for g in phi_supp)
+            if shifted == target_supp:
+                return True
+    return False
+
+
+@main.command(name="migrate-canonical-ids")
+@click.option(
+    "--db", type=click.Path(path_type=Path), default=None,
+    help="DuckDB store path (default: data/bb_instances.duckdb).",
+)
+@click.option(
+    "--dry-run/--apply", default=True,
+    help="By default just report what would change; pass --apply to commit the UPDATEs.",
+)
+def migrate_canonical_ids(db: Path | None, dry_run: bool) -> None:
+    """Recompute every row's `instance_id`, `A_poly`, `B_poly` using the
+    current `canonical_pair` rule.
+
+    Needed after the canonical-form lex order changes (e.g. the Move 1
+    bitset rewrite, which picks a different orbit representative
+    within each equivalence class). When the new canonical rep is
+    block-swapped relative to the old, the A/B-asymmetric feature
+    columns (`dim_ker_A` ↔ `dim_ker_B`, `supp_diameter_A` ↔ `…_B`,
+    `min_wt_ker_A` ↔ `min_wt_ker_B`, `A_weight` ↔ `B_weight`) are
+    transposed in the same UPDATE. Idempotent: rows already in the
+    current canonical form are no-ops. Use `--apply` to commit.
+    """
+    from collections import defaultdict
+    from .automorphism import automorphisms
+    from .canonical import build_perm_table, canonical_pair
+    from .group import ZmZn
+    from .poly import Poly
+    from .store import canonical_hash, connect
+
+    db_path = db or (LAB_ROOT / "data" / "bb_instances.duckdb")
+    if not db_path.exists():
+        raise click.ClickException(f"corpus DB {db_path} not found")
+
+    # Cache automorphism + permutation tables per (ell, m) so we pay
+    # the build cost once per group instead of once per row.
+    perm_cache: dict[tuple[int, int], tuple] = {}
+
+    def get_group_data(ell: int, m_: int):
+        key = (ell, m_)
+        if key not in perm_cache:
+            G = ZmZn(ell, m_)
+            auts = automorphisms(G)
+            perm_cache[key] = (G, auts, build_perm_table(G, auts=auts))
+        return perm_cache[key]
+
+    n_total = 0
+    n_changed = 0
+    n_swapped = 0
+    n_collisions = 0
+    by_group: dict[str, list[int]] = defaultdict(lambda: [0, 0])  # [seen, changed]
+
+    with connect(db_path) as con:
+        rows = con.execute(
+            "SELECT instance_id, group_struct, ell, m, A_poly, B_poly FROM bb_instances"
+        ).fetchall()
+        click.echo(f"  scanning {len(rows)} rows...")
+
+        # First pass: compute (old_id, new_id, new_A, new_B, swapped)
+        # tuples; detect collisions before applying any UPDATE.
+        updates: list[tuple[str, str, str, str, bool]] = []
+        new_ids_seen: set[str] = set()
+        for iid, gstruct, ell, m_, A_str, B_str in rows:
+            n_total += 1
+            by_group[gstruct][0] += 1
+            G, auts, perms = get_group_data(ell, m_)
+            A = Poly.from_string(A_str, G)
+            B = Poly.from_string(B_str, G)
+            canon = canonical_pair(A.support, B.support, G, perms=perms)
+            new_A_supp = frozenset(canon.A_support)
+            new_B_supp = frozenset(canon.B_support)
+            new_A_str = Poly(support=new_A_supp, group=G).canonical_string()
+            new_B_str = Poly(support=new_B_supp, group=G).canonical_string()
+            new_id = canonical_hash(gstruct, new_A_str, new_B_str)
+            if new_id == iid and new_A_str == A_str and new_B_str == B_str:
+                continue
+            # Detect whether the new canonical rep came from the swap
+            # orientation: new_A is in the orbit of old A under
+            # (aut × translation) alone iff no swap happened.
+            no_swap = _orbit_contains_no_swap(new_A_supp, A.support, G, auts)
+            swapped = not no_swap
+            if swapped:
+                n_swapped += 1
+            if new_id in new_ids_seen:
+                n_collisions += 1
+                click.echo(
+                    f"  COLLISION  old={iid[:8]} → new={new_id[:8]} "
+                    f"(already claimed by another row in {gstruct})"
+                )
+                continue
+            new_ids_seen.add(new_id)
+            updates.append((iid, new_id, new_A_str, new_B_str, swapped))
+            n_changed += 1
+            by_group[gstruct][1] += 1
+
+        click.echo(
+            f"\n  summary: {n_total} rows scanned, "
+            f"{n_changed} need updates ({n_swapped} via block-swap), "
+            f"{n_collisions} collisions"
+        )
+        for gstruct in sorted(by_group):
+            seen, changed = by_group[gstruct]
+            click.echo(f"    {gstruct:10s}  {seen:4d} seen  {changed:4d} changed")
+
+        if n_collisions > 0:
+            raise click.ClickException(
+                "collisions detected; aborting before any UPDATE. "
+                "This means two orbit-distinct rows are mapping to the same "
+                "new canonical hash, which should not happen — investigate."
+            )
+
+        if dry_run:
+            click.echo("\n  --dry-run (default); pass --apply to commit the UPDATEs")
+            return
+
+        if not updates:
+            click.echo("\n  nothing to do (DB already in current canonical form).")
+            return
+
+        # Detect which A/B-paired feature columns actually exist (some
+        # are added by `bb-lab fill-features` and may not be present
+        # in a v0-only DB).
+        feat_cols = {
+            r[0] for r in con.execute(
+                "SELECT column_name FROM information_schema.columns "
+                "WHERE table_name = 'bb_instances'"
+            ).fetchall()
+        }
+        swap_pairs = [
+            ("dim_ker_A", "dim_ker_B"),
+            ("A_weight", "B_weight"),
+            ("supp_diameter_A", "supp_diameter_B"),
+            ("min_wt_ker_A", "min_wt_ker_B"),
+        ]
+        active_pairs = [(a, b) for (a, b) in swap_pairs if a in feat_cols and b in feat_cols]
+        swap_set_clause = ", ".join(
+            f"{a} = old.{b}, {b} = old.{a}" for (a, b) in active_pairs
+        )
+
+        for old_id, new_id, new_A, new_B, swapped in updates:
+            if swapped and active_pairs:
+                # Two-step UPDATE: capture the old A/B-paired values, then
+                # swap them as we write the new id + polys.
+                old_vals = con.execute(
+                    f"SELECT {', '.join(c for pair in active_pairs for c in pair)} "
+                    f"FROM bb_instances WHERE instance_id = ?",
+                    [old_id],
+                ).fetchone()
+                set_pieces = [
+                    "instance_id = ?", "A_poly = ?", "B_poly = ?", "updated_at = now()",
+                ]
+                params: list[object] = [new_id, new_A, new_B]
+                for (a_col, b_col), (a_val, b_val) in zip(
+                    active_pairs, [tuple(old_vals[i:i+2]) for i in range(0, len(old_vals), 2)],
+                ):
+                    set_pieces.append(f"{a_col} = ?")
+                    params.append(b_val)
+                    set_pieces.append(f"{b_col} = ?")
+                    params.append(a_val)
+                params.append(old_id)
+                con.execute(
+                    f"UPDATE bb_instances SET {', '.join(set_pieces)} WHERE instance_id = ?",
+                    params,
+                )
+            else:
+                con.execute(
+                    """
+                    UPDATE bb_instances
+                       SET instance_id = ?, A_poly = ?, B_poly = ?, updated_at = now()
+                     WHERE instance_id = ?
+                    """,
+                    [new_id, new_A, new_B, old_id],
+                )
+        click.echo(f"\n  applied {len(updates)} UPDATEs ({n_swapped} with A/B field swap).")
+
+
 if __name__ == "__main__":
     main()
