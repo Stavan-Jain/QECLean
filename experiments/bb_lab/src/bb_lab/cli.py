@@ -155,13 +155,23 @@ def lean_emit(state_yaml: Path, out: Path) -> None:
 @click.option(
     "--verbose/--no-verbose", default=True,
 )
+@click.option(
+    "--workers", type=int, default=0,
+    help="Parallel workers (0=auto, capped at 8; 1=serial). "
+         "Parallel uses `enumerate_canonical_pairs_parallel`; serial keeps "
+         "the streaming iterator.",
+)
 def enumerate_cmd(
     ell: int, m_arg: int, weight: int, only_k_geq: int,
-    db: Path | None, verbose: bool,
+    db: Path | None, verbose: bool, workers: int,
 ) -> None:
     """Canonical-form enumeration over BB instances → DuckDB corpus."""
+    import os
     import time
-    from .enumerate_bb import enumerate_canonical_pairs
+    from .enumerate_bb import (
+        enumerate_canonical_pairs,
+        enumerate_canonical_pairs_parallel,
+    )
     from .group import ZmZn
     from .poly import Poly
     from .store import StoredInstance, canonical_hash, connect, upsert_instance
@@ -169,13 +179,32 @@ def enumerate_cmd(
     G = ZmZn(ell, m_arg)
     db_path = db or (LAB_ROOT / "data" / "bb_instances.duckdb")
 
+    if workers == 0:
+        n_workers = min(os.cpu_count() or 1, 8)
+    else:
+        n_workers = max(workers, 1)
+
     t = time.time()
     n_added = 0
     k_dist: dict[int, int] = {}
-    with connect(db_path) as con:
-        for inst in enumerate_canonical_pairs(
+
+    if n_workers == 1:
+        # Streaming serial path — write to DB as instances arrive.
+        instance_source = enumerate_canonical_pairs(
             G, weight=weight, only_k_geq=only_k_geq, verbose=verbose,
-        ):
+        )
+    else:
+        # Parallel path — collect all hits then bulk insert. Workers don't
+        # share the DB lock, so writing has to happen on the driver.
+        if verbose:
+            click.echo(f"  enumerating in parallel with {n_workers} workers...")
+        instance_source = enumerate_canonical_pairs_parallel(
+            G, weight=weight, only_k_geq=only_k_geq,
+            n_workers=n_workers, verbose=verbose,
+        )
+
+    with connect(db_path) as con:
+        for inst in instance_source:
             A_poly_str = Poly(
                 support=frozenset(inst.canonical.A_support), group=G
             ).canonical_string()
@@ -199,9 +228,10 @@ def enumerate_cmd(
             n_added += 1
             k_dist[inst.k] = k_dist.get(inst.k, 0) + 1
     dt = time.time() - t
+    mode = "serial" if n_workers == 1 else f"parallel-{n_workers}"
     click.echo(
-        f"  enumerate Z_{ell}xZ_{m_arg} weight={weight} k≥{only_k_geq}: "
-        f"{n_added} canonical instances in {dt:.1f}s → {db_path}"
+        f"  enumerate Z_{ell}xZ_{m_arg} weight={weight} k≥{only_k_geq} "
+        f"[{mode}]: {n_added} canonical instances in {dt:.1f}s → {db_path}"
     )
     for k in sorted(k_dist):
         click.echo(f"    k={k:3d}: {k_dist[k]} codes")
