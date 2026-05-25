@@ -210,10 +210,14 @@ def enumerate_cmd(
 @main.command(name="fill-features")
 @click.option("--db", type=click.Path(path_type=Path), default=None)
 def fill_features(db: Path | None) -> None:
-    """Compute combinatorial features (Tanner girth, support diameter)
-    for every corpus instance lacking them."""
-    from .checks import bb_check_matrices
-    from .features import tanner_girth, support_diameter
+    """Compute combinatorial + algebraic features for every corpus
+    instance lacking them: Tanner girth, support diameter, and
+    `min_wt_ker_A` / `min_wt_ker_B` (minimum non-zero Hamming weight of
+    the F₂-kernel of multiplication-by-A / B).  The last is the
+    classical cyclic-code min distance — and the key BB-distance
+    bound `d_X(BB(A,B)) ≤ min(min_wt_ker_A, min_wt_ker_B)`."""
+    from .checks import bb_check_matrices, circulant
+    from .features import tanner_girth, support_diameter, min_weight_in_kernel
     from .group import ZmZn
     from .poly import Poly
     from .store import connect
@@ -221,18 +225,21 @@ def fill_features(db: Path | None) -> None:
 
     db_path = db or (LAB_ROOT / "data" / "bb_instances.duckdb")
     with connect(db_path) as con:
-        # Schema may already have the new columns from CREATE TABLE IF
-        # NOT EXISTS; for older DBs we ALTER to add them.
-        for col in ("tanner_girth", "supp_diameter_A", "supp_diameter_B"):
+        for col in (
+            "tanner_girth", "supp_diameter_A", "supp_diameter_B",
+            "min_wt_ker_A", "min_wt_ker_B",
+        ):
             try:
                 con.execute(f"ALTER TABLE bb_instances ADD COLUMN {col} INTEGER")
             except Exception:
-                pass  # already exists
+                pass
         rows = con.execute(
-            "SELECT instance_id, ell, m, A_poly, B_poly FROM bb_instances WHERE tanner_girth IS NULL"
+            "SELECT instance_id, ell, m, A_poly, B_poly, dim_ker_A, dim_ker_B "
+            "FROM bb_instances "
+            "WHERE tanner_girth IS NULL OR min_wt_ker_A IS NULL"
         ).fetchall()
         click.echo(f"  filling features for {len(rows)} instances...")
-        for iid, ell, m_, A_str, B_str in rows:
+        for iid, ell, m_, A_str, B_str, dim_kA, dim_kB in rows:
             G = ZmZn(ell, m_)
             A = Poly.from_string(A_str, G)
             B = Poly.from_string(B_str, G)
@@ -241,13 +248,18 @@ def fill_features(db: Path | None) -> None:
             g_int = -1 if g == math.inf else int(g)
             diam_A = support_diameter(A.support, G)
             diam_B = support_diameter(B.support, G)
+            # Min-weight-in-ker: skip if dim too large (brute force is
+            # exponential). For our corpus dim_ker ≤ 24.
+            mw_A = min_weight_in_kernel(circulant(A)) if dim_kA <= 22 else None
+            mw_B = min_weight_in_kernel(circulant(B)) if dim_kB <= 22 else None
             con.execute(
                 """
                 UPDATE bb_instances
-                   SET tanner_girth = ?, supp_diameter_A = ?, supp_diameter_B = ?, updated_at = now()
+                   SET tanner_girth = ?, supp_diameter_A = ?, supp_diameter_B = ?,
+                       min_wt_ker_A = ?, min_wt_ker_B = ?, updated_at = now()
                  WHERE instance_id = ?
                 """,
-                [g_int, diam_A, diam_B, iid],
+                [g_int, diam_A, diam_B, mw_A, mw_B, iid],
             )
         click.echo(f"  done.")
 

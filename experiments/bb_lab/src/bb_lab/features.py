@@ -70,6 +70,44 @@ def tanner_girth(H: np.ndarray) -> int | float:
     return best
 
 
+def min_weight_in_kernel(M: np.ndarray) -> int:
+    """Minimum non-zero Hamming weight of a vector in `ker(M)` over F₂.
+
+    `ker(M)` is treated as a linear code in F₂^n; this returns its
+    minimum distance (≥ 1 for nontrivial kernels).
+
+    The kernel is built once via `nullspace_f2`; we then walk all
+    2^dim_ker − 1 non-empty subsets of basis vectors, XOR them, and
+    track the minimum weight. For dim_ker ≤ ~22 this is fast; for
+    larger kernels we'd want a Brouwer–Zimmermann-style algorithm but
+    that's a v1.5 concern.
+
+    Returns `n + 1` (a sentinel "no nonzero element found") if the
+    kernel is trivial.
+    """
+    from .linalg import nullspace_f2
+    basis = nullspace_f2(M)
+    dim, n = basis.shape
+    if dim == 0:
+        return n + 1
+    if dim > 22:
+        raise ValueError(
+            f"kernel dim {dim} > 22; brute-force enumeration is "
+            "infeasible. Use a min-distance algorithm instead."
+        )
+    best = n + 1
+    # Iterate Gray-code style: each step toggles one basis vector
+    acc = np.zeros(n, dtype=np.uint8)
+    for mask in range(1, 1 << dim):
+        # Bit that toggled between mask-1 and mask
+        toggled = (mask ^ (mask - 1)).bit_length() - 1
+        acc ^= basis[toggled]
+        w = int(acc.sum())
+        if w < best:
+            best = w
+    return best
+
+
 def support_diameter(
     support: frozenset[tuple[int, ...]] | tuple[tuple[int, ...], ...],
     G: AbelianGroup,
