@@ -1,21 +1,24 @@
 """Weight-bounded enumeration of canonical BB-code polynomial pairs.
 
-For a finite abelian group G and a weight bound `w_max`, enumerate
+For a finite abelian group G and a weight bound `weight`, enumerate
 all distinct (modulo `canonical.canonical_pair`) BB instances with
-`weight(A), weight(B) ≤ w_max` and produces:
+`weight(A) = weight(B) = weight` and produces:
   - canonical (A, B) supports
   - n, k
   - polynomial weights
-  - kernel dimensions (k = 2·dim ker A ∩ ker B is already in `code_params`)
+  - rank H_X, rank H_Z, dim ker A, dim ker B
 
-`itertools.combinations` is the inner loop; canonical-form dedup
-happens via a `set` of canonical keys. We additionally skip pairs
-where either polynomial is zero (those are degenerate).
+`itertools.combinations` is the inner loop; the canonical-form check
+uses the bitset fast path (`is_canonical_bits` against a precomputed
+`(φ, h)` permutation table). Pairs are skipped early if their bitset
+key is dominated by any transformation — most pairs early-exit after
+a handful of permutation applications.
 
 For G = Z_3 × Z_3 (|G|=9, |Aut|=48), weight 3 enumeration is
-nearly instant. For G = Z_6 × Z_6 (|G|=36, |Aut|=288), weight 3 is
-still O(seconds). Beyond that we'd need smarter enumeration (canonical
-A first, then canonical-B-given-A); deferred.
+nearly instant. For G = Z_6 × Z_6 (|G|=36, |Aut|=288), weight 3 fits
+in minutes. For G = Z_12 × Z_6 (the gross group), weight 3 takes
+hours; that's the asymptote we expect from a "canonical-A then
+canonical-B" split, deferred to a future move.
 """
 
 from __future__ import annotations
@@ -24,14 +27,18 @@ import itertools
 from dataclasses import dataclass
 from typing import Iterator
 
-import numpy as np
-
 from .automorphism import automorphisms
-from .canonical import CanonicalPair, canonical_pair
-from .checks import bb_check_matrices
+from .canonical import (
+    CanonicalPair,
+    build_perm_table,
+    canonical_bits,
+    is_canonical_bits,
+    _bits_to_support,
+)
+from .checks import bb_check_matrices, circulant
 from .codeparams import code_params
 from .group import AbelianGroup
-from .linalg import nullspace_f2, rank_f2
+from .linalg import rank_f2
 from .poly import Poly
 
 
@@ -50,20 +57,18 @@ class EnumeratedInstance:
     dim_ker_B: int
 
 
-def _to_poly(supp: tuple[tuple[int, ...], ...], G: AbelianGroup) -> Poly:
+def _to_poly(
+    supp: tuple[tuple[int, ...], ...], G: AbelianGroup
+) -> Poly:
     return Poly(support=frozenset(supp), group=G)
 
 
-def _make_instance(
-    canon: CanonicalPair,
-) -> EnumeratedInstance:
+def _make_instance(canon: CanonicalPair) -> EnumeratedInstance:
     G = canon.group
     A = _to_poly(canon.A_support, G)
     B = _to_poly(canon.B_support, G)
     checks = bb_check_matrices(A, B)
     params = code_params(checks)
-    # Kernel dims for each individual polynomial
-    from .checks import circulant
     dim_ker_A = G.cardinality - rank_f2(circulant(A))
     dim_ker_B = G.cardinality - rank_f2(circulant(B))
     return EnumeratedInstance(
@@ -92,31 +97,48 @@ def enumerate_canonical_pairs(
     have no logicals; not interesting for distance work).
     """
     auts = automorphisms(G)
-    elems = list(G)
+    perms = build_perm_table(G, auts=auts)
+    N = G.cardinality
     if verbose:
         from sys import stderr
         print(
-            f"enumerate: |G|={G.cardinality}, |Aut(G)|={len(auts)}, "
+            f"enumerate: |G|={N}, |Aut(G)|={len(auts)}, "
             f"weight={weight}, "
-            f"choose(|G|, w)={_binom(G.cardinality, weight)} polys, "
-            f"choose(|G|, w)^2={_binom(G.cardinality, weight)**2} pairs",
+            f"choose(|G|, w)={_binom(N, weight)} polys, "
+            f"choose(|G|, w)^2={_binom(N, weight)**2} raw pairs, "
+            f"|perms|={len(perms)}",
             file=stderr,
         )
-    # Fast-path strategy: walk raw pairs in lex order. For each, check
-    # `is_canonical` (early-exits on the first smaller orbit element).
-    # We yield only pairs that are themselves the canonical rep — no
-    # set-of-canonical-keys needed, since each canonical rep is visited
-    # exactly once.
-    from .canonical import is_canonical
-    for poly_A_idx in itertools.combinations(range(G.cardinality), weight):
-        sA = frozenset(elems[i] for i in poly_A_idx)
-        for poly_B_idx in itertools.combinations(range(G.cardinality), weight):
-            sB = frozenset(elems[i] for i in poly_B_idx)
-            if not is_canonical(sA, sB, G, auts=auts):
+
+    # Walk raw pairs in lex order of their bitsets. Combinations come
+    # from itertools, so the bitset for `combo` is just `sum(1<<i for i
+    # in combo)`. Use `is_canonical_bits` for the early-exit check; only
+    # the surviving canonical reps incur the full canonical_bits walk
+    # (needed for the orbit-size count).
+    for combo_A in itertools.combinations(range(N), weight):
+        A_bits = 0
+        for i in combo_A:
+            A_bits |= 1 << i
+        for combo_B in itertools.combinations(range(N), weight):
+            B_bits = 0
+            for j in combo_B:
+                B_bits |= 1 << j
+            if not is_canonical_bits(A_bits, B_bits, perms):
                 continue
-            # Compute full canonical form (just for orbit-size — the
-            # representative is already sA, sB).
-            canon = canonical_pair(sA, sB, G, auts=auts)
+            # Surviving pairs are canonical; compute orbit size and
+            # repackage as group-element tuples.
+            can_A, can_B, orbit_size = canonical_bits(A_bits, B_bits, perms)
+            # `is_canonical_bits` already guaranteed `(A_bits, B_bits)`
+            # is the lex-min rep, so `can_A == A_bits` and `can_B == B_bits`.
+            assert (can_A, can_B) == (A_bits, B_bits), (
+                "canonical_bits disagrees with is_canonical_bits — bug"
+            )
+            canon = CanonicalPair(
+                group=G,
+                A_support=_bits_to_support(can_A, G),
+                B_support=_bits_to_support(can_B, G),
+                orbit_size=orbit_size,
+            )
             inst = _make_instance(canon)
             if only_k_geq is not None and inst.k < only_k_geq:
                 continue

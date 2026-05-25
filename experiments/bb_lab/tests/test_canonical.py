@@ -16,7 +16,15 @@ from __future__ import annotations
 import pytest
 
 from bb_lab.automorphism import Automorphism, automorphisms
-from bb_lab.canonical import canonical_pair, is_canonical
+from bb_lab.canonical import (
+    _bits_to_support,
+    _support_to_bits,
+    build_perm_table,
+    canonical_bits,
+    canonical_pair,
+    is_canonical,
+    is_canonical_bits,
+)
 from bb_lab.group import AbelianGroup, ZmZn
 
 
@@ -158,3 +166,104 @@ def test_canonical_zero_polynomials_handled():
     canon = canonical_pair(set(), set(), G, auts=auts)
     assert canon.A_support == ()
     assert canon.B_support == ()
+
+
+# ---------------------------------------------------------------------------
+# Bitset-level API (introduced when canonical form was migrated off
+# frozenset[tuple] supports for speed)
+
+def test_support_bits_roundtrip():
+    """`_support_to_bits` then `_bits_to_support` is the identity (modulo
+    set vs sorted-tuple)."""
+    G = ZmZn(6, 6)
+    supp = frozenset({(0, 0), (3, 0), (1, 1), (5, 4)})
+    bits = _support_to_bits(supp, G)
+    recovered = _bits_to_support(bits, G)
+    assert set(recovered) == supp
+
+
+def test_perm_table_matches_explicit_transformation():
+    """For each (φ, h) entry of `build_perm_table(G)`, applying it to a
+    bitset of a support coincides with applying φ then translation to
+    the support directly."""
+    G = ZmZn(3, 4)
+    auts = automorphisms(G)
+    perms = build_perm_table(G, auts=auts)
+    supp = frozenset({(0, 0), (1, 0), (2, 3)})
+    bits = _support_to_bits(supp, G)
+    elems = list(G)
+    k = 0
+    for phi in auts:
+        for h in elems:
+            sigma = perms[k]
+            k += 1
+            # Apply via the precomputed permutation.
+            from bb_lab.canonical import _permute_bits
+            via_perm = _permute_bits(bits, sigma)
+            # Apply via the explicit phi-then-translate.
+            via_explicit = _support_to_bits(
+                frozenset(G.add(phi(g), h) for g in supp), G,
+            )
+            assert via_perm == via_explicit, (
+                f"perm {k-1} (phi={phi.images}, h={h}) "
+                f"disagrees with explicit transformation"
+            )
+
+
+def test_is_canonical_bits_agrees_with_canonical_bits():
+    """For random pairs: is_canonical_bits returns True iff
+    canonical_bits returns the input."""
+    import itertools
+    G = ZmZn(3, 3)
+    perms = build_perm_table(G)
+    N = G.cardinality
+    pairs = list(itertools.islice(
+        itertools.product(
+            itertools.combinations(range(N), 3),
+            itertools.combinations(range(N), 3),
+        ),
+        80,
+    ))
+    for cA, cB in pairs:
+        A_bits = 0
+        for i in cA: A_bits |= 1 << i
+        B_bits = 0
+        for j in cB: B_bits |= 1 << j
+        fast = is_canonical_bits(A_bits, B_bits, perms)
+        can_A, can_B, _ = canonical_bits(A_bits, B_bits, perms)
+        slow = (can_A == A_bits) and (can_B == B_bits)
+        assert fast == slow, (
+            f"is_canonical_bits={fast} disagrees with canonical_bits "
+            f"({can_A}, {can_B}) on input ({A_bits}, {B_bits})"
+        )
+
+
+def test_canonical_bits_orbit_size_matches_canonical_pair():
+    """Orbit size as computed at the bitset layer agrees with the high
+    level CanonicalPair.orbit_size."""
+    G = ZmZn(3, 3)
+    auts = automorphisms(G)
+    perms = build_perm_table(G, auts=auts)
+    elems = list(G)
+    A = frozenset({elems[0], elems[1], elems[2]})
+    B = frozenset({elems[3], elems[4], elems[5]})
+    canon = canonical_pair(A, B, G, auts=auts)
+    _, _, orbit_bits = canonical_bits(
+        _support_to_bits(A, G), _support_to_bits(B, G), perms,
+    )
+    assert canon.orbit_size == orbit_bits
+
+
+def test_canonical_pair_accepts_precomputed_perms():
+    """Passing precomputed `perms` to `canonical_pair` is equivalent to
+    letting it compute the table internally."""
+    G = ZmZn(3, 4)
+    auts = automorphisms(G)
+    perms = build_perm_table(G, auts=auts)
+    A = {(0, 0), (1, 0), (2, 3)}
+    B = {(0, 1), (0, 2), (1, 2)}
+    c1 = canonical_pair(A, B, G, auts=auts)
+    c2 = canonical_pair(A, B, G, perms=perms)
+    assert c1.A_support == c2.A_support
+    assert c1.B_support == c2.B_support
+    assert c1.orbit_size == c2.orbit_size
