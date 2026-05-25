@@ -207,6 +207,51 @@ def enumerate_cmd(
         click.echo(f"    k={k:3d}: {k_dist[k]} codes")
 
 
+@main.command(name="fill-features")
+@click.option("--db", type=click.Path(path_type=Path), default=None)
+def fill_features(db: Path | None) -> None:
+    """Compute combinatorial features (Tanner girth, support diameter)
+    for every corpus instance lacking them."""
+    from .checks import bb_check_matrices
+    from .features import tanner_girth, support_diameter
+    from .group import ZmZn
+    from .poly import Poly
+    from .store import connect
+    import math
+
+    db_path = db or (LAB_ROOT / "data" / "bb_instances.duckdb")
+    with connect(db_path) as con:
+        # Schema may already have the new columns from CREATE TABLE IF
+        # NOT EXISTS; for older DBs we ALTER to add them.
+        for col in ("tanner_girth", "supp_diameter_A", "supp_diameter_B"):
+            try:
+                con.execute(f"ALTER TABLE bb_instances ADD COLUMN {col} INTEGER")
+            except Exception:
+                pass  # already exists
+        rows = con.execute(
+            "SELECT instance_id, ell, m, A_poly, B_poly FROM bb_instances WHERE tanner_girth IS NULL"
+        ).fetchall()
+        click.echo(f"  filling features for {len(rows)} instances...")
+        for iid, ell, m_, A_str, B_str in rows:
+            G = ZmZn(ell, m_)
+            A = Poly.from_string(A_str, G)
+            B = Poly.from_string(B_str, G)
+            checks = bb_check_matrices(A, B)
+            g = tanner_girth(checks.H_X)
+            g_int = -1 if g == math.inf else int(g)
+            diam_A = support_diameter(A.support, G)
+            diam_B = support_diameter(B.support, G)
+            con.execute(
+                """
+                UPDATE bb_instances
+                   SET tanner_girth = ?, supp_diameter_A = ?, supp_diameter_B = ?, updated_at = now()
+                 WHERE instance_id = ?
+                """,
+                [g_int, diam_A, diam_B, iid],
+            )
+        click.echo(f"  done.")
+
+
 @main.command(name="fill-distances")
 @click.option(
     "--db", type=click.Path(path_type=Path), default=None,
