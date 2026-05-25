@@ -134,13 +134,77 @@ def lean_emit(state_yaml: Path, out: Path) -> None:
 
 
 @main.command(name="enumerate")
-def enumerate_cmd() -> None:
-    """Canonical-form enumeration over BB instances (v1; not in v0)."""
-    raise NotImplementedError(
-        "enumerate is part of v1 (canonical-form deduper + weight-bounded "
-        "enumeration). v0 only validates the substrate against the Bravyi "
-        "table; run `bb-lab bravyi-check` instead."
+@click.option(
+    "--ell", type=int, required=True, help="First cyclic factor ℓ for G = ZMod ℓ × ZMod m.",
+)
+@click.option(
+    "--m", "m_arg", type=int, required=True, help="Second cyclic factor m.",
+)
+@click.option(
+    "--weight", type=int, default=3,
+    help="Hamming weight of A and B (Bravyi uses 3).",
+)
+@click.option(
+    "--only-k-geq", type=int, default=2,
+    help="Drop canonical BB codes with k < this (k=0 codes have no logicals).",
+)
+@click.option(
+    "--db", type=click.Path(path_type=Path), default=None,
+    help="DuckDB output path (default: data/bb_instances.duckdb).",
+)
+@click.option(
+    "--verbose/--no-verbose", default=True,
+)
+def enumerate_cmd(
+    ell: int, m_arg: int, weight: int, only_k_geq: int,
+    db: Path | None, verbose: bool,
+) -> None:
+    """Canonical-form enumeration over BB instances → DuckDB corpus."""
+    import time
+    from .enumerate_bb import enumerate_canonical_pairs
+    from .group import ZmZn
+    from .poly import Poly
+    from .store import StoredInstance, canonical_hash, connect, upsert_instance
+
+    G = ZmZn(ell, m_arg)
+    db_path = db or (LAB_ROOT / "data" / "bb_instances.duckdb")
+
+    t = time.time()
+    n_added = 0
+    k_dist: dict[int, int] = {}
+    with connect(db_path) as con:
+        for inst in enumerate_canonical_pairs(
+            G, weight=weight, only_k_geq=only_k_geq, verbose=verbose,
+        ):
+            A_poly_str = Poly(
+                support=frozenset(inst.canonical.A_support), group=G
+            ).canonical_string()
+            B_poly_str = Poly(
+                support=frozenset(inst.canonical.B_support), group=G
+            ).canonical_string()
+            iid = canonical_hash(G.label(), A_poly_str, B_poly_str)
+            stored = StoredInstance(
+                instance_id=iid,
+                code_id=f"bb_enum_{G.label()}_{iid[:8]}",
+                group_struct=G.label(),
+                ell=ell, m=m_arg,
+                n=inst.n, k=inst.k,
+                A_poly=A_poly_str, B_poly=B_poly_str,
+                A_weight=inst.A_weight, B_weight=inst.B_weight,
+                rank_HX=inst.rank_HX, rank_HZ=inst.rank_HZ,
+                dim_ker_A=inst.dim_ker_A, dim_ker_B=inst.dim_ker_B,
+                orbit_size=inst.canonical.orbit_size,
+            )
+            upsert_instance(con, stored)
+            n_added += 1
+            k_dist[inst.k] = k_dist.get(inst.k, 0) + 1
+    dt = time.time() - t
+    click.echo(
+        f"  enumerate Z_{ell}xZ_{m_arg} weight={weight} k≥{only_k_geq}: "
+        f"{n_added} canonical instances in {dt:.1f}s → {db_path}"
     )
+    for k in sorted(k_dist):
+        click.echo(f"    k={k:3d}: {k_dist[k]} codes")
 
 
 @main.command(name="verify-cert")

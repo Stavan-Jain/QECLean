@@ -34,6 +34,11 @@ CREATE TABLE IF NOT EXISTS bb_instances (
   B_poly                TEXT,
   A_weight              INTEGER,
   B_weight              INTEGER,
+  rank_HX               INTEGER,
+  rank_HZ               INTEGER,
+  dim_ker_A             INTEGER,
+  dim_ker_B             INTEGER,
+  orbit_size            INTEGER,
   d_lb                  INTEGER,
   d_ub                  INTEGER,
   d_exact               INTEGER,
@@ -42,6 +47,9 @@ CREATE TABLE IF NOT EXISTS bb_instances (
   inserted_at           TIMESTAMP,
   updated_at            TIMESTAMP
 );
+
+CREATE INDEX IF NOT EXISTS idx_bb_group_struct ON bb_instances(group_struct);
+CREATE INDEX IF NOT EXISTS idx_bb_n_k        ON bb_instances(n, k);
 """
 
 
@@ -58,6 +66,11 @@ class StoredInstance:
     B_poly: str
     A_weight: int
     B_weight: int
+    rank_HX: int | None = None
+    rank_HZ: int | None = None
+    dim_ker_A: int | None = None
+    dim_ker_B: int | None = None
+    orbit_size: int | None = None
     d_lb: int | None = None
     d_ub: int | None = None
     d_exact: int | None = None
@@ -97,9 +110,10 @@ def upsert_instance(con: duckdb.DuckDBPyConnection, inst: StoredInstance) -> Non
         INSERT OR REPLACE INTO bb_instances (
           instance_id, code_id, group_struct, ell, m, n, k,
           A_poly, B_poly, A_weight, B_weight,
+          rank_HX, rank_HZ, dim_ker_A, dim_ker_B, orbit_size,
           d_lb, d_ub, d_exact, d_method, cert_path,
           inserted_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                   COALESCE((SELECT inserted_at FROM bb_instances WHERE instance_id = ?), ?),
                   ?)
         """,
@@ -107,6 +121,7 @@ def upsert_instance(con: duckdb.DuckDBPyConnection, inst: StoredInstance) -> Non
             inst.instance_id, inst.code_id, inst.group_struct,
             inst.ell, inst.m, inst.n, inst.k,
             inst.A_poly, inst.B_poly, inst.A_weight, inst.B_weight,
+            inst.rank_HX, inst.rank_HZ, inst.dim_ker_A, inst.dim_ker_B, inst.orbit_size,
             inst.d_lb, inst.d_ub, inst.d_exact, inst.d_method, inst.cert_path,
             inst.instance_id, now, now,
         ],
