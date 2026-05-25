@@ -35,3 +35,9 @@ testpaths = ["tests"]
 markers = [
   "slow: distance computations that take more than 60s (e.g. n=144, n=288)",
 ]
+# Skip the heroic SAT tests by default. They are real (test_bravyi_sat.py's
+# gross and bb_288 cases), but `gross` is ~2 minutes and `bb_288` is days —
+# neither belongs in the default `pytest` invocation. Opt back in with
+#   uv run pytest -m slow                # only slow tests
+#   uv run pytest -o addopts=''          # everything, including slow
+addopts = "-m 'not slow'"

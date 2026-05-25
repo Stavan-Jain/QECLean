@@ -46,7 +46,9 @@ search can happen before formalization.
 ```bash
 cd experiments/bb_lab
 uv sync --extra dev
-uv run pytest                                # the v0+ CI gate (24 tests, ~34 s)
+uv run pytest                                # the v0+ CI gate (82 tests, ~40 s; slow tests deselected)
+uv run pytest -m slow                        # only the heroic SAT tests (gross ~2 min, bb_288 days)
+uv run pytest -o addopts=''                  # everything including slow
 uv run bb-lab bravyi-check --quick           # 3 small SAT distances
 uv run bb-lab bravyi-check --quick --emit-proofs   # +DRAT proofs
 uv run bb-lab bravyi-check --full --emit-proofs    # n=144 (~2 min), n=288 (days)
