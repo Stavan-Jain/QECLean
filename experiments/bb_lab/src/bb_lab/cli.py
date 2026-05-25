@@ -521,6 +521,95 @@ def _orbit_contains_no_swap(
     return False
 
 
+@main.command(name="fill-distance-ubs")
+@click.option(
+    "--db", type=click.Path(path_type=Path), default=None,
+    help="DuckDB store path (default: data/bb_instances.duckdb).",
+)
+@click.option(
+    "--n-samples", type=int, default=50_000,
+    help="Random L1 samples per instance (default 50000; ~0.1s per instance).",
+)
+@click.option(
+    "--seed", type=int, default=42,
+    help="RNG seed for reproducibility.",
+)
+@click.option(
+    "--min-k", type=int, default=2,
+    help="Skip instances with k < this (no logicals → d undefined).",
+)
+@click.option(
+    "--max-n", type=int, default=None,
+    help="Skip instances with n > this. Default: no cap.",
+)
+@click.option(
+    "--only-missing/--all", default=True,
+    help="Default: only fill d_ub for instances where d_ub IS NULL and "
+         "d_exact IS NULL. Use --all to overwrite existing d_ub values with "
+         "tighter samples.",
+)
+def fill_distance_ubs(
+    db: Path | None, n_samples: int, seed: int,
+    min_k: int, max_n: int | None, only_missing: bool,
+) -> None:
+    """Sample-based upper bounds on `d_X` for corpus instances.
+
+    For each pending instance, run `l1_distance_ub` and stamp the
+    result into `bb_instances.d_ub`. Cheap (~0.1s per instance at
+    n_samples=50000) and tight for typical BB instances. Useful as a
+    pre-filter for `fill-distances` (skip instances where the cheap
+    upper bound is already above some threshold).
+    """
+    from .checks import bb_check_matrices
+    from .group import ZmZn
+    from .l1_sampling import l1_distance_ub
+    from .poly import Poly
+    from .store import connect
+
+    db_path = db or (LAB_ROOT / "data" / "bb_instances.duckdb")
+    if not db_path.exists():
+        raise click.ClickException(
+            f"corpus DB {db_path} not found — run `bb-lab enumerate` first"
+        )
+
+    where = ["k >= ?"]
+    params: list[object] = [min_k]
+    if max_n is not None:
+        where.append("n <= ?")
+        params.append(max_n)
+    if only_missing:
+        where.append("d_ub IS NULL AND d_exact IS NULL")
+    where_sql = " AND ".join(where)
+
+    with connect(db_path) as con:
+        rows = con.execute(
+            f"SELECT instance_id, group_struct, ell, m, A_poly, B_poly, n, k "
+            f"FROM bb_instances WHERE {where_sql} ORDER BY n, k",
+            params,
+        ).fetchall()
+        click.echo(
+            f"  pending: {len(rows)} instances "
+            f"(k ≥ {min_k}" + (f", n ≤ {max_n}" if max_n else "") + ")"
+        )
+        n_done = 0
+        for iid, gstruct, ell, m_, A_str, B_str, n_q, k_q in rows:
+            G = ZmZn(ell, m_)
+            A = Poly.from_string(A_str, G)
+            B = Poly.from_string(B_str, G)
+            checks = bb_check_matrices(A, B)
+            res = l1_distance_ub(checks, n_samples=n_samples, seed=seed)
+            con.execute(
+                "UPDATE bb_instances "
+                "SET d_ub = ?, updated_at = now() "
+                "WHERE instance_id = ?",
+                [res.distance_ub, iid],
+            )
+            n_done += 1
+            if n_done % 100 == 0:
+                click.echo(f"  …{n_done}/{len(rows)}")
+        click.echo(f"  done: {n_done} d_ub values stamped.")
+
+
 @main.command(name="migrate-canonical-ids")
 @click.option(
     "--db", type=click.Path(path_type=Path), default=None,
