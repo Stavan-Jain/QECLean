@@ -315,19 +315,30 @@ def fill_features(db: Path | None) -> None:
     "--timeout-per-instance", type=int, default=120,
     help="Per-instance wall-time cap; instances exceeding this get d_ub recorded.",
 )
+@click.option(
+    "--workers", type=int, default=0,
+    help="Concurrent SAT workers (0=auto, capped at 8; 1=serial). "
+         "Each worker is a per-task subprocess so hard timeouts still apply.",
+)
 def fill_distances(
     db: Path | None, max_n: int, min_k: int, limit: int | None,
-    timeout_per_instance: int,
+    timeout_per_instance: int, workers: int,
 ) -> None:
     """Compute exact SAT distance for corpus instances without a stored
     `d_exact`. Walks `bb_instances` in (n, k) order so the cheap ones
-    land first."""
+    land first.
+
+    With `--workers N`, up to N SAT solves run concurrently. Each is
+    a fresh subprocess (so `--timeout-per-instance` is a hard wall-clock
+    limit enforced by `Pool.terminate()`), and the driver thread
+    serialises DB writes (DuckDB allows only one writer).
+    """
     import multiprocessing as _mp
+    import os
     import time
     from .checks import bb_check_matrices
     from .group import ZmZn
     from .poly import Poly
-    from .sat_distance import x_distance
     from .store import connect
 
     db_path = db or (LAB_ROOT / "data" / "bb_instances.duckdb")
@@ -335,6 +346,11 @@ def fill_distances(
         raise click.ClickException(
             f"corpus DB {db_path} not found — run `bb-lab enumerate` first"
         )
+
+    if workers == 0:
+        n_workers = min(os.cpu_count() or 1, 8)
+    else:
+        n_workers = max(workers, 1)
 
     with connect(db_path) as con:
         rows = con.execute(
@@ -350,45 +366,184 @@ def fill_distances(
         ).fetchall()
         if limit is not None:
             rows = rows[:limit]
-        click.echo(f"  pending: {len(rows)} instances (n ≤ {max_n}, k ≥ {min_k})")
-        n_done = 0
-        n_timeout = 0
-        for iid, gstruct, ell, m_, A_str, B_str, n_q, k_q in rows:
-            G = ZmZn(ell, m_)
-            A = Poly.from_string(A_str, G)
-            B = Poly.from_string(B_str, G)
-            checks = bb_check_matrices(A, B)
+        mode = "serial" if n_workers == 1 else f"parallel-{n_workers}"
+        click.echo(
+            f"  pending: {len(rows)} instances (n ≤ {max_n}, k ≥ {min_k}) "
+            f"[{mode}, timeout={timeout_per_instance}s]"
+        )
 
-            # Subprocess for hard timeout; SAT can be long-tailed even
-            # for "small" n.
-            t = time.time()
-            try:
-                with _mp.get_context("spawn").Pool(processes=1) as pool:
-                    res = pool.apply_async(_sat_d_worker, (checks.H_X, checks.H_Z))
-                    distance = res.get(timeout=timeout_per_instance)
-            except _mp.TimeoutError:
-                con.execute(
-                    "UPDATE bb_instances SET d_method = ?, updated_at = now() WHERE instance_id = ?",
-                    [f"sat-timeout@{timeout_per_instance}s", iid],
-                )
+        if n_workers == 1:
+            _run_fill_distances_serial(
+                con, rows, timeout_per_instance,
+            )
+        else:
+            _run_fill_distances_parallel(
+                con, rows, timeout_per_instance, n_workers,
+            )
+
+
+def _build_checks_for_row(ell, m_, A_str, B_str):
+    """Driver-side parse + checks build. Cheap (linalg under |G|≤72)."""
+    from .checks import bb_check_matrices
+    from .group import ZmZn
+    from .poly import Poly
+    G = ZmZn(ell, m_)
+    A = Poly.from_string(A_str, G)
+    B = Poly.from_string(B_str, G)
+    return bb_check_matrices(A, B)
+
+
+def _record_distance(con, iid: str, distance: int, dt: float) -> None:
+    con.execute(
+        "UPDATE bb_instances "
+        "   SET d_exact = ?, d_method = ?, updated_at = now() "
+        " WHERE instance_id = ?",
+        [distance, "sat-cadical@1.9.5 (pysat)", iid],
+    )
+
+
+def _record_timeout(con, iid: str, timeout: int) -> None:
+    con.execute(
+        "UPDATE bb_instances "
+        "   SET d_method = ?, updated_at = now() "
+        " WHERE instance_id = ?",
+        [f"sat-timeout@{timeout}s", iid],
+    )
+
+
+def _run_fill_distances_serial(con, rows, timeout):
+    """Original one-instance-at-a-time path (used when --workers 1)."""
+    import multiprocessing as _mp
+    import time
+
+    n_done = 0
+    n_timeout = 0
+    for iid, gstruct, ell, m_, A_str, B_str, n_q, k_q in rows:
+        checks = _build_checks_for_row(ell, m_, A_str, B_str)
+        t = time.time()
+        try:
+            with _mp.get_context("spawn").Pool(processes=1) as pool:
+                res = pool.apply_async(_sat_d_worker, (checks.H_X, checks.H_Z))
+                distance = res.get(timeout=timeout)
+        except _mp.TimeoutError:
+            _record_timeout(con, iid, timeout)
+            n_timeout += 1
+            click.echo(f"  TIMEOUT  [[{n_q},{k_q}]]  G={gstruct}  iid={iid[:8]}")
+            continue
+        dt = time.time() - t
+        _record_distance(con, iid, distance, dt)
+        n_done += 1
+        click.echo(
+            f"  OK      [[{n_q},{k_q},{distance}]]  G={gstruct}  ({dt:5.1f}s)"
+        )
+    click.echo(f"\n  done: {n_done} solved, {n_timeout} timed out")
+
+
+def _run_fill_distances_parallel(con, rows, timeout, n_workers):
+    """N-worker watchdog SAT runner.
+
+    Invariants:
+      * At any point, at most `n_workers` per-task subprocesses are
+        in flight (one Pool of one process each, so terminating one
+        cleanly kills exactly the runaway SAT solve).
+      * Whenever a slot is freed (task completes or hits timeout),
+        the driver immediately replaces it with the next pending row.
+      * All DB writes happen on the driver thread (DuckDB only allows
+        one writer).
+      * On `--timeout-per-instance` exceeded, the worker is force-killed
+        via `Pool.terminate()`. The instance is marked
+        ``d_method = 'sat-timeout@<N>s'`` exactly as in the serial path.
+    """
+    import multiprocessing as _mp
+    import time
+
+    ctx = _mp.get_context("spawn")
+    n_done = 0
+    n_timeout = 0
+    n_total = len(rows)
+    row_iter = iter(rows)
+
+    # slot_id -> (iid, gstruct, n_q, k_q, pool, async_res, t_start)
+    in_flight: dict[int, tuple] = {}
+    next_slot_id = 0
+    n_finished = 0
+
+    def _spawn_next():
+        """Pull next row from the iterator, build checks, submit. No-op
+        if iterator is exhausted. Returns True if a task was launched."""
+        nonlocal next_slot_id
+        try:
+            iid, gstruct, ell, m_, A_str, B_str, n_q, k_q = next(row_iter)
+        except StopIteration:
+            return False
+        checks = _build_checks_for_row(ell, m_, A_str, B_str)
+        pool = ctx.Pool(processes=1)
+        async_res = pool.apply_async(
+            _sat_d_worker, (checks.H_X, checks.H_Z),
+        )
+        in_flight[next_slot_id] = (
+            iid, gstruct, n_q, k_q, pool, async_res, time.time(),
+        )
+        next_slot_id += 1
+        return True
+
+    # Prime the pump.
+    for _ in range(n_workers):
+        if not _spawn_next():
+            break
+
+    poll_interval = 0.05  # seconds; ~20 Hz watchdog
+    while in_flight:
+        now = time.time()
+        to_remove: list[int] = []
+        for slot_id, (
+            iid, gstruct, n_q, k_q, pool, async_res, t_start,
+        ) in in_flight.items():
+            if async_res.ready():
+                elapsed = now - t_start
+                try:
+                    distance = async_res.get(timeout=0)
+                    _record_distance(con, iid, distance, elapsed)
+                    n_done += 1
+                    n_finished += 1
+                    click.echo(
+                        f"  OK      [[{n_q},{k_q},{distance}]]  "
+                        f"G={gstruct}  ({elapsed:5.1f}s)  "
+                        f"[{n_finished}/{n_total}]"
+                    )
+                except Exception as exc:
+                    # SAT worker raised — record as error via d_method.
+                    con.execute(
+                        "UPDATE bb_instances SET d_method = ?, "
+                        "updated_at = now() WHERE instance_id = ?",
+                        [f"sat-error: {type(exc).__name__}", iid],
+                    )
+                    n_finished += 1
+                    click.echo(
+                        f"  ERROR   [[{n_q},{k_q}]]  G={gstruct}  "
+                        f"iid={iid[:8]}  ({type(exc).__name__})"
+                    )
+                pool.close()
+                pool.join()
+                to_remove.append(slot_id)
+            elif now - t_start > timeout:
+                pool.terminate()
+                pool.join()
+                _record_timeout(con, iid, timeout)
                 n_timeout += 1
-                click.echo(f"  TIMEOUT  [[{n_q},{k_q}]]  G={gstruct}  iid={iid[:8]}")
-                continue
-            dt = time.time() - t
+                n_finished += 1
+                click.echo(
+                    f"  TIMEOUT [[{n_q},{k_q}]]  G={gstruct}  iid={iid[:8]}  "
+                    f"[{n_finished}/{n_total}]"
+                )
+                to_remove.append(slot_id)
+        for slot_id in to_remove:
+            del in_flight[slot_id]
+            _spawn_next()  # refill the slot if any rows remain
+        if not to_remove and in_flight:
+            time.sleep(poll_interval)
 
-            con.execute(
-                """
-                UPDATE bb_instances
-                   SET d_exact = ?, d_method = ?, updated_at = now()
-                 WHERE instance_id = ?
-                """,
-                [distance, "sat-cadical@1.9.5 (pysat)", iid],
-            )
-            n_done += 1
-            click.echo(
-                f"  OK      [[{n_q},{k_q},{distance}]]  G={gstruct}  ({dt:5.1f}s)"
-            )
-        click.echo(f"\n  done: {n_done} solved, {n_timeout} timed out")
+    click.echo(f"\n  done: {n_done} solved, {n_timeout} timed out")
 
 
 def _sat_d_worker(H_X, H_Z) -> int:
