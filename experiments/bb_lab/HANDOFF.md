@@ -326,6 +326,56 @@ algebraic invariant, and the identity `dim ker M_A = Σ_O |O| · μ_O`
 remains a useful diagnostic. It's just not the right thing to put on
 the right-hand side of a `d ≥ …` inequality.
 
+### 6i. Bravyi engineers degeneracy — the engineering target lives in the regime where simple bounds DON'T apply
+
+A natural rescue of the §6h Jacobson conjecture (Tier 2.5) was to
+restrict to **non-degenerate** BB codes: those where `⟨supp(A)⟩ = G`
+and `⟨supp(B)⟩ = G` (each support generates the full group). Tier 3
+round 2 ran this and found a clean conditional theorem candidate on
+the corpus:
+- 1 937 non-degenerate rows (49.7% of the labeled corpus)
+- Naive 43 violations (2.2%) all of form "`B = unit · A`" or weight-≤2
+  syzygies in F₂[G]²
+- A tightener "no weight-≤2 syzygy" gives zero violations on 1 796
+  rows. Clean.
+
+**But every single Bravyi-table instance is degenerate.** Concretely:
+
+| code | `[G : ⟨supp(A)⟩]` |
+|---|---:|
+| bb_72_12_6 | 3 |
+| bb_90_8_10 | 3 |
+| bb_108_8_10 | 3 |
+| gross [[144,12,12]] | **3** |
+| bb_288_12_18 | 3 |
+
+Gross's `supp(A) = {(3,0), (0,1), (0,2)}` generates a subgroup of
+order 24 inside the order-72 group `Z_12 × Z_6`. The factor of 3 is
+exactly Lin-Pryadko's `c = |G_a ∩ G_b|`. **Bravyi specifically
+engineered the polynomials to live in proper-subgroup supports** —
+that's part of what gives the lifted-product wraparound structure
+its distance.
+
+Consequence: **the non-degenerate filter excludes the entire
+engineering target.** A Lean theorem on the non-degenerate domain
+would be clean and provable but say nothing about gross. The Tier 3
+round 2 verdict was explicit: "Declare partial progress and shelve.
+Do NOT advance to Tier 4."
+
+Rule for future Tier-2 candidates: **the engineering target lives in
+the degenerate regime, where `c > 1` and supports generate proper
+subgroups.** Any bound that gates on non-degeneracy (`c = 1`) is
+useful for understanding BB codes broadly but cannot bound gross.
+Bounds that are useful for the engineering target MUST treat the
+degeneracy index `c` as a parameter (like Lin-Pryadko Statement 12
+does, though loosely). The `bb_lab.degeneracy` module is the
+classifier; reach for it as a *feature*, not as a domain restriction.
+
+What survives the round-2 → round-2.5 exhaustion: see
+`pipeline/attempts/bb_distance_conjecture_conditional/result.md` for
+the clean conditional bound on the non-degenerate subset, and the
+section on `bb_lab.degeneracy` API for the support-subgroup classifier.
+
 ---
 
 ## 7. Recommended next moves, prioritized
