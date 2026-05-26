@@ -279,6 +279,53 @@ critical one for d ≥ 18) is ~3 days. **Don't kick off this run unless
 you're prepared to leave it.** The smaller Bravyi instances all
 finish in seconds–minutes.
 
+### 6h. Dimension counts are not weight invariants
+
+A real footgun this program hit. A Tier-2 conjecture proposed
+
+    d_X(BB(G, A, B)) ≥ Σ_O |O| · μ_O(A, B)
+
+where μ_O is the Jacobson-radical filtration depth at orbit O. The
+seed observation was true and sharp: for the gross code,
+`dim ker M_A = Σ_O |O| · μ_O(A) = 12`, matching `dim ker M_A` exactly.
+Tier 3 then ran this against the corpus and found **407 violations
+on 3 894 rows** — and `bb_72_12_6` violates *by itself* (bound = 8,
+actual `d = 6`). The conjecture is **falsified**.
+
+**Why it had to fail.** The right-hand side `Σ_O |O| · μ_O(A)` is
+literally `dim_{F₂} ker M_A` (this is a theorem, not a hypothesis).
+That dimension governs the **size of the X-logical coset space** —
+combined with the symmetric quantity for B, it gives Bravyi 2024's
+Lemma 1: `k = 2 · dim(ker A ∩ ker B)`. **It is a k-invariant, not a
+d-invariant.** The minimum weight of an element in a coset isn't
+bounded below by the coset's dimension — a 12-dimensional coset can
+contain weight-2 vectors. So the conjecture was using the wrong type
+of quantity from the start.
+
+The artifact is preserved at
+`pipeline/attempts/bb_distance_conjecture/result.md` as a first-class
+negative output, in the spirit of the gross moonshot's negative
+result. Tier 3's verdict is explicit: "do not attempt to formalize
+this conjecture. The Lean proof would necessarily fail."
+
+**Rule for future Tier-2 candidates.** Before testing any bound, ask:
+"is this quantity a weight invariant or a dimension invariant?" Weight
+invariants (e.g. classical-cyclic-code minimum distance `d_A^⊥`,
+per-orbit dual distances, weight-enumerator coefficients) can bound
+`d`. Dimension invariants (`dim ker`, orbit-size sums, rank deficits)
+bound `k` or related coset-space sizes, not `d`. The literature uses
+both kinds — they look superficially similar — but conflating them
+costs weeks. The Lin–Pryadko 2306.16400 Statement 12 lower bound
+`d ≥ ⌈d_A^⊥ / c⌉` is the right *shape* for a positive bound (it's a
+weight quantity over a weight quantity); the loose-on-gross part is
+that `c` is too pessimistic for engineered polynomial pairs.
+
+The Jacobson-radical machinery itself (in `algebraic_features.py` and
+`tests/test_jacobson.py`) is **not** wasted — it computes a genuine
+algebraic invariant, and the identity `dim ker M_A = Σ_O |O| · μ_O`
+remains a useful diagnostic. It's just not the right thing to put on
+the right-hand side of a `d ≥ …` inequality.
+
 ---
 
 ## 7. Recommended next moves, prioritized
