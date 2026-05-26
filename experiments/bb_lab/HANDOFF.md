@@ -505,6 +505,80 @@ classical analytic distance-bound technique can be tight on gross**.
 The remaining options are either new theory (1) or accepting that
 the negative-results program itself is the deliverable.
 
+### 6l. Factor-of-3 / "c-divided" bounds are specific to elementary-abelian G_odd
+
+The C-series produced C-v1 (radical-aware weight invariant `w_μ`)
+and C-v2 (a candidate distance bound using it). The Tier 2 round 6
+conjecture under test:
+
+    d_X(BB(G, A, B)) ≥ (1/c) · min_O min(w_1(A, O), w_1(B, O))
+
+where `c = [G_a : G_a ∩ G_b]` is the Lin-Pryadko index and `w_1` is
+C-v1's radical-aware weight at filtration level 1. The "factor of
+3" intuition: gross has `w_1 = 36` on each vanishing orbit and
+`c = 3`, so `36/3 = 12 = d`. **Tight by inspection on gross.**
+
+**The C-v2 corpus sweep**:
+
+- 3 319 / 3 894 violations (85.2%). Most rows violate.
+- BUT violations are concentrated at `c = 1`: 3 148 / 3 245 of
+  `c=1` rows violate; at `c ≥ 3`, the conjecture survives on 74
+  rows with zero violations.
+- Bravyi-table: 4 of 5 tight (bb_72_12_6, bb_90_8_10, gross,
+  bb_288_12_18). **bb_108_8_10 violates**: bound = 12, actual
+  d = 10.
+
+**Diagnosis** (the precise structural pin-point):
+
+bb_108_8_10 has `G = Z_9 × Z_6`, so `G_odd = Z_9 × Z_3` — a
+**cyclic prime-power**. The other 4 Bravyi codes all have
+`G_odd = Z_3 × Z_3` — **elementary abelian**.
+
+The factor-of-3 between `w_1 = 36` and `d = 12` is **not a general
+theorem** — it's a coincidence of the elementary-abelian `G_odd`
+structure that 4 of 5 Bravyi codes happen to share. Cyclic
+prime-power `G_odd` breaks the coincidence.
+
+**Side-quest result (`per_orbit_dual_distance` investigation)**:
+The T2R2 `per_orbit_dual_distance` is **not** `w_1 / c` in
+disguise. The ratio `w_1 / per_orbit_dual_distance` varies per
+orbit AND per polynomial (samples gave 1, 3, 4, 5). Two genuinely
+distinct quantities; the C-v1 finding was a real new invariant,
+not a misinterpretation of the existing one.
+
+**Z_4 × Z_6 anomaly**: this corpus subset shows 65% tightness
+despite NOT having elementary-abelian `G_odd`. A second pattern
+worth investigating separately (`G_odd = Z_3`, rank 1) — likely a
+different `c` definition or different conjecture shape applies.
+
+**What this opens (the C-v3 hand-off)**:
+
+The narrowed conjecture restricted to elementary-abelian `G_odd`
+is a clean candidate:
+
+  *For BB codes with `G_odd ≅ (Z_p)^k` for some prime p (i.e.,
+  G_odd elementary abelian), `d_X ≥ (1/c) · min_O min(w_1(A,O),
+  w_1(B,O))`.*
+
+It would cover gross + 3 of the other 4 Bravyi codes, with
+bb_108_8_10 cleanly excluded by the structural hypothesis (not
+by violation). This is the strongest concrete bound candidate the
+program has produced; it's the C-v3 target — see `HANDOFF_C3.md`.
+
+**Rule for future bounds**:
+
+Don't treat `c` (or any "structural denominator") as a magic
+quantity. The c-divided shape requires a specific `G_odd`
+structure to be tight. **Always include the G-classifier as a
+hypothesis, not just an arithmetic factor.** A bound of the form
+"`d ≥ f(features) / c`" without a `G_odd`-structure side-condition
+is at risk of the §6l failure mode.
+
+The reverse statement is the C-v3 working hypothesis: the right
+`G_odd` structure + the right numerator (C-v1's `w_1`) + the right
+denominator (LP's `c`) might compose into a tight conditional
+theorem on the elementary-abelian-G_odd subfamily.
+
 ---
 
 ## 7. Recommended next moves, prioritized
