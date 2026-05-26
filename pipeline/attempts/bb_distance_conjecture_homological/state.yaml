@@ -1,0 +1,172 @@
+code_id: bb_distance_homological
+display_name: 'Cover-graph chain-map distance bound for BB codes (Symons-Rajput-Browne 2025)'
+status: shelved
+track: moonshot
+parent: bb_distance_conjecture
+started_at: 2026-05-26
+worktree_branch: bb-lab-v0
+phase: tier-2-round-5
+parent_program: 4-tier BB analytic distance bound (Tier 1 / 2 / 3 / 4)
+tier: 2
+round: 5
+
+purpose: |
+  Tier 2 round 5 in the 4-tier program toward an analytic distance
+  bound for BB codes. Rounds 1-4 eliminated the entire **character-
+  theoretic / Fourier-transform** family of bounds (HANDOFF §§6h, 6i,
+  6j). This round shifts to the categorically distinct
+  **homological / chain-complex** family.
+
+  Specifically, the candidate bound is the SRB 2025 cover-graph
+  chain-map transfer:
+
+      d(cover BB code)  ≥  d(base BB code)
+
+  whenever the cover code's Tanner graph is an h-fold cover of the
+  base BB code's Tanner graph (h ≥ 2). The base / cover polynomials
+  are related by `Mod(α̃_i, ℓ') = α_i` for each monomial exponent on
+  each axis (the "projection condition", Symons-Rajput-Browne 2025
+  Theorem 3.1).
+
+  Reference: B. C. B. Symons, A. Rajput, D. E. Browne.
+  "Sequences of Bivariate Bicycle Codes from Covering Graphs."
+  arXiv:2511.13560 (Nov 17, 2025).
+
+  The bound has TWO regimes:
+
+    * **Rigorous (SRB Theorem 4.7):** requires `h` odd AND `k_h = k`.
+      The proof uses `p ∘ τ = h · I` mod 2 = I, giving chain-map
+      injectivity on F_2-homology.
+    * **Conjectural (SRB §7, page 39):** asserts the same bound for
+      ALL h ≥ 2, including even h. No counterexamples in SRB's
+      Tables 1-10.
+
+  When h is EVEN (in particular h = 2, which is the case for gross),
+  the rigorous theorem fails — `p ∘ τ = h · I = 0` over F_2, so the
+  chain-map injectivity argument collapses. This is the §6k
+  obstruction articulated below.
+
+verdict: shelved-trivial-on-gross
+verdict_summary: |
+  Honest negative result on the gross-tightness goal, plus a strong
+  positive corroboration of SRB 2025's published conjecture.
+
+  Headline numbers:
+    * **Gross [[144,12,12]]**: bound = 6 (conj), 1 (rigorous), 12 (upper).
+      The actual d = 12 is matched by the UPPER bound but only half-
+      matched by the LOWER bound. Per the §6h-§6j discipline, this
+      is "shelved-trivial-on-gross" (bound ≤ 8) — the conjectural
+      lower bound 6 is non-trivial but not tight.
+    * **Corpus** (3894 rows with d_exact): 443 rows in S (conjectural),
+      0 violations of the SRB §7 conjecture, 244 rows tight (55.1%
+      tightness rate). **The conjecture passes the lab's largest
+      empirical test.**
+    * **All 5 Bravyi instances**: non-trivial conjectural bound;
+      between 2 (bb_90, rigorous, h=5 base Z_3 × Z_3) and 12 (bb_288,
+      conjectural, gross-as-base). Per Bravyi table: see evidence.md.
+
+  Two reasons the bound is not tight on gross:
+
+  1. **Cover index h = 2 is even**. Gross is a double cover of
+     [[72, 12, 6]] (SRB Example 5, our test_gross_is_double_cover_of_72_12_6
+     verifies this from the polynomials). h = 2 means SRB Theorem 4.7
+     doesn't apply rigorously; only the conjecture does.
+
+  2. **`d_base([[72,12,6]]) = 6 ≠ d_gross / h = 12 / 2 = 6`.** Even
+     under the conjecture, the lower bound is exactly d_base. We can
+     only reach 12 if there is a base code with d_base = 12 — and
+     there isn't one strictly smaller than gross. (The only other
+     same-polynomial smaller code is [[18, 12, 2]] which is even
+     smaller, but its distance is only 2.)
+
+  Both points are structural; no implementation refinement can break
+  past them. The §6k obstruction (proposed below) captures the
+  conceptual issue: the chain-map argument requires `h` coprime to
+  `char(F_2) = 2`, and gross-as-cover has exactly the failing arithmetic.
+
+next_steps: |
+  1. DO NOT advance to Tier 3 / Tier 4 in this form.
+     - Bound is 6 on gross (less than the §6h-§6j threshold of 8 for
+       "tight").
+     - A Lean theorem of the form `d_gross ≥ 6` would be true, durable,
+       and a meaningful program output — but it would not close the
+       gap to the target d ≥ 12.
+
+  2. Document the §6k obstruction (cover-graph chain-map bounds
+     require h coprime to char(F_2); gross-as-cover has h = 2).
+     This is the homological analogue of §6j's "2 | |G|" obstruction:
+     the SAME arithmetic 2-divisibility blocks both the Fourier
+     transform of F_2[G] (§6j) and the chain-map composition over F_2
+     (§6k). Whatever makes gross d = 12 is structurally invisible to
+     "linear-map cover-projection over F_2" arguments just as it was
+     invisible to "character decomposition of F_2[G]" arguments.
+
+  3. Future Tier-2 directions worth exploring (NOT THIS ROUND):
+     a. Look for a base code OTHER than [[72,12,6]] where gross is
+        an ODD-h cover (h = 3, 9, ...). The natural divisor pairs
+        of (12, 6) don't yield such bases (verified by enumeration),
+        but a non-trivial automorphism-twisted cover might. This is
+        speculative.
+     b. Use a stronger homological invariant than the bare distance
+        (e.g. systolic distance, balanced-product distance lemmas
+        per Breuckmann-Eberhardt 2021). Per the SRB conclusion §7,
+        the authors explicitly leave "different tools" as an open
+        question for the h-even case.
+     c. Implement a mapping-cone variant of the chain-map argument
+        that survives in characteristic 2. SRB Remark 8 sketches
+        this; would require new theory.
+     d. Direct-search for a base BB code of distance > 6 (under
+        |G| < 72) that gross is some non-trivial cover of. None is
+        known to the authors; the corpus DB only labels small
+        instances and gross's natural-h=2 base is the only one in
+        the standard polynomial family.
+
+  4. The cover-graph machinery itself (enumerate_base_codes,
+     `_project_poly_mod`, `BaseCover` dataclass) is durable and reusable.
+     Any future homological-family Tier-2 candidate that works on
+     covers / quotients of BB codes can build on it without
+     re-deriving the projection-condition arithmetic.
+
+prior_art_references:
+  - 'Symons, Rajput, Browne 2025: "Sequences of Bivariate Bicycle Codes
+    from Covering Graphs", arXiv:2511.13560 — the candidate paper for
+    this round. Theorem 4.6 (d_h ≤ h · d, h odd), Theorem 4.7
+    (d ≤ d_h, h odd, k_h = k), §7 conjecture (both bounds for any h).'
+  - 'Wang, Pryadko 2022: "Distance Bounds for Generalized Bicycle
+    Codes", arXiv:2203.17216, Symmetry 14(7) 1348. The systematic
+    distance-bound paper for GB codes. Statement 14 (weight-4 only,
+    not applicable to gross). Statements 7, 13 (existence / upper
+    bounds — not pointwise lower).'
+  - 'Kovalev, Pryadko 2013: "Quantum hyperbicycle low-density parity
+    check codes with finite rate", arXiv:1212.6703. Original
+    constructive reference; subsumed by Wang-Pryadko 2022 for our
+    distance-bound purposes.'
+  - 'Bravyi, Cross, Gambetta, Maslov, Rall, Yoder 2024:
+    "High-threshold and low-overhead fault-tolerant quantum memory",
+    arXiv:2308.07915 (Nature 627). The BB-code reference; verifies
+    d_gross = 12 numerically via MIP.'
+  - 'HANDOFF.md §6h (dimension vs. weight invariants),
+    §6i (gross degenerate),
+    §6j (character-theoretic family blind to gross).'
+  - 'notes/T2R4.0_literature.md — the Round 4 BBCS-character-theoretic
+    literature check (verdict: shelved-paper-doesnt-help).'
+  - 'notes/T2R5.0_literature.md — this round''s literature check.
+    Reference SRB 2025; §6k obstruction articulated.'
+
+artifacts:
+  - 'experiments/bb_lab/src/bb_lab/homological_bounds.py: NEW module
+    implementing `_project_poly_mod`, `_divisors`, `enumerate_base_codes`,
+    `BaseCover`, `bb_homological_bound`, `bb_homological_upper_bound`,
+    `bb_homological_condition`, `base_distance_from_table`. ~340 lines.'
+  - 'experiments/bb_lab/tests/test_homological_bounds.py: 27 unit tests
+    covering divisor helper, projection map, base-code enumeration,
+    SRB Example 5 (gross-as-double-cover-of-bb_72), rigorous/conjectural
+    mode discipline, end-to-end bound on Bravyi instances.'
+  - 'experiments/bb_lab/scripts/tier2_homological_eval.py: corpus +
+    Bravyi eval driver.'
+  - 'experiments/bb_lab/notes/T2R5.0_literature.md: literature
+    triangulation, §6k obstruction articulation.'
+  - 'experiments/bb_lab/notes/T2R5.3_eval.md: corpus + Bravyi eval
+    results.'
+  - 'pipeline/attempts/bb_distance_conjecture_homological/{state.yaml,
+    hypothesis.md, evidence.md, result.md}: this attempt.'
