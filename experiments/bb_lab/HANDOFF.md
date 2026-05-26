@@ -376,6 +376,72 @@ What survives the round-2 → round-2.5 exhaustion: see
 the clean conditional bound on the non-degenerate subset, and the
 section on `bb_lab.degeneracy` API for the support-subgroup classifier.
 
+### 6j. The entire character-theoretic distance-bound family is structurally blind to gross
+
+Tier 2 round 3 (HT/Roos multivariate cyclic, T2R3) and round 4
+(Bernal–Bueno-Carreño–Simón 2016 apparent distance, T2R4) both
+produced trivial / inapplicable bounds on gross. The Round 4 agent's
+literature work pinned down the underlying reason and elevated it
+to a much sharper structural claim than §6i.
+
+**The observation, made precise**:
+
+> Every published distance bound for abelian (multivariate cyclic)
+> codes derived from the **character-theoretic / Fourier-transform
+> decomposition** of `F_q[G]` requires `gcd(|G|, q) = 1` — i.e., that
+> `F_q[G]` be semisimple. Gross has `|G| = 72 = 2³·9` over `F_2`,
+> so `F_2[G]` is **non-semisimple**. The entire family of approaches
+> is structurally impotent on gross.
+
+Verified literature:
+- Camion 1971 (multivariate BCH), Sabin–Lomonaco 1992, Saints–Heegard
+  1995 (IEEE TIT 41(6)), Bernal–Bueno-Carreño–Simón 2016
+  ([arXiv:2402.03938](https://arxiv.org/abs/2402.03938)),
+  Bernal–Guerreiro–Simón 2017
+  ([arXiv:1704.03761](https://arxiv.org/abs/1704.03761)) — **all
+  assume semisimplicity explicitly.** BBCS 2016 §II/§III opening,
+  Thm 22, Thm 25 all state this assumption verbatim.
+- **Jitman–Ling 2013** ("Abelian Codes in Principal Ideal Group
+  Algebras", IEEE TIT) is the load-bearing citation: it proves that
+  for non-semisimple `F_q[G]`, distance bounds can only be derived
+  from semisimple-quotient bounds, and are **never sharper** than
+  what the semisimple quotient yields. They also show abelian codes
+  in non-semisimple PIGAs are asymptotically bad.
+
+**Implication for the program**: Gross's d = 12 cannot come from any
+character-theoretic argument. The Jacobson radical of `F_2[G]` (the
+"non-semisimple part") *contributes to `dim ker M_A`* (§6h's identity
+`dim ker M_A = Σ_O |O| · μ_O`) but contributes *nothing* to the
+lower-bound side of `d` under any extant character-theoretic
+framework. **Whatever makes gross d=12 is not visible in the Fourier
+decomposition of `F_2[G]`.**
+
+**Rule for future Tier-2 candidates**: any candidate whose RHS
+ultimately decomposes the code via characters / Fourier / orbit
+projections is structurally limited by the semisimple quotient. Such
+candidates can be tested for completeness, but a-priori their
+expected value against gross is bounded above by what BCH / HT /
+Roos / BBCS / Camion already give (which is ≤ 8 on gross, see
+Round 3). The remaining open directions are:
+
+1. **Homological / chain-complex** bounds (e.g. Pesah–Roffe 2025
+   cover-graph chain-map transfer; Hsieh–Le Gall 2020; Kovalev–
+   Pryadko 2013). These work on the chain complex of the BB code
+   directly, not on the group-algebra decomposition. They are
+   *categorically* distinct from the character-theoretic family —
+   different toolkit, different obstructions, untouched by §6j.
+2. **Radical-aware weight invariants** for `F_2[G]` when `2 | |G|`.
+   No literature reference found; would require new theory. A
+   weight-invariant filtration on the Jacobson radical of `F_2[G]`
+   that bounds `d` from below would dodge §6j by definition.
+
+This is a much stronger pruning than §6i: **the entire algebraic-
+coding-theory toolkit for multivariate cyclic codes is blocked from
+giving a tight bound on gross**, not just one specific approach.
+This is consistent with Otjens 2025's stated open problem and
+explains why no closed-form formula has been published despite
+extensive interest.
+
 ---
 
 ## 7. Recommended next moves, prioritized
