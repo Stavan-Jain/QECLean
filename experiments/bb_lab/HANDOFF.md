@@ -442,6 +442,69 @@ This is consistent with Otjens 2025's stated open problem and
 explains why no closed-form formula has been published despite
 extensive interest.
 
+### 6k. Cover-graph chain-map bounds also fall to the 2-divisibility wall
+
+Tier 2 round 5 attempted the *homological* family — categorically
+distinct from the §6j character-theoretic family. The candidate:
+**Symons–Rajput–Browne 2025** ([arXiv:2511.13560](https://arxiv.org/abs/2511.13560)),
+"Sequences of Bivariate Bicycle Codes from Covering Graphs". This
+paper gives bounds of the form `d ≤ h · d_base` and `d ≥ d_base / h`
+(roughly), where the BB code at hand is realized as an h-fold cover
+of a smaller-G base BB code.
+
+Lab implementation tested the paper's §7 conjecture against 443
+corpus rows: **zero violations, 55.1% tightness rate** — the strongest
+independent empirical corroboration of SRB §7 so far (the paper's
+own tables cover ~150 instances).
+
+**But the bound is loose-to-trivial on gross**. Two settings:
+
+- **Conjectural form** (any `h ≥ 2`): `d_gross ≥ 6`. Loose by 6.
+- **Rigorous form** (h coprime to `char(F)`): `d_gross ≥ 1`.
+  Gross is realized as the **h=2 cover** of `[[72,12,6]]` over `F₂`,
+  so the rigorous hypothesis `gcd(h, char F) = 1` **fails** —
+  specifically, `p ∘ τ = h · I = 0 (mod 2)`, so the chain-map
+  composition collapses and the injectivity argument behind the
+  bound is unavailable.
+
+**Generalization to §6k**: cover-graph / chain-map distance transfer
+bounds require `gcd(h, char F) = 1` where `h` is the cover degree.
+For BB codes engineered with `|G|` even over `F₂`, the natural
+covers exhibit `h` even — and gross's specific construction is an
+h=2 cover. The arithmetic 2-divisibility that blocked §6j's
+Fourier-theoretic family **also blocks the chain-map family**, via a
+mathematically distinct mechanism but the same underlying obstruction.
+
+**Connecting §6j and §6k**: the §6j wall came from `gcd(|G|, char F) > 1`
+(forcing F₂[G] non-semisimple). The §6k wall comes from
+`gcd(h, char F) > 1` (forcing chain-map non-injectivity). In both
+cases the culprit is `char F = 2` dividing a key integer arithmetic
+parameter of gross's construction. **This strongly suggests gross's
+|G|=72 (=2³·3²) over F₂ was chosen to be adversarial against bounds
+that hinge on 2-coprimality**, deliberately or as a side effect of
+optimizing for large d.
+
+**Surviving directions** (after eliminating §6h–§6k):
+
+1. **Radical-aware weight invariants** for F₂[G] when 2 | |G|. No
+   literature reference found; would require new theory. Specifically:
+   a weight invariant defined on the Jacobson-radical filtration of
+   F₂[G] that bounds `d` from below. The Round 1 Jacobson conjecture
+   used the *dimension* of the radical filtration (which is a
+   k-invariant per §6h); a *weight* refinement is theoretically open.
+2. **Bounds requiring `char F ≠ 2`**. By lifting to `F_p` for odd `p`
+   and transferring back — but this trades distance theory for
+   characteristic-zero / odd-char techniques that don't directly
+   bound F₂-codes. Worth checking literature; almost certainly fails
+   for the same arithmetic-2-divisibility reason.
+3. **Bounds that explicitly avoid 2-coprimality assumptions** — open
+   to investigation; not aware of any in the published literature.
+
+The corollary for the program's headline goal: **no published
+classical analytic distance-bound technique can be tight on gross**.
+The remaining options are either new theory (1) or accepting that
+the negative-results program itself is the deliverable.
+
 ---
 
 ## 7. Recommended next moves, prioritized
