@@ -1,0 +1,57 @@
+{
+  "code_id": "bb_72_12_6",
+  "direction": "X",
+  "distance": 6,
+  "emitted_at": "2026-05-24T16:23:32.628856+00:00",
+  "h_check_sha256": "ffc3405373dc5afa63f51be84d8c7f1d31a973e4334a8d60dd70fb2e5368d63b",
+  "l_logical_sha256": "5acb9fde5ed9931ce012ec0be12babaa070b83cf88a6355d40463f336c1ce687",
+  "n": 72,
+  "schema_version": "bb-cert/v1",
+  "solver": "cadical@3.0.0",
+  "unsat_proofs": [
+    {
+      "cnf_path": "bb_72_12_6/bb_72_12_6_w1.cnf",
+      "cnf_sha256": "78f29f2efd882a4b4d396b340bde1094eb10b5f3bcc6a4f9287a9c0e1570f03c",
+      "drat_path": "bb_72_12_6/bb_72_12_6_w1.drat",
+      "drat_sha256": "d4012015095296d2801439687d3b12330e0e361a41754e30995dc56fa631d733",
+      "weight_bound": 1
+    },
+    {
+      "cnf_path": "bb_72_12_6/bb_72_12_6_w2.cnf",
+      "cnf_sha256": "e8fcfddf34394550a9b22277926cd30486fbdabe1291fb74f36a4a9134f4e78a",
+      "drat_path": "bb_72_12_6/bb_72_12_6_w2.drat",
+      "drat_sha256": "ba1b7bc3ecfbc4d6e2e8409a6d19b29d517e8273804b80cdf858a6788518cb5d",
+      "weight_bound": 2
+    },
+    {
+      "cnf_path": "bb_72_12_6/bb_72_12_6_w3.cnf",
+      "cnf_sha256": "a12aaddfe39e0f09282cc41e8c624be314209966a5bae6fcf1a99e55d2fca91c",
+      "drat_path": "bb_72_12_6/bb_72_12_6_w3.drat",
+      "drat_sha256": "17eb70a1c1db9e43b56c5d1823d4e82f44bd93dc51c26ba174fbfe1dfd31a2e5",
+      "weight_bound": 3
+    },
+    {
+      "cnf_path": "bb_72_12_6/bb_72_12_6_w4.cnf",
+      "cnf_sha256": "03a4812f4158584225b69297c66b79de6739f720177c200a75b0f8a8bd3f397b",
+      "drat_path": "bb_72_12_6/bb_72_12_6_w4.drat",
+      "drat_sha256": "082c9cfcda9a872c9c83190fbaa628f1e7dbde0cc48a95a46460c06c6c8c4457",
+      "weight_bound": 4
+    },
+    {
+      "cnf_path": "bb_72_12_6/bb_72_12_6_w5.cnf",
+      "cnf_sha256": "828704e088e6430dc5ba9f7e89190414e3640b085a7a781290574a46a0e946e8",
+      "drat_path": "bb_72_12_6/bb_72_12_6_w5.drat",
+      "drat_sha256": "00991e3b9d40b2ebc47b06288634464b2da5e3b80cf9d4d1e82cc4da8aba9dce",
+      "weight_bound": 5
+    }
+  ],
+  "wall_seconds": 0.11306214332580566,
+  "witness_support": [
+    51,
+    53,
+    67,
+    68,
+    69,
+    70
+  ]
+}

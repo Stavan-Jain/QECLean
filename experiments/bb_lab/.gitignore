@@ -1,0 +1,19 @@
+data/
+runs/
+scratch/
+*.duckdb
+*.duckdb.wal
+*.parquet
+.venv/
+.pytest_cache/
+__pycache__/
+*.egg-info/
+
+# Large LRAT/CNF artifacts: only the smallest instance (bb_72_12_6) is
+# committed as format evidence. Anything larger gets regenerated on demand
+# via `bb-lab bravyi-check --emit-proofs` (cadical is deterministic given
+# the same CNF, so the JSON cert's SHA256 still matches after regeneration).
+certificates/bb_90_8_10/
+certificates/bb_108_8_10/
+certificates/gross/
+certificates/bb_288_12_18/

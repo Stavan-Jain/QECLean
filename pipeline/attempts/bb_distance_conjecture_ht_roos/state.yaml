@@ -1,0 +1,141 @@
+code_id: bb_distance_ht_roos
+display_name: 'HT/Roos lower bound on BB code distance (single-block dominance regime)'
+status: shelved
+track: moonshot
+parent: bb_distance_conjecture
+started_at: 2026-05-26
+worktree_branch: bb-lab-v0
+phase: tier-2-round-3
+parent_program: 4-tier BB analytic distance bound (Tier 1 / 2 / 3 / 4)
+tier: 2
+round: 3
+
+purpose: |
+  Tier 2 round 3 in the 4-tier program toward an analytic distance
+  bound for BB codes. Rounds 1-2 eliminated whole categories of
+  candidate bounds (HANDOFF §§6h, 6i). This round explores classical
+  Hartmann-Tzeng (HT, 1972) and Roos (1983) lower bounds for
+  multivariate cyclic codes applied to BB-code per-block polynomials,
+  composed with a single-block-dominance structural condition.
+
+  Specifically, the candidate bound is:
+
+      d_X(BB(A, B))  ≥  min(mv_ht(nv(A)), mv_ht(nv(B)))  when S(A, B) holds,
+
+  where:
+    * nv(A) ⊆ Ĝ_odd is the "non-vanishing set" of A (characters where
+      Â(χ) ≠ 0 in F̄_2), which is the textbook defining set of the
+      annihilator code ker M_A;
+    * mv_ht(·) is the multivariate Hartmann-Tzeng bound;
+    * S(A, B) is the structural condition "single-block witness
+      dominates" — operationally `d_X = min(d_A^⊥, d_B^⊥)`, i.e. the
+      textbook CSS upper bound is tight.
+
+verdict: shelved-trivial-on-gross
+verdict_summary: |
+  Honest negative result on the engineering target (gross).
+
+  Headline numbers (3894 corpus rows with d_exact):
+    * Condition S(A, B) holds: 19 rows (0.5%) — all in Z_3 × Z_5 or Z_3 × Z_3.
+    * Violations: 0.
+    * Tight in S: 13 rows (all on Z_3 × Z_5).
+    * For all 5 Bravyi codes including gross: bb_ht_bound = 1 (trivial).
+
+  Two compounding obstructions explain why HT/Roos cannot bound gross:
+
+  1. **`F_2[G]` is not semisimple for gross's `G = Z_12 × Z_6`** (|G|=72,
+     even). HT/Roos applies to the F̄_2 characters which only lift over
+     the semisimple quotient `F_2[G_odd] = F_2[Z_3 × Z_3]`. The Jacobson
+     radical contributes additional kernel mass invisible to HT, so the
+     bound on the F_2-cyclic code can be strictly less than HT predicts.
+     bb_72, bb_108, gross, bb_288 all have even |G| and hit this.
+
+  2. **G_odd is non-cyclic** (gcd(axes) > 1). For gross G_odd = Z_3 × Z_3
+     has gcd(3, 3) = 3, so no element generates the full G_odd. The
+     classical "longest chain in T along a coprime step" bound (the
+     univariate HT) doesn't extend without additional structure. The
+     genuine multivariate-cyclic-code bound (Camion 1970, Sabin-Lomonaco
+     1992, Saints-Heegard 1995, Bernal-Bueno-Carreño-Simón 2016) does
+     exist but is substantially more involved than what we implemented;
+     a permissive implementation gives false lower bounds (verified
+     against the corpus and an explicit Z_3 × Z_5 counterexample).
+
+  bb_90 has odd |G|=45 (passes obstruction 1), but G_odd = Z_15 × Z_3
+  is non-cyclic (passes obstruction 2 also? no, gcd(15,3) = 3): mv_ht=1
+  there too. So none of the 5 Bravyi instances admit a meaningful HT
+  bound under this implementation.
+
+  Even ignoring those obstructions and using the literature multivariate
+  bound, the single-block-dominance condition `S(A, B)` is rarely
+  satisfied: only 19/3894 corpus rows satisfy it, and crucially **0/5
+  Bravyi codes likely satisfy it for the relevant min-wt-X-logical**
+  (their dominant logicals are mixed-block; this is what gives the
+  surface-code-like d ≈ √n scaling for engineered BB codes).
+
+  Per HANDOFF §6i, BB codes' engineering target lies in the regime
+  where simple cyclic-code algebra cannot give tight bounds. This round
+  confirms that observation for the HT/Roos-style algebraic toolkit.
+
+next_steps: |
+  1. DO NOT advance to Tier 3 / Tier 4 in this form.
+     - Bound is trivial (= 1) on all 5 Bravyi codes due to the
+       non-cyclic G_odd structure.
+     - Even on the corpus, the condition S(A, B) gates out 99.5% of rows.
+     - A Lean theorem about a domain that gates out gross does not
+       help the program's goal.
+  2. Document this as a first-class negative output. The compounding
+     non-semisimple + non-cyclic obstructions are a structural lesson
+     for the program: BB codes' engineered G shapes (Z_ℓ × Z_m with
+     gcd(ℓ, m) > 1, |G| even) are EXACTLY the regime that breaks
+     classical cyclic-code algebra.
+  3. Future Tier-2 directions worth exploring (NOT THIS ROUND):
+     - Bernal-Bueno-Carreño-Simón apparent distance for multivariate
+       abelian codes (more sophisticated than what was implemented;
+       handles non-cyclic G properly).
+     - Cover-graph chain-map transfer bounds (Pesah et al. 2025): if
+       gross is an h-cover of a base BB code with known distance,
+       d_gross ≥ d_base might hold.
+     - Bounds that explicitly handle the radical of F_2[G] for even
+       |G| via the Jacobson filtration (similar to the per-orbit
+       weight invariants but for d, not k).
+
+prior_art_references:
+  - 'Hartmann & Tzeng 1972: "Generalizations of the BCH bound",
+    Information and Control 20, 489-498.'
+  - 'Roos 1983: "A new lower bound for the minimum distance of a
+    cyclic code", IEEE TIT 29, 330-332.'
+  - 'Camion 1970: "Abelian codes", MRC Tech. Sum. Rep. 1059.'
+  - 'Sabin & Lomonaco 1992: "Metacyclic Error-Correcting Codes", AAECC.'
+  - 'Saints & Heegard 1995: IEEE TIT 41(6), "Algebraic-geometric codes
+    and multidimensional cyclic codes..."'
+  - 'Bernal, Bueno-Carreño & Simón 2016: IEEE TIT 62(2), "Apparent
+    Distance and a Notion of BCH Multivariate Codes" (arXiv:2402.03938
+    is the 2024 preprint update).'
+  - 'Lin-Pryadko 2306.16400 (the canonical 2BGA reference) does not
+    use HT/Roos/Camion — uses TZ-style bound via per-block d^perp.'
+  - 'experiments/bb_lab/HANDOFF.md §6h, §6i: dimension vs. weight
+    invariants; BB engineering target lies in the degenerate regime.'
+  - 'experiments/bb_lab/notes/T2.3_literature_survey.md: full BB-code
+    distance-bound literature triage.'
+  - 'experiments/bb_lab/notes/T2R3.0_literature_check.md: HT/Roos-
+    specific literature check; confirmed NOT applied to BB codes
+    in the surveyed literature (novel-to-us, plausibly novel-to-
+    literature).'
+
+artifacts:
+  - 'experiments/bb_lab/src/bb_lab/ht_roos.py: NEW module implementing
+    defining_set, nonvanishing_set, bch_bound, ht_bound, mv_bch_bound,
+    mv_ht_bound, bb_ht_per_block_bound, bb_ht_condition, bb_ht_bound.
+    ~570 lines.'
+  - 'experiments/bb_lab/tests/test_ht_roos.py: 32 unit tests covering
+    univariate HT/BCH against textbook examples (Hamming dual,
+    consecutive-run BCH), multivariate reduction to univariate,
+    Bravyi smoke tests, defining-set ↔ vanishing-orbits consistency.'
+  - 'experiments/bb_lab/scripts/tier2_ht_roos_eval.py: corpus eval
+    driver.'
+  - 'experiments/bb_lab/notes/T2R3.0_literature_check.md: literature
+    triangulation.'
+  - 'experiments/bb_lab/notes/T2R3.4_eval.md: corpus + Bravyi eval
+    results.'
+  - 'pipeline/attempts/bb_distance_conjecture_ht_roos/{state.yaml,
+    hypothesis.md, evidence.md, result.md}: this attempt.'

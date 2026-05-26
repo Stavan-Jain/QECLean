@@ -1,0 +1,144 @@
+code_id: bb_distance_bbcs
+display_name: 'BBCS 2016 apparent distance for full multivariate abelian codes (Round 4 candidate)'
+status: shelved
+track: moonshot
+parent: bb_distance_conjecture_ht_roos
+started_at: 2026-05-26
+worktree_branch: bb-lab-v0
+phase: tier-2-round-4
+parent_program: 4-tier BB analytic distance bound (Tier 1 / 2 / 3 / 4)
+tier: 2
+round: 4
+
+purpose: |
+  Tier 2 round 4 in the 4-tier program toward an analytic distance
+  bound for BB codes. Round 3 (HT/Roos) eliminated classical
+  univariate-cyclic distance bounds because (i) BB's G_odd is
+  non-cyclic for all 5 Bravyi instances, and (ii) F_2[G] is
+  non-semisimple for 4 of 5 Bravyi instances. Round 3's recommendation
+  was to escalate to the Bernal-Bueno-Carreño-Simón 2016 apparent
+  distance for full multivariate abelian codes, which is documented
+  in the literature as handling non-cyclic G via hypermatrix
+  manipulation and reducing bivariate complexity from exponential
+  to linear.
+
+  The candidate bound shape was:
+
+      d_X(BB(A, B))  ≥  min(bbcs_apparent(A, G), bbcs_apparent(B, G))
+        when S(A, B) holds,
+
+  where `bbcs_apparent(·)` is the BBCS algorithm and S is some
+  structural single-block-dominance condition.
+
+verdict: shelved-paper-doesnt-help
+verdict_summary: |
+  The BBCS framework explicitly assumes F_q[G] is semisimple
+  (gcd(|G|, q) = 1, stated on page 2 of the 2016 paper and reiterated
+  in Sections III and V; identical assumption in the 2017 companion
+  paper Bernal-Guerreiro-Simón arXiv:1704.03761).
+
+  Four of the five Bravyi BB instances (bb_72_12_6, bb_108_8_10,
+  gross, bb_288_12_18) have F_2[G] non-semisimple (|G| even), so
+  the framework does not apply. The remaining one (bb_90_8_10,
+  |G|=45) is in principle in scope but is a single data point and
+  is not the program's engineering target (gross is).
+
+  Per the T2R4 spec's explicit instruction:
+    "If the paper turns out to NOT handle non-semisimple F_2[G]
+    (which would re-instate the Round 3 obstruction), document
+    this and stop. The shelved verdict is the correct output.
+    Don't force the implementation."
+
+  The compounding obstruction (HANDOFF §6i: F_2[G] non-semisimple
+  AND G_odd non-cyclic AND degenerate supports, all simultaneously)
+  reappears unchanged. BBCS resolves the "non-cyclic G" part but
+  not the "non-semisimple F_2[G]" part; without the latter the
+  framework is silent on gross.
+
+  Companion result: Jitman-Ling 2013 ("Abelian Codes in Principal
+  Ideal Group Algebras," IEEE TIT 59(1)) explicitly addresses
+  non-semisimple abelian-code bounds and shows (i) any
+  non-semisimple bound is derived from the semisimple-quotient
+  bound (so never sharper) and (ii) abelian codes in non-semisimple
+  PIGAs are asymptotically bad. This is not a missing-paper
+  obstruction; it is structural to the character-theoretic /
+  Fourier-transform line of multivariate-abelian-code algebra.
+
+  No source code beyond literature notes was written: per the spec,
+  "a hand-waved implementation that doesn't match the paper is not
+  honest." A clean stop is the correct output.
+
+next_steps: |
+  1. DO NOT advance to Tier 3 / Tier 4 on the BBCS candidate.
+     - The paper's framework is silent on the engineering target
+       (gross). Implementation would either (a) restrict to bb_90
+       and not say anything about gross, or (b) apply BBCS to the
+       semisimple quotient F_2[G_odd] and produce the same
+       trivial-on-gross bound that Round 3 already produced.
+  2. Document this as a first-class "literature-doesn't-cover-our-
+     regime" outcome. The compounding-obstructions observation from
+     Round 3 (HANDOFF §6i; T2R3.4) is now strengthened: the entire
+     classical multivariate-abelian-code distance-bound literature
+     (Camion 1971 → Sabin-Lomonaco 1992 → Saints-Heegard 1995 →
+     BBCS 2016 → BGS 2017) is in the semisimple regime.
+  3. Future Tier-2 directions (NOT THIS ROUND):
+     - **Bound that handles the radical of F_2[G] for even |G| in
+       its own right** — i.e. a weight invariant analogous to the
+       Jacobson-radical filtration depth but on the d-side of the
+       inequality (cf. HANDOFF §6h: weight invariants only on RHS).
+       Conceptually this would be a "depth-weighted distance" that
+       sees the radical strata, not just the semisimple quotient.
+       No reference found in literature so far.
+     - **Cover-graph chain-map transfer bounds (Pesah et al. 2025,
+       arXiv:2501.xxxxx)**: if gross is an h-cover of a base BB
+       code with known distance d_base, then `d_gross ≥ d_base`
+       might hold (this is structural, not algebraic, so dodges
+       the semisimple/cyclic obstructions entirely).
+     - **Homological-product surgery bounds (Hsieh-Le Gall 2020,
+       Kovalev-Pryadko 2013)**: bound `d_X` in terms of the
+       homology of the C-block / B-block 2-complex coupled through
+       the boundary maps. Algebraically different machinery, no
+       reliance on semisimplicity.
+
+prior_art_references:
+  - 'Bernal, Bueno-Carreño, Simón 2016: "Apparent Distance and a
+    Notion of BCH Multivariate Codes," IEEE TIT 62(2), 655-668.
+    doi:10.1109/TIT.2015.2512594. arXiv preprint update:
+    arXiv:2402.03938 (2024). [SEMISIMPLE ASSUMPTION on page 2,
+    Section II; reiterated Section III, Theorem 22, Theorem 25.]'
+  - 'Bernal, Guerreiro, Simón 2017: "From ds-bounds for cyclic
+    codes to true distance for abelian codes," arXiv:1704.03761.
+    [Same semisimple assumption, stated page 3 Section 2.]'
+  - 'Jitman, Ling 2013: "Abelian Codes in Principal Ideal Group
+    Algebras," IEEE TIT 59(1), 211-222. Explicitly addresses
+    non-semisimple PIGAs; shows abelian codes there are
+    asymptotically bad and any distance bound is derived from
+    semisimple quotient.'
+  - 'Camion 1971: "Abelian Codes," MRC Tech. Sum. Rep. 1059,
+    U. Wisconsin. Original apparent-distance reference.'
+  - 'Sabin, Lomonaco 1992: "On Minimum Distance Bounds for Abelian
+    Codes," AAECC 3, 183-197.'
+  - 'Saints, Heegard 1995: "Algebraic-geometric codes and
+    multidimensional cyclic codes," IEEE TIT 41(6), 1733-1751.'
+  - 'HANDOFF.md §§6h, 6i (this codebase): the weight-vs-dimension
+    invariant lesson and the "Bravyi engineers degeneracy"
+    observation. Both apply uniformly to the BBCS round.'
+  - 'pipeline/attempts/bb_distance_conjecture_ht_roos/result.md
+    (Round 3 verdict): same structural obstruction, different
+    algebraic toolkit.'
+  - 'experiments/bb_lab/notes/T2R4.0_literature.md: this round''s
+    detailed literature trail.'
+
+artifacts:
+  - 'experiments/bb_lab/notes/T2R4.0_literature.md: literature
+    triangulation, BBCS semisimplicity assumption quoted verbatim,
+    Jitman-Ling 2013 cross-check, property checklist (a)/(b)/(c).'
+  - 'pipeline/attempts/bb_distance_conjecture_bbcs/{state.yaml,
+    hypothesis.md, evidence.md, result.md}: this attempt.'
+  - 'No new source code, tests, or eval scripts were written. Per
+    the T2R4 spec instruction "Don''t fake an implementation. If
+    the BBCS paper is paywalled or you can''t find the algorithm
+    precisely, document and stop." The paper was located and read
+    in full; the obstruction is in the paper''s explicit
+    assumptions, not in our access. Test count remains at the
+    pre-round baseline of 195 passed / 2 skipped.'
