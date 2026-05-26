@@ -125,3 +125,173 @@ def is_non_degenerate(
     if A.group != B.group:
         raise ValueError("A and B must live in the same group algebra")
     return supp_generates_G(A, G) and supp_generates_G(B, G)
+
+
+# ===========================================================================
+# C-v3: elementary-abelian G_odd classifier
+# ===========================================================================
+#
+# `G_odd` is the maximal odd-order quotient of an abelian group G — equivalently,
+# the product of axis-wise odd parts. The C-v3 narrowed conjecture (HANDOFF_C3 §2)
+# gates on G_odd being "elementary abelian" in the LOOSE sense:
+#
+#     for each prime p | |G_odd|, the p-primary part of G_odd is ≅ (Z_p)^{k_p}
+#
+# Equivalently: each per-axis odd order is squarefree (no prime-square factor).
+#
+# This includes bb_90's G_odd = Z_3 × Z_3 × Z_5 (two primes but each part
+# elementary abelian) and excludes bb_108's G_odd = Z_9 × Z_3 (a Z_9 factor
+# breaks the squarefree-axis-order condition).
+#
+# A stricter notion — `G_odd = (Z_p)^k` for a single prime p — is also exposed
+# via `g_odd_elementary_prime` for callers that need the single-prime form.
+
+
+def _prime_factorization(n: int) -> list[tuple[int, int]]:
+    """Return [(p, e), …] for n = ∏ p^e, with p ascending. n must be ≥ 1.
+
+    For n = 1, returns [] (the empty factorization).
+    """
+    if n < 1:
+        raise ValueError(f"_prime_factorization: n = {n} must be ≥ 1")
+    out: list[tuple[int, int]] = []
+    p = 2
+    m = n
+    while p * p <= m:
+        if m % p == 0:
+            e = 0
+            while m % p == 0:
+                m //= p
+                e += 1
+            out.append((p, e))
+        p += 1
+    if m > 1:
+        out.append((m, 1))
+    return out
+
+
+def _odd_part(n: int) -> int:
+    """Return the largest odd divisor of n. For n = 0, returns 0."""
+    while n > 0 and n % 2 == 0:
+        n //= 2
+    return n
+
+
+def g_odd_decomposition(G: AbelianGroup) -> tuple[int, ...]:
+    """Return the **primary cyclic factor orders** of the max-odd quotient `G_odd`.
+
+    For G = ∏ Z_{n_i}, G_odd = ∏ Z_{n_i_odd} where n_i_odd = largest odd
+    divisor of n_i. Each Z_{n_i_odd} decomposes via CRT into its prime-
+    power cyclic components: Z_{n_i_odd} ≅ ∏_p Z_{p^{e_{ip}}} where
+    n_i_odd = ∏ p^{e_{ip}}. The full primary cyclic decomposition of
+    G_odd is the concatenation of all such prime-power factors across
+    axes. The returned tuple is sorted ascending for determinism.
+
+    Examples
+    --------
+    >>> g_odd_decomposition(ZmZn(12, 6))     # G_odd = Z_3 × Z_3
+    (3, 3)
+    >>> g_odd_decomposition(ZmZn(9, 6))      # G_odd = Z_9 × Z_3
+    (3, 9)
+    >>> g_odd_decomposition(ZmZn(15, 3))     # G_odd = Z_3 × Z_3 × Z_5
+    (3, 3, 5)
+    >>> g_odd_decomposition(AbelianGroup((4,)))  # G_odd trivial
+    ()
+    """
+    factors: list[int] = []
+    for axis_order in G.orders:
+        odd_part = _odd_part(axis_order)
+        if odd_part == 1:
+            continue
+        for p, e in _prime_factorization(odd_part):
+            factors.append(p ** e)
+    return tuple(sorted(factors))
+
+
+def is_g_odd_elementary_abelian(G: AbelianGroup) -> bool:
+    """Return True iff `G_odd` is **elementary abelian on every prime part**.
+
+    Definition (this module's convention, per HANDOFF_C3 §6): for every
+    prime `p` dividing `|G_odd|`, the p-primary subgroup of `G_odd` is
+    a direct sum of copies of `Z_p` (NO `Z_{p^2}` or higher). Multiple
+    distinct primes are allowed.
+
+    Equivalently: every primary cyclic factor returned by
+    `g_odd_decomposition` is prime (not a prime power > p^1).
+
+    Equivalently: each axis's max-odd order is squarefree.
+
+    For a trivial G_odd (G a 2-group), this is vacuously True.
+
+    Examples
+    --------
+    >>> is_g_odd_elementary_abelian(ZmZn(12, 6))  # G_odd = (Z_3)^2
+    True
+    >>> is_g_odd_elementary_abelian(ZmZn(9, 6))   # G_odd has Z_9 — squarefree-fail
+    False
+    >>> is_g_odd_elementary_abelian(ZmZn(15, 3))  # G_odd = Z_3 × Z_3 × Z_5
+    True
+    >>> is_g_odd_elementary_abelian(AbelianGroup((4,)))  # G_odd trivial
+    True
+
+    Note
+    ----
+    This is the **loose** definition: multiple primes are allowed as
+    long as each prime's primary part is elementary abelian. For the
+    stricter "single-prime" definition, use `g_odd_elementary_prime`.
+    """
+    for factor in g_odd_decomposition(G):
+        # factor is a prime power p^e. Check e == 1.
+        # We know factor ≥ 3 (odd and > 1), so the smallest prime factor
+        # is at least 3.
+        # Simplest check: factor must be prime.
+        if not _is_prime(factor):
+            return False
+    return True
+
+
+def _is_prime(n: int) -> bool:
+    """Quick primality test for small n (up to ~10^6 cleanly). For BB-corpus
+    inputs (axis odd parts ≤ |G| ≤ 288), trial division is fine."""
+    if n < 2:
+        return False
+    if n < 4:
+        return True
+    if n % 2 == 0:
+        return False
+    p = 3
+    while p * p <= n:
+        if n % p == 0:
+            return False
+        p += 2
+    return True
+
+
+def g_odd_elementary_prime(G: AbelianGroup) -> int | None:
+    """Return the unique prime `p` if `G_odd ≅ (Z_p)^k` for some k ≥ 0,
+    else None.
+
+    This is the STRICT elementary-abelian condition: G_odd is a single-prime
+    elementary abelian group. `bb_90_8_10` has `G_odd = Z_3 × Z_3 × Z_5`
+    (two primes), so it returns None even though
+    `is_g_odd_elementary_abelian` returns True.
+
+    For trivial G_odd (G a 2-group), returns None — there is no prime.
+
+    Examples
+    --------
+    >>> g_odd_elementary_prime(ZmZn(12, 6))  # G_odd = (Z_3)^2
+    3
+    >>> g_odd_elementary_prime(ZmZn(15, 3))  # multi-prime
+    >>> g_odd_elementary_prime(ZmZn(9, 6))   # not elementary abelian
+    """
+    factors = g_odd_decomposition(G)
+    if not factors:
+        return None
+    primes = set(factors)
+    if len(primes) != 1:
+        return None
+    (p,) = primes
+    if not _is_prime(p):
+        return None
+    return p

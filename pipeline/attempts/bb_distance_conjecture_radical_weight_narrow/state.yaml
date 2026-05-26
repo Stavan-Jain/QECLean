@@ -1,0 +1,124 @@
+code_id: bb_distance_radical_weight_narrow
+display_name: 'Narrowed radical-weight distance bound for BB codes
+                (elementary-abelian G_odd ∧ c ≥ 3)'
+status: survives
+track: moonshot
+started_at: 2026-05-26
+worktree_branch: claude/blissful-hermann-770631
+phase: tier-2-conjecture-mill
+parent_program: 4-tier BB analytic distance bound (Tier 1 / 2 / 3 / 4)
+tier: 2
+purpose: |
+  Test the narrowed form of the C-v2 conjecture (HANDOFF_C3 §2):
+
+      If G_odd is loosely elementary abelian (each prime-part is
+         elementary abelian) AND c ≥ 3, then
+         d_X(BB(G, A, B)) ≥ ⌈(1/c) · min_O min(w_1(A, O), w_1(B, O))⌉.
+
+  HANDOFF_C3 had hypothesized only the elem-ab condition. The C-v3
+  corpus sweep showed that all 3 894 labeled corpus rows have
+  loose-elem-ab G_odd, so the elem-ab restriction alone doesn't help.
+  Adding c ≥ 3 (the LP joint-support index) gives the clean
+  survival domain.
+
+verdict: SURVIVES — strongest signal in the C-program
+
+verdict_summary: |
+  The narrowed conjecture survives on its hypothesis domain.
+
+  Empirical evidence:
+    * Corpus sweep (3 894 labeled rows): 0 violations within the
+      hypothesis domain (loose elem-ab G_odd ∧ c ≥ 3); 74 rows
+      qualify, 33 tight (44.6% tightness rate).
+    * Bravyi table: 4 of 5 instances satisfy hypothesis (bb_72,
+      bb_90, gross, bb_288); ALL 4 are tight with bound = d_published.
+      bb_108_8_10 is excluded by hypothesis (G_odd = Z_9 × Z_3 NOT
+      elementary abelian), so its prior C-v2 violation does NOT
+      apply.
+    * gross is tight: bound = 12 = d_actual.
+
+  Per HANDOFF_C3 §C-v3.6 stop conditions: this is the
+  **"survives-tight-on-gross-and-clean"** outcome — recommended next
+  step is C-v4 (formal Lean proof attempt).
+
+  Caveats:
+    * The corpus c ≥ 3 sample is small (74 rows). Survival is
+      empirically robust on this subset but the sample size is
+      smaller than ideal.
+    * The narrowed domain excludes a large fraction of BB codes
+      (the c < 3 regime — most non-engineered BB codes), so this is
+      a conditional theorem, not a universal one. The C-v1
+      F_2[G]-unit-invariance restriction also carries through.
+
+prior_art_references:
+  - 'HANDOFF_C3.md: handoff specifying the narrowed conjecture.'
+  - 'pipeline/attempts/bb_distance_conjecture_radical_weight/result.md:
+    C-v2 falsification (3 319 corpus violations primary, bb_108
+    violates, all alternatives fail).'
+  - 'pipeline/attempts/bb_distance_conjecture/result.md:
+    T2R1 unconditional Jacobson conjecture FALSIFIED (HANDOFF §6h).
+    Same shape as C-v2 but with μ_O instead of w_1.'
+  - 'Lin–Pryadko 2023 (arXiv:2306.16400) Statement 12: the parallel
+    classical bound with d_A^⊥ in place of w_1.'
+  - 'experiments/bb_lab/notes/Cv1_results.md: w_μ definition and
+    gross numerical table (w_1 = 36 → bound 12 = d).'
+
+artifacts:
+  - 'experiments/bb_lab/src/bb_lab/degeneracy.py: added
+    g_odd_decomposition, is_g_odd_elementary_abelian,
+    g_odd_elementary_prime; existing functions untouched.'
+  - 'experiments/bb_lab/tests/test_degeneracy.py: added 9 tests
+    pinning Bravyi-table classification.'
+  - 'experiments/bb_lab/scripts/cv3_restricted_sweep.py:
+    cross-stratified corpus sweep.'
+  - 'experiments/bb_lab/notes/Cv3_restricted_sweep.md: corpus sweep
+    results, by-c stratification, hypothesis-domain identification.'
+  - 'experiments/bb_lab/notes/Cv3_z4xz6_anomaly.md: confirmed
+    Z_4 × Z_6 anomaly is the same conjecture (rank-1 G_odd).'
+  - 'experiments/bb_lab/notes/Cv3_tightness.md: structural condition
+    S characterization for C-v4 proof attempt.'
+
+next_steps: |
+  This is a SURVIVING conditional conjecture. Per HANDOFF_C3 §C-v3.6
+  the next move is **C-v4 (formal Lean proof attempt)**.
+
+  Proof strategy ingredients (per notes/Cv3_tightness.md §"the
+  structural condition S for C-v4 proof"):
+
+    1. Lin–Pryadko Statement 12 proof technique gives the LP-style
+       denominator structure (d ≥ d_A^⊥ / c). The C-v3 conjecture
+       replaces d_A^⊥ with w_1, which is the per-orbit isotypic
+       kernel min weight.
+
+    2. Maschke decomposition of F_2[G_odd] into a product of fields
+       (semisimplicity under the elem-ab hypothesis) gives the
+       Wedderburn structure that makes w_1 well-defined per orbit.
+
+    3. The 2-Sylow / Jacobson radical structure of F_2[G_2]
+       contributes the "non-semisimple part" that distinguishes w_1
+       from d_A^⊥. The Berman-Charpin-Andriatahiny line (see
+       notes/Cv1_literature.md) gives the min-weight machinery for
+       radical powers in elementary-abelian-p-group group algebras
+       — but the proof here needs the LOOSE version (mixed primes).
+
+    4. Combine via "the X-logical of minimum weight lies in
+       ker(M_A^T) ∩ R_O for some orbit O where A vanishes" — a
+       per-orbit logical-decomposition argument adapted from LP.
+
+  The proof statement in Lean (HANDOFF_C3 §9 sketch):
+
+      theorem bb_distance_lower_bound_narrowed
+        {G : Type} [AddCommGroup G] [Fintype G]
+        (A B : G → ZMod 2)
+        (h_ea : IsLooseElemAbGOdd G)
+        (h_c : c A B G ≥ 3)
+        : (bbChainComplex A B).distance ≥
+            (1 / c A B G) * ((min over vanishing orbits) min(w_1 A O, w_1 B O))
+        := by sorry
+
+  Hard parts:
+    - Define w_1 and c in Lean against the BBChainComplex framework.
+    - The actual distance inequality — requires the LP / per-orbit
+      / Maschke / radical-aware proof outlined above.
+    - F_2[G]-unit invariance is dropped (per C-v1 §7); document the
+      theorem's domain carefully.
