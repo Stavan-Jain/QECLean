@@ -639,3 +639,265 @@ def w_mu_table(
                 A, orbit, mu, G=G, max_basis_dim=max_basis_dim
             )
     return out
+
+
+# ===========================================================================
+# C-v2: BB-code distance bound conjectures using w_μ
+# ===========================================================================
+#
+# HANDOFF_C2 candidate (primary):
+#
+#     d_X(BB(G, A, B))  ≥  (1/c) · min_O min(w_1(A, O), w_1(B, O))
+#
+# where c = [G_a : G_a ∩ G_b], G_a = ⟨supp(A)⟩, G_b = ⟨supp(B)⟩, and the
+# min ranges over Frobenius orbits where both w_1(A, O) and w_1(B, O)
+# are finite (i.e., both polynomials vanish on O). For gross this gives
+# 36/3 = 12 = d, tight.
+#
+# Alternative formulations are provided for A/B testing per HANDOFF_C2 §5.
+
+
+def _subgroup_closure_of_support(supp, G: AbelianGroup) -> set:
+    """Local copy of degeneracy._subgroup_closure to avoid the import cycle
+    (radical_weight imports algebraic_features which would loop if we
+    pulled degeneracy in at module level)."""
+    closure = {tuple(0 for _ in G.orders)}
+    if not supp:
+        return closure
+    frontier = set(closure)
+    while frontier:
+        new_frontier = set()
+        for h in frontier:
+            for g in supp:
+                gh = G.add(h, g)
+                if gh not in closure:
+                    closure.add(gh)
+                    new_frontier.add(gh)
+        frontier = new_frontier
+    return closure
+
+
+def joint_support_subgroup_index(
+    A: Poly, B: Poly, G: AbelianGroup | None = None
+) -> int:
+    """Return `c = [G_a : G_a ∩ G_b]` where `G_a = ⟨supp(A)⟩`,
+    `G_b = ⟨supp(B)⟩`.
+
+    This is the Lin–Pryadko-style "joint" support-subgroup index used as
+    the denominator in the C-v2 conjecture. It equals
+    `[G_b : G_a ∩ G_b]` as well by Dedekind's identity for subgroup
+    intersections (both supports' closures have the same intersection
+    relative-index, since `|G_a| · |G_b| = |G_a · G_b| · |G_a ∩ G_b|`
+    for abelian subgroups). Note: this is NOT the same as the existing
+    `weight_invariants._intersection_subgroup_order` which returns
+    `|G_a ∩ G_b|`.
+
+    For non-degenerate BB codes (`G_a = G_b = G`), `c = 1`.
+
+    For gross (`G_a = ⟨3⟩ × Z_6`, `G_b = Z_12 × ⟨3⟩`,
+    `G_a ∩ G_b = ⟨3⟩ × ⟨3⟩`), `c = 3`.
+    """
+    if G is None:
+        G = A.group
+    if A.group != B.group:
+        raise ValueError("A and B must live in the same group algebra")
+    G_a = _subgroup_closure_of_support(A.support, G)
+    G_b = _subgroup_closure_of_support(B.support, G)
+    inter = G_a & G_b
+    if not inter:
+        # Degenerate input — both supports empty.
+        return 1
+    return len(G_a) // len(inter)
+
+
+def _min_joint_w_mu(
+    A: Poly,
+    B: Poly,
+    G: AbelianGroup,
+    mu: int = 1,
+    *,
+    require_joint_vanishing: bool = True,
+    max_basis_dim: int = 22,
+) -> tuple[float | int, frozenset[tuple[int, ...]] | None]:
+    """Return `(min_O min(w_μ(A, O), w_μ(B, O)), argmin orbit)`.
+
+    Iterates Frobenius orbits on `Ĝ_odd`. If `require_joint_vanishing`
+    is True, restricts to orbits where *both* `μ_O(A) > 0` and
+    `μ_O(B) > 0` (the primary HANDOFF_C2 convention). If False, takes
+    the min over all orbits where both `w_μ(A, O)` and `w_μ(B, O)`
+    are finite (which for `μ = 1` is equivalent to joint-vanishing in
+    practice).
+
+    Returns `(float("inf"), None)` when no orbit qualifies (vacuous).
+    """
+    from .algebraic_features import jacobson_radical_depth  # local to avoid cycle
+
+    orbits = g_odd_frobenius_orbits(G)
+    best: float | int = float("inf")
+    argmin: frozenset[tuple[int, ...]] | None = None
+    for orbit in orbits:
+        if require_joint_vanishing:
+            if jacobson_radical_depth(A, orbit, G) == 0:
+                continue
+            if jacobson_radical_depth(B, orbit, G) == 0:
+                continue
+        wA = w_mu(A, orbit, mu, G, max_basis_dim=max_basis_dim)
+        wB = w_mu(B, orbit, mu, G, max_basis_dim=max_basis_dim)
+        if wA == float("inf") or wB == float("inf"):
+            continue
+        cand = min(wA, wB)
+        if cand < best:
+            best = cand
+            argmin = orbit
+    return best, argmin
+
+
+def bb_radical_bound(
+    A: Poly,
+    B: Poly,
+    G: AbelianGroup | None = None,
+    *,
+    max_basis_dim: int = 22,
+) -> int | float:
+    """C-v2 primary conjecture lower bound on `d_X(BB(G, A, B))`:
+
+        d_X  ≥  ⌈(1/c) · min_O min(w_1(A, O), w_1(B, O))⌉
+
+    where the min is over orbits where both A and B vanish, and
+    `c = [G_a : G_a ∩ G_b]` is the joint-support index.
+
+    Returns 0 when the bound is vacuous (no joint-vanishing orbit) so
+    the caller can distinguish "vacuous" from "satisfied with bound 1".
+    Otherwise returns a positive integer (ceiling of the rational).
+    """
+    if G is None:
+        G = A.group
+    if A.group != B.group:
+        raise ValueError("A and B must live in the same group algebra")
+    c = joint_support_subgroup_index(A, B, G)
+    raw, _ = _min_joint_w_mu(
+        A, B, G, mu=1, require_joint_vanishing=True,
+        max_basis_dim=max_basis_dim,
+    )
+    if raw == float("inf"):
+        return 0
+    import math
+    return math.ceil(raw / max(c, 1))
+
+
+def bb_radical_bound_alt(
+    A: Poly,
+    B: Poly,
+    G: AbelianGroup | None = None,
+    *,
+    formulation: str = "primary",
+    max_basis_dim: int = 22,
+) -> int | float:
+    """C-v2 alternative formulations (HANDOFF_C2 §5).
+
+    formulation:
+        "primary"   — same as bb_radical_bound: ⌈(1/c) · min_O joint w_1⌉
+        "any-orbit" — like primary but min over orbits where either A
+                      or B vanishes (not requiring joint). Bound = 0 if
+                      neither vanishes anywhere.
+        "multi-mu"  — ⌈(1/c) · min_{O, μ ≤ min(μ_O(A), μ_O(B))}
+                          min(w_μ(A,O), w_μ(B,O)) / μ⌉
+        "sum"       — (1/c) · Σ_{O joint vanishing} min(w_1(A, O), w_1(B, O))
+                      (Per HANDOFF_C2 §5 Alt-C: dead-on-arrival on gross;
+                       included for completeness.)
+        "geometric" — ⌈(1/c) · √(min_O w_1(A,O) · w_1(B,O))⌉
+                      (Per HANDOFF_C2 §5 Alt-D.)
+
+    Returns the bound (ceiling of an integer/rational quantity); 0 for
+    vacuous bounds.
+    """
+    import math
+
+    if G is None:
+        G = A.group
+    if A.group != B.group:
+        raise ValueError("A and B must live in the same group algebra")
+    c = joint_support_subgroup_index(A, B, G)
+
+    if formulation == "primary":
+        return bb_radical_bound(A, B, G, max_basis_dim=max_basis_dim)
+
+    if formulation == "any-orbit":
+        raw, _ = _min_joint_w_mu(
+            A, B, G, mu=1, require_joint_vanishing=False,
+            max_basis_dim=max_basis_dim,
+        )
+        if raw == float("inf"):
+            return 0
+        return math.ceil(raw / max(c, 1))
+
+    if formulation == "multi-mu":
+        from .algebraic_features import jacobson_radical_depth
+
+        orbits = g_odd_frobenius_orbits(G)
+        L = loewy_length(G)
+        best: float | int = float("inf")
+        for orbit in orbits:
+            mu_A = jacobson_radical_depth(A, orbit, G)
+            mu_B = jacobson_radical_depth(B, orbit, G)
+            mu_max = min(mu_A, mu_B, L)
+            if mu_max == 0:
+                continue
+            for mu in range(1, mu_max + 1):
+                wA = w_mu(A, orbit, mu, G, max_basis_dim=max_basis_dim)
+                wB = w_mu(B, orbit, mu, G, max_basis_dim=max_basis_dim)
+                if wA == float("inf") or wB == float("inf"):
+                    continue
+                cand = min(wA, wB) / mu
+                if cand < best:
+                    best = cand
+        if best == float("inf"):
+            return 0
+        return math.ceil(best / max(c, 1))
+
+    if formulation == "sum":
+        from .algebraic_features import jacobson_radical_depth
+
+        orbits = g_odd_frobenius_orbits(G)
+        total = 0.0
+        any_orbit = False
+        for orbit in orbits:
+            if jacobson_radical_depth(A, orbit, G) == 0:
+                continue
+            if jacobson_radical_depth(B, orbit, G) == 0:
+                continue
+            wA = w_mu(A, orbit, 1, G, max_basis_dim=max_basis_dim)
+            wB = w_mu(B, orbit, 1, G, max_basis_dim=max_basis_dim)
+            if wA == float("inf") or wB == float("inf"):
+                continue
+            total += min(wA, wB)
+            any_orbit = True
+        if not any_orbit:
+            return 0
+        return math.ceil(total / max(c, 1))
+
+    if formulation == "geometric":
+        from .algebraic_features import jacobson_radical_depth
+
+        orbits = g_odd_frobenius_orbits(G)
+        best: float | int = float("inf")
+        for orbit in orbits:
+            if jacobson_radical_depth(A, orbit, G) == 0:
+                continue
+            if jacobson_radical_depth(B, orbit, G) == 0:
+                continue
+            wA = w_mu(A, orbit, 1, G, max_basis_dim=max_basis_dim)
+            wB = w_mu(B, orbit, 1, G, max_basis_dim=max_basis_dim)
+            if wA == float("inf") or wB == float("inf"):
+                continue
+            cand = math.sqrt(wA * wB)
+            if cand < best:
+                best = cand
+        if best == float("inf"):
+            return 0
+        return math.ceil(best / max(c, 1))
+
+    raise ValueError(
+        f"unknown formulation {formulation!r}; expected one of: "
+        "primary, any-orbit, multi-mu, sum, geometric"
+    )

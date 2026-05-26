@@ -29,7 +29,10 @@ from bb_lab.algebraic_features import (
 from bb_lab.group import AbelianGroup, ZmZn
 from bb_lab.poly import Poly
 from bb_lab.radical_weight import (
+    bb_radical_bound,
+    bb_radical_bound_alt,
     jacobson_filtration_dims,
+    joint_support_subgroup_index,
     loewy_length,
     w_mu,
     w_mu_table,
@@ -430,3 +433,106 @@ def test_w_mu_mismatched_group():
     orbit = g_odd_frobenius_orbits(G_a)[0]
     with pytest.raises(ValueError):
         w_mu(A, orbit, 1, G_b)
+
+
+# ===========================================================================
+# C-v2 conjecture tests — DOCUMENT THE FALSIFICATION
+# ===========================================================================
+#
+# The conjecture
+#     d_X(BB(G, A, B)) ≥ ⌈(1/c) · min_O min(w_1(A, O), w_1(B, O))⌉
+# is tight on gross (12=12) but VIOLATES on bb_108_8_10 (12 > 10) and
+# on 3 319 corpus rows (85%). These tests pin the numerical record so
+# any future refactor that changes bb_radical_bound's behavior is
+# caught immediately.
+
+
+def test_joint_support_subgroup_index_gross():
+    """Gross: G_a = ⟨3⟩ × Z_6 (order 24), G_b = Z_12 × ⟨3⟩ (order 24),
+    G_a ∩ G_b = ⟨3⟩ × ⟨3⟩ (order 8). c = 24/8 = 3.
+    """
+    G = ZmZn(12, 6)
+    A = Poly.from_string("x^3 + y + y^2", G)
+    B = Poly.from_string("y^3 + x + x^2", G)
+    assert joint_support_subgroup_index(A, B, G) == 3
+
+
+def test_joint_support_subgroup_index_non_degenerate():
+    """When both supports generate G, c = 1."""
+    G = ZmZn(3, 5)
+    # Non-degenerate champion: supp generates Z_3 × Z_5.
+    A = Poly.from_string("1 + x + x^2*y", G)
+    B = Poly.from_string("1 + x + x*y^3", G)
+    assert joint_support_subgroup_index(A, B, G) == 1
+
+
+def test_joint_support_subgroup_index_equal_polys():
+    """When A = B, G_a = G_b, intersection = G_a, c = 1."""
+    G = ZmZn(3, 6)
+    A = Poly.from_string("1 + y + y^2", G)
+    assert joint_support_subgroup_index(A, A, G) == 1
+
+
+def test_bb_radical_bound_gross_tight():
+    """Gross: w_1 = 36 per vanishing orbit, c = 3, bound = 12 = d.
+
+    This is the gross "factor of 3" coincidence (HANDOFF_C2 §1) that
+    seeded the C-v2 conjecture.
+    """
+    G = ZmZn(12, 6)
+    A = Poly.from_string("x^3 + y + y^2", G)
+    B = Poly.from_string("y^3 + x + x^2", G)
+    assert bb_radical_bound(A, B, G) == 12
+
+
+def test_bb_radical_bound_bb108_falsifies():
+    """bb_108_8_10 (G = Z_9 × Z_6) VIOLATES the conjecture.
+
+    Bound = 12 but Bravyi 2024 establishes d_published = 10. This
+    test pins the falsification numerical record (HANDOFF_C2 §C-v2.4
+    Bravyi-table verdict).
+    """
+    G = ZmZn(9, 6)
+    A = Poly.from_string("x^3 + y + y^2", G)
+    B = Poly.from_string("y^3 + x + x^2", G)
+    bound = bb_radical_bound(A, B, G)
+    assert bound == 12
+    d_published = 10
+    assert bound > d_published, (
+        "C-v2 conjecture asserts d ≥ 12 but Bravyi 2024 establishes "
+        "d = 10; this constitutes a falsification."
+    )
+
+
+def test_bb_radical_bound_z3_z6_equal_polys_falsifies():
+    """Z_3 × Z_6, A = B = 1+y+y² (d = 2 per corpus): bound = 12 > 2."""
+    G = ZmZn(3, 6)
+    A = Poly.from_string("1 + y + y^2", G)
+    B = Poly.from_string("1 + y + y^2", G)
+    assert bb_radical_bound(A, B, G) == 12
+
+
+def test_bb_radical_bound_alt_sum_violates_gross():
+    """Per HANDOFF_C2 §5 Alt-C: sum formulation violates gross
+    (bound = 24 > d = 12). Dead-on-arrival, included for completeness.
+    """
+    G = ZmZn(12, 6)
+    A = Poly.from_string("x^3 + y + y^2", G)
+    B = Poly.from_string("y^3 + x + x^2", G)
+    assert bb_radical_bound_alt(A, B, G, formulation="sum") == 24
+
+
+def test_bb_radical_bound_alt_multi_mu_gross_loose():
+    """multi-mu gives bound 6 on gross (loose by 6 vs d = 12)."""
+    G = ZmZn(12, 6)
+    A = Poly.from_string("x^3 + y + y^2", G)
+    B = Poly.from_string("y^3 + x + x^2", G)
+    assert bb_radical_bound_alt(A, B, G, formulation="multi-mu") == 6
+
+
+def test_bb_radical_bound_alt_unknown_formulation():
+    G = ZmZn(12, 6)
+    A = Poly.from_string("x^3 + y + y^2", G)
+    B = Poly.from_string("y^3 + x + x^2", G)
+    with pytest.raises(ValueError):
+        bb_radical_bound_alt(A, B, G, formulation="nonexistent")
