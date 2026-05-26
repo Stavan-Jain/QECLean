@@ -1,0 +1,146 @@
+code_id: bb_distance_radical_weight_narrow_tier3
+display_name: 'Tier 3 adversarial stress test of the C-v3 narrowed
+                radical-weight distance bound'
+status: falsified-as-tight-surviving-as-loose
+track: moonshot
+started_at: 2026-05-26
+worktree_branch: claude/blissful-hermann-770631
+phase: tier-3-skeptic
+parent_program: 4-tier BB analytic distance bound (Tier 1 / 2 / 3 / 4)
+tier: 3
+purpose: |
+  Test the C-v3 narrowed conjecture (HANDOFF_TIER3_CV3 §1)
+  adversarially out-of-corpus, across 5 batteries (weight-4 codes,
+  other G_odd primes, larger G_2, adversarial constructions, and
+  Bravyi-paper extended). Per the pipeline's design, no conjecture
+  reaches Tier 4 (Lean) without surviving Tier 3.
+
+  The narrowed conjecture (C-v3):
+      G_odd elem-ab ∧ c ≥ 3 ⟹
+          d_X ≥ ⌈(1/c) · min_O min(w_1(A,O), w_1(B,O))⌉.
+
+verdict: FALSIFIED-AS-TIGHT; SURVIVES-AS-LOOSE-WITH-R4
+
+verdict_summary: |
+  The original (tight) C-v3 conjecture is FALSIFIED on:
+    - T3-A: 78/500 in-scope weight-4 violators on Z_6 × Z_6.
+    - T3-C: C1 violator on Z_12 × Z_12 (gross polys, bound=18, d=12).
+
+  Two refinement attempts ran in parallel:
+
+  R1 (odd-weight) [parallel agent, commit 283ddd4]:
+    - Adds `weight(A), weight(B) both odd` to hypothesis.
+    - Saves all 78 T3-A violators.
+    - Doesn't address T3-C (C1 has odd weights).
+    - Necessary but not sufficient.
+
+  R4 (cross-orbit min) [parallel agent, commit 283ddd4]:
+    - Replaces per-orbit `min_O w_1` with cross-orbit min weight
+      over the joint-vanishing direct sum.
+    - Saves C1 (R4 bound = 12 = d).
+    - Loose on Bravyi: gross gap 4, bb_288 gap 6, bb_72 gap 2.
+    - LOOSE BUT CORRECT.
+
+  H_UNIT² (unit-factor order ≤ 2) [this artifact]:
+    - Candidate TIGHT refinement based on per-axis Loewy unit factor.
+    - 3/4 sampled cases match prediction; case (4, 5) refutes.
+    - FALSIFIED as a tight refinement.
+
+  Conclusion: C-v3 + R1 + R4 gives a LOOSE-BUT-CORRECT bound that
+  survives empirically. No TIGHT refinement was found.
+
+per_battery_results:
+  T3-A_weight4_z6_z6:
+    in_scope_tested: 500
+    violations: 78
+    tightness_rate_within_in_scope: 77.4%
+    refinement_saves: 78/78 via R1 (odd-weight)
+    status: falsified-with-clean-refinement-R1
+  T3-B_other_primes:
+    in_scope_tested: 1
+    violations: 0
+    tightness_rate: 100%
+    status: inconclusive  # most cases had k=0; only 1 testable
+  T3-C_larger_g2:
+    in_scope_tested: 1
+    violations: 1
+    tightness_rate: 0%
+    status: falsified-tight, saved-by-R4-loose
+    representative_violator: 'Z_12×Z_12, A=x^3+y+y^2, B=y^3+x+x^2: bound=18, d=12'
+    R4_fix: 'R4 bound = 12 = d (tight under R4); R4 is correct here'
+  T3-D_adversarial:
+    in_scope_tested: 2
+    violations: 0
+    status: clean-but-small  # full annealing sampler not run
+  T3-E_bravyi_extended:
+    in_scope_tested: 3
+    violations: 0
+    tightness_rate: 100%
+    status: clean
+  H_UNIT2_targeted:
+    in_scope_tested: 4
+    violations: 1 unexpected (predicted tight)
+    status: refinement-falsified  # (4, 5) refutes H_UNIT²
+  R4_critical_cases:
+    in_scope_tested: 4 + 8
+    violations_after_R4: 0
+    looseness_on_bravyi: gross 4, bb_288 6, bb_72 2
+    status: correct-but-loose
+
+prior_art_references:
+  - 'HANDOFF_TIER3_CV3.md: this Tier 3 round''s spec.'
+  - 'pipeline/attempts/bb_distance_conjecture_radical_weight_narrow/result.md:
+    C-v3 verdict (survives within elem-ab + c≥3 corpus).'
+  - 'experiments/bb_lab/notes/T3_CV3_A_weight4.md: T3-A characterization
+    (committed in 283ddd4).'
+  - 'experiments/bb_lab/notes/T3_CV3_R4_crossorbit.md: R4 refinement
+    finding (committed in 283ddd4).'
+  - 'experiments/bb_lab/notes/T3_CV3_C_g2.md: T3-C falsifier and
+    structural diagnosis.'
+  - 'experiments/bb_lab/notes/T3_CV3_H_UNIT2_attempt.md: failed tight
+    refinement attempt.'
+
+artifacts:
+  scripts:
+    - 'experiments/bb_lab/scripts/tier3_cv3_a_weight4.py: T3-A
+       enumeration + SAT (committed in 283ddd4).'
+    - 'experiments/bb_lab/scripts/tier3_cv3_refinement_test.py: R1/R2
+       vs violators (committed in 283ddd4).'
+    - 'experiments/bb_lab/scripts/tier3_cv3_refined_bcde.py: T3-B/C/D/E
+       spot-checks (committed in 283ddd4).'
+    - 'experiments/bb_lab/scripts/tier3_cv3_r4_crossorbit.py: R4
+       cross-orbit bound (committed in 283ddd4).'
+    - 'experiments/bb_lab/scripts/tier3_cv3_unit_squared.py: H_UNIT²
+       broad enumeration (this commit).'
+    - 'experiments/bb_lab/scripts/tier3_cv3_unit_squared_targeted.py:
+       H_UNIT² targeted SAT (this commit).'
+  notes:
+    - 'experiments/bb_lab/notes/T3_CV3_A_weight4.md (committed in 283ddd4)'
+    - 'experiments/bb_lab/notes/T3_CV3_R4_crossorbit.md (committed in 283ddd4)'
+    - 'experiments/bb_lab/notes/T3_CV3_B_primes.md (this commit)'
+    - 'experiments/bb_lab/notes/T3_CV3_C_g2.md (this commit)'
+    - 'experiments/bb_lab/notes/T3_CV3_D_adversarial.md (this commit)'
+    - 'experiments/bb_lab/notes/T3_CV3_E_bravyi_extended.md (this commit)'
+    - 'experiments/bb_lab/notes/T3_CV3_H_UNIT2_attempt.md (this commit)'
+
+next_steps: |
+  RECOMMENDED: Write HANDOFF_C4_R4.md for Lean formalization of the
+  R1 + R4 loose-but-correct bound:
+
+      Theorem (C-v4-loose): if G_odd is loosely elem-ab AND c ≥ 3
+      AND weight(A), weight(B) both odd, then
+          d_X(BB(G, A, B)) ≥ ⌈(1/c) · cross_orbit_min_weight(A, B, G)⌉.
+
+  Proof technique: adapt Lin-Pryadko Statement 12 substituting
+  cross-orbit min for the per-orbit numerator. The bound is loose
+  on gross/bb_288 but correct on all tested cases.
+
+  NOT RECOMMENDED: pursuing tight C-v1-based bounds. H_UNIT² failure
+  ((4, 5) case) confirms the C-v1 framework's structural limitation
+  (R_O-unit-invariance washes out distance-relevant information).
+
+  Open directions for future research:
+    1. Define a non-R_O-unit-invariant analog of w_1 (research-level pivot).
+    2. Direct Lin-Pryadko Statement 12 in Lean (= weaker than R4 but
+       fully classical).
+    3. Accept the negative-tight result + R4-loose result as deliverable.

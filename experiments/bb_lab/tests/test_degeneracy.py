@@ -15,6 +15,9 @@ so that future refactors of `_subgroup_closure` don't drift silently.
 from __future__ import annotations
 
 from bb_lab.degeneracy import (
+    g_odd_decomposition,
+    g_odd_elementary_prime,
+    is_g_odd_elementary_abelian,
     is_non_degenerate,
     supp_generates_G,
     support_subgroup_index,
@@ -187,3 +190,80 @@ def test_index_divides_group_order_on_assorted_polys():
         assert G.cardinality % idx == 0, (
             f"{s} on {G.label()}: index {idx} doesn't divide |G|={G.cardinality}"
         )
+
+
+# ===========================================================================
+# C-v3: elementary-abelian G_odd classifier tests
+# ===========================================================================
+
+
+def test_g_odd_decomposition_gross():
+    """Gross G = Z_12 × Z_6 has G_odd = Z_3 × Z_3 (cube-root × cube-root)."""
+    assert g_odd_decomposition(ZmZn(12, 6)) == (3, 3)
+
+
+def test_g_odd_decomposition_bb108():
+    """bb_108 G = Z_9 × Z_6 has G_odd = Z_9 × Z_3 — the Z_9 makes it
+    NOT elementary abelian (per HANDOFF_C3 §1)."""
+    assert g_odd_decomposition(ZmZn(9, 6)) == (3, 9)
+
+
+def test_g_odd_decomposition_bb90():
+    """bb_90 G = Z_15 × Z_3 is odd-order; G_odd = G itself decomposes
+    via CRT into Z_3 × Z_5 × Z_3 (axis 1 splits into Z_3 × Z_5)."""
+    assert g_odd_decomposition(ZmZn(15, 3)) == (3, 3, 5)
+
+
+def test_g_odd_decomposition_z4xz6():
+    """Z_4 × Z_6: axis 1 odd part = 1 (Z_4 is a 2-group), axis 2 odd
+    part = 3. G_odd = Z_3, rank 1."""
+    assert g_odd_decomposition(ZmZn(4, 6)) == (3,)
+
+
+def test_g_odd_decomposition_z4_pure_2group():
+    """Z_4 is a 2-group; G_odd is trivial."""
+    assert g_odd_decomposition(AbelianGroup((4,))) == ()
+
+
+def test_is_g_odd_elementary_abelian_bravyi_table():
+    """The 5 Bravyi codes: 4 are loose-elementary-abelian, 1 is not.
+
+    HANDOFF_C3 §1: bb_108 (G_odd = Z_9 × Z_3) is the only Bravyi instance
+    failing the hypothesis. The other 4 must qualify.
+    """
+    # bb_72, gross, bb_288: G_odd = Z_3 × Z_3
+    assert is_g_odd_elementary_abelian(ZmZn(6, 6)) is True
+    assert is_g_odd_elementary_abelian(ZmZn(12, 6)) is True
+    assert is_g_odd_elementary_abelian(ZmZn(12, 12)) is True
+    # bb_90: G_odd = Z_3 × Z_3 × Z_5 (multi-prime but each part elem-ab)
+    assert is_g_odd_elementary_abelian(ZmZn(15, 3)) is True
+    # bb_108: NOT elementary abelian (has Z_9 factor)
+    assert is_g_odd_elementary_abelian(ZmZn(9, 6)) is False
+
+
+def test_is_g_odd_elementary_abelian_2group():
+    """A 2-group has trivial G_odd → vacuously elementary abelian."""
+    assert is_g_odd_elementary_abelian(AbelianGroup((4,))) is True
+    assert is_g_odd_elementary_abelian(AbelianGroup((4, 2))) is True
+
+
+def test_is_g_odd_elementary_abelian_rank1():
+    """Single-cyclic-G_odd is elementary abelian (rank 1).
+
+    Per HANDOFF_C3 §C-v3.4, Z_4 × Z_6 (G_odd = Z_3) qualifies — this
+    resolves the Z_4 × Z_6 anomaly: it's already in the loose-elem-ab
+    domain.
+    """
+    assert is_g_odd_elementary_abelian(ZmZn(4, 6)) is True  # G_odd = Z_3
+    assert is_g_odd_elementary_abelian(ZmZn(3, 4)) is True  # G_odd = Z_3
+    assert is_g_odd_elementary_abelian(ZmZn(8, 6)) is True  # G_odd = Z_3
+
+
+def test_g_odd_elementary_prime_strict():
+    """Strict single-prime classifier."""
+    assert g_odd_elementary_prime(ZmZn(12, 6)) == 3   # (Z_3)^2
+    assert g_odd_elementary_prime(ZmZn(15, 3)) is None  # multi-prime (3, 5)
+    assert g_odd_elementary_prime(ZmZn(9, 6)) is None   # Z_9 factor
+    assert g_odd_elementary_prime(AbelianGroup((4,))) is None  # trivial
+    assert g_odd_elementary_prime(ZmZn(5, 5)) == 5   # (Z_5)^2
+    assert g_odd_elementary_prime(AbelianGroup((7,))) == 7  # Z_7

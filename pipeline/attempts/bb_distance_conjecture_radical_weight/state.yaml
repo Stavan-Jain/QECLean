@@ -1,0 +1,112 @@
+code_id: bb_distance_radical_weight
+display_name: 'Radical-weight (w_μ / c) distance bound conjecture for BB codes'
+status: falsified
+track: moonshot
+started_at: 2026-05-26
+worktree_branch: claude/blissful-hermann-770631
+phase: tier-2-conjecture-mill
+parent_program: 4-tier BB analytic distance bound (Tier 1 / 2 / 3 / 4)
+tier: 2
+purpose: |
+  Test the Tier-2 candidate conjecture (C-v2)
+
+      d_X(BB(G, A, B))  ≥  ⌈(1/c) · min_O min(w_1(A, O), w_1(B, O))⌉
+
+  where:
+    - w_1(A, O) is the C-v1 weight-aware Jacobson-radical filtration
+      invariant at filtration level 1, restricted to the orbit-O
+      local-ring component (radical_weight.w_mu);
+    - c = [G_a : G_a ∩ G_b], the LP-style joint-support index
+      (radical_weight.joint_support_subgroup_index);
+    - min_O is over Frobenius orbits where both A and B vanish.
+
+  Numerical motivation (HANDOFF_C2 §1): on gross, w_1 = 36 per
+  vanishing orbit and c = 3, giving bound 36/3 = 12 = actual d. The
+  "factor of 3" coincidence is the seed observation; Tier 2's job
+  is to falsify or corroborate against the corpus + Bravyi table.
+
+  Four alternative formulations from HANDOFF_C2 §5 were also tested:
+  any-orbit, multi-mu, sum, geometric.
+
+verdict: FALSIFIED
+verdict_summary: |
+  The primary conjecture and four of five alternatives are falsified.
+
+  Headline numbers (3 894 labeled corpus rows + 5 Bravyi instances):
+
+    * Primary conjecture:
+        - 3 319 / 3 894 corpus violations (85.2%).
+        - 4 / 5 Bravyi instances tight; 1 (bb_108_8_10) VIOLATES
+          (bound 12 > d_published 10).
+    * any-orbit: identical to primary on the labeled corpus
+      (3 319 violations).
+    * multi-mu: 3 133 violations.
+    * geometric: 3 614 violations.
+    * sum: violates gross itself (bound 24 > d 12); excluded from
+      corpus testing.
+
+  Subset c ≥ 3: 0 corpus violations (74 rows), but bb_108_8_10
+  (Bravyi) is c = 3 and violates. So "c ≥ 3" is necessary but not
+  sufficient gating.
+
+prior_art_references:
+  - 'HANDOFF_C2.md: candidate conjecture and falsification target.'
+  - 'pipeline/attempts/bb_distance_conjecture/result.md: Tier-2 round 1
+    Jacobson conjecture FALSIFIED (HANDOFF §6h). C-v2 substitutes
+    weight-shaped w_1 for the dimension-shaped μ to dodge §6h, but
+    is still falsified for distinct reasons.'
+  - 'pipeline/attempts/bb_distance_conjecture_conditional/result.md:
+    non-degeneracy-gated conditional version of the Jacobson conjecture
+    that produced a clean theorem on a corpus subset that EXCLUDES the
+    engineering target (gross). The C-v2 ''c ≥ 3'' subset behaves
+    analogously, and is broken by bb_108_8_10.'
+  - 'experiments/bb_lab/notes/Cv1_results.md: w_μ definition and the
+    gross numerical table (w_1 = 36 per vanishing orbit, source of
+    the C-v2 seed observation).'
+  - 'Lin–Pryadko 2023 (arXiv:2306.16400) Statement 12: the parallel
+    classical-bound shape this C-v2 conjecture mimicks.'
+  - 'Jitman–Ling 2013 (IEEE TIT 59(5)): structural barrier that non-
+    semisimple PIGA distance bounds transfer through the semisimple
+    quotient. Would predict no non-trivial w_1-based bound.'
+
+artifacts:
+  - 'experiments/bb_lab/src/bb_lab/radical_weight.py: added
+    joint_support_subgroup_index, bb_radical_bound, bb_radical_bound_alt'
+  - 'experiments/bb_lab/tests/test_radical_weight.py: added 9 tests
+    covering c computation, gross tight=12, bb_108 violation,
+    alternatives, edge cases.'
+  - 'experiments/bb_lab/scripts/cv2_corpus_sweep.py: corpus sweep'
+  - 'experiments/bb_lab/notes/Cv2_literature.md: literature check'
+  - 'experiments/bb_lab/notes/Cv2_perodual_investigation.md: side-quest'
+  - 'experiments/bb_lab/notes/Cv2_corpus_sweep.md: full sweep results'
+  - 'experiments/bb_lab/notes/Cv2_bravyi_table.md: Bravyi table'
+  - 'experiments/bb_lab/notes/Cv2_alternatives.md: §5 alternatives'
+  - 'experiments/bb_lab/notes/Cv2_tightness.md: tightness analysis'
+
+next_steps: |
+  Per HANDOFF_C2 §12 "falsified-by-corpus → if alternatives in §5
+  don't survive either, document the obstruction in HANDOFF.md as
+  §6l, and decide whether to attempt C-v2 round 2 with a different
+  conjecture shape or shelve":
+
+    1. The C-v2 conjecture as stated (and the §5 alternatives) is
+       falsified. Recommended verdict for the broader program:
+       document this as HANDOFF.md §6l (radical-weight + LP-style
+       denominator is structurally blind to the elementary-abelian
+       vs. cyclic-prime-power distinction in G_odd).
+
+    2. Possible narrower follow-up (NOT pursued in C-v2):
+         * Gate on G_odd elementary abelian (e.g. G_odd = Z_3 × Z_3
+           specifically). Excludes bb_108_8_10 but includes gross,
+           bb_72, bb_288. Re-corpus-test in that narrower domain.
+         * 918 labeled corpus rows have G_odd = Z_3 × Z_3 (Z_6×Z_6
+           812 + Z_4×Z_6 106), enough for a meaningful sweep.
+
+    3. The side-quest on per_orbit_dual_distance produced a
+       documented finding (the existing function uses fiber-summed
+       constraints and is NOT equal to w_1 / c) but no recommended
+       code change in C-v2. A separate refactor pass should
+       eventually update the function or rename for clarity.
+
+    4. Do NOT advance to C-v3 (formal proof). The conjecture is
+       falsified at Tier 2.
