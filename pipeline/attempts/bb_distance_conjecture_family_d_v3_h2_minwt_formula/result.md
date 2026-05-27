@@ -430,3 +430,172 @@ The natural next session pivot: **Lean formalization of §6h-§6m and
 the (4/9)|G| identity** — turning the round-2-v2 negative result into
 a Lean-verified structural-impossibility theorem with explicit
 positive-identity witness.
+
+## 14. Open research questions
+
+Critical-reading of §6n raises several follow-up questions a BB-code
+researcher would want answered before declaring the result complete.
+Ordered by ROI / importance.
+
+### 14.1. Highest-ROI: are any of the 403 non-Bravyi tight codes BETTER than Bravyi?
+
+Of the 408 tight cases on `|G| ≤ 90`, only 5 are Bravyi-table
+instances. The other 403 are weight-3 BB codes satisfying the
+refined Z_3-pair hypothesis with `min_wt(H_2) = (4/9)|G|` exactly.
+Their `d_exact` values are in the corpus (most are SAT-verified).
+
+Concrete question: **does any non-Bravyi tight code have higher `d/n`
+than the Bravyi instances?**
+
+- If yes → publishable: new BB codes that the Bravyi polynomial
+  search missed.
+- If no → also publishable: Bravyi's search was effectively exhaustive
+  within the structural family `(4/9)|G|` identifies.
+
+This is a 1-hour SQL query on the corpus. The fact that it's not in
+the result.md is the most glaring gap. **Should be answered next.**
+
+### 14.2. Does the conjectured `((w-1)/w)² · |G|` generalize?
+
+§2.3 conjectures the formula for arbitrary weight w. The proof
+structure suggests:
+
+- For weight-w, hypothesis = "refined Z_w-pair" (each `φ` permutes
+  one polynomial's support onto Z_w and is constant on the other's).
+- Witness = `e(g) = 1[φ_A(g) ≠ w-1 ∧ φ_B(g) ≠ w-1]`, support
+  `((w-1)/w)² · |G|`.
+
+**Parity obstruction**: For the inner sum to vanish mod 2, we need
+`w-1 ≡ 0 (mod 2)`, i.e., **w must be odd**. For even w, the witness
+construction fails — sum is `w-1 ≡ 1 (mod 2)`, so `(e · A) ≠ 0`.
+
+So the conjecture as stated is only plausible for **odd weights**.
+A truly general formula would need to handle even w differently (or
+not at all). The corpus is exclusively wt=3, so this is untested.
+**Worth investigating analytically** before claiming the formula
+generalizes.
+
+### 14.3. Algebraic taxonomy of the 29 strict cases
+
+§5 identifies three mechanisms (2-torsion, axis-degenerate supports,
+extra Z_3-homs) but doesn't pin them down case-by-case. A complete
+classification would:
+
+1. For each of the 29 strict cases, identify which structural feature
+   causes strictness.
+2. For each structural feature, derive the **exact** `min_wt(H_2)`
+   (not just "less than (4/9)|G|").
+3. Produce a decision-tree closed form: given `(A, B, G)`, classify
+   into a structural category, then output `min_wt(H_2)` exactly.
+
+This converts the result from "(4/9)|G| is tight in the generic case"
+to "complete closed-form formula for ALL refined Z_3-pair codes,
+across structural categories." Real theorem with multiple cases,
+~few days of work.
+
+### 14.4. Can the cellular witness yield a `d_X` LOWER bound (dodging §6m)?
+
+§6m blocks F_2[G]-module-iso-class lower bounds on `d_X`. The (4/9)|G|
+witness `e(g) = 1[φ_A(g) ≠ 2 ∧ φ_B(g) ≠ 2]` uses **non-module data**:
+the F_2-basis vectors of F_2[G] indexed by group elements. It's
+embedding-specific. **In principle this dodges §6m.**
+
+Concrete next question: the witness `e` is a Z-codeword (annihilates
+both A and B). Is it a *logical* Z-codeword or a *stabilizer*?
+
+- If it's always a stabilizer for some structural reason, the witness
+  doesn't bound `d_Z`. It tells us only that small stabilizers exist.
+- If it's a logical, `d_Z ≤ wt(e) = (4/9)|G|` — the upper-bound
+  conclusion we already have.
+- If we can characterize WHEN it's stabilizer vs logical structurally
+  (some algebraic condition on `(A, B, G)`), we might find a subfamily
+  where the witness IS a stabilizer, meaning no logical of weight
+  `(4/9)|G|` exists. **That would lower-bound `d_Z` from below**
+  using non-module data — exactly what §6m permits.
+
+This is the moonshot's primary question viewed through the cellular
+lens. Worth ~2-3 sessions of focused work; high uncertainty but
+high payoff if it lands.
+
+### 14.5. Make the "base × fiber" decomposition rigorous
+
+The refined Z_3-pair gives a quotient `G ↠ Z_3 × Z_3` with kernel
+`fiber ⊂ G`. For gross, fiber = `4Z_12 × 2Z_6` of order 8 = G_2.
+The fiber's structure (specifically G_2 = Z_4 × Z_2 for gross)
+seems to control `d_X` — but §6n does not explain how.
+
+Can we prove a theorem of the form
+
+```
+d_X(BB(G, A, B))  =  f(base structure) · g(fiber structure)
+```
+
+or even an inequality
+
+```
+d_X(BB(G, A, B))  ≥  f(base) · g(fiber)
+```
+
+for refined Z_3-pair codes? Concretely: derive a lower-bound formula
+parametric in the cellular structure (base) and the lift (fiber).
+This is the natural connection to Panteleev-Kalachev's lifted-product
+theory; their asymptotic `d = Ω(N)` might admit a quantitative
+refinement in the refined-Z_3-pair setting.
+
+Research-grade work, ~weeks. Could yield the first quantitative
+lifted-product distance bound for engineered BB codes.
+
+### 14.6. Decoder implications
+
+The cellular decomposition `G → Z_3 × Z_3 × fiber` suggests a
+hierarchical decoder: first correct on the 9 cells, then refine within
+each fiber. Compare to surface code's local-then-global decoding.
+
+Concrete experiments:
+- Run BP / OSD on Bravyi codes WITH and WITHOUT cellular-aware
+  initialization. Compare convergence and threshold.
+- Build a custom decoder that explicitly leverages the Z_3-cellular
+  structure. Does it beat generic BP / OSD on the same codes?
+
+If yes → BB codes might decode faster / with better thresholds than
+expected, and §6n becomes practically relevant. If no → §6n is
+mathematically elegant but practically irrelevant.
+
+This is harder to answer cleanly (simulation + threshold analysis),
+but it determines whether the cellular structure matters for
+fault-tolerant quantum computing.
+
+### 14.7. The "complement" structure
+
+The witness has support `(4/9)|G|`. The complement has support
+`(5/9)|G|`. Is the complement also in `Ann(A) ∩ Ann(B)`?
+
+By symmetry of `Ann(A) ∩ Ann(B)` under "flip the witness": no, since
+`e + 1_G = (complement indicator)` is in `Ann(A) ∩ Ann(B)` iff
+`1_G ∈ Ann(A) ∩ Ann(B)`, iff `A · 1 = 0` and `B · 1 = 0`, iff
+`|supp(A)| ≡ 0 (mod 2)` and `|supp(B)| ≡ 0 (mod 2)`. For weight-3
+polynomials, weights are odd, so `A · 1 ≠ 0` and the complement is
+NOT in `Ann(A) ∩ Ann(B)`.
+
+So the (4/9)|G| witness is "asymmetric in the complement direction" —
+it's not the case that both half-spaces give witnesses. This is a
+small observation but worth noting in any future paper.
+
+### 14.8. What I'd actually do first
+
+Given limited time, the priority ordering (highest first):
+
+1. **§14.1** (1 hour SQL query) — could find new codes immediately
+2. **§14.2** (1 day analytical) — fixes the formula's generalization claim
+3. **§14.3** (few days) — completes the theorem statement
+4. **§14.4** (2-3 sessions, risky) — the moonshot's primary question revisited
+5. **§14.5** (research-grade) — quantitative lifted-product theory
+6. **§14.6** (simulation-heavy) — practical relevance test
+
+The first three (§14.1-§14.3) are *cheap and important* — completing
+the §6n picture. They should land before declaring the result
+complete. §14.4-§14.6 are bigger investments with higher uncertainty
+but potentially much bigger payoffs.
+
+**The single most important question** is §14.1. The 403 non-Bravyi
+tight codes are sitting in the corpus, waiting to be queried.
