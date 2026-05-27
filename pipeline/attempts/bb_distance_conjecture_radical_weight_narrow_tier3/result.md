@@ -172,3 +172,45 @@ fresh theory.
 The 4-tier pipeline architecture (HANDOFF.md §2) caught both
 the original failure (via T3) and the false-tight-refinement
 (H_UNIT²) BEFORE Lean — saving weeks of misdirected formalization.
+
+---
+
+## POSTSCRIPT (2026-05-27): R1 + R4 itself FALSIFIED
+
+The "loose-but-correct" R1 + R4 conjecture that this document recommended
+for Lean formalization (§"Recommended next steps" item 1) has now been
+falsified by a clean in-hypothesis counterexample:
+
+> `G = Z_3 × Z_15`, `A = 1 + x + x²`, `B = 1 + y + y² + y³ + y⁴`.
+> All R1 + R4 hypotheses hold (odd weights, loose elem-ab `G_odd`, `c = 3`).
+> R4 bound = 4 but `d_X = 2`. **Conjecture falsified, gap +2**.
+
+The mechanism is the proof gap predicted by abstract critique but never
+explicitly demonstrated: `(1 + x) ∈ ker(M_A)` of weight 2 lives on
+A-only-vanishing orbits (not joint-vanishing), so R4's restriction to
+`W(A, B)` doesn't see it. Lin–Pryadko Statement 12 (using full `d_A^⊥`)
+remains correct and is tight at 2 on this instance.
+
+Verification: 45 explicit weight-2 X-logical witnesses found by
+brute-force enumeration; R4 raw value 12 verified by exhaustive
+enumeration of all 255 nonzero F₂-combinations in the 8-dim basis;
+CSS commutation, `(n, k)`, and Frobenius orbit analysis all confirmed
+by independent paths. See [`notes/Cv4_R4_falsified.md`](../../../experiments/bb_lab/notes/Cv4_R4_falsified.md)
+and scripts `experiments/bb_lab/scripts/adv_attack3_{z3xz7, verify, recheck, scope}.py`.
+
+**Updated recommendations:**
+
+1. ~~Write `HANDOFF_C4_R4.md`~~ — **WITHDRAWN.** R1 + R4 has no provable
+   form in its currently-stated hypothesis domain.
+2. **Lin–Pryadko Statement 12 remains the only correct Lean target**
+   for analytic distance bounds on BB codes in the C-program's lineage.
+3. The empirical "0 violations on c ≥ 3" finding from the corpus sweep
+   is now understood as an artifact of the corpus being dominated by
+   single-prime `G_odd`. The failure regime is multi-prime `G_odd` with
+   rank-1 on at least one prime — which includes `[[90, 8, 10]]`'s
+   group structure (`Z_3² × Z_5`), though its specific polynomials
+   happen to avoid the failure.
+4. **The C-program (Cv1 → Cv2 → Cv3 → R1+R4) is closed** with no
+   surviving bound on the Bravyi engineering target. The `w_1` weight
+   invariant (Cv1) stands as a standalone contribution; the
+   distance-bound thread is exhausted.
