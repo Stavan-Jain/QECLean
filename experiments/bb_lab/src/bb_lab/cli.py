@@ -5,6 +5,7 @@ Subcommands:
   bb-lab distance <yaml>         compute exact distance for a state.yaml entry
   bb-lab lean-import <yaml>      print the JSON descriptor for a state.yaml row
   bb-lab lean-emit <yaml> <out>  emit a Lean skeleton from a state.yaml row
+  bb-lab classify <flags>        run the Tier-0 obstruction gate on a candidate spec
 
 `enumerate` is reserved for v1 (canonical-form deduper + weight-bounded
 enumeration); calling it raises NotImplementedError today.
@@ -968,6 +969,168 @@ def migrate_canonical_ids(db: Path | None, dry_run: bool) -> None:
                     [new_id, new_A, new_B, old_id],
                 )
         click.echo(f"\n  applied {len(updates)} UPDATEs ({n_swapped} with A/B field swap).")
+
+
+@main.command(name="classify")
+@click.option(
+    "--family",
+    required=True,
+    type=click.Choice(
+        [
+            "char-theoretic",
+            "chain-map",
+            "combinatorial",
+            "radical-weight",
+            "module-theoretic",
+            "syzygy",
+            "computational-LP",
+            "lifted-product",
+        ]
+    ),
+    help="Mathematical family of the candidate (determines which §6 obstructions can fire).",
+)
+@click.option(
+    "--rhs",
+    "rhs_type",
+    required=True,
+    type=click.Choice(["weight", "dimension", "mixed"]),
+    help="Type of quantity on the bound's RHS. `dimension` triggers §6h (category error).",
+)
+@click.option(
+    "--id",
+    "candidate_id",
+    default="cli-adhoc",
+    help="Candidate ID (defaults to 'cli-adhoc' for ad-hoc invocations).",
+)
+@click.option("--name", default="ad-hoc CLI candidate", help="Human-readable candidate name.")
+@click.option("--bound-formula", default="", help="Optional bound formula string for the record.")
+@click.option("--citation", default="", help="Optional citation string for the record.")
+@click.option(
+    "--requires-non-degenerate/--no-requires-non-degenerate",
+    default=False,
+    help="Candidate's hypothesis requires c = 1 (excludes the engineering target; §6i).",
+)
+@click.option(
+    "--requires-semisimple/--no-requires-semisimple",
+    default=False,
+    help="Candidate's derivation requires F[G] semisimple (gcd(|G|, char F) = 1; §6j).",
+)
+@click.option(
+    "--requires-cover-coprime/--no-requires-cover-coprime",
+    default=False,
+    help="Candidate's derivation requires gcd(h, char F) = 1 for the cover index (§6k).",
+)
+@click.option(
+    "--needs-new-theory/--no-needs-new-theory",
+    default=False,
+    help="Mark as a research seed; forces verdict NEEDS-NEW-THEORY.",
+)
+@click.option(
+    "--json",
+    "as_json",
+    is_flag=True,
+    default=False,
+    help="Emit the Classification as JSON instead of a human-readable summary.",
+)
+def classify_cmd(
+    family: str,
+    rhs_type: str,
+    candidate_id: str,
+    name: str,
+    bound_formula: str,
+    citation: str,
+    requires_non_degenerate: bool,
+    requires_semisimple: bool,
+    requires_cover_coprime: bool,
+    needs_new_theory: bool,
+    as_json: bool,
+) -> None:
+    """Run the Tier-0 pre-flight obstruction gate on a candidate spec.
+
+    Builds a `Candidate` from CLI flags, runs `obstructions.classify()`,
+    and prints the verdict + per-instance blast radius + reasoning.
+
+    Examples:
+
+    \b
+      # A char-theoretic weight bound — should be blocked on the §6j
+      # non-semisimple Bravyi instances, but pass on bb_90_8_10:
+      bb-lab classify --family char-theoretic --rhs weight --requires-semisimple
+
+    \b
+      # A bound claiming a dimension quantity bounds distance —
+      # immediately SHELVED-A-PRIORI via §6h:
+      bb-lab classify --family radical-weight --rhs dimension
+
+    \b
+      # Lin–Pryadko Statement 12 (textbook; no obstruction):
+      bb-lab classify --family lifted-product --rhs weight \\
+        --name "LP Statement 12" \\
+        --citation "arXiv:2306.16400"
+    """
+    import json as _json
+
+    from .obstructions import Candidate, Family, RHSType, classify
+
+    candidate = Candidate(
+        id=candidate_id,
+        name=name,
+        family=Family(family),
+        rhs_type=RHSType(rhs_type),
+        bound_formula=bound_formula,
+        citation=citation,
+        requires_non_degenerate=requires_non_degenerate,
+        requires_semisimple=requires_semisimple,
+        requires_cover_coprime=requires_cover_coprime,
+        needs_new_theory=needs_new_theory,
+    )
+    result = classify(candidate)
+
+    if as_json:
+        click.echo(
+            _json.dumps(
+                {
+                    "candidate_id": result.candidate_id,
+                    "verdict": result.verdict.value,
+                    "obstructions_hit": list(result.obstructions_hit),
+                    "bravyi_blast_radius": list(result.bravyi_blast_radius),
+                    "reasoning": list(result.reasoning),
+                },
+                indent=2,
+            )
+        )
+        return
+
+    # Human-readable layout.
+    click.echo(f"Candidate: {name} (id={candidate_id})")
+    click.echo(f"  family:   {family}")
+    click.echo(f"  rhs:      {rhs_type}")
+    flags: list[str] = []
+    if requires_non_degenerate:
+        flags.append("requires-non-degenerate")
+    if requires_semisimple:
+        flags.append("requires-semisimple")
+    if requires_cover_coprime:
+        flags.append("requires-cover-coprime")
+    if needs_new_theory:
+        flags.append("needs-new-theory")
+    if flags:
+        click.echo(f"  flags:    {', '.join(flags)}")
+    click.echo("")
+    click.echo("Classification:")
+    click.echo(f"  verdict:             {result.verdict.value}")
+    obs_display = ", ".join(result.obstructions_hit) if result.obstructions_hit else "(none)"
+    click.echo(f"  obstructions hit:    {obs_display}")
+    if result.bravyi_blast_radius:
+        click.echo("  bravyi blast radius:")
+        for entry in result.bravyi_blast_radius:
+            click.echo(f"    - {entry}")
+    else:
+        click.echo("  bravyi blast radius: (none)")
+    click.echo("")
+    click.echo("Reasoning:")
+    for line in result.reasoning:
+        click.echo(f"  - {line}")
 
 
 if __name__ == "__main__":
