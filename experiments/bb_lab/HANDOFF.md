@@ -708,6 +708,55 @@ The empirical artifact is at
 under `obstructions.py` via the `is_module_natural_invariant`
 predicate.
 
+## §6n: The (4/9)|G| H_2 min-weight identity (positive structural feature)
+
+Round-2 v2 session 3 (this is a **positive** finding, not an
+obstruction) pinned down the empirical observation from session 1
+that for the 5 Bravyi instances, `min_wt(H_2(Koszul(A, B))) = (4/9)·|G|`
+exactly. The general structural identity:
+
+**Theorem.** For weight-3 BB codes `(A, B)` over `G = Z_ℓ × Z_m`
+satisfying the **refined Z_3-pair hypothesis** — there exist linearly-
+independent group homomorphisms `φ_A, φ_B: G → Z_3` with
+`φ_A(supp(A)) = {0, 1, 2}` (multiset), `φ_A(supp(B))` constant in Z_3,
+`φ_B(supp(B)) = {0, 1, 2}`, and `φ_B(supp(A))` constant — the element
+`e(g) = 1[φ_A(g) ≠ 2 AND φ_B(g) ≠ 2]` is in `Ann(A) ∩ Ann(B) = H_2`
+with weight `(4/9)·|G|`.
+
+So `min_wt(H_2) ≤ (4/9)·|G|` whenever the hypothesis holds. The bound
+is tight in 93.4% of cases (corpus-wide) and tight for all 5 Bravyi
+instances.
+
+**Verification**: 437/437 corpus instances satisfying the refined
+hypothesis confirm the upper bound; 0 violations.
+
+**Conjectured generalization** (untested, no wt ≥ 4 corpus): for
+weight-w BB codes with the analogous Z_w-pair hypothesis,
+`min_wt(H_2) ≤ ((w-1)/w)² · |G|`.
+
+This is **not a distance bound on d_X** — `min_wt(H_2)` has the wrong
+sign per §6m. But it IS a clean structural identity for the joint
+annihilator of weight-3 polynomial pairs, deserving its own niche as
+a positive feature.
+
+**Mechanism (one-line proof)**: For each h, `(e·A)(h)` factors as
+`[φ_B(h) − c_A ≠ 2] · sum_a 1[φ_A(h−a) ≠ 2]` where `c_A = φ_B(supp(A))`
+(constant by hypothesis). The inner sum is 2 (one of three values
+mod 3 is 2, the other two aren't), even. So `(e·A)(h) = 0`. Symmetric
+for B.
+
+**Connection to §6m**: The identity is **embedding-specific** (depends
+on the canonical F_2-basis of F_2[G]). It does NOT factor through the
+F_2[G]-module iso class of H_2. Hence it's compatible with §6m's
+"min weight ≠ module invariant" statement: the (4/9)|G| upper bound
+is a feature of the embedding, not of the abstract module.
+
+The empirical artifact is at
+`pipeline/attempts/bb_distance_conjecture_family_d_v3_h2_minwt_formula/result.md`.
+Tier-1 implementation in `src/bb_lab/h2_minwt_formula.py` with 14
+regression tests in `tests/test_h2_minwt_formula.py`. Test suite total:
+383 passing (was 369 in session 2).
+
 ---
 
 ## 7. Recommended next moves, prioritized
