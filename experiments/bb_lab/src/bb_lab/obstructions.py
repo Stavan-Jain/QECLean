@@ -1,6 +1,6 @@
 """Pre-flight obstruction gate for candidate BB-code distance bounds (Tier 0).
 
-Encodes the §6h–§6k structural obstructions from
+Encodes the §6h–§6m structural obstructions from
 `experiments/bb_lab/HANDOFF.md` as machine-checkable predicates on a
 `Candidate` descriptor, evaluated against canonical Bravyi-table
 fingerprints. `classify(candidate)` returns a `Classification` that
@@ -43,7 +43,19 @@ Encoded obstructions:
        every Bravyi instance. Round-2 Tier 2 Family C v1 (empirical
        Pearson correlation −0.020 across 4,364 SAT-verified rows).
 
-See `experiments/bb_lab/HANDOFF.md` §6h–§6l for the full math and
+  §6m  F_2[G]-module-isomorphism-class invariants cannot lower-bound
+       d_X. Min Hamming weight is not a module-iso invariant: for
+       gross, H_0(K) ≅ H_2(K) as F_2[G]-modules (Frobenius duality)
+       but min_wt(H_0) = 1 and min_wt(H_2) = 32 (32× gap). Any
+       function ψ([M(A, B)]) that depends only on the F_2[G]-module
+       iso class of a construction M(A, B) — Hilbert series, CM
+       regularity, Betti / Tor / Ext dimensions, projective dimension,
+       depth — collapses to the minimum d_X over the iso-orbit, which
+       can be small. Structural; SHELVED-A-PRIORI regardless of
+       instance. Round-2 v2 Tier 0; the witness lives at
+       `scripts/family_d_v1_koszul_h2_iso_witness.py`.
+
+See `experiments/bb_lab/HANDOFF.md` §6h–§6m for the full math and
 the round-1 / round-2 failures that motivated each entry.
 """
 
@@ -170,6 +182,30 @@ class Candidate:
     vanishing on a non-trivial character forces `λ_2 = weight`, so any
     spectral gap-based lower bound is identically vacuous."""
 
+    is_module_natural_invariant: bool = False
+    """If True, the bound's RHS is a numerical invariant of the F_2[G]-
+    module isomorphism class of some functorially constructed
+    F_2[G]-module M(A, B) — e.g., Hilbert series coefficients,
+    Castelnuovo-Mumford regularity, Betti / Tor / Ext dimensions,
+    projective dimension, depth, multiset of indecomposable summands.
+    Fires §6m structurally because min Hamming weight is not an
+    F_2[G]-module-isomorphism-class invariant (witness: H_0(K_gross) ≅
+    H_2(K_gross) as F_2[G]-modules, but min_wt(H_0) = 1 and
+    min_wt(H_2) = 32, a 32× gap).
+
+    Importantly: this flag is INDEPENDENT of `rhs_type`. §6m fires
+    even on `rhs_type = WEIGHT` candidates if the LHS / module M(A, B)
+    is only used through its iso class. Example: "d_X ≥ min weight in
+    H_2(K(A, B))" is `rhs_type = WEIGHT` but H_2's iso class doesn't
+    determine min_wt(H_2), so any candidate that DEFINES min_wt(H_2)
+    via H_2's iso class alone falls to §6m.
+
+    §6m does NOT fire when the bound mixes module data with explicit
+    non-module data (Hamming weight on specific vectors, the standard
+    F_2-basis {e_g}, set-theoretic supports, classical dual distances).
+    See HANDOFF.md §6m "Escape clause" for the precise boundary.
+    """
+
     needs_new_theory: bool = False
     """If True, the bound is a research seed — its mathematical
     foundation isn't yet built. Always returns NEEDS-NEW-THEORY."""
@@ -270,6 +306,22 @@ def _fires_6l(c: Candidate, i: InstanceFingerprint) -> bool:
     return c.uses_cayley_spectral_bound and i.has_k_geq_2
 
 
+def _fires_6m(c: Candidate, _i: InstanceFingerprint) -> bool:
+    """§6m is structural / instance-independent.
+
+    Fires when the candidate's RHS is a numerical F_2[G]-module-
+    isomorphism-class invariant of some construction M(A, B). The
+    obstruction is independent of the specific Bravyi instance — it
+    holds because min Hamming weight is not such an invariant in
+    general (witness: gross's H_0 ≅ H_2 with min_wt 1 vs 32).
+
+    Follows the §6h pattern (structural / instance-independent) in
+    that it returns SHELVED-A-PRIORI regardless of which instances
+    are checked.
+    """
+    return c.is_module_natural_invariant
+
+
 OBSTRUCTIONS: tuple[Obstruction, ...] = (
     Obstruction(
         id="6h",
@@ -318,6 +370,18 @@ OBSTRUCTIONS: tuple[Obstruction, ...] = (
         triggers_when="candidate.uses_cayley_spectral_bound AND instance.has_k_geq_2",
         predicate=_fires_6l,
     ),
+    Obstruction(
+        id="6m",
+        section_ref="HANDOFF.md §6m",
+        short_description=(
+            "F_2[G]-module-isomorphism-class invariants cannot lower-bound "
+            "d_X: min Hamming weight depends on embedding, not iso class. "
+            "Witness: gross has H_0 ≅ H_2 as F_2[G]-modules but min_wt(H_0) = 1 "
+            "and min_wt(H_2) = 32."
+        ),
+        triggers_when="candidate.is_module_natural_invariant",
+        predicate=_fires_6m,
+    ),
 )
 
 
@@ -340,6 +404,18 @@ class Classification:
         return self.verdict == Verdict.PROCEED
 
 
+_STRUCTURAL_OBS_IDS: tuple[str, ...] = ("6h", "6m")
+"""Obstruction IDs whose predicates are instance-independent / structural.
+
+§6h: dimension RHS is a category error regardless of instance.
+§6m: an F_2[G]-module-iso-class numerical invariant cannot lower-bound
+     min Hamming weight regardless of instance — see HANDOFF.md §6m.
+
+These short-circuit `classify` with SHELVED-A-PRIORI; per-instance
+obstructions (§6i, §6j, §6k, §6l) are evaluated separately.
+"""
+
+
 def classify(
     candidate: Candidate,
     instances: tuple[InstanceFingerprint, ...] = BRAVYI_FINGERPRINTS,
@@ -350,11 +426,14 @@ def classify(
     Decision tree:
 
     1. If `candidate.needs_new_theory`, returns NEEDS-NEW-THEORY.
-    2. If §6h fires, returns SHELVED-A-PRIORI (category error).
-    3. Else evaluate every (obstruction, instance) pair.
-    4. If every instance in `instances` is blocked by ≥1 obstruction,
-       returns SHELVED-A-PRIORI.
-    5. Else returns PROCEED. `bravyi_blast_radius` lists which instances
+    2. If §6h fires, returns SHELVED-A-PRIORI (category error: RHS is
+       a dimension quantity, but d_X is a weight quantity).
+    3. If §6m fires, returns SHELVED-A-PRIORI (structural: RHS is a
+       module-iso-class invariant, but min weight depends on embedding).
+    4. Else evaluate every (per-instance obstruction, instance) pair.
+    5. If every instance in `instances` is blocked by ≥1 per-instance
+       obstruction, returns SHELVED-A-PRIORI.
+    6. Else returns PROCEED. `bravyi_blast_radius` lists which instances
        are blocked so the downstream tester knows where the candidate
        can possibly be tight.
     """
@@ -375,9 +454,14 @@ def classify(
             reasoning=tuple(reasoning),
         )
 
-    # §6h is type-level (instance-independent). Check once.
+    # Structural / instance-independent obstructions: §6h and §6m.
+    # Order matters for the reasoning trace: §6h reports first when both
+    # would fire, since dimension-RHS is the more elementary category
+    # error.
+    sentinel = instances[0] if instances else None
+
     obs_6h = next(o for o in obstructions if o.id == "6h")
-    if instances and obs_6h.predicate(candidate, instances[0]):
+    if sentinel is not None and obs_6h.predicate(candidate, sentinel):
         obstructions_hit.append("6h")
         reasoning.append(
             f"§6h fires (type-level): {obs_6h.short_description} "
@@ -392,8 +476,26 @@ def classify(
             reasoning=tuple(reasoning),
         )
 
-    # Per-instance obstructions (§6i, §6j, §6k).
-    per_instance_obs = [o for o in obstructions if o.id != "6h"]
+    obs_6m = next(o for o in obstructions if o.id == "6m")
+    if sentinel is not None and obs_6m.predicate(candidate, sentinel):
+        obstructions_hit.append("6m")
+        reasoning.append(
+            f"§6m fires (structural): {obs_6m.short_description} "
+            "An F_2[G]-module-iso-class invariant cannot determine min "
+            "Hamming weight, so it cannot tightly lower-bound d_X."
+        )
+        return Classification(
+            candidate_id=candidate.id,
+            obstructions_hit=tuple(obstructions_hit),
+            bravyi_blast_radius=(),
+            verdict=Verdict.SHELVED_A_PRIORI,
+            reasoning=tuple(reasoning),
+        )
+
+    # Per-instance obstructions (§6i, §6j, §6k, §6l).
+    per_instance_obs = [
+        o for o in obstructions if o.id not in _STRUCTURAL_OBS_IDS
+    ]
     blocked_instances: set[str] = set()
     for inst in instances:
         for obs in per_instance_obs:
@@ -514,4 +616,70 @@ FAMILY_C_V1_SPECTRAL = Candidate(
         "BB code). Empirical Pearson(gap, d) = −0.020 across 4,364 rows."
     ),
     uses_cayley_spectral_bound=True,
+)
+
+
+FAMILY_D_V1_KOSZUL_H_2_MIN_WEIGHT = Candidate(
+    id="family_d_v1_koszul_h2_min_weight",
+    name="Family D v1: minimum Hamming weight in Koszul H_2",
+    family=Family.SYZYGY,
+    rhs_type=RHSType.WEIGHT,
+    bound_formula="d_X ≥ min weight in H_2(K(A, B)) \\ {0}",
+    citation=(
+        "Round-2 v2 first session (commit 5580064); falsified empirically "
+        "(0/5 Bravyi rows satisfy lower bound; 199/200 corpus rows are "
+        "strictly UPPER-bounded). The relation d_X ≤ min_wt(H_2) is a "
+        "robust upper bound, never a lower bound. See "
+        "pipeline/attempts/bb_distance_conjecture_family_d_v1_koszul_h2/result.md "
+        "for the §5 mechanism (γ ∈ H_2 ⇒ (γ, 0) ∈ ker H_X) and §6 "
+        "generalization to §6m."
+    ),
+    # The hypothesis was that min_wt(H_2) is determined by H_2's
+    # F_2[G]-module-iso-class. The witness in
+    # `scripts/family_d_v1_koszul_h2_iso_witness.py` shows this is
+    # false (H_0 ≅ H_2 but min_wt differs by 32×), so any version of
+    # this candidate that reads min_wt off the module class is blocked
+    # by §6m as well as being empirically wrong-signed.
+    is_module_natural_invariant=True,
+)
+
+
+FAMILY_D_V1_HILBERT_SERIES_MIN_DEGREE = Candidate(
+    id="family_d_v1_hilbert_series_min_degree",
+    name=(
+        "Family D 4a (handoff): minimum non-vanishing degree of "
+        "Hilbert series of syz(A, B)"
+    ),
+    family=Family.MODULE_THEORETIC,
+    rhs_type=RHSType.WEIGHT,  # claimed weight, but RHS factors through
+                              # the iso class of syz(A, B), so §6m fires.
+    bound_formula=(
+        "d_X ≥ min { d ≥ 0 : dim_F_2 syz_d(A, B) > 0 }  in the "
+        "augmentation grading of F_2[G]"
+    ),
+    citation=(
+        "HANDOFF_FAMILY_D_MOONSHOT.md §4a — the canonical Family D 4a "
+        "candidate (Hilbert series of syz(A, B) under augmentation "
+        "grading). Hilbert series coefficients are dim_F_2 of graded "
+        "pieces, so the minimum non-vanishing degree is an F_2[G]-"
+        "module-iso-class invariant. Falls to §6m structurally."
+    ),
+    is_module_natural_invariant=True,
+)
+
+
+FAMILY_D_V1_CM_REGULARITY = Candidate(
+    id="family_d_v1_castelnuovo_mumford_regularity",
+    name="Family D 4b (handoff): Castelnuovo–Mumford regularity of (A, B)",
+    family=Family.MODULE_THEORETIC,
+    rhs_type=RHSType.WEIGHT,
+    bound_formula="d_X ≥ φ(reg((A, B)))  for some monotone φ",
+    citation=(
+        "HANDOFF_FAMILY_D_MOONSHOT.md §4b — Castelnuovo–Mumford "
+        "regularity adapted to F_2[G]. Regularity is defined via "
+        "dimensions of Tor groups (Aramova-Herzog; Eisenbud-Goto). "
+        "Each Tor_i^{F_2[G]}(F_2, F_2[G]/(A,B)) is an F_2[G]-module-"
+        "iso-class invariant, so reg is too. Falls to §6m."
+    ),
+    is_module_natural_invariant=True,
 )

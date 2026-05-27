@@ -1,8 +1,8 @@
 """Tests for the Tier-0 pre-flight obstruction gate.
 
 The exit criterion for the obstruction-registry module is that every
-round-1 conjecture round classifies the way the historical record says
-it should:
+round-1 / round-2 / round-2-v2 conjecture round classifies the way
+the historical record says it should:
 
   * Cv1-original (Jacobson dimension sum): SHELVED-A-PRIORI via §6h.
   * HT-Roos (char-theoretic): SHELVED-A-PRIORI on the four §6j-hit
@@ -11,12 +11,18 @@ it should:
     gross" is shelved.
   * SRB cover-graph (chain-map): blocked on gross via §6k; survives
     on the other Bravyi instances.
+  * Family C v1 (spectral): SHELVED-A-PRIORI via §6l (vacuous on
+    every BB code with k ≥ 2).
+  * Family D v1 (Koszul H_2 min weight): SHELVED-A-PRIORI via §6m
+    (round-2 v2 first session; the iso witness in
+    `scripts/family_d_v1_koszul_h2_iso_witness.py` shows min_wt is
+    not a module-iso invariant).
   * Lin-Pryadko Statement 12 (lifted-product, weight RHS, no
     degeneracy/semisimple/cover hypothesis): PROCEED.
   * Cv1 w_1 (radical-weight, weight RHS): PROCEED.
 
-These tests anchor the §6 registry to the round-1 historical record;
-any future edit that changes a verdict needs to update the
+These tests anchor the §6 registry to the round-1 / round-2 historical
+record; any future edit that changes a verdict needs to update the
 corresponding HANDOFF.md §6 entry (or vice versa) explicitly.
 """
 
@@ -29,6 +35,9 @@ from bb_lab.obstructions import (
     CV1_ORIGINAL_JACOBSON_SUM,
     CV1_W1_REFINED,
     FAMILY_C_V1_SPECTRAL,
+    FAMILY_D_V1_CM_REGULARITY,
+    FAMILY_D_V1_HILBERT_SERIES_MIN_DEGREE,
+    FAMILY_D_V1_KOSZUL_H_2_MIN_WEIGHT,
     HT_ROOS,
     LIN_PRYADKO_STMT_12,
     OBSTRUCTIONS,
@@ -243,6 +252,133 @@ def test_6l_can_be_dodged_by_an_instance_without_k_geq_2() -> None:
     # No instance triggers §6l, so the candidate proceeds.
     assert "6l" not in result.obstructions_hit
     assert result.verdict == Verdict.PROCEED
+
+
+# --- §6m: F_2[G]-module-iso-class invariants cannot bound min weight ---
+
+
+def test_6m_fires_on_koszul_h2_min_weight() -> None:
+    """The round-2 v2 first session's Koszul H_2 candidate is the
+    historical anchor for §6m. It defines `d_X ≥ min_wt(H_2(K(A, B)))`
+    but H_2's iso class doesn't determine its min weight (witness:
+    H_0(K_gross) ≅ H_2(K_gross) as F_2[G]-modules with min_wt 1 vs 32).
+    Falls to §6m structurally, in addition to being empirically wrong-
+    signed."""
+    result = classify(FAMILY_D_V1_KOSZUL_H_2_MIN_WEIGHT)
+    assert "6m" in result.obstructions_hit
+    assert result.verdict == Verdict.SHELVED_A_PRIORI
+    assert any("§6m" in line for line in result.reasoning)
+
+
+def test_6m_fires_on_hilbert_series_min_degree() -> None:
+    """A hypothetical 4a-style candidate that bounds d_X by the
+    minimum non-vanishing degree of the Hilbert series of syz(A, B).
+    Hilbert series coefficients are dimensions of graded pieces of
+    an F_2[G]-module, so the min degree is iso-class invariant.
+    §6m fires structurally; the candidate cannot be tight."""
+    result = classify(FAMILY_D_V1_HILBERT_SERIES_MIN_DEGREE)
+    assert "6m" in result.obstructions_hit
+    assert result.verdict == Verdict.SHELVED_A_PRIORI
+
+
+def test_6m_fires_on_cm_regularity() -> None:
+    """Castelnuovo-Mumford regularity is defined via Tor dimensions
+    (Aramova-Herzog), all iso-class invariants. Any 4b-style bound
+    `d_X ≥ φ(reg((A, B)))` falls to §6m."""
+    result = classify(FAMILY_D_V1_CM_REGULARITY)
+    assert "6m" in result.obstructions_hit
+    assert result.verdict == Verdict.SHELVED_A_PRIORI
+
+
+def test_6m_is_structural_not_per_instance() -> None:
+    """§6m, like §6h, is instance-independent — the obstruction holds
+    regardless of which Bravyi instance the candidate is evaluated on.
+    The `bravyi_blast_radius` should therefore be EMPTY (no per-instance
+    fire), and the verdict should be SHELVED-A-PRIORI directly."""
+    result = classify(FAMILY_D_V1_KOSZUL_H_2_MIN_WEIGHT)
+    assert result.bravyi_blast_radius == ()
+    assert result.verdict == Verdict.SHELVED_A_PRIORI
+
+
+def test_6m_does_not_fire_without_module_natural_flag() -> None:
+    """A candidate that uses NON-module data (e.g., explicit Hamming
+    weight, classical dual distance, set-theoretic support) is not
+    subject to §6m. The default Candidate has
+    is_module_natural_invariant=False; §6m only fires when the flag is
+    set explicitly. Lin-Pryadko (uses d_A^⊥) is the canonical
+    non-firing example."""
+    result = classify(LIN_PRYADKO_STMT_12)
+    assert "6m" not in result.obstructions_hit
+    # LP12 also doesn't have the flag set, so let's also test a generic
+    # weight bound that explicitly does NOT use module data.
+    non_module_candidate = Candidate(
+        id="hypothetical-weight-enumerator-bound",
+        name="Hypothetical weight-enumerator-coefficient bound",
+        family=Family.COMBINATORIAL,
+        rhs_type=RHSType.WEIGHT,
+        bound_formula="d_X ≥ φ(weight-enumerator coefficient at degree w)",
+        is_module_natural_invariant=False,
+    )
+    result = classify(non_module_candidate)
+    assert "6m" not in result.obstructions_hit
+    assert result.verdict == Verdict.PROCEED
+
+
+def test_6m_does_not_fire_on_radical_weight_w1() -> None:
+    """The round-1 w_1 invariant is in the RADICAL_WEIGHT family but
+    is fundamentally a *weight* quantity in the standard F_2-basis,
+    not an iso-class invariant of the radical filtration. §6m does
+    NOT fire on w_1 even though w_1 mentions radical structure."""
+    result = classify(CV1_W1_REFINED)
+    assert "6m" not in result.obstructions_hit
+
+
+def test_6m_short_circuits_after_6h() -> None:
+    """If a candidate triggers both §6h (dimension RHS) and §6m (module
+    natural), §6h reports first because dimension-RHS is the more
+    elementary category error. The Classification carries only §6h
+    (since §6h short-circuits, §6m is never evaluated)."""
+    bad = Candidate(
+        id="dim-rhs-and-module-natural",
+        name="Hypothetical dim-RHS candidate that's also iso-class invariant",
+        family=Family.MODULE_THEORETIC,
+        rhs_type=RHSType.DIMENSION,
+        is_module_natural_invariant=True,
+    )
+    result = classify(bad)
+    assert result.obstructions_hit == ("6h",)
+    assert result.verdict == Verdict.SHELVED_A_PRIORI
+
+
+def test_6m_short_circuits_before_per_instance_obstructions() -> None:
+    """§6m short-circuits like §6h: if it fires, per-instance
+    obstructions (§6i/§6j/§6k/§6l) are NOT evaluated. The Classification
+    carries only §6m and the blast radius is empty."""
+    # A candidate that would also trigger §6j and §6l, but has the
+    # module-natural flag set so §6m fires first.
+    bad = Candidate(
+        id="module-natural-plus-spectral-plus-char-theoretic",
+        name="Hypothetical multi-failure candidate",
+        family=Family.MODULE_THEORETIC,
+        rhs_type=RHSType.WEIGHT,
+        is_module_natural_invariant=True,
+        requires_semisimple=True,        # would trigger §6j on most Bravyi
+        uses_cayley_spectral_bound=True,  # would trigger §6l on all Bravyi
+    )
+    result = classify(bad)
+    assert result.obstructions_hit == ("6m",)
+    assert result.bravyi_blast_radius == ()
+    assert result.verdict == Verdict.SHELVED_A_PRIORI
+
+
+def test_6m_is_added_to_obstructions_registry() -> None:
+    """Regression: §6m appears in the OBSTRUCTIONS registry with the
+    correct HANDOFF reference. Catches forgetting to register a new
+    obstruction after defining its predicate."""
+    obs_ids = {o.id for o in OBSTRUCTIONS}
+    assert "6m" in obs_ids
+    obs_6m = next(o for o in OBSTRUCTIONS if o.id == "6m")
+    assert obs_6m.section_ref == "HANDOFF.md §6m"
 
 
 # --- needs_new_theory escape hatch -------------------------------------

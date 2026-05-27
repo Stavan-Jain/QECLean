@@ -1021,6 +1021,24 @@ def migrate_canonical_ids(db: Path | None, dry_run: bool) -> None:
     help="Candidate's derivation requires gcd(h, char F) = 1 for the cover index (§6k).",
 )
 @click.option(
+    "--uses-cayley-spectral-bound/--no-uses-cayley-spectral-bound",
+    default=False,
+    help=(
+        "Candidate's bound uses a Cayley-graph spectral gap "
+        "(Cheeger/Sipser-Spielman/Tanner). Triggers §6l on every BB code "
+        "with k ≥ 2 (vacuous on every Bravyi instance)."
+    ),
+)
+@click.option(
+    "--is-module-natural-invariant/--no-is-module-natural-invariant",
+    default=False,
+    help=(
+        "Candidate's RHS is an F_2[G]-module-isomorphism-class numerical "
+        "invariant (Hilbert series, regularity, Betti/Tor/Ext dim, etc.). "
+        "Triggers §6m structurally — min weight is not such an invariant."
+    ),
+)
+@click.option(
     "--needs-new-theory/--no-needs-new-theory",
     default=False,
     help="Mark as a research seed; forces verdict NEEDS-NEW-THEORY.",
@@ -1042,6 +1060,8 @@ def classify_cmd(
     requires_non_degenerate: bool,
     requires_semisimple: bool,
     requires_cover_coprime: bool,
+    uses_cayley_spectral_bound: bool,
+    is_module_natural_invariant: bool,
     needs_new_theory: bool,
     as_json: bool,
 ) -> None:
@@ -1082,6 +1102,8 @@ def classify_cmd(
         requires_non_degenerate=requires_non_degenerate,
         requires_semisimple=requires_semisimple,
         requires_cover_coprime=requires_cover_coprime,
+        uses_cayley_spectral_bound=uses_cayley_spectral_bound,
+        is_module_natural_invariant=is_module_natural_invariant,
         needs_new_theory=needs_new_theory,
     )
     result = classify(candidate)
