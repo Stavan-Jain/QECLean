@@ -28,6 +28,7 @@ from bb_lab.obstructions import (
     BRAVYI_FINGERPRINTS,
     CV1_ORIGINAL_JACOBSON_SUM,
     CV1_W1_REFINED,
+    FAMILY_C_V1_SPECTRAL,
     HT_ROOS,
     LIN_PRYADKO_STMT_12,
     OBSTRUCTIONS,
@@ -187,6 +188,60 @@ def test_cv1_w1_refined_proceeds() -> None:
     falsified at Tier 3 for OTHER reasons — joint-vanishing-orbit
     restriction unsoundness — but that's downstream of Tier 0.)"""
     result = classify(CV1_W1_REFINED)
+    assert result.verdict == Verdict.PROCEED
+
+
+# --- §6l: Cayley-graph spectral bounds vacuous on BB codes with k ≥ 2 --
+
+
+def test_6l_fires_on_spectral_candidate() -> None:
+    """Family C v1 (Cayley spectral) hits §6l on every Bravyi instance
+    because all have k ≥ 2 by construction. Joint vanishing on a
+    non-trivial character forces λ_2 = weight, so the spectral gap
+    is identically zero."""
+    result = classify(FAMILY_C_V1_SPECTRAL)
+    assert "6l" in result.obstructions_hit
+    blocked = {b.split("@")[1] for b in result.bravyi_blast_radius if b.startswith("6l@")}
+    # All 5 Bravyi instances are blocked since all have k ≥ 2.
+    assert blocked == {i.id for i in BRAVYI_FINGERPRINTS}
+
+
+def test_6l_implies_shelved_a_priori() -> None:
+    """Since §6l blocks every Bravyi instance (all have k ≥ 2), a
+    spectral candidate cannot be tight on any engineering target.
+    Verdict: SHELVED-A-PRIORI."""
+    result = classify(FAMILY_C_V1_SPECTRAL)
+    assert result.verdict == Verdict.SHELVED_A_PRIORI
+
+
+def test_6l_does_not_fire_without_spectral_flag() -> None:
+    """The default Candidate has uses_cayley_spectral_bound=False;
+    §6l only fires when the flag is set explicitly."""
+    candidate = Candidate(
+        id="non-spectral",
+        name="A non-spectral combinatorial bound",
+        family=Family.COMBINATORIAL,
+        rhs_type=RHSType.WEIGHT,
+    )
+    result = classify(candidate)
+    assert "6l" not in result.obstructions_hit
+
+
+def test_6l_can_be_dodged_by_an_instance_without_k_geq_2() -> None:
+    """An instance with `has_k_geq_2=False` (a hypothetical k=0 BB
+    code) doesn't trigger §6l. Useful for confirming the predicate
+    really gates on the joint-vanishing precondition, not just the
+    candidate's flag."""
+    k_zero_instance = (
+        InstanceFingerprint(
+            id="hypothetical-k-zero",
+            G_order=36,
+            has_k_geq_2=False,
+        ),
+    )
+    result = classify(FAMILY_C_V1_SPECTRAL, instances=k_zero_instance)
+    # No instance triggers §6l, so the candidate proceeds.
+    assert "6l" not in result.obstructions_hit
     assert result.verdict == Verdict.PROCEED
 
 

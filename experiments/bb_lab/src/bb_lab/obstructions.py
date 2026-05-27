@@ -34,8 +34,17 @@ Encoded obstructions:
        gross_144_12_12 is the canonical case (h = 2 cover of bb_72
        over F_2).
 
-See `experiments/bb_lab/HANDOFF.md` §6h–§6k for the full math and
-the round-1 failures that motivated each entry.
+  §6l  Cayley-graph spectral bounds are vacuous on BB codes with
+       k ≥ 2. For any BB code with k > 0, A and B jointly vanish on a
+       non-trivial character χ of G (Bravyi 2024 Lemma 1), which forces
+       the Cayley-graph eigenvalue `λ_A(χ) = weight(A)`. The spectral
+       gap `weight − λ_2` is therefore ≤ 0, making any Sipser-Spielman /
+       Tanner / Cheeger-style spectral lower bound identically zero on
+       every Bravyi instance. Round-2 Tier 2 Family C v1 (empirical
+       Pearson correlation −0.020 across 4,364 SAT-verified rows).
+
+See `experiments/bb_lab/HANDOFF.md` §6h–§6l for the full math and
+the round-1 / round-2 failures that motivated each entry.
 """
 
 from __future__ import annotations
@@ -154,6 +163,13 @@ class Candidate:
     cover index h. Implied by `family == CHAIN_MAP` but may also
     be true for other families that use chain-map transfer."""
 
+    uses_cayley_spectral_bound: bool = False
+    """If True, the bound's derivation relies on the spectral radius
+    (Cheeger / Sipser-Spielman / Tanner-spectral) of `M_A` or `M_B`'s
+    Cayley graph. Fires §6l on every BB code with k ≥ 2 — joint
+    vanishing on a non-trivial character forces `λ_2 = weight`, so any
+    spectral gap-based lower bound is identically vacuous."""
+
     needs_new_theory: bool = False
     """If True, the bound is a research seed — its mathematical
     foundation isn't yet built. Always returns NEEDS-NEW-THEORY."""
@@ -177,6 +193,12 @@ class InstanceFingerprint:
     is_non_degenerate: bool = False
     """True if c = ⟨supp(A) ∩ supp(B)⟩ index is 1. None of the
     Bravyi instances are non-degenerate (all have c = 3)."""
+
+    has_k_geq_2: bool = True
+    """True if the code has at least one logical qubit (k ≥ 2 in CSS;
+    k ≥ 1 since BB k is always even). All Bravyi-table instances have
+    k ≥ 2 by construction (engineered specifically for k > 0).
+    §6l fires only on instances with k ≥ 2."""
 
 
 BRAVYI_FINGERPRINTS: tuple[InstanceFingerprint, ...] = (
@@ -244,6 +266,10 @@ def _fires_6k(c: Candidate, i: InstanceFingerprint) -> bool:
     return needs_cover_coprime and i.is_known_chain_map_blocker
 
 
+def _fires_6l(c: Candidate, i: InstanceFingerprint) -> bool:
+    return c.uses_cayley_spectral_bound and i.has_k_geq_2
+
+
 OBSTRUCTIONS: tuple[Obstruction, ...] = (
     Obstruction(
         id="6h",
@@ -281,6 +307,16 @@ OBSTRUCTIONS: tuple[Obstruction, ...] = (
         ),
         triggers_when="chain-map family AND instance.is_known_chain_map_blocker",
         predicate=_fires_6k,
+    ),
+    Obstruction(
+        id="6l",
+        section_ref="HANDOFF.md §6l",
+        short_description=(
+            "Cayley-graph spectral bounds are vacuous on BB codes with "
+            "k ≥ 2 (joint vanishing forces λ_2 = weight, so spectral gap = 0)."
+        ),
+        triggers_when="candidate.uses_cayley_spectral_bound AND instance.has_k_geq_2",
+        predicate=_fires_6l,
     ),
 )
 
@@ -463,4 +499,19 @@ LIN_PRYADKO_STMT_12 = Candidate(
         "tight on 0.1% of round-1 corpus; bound = 2 on every Bravyi code "
         "(loose by 4–10)."
     ),
+)
+
+FAMILY_C_V1_SPECTRAL = Candidate(
+    id="family_c_v1_spectral",
+    name="Family C v1: Cayley-graph spectral / Sipser-Spielman bound",
+    family=Family.COMBINATORIAL,
+    rhs_type=RHSType.WEIGHT,
+    bound_formula="d ≥ ⌊n · (w − λ_2(M_A or M_B)) / (2w)⌋",
+    citation=(
+        "Sipser-Spielman 1996 IT / Tanner 1981 spectral bound applied to "
+        "BB Cayley graphs; round-2 Family C v1, FALSIFIED-AS-PREDICTOR via "
+        "§6l (joint vanishing forces λ_2 = weight, gap = 0 for every k ≥ 2 "
+        "BB code). Empirical Pearson(gap, d) = −0.020 across 4,364 rows."
+    ),
+    uses_cayley_spectral_bound=True,
 )

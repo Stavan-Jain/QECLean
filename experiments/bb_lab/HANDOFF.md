@@ -505,6 +505,48 @@ classical analytic distance-bound technique can be tight on gross**.
 The remaining options are either new theory (1) or accepting that
 the negative-results program itself is the deliverable.
 
+### 6l. Cayley-graph spectral bounds are vacuous on every BB code with k ≥ 2
+
+Tier 2 round 2 Family C tested a spectral-radius predictor on the
+SAT-verified corpus (4,364 weight-3 rows; see
+`experiments/bb_lab/scripts/family_c_spectral_check.py`). The
+across-corpus Pearson correlation between the Cayley-graph spectral
+gap of M_A / M_B and `d_X` is **-0.020** — effectively zero. The cause
+is structural, not statistical:
+
+> By Bravyi 2024 Lemma 1, `k = 2·dim(ker A ∩ ker B)` for the BB code
+> BB(G, A, B). Hence `k ≥ 2` iff `A` and `B` jointly vanish on some
+> non-trivial character `χ` of `G`. On that `χ`, the Cayley-graph
+> eigenvalue `λ_A(χ) = sum_{g ∈ supp(A)} χ(g)` has absolute value
+> equal to `|supp(A)|` (a sum of |supp(A)|-many unit complex numbers
+> all aligned in the trivial direction after `A`'s vanishing). So
+> `λ_2(M_A) ≥ |supp(A)|`, meaning the Sipser-Spielman / Tanner /
+> Cheeger-style spectral gap `weight − λ_2` is `≤ 0` for every BB
+> code with k ≥ 2.
+
+The Cayley-graph spectral radius (and any bound derived from it as
+"gap-based") is therefore **identically vacuous on the engineering
+target**. This is a stronger obstruction than §6j/§6k: it doesn't hinge
+on characteristic-2 arithmetic, but rather on the basic algebraic fact
+that BB codes with k > 0 are *engineered* to have spectrally
+degenerate connection-set polynomials.
+
+This rules out the entire Family C "spectral-bound" subfamily without
+further empirical work. Combined with the round-1 girth-bound result
+(loose by 9 on gross), it suggests that *every* purely-combinatorial
+Family-C bound is structurally inapplicable or empirically loose.
+The remaining options for Family C are non-spectral expansion
+arguments (vertex / edge expansion via combinatorial means, no
+Cheeger-style proxy) and code-LP / SDP relaxations — neither has a
+known concrete formula on BB codes today.
+
+The empirical artifact is at
+`pipeline/attempts/bb_distance_conjecture_family_a_v2_yspread/result.md`
+(spectral check appears in the codebase under
+`scripts/family_c_spectral_check.py`; result is fully reproducible).
+Machine-checked under `obstructions.py` via the
+`uses_cayley_spectral_bound` predicate.
+
 ---
 
 ## 7. Recommended next moves, prioritized
