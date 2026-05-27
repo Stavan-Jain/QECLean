@@ -683,14 +683,24 @@ def joint_support_subgroup_index(
     """Return `c = [G_a : G_a ∩ G_b]` where `G_a = ⟨supp(A)⟩`,
     `G_b = ⟨supp(B)⟩`.
 
-    This is the Lin–Pryadko-style "joint" support-subgroup index used as
-    the denominator in the C-v2 conjecture. It equals
-    `[G_b : G_a ∩ G_b]` as well by Dedekind's identity for subgroup
-    intersections (both supports' closures have the same intersection
-    relative-index, since `|G_a| · |G_b| = |G_a · G_b| · |G_a ∩ G_b|`
-    for abelian subgroups). Note: this is NOT the same as the existing
-    `weight_invariants._intersection_subgroup_order` which returns
-    `|G_a ∩ G_b|`.
+    ⚠️  **This is NOT Lin-Pryadko Statement 12's `c`.** LP Stmt 12 uses
+    `c = |G_a ∩ G_b|` — the subgroup *order*, implemented in
+    `weight_invariants._intersection_subgroup_order` / `tz_lower_bound`.
+    This function returns the *index*, which is a categorically different
+    quantity and gives a different bound shape. The C-v2 series
+    (`bb_radical_bound`, Cv1 → Cv4 conjectures) deliberately uses the
+    index per the HANDOFF_C2 design (see `notes/Cv2_literature.md` §2);
+    candidates that aim to *match* LP12 must call the `weight_invariants`
+    version instead.
+
+    Concretely:
+      * gross: `|G_a| = |G_b| = 24`, `|G_a ∩ G_b| = 8`,
+        `[G_a : G_a ∩ G_b] = 3`.  LP12's c = 8; this function's c = 3.
+
+    Definition: `[G_b : G_a ∩ G_b]` as well by Dedekind's identity for
+    subgroup intersections (both supports' closures have the same
+    intersection relative-index, since `|G_a| · |G_b| = |G_a · G_b| ·
+    |G_a ∩ G_b|` for abelian subgroups).
 
     For non-degenerate BB codes (`G_a = G_b = G`), `c = 1`.
 
