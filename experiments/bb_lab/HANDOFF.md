@@ -376,24 +376,33 @@ What survives the round-2 → round-2.5 exhaustion: see
 the clean conditional bound on the non-degenerate subset, and the
 section on `bb_lab.degeneracy` API for the support-subgroup classifier.
 
-### 6j. The entire character-theoretic distance-bound family is structurally blind to gross
+### 6j. The surveyed character-theoretic distance-bound family is blind to gross
+
+> **Scope correction (2026-06, adversarial review).** This section
+> originally claimed "every published distance bound … requires
+> semisimplicity" with Jitman–Ling 2013 as a proven impossibility.
+> That was over-stated; the corrected, defensible version is below,
+> and the over-claims it retracted are flagged inline. See "Reopened
+> directions" at the end of this section.
 
 Tier 2 round 3 (HT/Roos multivariate cyclic, T2R3) and round 4
 (Bernal–Bueno-Carreño–Simón 2016 apparent distance, T2R4) both
 produced trivial / inapplicable bounds on gross. The Round 4 agent's
-literature work pinned down the underlying reason and elevated it
-to a much sharper structural claim than §6i.
+literature work pinned down the underlying reason.
 
 **The observation, made precise**:
 
-> Every published distance bound for abelian (multivariate cyclic)
-> codes derived from the **character-theoretic / Fourier-transform
-> decomposition** of `F_q[G]` requires `gcd(|G|, q) = 1` — i.e., that
-> `F_q[G]` be semisimple. Gross has `|G| = 72 = 2³·9` over `F_2`,
-> so `F_2[G]` is **non-semisimple**. The entire family of approaches
-> is structurally impotent on gross.
+> Every distance bound for abelian (multivariate cyclic) codes
+> **surveyed by this program** that is derived from the
+> character-theoretic / Fourier-transform decomposition of `F_q[G]`
+> assumes `gcd(|G|, q) = 1` — i.e., that `F_q[G]` be semisimple.
+> Gross has `|G| = 72 = 2³·9` over `F_2`, so `F_2[G]` is
+> **non-semisimple**, and none of the surveyed bounds applies as
+> stated.
 
-Verified literature:
+This is an absence-of-evidence claim over a finite survey, not a
+proven impossibility. The survey:
+
 - Camion 1971 (multivariate BCH), Sabin–Lomonaco 1992, Saints–Heegard
   1995 (IEEE TIT 41(6)), Bernal–Bueno-Carreño–Simón 2016
   ([arXiv:2402.03938](https://arxiv.org/abs/2402.03938)),
@@ -402,19 +411,37 @@ Verified literature:
   assume semisimplicity explicitly.** BBCS 2016 §II/§III opening,
   Thm 22, Thm 25 all state this assumption verbatim.
 - **Jitman–Ling 2013** ("Abelian Codes in Principal Ideal Group
-  Algebras", IEEE TIT) is the load-bearing citation: it proves that
-  for non-semisimple `F_q[G]`, distance bounds can only be derived
-  from semisimple-quotient bounds, and are **never sharper** than
-  what the semisimple quotient yields. They also show abelian codes
-  in non-semisimple PIGAs are asymptotically bad.
+  Algebras", IEEE TIT). *Original over-claim, now retracted*: that
+  JL "proves distance bounds can only be derived from
+  semisimple-quotient bounds and are never sharper." What the paper
+  actually provides (per the quote in `notes/Cv1_literature.md`) is
+  *an* upper bound on minimum distance expressed via the semisimple
+  quotient — an existence statement, not an impossibility theorem.
+  Moreover JL's results are scoped to **PIGAs**, which in the abelian
+  case requires the Sylow-p subgroup of `G` to be **cyclic**. Gross's
+  2-Sylow is `Z_4 × Z_2` — *not cyclic* — so `F_2[Z_12 × Z_6]` is
+  **not a PIGA and JL's theorems do not cover it at all.** Their
+  asymptotic-badness result is likewise PIGA-scoped (and concerns
+  single-block abelian codes, not the A↔B coupling that gives BB
+  codes their distance).
+- **Castagnoli–Massey–Schoeller–von Seemann 1991 / Roth–Seroussi
+  1986** (repeated-root cyclic codes, the univariate non-semisimple
+  case) are *published non-semisimple distance results*: the
+  distance of a repeated-root cyclic code is determined by the
+  distances of its simple-root reductions times a **multiplicative
+  repetition factor**. This contradicts the literal "never sharper
+  than the semisimple quotient" reading: the multiplicative factor
+  can exceed 1. (See `notes/T2R4.0_literature.md` §3e, which recorded
+  the result but dismissed it.)
 
-**Implication for the program**: Gross's d = 12 cannot come from any
-character-theoretic argument. The Jacobson radical of `F_2[G]` (the
-"non-semisimple part") *contributes to `dim ker M_A`* (§6h's identity
-`dim ker M_A = Σ_O |O| · μ_O`) but contributes *nothing* to the
-lower-bound side of `d` under any extant character-theoretic
-framework. **Whatever makes gross d=12 is not visible in the Fourier
-decomposition of `F_2[G]`.**
+**Implication for the program (corrected)**: no *surveyed, as-stated*
+character-theoretic bound applies to gross, and the burden is on any
+new candidate to explain how it gets past the non-semisimple wall.
+But "gross's d = 12 cannot come from any character-theoretic
+argument" is **not established** — in particular, nothing in the
+survey rules out radical-aware refinements (CMS-style multiplicative
+transfer through the Loewy filtration) on the non-PIGA algebra
+`F_2[Z_12 × Z_6]`, which no surveyed paper covers.
 
 **Rule for future Tier-2 candidates**: any candidate whose RHS
 ultimately decomposes the code via characters / Fourier / orbit
@@ -424,23 +451,45 @@ expected value against gross is bounded above by what BCH / HT /
 Roos / BBCS / Camion already give (which is ≤ 8 on gross, see
 Round 3). The remaining open directions are:
 
-1. **Homological / chain-complex** bounds (e.g. Pesah–Roffe 2025
-   cover-graph chain-map transfer; Hsieh–Le Gall 2020; Kovalev–
-   Pryadko 2013). These work on the chain complex of the BB code
-   directly, not on the group-algebra decomposition. They are
-   *categorically* distinct from the character-theoretic family —
-   different toolkit, different obstructions, untouched by §6j.
+1. **Homological / chain-complex** bounds (Symons–Rajput–Browne 2025,
+   [arXiv:2511.13560](https://arxiv.org/abs/2511.13560), cover-graph
+   chain-map transfer — *not* "Pesah–Roffe 2025", which
+   `notes/T2R5.0_literature.md` determined is not a real paper title;
+   also Hsieh–Le Gall 2020; Kovalev–Pryadko 2013). These work on the
+   chain complex of the BB code directly, not on the group-algebra
+   decomposition. They are *categorically* distinct from the
+   character-theoretic family — different toolkit, different
+   obstructions, untouched by §6j.
 2. **Radical-aware weight invariants** for `F_2[G]` when `2 | |G|`.
-   No literature reference found; would require new theory. A
-   weight-invariant filtration on the Jacobson radical of `F_2[G]`
-   that bounds `d` from below would dodge §6j by definition.
+   A weight-invariant filtration on the Jacobson radical of `F_2[G]`
+   that bounds `d` from below would dodge §6j by definition. The
+   repeated-root literature (CMS 1991, above) is univariate prior
+   art for exactly this shape.
 
-This is a much stronger pruning than §6i: **the entire algebraic-
-coding-theory toolkit for multivariate cyclic codes is blocked from
-giving a tight bound on gross**, not just one specific approach.
-This is consistent with Otjens 2025's stated open problem and
-explains why no closed-form formula has been published despite
-extensive interest.
+The honest summary: **no surveyed as-stated technique applies to
+gross**, which is consistent with Otjens 2025's stated open problem.
+The original stronger reading ("the entire algebraic-coding-theory
+toolkit is blocked") is retracted.
+
+**Reopened directions (2026-06 adversarial review)** — each was
+prematurely closed by an over-claim above or in §6k:
+
+1. **CMS-style multiplicative radical transfer**: a lower bound
+   `d_A^⊥(F_2[G]) ≥ m(A) · d̄_A^⊥(F_2[G_odd])` with `m` a Loewy-layer
+   weight factor, composed with Lin–Pryadko Statement 12. Univariate
+   precedent exists (repeated-root codes); the multivariate /
+   non-cyclic-Sylow case (`G_2 = Z_4 × Z_2`) is unexplored — and
+   un-blocked, since JL doesn't cover non-PIGAs.
+2. **Even-h cover transfer** (see §6k correction): §6k only rules out
+   SRB's specific `p∘τ = h·I` transfer map; Smith-theory / extension-
+   sequence arguments for free Z_2-actions over F_2 are untried.
+3. **Multivariate HT/BCH for full-axis-support polynomials**: the
+   per-axis-BCH counterexample (`1 + x + x²` in `F_2[Z_3 × Z_6]`) is
+   axis-degenerate; the lockout in `weight_invariants.py` is broader
+   than the evidence. Untested for polys with support on every axis.
+4. **Single-prime-G_odd restriction of R1+R4**: per
+   `notes/Cv4_R4_falsified.md` § Implications, the falsifier needs
+   multi-prime `G_odd`; gross/[[72]]/[[288]] all have `G_odd = Z_3²`.
 
 ### 6k. Cover-graph chain-map bounds also fall to the 2-divisibility wall
 
@@ -474,6 +523,20 @@ covers exhibit `h` even — and gross's specific construction is an
 h=2 cover. The arithmetic 2-divisibility that blocked §6j's
 Fourier-theoretic family **also blocks the chain-map family**, via a
 mathematically distinct mechanism but the same underlying obstruction.
+
+> **Scope correction (2026-06, adversarial review).** The paragraph
+> above over-generalizes. What is actually established: *SRB's
+> specific transfer map* (`τ` with `p ∘ τ = h · I`) collapses for
+> even h. That obstructs one proof technique in one paper, not the
+> family — nothing rules out a different transfer argument (e.g.
+> Smith exact sequences for free Z_2-actions on F₂ chain complexes,
+> which are precisely designed for the p = 2 case and were never
+> attempted). Meanwhile the lab's own 443-row sweep found **zero
+> violations** of the even-h bound and 55.1% tightness — strong
+> evidence the *bound* holds and only the *proof* is missing. The
+> "gross was chosen to be adversarial against 2-coprimality"
+> speculation is unfalsifiable narrative and should not inform
+> pruning decisions. See §6j "Reopened directions" item 2.
 
 **Connecting §6j and §6k**: the §6j wall came from `gcd(|G|, char F) > 1`
 (forcing F₂[G] non-semisimple). The §6k wall comes from
