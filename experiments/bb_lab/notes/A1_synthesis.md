@@ -13,12 +13,24 @@ preemption (the odd-h cover transfer — published twice), a complete
 verified toolkit for Tracks A and B, a published analytic anchor for
 the bottom of gross's cover chain, and two internal errors in the
 program's own documents (A0 observations 2-as-glossed and 3; two
-phantom/apocryphal citations in HANDOFF). The single most valuable
-discovery is corrective: SRB Thm 4.7 + the corrected A0 tables already
-yield a fully-analytic 2 ≤ d(bb_90) ≤ 10 **today**, and one analytic
-d ≥ 4 for [[36,8,4]] would produce the program's first fully-analytic
-nontrivial bound on a Bravyi-table instance (bb_108) with no
-conjectural ingredient.
+phantom/apocryphal citations in HANDOFF).
+
+**On the goal priorities (gross first).** The two highest-priority
+goals are about gross specifically (1: d = 12; 3: any nontrivial
+gross bound > the published LP floor of d ≥ 2). Phase 1 confirms the
+*only* routes to those are the gross-directed Tier-1 leads (§3):
+the h=2 Smith cover transfer (1.1, the goal-1 gate — and the crux is
+now pinned to one new-math step, weight control through Δ = ∩ω on
+gross's *realized* pr=0 branch) and the bivariate CMS / radical
+attack on gross's own algebra (1.2, immune to the even-h wall). The
+reachable-today results — a fully-analytic 2 ≤ d(bb_90) ≤ 10, and
+d(bb_108) ≥ 4 from one structural d([[36,8,4]]) ≥ 4 — are goal-**2**
+(non-gross) and, via the odd-h transfer, do **not** advance gross;
+they are reachable precisely because they have the odd-h structure
+gross lacks (the streetlight effect). They are banked as an
+opportunistic Tier-2 side-deliverable (§3 lead 5), gross-relevant
+only if 1.1 lands and propagates the base bound up gross's even-h
+chain.
 
 ---
 
@@ -246,74 +258,90 @@ better formulation and imposes one mandatory check:
 
 ---
 
-## 3. Five most valuable concrete leads for Phase 2 (ranked)
+## 3. Phase-2 leads, ranked by directness toward the gross goals
 
-1. **Smith-sequence proof of the h=2 cover transfer (Track B core).**
-   Start from: Degtyarev–Kharlamov arXiv:math/0004134, Appendix A.1
-   (Thm A.1.1, item A.1.2, Cor A.1.3, A.1.5; proofs in Bredon,
-   *Compact Transformation Groups*, Ch. 3), plus SRB arXiv:2511.13560
-   Thms 4.1/4.3 (chain maps, valid at h=2) and GZ arXiv:2502.20297v2
-   Lemma 3.8 (free-Γ-module hypothesis). The two-branch skeleton is
-   fully set up in L2 (§ L2-smith-sequence-machinery and open
-   questions 2–3); the only new mathematics is weight control on the
-   pr_*[L̃] = 0 branch, with the obstruction identified exactly as
-   Δ = ∩ω : H₂(base) → H₁(base) (ω = the x-direction cut cocycle).
-   State the theorem at free-Γ-module generality per GZ Remark 3.6.
-   Payoff: first proof of the h=2 case of the SRB §7 conjecture;
-   composes down gross's chain to the published [[18,8,2]] anchor.
+**Re-ranking rationale (2026-06-10).** Goals in priority order are
+(1) analytic proof gross d = 12, (2) analytic bound for a class of BB
+codes, (3) any nontrivial analytic bound on gross. The first Phase-1
+synthesis pass let "nearest-term publishable" float the bb_108/bb_90
+results to the top — but those are goal-**2** (non-gross), and via the
+*odd-h* SRB transfer they do **not** advance gross (gross's chain is
+even-h at every level; different, unproven machinery). They are
+reachable precisely because they have the odd-h structure gross
+lacks — the streetlight effect. This section is re-ordered to lead
+with the **gross-directed** tracks (goals 1 & 3) and to demote the
+non-gross result to an opportunistic side-deliverable whose gross
+relevance is *contingent on Track B*.
 
-2. **Structural d ≥ 4 for [[36,8,4]] from scratch (Track B
-   milestone, no conjecture needed).** *Redirected by Gap 3 (§6):
-   there is NO published analytic route* — Breuckmann–Eberhardt
-   arXiv:2012.09271's distance theorems are the wrong shape (need
-   Tanner × cycle-graph + expansion, vacuous at n=36; they couldn't
-   bound their own 1014-qubit example) and LP Statement 12 provably
-   tops out at d ≥ 2 here. The obligation is a **structural** reason
-   no weight-≤3 logical exists — a combinatorial/algebraic argument
-   on the logical space — *not* a `decide` or ILP enumeration, which
-   fail the analytic bar by the same logic that excluded SAT (trust
-   base ≠ analytic; see Gap 3). Inputs: Tiew–Breuckmann
-   arXiv:2411.03302 §VI.B (balanced-product realization, q=2 identity
-   verified) for the structure to exploit; the L4-no-hgp-36-8-4
-   impossibility closes the HGP shortcut; the TB Gurobi check
-   (github.com/h1010134/balanced-product-cyclic-codes) is ground
-   truth for *validating* the target number, not the proof. Composing
-   the structural result with SRB Thm 4.7 (h = 3 odd, k preserved,
-   verifier-checked) yields the program's first fully-analytic
-   nontrivial bound on a Bravyi-table instance: d(bb_108) ≥ 4. Free
-   rider available today: write up 2 ≤ d(bb_90) ≤ 10 (SRB Thms 4.6+4.7
-   over the h=5 cover of [[18,8,2]], upper bound saturated).
+Note the floor: gross already has a published analytic d ≥ 2 (LP
+Statement 12, c = 8 ⟹ ⌈12/8⌉ = 2). So "progress on gross" means
+**beating 2**, and only the gross-directed tracks below can.
 
-3. **Translate KP-2013's repeated-codeword decomposition to BB
-   2-covers (Track B second route + saturation insight).** Start
-   from: Kovalev–Pryadko arXiv:1212.6703v2, §IV.E (Lemma 4, Thms 8–9,
-   pp. 9–10) — the only published F₂ even-symmetry distance lower
-   bound, proved by splitting any null vector as u^(1+x) + γᵀG_Z with
-   no transfer inversion. The open work (L2 open question 1): does
-   the (gross, [[72,12,6]]) pair satisfy a BB analogue of
-   k_i^(1+x) = k_i, and what does d = min(d₁,d₂,d̃₁,d̃₂) become in BB
-   language? The classical h=2 mechanism to imitate is the
-   generalized van Lint theorem, Chen–Xie–Ding arXiv:2402.02853
-   Thm 2.1 (exact d = min{2d(C₁), d(C₂)} by Plotkin decomposition
-   along a free Z₂-action).
+### Tier 1 — gross-directed (goals 1 & 3)
 
-4. **Bivariate CMS valuation theorem (Track A's theorem).** Start
-   from: CMS 1991 (ETH Massey archive, BI433.pdf — the only source
-   for the exact statement), Lemma 1 / eqs. (7)–(13c) and the Lemma-2
+1. **Smith-sequence proof of the h=2 cover transfer (Track B core —
+   the goal-1 gate).** This is the master key: a proven h=2 transfer
+   `d_cover ≥ d_base` propagates *up* gross's even-h chain, so
+   combined with any analytic base bound > 2 it lifts gross above the
+   LP floor (e.g. transfer + [[36,8,4]] structural d ≥ 4 ⟹ d(gross)
+   ≥ 4; deeper bases push higher; the conjectural ceiling is
+   d(gross) ≥ 6 from [[72,12,6]]). Start from: Degtyarev–Kharlamov
+   arXiv:math/0004134, Appendix A.1 (Thm A.1.1, A.1.2, Cor A.1.3,
+   A.1.5; proofs in Bredon, *Compact Transformation Groups*, Ch. 3),
+   plus SRB arXiv:2511.13560 Thms 4.1/4.3 (chain maps, valid at h=2)
+   and GZ arXiv:2502.20297v2 Lemma 3.8 (free-Γ-module hypothesis).
+   Two-branch skeleton set up in L2 (§ L2-smith-sequence-machinery,
+   open questions 2–3); the only new mathematics is weight control on
+   the pr_*[L̃] = 0 branch, obstruction identified exactly as
+   Δ = ∩ω : H₂(base) → H₁(base) (ω = x-direction cut cocycle). Gap 5
+   confirmed gross's pr=0 branch is *realized*, so this weight-control
+   step is unavoidable and is genuinely new math (no bundle/product
+   tool supplies it). State at free-Γ-module generality per GZ
+   Remark 3.6.
+
+2. **Bivariate CMS valuation theorem (Track A — the gross-native
+   direct attack).** The one route that bypasses the even-h wall
+   entirely: it works on gross's own group algebra F₂[Z₁₂×Z₆], no
+   cover. This is the hedge if Track B's even-h transfer stays out of
+   reach, and the only standalone path to a gross bound > 2. Start
+   from: CMS 1991 (ETH Massey archive, BI433.pdf — only source for
+   the exact statement), Lemma 1 / eqs. (7)–(13c) and the Lemma-2
    lower-bound mechanism (eqs. (20)/(21)/(25)/(27)); replace the
    (x−1)-adic valuation with the bivariate radical filtration of
    F₂[Z₄×Z₂] (nilpotency index 5), using the monomial-like tensor
    weights (arXiv:1003.3386 Thm 3.5) as the P-ladder and the
    Özadam–Özbudak atoms (arXiv:0906.4008 Thm 3.6) per axis. First
    sub-task: derive the rad^t(F₂[Z₄×Z₂]) minimum weights in-house
-   (the D-L shortcut is refuted). Compose the result with LP
-   Statement 12 (arXiv:2306.16400) on the semisimple-reduction side.
+   (the D-L shortcut is refuted, Gap 1). Compose with LP Statement 12
+   (arXiv:2306.16400) on the semisimple-reduction side. Gap 1
+   confirmed the target is open across the entire MM-Rúa lineage.
    Pre-publication gates: fetch MM-Rúa DCC 2007
    (DOI 10.1007/s10623-007-9114-1); body-check Rowshan 2601.01137;
    cite and distinguish Wang–Pryadko arXiv:2203.17216.
 
-5. **Compute the four terms of the ES fundamental exact sequence for
-   gross (Tracks A/B shared substrate).** Start from:
+3. **Translate KP-2013's repeated-codeword decomposition to the
+   (gross, [[72,12,6]]) pair (Track B second route, gross-native).**
+   A concrete, possibly more tractable alternative to the full Smith
+   argument — it attacks the same even-h transfer but via an explicit
+   F₂ even-symmetry decomposition rather than equivariant topology.
+   Start from: Kovalev–Pryadko arXiv:1212.6703v2, §IV.E (Lemma 4,
+   Thms 8–9, pp. 9–10) — the only published F₂ even-symmetry distance
+   lower bound, proved by splitting any null vector as
+   u^(1+x) + γᵀG_Z with no transfer inversion. Open work (L2 open
+   question 1): does (gross, [[72,12,6]]) satisfy a BB analogue of
+   k_i^(1+x) = k_i, and what does d = min(d₁,d₂,d̃₁,d̃₂) become in BB
+   language? Classical h=2 mechanism to imitate: generalized van Lint
+   theorem, Chen–Xie–Ding arXiv:2402.02853 Thm 2.1 (exact
+   d = min{2d(C₁), d(C₂)} by Plotkin decomposition along a free
+   Z₂-action).
+
+4. **Compute the four terms of the ES fundamental exact sequence for
+   gross (cheap groundwork — do this first; feeds Tiers 1.1–1.3).**
+   Not itself a bound, but the cheapest gross-specific computation
+   that produces structural understanding, and the natural input for
+   any weight-aware argument on gross — it localizes where Track A's
+   filtration and Track B's homology classes actually live in gross's
+   12-dimensional logical space. Start from:
    Eberhardt–Steffan arXiv:2407.03973 (IEEE TIT 2025), Theorem 2.3,
    with R = F₂[Z₁₂×Z₆], c = x³+y+y², d = y³+x+x²: compute
    dim ann(c)/ann(c)(d), dim ann(d)/(c)ann(d), dim ((c)∩(d))/(cd),
@@ -323,6 +351,34 @@ better formulation and imposes one mandatory check:
    (computational), and is the natural input for any weight-aware
    minimum-weight argument on gross — including where Track A's
    filtration and Track B's homology classes actually live.
+
+### Tier 2 — opportunistic (goal 2; gross-relevant only via Tier 1.1)
+
+5. **Structural d ≥ 4 for [[36,8,4]] from scratch.** *Demoted from
+   the first pass's #2.* Standalone this is a goal-2 result: composed
+   with the *odd-h* SRB Thm 4.7 it gives the program's first
+   fully-analytic bound on a Bravyi instance, d(bb_108) ≥ 4 (and the
+   free rider 2 ≤ d(bb_90) ≤ 10 from SRB Thms 4.6+4.7 over the h=5
+   cover of [[18,8,2]], upper bound saturated) — but **bb_108 and
+   bb_90 are not gross**, and the odd-h route does not reach it. Its
+   one path to gross is via Tier 1.1: *if* the even-h transfer is
+   proven, this same base bound propagates up gross's even-h chain to
+   d(gross) ≥ 4. So pursue it **only** (a) as a cheap goal-2 banking
+   move once Tier 1 is underway, or (b) if its proof *technique* — a
+   structural "no weight-≤3 logical" argument on the balanced-product
+   logical space — looks like it scales conceptually to gross's
+   144-qubit space (where enumeration is hopeless). Test that
+   scalability explicitly before investing; if it's [[36,8,4]]-specific
+   combinatorics, it stays a consolation prize. *Redirected by Gap 3:*
+   no published analytic route exists (BE 2012.09271 wrong shape +
+   vacuous expansion; LP tops out at 2); the obligation is
+   structural, *not* a `decide`/ILP enumeration (which fails the
+   analytic bar by the same logic that excluded SAT — trust base ≠
+   analytic). Inputs: Tiew–Breuckmann arXiv:2411.03302 §VI.B
+   (balanced-product realization, q=2 identity verified); the
+   L4-no-hgp-36-8-4 impossibility closes the HGP shortcut; the TB
+   Gurobi check (github.com/h1010134/balanced-product-cyclic-codes)
+   validates the target number, not the proof.
 
 ---
 
@@ -577,25 +633,31 @@ X-logicals that project to zero, so the dangerous branch is
 through the Smith connecting map Δ = ∩ω is unavoidable. Keyword
 sweeps re-confirm zero QEC applications of Smith theory to date.
 
-### Net effect on the ranked leads (§3)
+### Net effect on the ranked leads (§3 — re-ranked 2026-06-10)
 
-- **Lead 1 (Smith h=2 transfer)** stands, with the crux now exact:
-  weight control on the realized pr=0 branch of gross's own cover.
-  Genuinely new mathematics; no tool in the bundle/product literature
-  supplies it.
-- **Lead 2 ([[36,8,4]] → bb_108)** is REDIRECTED: no published
-  analytic route exists; LP tops out at 2; prove d ≥ 4 from scratch
-  via a **structural** argument (a `decide`/ILP enumeration fails the
-  analytic bar by the same logic that excluded SAT — see Gap 3 above;
-  enumeration is valid only as ground-truth validation, not as the
-  proof). Composition keystone (SRB Thm 4.7 + k₃ = k = 8 for bb_108's h = 3
-  cover) verified.
-- **Lead 4 (bivariate CMS / Track A)** confirmed open across the
-  entire MM-Rúa lineage; new assets: monomial-like product formula +
-  multivariable weight-retaining theorem (MOOS 2015).
-- **Track D** confirmed unpreempted (BKK misreport resolved).
-- The fully-analytic floor of the gross chain remains [[18,8,2]]'s
-  d = 2 until either d([[36,8,4]]) ≥ 4 lands (→ gross ≥ 4 would
-  additionally need the h=2 transfer twice) or [[72,12,6]] acquires
-  an analytic handle (none exists; Yoder family distance is
-  conjectured only).
+*(Lead numbers below refer to the re-ranked §3: Tier 1 = gross-directed
+1.1 Smith h=2 transfer, 1.2 Track A CMS, 1.3 KP-2013 even-symmetry,
+1.4 ES substrate; Tier 2 = opportunistic 5. [[36,8,4]]→bb_108.)*
+
+- **1.1 (Smith h=2 transfer, the goal-1 gate)** stands at #1, with the
+  crux now exact: weight control on the realized pr=0 branch of gross's
+  own cover. Genuinely new mathematics; no tool in the bundle/product
+  literature supplies it (Gap 5).
+- **1.2 (bivariate CMS / Track A)** promoted to the #2 gross-native
+  attack (immune to the even-h wall, the hedge if 1.1 stalls);
+  confirmed open across the entire MM-Rúa lineage (Gap 1); new assets:
+  monomial-like product formula + multivariable weight-retaining
+  theorem (MOOS 2015).
+- **5. ([[36,8,4]] → bb_108)** DEMOTED to opportunistic goal-2: no
+  published analytic route (Gap 3), prove d ≥ 4 structurally (not
+  `decide`/ILP — fails the analytic bar by the same logic that
+  excluded SAT). It is **not gross**; its only path to gross is
+  *through* 1.1 (even-h transfer propagating the base bound up). SRB
+  Thm 4.7 + k₃ = k = 8 composition to bb_108 verified.
+- **Track D** confirmed unpreempted (BKK misreport resolved, Gap 2).
+- The fully-analytic floor *on gross* is d ≥ 2 (LP Statement 12,
+  published). Beating it requires either 1.1 + an analytic base bound
+  (e.g. + lead 5's d([[36,8,4]]) ≥ 4 ⟹ d(gross) ≥ 4), or 1.2 directly.
+  The chain's deepest published analytic anchor is [[18,8,2]] d = 2
+  (HGP); [[72,12,6]] has no analytic handle (Gap 4; Yoder family
+  distance conjectured only).
