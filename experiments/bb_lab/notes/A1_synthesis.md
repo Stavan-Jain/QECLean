@@ -262,18 +262,27 @@ better formulation and imposes one mandatory check:
    Payoff: first proof of the h=2 case of the SRB §7 conjecture;
    composes down gross's chain to the published [[18,8,2]] anchor.
 
-2. **Analytic d ≥ 4 for [[36,8,4]] via balanced-product distance
-   theory (Track B milestone, no conjecture needed).** Start from:
-   Breuckmann–Eberhardt arXiv:2012.09271 (the unexamined candidate
-   tool, per L4 open question 1), with Tiew–Breuckmann
-   arXiv:2411.03302 §VI.B (the code's balanced-product realization,
-   equivalence verified) and the L4-no-hgp-36-8-4 impossibility
-   closing the HGP route. Composing with SRB Thm 4.7 (h = 3 odd,
-   k preserved, hypotheses verifier-checked) immediately yields the
-   program's first fully-analytic nontrivial bound on a Bravyi-table
-   instance: d(bb_108) ≥ 4. Free rider available today: write up
-   2 ≤ d(bb_90) ≤ 10 (SRB Thms 4.6+4.7 over the h=5 cover of
-   [[18,8,2]], upper bound saturated).
+2. **Structural d ≥ 4 for [[36,8,4]] from scratch (Track B
+   milestone, no conjecture needed).** *Redirected by Gap 3 (§6):
+   there is NO published analytic route* — Breuckmann–Eberhardt
+   arXiv:2012.09271's distance theorems are the wrong shape (need
+   Tanner × cycle-graph + expansion, vacuous at n=36; they couldn't
+   bound their own 1014-qubit example) and LP Statement 12 provably
+   tops out at d ≥ 2 here. The obligation is a **structural** reason
+   no weight-≤3 logical exists — a combinatorial/algebraic argument
+   on the logical space — *not* a `decide` or ILP enumeration, which
+   fail the analytic bar by the same logic that excluded SAT (trust
+   base ≠ analytic; see Gap 3). Inputs: Tiew–Breuckmann
+   arXiv:2411.03302 §VI.B (balanced-product realization, q=2 identity
+   verified) for the structure to exploit; the L4-no-hgp-36-8-4
+   impossibility closes the HGP shortcut; the TB Gurobi check
+   (github.com/h1010134/balanced-product-cyclic-codes) is ground
+   truth for *validating* the target number, not the proof. Composing
+   the structural result with SRB Thm 4.7 (h = 3 odd, k preserved,
+   verifier-checked) yields the program's first fully-analytic
+   nontrivial bound on a Bravyi-table instance: d(bb_108) ≥ 4. Free
+   rider available today: write up 2 ≤ d(bb_90) ≤ 10 (SRB Thms 4.6+4.7
+   over the h=5 cover of [[18,8,2]], upper bound saturated).
 
 3. **Translate KP-2013's repeated-codeword decomposition to BB
    2-covers (Track B second route + saturation insight).** Start
@@ -482,12 +491,49 @@ applies cleanly (c = |N| = 2, d⊥_A = d⊥_B = 4) and gives d_Z ≥ 2;
 it structurally cannot reach 4. The SRB composition keystone is
 verified verbatim (Thm 4.7: "suppose h is odd and kh = k. Then
 d ≤ dh ≤ hd"), so an analytic d([[36,8,4]]) ≥ 4 composes to a
-fully-analytic d(bb_108) ≥ 4. **Decision point for Phase 2**: the
-proof obligation "no nontrivial logical of weight ≤ 3 on 36 qubits"
-fits the repo's Lean anti-witness/`decide` pattern (kernel-checked
-finite case analysis, not SAT) — whether that meets the program's
-"fully analytic" bar, or whether a structural argument is required,
-must be decided before Track B's nearest-term deliverable is scoped.
+fully-analytic d(bb_108) ≥ 4.
+
+**The proof obligation must be structural, not a `decide`.** The base
+result is "no nontrivial logical of weight ≤ 3 on 36 qubits." It is
+tempting to discharge this with the repo's Lean anti-witness/`decide`
+pattern — but a raw `decide` over the weight-≤3 ball is **not
+analytic**, and is excluded by the same program decision that
+excluded SAT. Rationale (this corrects an earlier framing of this
+note that treated it as an open Phase-2 question):
+
+- "Analytic vs computational" and "trust base" are orthogonal axes.
+  SAT+DRAT, a Lean kernel `decide`, and a human referee differ only
+  in *trust base*. The program's "fully analytic" constraint is about
+  the *other* axis — a structural, generalizing argument vs
+  exhaustive case enumeration. Swapping SAT → kernel changes the
+  trust base and leaves the result just as computational (a `decide`
+  is in fact *dumber* than SAT — no clause learning, only kernel
+  reduction). The four-color theorem is the standard illustration:
+  kernel-checkable in principle, still the canonical example of a
+  proof that certifies without explaining.
+- The "fully analytic only — no SAT load-bearing" decision was taken
+  precisely to forbid a finite computation carrying the weight of the
+  result. A `decide` base case is that same forbidden hybrid
+  ("analytic transfer theorem + computed base distance") with a
+  different checker. It also defeats goals 1–2: enumerating
+  [[36,8,4]] tells you nothing about gross (infeasible to enumerate)
+  or the family.
+- Where the line genuinely sits: a finite check is *not* automatically
+  non-analytic — the disqualifier is *brute* enumeration. An analytic
+  reduction (e.g. an automorphism/symmetry argument on the
+  logical-operator space) that collapses the problem to a *handful* of
+  human-surveyable cases, with the kernel discharging only that
+  residue, *is* analytic (the small toric/surface-code distance proofs
+  in this repo are roughly this shape). What fails the bar is `decide`
+  over the whole weight-≤3 ball with no structural reduction in front
+  of it.
+
+So Track B's nearest-term deliverable is a *structural reason* no
+weight-≤3 logical of [[36,8,4]] exists — a combinatorial/algebraic
+argument about its logical space — not an enumeration. The TB ILP
+check (and a `decide`) remain valid as ground-truth validation that
+the analytic argument targets the right number; they cannot *be* the
+argument.
 
 ### Gap 4 — Gross's 2-cover chain verified as SRB-class; every step is even-h; [[72,12,6]] has no analytic family
 
@@ -539,8 +585,10 @@ sweeps re-confirm zero QEC applications of Smith theory to date.
   supplies it.
 - **Lead 2 ([[36,8,4]] → bb_108)** is REDIRECTED: no published
   analytic route exists; LP tops out at 2; prove d ≥ 4 from scratch
-  (Lean-decide vs structural argument = explicit Phase-2 decision).
-  Composition keystone (SRB Thm 4.7 + k₃ = k = 8 for bb_108's h = 3
+  via a **structural** argument (a `decide`/ILP enumeration fails the
+  analytic bar by the same logic that excluded SAT — see Gap 3 above;
+  enumeration is valid only as ground-truth validation, not as the
+  proof). Composition keystone (SRB Thm 4.7 + k₃ = k = 8 for bb_108's h = 3
   cover) verified.
 - **Lead 4 (bivariate CMS / Track A)** confirmed open across the
   entire MM-Rúa lineage; new assets: monomial-like product formula +
