@@ -455,7 +455,9 @@ Round 3). The remaining open directions are:
    [arXiv:2511.13560](https://arxiv.org/abs/2511.13560), cover-graph
    chain-map transfer — *not* "Pesah–Roffe 2025", which
    `notes/T2R5.0_literature.md` determined is not a real paper title;
-   also Hsieh–Le Gall 2020; Kovalev–Pryadko 2013). These work on the
+   "Hsieh–Le Gall 2020" likewise purged per A1 lane L2 — phantom, the
+   only joint Hsieh–Le Gall paper is the 2011 NP-hardness-of-decoding
+   result; also Kovalev–Pryadko 2013). These work on the
    chain complex of the BB code directly, not on the group-algebra
    decomposition. They are *categorically* distinct from the
    character-theoretic family — different toolkit, different
@@ -467,9 +469,12 @@ Round 3). The remaining open directions are:
    art for exactly this shape.
 
 The honest summary: **no surveyed as-stated technique applies to
-gross**, which is consistent with Otjens 2025's stated open problem.
-The original stronger reading ("the entire algebraic-coding-theory
-toolkit is blocked") is retracted.
+gross**, which is consistent with the stated open problem in
+Postema–Kokkelmans, arXiv:2502.17052 (the "Otjens 2025" attribution
+used previously is apocryphal — same arXiv id, wrong author; per A1
+lane L3 verification, see `notes/A1_literature_L3.md`). The original
+stronger reading ("the entire algebraic-coding-theory toolkit is
+blocked") is retracted.
 
 **Reopened directions (2026-06 adversarial review)** — each was
 prematurely closed by an over-claim above or in §6k:
@@ -629,8 +634,10 @@ etc. Then a small notebook or script that:
 3. Emits a structured "conjecture record" per hypothesis
 
 **Before declaring any conjecture novel**, do the literature check
-(§6a). Lin–Pryadko 2306.16400, Kovalev–Pryadko 2013, Hsieh–Le Gall
-2020, and Roffe's qLDPC survey are the obvious starting points.
+(§6a). Lin–Pryadko 2306.16400, Kovalev–Pryadko 2013, and Roffe's
+qLDPC survey are the obvious starting points. (A previous version
+also listed "Hsieh–Le Gall 2020" — phantom citation, purged; see
+`notes/A1_literature_L2.md`.)
 
 ---
 

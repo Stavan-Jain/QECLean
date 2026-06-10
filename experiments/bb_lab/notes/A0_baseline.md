@@ -28,17 +28,23 @@ the SRB §7 conjecture (h even).
    `d ≤ min(d_A^⊥, d_B^⊥)` is of course never violated.
 2. **The even-h cover chain is fully populated with exact distances**:
    gross →(h=2) [[72,12,6]] d=6 →(h=2) [[36,8,4]] d=4 (SAT, this
-   run) →(h=2) [[18,8,2]] d=2 (SAT). Distances halve exactly at each
-   2-cover step — gross's lattice *saturates* `d_cover = 2·d_base`
-   all the way down. If Track B proves the h=2 transfer
-   `d_cover ≥ d_base`, the fully-analytic floor from this chain is
-   set by the deepest base we can bound analytically by hand
-   ([[18,8,2]]: d ≥ 2 is a weight-1 exhaustion argument).
-3. **Every rigorous (odd-h) base of every Bravyi instance has
-   k′ = 0** — the rigorous SRB bound is vacuous on the whole table,
-   confirming §6k's narrow claim. All value lives on the even-h
-   (conjectural) side; proving even h=2 (Track B) unlocks the entire
-   lattice above.
+   run) →(h=2) [[18,8,2]] d=2 (SAT). *(Corrected per A1 synthesis §5:
+   an earlier version of this observation claimed `d_cover = 2·d_base`
+   saturates at every step — false at [[72,12,6]] → [[36,8,4]], where
+   6 ≠ 2·4. Only gross→72 and 36→18 saturate.)* If Track B proves
+   the h=2 transfer `d_cover ≥ d_base`, the fully-analytic floor from
+   this chain is set by the deepest base with an analytic distance
+   ([[18,8,2]] = HGP(J₃,J₃) per A1 lane L4: published analytic d = 2).
+3. **Rigorous (odd-h) bases with k′ > 0 exist for exactly two Bravyi
+   instances** — bb_90 (3×3 base, h=5) and bb_108 (3×6 base, h=3);
+   bb_72, gross, and bb_288 have none. *(Corrected per A1 synthesis
+   §5: an earlier version claimed every odd-h base on the table has
+   k′ = 0 — wrong by this file's own tables below.)* Consequence
+   (A1 lane L4): SRB Thm 4.6/4.7 already give a fully-analytic
+   `2 ≤ d(bb_90) ≤ 10` today, and an analytic d ≥ 4 for [[36,8,4]]
+   would give fully-analytic `d(bb_108) ≥ 4`. For gross itself all
+   positive-k′ bases are even-h, so Track B's h=2 theorem remains
+   the gate.
 4. **`c` (LP denominator, `|G_a ∩ G_b|`) ≠ support-subgroup index.**
    Gross: `[G:⟨supp A⟩] = [G:⟨supp B⟩] = 3` but `c = 8`. Don't
    conflate them (the plan's context note said "c = 3"; the LP
