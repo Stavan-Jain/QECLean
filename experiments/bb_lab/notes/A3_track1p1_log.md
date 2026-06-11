@@ -331,3 +331,66 @@ a restated classical (van Lint/Castagnoli) lemma, but the exact statement was
 not re-confirmed here. Re-verify before any write-up leans on it. The analytic
 conclusion above (classical Plotkin needs `a` code-constrained; gross's `a` is
 only syndrome-constrained) does not depend on the citation.
+
+---
+
+## Entry 4 (2026-06-10) — Fork B is analytically vacuous (it degrades to the floor); Fork A is necessary
+
+Tested Fork B (a uniform dangerous-sector bound via the elementary projection
+inequality). Found a clean rigorous bound — then found it cannot beat the floor
+fully-analytically. Recorded because the *reason* is the sharpest justification
+yet for why the factor-2 (Fork A) is the only viable analytic route.
+
+### The elementary projection bound (rigorous, but bounded by d_base)
+
+For ANY nontrivial cover logical v=(v₀,v₁): **|v| ≥ |p(v)|** (triangle
+inequality; p sums the sheets and is a projection chain map — verified). Casing
+on p(v):
+- p(v)=0: v = τ(v₀), [v₀]≠0, so |v| = 2|v₀| ≥ 2·d_base;
+- p(v)≠0, [p(v)]≠0 (safe): |v| ≥ |p(v)| ≥ d_base;
+- p(v)≠0, [p(v)]=0 (dangerous, b≠0): p(v) is a nonzero base Z-stabilizer, so
+  |v| ≥ |p(v)| ≥ μ_Z := min nonzero base-stabilizer weight.
+
+Hence **d_cover ≥ min(d_base, μ_Z)**. Computed (`scripts/a3_forkB_projection_bound.py`,
+SAT with sanity checks): for the base [[72,12,6]], μ_Z = μ_X = **6**, so the
+bound reads d_gross ≥ min(6, 6) = **6** — *if* d_base = 6 and μ_Z = 6 are taken
+as given.
+
+### Why it is analytically vacuous (the fatal catch)
+
+`min(d_base, μ_Z) ≤ d_base`: the bound is **monotonically non-increasing under
+the cover chain — it can never grow.** To make d_base = d([[72,12,6]]) analytic,
+recurse the same bound: d₇₂ ≥ min(d₃₆, μ₃₆) ≤ d₃₆ = 4 < 6. Continuing,
+d₃₆ ≥ min(d₁₈, μ₁₈) ≤ d₁₈ = 2. The chain bottoms at the one analytic anchor
+(Phase 1: [[18,8,2]] = HGP(J₃,J₃), analytic d=2), so **fully-analytically this
+bound gives only d_gross ≥ 2 — exactly the published LP floor, no improvement.**
+It yields ≥ 6 *only* as a hybrid that imports SAT's d₇₂ = 6, which the program's
+"fully analytic" constraint forbids (same exclusion as SAT).
+
+### The payoff: Fork A is necessary, and we know precisely why
+
+The elementary bound caps at d_base because the only sectors it controls give
+≥ d_base (safe) or ≥ μ_Z (dangerous, b≠0). **The single growth mechanism in the
+whole picture is the symmetric case p(v)=0, which gives 2·d_base** — and that is
+exactly the factor-2 (Fork A) lemma. So:
+- Fork B (uniform projection bound): rigorous but ≤ d_base ⇒ degrades to 2
+  fully-analytically. **Dead for goals 1 and 3.**
+- Fork A (factor-2 on the symmetric/dangerous sector): the *only* route that
+  grows the bound past the base, and the only path to beating the floor
+  analytically — for d_gross ≥ 4 (with a structural d([[36,8,4]])≥4 base via the
+  even-h chain) up to d_gross = 12 (full factor-2 + analytic base).
+
+This converts the earlier "two forks" into one: **Fork A is mandatory.** The
+crux remains the s≠0 seam-leakage analytic bound (Entry 3), now known to be not
+just the hard part but the *essential* part — no elementary projection shortcut
+exists.
+
+### Status (Track 1.1, end of session)
+
+- §1 complete and verified (framework, Δ explicit).
+- §2 factor-2 lemma: TRUE (validated SAT, all cases ≥12, minimum at the clean
+  symmetric case which is proven analytically); the two off-minimum cases (s≠0,
+  [c]=0) owe an analytic ≥ 2·d_base; that seam-aware weight argument is the
+  genuine open new-math step, and Entry 4 shows it is unavoidable.
+- No fully-analytic improvement on the d ≥ 2 floor yet; the path to one is
+  Fork A specifically.
