@@ -195,3 +195,70 @@ for "minimum weight of a dangerous logical with s ≠ 0." If provably > 12, pivo
 the proof to the easy case + an "s≠0 ⇒ off-minimum" lemma. If a weight-12 s≠0
 member exists, the hard seam-leakage case is unavoidable and the months estimate
 stands. Then (either way) close the s=0 [v₀]=0 subcase.
+
+---
+
+## Entry 2 (2026-06-10) — the lemma's three cases, rigorously located (validated SAT)
+
+Built `scripts/a3_s_nonzero_sat.py` and `scripts/a3_s0_subcase.py` — constrained
+min-weight SATs whose encodings **pass a sanity ladder** (they reproduce
+d_cover = 12: nontrivial-logical min is UNSAT at w≤11, SAT at w=12). This is the
+validation the scout's `a1_smith_sector_sat.py` lacked (its "safe min = 6" is the
+encoding bug). Encoding: cycle H_X v=0; dangerous (P^T g_i)·v=0 ∀ base logX g_i
+[⟺ [p(v)]=0]; nontrivial OR_a(L_a·v=1) over cover logX; s constraints as
+equalities (s=0) or an OR-of-parities (s≠0); [v₀]=0 via (Π₀^T g_i)·v=0.
+
+**The factor-2 lemma decomposes into three cases, and only one binds the
+minimum:**
+
+| case | meaning | min weight (validated SAT) | analytic status |
+|---|---|---|---|
+| **s=0, [c]≠0** | both sheets are nontrivial base logicals | **12 = 2·d_base** (achieved) | **clean: |v₀|,|v₁| ≥ d_base ⇒ |v| ≥ 2·d_base** |
+| s=0, [c]=0 | both sheets base-trivial | ≥ 15 (UNSAT ≤14) | off-minimum; analytic ≥12 still owed |
+| s≠0 | seam leakage | 14 (UNSAT ≤13) | off-minimum; analytic ≥12 still owed |
+
+So the minimum-weight (12) dangerous logicals are **exactly** the clean
+s=0,[c]≠0 ones, and that case has a one-line analytic proof. The sampling lead
+from Entry 1 is now confirmed with a trustworthy encoding (the true s≠0 min is
+14, not the sampled 16).
+
+**What this does and does NOT establish.** It does NOT prove the lemma — the SAT
+results are discovery/confidence (same exclusion as the d=12 certificate), and
+the two off-minimum cases still owe an *analytic* ≥ 2·d_base (we now know both
+are true with margin: ≥14 and ≥15). What it DOES is crystallize the proof
+strategy and de-risk it substantially:
+- the factor-2 *value* is correct and is attained precisely where the clean
+  argument applies;
+- the obstruction (seam leakage, s≠0) and the degenerate subcase ([c]=0) are
+  provably **off the minimum**, so a complete analytic proof needs only crude
+  (≥12, not tight ≥14/≥15) bounds there, which should be far easier than a tight
+  seam analysis.
+
+**Reframing of the crux (possible major simplification — to test next).** The
+σ-involution makes the cover code a candidate for the *classical* van Lint /
+Chen–Xie–Ding Plotkin double-cover distance theorem (A1 lane L2,
+arXiv:2402.02853 Thm 2.1: d = min{2·d(C₁), d(C₂)} along a free Z₂-action). If
+that theorem (or KP-2013 Thms 8–9) applies to the BB cover, the dangerous-sector
+bound 2·d_base is a KNOWN result, not new math — which would contradict the
+"months" estimate in the good direction. The catch the scouts flagged: the
+clean theorem's hypothesis (KP's k^(1+x)=k) FAILS on gross, and the failure is
+exactly the s≠0 seam leakage. The computational finding "s≠0 ⇒ off-minimum"
+suggests the *conclusion* survives the hypothesis failure — i.e. the remaining
+analytic work is precisely bridging that gap (the conclusion holds, the standard
+proof doesn't). This is the sharpest statement of the crux so far.
+
+### Status
+
+- §1: complete, verified.
+- §2: lemma TRUE (validated SAT, all 3 cases ≥12, minimum at the clean case);
+  clean case proven analytically; **two off-minimum cases owe an analytic ≥12.**
+  Crux reframed as "extend the classical Plotkin double-cover bound past the
+  hypothesis (k^(1+x)=k) that gross violates."
+
+### Next
+
+1. Read Chen–Xie–Ding arXiv:2402.02853 Thm 2.1 and KP-2013 Thms 8–9 hypotheses
+   in full; pin exactly which hypothesis gross violates and whether the
+   conclusion's proof can be salvaged on the off-minimum cases (crude ≥12).
+2. Attempt the analytic ≥12 for s≠0 and for s=0/[c]=0 (crude bounds suffice).
+3. Skeptic sweep before trusting any drafted bridge argument.
