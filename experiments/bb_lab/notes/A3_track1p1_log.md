@@ -262,3 +262,72 @@ proof doesn't). This is the sharpest statement of the crux so far.
    conclusion's proof can be salvaged on the off-minimum cases (crude ≥12).
 2. Attempt the analytic ≥12 for s≠0 and for s=0/[c]=0 (crude bounds suffice).
 3. Skeptic sweep before trusting any drafted bridge argument.
+
+---
+
+## Entry 3 (2026-06-10) — Plotkin reformulation; the precise analytic obstruction for s≠0
+
+### Plotkin coordinates make the clean case a one-liner and expose the gap
+
+Reparametrize a dangerous cover X-cycle by (a, b) := (v₀, p(v)=v₀+v₁), so
+v = (a, a+b) and |v| = |a| + |a+b| — literally the classical Plotkin/[u|u+v]
+shape. The cycle condition becomes the single relation **∂₁a = d_c·b** (= s),
+and dangerous ⟺ b = p(v) is a base stabilizer ([b]=0). Then:
+
+- **b = 0 (s=0):** a is a base cycle, v = τ(a); nontrivial ⟹ [a] ≠ 0 ⟹
+  |v| = 2|a| ≥ 2·d_base. The clean case, now a one-liner in these coordinates.
+- **b ≠ 0 (s≠0):** ∂₁a = d_c·b ≠ 0, so **a is not a base cycle.** This is the
+  exact point where the classical Plotkin theorem (d = min{2·d(C₁), d(C₂)})
+  fails to apply: that theorem needs the first component `a` to range over a
+  *code with its own minimum distance*; here `a` ranges over an **affine
+  syndrome class** {a : ∂₁a = d_c b}, which contains arbitrarily light vectors.
+  (This is the concrete form of the "k^(1+x)=k" hypothesis that KP-2013 Thm 8
+  needs and gross violates.)
+
+### The precise obstruction (why crude bounds miss)
+
+Correct each sheet by a min-weight syndrome representative e (∂₁e = s): then
+a+e and (a+b)+e are base cycles, giving
+    |v| = |a| + |a+b| ≥ (|a+e|−|e|) + (|a+b+e|−|e|) ≥ 2·d_base − 2|e|
+when both corrected cycles are nontrivial base logicals. This **loses 2|e|**,
+so it only yields 2·d_base when s=0. The validated SAT says the truth on this
+sector is ≥ 14 > 12, so the real bound has slack the syndrome-correction throws
+away: the seam structure must force a and a+b into *heavy* classes (not merely
+nontrivial), which this argument does not capture. Closing it is the genuine
+new-math step — consistent with the scouting "months" estimate, now pinned to a
+one-line gap.
+
+### Honest status of the analytic bound (no overclaim)
+
+What is **analytically proven** today (given d_base = 6 as the transfer input):
+- safe sector: |v| ≥ |p(v)| ≥ d_base = 6 (the published projection branch);
+- dangerous sector, clean case (s=0, [c]≠0): |v| ≥ 2·d_base = 12.
+
+What is **NOT yet analytically proven**: the two off-minimum dangerous cases
+(s≠0 → truth ≥14; s=0,[c]=0 → truth ≥15). Until those have analytic ≥-bounds,
+**there is no complete analytic lower bound on d(gross) beyond the known
+Lin–Pryadko floor d ≥ 2** — a dangerous logical could, as far as *proven* math
+goes, hide light in the unanalyzed cases (computation says it does not). So:
+real structural progress and a fully de-risked target, but the headline bound
+is not yet improved. State it this way to anyone reading.
+
+### Two honest forks for the next session
+
+- **Fork A (full factor-2, goal 1 route):** close the s≠0 and [c]=0 cases with a
+  seam-aware weight argument (the heavy-class forcing). Genuinely new; high
+  payoff (d_gross = 12 if the base case d_base=6 is itself made analytic).
+- **Fork B (modest but complete, goal 3 route):** look for an analytic
+  dangerous-sector ≥ 6 (not 12) that covers ALL cases — if even a weak uniform
+  dangerous-sector bound exists, combined with the safe ≥6 it gives a complete
+  analytic d_gross ≥ 6, beating the floor. This may be far easier than the
+  factor-2 and directly serves goal 3; worth scoping before grinding Fork A.
+
+### Citation flag
+
+A1 lane L2 cited "Chen–Xie–Ding arXiv:2402.02853 Thm 2.1" for the Plotkin
+double-cover distance. The arXiv abstract (fetched) describes a repeated-root
+*cyclic codes* construction and does not surface that theorem; Thm 2.1 is likely
+a restated classical (van Lint/Castagnoli) lemma, but the exact statement was
+not re-confirmed here. Re-verify before any write-up leans on it. The analytic
+conclusion above (classical Plotkin needs `a` code-constrained; gross's `a` is
+only syndrome-constrained) does not depend on the citation.
