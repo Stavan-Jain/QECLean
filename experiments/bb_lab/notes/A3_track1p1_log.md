@@ -124,3 +124,74 @@ seam terms.
    to seam leakage when u+t₀ is not individually a base cycle.
 3. Before trusting any drafted argument: ultracode skeptic sweep hunting a cover
    stabilizer t that mixes sheets to drop |τ(u)+t| below 12 (the kill criterion).
+
+---
+
+## Entry 1 (2026-06-10) — §1 complete (Δ explicit); §2 reduced; a promising-but-unverified simplification
+
+### §1 done: the sheet/cut framework and Δ are explicit and verified
+
+- **Sheet/cut structure of the cover boundary, verified exactly**
+  (`scripts/a3_cut_decomposition.py`). Permuting the lab-built cover H_X and H_Z
+  into (sheet, base) order gives precisely the block form
+  `[[d_nc, d_c],[d_c, d_nc]]` for *both* boundaries, with d_nc + d_c = the base
+  boundary and d_c the x-seam-crossing part (36 nonzero entries, supported on the
+  x-monomials x³ of A and x, x² of B — exactly as predicted). This confirms
+  τ(u)=(u,u) and p(v)=v₀+v₁ form a short exact sequence of complexes
+  `0 → C_base →τ C_cover →p C_base → 0` (both are chain maps; p∘τ = 1+σ = 0).
+- **Δ = ∩ω has the closed form `Δ[z] = [∂₂c · z]`** (seam part of the base
+  boundary ∂₂ applied to the base 2-cycle z), derived by the snake lemma
+  (lift z↦(z,0); ∂₂cover(z,0) = τ(∂₂c z) since ∂₂base z = 0). Verified
+  (`scripts/a3_delta_explicit.py`): dim H₂(base) = 6, and **im(Δ) = ker(tr_*)**
+  as subspaces of H₁(base), both 6-dim — Smith exactness confirmed end to end.
+
+### §2 reduction: both sheets share a base syndrome
+
+For a cover X-cycle v=(v₀,v₁), the cycle condition ∂₁cover v = 0 in sheet
+coordinates is d_nc v₀ + d_c v₁ = 0 and d_c v₀ + d_nc v₁ = 0. Adding the base
+syndromes: **∂₁base v₀ = ∂₁base v₁ = d_c·p(v) =: s** (both sheets carry the
+*same* base X-syndrome, equal to the seam part applied to the sheet-sum). The
+factor-2 lemma |v₀|+|v₁| ≥ 2·d_base then splits:
+
+- **s = 0 (easy):** v₀, v₁ are base cycles with [v₀] = [v₁] (they differ by
+  p(v), a base stabilizer). If that common class is nontrivial, each has weight
+  ≥ d_base, so |v| ≥ 2·d_base. ✓ The 6 dangerous *reps* are exactly this case
+  (they are τ(u), p(v)=0 ⇒ s=0, [u] nontrivial).
+  *(Open subcase: [v₀]=0 — both sheets base stabilizers; must check such v is a
+  cover stabilizer, i.e. trivial, hence excluded.)*
+- **s ≠ 0 (hard):** v₀, v₁ are NOT base cycles — the seam leaks weight between
+  sheets. The crude syndrome-weight bound is insufficient; this is the genuine
+  open crux (the "new math" the scouting flagged), where Δ=∩ω enters.
+
+### Promising-but-UNVERIFIED simplification (trap-shaped — do not lean on)
+
+`scripts/a3_syndrome_split_probe.py` finds: the hard case is non-vacuous
+(36/72 stabilizer generators produce s≠0), **but in 40k random samples every
+s≠0 dangerous member has weight ≥ 16, while the weight-12 minima are all s=0.**
+If this held rigorously it would be a major de-risking: the factor-2 bound on
+the *minimum* would follow from the easy s=0 case alone, and the hard seam-
+leakage case would only ever produce off-minimum (heavier) logicals.
+
+**This is random sampling, and "held on N samples then died on a hostile
+example" is exactly how this program's prior conjectures failed.** It is logged
+as a lead, NOT a result. The map v ↦ s(v) = d_c·p(v) is *linear* on the
+dangerous logical space, so {s=0} is a subspace and the s≠0 members are its
+nonzero cosets — which makes the question "is every s≠0 coset's min weight
+> 12?" a well-posed (if hard) coset-min-weight problem, not just a sampling
+hope.
+
+### Status
+
+- §1 (Δ explicit + framework): **complete, verified** (3 scripts).
+- §2 (factor-2 lemma): reduced to the syndrome split; easy case done modulo one
+  subcase; **hard case (s≠0) open**; a sampling lead suggests the hard case may
+  be off-minimum but this is unverified.
+
+### Next concrete sub-step (highest value)
+
+Rigorously decide the s≠0 lead: build a **trustworthy** constrained min-weight
+check (carefully encoded, cross-checked against d=12 — NOT the buggy scout CNF)
+for "minimum weight of a dangerous logical with s ≠ 0." If provably > 12, pivot
+the proof to the easy case + an "s≠0 ⇒ off-minimum" lemma. If a weight-12 s≠0
+member exists, the hard seam-leakage case is unavoidable and the months estimate
+stands. Then (either way) close the s=0 [v₀]=0 subcase.
