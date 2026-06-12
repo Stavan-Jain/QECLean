@@ -760,3 +760,86 @@ monomial or D-pair, and the doubly-radical freedom is exactly mod-kernel.
 - Remaining for the conditional factor-2 theorem: (T-tail) k ≥ 8, and the
   two rung locality hand write-ups (hexagon+2, pair-union+1).
 - The component frame is validated and ready as the tail's working language.
+
+---
+
+## Entry 8 (2026-06-12) — tail attack I: the layer dictionary, and "light ⟹ all five components alive"
+
+First working session on (T-tail) in the Entry-7 CRT frame
+(`a3_mb_tail_dictionary.py`). The frame is now fully instrumented and it
+produced its first global structural result on light stabilizers.
+
+### The instrument (all machine-verified)
+
+- **Layer dictionary d₃.** For f ∈ F₂[Z₃²] nonzero with Fourier support
+  inside a set W of character orbits (|orbits| = 5: trivial + four), the
+  minimum weight d₃(W) depends only on (n, ε) = (#nontrivial orbits in W,
+  trivial ∈ W) — the GL₂(Z₃)-symmetry permuting the four directions — with
+  table (n,ε): (0,1)→9, (1,0)→6, (1,1)→3, (2,0)→4, (2,1)→3, (3,·)→2,
+  (4,0)→2, (4,1)→1. Verified by brute force over all 512 functions.
+- **Component transforms.** Â_j, B̂_j derived *empirically* as partial
+  Fourier transforms of the lab ∂₂δ₀ columns (guaranteeing the
+  multiplicativity ĥat(Az)_j = Â_j·ẑ_j by translation-equivariance — a
+  first hand-coded version had the orientation backwards and was caught by
+  exactly this check). Structure as predicted by Entry 7: comp 0 both
+  units; comp 1 A-radical/B-unit; comp 2 mirror; comps 3,4 both radical;
+  kernel dims (0,0,0,2,4).
+- **Support grammar.** Per component the realizable pairs
+  (supp Â_jẑ_j, supp B̂_jẑ_j) over all ẑ_j: radical sides take only
+  co-point (3) or full (4) supports; comp 4 is rigid (B̂₄ = ω·Â₄ forces
+  equal supports, only 6 pairs); pair-set sizes (16, 53, 53, 20, 6).
+- **The bound.** |b| ≥ COST(pattern(z)) := Σ_s d₃(W_s^A) + Σ_s d₃(W_s^B)
+  over the four s-layers. Validity verified on 200 random z; **tight on
+  both exceptional families**: hexagon = 6, D-pair = 10 (and the per-layer
+  accounting matches the hand computation: hexagon = three δ-point layers
+  per block; dA-pair = (1,1,2 | 1,1,2,2)).
+
+### New result: the component-support lemma (verified finite minimization)
+
+Minimizing COST over the full grammar (mixed-radix DP over per-layer alive
+counts, exhaustive):
+
+- global minimum = **6**, achieved only by the 4 hexagon-type patterns
+  (S₀ = a co-point, all four nontrivial components full on those 3 layers);
+- forcing ANY single component dead (j = 0: S₀ = ∅; j ∈ {1,2,3,4}: the
+  joint-annihilator grade) gives minimum **12**.
+
+**Lemma (component support).** Every b ∈ Stab_Z(base) with |b| ≤ 11 has all
+five CRT components visibly alive: for every j, (Â_jẑ_j, B̂_jẑ_j) ≠ (0,0).
+Status: exhaustive verified computation over a verified relaxation; the
+counting is structured enough (support sizes × the d₃ table) that a hand
+proof looks like a tractable LP-style argument — owed, not claimed.
+
+### The sub-12 landscape (the equality-analysis target list)
+
+All-components-alive patterns with COST ≤ 11, by cost:
+6: 4 (exactly the hexagon patterns) · 7: 24 · 8: 85 · 9: 136 · 10: 456 ·
+11: 904. Structure: every pattern of cost ≤ 9 is a "3-layer near-hexagon"
+(three alive layers per block, counts mostly 4, S₀ inside the alive
+layers); the 2-layer-S₀ families appear at cost 10 — and the actual D-pair
+pattern (S₀ on 2 layers, computed signature SA = (1010,1110,1010,1110,1110),
+SB = (1010,1111,1111,1011,1110)) sits there, again tight.
+
+### What this does and does not give
+
+- It does NOT yet prove (T-tail): COST is a lower bound, so sub-12-cost
+  patterns are *candidates* that an actual light b must realize — the tail
+  now reduces to: **(i)** hand-organize the two finite minimizations
+  (component-support lemma; the ≥ 12 floor outside the explicit sub-12
+  list), and **(ii)** an equality analysis showing each sub-12 pattern
+  class is realized at weight ≤ 11 only by hexagons and D-pairs (mod
+  kernel). The forcing tools for (ii): a weight-1 layer with full support
+  is a δ-point; co-point ideal elements have 2-parameter coefficient
+  rigidity across their 3 layers; comp-4 support equality; S₀ shared
+  between blocks.
+- The pattern list is finite, explicit, and small at the cheap end — the
+  near-hexagon (≤ 9) band looks provably hexagon-only by δ-point forcing;
+  the 10–11 band is where D-pairs live and needs the genuine case analysis.
+
+### Next
+
+1. Equality analysis for the ≤ 9 band (δ-point forcing ⟹ z ≡ monomial mod
+   kernel candidates), then the 10–11 band (D-pair forcing).
+2. Hand-organize the two finite minimizations (the component-support lemma
+   first — it is the cleanest standalone statement).
+3. Keep the rung locality write-ups (Entry 6) on the queue; unchanged.
