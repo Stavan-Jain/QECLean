@@ -30,13 +30,19 @@ by the layer-profile route (Entries 8–9: parity + floor + evenness lemmas
 reduce |b| ≤ 10 to 28 profile families; exhaustive syndrome-join checks
 resolve every family to exactly 36 hexagons + 216 D-pairs + nothing); the
 m-rungs (m(hexagon) ≥ 3, m(D-pair) ≥ 1) verified exhaustively. **No
-unbounded-structure gap remains anywhere in the factor-2 lemma.** What is
-left to meet the program's "fully analytic" bar (§1) is hand-organization
-of the finite checks: (a) the comp-4-aliveness ingredient of the floor
-lemma, (b) rigidity lemmas replacing the 28-family enumeration (the
-δ-point/ψ-evaluation rigidity carries most families at once), (c) the two
-m-rung locality proofs. Start at `notes/A3_track1p1_log.md` Entries 8–9 and
-`scripts/a3_mb_tail_*.py`.
+unbounded-structure gap remains anywhere in the factor-2 lemma.** Entry 10
+began the hand-organization and removed the last machine dependency from
+profile completeness: the d₃ dictionary, the rigidity ENGINE (radical
+ideals are co-point-or-full with 1-parameter values), the ONE-BLOCK lemma
+(|Bz′| ≥ 12 on Ann(A)\ker; exact min 16), and the FLOOR lemma are all
+hand-proven, and the family analysis collapses (pivot on the lighter
+block, weight ≤ 5) to SIX shape lemmas, of which (1,1,1) [⟹ hexagons; R1]
+and (1,1,1,1) [⟹ none] are proven. What is left for the "fully analytic"
+bar (§1): the four remaining shape lemmas R-(2,1,1) [the D-pair lemma],
+R-(2,1,1,1), R-(2,2,1), R-(3,1,1) — statements, tools, and target outputs
+fixed by the G4 master table in `a3_mb_rigidity.py` — plus the two m-rung
+locality proofs. Start at `notes/A3_track1p1_log.md` Entries 9–10 and
+`scripts/a3_mb_rigidity.py`.
 
 ---
 
@@ -323,14 +329,14 @@ branch `claude/eager-hofstadter-6da593` (fast-forward continuation). Each
 
 ## 8. Concrete next steps (ranked)
 
-1. **Hand-organize the remaining finite checks (§4; Entry 9 list).** In
-   order: (b) the δ-point/ψ-evaluation rigidity lemmas replacing the
-   28-family enumeration (one lemma covers the eight A={1,1,1} families;
-   a second the {2,1,1}-A families; etc.); (a) comp-4-aliveness for
-   |b| ≤ 11 (an LP over the layer cost table); (c) the two m-rung
-   locality proofs (shared-check ≤ 1 already proven; residue =
-   one-hexagon neighborhood analysis). Time-box; failures are
-   first-class outputs (A3 log).
+1. **Finish the four remaining shape lemmas (Entry 10 §"Status"):**
+   R-(2,1,1) (the D-pair lemma: 2-point direction forcing + ratio
+   rigidity + endgame, plus its mirror for the (2,2,1,1) heavier-block
+   classes), R-(2,1,1,1), R-(2,2,1), R-(3,1,1) (no such im(A·) element).
+   Each is engine + dictionary casework with the target output fixed by
+   the G4 table. Then the two m-rung locality proofs (shared-check ≤ 1
+   already proven; residue = one-hexagon neighborhood analysis).
+   Time-box; failures are first-class outputs (A3 log).
 2. **Assemble the conditional factor-2 write-up** once 1 lands (theorem +
    full dependency tree: which steps are hand-proven vs verified-finite),
    then redo the recursion bookkeeping (Entry 4's caution: the safe sector
