@@ -1782,3 +1782,96 @@ grammar) and closes (M-im) — hence goal 1 — entirely.
   (light-cycle flux census / affine-COST on five pinned cosets), with the
   pinned-component data pointing at the latter.
 - d(gross) = 12 ⟺ (M-im) — unchanged, one statement away.
+
+## Entry 19 (2026-06-12) — offset-COST DP: the support-only floor stalls at 6–8; transport and parity structure of the Smith cosets
+
+First machine pass on the affine-COST route to (M-im)
+(`a3_mim_offset_cost.py`). Outcome: **honest negative on the floor** —
+the Entry-8 d₃ dictionary applied to the offset grammar cannot reach 12 —
+plus four structural results that shape the next attack.
+
+### The instrument
+
+For w = d2c₀ζ + ∂₂t in the Smith coset C(ζ), the CRT component data is
+V_j = off_j + (B̂_j t̂_j, Â_j t̂_j) with off_j = comp_j(d2c₀ζ) and the t̂_j
+free and **independent** across j — so the per-component support-pattern
+sets multiply exactly (the only relaxation is the per-slot dictionary
+bound |w_{block,s}| ≥ d₃(n, ε)). The DP is Entry 8's D4 with two
+generalizations: per-component pattern sets shifted by the offsets, and
+the comp-0 (mask_L, mask_R) pairs decoupled per block.
+
+Sanity ladder, all PASS: zero offset reproduces Entry 8 **exactly**
+(grammar sizes 16/53/53/20/6; global min 6 achieved by exactly the 4
+hexagon patterns; min 12 with any one of the five components forced
+dead); 200 random coset elements per orbit satisfy |w| ≥ COST(w), realize
+patterns inside the offset grammar, and verify the affine
+multiplicativity ĥat(w)_j = off_j + (B̂_j t̂_j, Â_j t̂_j); the M8 pins are
+reproduced (pinned ⟺ (0,0) not in the offset grammar).
+
+### Structure result 1: the 5-orbit reduction needs only translation
+
+The translation-only orbits of ker ∂₂ ∖ 0 are **already the five
+translation+swap orbits** (sizes 9, 12, 36, 3, 3 — the swap stabilizes
+each orbit setwise). Since [d2c_j ζ] is cut-independent (verified all j)
+and class(Tζ) = T·class(ζ) (verified), the coset — hence any
+coset-intrinsic floor — transports along translations alone. No swap
+transport lemma is needed for (M-im).
+
+### Structure result 2 (new, informational): Δ^y ≠ Δ^x, even as images
+
+The builder identity Ŝ(d2c^x₀ζ) = d2c^y₀(Sζ) holds exactly (the swap
+maps x-Smith data to y-Smith data), but the y-cut connecting map differs
+from the x-cut one **pointwise and in image**: rank(im∂₂ + imΔ^x-reps +
+imΔ^y-reps) = 40 vs 36 — the two 6-dim Smith images share only a 2-dim
+intersection. The x-cover and y-cover see genuinely different "dangerous"
+classes. (Not needed for (M-im) by structure result 1; recorded because
+it kills any hope of a swap-symmetric description of im Δ.)
+
+### Structure result 3: the parity lemma survives on the Smith cosets
+
+The comp-0 offsets are **diagonal** (off₀_L = off₀_R) for all five
+orbits — equivalently comp 0 is never pinned. So every element of every
+Smith coset has equal layer-parity vectors in the two blocks, exactly
+like a stabilizer (Entry 9 lemma (i)). Hand proof: comp-0 data of
+d2c₀ζ is (B̂₀ẑ₀-with-cut-marks, Â₀ẑ₀-with-cut-marks) and Â₀ = B̂₀;
+to be made precise in the hand write-up of the offset grammar.
+
+### Structure result 4: comps 1, 2 are offset-free; the offsets live at {3,4}
+
+Since every pin set is inside {3, 4} (M8, reproduced), the comp-1/2
+offsets are realizable, so re-centering makes those grammars **equal to
+the homogeneous ones** (sizes 53/53 for every orbit). All
+orbit-dependence of the coset sits in the doubly-radical pair {3, 4} —
+where ker ∂₂ lives. Grammar sizes there: comp 3: 41 (pinned) or 20
+(unpinned); comp 4: 15 (pinned) or 6 (unpinned).
+
+### The floors (the negative)
+
+    orbit (n=9,  wt=16): floor 8    (true class min 12)
+    orbit (n=12, wt=18): floor 7
+    orbit (n=36, wt=18): floor 7
+    orbit (n=3,  wt=24): floor 8
+    orbit (n=3,  wt=24): floor 6
+
+All floors ≤ 12 (consistency with the SAT class minima = 12: PASS), all
+< 12: **the support-only dictionary cannot carry (M-im).** Diagnosis from
+the witnesses: d₃ sees supports, not values. The wt-24b orbit (pinned
+only at comp 3) still admits the full hexagon support pattern at cost 6 —
+the offset constrains comp-3 *values*, but the support relaxation forgets
+them. The sub-12 landscape is thousands of patterns per orbit (e.g.
+{8:17, 9:48, 10:564, 11:2224} for wt-16) — pattern-by-pattern equality
+analysis is infeasible without a sharper floor.
+
+### Next (the value-refined floor)
+
+The fix the diagnosis dictates: make components {0, 3, 4} **value-exact**
+— their joint coset data is tiny and explicit (Γ₀ diagonal: 16; off₃+Γ₃:
+64; off₄+Γ₄: 16 — i.e. 16384 affine value-combos per orbit, the only
+orbit-dependent data by structure result 4) — and keep the support
+grammar only at the unit-side comps {1, 2} (53 × 53 patterns). The slot
+dictionary upgrades to d₃ᵛ(v₀; a₁, a₂; v₃, v₄) = exact minimum weight of
+a Z₃²-layer with prescribed transform values at {0,3,4} and prescribed
+aliveness at {1,2} (the value 5-tuple ↔ layer bijection makes this a
+512-entry exact table). This is Entry 9's δ-point/ψ-evaluation rigidity
+baked into the floor. Entry 20.
+

@@ -210,6 +210,23 @@ orbits are pinned exactly in the doubly-radical components {3,4} — next
 session: the offset-COST DP per orbit (machine floor first; if ≥ 12
 everywhere, hand-organize like Entries 9–12 and goal 1 closes).*
 
+*Update (Entry 19): the offset-COST DP ran (`a3_mim_offset_cost.py`,
+sanity ladder all-PASS, exact Entry-8 reproduction at zero offset) —
+**negative on the floor**: the support-only d₃ dictionary gives 8/7/7/8/6
+on the five orbits, far below 12 (d₃ sees supports, not values; the
+wt-24b coset still admits the hexagon support pattern). Keep: the 5-orbit
+reduction needs only translation covariance (the translation orbits
+already equal the swap orbits, and class(Tζ) = T class(ζ) verified);
+Δ^y ≠ Δ^x pointwise AND in image (the two 6-dim Smith images meet in
+dim 2) — no swap-symmetric description of im Δ exists; the parity lemma
+survives on every Smith coset (comp-0 offsets diagonal); all
+orbit-dependence sits at the doubly-radical pair {3,4} (comps 1, 2
+re-center to the homogeneous grammars). Next: the value-refined floor —
+components {0,3,4} value-exact (16·64·16 affine combos per orbit), comps
+{1,2} support-relaxed, slot dictionary upgraded to the exact
+prescribed-values table d₃ᵛ (Entry-9 δ-point rigidity baked into the
+floor).*
+
 **The former tail (L-C) — now closed verified-finite (Entries 8–9).** The
 classification "every b ∈ Stab_Z(base) with 0 < |b| ≤ 11 is a hexagon or a
 D-pair" is established by the layer-profile route
