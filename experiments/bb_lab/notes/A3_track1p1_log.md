@@ -1321,3 +1321,109 @@ proofs — m(hexagon) ≥ 3 (no non-imΔ cycle in hexagon+2 qubits) and
 m(D-pair) ≥ 1 (cycle space of the 11-qubit pair union) — then the assembled
 write-up with the full dependency tree, and the recursion bookkeeping
 (Entry 4's caution) for what the factor-2 statement yields downstream.
+
+## Entry 13 (2026-06-12) — the small-cycle theorem: m-rungs closed AND (H0) discharged
+
+Working the two owed m-rung locality proofs forced a stronger statement, and
+the stronger statement is *better*: it has a clean hand proof, it closes both
+rungs in two lines each, and it **proves (H0) — the d_base ≥ 6 transfer
+input — outright**, removing the last hypothesis of the conditional theorem.
+All intermediates machine-verified in `a3_small_cycles.py` (W1–W9, all PASS).
+
+### Theorem (no small cycles)
+
+**Every nonzero 1-cycle u = (u_L, u_R) ∈ ker H_X of the base [[72,12,6]]
+code has |u| ≥ 6. The same holds for ker H_Z.** (W6: exhaustive hash-join
+over all weight splits a + b ≤ 5 finds zero solutions on both sides;
+W7 census: exactly 120 weight-6 cycles = 36 hexagons + 84 logicals,
+matching T4.)
+
+*Proof.* A cycle satisfies A·u_L = B·u_R =: σ over F₂[Z₆²]. Split by
+(|u_L|, |u_R|), using |A·f| ≡ |f| and |B·f| ≡ |f| (mod 2) (odd generator
+weights), which forces |u_L| ≡ |u_R| (mod 2) and kills the splits
+(1,2), (2,1), (2,3), (3,2), (1,4), (4,1).
+
+- **(k,0) and (0,k), k ≤ 5** — u_L ∈ Ann(A) (resp. u_R ∈ Ann(B)) nonzero.
+  Engine: the unit components force ẑ₀ = ẑ₂ = 0, the radical components lie
+  in the self-annihilating ideals (Ann(Â_j) = (Â_j)), so a nonzero element
+  has ≥ 3 alive layers (co-point-or-full) and all layers even (ẑ₀ = 0):
+  weight ≥ 6, and even. (W1: exact minima 6, all weights even — kills
+  (5,0)/(0,5) by parity too.)
+- **(1,1)** — A·g = B·r forces the two translate 3-sets to coincide, hence
+  their difference sets: dA = dB. But dA ∩ dB = ∅. ✗ (W3.)
+- **(1,3) and (3,1)** — |B·z| = 3 for a 3-set z requires (inclusion–
+  exclusion with ov ≤ 1) all three pairs of columns to overlap with **no**
+  common triple cell: z is a dB-triangle with distinct overlap cells.
+  dB-triangles form one translation+reflection class (W4): the chirality
+  rep {0, (1,0), (2,3)} has a common triple cell, |B·z| = 7 ✗; the other,
+  {0, (1,0), (5,3)}, gives B·z = a translate of y³(1 + x² + x⁴) — three
+  cells with the **same y-coordinate**. But A·g has y-coordinates
+  g_y + {0,1,2}, pairwise **distinct**. ✗ Mirror for dA-triangles
+  (constant-x image vs. the three distinct x-coordinates of B·r). ✗
+- **(2,2)** — write π_x, π_y for the coordinate projections (ring
+  homomorphisms onto F₂[Z₆]): π_y(A) = 1+y+y², π_y(B) = y³, π_x(A) = x³,
+  π_x(B) = 1+x+x². Two sub-cases by |σ|:
+  - **|σ| = 4** (both pairs overlapping): ℓ-diff ∈ dA, r-diff ∈ dB.
+    Matching |π_y(σ)| forces the ℓ-pair's y-gap to be 1 (the (3,±2) diffs
+    give weight 4 vs. ≤ 2) and the r-pair's y-gap to be 3. If
+    ℓ-diff = (0,±1): π_x(u_L) = 0, so (1+x+x²)·π_x(u_R) = 0 with
+    |π_x(u_R)| ≤ 2 < 4 = min wt Ann(1+x+x²) (W5) ⟹ r_x-gap 0 ⟹
+    r-diff = (0,3) ∉ dB. ✗ If ℓ-diff = ±(3,1): matching |π_x| forces
+    r-diff = ±(1,3); then up to translation σ = A(1+x³y), whose
+    x-coordinate multiplicity multiset is {3,1}, while B(1+xy³) has
+    {2,1,1} — translation-invariant mismatch. ✗ (W5.)
+  - **|σ| = 6** (both pairs disjoint): ℓ-diff ∉ dA, r-diff ∉ dB. If the
+    ℓ-pair has y-gap 0: π_y(u_R) = 0 forces r_y-gap 0, and matching
+    |π_x| = 2 forces r_x-gap ±1, i.e. r-diff = (±1,0) ∈ dB. ✗ If y-gap
+    ±1: ℓ-diff = (e,±1) with e ∈ {1,2,4,5}; π_y forces r-diff = (f,3)
+    with f ∈ {0,3}; then |π_x(σ)| = 2 from the left but 0 (f = 0) or 6
+    (f = 3) from the right. ✗ y-gaps ±2, 3 die on |π_y| alone (4 or 6
+    vs. ≤ 2). ✗
+
+All splits dead; weight-5 splits die by parity and Ann-evenness. The ker H_Z
+side follows by the inversion duality below (and was checked directly, W6). ∎
+
+### Corollary 1: (H0) is a theorem — d(base [[72,12,6]]) ≥ 6, analytically
+
+A nontrivial Z-logical is in particular a nonzero 1-cycle: d_Z(base) ≥ 6.
+**The transfer input (H0) is no longer a hypothesis.** (Sharpness: the
+classification says weight-6 stabilizers are exactly hexagons, so *any*
+weight-6 non-hexagon cycle is a nontrivial logical; the census finds 84 —
+exhibiting one explicitly makes d_Z(base) = 6 a hand fact too.)
+
+### Corollary 2: the m-rungs (the last two owed local facts)
+
+- **m(hexagon) ≥ 3.** Let b = ∂₂δ_g, supp b = h(g). Since
+  supp(d2c_j δ_g) ⊆ h(g) (the seam split is entrywise, W8), m(b) =
+  min |u′ off h(g)| over cycles u′ with [u′] ∉ imΔ. If |u′ off h| ≤ 2:
+  replace u′ by u′ + b if needed so that |u′ ∩ h| ≤ 3; the new rep has
+  weight ≤ 3 + 2 = 5 < 6, hence is 0 — but then [u′] = 0 ∈ imΔ. ✗
+- **m(D-pair) ≥ 1.** b = ∂₂(δ_g + δ_{g′}), supp(d2c_j z_b) ⊆ h ∪ h′ =
+  supp b ∪ {q*} (q* the unique overlap qubit, W8). If m(b) = 0, some
+  cycle u′ with [u′] ∉ imΔ is supported in the 11-qubit union. Write
+  u′ = (P, P′, ε) over the regions (h\h′, h′\h, {q*}) and average over the
+  coset {u′, u′+b₁, u′+b₂, u′+b₁+b₂} (b_i the two hexagons): the four
+  weights sum to 5+5+5+5+2 = 22 < 4·6, so some rep has weight ≤ 5, hence
+  = 0 — but then u′ ∈ span{b₁, b₂} and [u′] = 0. ✗
+
+With Entry 12's classification this **completes every rung of (M)**:
+m(0) ≥ 6 (Corollary 1 — a non-imΔ class is nonzero); hexagons 6 + 2·3 ≥ 12;
+D-pairs 10 + 2·1 ≥ 12; |b| ≥ 12 trivial; no other light b exists.
+**(M) is proven: |b| + 2m(b) ≥ 12 for every base Z-stabilizer b — with no
+hypothesis left.**
+
+### Corollary 3: the inversion duality d_X = d_Z (any BB code)
+
+Inversion ι(g) = g⁻¹ is an algebra automorphism for ANY abelian group —
+including the cover group Z₁₂×Z₆. The map Φ(w_L, w_R) := (ι(w_R), ι(w_L))
+sends ker H_Z bijectively to ker H_X (apply ι to B̄w_L + Āw_R = 0) and the
+X-stabilizer row space onto the Z-stabilizer column space
+(Φ(row g of H_X) = ∂₂δ_{g⁻¹}), preserving weight. Hence **d_X = d_Z for the
+base and for gross** (W9: verified for both). The separate ker H_Z
+small-cycle check (W6) independently confirms the base case.
+
+### Status
+
+The factor-2 ladder (M) is fully proven, unconditionally. Next entry
+assembles the consequence — the first fully-analytic distance bound on
+gross beating the published floor — with its complete dependency tree.
