@@ -1875,3 +1875,94 @@ aliveness at {1,2} (the value 5-tuple ↔ layer bijection makes this a
 512-entry exact table). This is Entry 9's δ-point/ψ-evaluation rigidity
 baked into the floor. Entry 20.
 
+
+## Entry 20 (2026-06-12) — the value-refined floor + completion sweep: (M-im) closes at the verified-finite level
+
+Script: `a3_mim_value_cost.py` (S1–S7, all PASS). Outcome: **(M-im) — and
+with it d(gross) = 12 — now holds at the verified-finite level**, by a
+route independent of SAT, with every machine ingredient an explicit
+finite enumeration over verified encodings. This is the Entry-9 moment
+for goal 1: no unbounded-structure gap remains; what is owed is
+hand-organization (the Entries 10–12 analogue).
+
+### The value dictionary (S1, S2)
+
+The 512 layers f ∈ F₂[Z₃²] are in **bijection** with their transform
+value 5-tuples (v₀, v₁, v₂, v₃, v₄) ∈ F₂ × F₄⁴ (one value per character
+orbit; 512 = 2·4⁴, each tuple hit exactly once — Fourier inversion with
+Frobenius). Upgrading the Entry-8 d₃ table to prescribed VALUES at
+comps {0, 3, 4} and aliveness at comps {1, 2}:
+
+    d₃ᵛ(v₀; a₁, a₂; v₃, v₄) = min wt of a layer with those constraints —
+
+an exact 32×4 table; marginalizing values reproduces d₃ on all 31
+support sets (S2). Two hand-grade facts fall out: **slot-weight parity**
+wt(f) ≡ v₀ (mod 2) (augmentation = comp-0 value), and with the Entry-19
+diagonality of comp-0 offsets: **every Smith-coset element has even
+weight, and even VCOST** — the sub-12 landscape lives at costs
+{6, 8, 10} only.
+
+### The value-refined floor (S3–S5)
+
+Components {0, 3, 4} — where ker ∂₂ lives and every orbit is pinned —
+become value-exact: their joint coset data is (off₀+Γ₀)×(off₃+Γ₃)×
+(off₄+Γ₄) = 16·64·16 = 16384 affine combos (Γ_j the graph ideal
+{(B̂_jt̂, Â_jt̂)}); comps {1, 2} keep the support grammar (53×53,
+homogeneous by Entry 19). CRT keeps the five coordinates independent, so
+the product is the EXACT image of the coset; the only relaxation is
+per-slot d₃ᵛ. Ladder: zero offset gives floor 6 with exactly **36**
+value-achievers = the 36 hexagons (value-exactness sees each hexagon
+individually; Entry 8 saw 4 support patterns); the refinement sandwich
+OFFCOST ≤ VCOST ≤ |w| holds on 1000 random coset elements.
+
+Floors: **8 / 8 / 8 / 8 / 6** on the five orbits (wt-16, 18a, 18b, 24a,
+24b) — better than Entry 19's 8/7/7/8/6 but still short of 12: the
+support relaxation at comps {1, 2} is now the binding loss.
+
+### The completion sweep (S6/S7): the kill
+
+The miss is recoverable because a sub-12 combo **determines its
+candidates completely**: comps 1, 2 are affine graphs over the coset —
+
+    V₁R = c₁ + ρ₁·V₁L (ρ₁ = Â₁B̂₁⁻¹ radical, c₁ from the offsets),
+    V₂L = c₂ + ρ₂·V₂R —
+
+so enumerating V₁L inside mask₁L (≤ 3⁴) and V₂R inside mask₂R (≤ 3⁴),
+filtering on the partner masks, and inverting the value bijection
+reconstructs every candidate w **exactly** (spot-verified: completions
+land in the coset with the computed weight; coset membership via the
+42-bit syndrome key). Any coset element of weight ≤ 11 is even, hence
+≤ 10, hence realizes a combo of cost ≤ 10 and appears in the sweep.
+
+Results per orbit (combos at cost ≤ 10 / completions / min weight):
+
+    wt-16:  1044 / 113004 / 18      wt-18a: 1476 / 130950 / 14
+    wt-18b: 1420 / 149904 / 14      wt-24a: 1038 /  99468 / 18
+    wt-24b: 2532 / 241596 / 16
+
+**Zero completions of weight ≤ 11 anywhere** — and the minima 14–18 show
+slack: the weight-12 class minima have VCOST = 12 and never enter the
+sub-12 sweep. With class(Tζ) = T·class(ζ) verified for all 36
+translations on a basis (linearity extends to all ζ), the five orbit
+kills cover all 63 classes:
+
+> **(M-im), verified-finite:** every base 1-cycle in a nonzero imΔ class
+> has weight ≥ 12. Hence (with (M), (R), duality — all fully analytic)
+> **d(gross) = 12 at the verified-finite level.**
+
+### Status vs. the analytic bar
+
+Per §1 of A_HANDOFF the finite checks are not yet human-surveyable
+residues; the owed hand-organization, in Entry-10–12 style:
+  (a) the slot-parity and even-weight lemmas (hand-proven above, to be
+      written out);
+  (b) the d₃ᵛ dictionary on the cells that occur (δ-point/ψ-evaluation
+      rigidity — the value analogue of the Entry-9 layer dictionary);
+  (c) the cost-≤10 combo classification (the offset C-table: why only
+      ~1k–2.5k combos, in few families — the orbit translation
+      stabilizers and the Γ₃/Γ₄ module structure are the compression);
+  (d) the completion-kill rigidity (why ρ-affinity forces every
+      completion to weight ≥ 14 — note the uniform slack above 12).
+Alternative hand route still open: the weight-8/10 flux census (route B)
+— next entry sizes both before committing to one.
+

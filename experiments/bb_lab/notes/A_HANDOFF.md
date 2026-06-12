@@ -227,6 +227,22 @@ components {0,3,4} value-exact (16·64·16 affine combos per orbit), comps
 prescribed-values table d₃ᵛ (Entry-9 δ-point rigidity baked into the
 floor).*
 
+*Update (Entry 20): **(M-im) — hence d(gross) = 12 — closes at the
+verified-finite level** (`a3_mim_value_cost.py`, all-PASS). The value
+5-tuple ↔ layer bijection gives the exact dictionary d₃ᵛ; coset weights
+and costs are even (slot parity = comp-0 value + Entry-19 diagonality);
+the value floors are 8/8/8/8/6 — and the residual sub-12 combos (1k–2.5k
+per orbit, costs {6,8,10}) are killed exactly: comps 1, 2 are affine
+graphs (V₁R = c₁ + ρ₁V₁L etc.), so each combo has ≤ 81×81 completions,
+each reconstructing w exactly — minimum completion weight 14–18 across
+all five orbits, zero below 12. Translation transport (all 36
+translations verified on a basis) extends the five orbit kills to all 63
+classes. Owed for the full analytic bar: hand-organization (the
+Entries 10–12 analogue): (a) parity lemmas (done, to write out), (b) the
+d₃ᵛ dictionary on occurring cells, (c) the cost-≤10 combo
+classification, (d) the ρ-affinity completion kill. Route B (weight-8/10
+flux census) remains the alternative; next entry sizes both.*
+
 **The former tail (L-C) — now closed verified-finite (Entries 8–9).** The
 classification "every b ∈ Stab_Z(base) with 0 < |b| ≤ 11 is a hexagon or a
 D-pair" is established by the layer-profile route
