@@ -1,11 +1,16 @@
 # A fully analytic distance bound for the gross code: d ≥ 6
 
-> **STATUS: DRAFT — pending the Entry-15 adversarial re-review** (in
-> progress in a parallel session). Nothing here may be cited externally
-> until that pass returns clean. Every numerical statement in this note is
-> *confirmation* of a hand proof, never an ingredient; the verification
-> scripts are listed in Appendix A. Source of record for the proofs:
-> `notes/A3_track1p1_log.md`, Entries 5 and 10–14.
+> **STATUS: REVIEW-CLEARED.** The Entry-15 adversarial re-review (fresh
+> session; every machine check re-implemented independently —
+> `a3_adv15_recheck.py`, 49/49 — and every prose argument re-derived by
+> hand) found **all links HOLD**; its two presentational notes are folded
+> in below (§3 d₃ remark; §6.3 (1,1,1,1) bullet). Every numerical
+> statement in this note is *confirmation* of a hand proof, never an
+> ingredient; the verification scripts are listed in Appendix A. Source of
+> record for the proofs: `notes/A3_track1p1_log.md`, Entries 5 and 10–15.
+> The post-review goal-1 advance (Entries 16–18: (R), the flux
+> characterization, d(gross) = 12 ⟺ (M-im)) is NOT yet part of this note
+> and has not yet had its own skeptic pass.
 
 ---
 
@@ -154,9 +159,14 @@ inside orbit set W, the minimum weight depends only on
 
     (0,T)→9, (1,F)→6, (1,T)→3, (2,F)→4, (2,T)→3, (3,·)→2, (4,F)→2, (4,T)→1.
 
-(Hand proof of each row: `A3` Entry 10, "Dictionary lemma". Below we use
-only: weight-1 layers are δ-points with full Fourier support and values
-ψ_j(t); d₃({1}) = d₃({3}) = 6; d₃({1,3}) = 4.)
+(Hand proof of each row: `A3` Entry 10, "Dictionary lemma". **Convention,
+per the Entry-15 review:** d₃(W) is the minimum weight over nonzero f with
+Fourier support *contained in* W — not exactly W; the two differ (e.g. the
+exact-support minimum at (2,T) is 5, while d₃(2,T) = 3, attained by a line
+whose support is a proper subset). Every use below is of the safe form
+"supp ⊆ W ⟹ |f| ≥ d₃(W)". Below we use only: weight-1 layers are δ-points
+with full Fourier support and values ψ_j(t); d₃({1}) = d₃({3}) = 6;
+d₃({1,3}) = 4.)
 
 ---
 
@@ -370,9 +380,16 @@ classification from the block to b itself:
   difference pattern of A·δ_g. Endgame: z − δ_g ∈ Ann(A) with
   |B(z − δ_g)| ≤ 7 + 3 < 16 ⟹ z ≡ δ_g mod ker ∂₂: **b is a hexagon**.
 - **(1,1,1,1):** all V_j full ⟹ constant ⟹ the four cells coincide
-  (δ-column). Completions die: the B-block would be all-odd of weight
-  ≤ 6, i.e. (1,1,1,1) or (3,1,1,1), and both are killed by joint
-  component constraints (`A3` Entry 10). **No light b.**
+  (δ-column at t\*). Completions die: the B-block would be all-odd of
+  weight ≤ 6, i.e. (1,1,1,1) or (3,1,1,1) — and one comp-2 transfer kills
+  both at once (the Entry-15 reviewer's simplification of the Entry-10
+  kill): the A-side pins ẑ₂ = Â₂⁻¹·ψ₂(t\*)·uv = ψ₂(t\*)·uv (units fix
+  the socle: u₀·uv = ε(u₀)·uv = uv), so V₂ᴮ = B̂₂·ψ₂(t\*)uv = 0 since the
+  radical B̂₂ kills the socle — but either B-shape has a δ-point layer,
+  where V₂ᴮ takes the nonzero value ψ₂(t-cell). ✗ **No light b.**
+  (The original Entry-10 route — socle-transfer constants forcing the
+  B-cells to coincide, then the comp-1 and Q-dictionary kills — remains
+  valid; `A3` Entry 15, Note 1 spells out its compressed steps.)
 - **(2,1,1) [the D-pair lemma]:** direction forcing puts the pair in the
   t_y direction; with 1 + η = η², the C-ratio system has exactly one
   solution per pair-layer position — the three single-fibre patterns
@@ -514,6 +531,7 @@ and the case grid grows accordingly. Not attempted; the safe-sector
 | R-(2,1,1,1), R-(2,2,1) class + kill + T-identity | V7, V8 |
 | shape master table (all profiles, μ_B) | G4 |
 | slice identity foundations | `a3_mb_foundations.py` V1–V8 |
+| independent re-implementation of the whole chain | `a3_adv15_recheck.py` (Entry-15 review, 49 checks) |
 | light-b enumeration; m-values | `a3_mb_scan.py` |
 | end-to-end SAT crosschecks | `a3_mb_crosscheck.py` C1 (b≠0 dangerous min 14), C2 (imΔ-distance 12) |
 
