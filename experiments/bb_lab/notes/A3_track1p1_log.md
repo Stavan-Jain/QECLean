@@ -667,3 +667,96 @@ the counting lemma) are PROVEN above.
    recursion bookkeeping (what (M) at every level + an analytic anchor
    actually yields for goals 2/3 — note Entry 4's caution that the safe
    sector caps the full-code bound at d_base).
+
+---
+
+## Entry 7 (2026-06-12) — (T-oct) proven by hand; CRT component frame for the tail (groundwork)
+
+Two increments past Entry 6: the octahedron-freeness input to the k = 7 rung
+is now a full hand proof (no finite sweep left in the k ≤ 7 classification),
+and the algebraic frame for the k ≥ 8 tail is set up and validated.
+
+### Octahedron-freeness of Cay(Z₆², D) — hand proof (closes T-oct)
+
+*Step 1 (color reduction).* In K(2,2,2) every edge lies in a triangle, and
+the edges at a common vertex are linked through triangles (for edges (a,p),
+(a,q) with p,q in the same part, route via a third-part vertex c: triangles
+a-p-c and a-q-c share the edge (a,c)); since every triangle of Cay(Z₆², D)
+is monochromatic (Entry 6, step (i)), all 12 edges of an embedded octahedron
+carry one color. By the swap symmetry take dA: the octahedron embeds in
+Cay(Z₂×Z₆, D'), D' = {(0,±1), (1,±1), (1,±2)} (first coordinate ε ∈ Z₂ is
+the x-degree /3, second is y ∈ Z₆).
+
+*Step 2 (accounting).* K(2,2,2) has 6 vertices, 12 edges, and 3 non-edges
+forming a perfect matching. Within an ε-class, an edge needs y-difference
+±1 (an induced subgraph of the 6-cycle C₆); across classes, an edge needs
+y-difference ∈ {±1, ±2}, i.e. ∉ {0, 3}. m distinct vertices of one ε-class
+induce ≤ max(m−1, …) C₆-edges: ≤ 2 for m = 3, ≤ 3 for m = 4, ≤ 4 for m = 5,
+≤ 6 for m = 6.
+
+*Step 3 (kill every ε-split a + (6−a)).*
+- a ∈ {0,1}: the big class has C(6−a,2) ≥ 10 internal pairs but at most
+  (induced edges) + (3 non-edges) ≤ 6 + 3 = 9 < 10 of them are realizable. ✗
+- a = 2: internal edges ≤ 1 + 3 = 4, so cross edges ≥ 12 − 4 = 8 = all cross
+  pairs; hence all 3 non-edges are internal and the 4-class induces exactly
+  3 C₆-edges — forcing 4 consecutive y-values {y, y+1, y+2, y+3} whose three
+  non-adjacent pairs (y,y+2), (y+1,y+3), (y,y+3) would all be non-edges; they
+  are not pairwise disjoint, contradicting the perfect matching. ✗
+- a = 3: internal edges ≤ 2 + 2, so ≥ 8 of the 9 cross pairs are edges, i.e.
+  at most one cross pair has y-difference ∈ {0,3} ⟺ equal residues mod 3.
+  With residue multisets (n₁,n₂,n₃), (n'₁,n'₂,n'₃) (each n ≤ 2 since a mod-3
+  class of Z₆ has 2 elements), conflicts = Σ n_c n'_c ≤ 1 forces, up to
+  relabeling, (2,1,0) against (0,1,2). The (2,·)-class has y-values
+  {α, α+3, β}: the pair (α, α+3) has difference 3 — a non-edge; of (α,β) and
+  (α+3,β), the differences differ by 3 so at most one is ±1 (an edge), and
+  whichever of them is not an edge is a non-edge sharing a vertex with
+  (α, α+3) or with the other — contradicting disjointness of the matching. ✗
+No split survives; Cay(Z₂×Z₆, D') and hence Cay(Z₆², D) is octahedron-free. ∎
+
+Consequence: with Entry 6's Turán-uniqueness step, **the light-stabilizer
+classification is now fully proven for every face-support k ≤ 7** — no finite
+sweep remains anywhere in the k ≤ 7 range. The conditional theorem's (T-oct)
+hypothesis is discharged; the remaining gaps are (T-tail) and the two rung
+locality write-ups.
+
+### CRT component frame for the k ≥ 8 tail (set up, validated — not yet a proof)
+
+G = Z₆² ≅ Z₂² × Z₃² via x = s_x·t_x (s_x = x³, t_x = x⁴), same in y. Then
+R = F₂[G] ≅ Π_{j=0..4} R_j with R_j = F_j[Z₂²], F₀ = F₂ at the 3-part
+character (ξ,η) = (1,1), and F₁..₄ = F₄ at the Frobenius orbits of
+(ξ,η) = (ψ(t_x), ψ(t_y)) ∈ {(1,ω), (ω,1), (ω,ω), (ω,ω²)}. Writing u = 1+s_x,
+v = 1+s_y (u² = v² = 0; R_j is local with radical (u,v)):
+
+    Â_j = (1+η+η²) + u + ηv ,    B̂_j = (1+ξ+ξ²) + v + ξu ,
+
+so Â_j is a unit iff η = 1 and otherwise the pure radical element u + ηv
+(resp. B̂_j unit iff ξ = 1, else v + ξu). Hand computation of
+Ann(Â) ∩ Ann(B̂) per component gives kernel components
+(0, 0, 0, F₄·uv, span_F₄{ωu+v, uv}) — F₂-dims (0,0,0,2,4) — **verified
+numerically** via idempotent projectors (probe in session transcript; sum of
+the five idempotents = I, ranks 4/8/8/8/8, kernel projections 0/0/0/2/4,
+total 6 ✓ matching the known dim ker ∂₂ = 6).
+
+Structural reading: components (1,1), (1,ω), (ω,1) are *rigid* — at least one
+of Â, B̂ is a unit there, so ẑ_j ≠ 0 is directly visible in b̂_j; the two
+*doubly-radical* components (ω,ω), (ω,ω²) host the entire kernel and all the
+"invisible" directions. The Entry-6 x/y-collapse partial bounds are the
+(ξ=1)- and (η=1)-shadows of this decomposition.
+
+Attack plan (next session): per-s-layer weight dictionary over the t-grid
+Z₃² — a nonzero layer whose 3-part Fourier support is {trivial} has t-support
+9; one F₄-orbit: 6; trivial + one orbit: 3 (coset of a Z₃ line); two generic
+orbits: ≤ 4 (witness (1+t_x)(1+t_y)); the ≥-side of this dictionary is the
+to-verify half. Combine with the rigidity pattern: a light b pins the
+component support of ẑ on the rigid components, leaving freedom only in the
+doubly-radical pair, where multiplication by u+ηv, v+ξu has a 2-step
+filtration — the repeated-root layer analysis lives entirely in two F₄[Z₂²]
+local rings. Goal shape: |b| ≤ 10 forces ẑ rigid-component-supported like a
+monomial or D-pair, and the doubly-radical freedom is exactly mod-kernel.
+
+### Status
+
+- k ≤ 7 classification: fully PROVEN (Entries 6 + 7).
+- Remaining for the conditional factor-2 theorem: (T-tail) k ≥ 8, and the
+  two rung locality hand write-ups (hexagon+2, pair-union+1).
+- The component frame is validated and ready as the tail's working language.

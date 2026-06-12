@@ -23,10 +23,10 @@ projected stabilizer `b = p(v)` via the verified, hand-checkable slice identity
 cut-coordinate artifact), so the factor-2 lemma is exactly **(M): |b| + 2·m(b)
 ≥ 12 for every base Z-stabilizer b**. Entry 6 built the analytic ladder for
 (M): `b = 0` and `|b| ≥ 12` proven; the light-b classification proven for
-face-supports k ≤ 7 (hexagon-overlap ≤ 1 and K₄-freeness of the overlap
-Cayley graph, both with full hand proofs; k = 7 closed via Turán uniqueness +
-verified octahedron-freeness); the m-rungs (m(hexagon) ≥ 3, m(D-pair) ≥ 2)
-verified exhaustively with hand-proof routes sketched. **The single remaining
+face-supports k ≤ 7 (hexagon-overlap ≤ 1, K₄-freeness, and — Entry 7 —
+octahedron-freeness of the overlap Cayley graph, all with full hand proofs;
+k = 7 closed via Turán uniqueness); the m-rungs (m(hexagon) ≥ 3,
+m(D-pair) ≥ 2) verified exhaustively with hand-proof routes sketched. **The single remaining
 unbounded-structure gap is the k ≥ 8 tail**: every base Z-stabilizer whose
 minimal face support is ≥ 8 has weight ≥ 12 — a *classical* statement about
 one abelian 2-block group code, squarely in the repeated-root/van-Lint lane.
@@ -132,9 +132,10 @@ reproduce `d=12`) — the validation the buggy scout script lacked (see §5).
 - **Analytically proven** (given `d_base=6` as the transfer input, used only
   at b=0): safe sector ≥ 6; the m(b) reduction itself; (M) on the rungs b=0,
   |b| ≥ 12, and light-b classification through face-support k ≤ 7
-  (ov ≤ 1 + K₄-freeness, full hand proofs — Entry 6).
-- **Verified finite facts with hand-proofs owed:** octahedron-freeness
-  (k = 7 input), the two m-rung locality facts (hexagon+2, pair-union+1).
+  (ov ≤ 1 + K₄-freeness — Entry 6; octahedron-freeness — Entry 7; all full
+  hand proofs).
+- **Verified finite facts with hand-proofs owed:** the two m-rung locality
+  facts (hexagon+2, pair-union+1).
 - **Open** (true with margin per SAT): the k ≥ 8 tail — see §4.
 - **Therefore: no fully-analytic improvement on `d ≥ 2` exists yet.** Do not
   claim one. (Unchanged — the ladder is not yet closed.)
@@ -156,7 +157,7 @@ Status of (M) by rung (Entry 6):
 |---|---|---|
 | b = 0 | m(0) ≥ 6 | PROVEN given d_base ≥ 6 (only place d_base is used) |
 | \|b\| ≥ 12 | trivial | PROVEN |
-| classification | light b = 36 hexagons ∪ 216 D-pairs | PROVEN for face-support k ≤ 7; **OPEN for k ≥ 8 (the tail)** |
+| classification | light b = 36 hexagons ∪ 216 D-pairs | PROVEN for face-support k ≤ 7 (Entry 7 closed the octahedron check by hand); **OPEN for k ≥ 8 (the tail)** |
 | m(hexagon) ≥ 3 | no non-imΔ cycle in hexagon+2 qubits | verified exhaustively; local hand proof owed |
 | m(D-pair) ≥ 1 | cycle space of the 11-qubit pair union = the two columns | verified (rank 9, all 12 types); hand proof owed |
 
@@ -308,10 +309,9 @@ branch `claude/eager-hofstadter-6da593` (fast-forward continuation). Each
    (van Lint lane, citation now verbatim-verified), y-side CRT
    `F₂[Z₆²] ≅ F₂[Z₂²] × (F₄[Z₂²])⁴`, x-collapse partial bound as the base
    layer. Time-box per approach; failures are first-class outputs (A3 log).
-2. **Hand-organize the owed finite checks** (Entry 6): octahedron-freeness in
-   Z₂×Z₆ (only the 3+3 ε-split is nontrivial), and the two rung locality
-   proofs (shared-check ≤ 1 is already proven; residue = one-hexagon
-   neighborhood analysis).
+2. **Hand-organize the owed finite checks**: the two rung locality proofs
+   (shared-check ≤ 1 is already proven; residue = one-hexagon neighborhood
+   analysis). (Octahedron-freeness: DONE by hand, Entry 7.)
 3. **Assemble the conditional factor-2 write-up** once 1–2 land, then redo the
    recursion bookkeeping (Entry 4's caution: the safe sector caps the
    full-code bound at d_base — the factor-2 protects, not doubles, the
