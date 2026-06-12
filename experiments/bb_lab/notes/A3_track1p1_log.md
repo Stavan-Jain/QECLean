@@ -1623,3 +1623,93 @@ the cut-cylinder/Mayer–Vietoris structure of the cover; or exhibiting a
 3. The weight-8/10 reachable-cycle census (deferred; only relevant as a
    cross-check once (R) + (M-im) land — the reduction bypasses the
    per-weight rungs entirely).
+
+## Entry 17 (2026-06-12) — (R) PROVEN by a one-line homotopy; (M-im) is the last statement before d = 12
+
+Script: `a3_r_homotopy_mim.py` (R1–R3, M1–M6, all PASS).
+
+### Theorem: ker δ = im Δ — the deck action is null-homotopic on cycles
+
+Over the cover ring F₂[Z₁₂×Z₆], squaring B kills its y-dependence
+(y⁶ = 1):
+
+    B² = y⁶ + x² + x⁴ = 1 + x² + x⁴,    (1+x²)(1+x²+x⁴) = 1 + x⁶.
+
+**Proof of (R).** For any cover 1-cycle v = (v_L, v_R) (A·v_L = B·v_R), set
+z := (1+x²)·B·v_L. Then
+
+    ∂₂z = (B z, A z) = ((1+x²)B²·v_L, (1+x²)B·(A v_L))
+        = ((1+x⁶)v_L, (1+x²)B²·v_R) = (1+x⁶)·v = v + σv.
+
+So (1+σ)Z₁(cover) ⊆ B₁(cover): **σ_* = id on H₁(gross)**; hence
+τ_*∘pr_* = (1+σ)_* = 0, giving im pr_* ⊆ ker τ_* = im Δ, and equality by
+rank–nullity (both sides have dimension 12 − dim im τ_*). ∎
+(R1: the two identities; R2: the homotopy verified on all 78 basis cycles
+of ker H_X^cov; R3: on the base the same identity degenerates to 0 = 0,
+as it must.)
+
+**Consequence (the goal-1 ledger).** With (M) proven (Entries 5–13) and
+(R) proven, the safe sector satisfies |v| ≥ |p(v)| with
+[p(v)] ∈ im Δ ∖ 0, so
+
+> **d(gross) = 12  ⟸  (M-im): every 1-cycle in a nonzero imΔ class has
+> weight ≥ 12.**
+
+Both directions: ≥ 12 from (M) + (R) + (M-im) + duality; ≤ 12 because
+τ(u\*) (u\* the Entry-13/A4 weight-6 logical) is a weight-12 logical —
+nontrivial since [u\*] ∉ im Δ = ker τ_*, which is the weight-6 sub-rung of
+(M-im) below. **Goal 1 is one base-code statement away.**
+
+### The flux characterization of the Smith classes (M4)
+
+The Smith **linking form** P[ξ, ζ] := ⟨d1c_jᵀξ, d2c_jζ⟩ over
+ξ ∈ ker H_Xᵀ (the X-side 2-kernel, = ι(ker ∂₂)) and ζ ∈ ker ∂₂ is
+**identically zero, for every cut j** (M4). Since the H₁-pairing of the
+X- and Z-sides is perfect and both Smith spaces are 6-dimensional:
+
+    im Δ^X = (im Δ^Z)^⊥   ⟹   [w] ∈ im Δ  ⟺  the six seam-flux
+    functionals  ℓ_ξ(w) := ξᵀ·d1c_j·w  all vanish.
+
+(M-im) restated: **a cycle with vanishing seam flux that is not a
+boundary has weight ≥ 12** — six explicit sparse parities decide Smith
+membership. (Hand proof of the zero linking form: owed; candidate route
+via the (R) homotopy and τᵀ = p adjointness.)
+
+### The weight-6 sub-rung of (M-im), hand-checkable (M3, M6)
+
+Every weight-6 logical has **nonzero flux** — verified per orbit
+(Ann(A)-type: flux (1,0,0,1,1,1); Ann(B)-type: (1,1,1,0,0,1); mixed
+(3,3): (0,1,1,0,1,0)), and flux-vanishing is translation-covariant, so
+the orbit-level check covers all 84. Equivalently τ(u) is never a cover
+boundary (M3, rank check). Each flux value is a parity of an explicit
+short sum — surveyable by hand. **No weight-6 cycle lies in a nonzero
+imΔ class.**
+
+### (M-im) discovery (M1, M2, M5) and the dead end
+
+- **ker ∂₂ ∖ 0 has 5 orbits** under translation + swap: (size, weight) =
+  (9, 16), (12, 18), (36, 18), (3, 24), (3, 24). Only 5 classes of Smith
+  reps to bound.
+- Rep weights |d2c_jζ| per orbit and cut: the wt-16 orbit gives
+  {12,12,16,12,12,16}; the wt-18 orbits give 12–18; the wt-24 orbits sit
+  at 20. The 18 reps of weight 12 (S8/M5) realize the class minimum: the
+  bar is *attained by the canonical reps*.
+- **Dead end (first-class): the π_x-collapse bound is vacuous** — the
+  exact collapsed minimum L_j is 0 for every orbit and cut (M2). The
+  column-profile relations c_{i−3} = (y+y²)c_i, c_{i−1}+c_{i−2} = y³c_i
+  make the collapsed coset always reach 0. Any proof of (M-im) must stay
+  2-dimensional.
+
+### Next steps (the (M-im) program)
+
+1. **Light-cycle flux route**: extend the weight-6 census to weights 8
+   and 10 (the split machinery of Entry 13 at higher weight) and show
+   every non-boundary cycle there has nonzero flux. Weight 10 must use
+   the D-pair boundaries (flux 0, class 0 — allowed); the statement is
+   exactly "light non-boundary cycles are never flux-silent".
+2. **Affine-COST route**: per orbit rep, run the Entry-8/9 component
+   grammar on the coset d2c_jζ + im ∂₂ (the offset version of profile
+   completeness); if the COST floor on each coset is ≥ 12, the dictionary
+   machinery closes (M-im) the same way it closed the classification.
+3. Hand proof of the zero linking form (the flux characterization's
+   remaining leg).
