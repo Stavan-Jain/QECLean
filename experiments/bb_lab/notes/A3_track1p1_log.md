@@ -931,3 +931,158 @@ analytic proof — what remains is hand-organization, now a bounded list:
    then (c).
 2. Then assemble the full conditional factor-2 write-up (theorem +
    dependency tree), and revisit the recursion bookkeeping for goals 2/3.
+
+---
+
+## Entry 10 (2026-06-12) — hand-organization I: engine, floor, one-block, R1; six-shape architecture
+
+First block of the hand-proof program replacing Entry 9's machine checks
+(`a3_mb_rigidity.py` for the verifications G1–G4). Outcome: the load-bearing
+chain for profile completeness is now FULLY hand-proven (the Entry-8
+component-support DP is no longer needed anywhere), the analysis collapses
+to SIX shape lemmas via a pivot-on-the-lighter-block architecture, and two
+of the six (plus the shared engine and endgame) are proven by hand below.
+
+### Dictionary lemma (hand proof, completing Entry 8's d₃ table)
+
+For nonzero f ∈ F₂[Z₃²]: |f| mod 2 = f̂(trivial); weight-1 elements are
+δ-points (full Fourier support); weight-2 elements are pairs δ_t + δ_t′
+with support exactly the three nontrivial orbits not orthogonal to t − t′;
+the three nonzero elements of a single-orbit ideal are the tr∘χ indicators,
+weight 6; lines (cosets of order-3 subgroups) have weight 3 and support
+{trivial, orthogonal orbit}; crossing-line pairs have weight 4 and support
+two nontrivial orbits. These plus parity give every entry of the d₃ table:
+(0,T)=9, (1,F)=6, (1,T)=3, (2,F)=4, (2,T)=3, (3,·)=2, (4,F)=2, (4,T)=1.
+
+### Engine lemma (G1; hand proof)
+
+Let D be any of the six radical multipliers Â₁, Â₃, Â₄, B̂₂, B̂₃, B̂₄. Its
+value vector has three nonzero values, pairwise distinct, plus one zero —
+so {values of αD} = all of F₄ for α ≠ 0. The ideal (D) = {αD + β·1⃗}
+(1⃗ = uv = the constant vector), and:
+- α = 0: the nonzero constant vectors — support FULL;
+- α ≠ 0: β = αD[s₄] for exactly one layer s₄ — support exactly the
+  CO-POINT Z₂² \ {s₄}, value vector α(D + D[s₄]1⃗): one F₄-line per s₄.
+Hence: a full-support ideal element is CONSTANT; a co-point element has
+fixed value ratios. Two corollaries used everywhere: (a) any nonzero
+V_j^X (j radical on side X) has ≥ 3 nonzero layers; (b) on a block whose
+nonzero layers are δ-points, V_j^X[s] = ψ_j(t_s), so constancy or ratio
+rigidity translate into character equations on the cells t_s, and ψ₃, ψ₄
+(or any two of the three radical characters) separate Z₃².
+
+### One-block lemma (G2; hand proof)
+
+If z′ ∈ Ann(A) \ ker ∂₂ then |Bz′| ≥ 12 (mirror: Ann(B), |Az′| ≥ 12).
+Proof: ẑ′₀ = ẑ′₂ = 0 (units), ẑ′_j ∈ Ann(Â_j) = (Â_j) for j ∈ {1,3,4}
+(the ideal is its own annihilator: D² = 0, D·1⃗ = 0, dimension count).
+Then V′^B₄ = ωÂ₄ẑ′₄ = 0; V′^B₃ = B̂₃ẑ′₃ ∈ F₄·1⃗ (B̂₃Â₃ is a nonzero socle
+multiple since the generators are non-proportional); V′^B₁ = B̂₁ẑ′₁ ∈ (Â₁).
+So Bz′ has component support ⊆ {1, 3} with d₃({1}) = d₃({3}) = 6,
+d₃({1,3}) = 4. If component 1 is alive its support has ≥ 3 layers, each of
+cost ≥ 4: |Bz′| ≥ 12; if only component 3, all four layers cost 6 each:
+≥ 24; if neither, Bz′ = 0 and z′ ∈ ker. ∎  (Exact minimum: 16, G2.)
+
+### Floor lemma (hand proof — replaces the component-support dependency)
+
+If b ≠ 0, |b| ≤ 10, then BOTH blocks have ≥ 3 nonzero layers. Suppose the
+A-block has ≤ 2. Then every A-radical V_j^A has support ≤ 2, hence = 0
+(engine (a)), so ẑ_{1,3,4} ∈ Ann(Â_j), giving V^B₄ = 0, V^B₃ ∈ F₄·1⃗,
+V^B₁ ∈ (Â₁); also S₀ ⊆ (A-layers), so |S₀| ≤ 2.
+- A-block = 0: w₀ = 0 and ẑ₂ = 0 (unit), so the B-side has components
+  ⊆ {1,3}: the one-block lemma gives |b| = |Bz| ≥ 12. ✗
+- A-block ≠ 0: its layers have W ⊆ {0,2}, cost ≥ 3 each, so |Az| ≥ 3. On
+  the B-side: if component 3 is alive, V^B₃ is a nonzero constant, so ALL
+  FOUR B-layers are nonzero at cost ≥ 2: |Bz| ≥ 8 and |b| ≥ 11 ⟹ 12 by
+  evenness. If component 3 is dead and component 1 alive: ≥ 3 layers with
+  W ⊆ {0,1,2}, at most two carrying the trivial flag: |Bz| ≥ 3+3+4 = 10,
+  |b| ≥ 13. If 1 dead, 2 alive: ≥ 3 layers, W ⊆ {0,2}: ≥ 3+3+6 = 12. If
+  1, 2, 3 all dead: B-block ⊆ component 0 on ≤ 2 layers: either Bz = 0
+  (then z ∈ Ann(B) \ ker and the mirror one-block lemma gives
+  |Az| ≥ 12 ✗) or |Bz| ≥ 9, |b| ≥ 12. ∎
+**Profile completeness (parity + floor + evenness) is now fully
+hand-proven.** The Entry-8 component-support lemma is demoted to a
+corollary/confirmation; nothing load-bearing rests on the DP anymore.
+
+### The six-shape architecture (pivot on the lighter block)
+
+For |b| ≤ 10 both blocks have ≥ 3 nonzero layers, so the lighter block has
+weight 3, 4 or 5; by the x↔y swap symmetry (A(x,y) = B(y,x)) take it to be
+the A-block. Its layer profile is one of SIX shapes:
+  weight 3: (1,1,1);  weight 4: (1,1,1,1), (2,1,1);
+  weight 5: (2,1,1,1), (2,2,1), (3,1,1).
+Each shape needs one lemma of the form "the f ∈ im(A·) of this shape are
+exactly […], and their completions b = (B(z₀+z′), f) at |b| ≤ 10 are
+exactly […]" — with the uniform ENDGAME: once f = A·g for an explicit
+light generator g (monomial or pair), z − g ∈ Ann(A) and
+|B(z − g)| ≤ |Bz| + |Bg| ≤ 7 + 4 < 12, so the one-block lemma forces
+z ≡ g mod ker. Master data (G4, per translation class of im(A·)):
+
+  shape    | im(A·) classes | min |f|+μ_B | light completions
+  (1,1,1)  | 1  (= A·monomial)        | 6  | hexagons only
+  (1,1,1,1)| 1  (the δ-column)        | 16 | none
+  (2,1,1)  | 3  (= A·(dA-pairs))      | 10 | the dA D-pairs
+  (2,1,1,1)| 1                        | 14 | none
+  (2,2,1)  | 3                        | 14 | none
+  (3,1,1)  | NONE in im(A·)           | —  | none
+  [(2,2,1,1), weight 6, arises only as the HEAVIER block: 12 classes, of
+   which exactly the 3 dB-pair classes complete to 10 — handled by the
+   mirror of (2,1,1) on the B-side, never as a pivot shape.]
+
+### R1 (shape (1,1,1)) — hand proof
+
+Let the A-block be three δ-point layers (Az)_{s_i} = δ_{t_i}, fourth layer
+zero. Every V_j^A is supported in {s₁,s₂,s₃} with V_j^A[s_i] = ψ_j(t_i) ≠ 0,
+so for the A-radical j ∈ {1,3,4} the engine forces V_j^A = α_j C_j(s₄): the
+ratios give ψ_j(t_i − t_k) = C_j(s₄)[s_i]/C_j(s₄)[s_k], explicit constants.
+ψ₃, ψ₄ separate Z₃², so all pairwise differences t_i − t_k are determined
+(and the comp-1 equations are a consistency condition); translating in s
+(WLOG s₄ = [s_xs_y], where C_j = Â_j) and solving the two-character linear
+system shows the unique solution is the difference pattern of A·δ_g — i.e.
+f is a hexagon A-block. G3 confirms: the (1,1,1)-shaped elements of im(A·)
+are EXACTLY the 36 A·δ_g. Endgame: z − δ_g ∈ Ann(A) and
+|B(z − δ_g)| ≤ 7 + 3 < 12 ⟹ z ≡ δ_g mod ker: **b is a hexagon.** ∎
+This kills all thirteen families with a {1,1,1} block.
+
+### R-(1,1,1,1) — hand kill
+
+A-block = four δ-point layers ⟹ all V_j^A (j ∈ {1,3,4}) are full-support
+ideal elements ⟹ CONSTANT vectors (engine) ⟹ ψ_j(t_s − t_{s′}) = 1 for
+all layers; ψ₃, ψ₄ separate ⟹ all t_s equal = t*: f is the δ-column
+Σ_s δ_{(s,t*)} (the unique im(A·) class, G4). Its parities force S₀ = all
+four layers, so the B-block is all-odd with |Bz| ≤ 6: profile (1,1,1,1) or
+(3,1,1,1). For (1,1,1,1): the mirror argument makes the B-block a δ-column
+at some t₀, so V₂^B, V₃^B, V₄^B are constants AND V₁^A = ψ₁(t*)·1⃗ ≠ 0;
+but then ẑ₁ would satisfy both Â₁ẑ₁ = (nonzero const)·1⃗ and
+B̂₁ẑ₁ = εẑ₁ = (const)·1⃗, forcing ẑ₁ ∈ F₄·1⃗ and hence Â₁ẑ₁ = 0 —
+contradiction. For (3,1,1,1): the B-radical constants force the three
+δ-layers of B at a common cell t₀ and the weight-3 layer P to satisfy
+Σ_{t∈P} ψ_j(t) = ψ_j(t₀) for j ∈ {2,3,4}; then Q := P △ {t₀} is a nonzero
+even set with Fourier support ⊆ {orbit 1}, |Q| ≤ 4 < 6 = d₃({1}) —
+contradiction (dictionary). ∎  Kills the (1,1,1,1) families.
+
+### Status & remaining obligations
+
+Hand-proven as of this entry: dictionary, engine, one-block, floor
+(⟹ profile completeness fully analytic), R1, R-(1,1,1,1).
+Remaining shape lemmas (statements fixed, tools assigned, all
+machine-confirmed via G4):
+1. **R-(2,1,1)** (the D-pair lemma): 2-point-layer direction forcing —
+   the layer's cell difference must avoid the three radical-character
+   kernels (else an A-radical support drops to 2), leaving only the
+   t_y-direction; then ratio rigidity as in R1 pins f to A·(dA-pair); the
+   endgame closes at |b| = 10. Also its mirror covering the (2,2,1,1)
+   heavier-block classes.
+2. **R-(2,1,1,1)**: hybrid of R-(1,1,1,1) (three constants) + one 2-point
+   layer; expect the same Q-style dictionary kill (G4: single class,
+   μ-heavy).
+3. **R-(2,2,1)**: one δ-layer + two 2-point layers; direction forcing on
+   both pairs + ratio consistency (G4: 3 classes, all μ ≥ 14: kill).
+4. **R-(3,1,1)**: show im(A·) has NO such element: the weight-3 layer is a
+   line or a non-collinear triple; in either case some A-radical
+   component vanishes on that layer (line: the orthogonal orbit among
+   {1,3,4}; triple: the killed orbit), dropping its support to ≤ 2 while
+   the δ-layers keep it nonzero — engine contradiction. (To write out:
+   the only subtlety is triples whose dead orbit is the A-unit comp 2.)
+Plus the two m-rung locality proofs (unchanged), and then the assembled
+write-up. The G4 table is the complete specification of what each lemma
+must produce.
