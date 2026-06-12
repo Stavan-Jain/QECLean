@@ -1427,3 +1427,92 @@ small-cycle check (W6) independently confirms the base case.
 The factor-2 ladder (M) is fully proven, unconditionally. Next entry
 assembles the consequence — the first fully-analytic distance bound on
 gross beating the published floor — with its complete dependency tree.
+
+## Entry 14 (2026-06-12) — assembly: d(gross) ≥ 6, fully analytic — the floor is beaten
+
+Putting Entries 5–13 together yields the program's first headline result.
+
+### Theorem (analytic gross bound)
+
+**d(gross [[144,12,12]]) ≥ 6, by a fully analytic proof** — no SAT, no
+`decide`, no enumeration anywhere in the load-bearing chain; every finite
+case split in the proofs is human-surveyable (≤ a dozen lines each).
+
+*Proof.* d = min(d_X, d_Z) = d_Z by the inversion duality (Entry 13,
+Cor. 3). Let v be a nontrivial Z-logical of the cover.
+
+- **Safe sector** (pr_*[v] ≠ 0): p is a weight-non-increasing chain map, so
+  |v| ≥ |p(v)|, and p(v) is a *nonzero* base 1-cycle, so the small-cycle
+  theorem (Entry 13) gives |v| ≥ 6.
+- **Dangerous sector** (pr_*[v] = 0): b := p(v) ∈ Stab_Z(base), and the
+  Entry-5 sheet identity gives |v| = |b| + 2·|v₀ off supp b| with
+  v₀ = d2c_j z_b + u′, [u′] ∉ imΔ — so |v| ≥ |b| + 2·m(b) ≥ 12 by **(M)**,
+  now fully proven (Entries 6–13).
+
+min(6, 12) = 6. ∎
+
+This **triples the published analytic floor** (Lin–Pryadko ⌈12/8⌉ = 2) and
+achieves **goal 3** of the program. It also proves d(base [[72,12,6]]) ≥ 6
+(Entry 13, Cor. 1) — to our knowledge the first analytic distance bound
+matching the true distance for a Bravyi-family BB code (A1-L3 found no
+analytic distance proofs in the literature for any of these).
+
+### Complete dependency tree (every leaf hand-proven; scripts are confirmation only)
+
+```
+d(gross) ≥ 6
+├── d_X = d_Z: inversion duality Φ                      [E13 Cor.3; W9]
+├── SAFE ≥ 6: p weight-non-increasing (SRB safe branch) [E0/E5]
+│   └── small-cycle theorem (min nonzero cycle ≥ 6)     [E13; W1–W7]
+└── DANGEROUS ≥ 12:
+    ├── sheet identity |v| = |b| + 2|v₀ off b|          [E5; a3_mb_foundations V1–V8]
+    │   └── cover block form + SES + Smith Δ            [E0/E5; a3_cut_decomposition,
+    │                                                    a3_delta_explicit]
+    └── (M): |b| + 2m(b) ≥ 12 for all b ∈ Stab_Z:
+        ├── b = 0: m(0) ≥ 6 ← small-cycle theorem       [E13]
+        ├── 0 < |b| ≤ 11 ⟹ hexagon or D-pair:
+        │   ├── parity + floor + evenness               [E9/E10]
+        │   ├── dictionary + engine + one-block(16)     [E10/E11]
+        │   └── six shape lemmas                        [E10 (R1, R-(1,1,1,1)),
+        │                                                E11 (R-(2,1,1) + endgame),
+        │                                                E12 (weight-5 kills)]
+        ├── m(hexagon) ≥ 3, m(D-pair) ≥ 1               [E13 Cor.2]
+        └── |b| ≥ 12: trivial
+```
+
+Machine confirmations: `a3_mb_foundations.py`, `a3_mb_rigidity.py` (G1–G4),
+`a3_shape_lemmas.py` (V1–V8), `a3_small_cycles.py` (W1–W9), plus the
+end-to-end SAT crosschecks `a3_mb_crosscheck.py` (C1: dangerous b≠0 min 14;
+C2: imΔ-distance 12) — all consistent with the bound (true d = 12 ≥ 6; the
+dangerous bound 12 is *tight*, attained by the τ(u) reps).
+
+### Honest scoreboard and the next frontier
+
+- **Goal 3 (beat the floor): ACHIEVED** — pending one round of adversarial
+  re-review next session (the discipline: a fresh skeptic pass over the two
+  newest links, the Entry-5 reduction and the Entry-13 case analysis,
+  before any external write-up).
+- **Goal 1 (d = 12): the dangerous side is DONE and tight.** The safe
+  sector now caps the bound: |v| ≥ |p(v)| alone cannot beat 6 because
+  weight-6 base logicals exist. But pointwise
+  |v| = |p(v)| + 2|v₀ ∧ v₁| — the slack is the sheet overlap, and SAT says
+  the true safe minimum is ≥ 12. So the precise remaining problem for
+  goal 1 is a **safe-sector analogue of (M)**: for w a nontrivial base
+  logical cycle, every cover cycle v with p(v) = w has
+  |w| + 2|v₀ ∧ v₁| ≥ 12. The same slice machinery applies (v₀ ranges over
+  a syndrome-shifted coset); this is where the old "s ≠ 0" structure
+  returns, now in its correct home.
+- **Goal 2 (a class of BB codes): the machinery is a template.** The
+  small-cycle engine analysis used only: the CRT component structure of
+  F₂[Z₆²], multiplicity-free difference sets with dA ∩ dB = ∅, and the
+  x/y projections. Each ingredient is checkable per BB instance; running
+  the template on the other Bravyi bases (and odd-h SRB covers, e.g.
+  bb_90/bb_108 with k′ = 8) is now mechanical exploration.
+
+### Next steps (ranked)
+
+1. Adversarial re-review of the full chain (fresh session, skeptic mode).
+2. Standalone write-up note (theorem + dependency tree + the surveyable
+   case tables) — the deliverable form of the result.
+3. Safe-sector (M)-analogue for goal 1 (d = 12).
+4. Template run on other BB bases for goal 2.
