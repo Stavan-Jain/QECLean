@@ -1534,3 +1534,92 @@ is exactly the asset goal 1 builds on. The write-up should lead with the
 minimal proof and present (M) as the deeper theorem. (Entry 4's dead-end
 verdict on Fork B is amended accordingly — the objection was to the tower
 recursion, not the bound; A_HANDOFF §5.1 updated.)
+
+## Entry 16 (2026-06-12) — goal 1 opened: the safe sector IS the Smith sector; d = 12 reduces to two base-code statements
+
+*(Entry 15 is reserved for the adversarial re-review running in a parallel
+session; this entry starts the goal-1 program on the safe sector.)*
+Foundations and discovery in `a3_msafe_scan.py` (S1–S8, all PASS).
+
+### The safe-slice framework (S1–S3)
+
+For a cover cycle v = (v₀, v₁) with p(v) = w a fixed base cycle, the cover
+block equations [[d1nc, d1c], [d1c, d1nc]] (re-derived per cut, S1) reduce
+to **∂₁v₀ = d1c_j·w** (the seam syndrome of w), with v₁ = v₀ + w; and
+|v| = |w| + 2·|v₀ off supp w|. So the safe sector has a literal mirror of
+(M): with m_safe(w) := min{|v₀ off supp w| : ∂₁v₀ = d1c_j w},
+
+    (M-safe):  |w| + 2·m_safe(w) ≥ 12   for every base cycle w, [w] ≠ 0.
+
+Base cycles are even (augmentation), so the light rungs are |w| ∈ {6,8,10}
+with m_safe ≥ 3, 2, 1. Solvability of the slice is class-invariant and
+cut-independent (S2): w is **reachable** iff δ(w) := [d1c_j w] ∈ coker ∂₁
+vanishes — the Gysin connecting map; im pr_* = ker δ.
+
+### Discovery 1: the weight-6 logicals (S4, S6)
+
+The 120 weight-6 cycles split as 36 + 48 + 36 over (|u_L|, |u_R|) =
+(6,0)/(3,3)/(0,6): the (6,0) family is exactly the 36 weight-6 elements of
+Ann(A) (one translation orbit — single t_y-fibre, shape (2,2,2) with
+t_y-direction pairs, x-span {c, c+3}; the engine classification mirrors the
+shape lemmas), the (0,6) family mirrors in Ann(B), and the (3,3) family is
+the 36 hexagons (trivial class) plus a 12-element orbit of mixed logicals.
+The 84 logicals occupy 84 **distinct** H₁ classes.
+
+### Discovery 2 (the headline): every weight-6 logical is UNREACHABLE (S5, S7)
+
+m_safe is **undefined** on all three weight-6 orbits — the slices are
+empty. No cover cycle projects onto any weight-6 base logical: the |w| = 6
+rung of (M-safe) is **vacuous**. More: computing δ on an H₁ basis and
+Δ[ζ] = [d2c_j ζ] on H₂ = ker ∂₂ gives, cut-independently,
+
+    ker δ = im Δ      (both 64 classes; Δ injective on the 64-element ker ∂₂),
+
+i.e. **the reachable classes are exactly the Smith classes** — the safe
+sector of gross sees only im Δ. (All 84 weight-6 classes lie outside, as
+they must.)
+
+### The reduction theorem for goal 1
+
+Since every safe logical v has [p(v)] ∈ ker δ ∖ {0} and |v| ≥ |p(v)|:
+
+> **d_Z(gross) ≥ 12  ⟸  (M) [proven, Entries 5–13]  +
+> (R): ker δ = im Δ analytically  +
+> (M-im): every 1-cycle in a nonzero imΔ class has weight ≥ 12.**
+
+(M-im) is exactly the statement the C2 crosscheck verified by SAT
+(imΔ-distance = 12, attained): true with the minimum sitting right at the
+bar. Equivalently, with explicit Smith reps: **dist(d2c_j ζ, Stab_Z) ≥ 12
+for each of the 63 nonzero ζ ∈ ker ∂₂** — a base-code
+distance-to-stabilizer bound, squarely in range of the proven machinery
+(the light-stabilizer classification controls how a stabilizer can cancel
+against d2c_j ζ). Structure available (S8): ker ∂₂ has weight enumerator
+{16:9, 18:48, 24:6} and lives in CRT components {3,4} only (dims 2+4);
+the reps satisfy |d2c_0 ζ| ∈ {12, 14, 16, 18, 20} — already ≥ 12.
+
+**(R) in equivalent forms.** im pr_* = ker τ_* ⟺ τ_*∘pr_* = 0 ⟺
+**σ_* = id on H₁(gross)** (the deck transformation x ↦ x+6 acts trivially
+on cover homology), via (1+σ)v = τ(p(v)). Dimensions force
+dim ker δ = dim im Δ = 6 from the Gysin sequence alone (im δ must fill the
+6-dim H₀ deficit), so (R) is the *inclusion* im pr_* ⊆ ker τ_*.
+
+### Dead end (first-class): the formal-module proof of (R) fails
+
+Trying z′ = (1+x⁶)u to bound τ(p(v)) = (1+x⁶)v: since (1+x⁶)² = 0,
+multiplication by (1+x⁶) factors through the base quotient, and the ansatz
+reduces to ∂₂^base ū = p(v) — i.e. [p(v)] = 0, false for safe v. So (R)
+is genuinely homological: any proof must use the cycle condition on v, not
+just module algebra. (Candidate routes: an explicit chain homotopy from
+the cut-cylinder/Mayer–Vietoris structure of the cover; or exhibiting a
+σ-stable logical basis of gross via the BB polynomial symmetries.)
+
+### Next steps (goal-1 queue)
+
+1. **(M-im)** via the classification: show no stabilizer b can cancel
+   d2c_j ζ below 12 — expect a graded argument in |b| using hexagon/D-pair
+   locality for light b and the COST/dictionary machinery for heavy b.
+   Start with the 9 weight-16 ζ's (likely one orbit).
+2. **(R)** via chain homotopy or a σ-stable basis.
+3. The weight-8/10 reachable-cycle census (deferred; only relevant as a
+   cross-check once (R) + (M-im) land — the reduction bypasses the
+   per-weight rungs entirely).
