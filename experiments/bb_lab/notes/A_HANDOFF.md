@@ -185,6 +185,23 @@ the formal (1+x⁶)-module proof FAILS — documented dead end), and
 enumerator {16:9, 18:48, 24:6} and lives in CRT components {3,4}).
 See `a3_msafe_scan.py` (S1–S8) and Entry 16.
 
+*Update (Entry 17): **(R) is PROVEN** — one-line homotopy: over the cover
+B² = 1+x²+x⁴ and (1+x²)B² = 1+x⁶, so z = (1+x²)B·v_L gives
+∂₂z = v + σv for every cover cycle: σ_* = id on H₁(gross). So now
+
+    **d(gross) = 12  ⟺  (M-im)**  (both directions; the upper bound is
+    τ(u\*) with u\*'s nonzero flux).
+
+New tools for (M-im): the Smith linking form vanishes identically, so
+im Δ^X = (im Δ^Z)^⊥ and Smith membership ⟺ six explicit seam-flux
+parities vanish; the weight-6 sub-rung (no weight-6 cycle is in a nonzero
+imΔ class) is verified in hand-checkable flux form on all three orbits;
+ker ∂₂ ∖ 0 has just 5 orbits under translation+swap, and the class minima
+12 are attained by the canonical reps themselves. Dead end: the
+π_x-collapse bound is identically 0. Two routes forward: the
+weight-8/10 light-cycle flux census, or the affine-COST grammar on the
+five cosets d2c_jζ + im ∂₂. See `a3_r_homotopy_mim.py` and Entry 17.*
+
 **The former tail (L-C) — now closed verified-finite (Entries 8–9).** The
 classification "every b ∈ Stab_Z(base) with 0 < |b| ≤ 11 is a hexagon or a
 D-pair" is established by the layer-profile route
