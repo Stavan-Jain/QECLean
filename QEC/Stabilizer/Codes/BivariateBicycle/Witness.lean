@@ -64,8 +64,7 @@ theorem tauUStar_mem_cycles : coverPull1 uStar ∈ grossComplex.cycles :=
   coverPull1_mem_cycles uStar_mem_cycles
 
 theorem chainWeight_tauUStar : grossComplex.chainWeight (coverPull1 uStar) = 12 := by
-  rw [grossComplex_chainWeight_eq, coverPull1_uStar_eq]
-  native_decide
+  rw [chainWeight_coverPull1, chainWeight_uStar]
 
 /-! ## The dual witness -/
 

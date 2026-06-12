@@ -352,6 +352,55 @@ theorem card_support_fiberSum_le [Fintype I] [Fintype J] [DecidableEq J]
   rw [card_support_fiberSum_add_overlap hσne hfiber v]
   exact Nat.le_add_right _ _
 
+/-- The support of a pullback along a double cover is exactly twice the base
+support: each base point in the support contributes its full two-point
+fiber. -/
+theorem card_support_pullback [Fintype I] [Fintype J]
+    (hσne : ∀ i, σ i ≠ i)
+    (hfiber : ∀ i i', f i' = f i ↔ i' = i ∨ i' = σ i)
+    {sec : J → I} (hsec : ∀ j, f (sec j) = j)
+    (u : J → ZMod 2) :
+    (Finset.univ.filter fun i => u (f i) ≠ 0).card
+      = 2 * (Finset.univ.filter fun j => u j ≠ 0).card := by
+  classical
+  -- Every member of the fiber pair `{sec j, σ (sec j)}` maps to `j`.
+  have hmem_im : ∀ j, ∀ i ∈ ({sec j, σ (sec j)} : Finset I), f i = j := by
+    intro j i hi
+    rcases Finset.mem_insert.mp hi with rfl | hi'
+    · exact hsec j
+    · rw [Finset.mem_singleton] at hi'
+      subst hi'
+      rw [(hfiber (sec j) (σ (sec j))).mpr (Or.inr rfl)]
+      exact hsec j
+  -- The pullback support is the disjoint union of the fiber pairs over the
+  -- base support.
+  have hbiUnion : (Finset.univ.filter fun i => u (f i) ≠ 0)
+      = (Finset.univ.filter fun j => u j ≠ 0).biUnion
+          (fun j => {sec j, σ (sec j)}) := by
+    ext i
+    simp only [Finset.mem_filter, Finset.mem_biUnion, Finset.mem_univ, true_and]
+    constructor
+    · intro hi
+      refine ⟨f i, hi, ?_⟩
+      have h1 : f i = f (sec (f i)) := (hsec (f i)).symm
+      rcases (hfiber (sec (f i)) i).mp h1 with h | h
+      · exact Finset.mem_insert.mpr (Or.inl h)
+      · exact Finset.mem_insert.mpr (Or.inr (Finset.mem_singleton.mpr h))
+    · rintro ⟨j, hj, hij⟩
+      rw [hmem_im j i hij]
+      exact hj
+  have hdisj : ∀ j₁ ∈ (Finset.univ.filter fun j => u j ≠ 0),
+      ∀ j₂ ∈ (Finset.univ.filter fun j => u j ≠ 0), j₁ ≠ j₂ →
+      Disjoint ({sec j₁, σ (sec j₁)} : Finset I) {sec j₂, σ (sec j₂)} := by
+    intro j₁ _ j₂ _ hne
+    refine Finset.disjoint_left.mpr fun i hi₁ hi₂ => ?_
+    exact hne ((hmem_im j₁ i hi₁).symm.trans (hmem_im j₂ i hi₂))
+  rw [hbiUnion, Finset.card_biUnion hdisj]
+  have hcard : ∀ j, ({sec j, σ (sec j)} : Finset I).card = 2 := fun j =>
+    Finset.card_pair (Ne.symm (hσne (sec j)))
+  rw [Finset.sum_congr rfl fun j _ => hcard j, Finset.sum_const, smul_eq_mul,
+    mul_comm]
+
 end DoubleCover
 
 /-! ## BB chain-map lemmas

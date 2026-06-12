@@ -186,6 +186,10 @@ theorem coverPull1_injective : Function.Injective ⇑coverPull1 :=
   LinearMap.funLeft_injective_of_surjective (ZMod 2) (ZMod 2) _
     coverPi_prodMap_surjective
 
+theorem coverPull0_injective : Function.Injective ⇑coverPull0 :=
+  LinearMap.funLeft_injective_of_surjective (ZMod 2) (ZMod 2) _
+    coverPi_surjective
+
 theorem coverPush1_surjective : Function.Surjective ⇑coverPush1 := fun u =>
   ⟨lift0 (Prod.map ⇑coverPi id) coverSec1 u,
     fiberSumFn_lift0 coverPi_prodMap_coverSec1 u⟩
@@ -239,6 +243,14 @@ theorem chainWeight_coverPush_le (v : GrossGroup × Fin 2 → ZMod 2) :
     bb72Complex.chainWeight (coverPush1 v) ≤ grossComplex.chainWeight v := by
   rw [gross_chainWeight_eq v]
   exact Nat.le_add_right _ _
+
+/-- Pulling back exactly doubles chain weight (each base qubit in the support
+contributes its full two-point fiber). -/
+theorem chainWeight_coverPull1 (u : BaseGroup × Fin 2 → ZMod 2) :
+    grossComplex.chainWeight (coverPull1 u) = 2 * bb72Complex.chainWeight u := by
+  rw [grossComplex_chainWeight_eq, bb72Complex_chainWeight_eq, coverPull1_apply]
+  exact card_support_pullback deckSigma1_ne coverPi_prodMap_fiber
+    coverPi_prodMap_coverSec1 u
 
 /-! ## Cycle-membership transfer -/
 
