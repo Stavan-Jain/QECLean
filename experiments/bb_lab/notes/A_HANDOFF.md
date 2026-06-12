@@ -6,7 +6,8 @@ bicycle (BB) quantum codes, especially the gross code `[[144,12,12]]`. It
 supersedes the Tier-1-era parts of `HANDOFF.md` for this specific effort and
 ties together the `A0`–`A3` notes. Date of handoff: 2026-06-10; updated
 2026-06-12 (Entries 11–14: all shape lemmas proven; (M) unconditional;
-**d(gross) ≥ 6 fully analytic**).
+**d(gross) ≥ 6 fully analytic**; Entry 15: the owed adversarial re-review
+passed — the chain HOLDS, **write-up grade**).
 
 ---
 
@@ -14,7 +15,10 @@ ties together the `A0`–`A3` notes. Date of handoff: 2026-06-10; updated
 
 **The program has its first headline theorem (Entry 14): d(gross) ≥ 6,
 fully analytic — triple the published Lin–Pryadko floor of 2. Goal 3 is
-achieved**, pending one owed adversarial re-review pass (see below). The
+achieved, and the owed adversarial re-review passed (Entry 15): every link
+HOLDS under an independent re-implementation of all machine checks
+(`a3_adv15_recheck.py`, 49/49) plus a hand re-derivation of every prose
+argument — the theorem is write-up grade.** The
 chain: gross is the free-Z₂ double cover of `[[72,12,6]]`; d_X = d_Z by the
 inversion duality Φ(w_L,w_R) = (ι(w_R), ι(w_L)) (Entry 13); the safe sector
 (pr_* ≠ 0) gives |v| ≥ |p(v)| ≥ 6 via the **small-cycle theorem** (Entry 13:
@@ -30,13 +34,20 @@ R-(3,1,1)); the m-rungs m(hexagon) ≥ 3 and m(D-pair) ≥ 1 follow from the
 small-cycle theorem by mod-hexagon coset averaging; and the old transfer
 hypothesis **(H0) d_base ≥ 6 is itself now a theorem** (Entry 13, Cor. 1).
 The Entry-8/9 machine checks are demoted to confirmations end to end.
-**Resume with: (1) an adversarial skeptic pass over the two newest links
-(the Entry-5 slice reduction and the Entry-13 case analysis) before any
-external write-up; (2) the standalone write-up; (3) goal 1 (d = 12) via the
-safe-sector (M)-analogue — |w| + 2|v₀ ∧ v₁| ≥ 12 over nontrivial base
-logicals w (the dangerous side is done and tight).** Start at
-`notes/A3_track1p1_log.md` Entries 13–14 and `scripts/a3_small_cycles.py`,
-`scripts/a3_shape_lemmas.py`.
+Goal 1 has since advanced past the raw (M)-analogue (Entries 16–18, after
+the review): the safe sector sees exactly the Smith classes, **(R) is
+proven** by the one-line homotopy, the flux characterization is fully
+analytic, and **d(gross) = 12 ⟺ (M-im)** — one base-code statement, with
+the weight-6 sub-rung proven and the affine-COST route seeded (all five
+Smith cosets pinned in components {3,4}).
+**Resume with: (1) goal 1 — the offset-COST DP on the five pinned cosets
+(§4 Entry-18 block; floors ≥ 12 everywhere ⟹ hand-organize like Entries
+9–12 and goal 1 closes); (2) the A4 write-up refresh (fold in Entry 15's
+Notes 1–2 — the (3,1,1,1) sub-case derivation order and a sentence fixing
+the d₃ dictionary as the support-⊆-W quantity — then extend with Entries
+16–18 once (M-im) lands, and get that extension its own skeptic pass).**
+Start at `notes/A3_track1p1_log.md` Entries 15–18 and
+`scripts/a3_r_homotopy_mim.py`, `scripts/a3_adv15_recheck.py`.
 
 ---
 
@@ -141,9 +152,10 @@ reproduce `d=12`) — the validation the buggy scout script lacked (see §5).
   1-cycles of weight ≤ 5, either side — Entry 13), which discharges (H0)
   d_base ≥ 6 AND both m-rungs; (M) in full; the inversion duality
   d_X = d_Z; **hence d(gross) ≥ 6 (Entry 14) and d(base) ≥ 6.**
-- **Owed before external write-up:** one adversarial skeptic re-review of
-  the two newest links (Entry-5 reduction, Entry-13 case analysis) in a
-  fresh session.
+- **Adversarial re-review: DONE (Entry 15, fresh session).** All four links
+  HOLD; two presentation debts recorded for the write-up (the (3,1,1,1)
+  derivation order; the d₃ = support-⊆-W clarification). Independent
+  checker: `a3_adv15_recheck.py` (49 checks, different encoding path).
 - **Open for goal 1 (d = 12):** the safe-sector (M)-analogue (§4).
 
 ---
@@ -236,8 +248,9 @@ load-bearing anymore.)*
 **Verification discipline before trusting any drafted argument:** run an
 adversarial skeptic sweep hunting a counterexample to an intermediate
 claim (never to the SAT-validated endpoints). Computation may *refute*
-but never *prove*. The owed pass for the new theorem: skeptic review of
-the Entry-5 reduction and the Entry-13 small-cycle case analysis.
+but never *prove*. The pass owed for the d ≥ 6 theorem was completed in
+Entry 15 (all links HOLD); the discipline applies afresh to any new
+goal-1/goal-2 argument.
 
 ---
 
@@ -335,12 +348,17 @@ the Entry-5 reduction and the Entry-13 small-cycle case analysis.
   → 8–9 (profile route, verified-finite closure) → 10–12 (hand-organization:
   engine, floor, one-block 16, all six shape lemmas — classification fully
   hand-proven) → 13 (small-cycle theorem: m-rungs + (H0) discharged) →
-  14 (**d(gross) ≥ 6 analytic** + dependency tree). Resume from Entries 13–14.
-- `notes/A4_writeup.md` — **the standalone write-up (DRAFT pending the
-  Entry-15 adversarial verdict):** Theorems A (small cycles; d(base) = 6
-  with explicit exhibit), B (d(gross) ≥ 6, minimal proof), C (dangerous
-  sector ≥ 12 via (M)), with the surveyable case tables and the
-  verification map. This is the deliverable form of the result.
+  14 (**d(gross) ≥ 6 analytic** + dependency tree) → 15 (adversarial
+  re-review: all links HOLD; **write-up grade**) → 16–18 (goal 1: the safe
+  sector IS the Smith sector; (R) proven by the homotopy; the flux
+  characterization via the no-double-wrap lemma; **d(gross) = 12 ⟺
+  (M-im)**). Resume from Entries 16–18 and the §4 update blocks.
+- `notes/A4_writeup.md` — **the standalone write-up of Theorems A/B/C
+  (review-cleared by Entry 15; fold in its Notes 1–2):** Theorems A (small
+  cycles; d(base) = 6 with explicit exhibit), B (d(gross) ≥ 6, minimal
+  proof), C (dangerous sector ≥ 12 via (M)), with the surveyable case
+  tables and the verification map. Entries 16–18 (the goal-1 advance) are
+  NOT yet covered by it or by the Entry-15 review.
 
 **Scripts (all under `scripts/`, run via `uv run python scripts/<name>` from
 `experiments/bb_lab/`):**
@@ -374,6 +392,9 @@ the Entry-5 reduction and the Entry-13 small-cycle case analysis.
   per-split kill intermediates, W6 exhaustive no-cycle-≤5 (both sides),
   W7 weight-6 census = 120, W8 m-rung scaffolding, W9 the inversion
   duality (base AND gross).
+- `a3_adv15_recheck.py` — **Entry 15**: the independent adversarial
+  re-implementation (49 checks; y-major indexing, bitmask F₂ algebra,
+  generator-side SAT hunt, own CRT frame). Confirmation only.
 - `a1_smith_*.py` — scout scaffolding. **`a1_smith_sector_sat.py` is BUGGY** (§6).
 - `a1_es_four_terms.py`, `a1_es_purity_check.py`, `a1_srb_cover_chain_check.py` —
   substrate (ES exact-sequence (6,6,6,6); purity; SRB cover-chain verification).
@@ -388,15 +409,13 @@ buggy-scout flag commit). Each `A3` entry is one commit.
 
 ## 8. Concrete next steps (ranked)
 
-1. **Adversarial re-review of the d(gross) ≥ 6 chain** (fresh session,
-   skeptic mode): the Entry-5 slice reduction and the Entry-13 small-cycle
-   case analysis are the two newest links; hunt for a counterexample to
-   each intermediate claim (not to the SAT-validated endpoints). Only
-   after this pass does the theorem graduate to write-up grade.
+1. ~~Adversarial re-review of the d(gross) ≥ 6 chain~~ **DONE (Entry 15):
+   all links HOLD; the theorem is write-up grade.**
 2. **Standalone write-up note**: the half-page minimal proof (small-cycle
    theorem + projection + b = 0 slice + duality ⟹ d ≥ 6), then the full
    (M) machinery as the tight dangerous-sector theorem; complete
-   dependency tree (Entry 14); the surveyable case tables.
+   dependency tree (Entry 14); the surveyable case tables; fold in
+   Entry 15's Notes 1–2.
 3. **Goal 1 (d = 12) — the safe-sector (M)-analogue** (§4): bound
    |w| + 2|v₀ ∧ v₁| ≥ 12 over nontrivial base logicals w. The dangerous
    side is done and tight; this is the only remaining gap to d = 12.
