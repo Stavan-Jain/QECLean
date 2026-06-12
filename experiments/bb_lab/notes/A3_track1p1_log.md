@@ -1535,10 +1535,150 @@ minimal proof and present (M) as the deeper theorem. (Entry 4's dead-end
 verdict on Fork B is amended accordingly — the objection was to the tower
 recursion, not the bound; A_HANDOFF §5.1 updated.)
 
+## Entry 15 (2026-06-12) — adversarial re-review: the d(gross) ≥ 6 chain HOLDS
+
+The owed skeptic pass (A_HANDOFF §0/§8 item 1), done in a fresh session under
+the standing rules: computation may refute but never prove; the SAT-validated
+endpoints are not attack targets; every load-bearing machine check was
+**re-implemented independently** (`scripts/a3_adv15_recheck.py`, 49 checks,
+all PASS) on a deliberately different encoding path — y-major indexing vs the
+lab's x-major, int-bitmask F₂ algebra vs numpy, direct-solve image membership
+vs dual-nullspace dots, a generator-side SAT hunt vs the layer-profile
+hash-join, own CRT frame (mod-2/mod-3 split, own F₄ tables) with the
+transform multiplicativity itself re-verified on the δ-basis. In parallel,
+every prose argument in the chain was re-derived by hand. Per-link verdicts:
+
+### Link 1 — the Entry-5 slice reduction: **HOLDS**
+
+- **Both inclusions** of "v₀ ranges exactly over d2c_j·z_b + {u′ ∈ Z₁ :
+  [u′] ∉ imΔ}" re-derived. (⊆): v = τ(u) + ∂₂^cov w with z = z_b + ζ gives
+  v₀ = d2c_j z_b + u″, u″ := u + d2c_jζ + ∂₂w₀ a cycle with [u″] = [u] +
+  Δ_j[ζ], so the ∉-imΔ condition is preserved. (⊇): given u′, take u := u′,
+  w := z_b placed entirely on sheet 1 (w₀ = 0); then v₀ = d2c_j z_b + u′ and
+  p(v) = b. The correspondence v ↔ v₀ is weight-faithful since v₁ = v₀ + b
+  (block form), so the slice minimum transfers exactly.
+- **Nontriviality bridge**: v = τ(u) + ∂₂^cov w is trivial ⟺ τ(u) ∈
+  im ∂₂^cov ⟺ [u] ∈ ker tr_\*, and ker tr_\* = im Δ_j is Smith exactness.
+  Re-verified EXACTLY (basis-level, not sampled): U0 := {u ∈ Z₁ : τ(u) ∈
+  im ∂₂^cov} equals im Δ_j + Stab for every cut j (AV4) — the lab's V5/V8
+  were sampled (200 random + 120 random); the exact check is strictly
+  stronger and passes.
+- **Boolean identity**: |x| + |x+b| = |b| + 2|x off supp b| is two-line
+  algebra (on supp b the two sheets contribute 1 per coordinate; off it,
+  2·x_q); it is applied to the correct restriction (off-supp of the SAME b
+  = p(v)). m(b) is well-defined (z_b-choice shifts absorb into the ζ-twist).
+- Foundations re-verified exactly: block form [[nc,c],[c,nc]] with
+  nc + c = base for H_X AND H_Z, all 6 cuts; dangerous space = τ(Z₁) +
+  im ∂₂^cov, dim 72 (exact rref equality).
+
+### Link 2 — the Entry-13 small-cycle case analysis: **HOLDS**
+
+- **Exhaustiveness of the split list**: |σ| ≡ |u_L| ≡ |u_R| (mod 2) via the
+  augmentation homomorphism (|A|, |B| odd) kills every odd-vs-even split;
+  what remains of a + b ≤ 5 is exactly (k,0)/(0,k), (1,1), (1,3)/(3,1),
+  (2,2) — the prose list is complete.
+- **(k,0)**: Ann(Â_j) = (Â_j) re-proven by hand in F₄[u,v]/(u²,v²)
+  ((u+ηv)·(δ+αu+βv+γuv) = δu + δηv + (αη+β)uv forces δ = 0, β = αη) and
+  re-verified by 256-element ring enumeration, both sides (AV6). The
+  ≥ 3-layers-all-even ⟹ ≥ 6-and-even conclusion follows; odd k dies by
+  parity.
+- **(1,1)**: equal translate 3-sets ⟹ dA = dB, contradicting dA ∩ dB = ∅ ✓.
+- **(1,3)/(3,1)**: the inclusion–exclusion behind "|B·z| = 3 ⟺ dB-triangle
+  with three DISTINCT pairwise-overlap cells" re-derived (common triple cell
+  ⟹ |B·z| = 7); both triangle classes re-enumerated independently; the
+  constant-y vs three-distinct-y kill checks out (AV2).
+- **(2,2)**: the full π_x/π_y bookkeeping re-derived by hand, including the
+  WLOGs the prose leaves implicit: pair differences are only defined up to
+  sign (unordered 2-sets), so the sign reductions are free; the
+  x-multiplicity multiset is translation-invariant, so the σ = A(1+x³y)
+  normalization is legitimate. Every sub-branch closes: |σ| = 4 with ℓ-diff
+  (0,±1) via Ann(1+x+x²) min weight 4; ℓ-diff ±(3,1) via {3,1} ≠ {2,1,1};
+  |σ| = 6 over all ℓ y-gaps 0, ±1, ±2, 3. Intermediates re-verified (AV2).
+- **The theorem itself**: exhaustive meet-in-middle with the independent
+  encoding — zero nonzero cycles of weight ≤ 5 in ker H_X AND ker H_Z;
+  weight-6 census = 120 (AV2).
+
+### Link 3 — Entries 10–12 (classification architecture): **HOLDS** (two notes)
+
+- **Pivot exhaustiveness**: evenness (|b| ≡ 2|z| ≡ 0), the parity lemma
+  (A and B have the same s-part multiset {1, s_x, s_y} — re-derived from the
+  monomials), and the floor (both blocks ≥ 3 alive layers — every branch of
+  the Entry-10 case walk re-checked against the d₃ costs) leave lighter-block
+  weight ∈ {3,4,5}; the six shapes are precisely the partitions into ≥ 3
+  parts on ≤ 4 layers; the x↔y swap σ(A) = B makes the lighter-block-=-A
+  pivot a genuine WLOG (it permutes the hexagon/D-pair families).
+- **Classification end-result hunted independently** (AV3, generator-side
+  SAT, blind to the shape machinery): weights 1–5, 7–9, 11 UNSAT; weight 6
+  = exactly the 36 hexagons; weight 10 = exactly the 216 D-pairs.
+- **One-block ≥ 16** case analysis re-walked (V₃/V₁ support splits × d₃
+  costs give 16/18/24/18/24) and the exact min 16 re-verified independently
+  on BOTH mirrors (4096-element span sweeps). The D-pair endgame needs only
+  > 12 (|Bz′| ≤ |Bz| + |Bp| ≤ 12), so 16 closes it with margin; the light
+  completions are exactly the 64 kernel translates per class (AV6).
+- **Weight-5 kills**: the B-block profile splits re-derived and exhaustive
+  (R-(2,1,1,1) completions: {(3,1,1), (2,1,1,1)}; R-(2,2,1): {1,2,2} only);
+  the comp-1 transfer kills re-derived (T = Â₁B̂₁⁻¹ has value vector
+  C₁([1]), kills constants, shifts δ's); the R-(3,1,1) κ-consistency
+  necessity re-derived from ψ₄ = ψ₁ψ₃ and η₁η₃ = η₄, and all 12 dead-2
+  triples violate κ₄ = κ₁κ₃ (AV6).
+- **Note 1 (presentational, no gap)**: in R-(1,1,1,1)'s (3,1,1,1) sub-case,
+  "the B-radical constants" compresses a three-step derivation that the
+  write-up should spell out: (i) V₃ᴮ, V₄ᴮ are constants via the A-side socle
+  transfer (Â₄ ∝ B̂₄; B̂₃Â₃ = ω·uv), (ii) ψ₃, ψ₄ separate ⟹ the three
+  δ-cells coincide at t₀, (iii) V₂ᴮ then cannot be co-point (a co-point
+  takes pairwise-distinct C-values on the three δ-layers, which now carry
+  the EQUAL values ψ₂(t₀)) ⟹ constant, giving the j = 2 relation. In fact
+  the A-side forces V₂ᴮ = 0 outright (ẑ₂ = ψ₂(t*)·uv is pinned by the unit
+  Â₂, and B̂₂·socle = 0), which contradicts the δ-layers immediately — a
+  one-line alternative kill worth recording.
+- **Note 2 (definitional, no gap)**: the d₃ dictionary is the
+  support-⊆-W quantity, NOT the exact-support minimum (those differ: e.g.
+  exact-support (2,T) has min 5, but d₃(2,T) = 3 via a line whose support is
+  a SUBSET). The prose uses it correctly throughout (all uses are
+  "support ⊆ W ⟹ weight ≥ d₃"); this re-review initially mis-read it the
+  other way and produced a spurious mismatch — one clarifying sentence in
+  the write-up will save the next reader the same trip. The (n,ε)
+  GL-symmetry of the table is real (verified over all 32 W).
+
+### Link 4 — the Entry-14 assembly and the duality: **HOLDS**
+
+- **Dichotomy**: [p(v)] ≠ 0 vs = 0 is tautologically exhaustive; the safe
+  branch needs only p(v) ≠ 0 (a nonzero base cycle) + the small-cycle
+  theorem; p is weight-non-increasing since |v₀| + |v₁| ≥ |v₀ + v₁|.
+- **m-rungs** (Entry 13 Cor. 2) re-derived: hexagon — the mod-b replacement
+  gives min(|u′∩h|, 6−|u′∩h|) ≤ 3, total ≤ 5 ⟹ rep = 0 ⟹ [u′] = 0 ∈ imΔ ✗;
+  D-pair — the four-coset weight sum is 2 per qubit of the 11-cell union
+  = 22 < 24 ✓ (and the seam containments supp(d2c_jδ_g) ⊆ h(g) hold for ALL
+  g, j — AV4 — closing the one spot the lab only argued "by construction").
+- **Inversion duality**: re-derived from the convolution convention —
+  Φ(w_L, w_R) = (ι(w_R), ι(w_L)) sends ker H_X → ker H_Z (apply ι to
+  Aw_L + Bw_R = 0 and use M_Bᵀ = M_B̄) and row g of H_X → row(−g) of H_Z, so
+  stabilizers map onto stabilizers, classes to classes, weights preserved:
+  d_X = d_Z. Exact basis-level checks pass for base AND cover (AV5).
+- **(M) assembly arithmetic**: 0 + 2·6, 6 + 2·3, 10 + 2·1, |b| ≥ 12 — all
+  ≥ 12 ✓; safe min 6; min(6,12) = 6 ✓.
+
+### Verdict
+
+**No link breaks. The theorem d(gross) ≥ 6 (and d(base) ≥ 6, d_X = d_Z)
+graduates to write-up grade.** The two notes above are presentation debts
+for the standalone write-up, not gaps. The independent checker
+`a3_adv15_recheck.py` (49 checks) joins the confirmation suite; like all of
+it, it is discovery/validation only and load-bearing nowhere.
+
+### Next
+
+1. The standalone write-up note (A_HANDOFF §8 item 2), folding in Notes 1–2.
+2. Goal 1 (d = 12): the safe-sector (M)-analogue.
+3. Goal 2: template runs on other BB bases.
+
+---
+
 ## Entry 16 (2026-06-12) — goal 1 opened: the safe sector IS the Smith sector; d = 12 reduces to two base-code statements
 
-*(Entry 15 is reserved for the adversarial re-review running in a parallel
-session; this entry starts the goal-1 program on the safe sector.)*
+*(Entry 15 is the adversarial re-review, which ran in a parallel session
+and is merged above; this entry starts the goal-1 program on the safe
+sector. The two lines proceeded concurrently from Entry 14.)*
 Foundations and discovery in `a3_msafe_scan.py` (S1–S8, all PASS).
 
 ### The safe-slice framework (S1–S3)
