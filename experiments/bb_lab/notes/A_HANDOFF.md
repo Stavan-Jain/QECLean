@@ -173,6 +173,18 @@ v₀ ranges over a syndrome-shifted coset (the old "s ≠ 0" data, in its
 correct home), and the overlap |v₀ ∧ v₁| is the new quantity to bound below
 on heavy-class slices. The m(b) slice machinery should adapt.
 
+*Update (Entry 16): the reduction is now much sharper.* The slice over w is
+nonempty iff δ(w) = [d1c_j w] = 0 in coker ∂₁, and **ker δ = im Δ**
+(verified, cut-independent): the safe sector sees exactly the 63 Smith
+classes. All 84 weight-6 base logicals are UNREACHABLE (empty slices —
+their rungs are vacuous). Goal 1 is therefore exactly two base-code
+statements: **(R)** ker δ = im Δ analytically (⟺ σ_* = id on H₁(gross);
+the formal (1+x⁶)-module proof FAILS — documented dead end), and
+**(M-im)** dist(d2c_j ζ, Stab_Z) ≥ 12 for the 63 nonzero ζ ∈ ker ∂₂
+(= the C2 crosscheck, true with the minimum at the bar; ker ∂₂ has weight
+enumerator {16:9, 18:48, 24:6} and lives in CRT components {3,4}).
+See `a3_msafe_scan.py` (S1–S8) and Entry 16.
+
 **The former tail (L-C) — now closed verified-finite (Entries 8–9).** The
 classification "every b ∈ Stab_Z(base) with 0 < |b| ≤ 11 is a hexagon or a
 D-pair" is established by the layer-profile route
