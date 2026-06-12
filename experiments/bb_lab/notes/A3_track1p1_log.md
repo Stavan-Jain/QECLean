@@ -1187,3 +1187,137 @@ Hand-proven so far: dictionary, engine, one-block (now ≥ 16), floor, R1,
 R-(1,1,1,1), **R-(2,1,1) + endgame**. Remaining: the three weight-5 kills
 R-(2,1,1,1), R-(2,2,1), R-(3,1,1) (next entry), then the two m-rung locality
 proofs, then the assembled write-up.
+
+## Entry 12 (2026-06-12) — hand-organization III: the weight-5 kills; light-b classification fully hand-proven
+
+Final block of the shape-lemma program (`a3_shape_lemmas.py`, checks V6–V8,
+all PASS — same script as Entry 11). Outcome: **R-(3,1,1), R-(2,1,1,1) and
+R-(2,2,1) are killed by hand**, so all six pivot shapes are closed and the
+light-stabilizer classification — every b ∈ Stab_Z(base) with 0 < |b| ≤ 11
+is one of the 36 hexagons or 216 D-pairs — is **fully hand-proven**, with no
+machine ingredient left anywhere in the chain.
+
+### The comp-1 transfer operator (the new shared tool, V7)
+
+B̂₁ = 1 + u + v is a self-inverse unit, so on component 1 the two blocks are
+locked together: V₁ᴬ = T·V₁ᴮ with **T := Â₁·B̂₁⁻¹ = Â₁(1+u+v)**. Direct
+expansion gives T = u + ωv + (1+ω)uv, whose value vector is exactly
+C₁([1]) = (0, ω, 1, ω²) — and T·1⃗ = 0 (it lies in the radical ideal). Two
+consequences: T kills constant vectors, and T·δ_σ is the co-point vector
+vanishing at layer σ. So whenever the B-side pins V₁ᴮ to a constant-plus-spike
+shape, the A-side value V₁ᴬ is forced to a co-point with a *prescribed* zero —
+one comparison with the A-side classification then kills the configuration.
+
+### R-(3,1,1): im(A·) has no such element (V6)
+
+Layers: weight-3 layer P at s_T, two δ-point layers, zero layer s₄. Each
+radical V_j (j ∈ {1,3,4}) is co-point (nonzero at the δ-layers, zero at s₄),
+so V_j[s_T] ≠ 0 is forced for all three.
+
+- **P a line** {p, p+g, p+2g}: V_j[s_T] = ψ_j(p)(1 + ψ_j(g) + ψ_j(2g)) = 0
+  unless the orbit j is orthogonal to g. Only one orbit class is, so at least
+  two of {1,3,4} die at s_T. ✗
+- **P a triangle** {p, p+g, p+h} (g, h independent): with
+  κ_j := 1 + ψ_j(g) + ψ_j(h), κ_j = 0 ⟺ {ψ_j(g), ψ_j(h)} = {ω, ω²}
+  ⟺ (j·g, j·h) ∈ {(1,2), (2,1)}; since j ↦ (j·g, j·h) is a bijection from
+  functionals to Z₃², **exactly one orbit class is dead**, and it can be any
+  of the four. Dead ∈ {1,3,4}: support kill as above. ✗
+- **Dead = comp 2** (the A-unit — the subtle family): all radical supports
+  survive, so the kill must come from rigidity. The ratio system
+  ψ_j(p − t₁)·κ_j = C-ratio_j (j ∈ {1,3,4}) is solvable only if the values
+  respect the character relation ψ₄ = ψ₁·ψ₃; the C-ratios do respect it
+  (Cr₄ = Cr₁·Cr₃, by the j-independent exponents and η₁η₃ = η₄), so
+  solvability forces **κ₄ = κ₁·κ₃**. This is base-point-invariant (rebasing
+  scales both sides by ψ₄), and the 6-case enumeration of dead-2 triangles
+  (gₓ = 1, hₓ = 2, the six non-collinear (g_y, h_y)) shows it **never
+  holds** (V6 table). ✗
+
+So im(A·) has no (3,1,1) element; by the x↔y swap neither does im(B·) — the
+fact the other two kills lean on. (V6 cross-check: direct enumeration finds
+0 and 0.)
+
+### R-(2,1,1,1): classification, then the kill (V7)
+
+*Classification.* All four layers alive, so radical supports are co-point or
+full; the three δ-layers keep every V_j nonzero on ≥ 3 layers. The pair
+difference δ lies in at most one radical kernel:
+
+- δ in **no** radical kernel (t_y direction): all three V_j full ⟹ constant
+  (engine) ⟹ the three δ-cells coincide at t*, and the pair-layer equation
+  ψ_j(p)·η_j² = ψ_j(t*) gives ψ_j(p − t*) = η_j for all j ⟹ p = t* + (0,1).
+  Pattern: **δ-cells t* on three layers, pair {t*+e, t*+2e} on the fourth** —
+  again a single t_y-fibre; one translation class, 36 elements (V7: equals
+  the enumerated set).
+- δ in **exactly one** radical kernel j₀: the other two V_j are full ⟹
+  constant ⟹ the three δ-cells coincide; but then V_{j₀} takes the *same*
+  value on the three δ-layers, while a co-point vector takes three *pairwise
+  distinct* values there (C-table). ✗
+
+*Kill.* A completion with |b| ≤ 10 has |Bz| = 5 (lighter-block pivot) and
+shares layer parities: S₀ = the three δ-layers. A weight-5 block with ≥ 3
+alive layers and exactly three odd ones is (3,1,1) (zero layer at s_P) or
+(2,1,1,1) (pair at s_P):
+
+- B-block (3,1,1): impossible — no (3,1,1) element of im(B·) (above).
+- B-block (2,1,1,1): the mirror classification pins it to δ-cells t₀ on the
+  three S₀-layers and a t_x pair {t₀+eₓ, t₀+2eₓ} at s_P. Then ψ₁ kills the
+  t_x pair (ψ₁(eₓ) = 1), so V₁ᴮ = ψ₁(t₀)·(1⃗ + δ_{s_P}), and the transfer
+  gives V₁ᴬ = ψ₁(t₀)·T·(1⃗ + δ_{s_P}) = ψ₁(t₀)·shift_{s_P}(T): a co-point
+  vector **vanishing at s_P**. But the A-side classification makes V₁ᴬ the
+  nonzero *constant* ψ₁(t*)·1⃗ — full support. ✗
+
+(V7: the completion minimum is |Bz| = 9, i.e. |f| + μ_B = 14 — the kill with
+a 4-unit margin.)
+
+### R-(2,2,1): classification, then the kill (V8)
+
+*Classification.* Zero layer s₄ ⟹ co-point rigidity; direction forcing
+(Entry 11) puts **both** pairs in the t_y direction (each pair layer is in
+every radical co-point support). Writing the δ-layer cell as t, the same
+η-power bookkeeping as in Entry 11 forces each pair layer to {t, t + k·e}
+where η^k = C(s_δ)/C(s_pair) — concretely, the three nonzero layers carry
+{t}, {t, t+e}, {t, t+2e} in an order determined by the arrangement. Three
+translation classes (relative position s_δ − s₄), 108 elements, all inside
+a single t_y-fibre (V8: equals the enumerated set; fibre check passes).
+
+*Kill.* A completion with |b| ≤ 10 has |Bz| = 5 with exactly **one** odd
+layer, at s_δ (parity matching: S₀ = {s_δ}). The only weight-5 layer profile
+with one odd part and ≥ 3 alive layers is {1, 2, 2} — so the B-block is
+(2,2,1) with its δ-layer at s_δ, and the mirror classification puts its two
+pairs in the t_x direction. ψ₁ kills both t_x pairs, so V₁ᴮ = ψ₁(t′)·δ_{s_δ}
+and the transfer gives V₁ᴬ = ψ₁(t′)·shift_{s_δ}(T): a co-point vector
+vanishing at **s_δ**. But the A-side rigidity makes V₁ᴬ = α₁·C₁(s₄), which
+vanishes at **s₄** and is nonzero at s_δ (it equals ψ₁(t_δ) there). ✗
+
+(V8: completion minimum |Bz| = 9 for every class — again margin 4.)
+
+### Milestone: the classification rung is fully analytic
+
+Assembling the pivot architecture (all pieces now hand-proven): for
+b ∈ Stab_Z(base) with 0 < |b| ≤ 11, evenness gives |b| ≤ 10; parity + floor
+give both blocks ≥ 3 alive layers, so the lighter block (WLOG the A-block,
+by the x↔y swap) has weight 3, 4 or 5 and shape among the six;
+
+- (1,1,1) ⟹ b is a hexagon (R1 + endgame, |b| = 6);
+- (2,1,1) ⟹ b is a dA D-pair (Entry 11, |b| = 10); the swap covers dB;
+- (1,1,1,1), (2,1,1,1), (2,2,1), (3,1,1) ⟹ no light b at all.
+
+**Theorem (light-stabilizer classification, hand-proven).** Every nonzero
+b ∈ Stab_Z(base) with |b| ≤ 11 is one of the 36 hexagons (|b| = 6) or the
+216 D-pairs (|b| = 10). In particular the minimum nonzero stabilizer weight
+is 6, and there are no stabilizers of weight 8.
+
+The Entry-8 component-support DP and the Entry-9 28-family hash-join are now
+*entirely* demoted to numerical confirmations. Dependency chain of the
+theorem: dictionary + engine + one-block(16) + floor + parity + evenness
+(Entries 8–11) + the six shape lemmas (R1, R-(1,1,1,1): Entry 10; R-(2,1,1) +
+endgame: Entry 11; the three weight-5 kills: this entry). Everything sits on
+explicit F₄[Z₂²] computations a referee can check line by line.
+
+### Status
+
+Remaining for the conditional factor-2 theorem (M): the two m-rung locality
+proofs — m(hexagon) ≥ 3 (no non-imΔ cycle in hexagon+2 qubits) and
+m(D-pair) ≥ 1 (cycle space of the 11-qubit pair union) — then the assembled
+write-up with the full dependency tree, and the recursion bookkeeping
+(Entry 4's caution) for what the factor-2 statement yields downstream.
