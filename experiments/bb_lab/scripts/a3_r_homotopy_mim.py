@@ -287,4 +287,70 @@ print(f"  count with |d2c_0 zeta| = 12: {n12} (S8 said 18)")
 print(f"  (t_x-fibres L, t_x-fibres R, |zeta|, |w_L|, |w_R|) multiset: "
       f"{sorted(set(fibre_flags))}")
 
+# ---------------------- M7: the winding sharpening + pinned components
+print("\n=== M7: d1c.d2c = 0 = d1nc.d2nc (the no-double-wrap identities) ===")
+def d2_mats(j):
+    d2nc = np.zeros((72, nb), np.uint8)
+    d2c = np.zeros((72, nb), np.uint8)
+    for g in Gb:
+        col = Gb.index(g)
+        for blk, steps in ((0, B_steps), (1, A_steps)):
+            for (sx, sy) in steps:
+                cell = blk * nb + Gb.index(((g[0] + sx) % 6, (g[1] + sy) % 6))
+                tgt = d2c if ((g[0] - j) % 6) + sx >= 6 else d2nc
+                tgt[cell, col] ^= 1
+    return d2nc, d2c
+ok_m7 = True
+for j in range(6):
+    d1c = d1c_mat(j)
+    d1nc = (HX ^ d1c) % 2
+    d2nc, d2c_ = d2_mats(j)
+    ok_m7 &= not ((d1c @ d2c_) % 2).any()
+    ok_m7 &= not ((d1nc @ d2nc) % 2).any()
+    ok_m7 &= not (((d1nc @ d2c_) % 2) ^ ((d1c @ d2nc) % 2)).any()
+print(f"  d1c_j d2c_j = 0, d1nc_j d2nc_j = 0, d1nc d2c = d1c d2nc (all j): {ok_m7}")
+
+print("\n=== M8: pinned components of the Smith cosets (affine-COST seed) ===")
+# per orbit rep zeta and component j: is the offset pair ((d2c z)^L_j-hat,
+# (d2c z)^R_j-hat) realizable as (Bhat t, Ahat t)?  Non-realizable = pinned.
+ORBITS5 = {0: (0, 0), 1: (0, 1), 2: (1, 0), 3: (1, 1), 4: (1, 2)}
+def wpow(k): return [1, 2, 3][k % 3]
+F4_MUL = np.zeros((4, 4), dtype=np.uint8)
+for a in range(4):
+    for b_ in range(4):
+        a0, a1 = a & 1, a >> 1
+        b0, b1 = b_ & 1, b_ >> 1
+        F4_MUL[a, b_] = ((a0 & b0) ^ (a1 & b1)) | ((((a0 & b1) ^ (a1 & b0) ^ (a1 & b1)) << 1))
+def f4m(a, b): return int(F4_MUL[a, b])
+def comp_hat(vec36, j):
+    out = [0, 0, 0, 0]
+    for g in Gb:
+        if vec36[Gb.index(g)]:
+            s = (g[0] % 2) | ((g[1] % 2) << 1)
+            c, d = ORBITS5[j]
+            out[s] ^= wpow(c * (g[0] % 3) + d * (g[1] % 3))
+    return tuple(out)
+def ring_mul4(f, g):
+    out = [0, 0, 0, 0]
+    for s1 in range(4):
+        for s2 in range(4):
+            out[s1 ^ s2] ^= f4m(f[s1], g[s2])
+    return tuple(out)
+delta0 = np.eye(nb, dtype=np.uint8)[Gb.index((0, 0))]
+AH = {j: comp_hat((d2b[nb:, :] @ delta0) % 2, j) for j in range(5)}
+BH = {j: comp_hat((d2b[:nb, :] @ delta0) % 2, j) for j in range(5)}
+def all_elems4():
+    from itertools import product as prod
+    return [tuple(t) for t in prod(range(4), repeat=4)]
+S4 = all_elems4()
+realizable = {j: {(ring_mul4(BH[j], t), ring_mul4(AH[j], t)) for t in S4} for j in range(5)}
+for k in sorted(orbs):
+    z = np.frombuffer(k, dtype=np.uint8).copy()
+    w0 = split_d2_apply(0, z)
+    pins = []
+    for j in range(5):
+        off = (comp_hat(w0[:nb], j), comp_hat(w0[nb:], j))
+        pins.append(0 if off in realizable[j] else 1)
+    print(f"  orbit wt {int(z.sum())}: pinned components (j=0..4): {pins}")
+
 print("\nDone.")

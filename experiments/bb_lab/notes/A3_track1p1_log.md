@@ -1713,3 +1713,72 @@ imΔ class.**
    machinery closes (M-im) the same way it closed the classification.
 3. Hand proof of the zero linking form (the flux characterization's
    remaining leg).
+
+## Entry 18 (2026-06-12) — the no-double-wrap lemma: the flux characterization is fully analytic
+
+Closes the owed leg of Entry 17 (the zero linking form) with a two-line
+geometric argument, and seeds the affine-COST route to (M-im).
+Script: `a3_r_homotopy_mim.py` M7–M8 (PASS).
+
+### Lemma (no double wrap)
+
+For every cut j:  **d1c_j·d2c_j = 0,  d1nc_j·d2nc_j = 0,  and
+d1nc_j·d2c_j = d1c_j·d2nc_j.**
+
+*Proof.* An entry of ∂₁∂₂ at (check c, face f) sums over two-step paths
+f → qubit → c: through the left block (a B-step, then an A-step) or the
+right block (an A-step, then a B-step), one path per factorization
+c·f⁻¹ = a·b per route — an even number in total (AB = BA). The x-advance
+of any such path is ≤ 3 + 2 = 5 < 6, so a path crosses the cut line **at
+most once**, and whether it crosses is determined by the endpoints alone
+(a monotone path of advance D < 6 from x_f crosses iff the cut lies in
+the circular interval (x_f, x_f + D]). Hence all paths at a given entry
+have the same crossing count: if 0, they all lie in d1nc·d2nc and cancel
+there; if 1, each crosses during exactly one of its two steps, so
+d1c·d2c and d1nc·d2nc receive nothing, and the paths distribute between
+d1nc·d2c and d1c·d2nc with even total — forcing those two entries equal.
+∎ (M7: verified as matrix identities for all six cuts. This sharpens the
+Entry-5 chain identities, whose stated form was only the sums.)
+
+### Corollary: the flux characterization, now fully analytic
+
+P[ξ, ζ] = ⟨d1c_jᵀξ, d2c_jζ⟩ = ξᵀ(d1c_j·d2c_j)ζ = **0** — the linking
+form vanishes *as a bilinear identity*, before any kernel conditions.
+With the standard perfect H₁^X × H₁^Z pairing and dim imΔ^X =
+dim imΔ^Z = 6 (forced by the Gysin sequence, Entry 16):
+
+    im Δ^X = (im Δ^Z)^⊥,   so   [w] ∈ im Δ  ⟺  ξᵀ·d1c_j·w = 0
+    for the six ξ ∈ ker H_Xᵀ — six explicit, sparse parities.
+
+Every ingredient of the characterization is now hand-proven. In
+particular the Entry-17 weight-6 sub-rung computations (nonzero flux on
+all three orbits) are load-bearing-grade: each is a finite overlap count
+between a weight-6 logical and an explicit X-Smith representative.
+
+### The affine-COST seed (M8): every Smith coset is pinned
+
+For each of the five ζ-orbits, the component offsets of the canonical rep
+d2c₀ζ were tested for realizability as boundary pairs (B̂t, Ât):
+
+    orbit wt 16:  pinned at components {3, 4}
+    orbit wt 18a: pinned at {4};   orbit wt 18b: pinned at {3, 4}
+    orbit wt 24a: pinned at {4};   orbit wt 24b: pinned at {3}
+
+Every orbit is pinned somewhere in the doubly-radical pair {3, 4} (and
+nowhere else) — as it must be: the obstruction lives where ker ∂₂ lives.
+Consequence for (M-im): in every element of a nonzero Smith class, the
+pinned component is alive, so the support grammar (co-point-or-full at
+radical components) forces alive layers in **both** blocks at the pinned
+component, and the offset version of the Entry-8/9 COST analysis applies
+with a nonzero floor. The next session's program: run the offset-COST
+minimization per orbit (machine first); if every floor is ≥ 12, the
+hand-organization mirrors Entries 9–12 (engine + C-table on the offset
+grammar) and closes (M-im) — hence goal 1 — entirely.
+
+### Status
+
+- (R): PROVEN (Entry 17). Zero linking form: PROVEN (this entry).
+- (M-im): weight-6 sub-rung proven; weights 8/10 remain, two routes
+  (light-cycle flux census / affine-COST on five pinned cosets), with the
+  pinned-component data pointing at the latter.
+- d(gross) = 12 ⟺ (M-im) — unchanged, one statement away.
