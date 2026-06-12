@@ -69,6 +69,13 @@ the per-cell locus tables derived by rules R1–R5: 48 + 48 + 22 = 118,
 matching Entry 25, all killed by one-convolution ρ-link checks.
 `a3_a4ext_recheck.py` certifies every table (all PASS).
 d(gross) = 12 and d(gross) ≥ 6 are both fully analytic.***
+**Update (A5 Entries 1–3, 2026-06-12): goal 2 STARTED —
+`notes/A5_goal2_log.md`. First class result: d(bb_108) ≥ 6 fully
+analytic (Z₂-frame engine + the gross d₃ dictionary via pullback),
+with the Theorem-B transfer to its n = 216 covers; corpus sweeps
+(812 Z6xZ6 + 68 Z15xZ3) locate a 54-member empirical class with zero
+d < 6 exceptions; gap analysis for the single class theorem in
+Entry 3.**
 
 ---
 
@@ -591,13 +598,22 @@ buggy-scout flag commit). Each `A3` entry is one commit.
    prose vs. the certified tables, with special attention to the §12
    locus-table presentation grade (rule-derived with worked
    representatives; a reviewer may demand more worked cells).
-5. **Goal 2 — template runs**: the small-cycle engine analysis on other
-   BB bases (Bravyi instances; bb_90/bb_108 odd-h covers with k′ = 8);
-   each run needs only the CRT components, the difference sets, and the
-   projections of that instance. The Entry-28 slot frame is
-   instance-generic (only m, the offsets, and the e/d_w dictionary
-   change).
-6. **Maintain `A3_track1p1_log.md`** as the running log; commit per entry.
+5. **Goal 2 — template runs**: STARTED — see `notes/A5_goal2_log.md`
+   (the goal-2 track log). Entry 1: the instance-hypothesis checker
+   (`scripts/a5_instance_hypotheses.py`) + corpus sweeps — the
+   empirical class {floor-bearing frame ∧ mult-free ∧ dA∩dB=∅} has
+   54 members across Z6xZ6/Z15xZ3 with zero d < 6 exceptions.
+   Entry 2: **bb_108 template run DONE — d(bb_108) ≥ 6 analytic**
+   (Z₂-frame engine, μ(Ann) = 12 via the gross d₃ dictionary pulled
+   back through Z₉×Z₃ → Z₃²; confirmation
+   `scripts/a5_bb108_smallcycles.py`, W1–W7 PASS), plus the Theorem-B
+   transfer to its two n = 216 free-Z₂ covers. Entry 3: gap analysis —
+   proposed class-theorem shape with hypotheses (a)–(d); the missing
+   deeper-2-part engine and the census-dependence of the (1,3)/(2,2)
+   kills are the open gaps. Next: bb_90 (semisimple variant) run;
+   (iv)/(v) census sweep over the 54-member class.
+6. **Maintain `A3_track1p1_log.md`** as the running log for the gross
+   arc, and `A5_goal2_log.md` for goal 2; commit per entry.
 
 ---
 
