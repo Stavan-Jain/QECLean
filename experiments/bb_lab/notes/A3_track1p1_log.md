@@ -1516,3 +1516,21 @@ dangerous bound 12 is *tight*, attained by the τ(u) reps).
    case tables) — the deliverable form of the result.
 3. Safe-sector (M)-analogue for goal 1 (d = 12).
 4. Template run on other BB bases for goal 2.
+
+### Addendum (same day): the minimal proof — Fork B resurrected
+
+The small-cycle theorem makes the headline bound much cheaper than the full
+chain suggests. Fork B (Entry 4) was killed because its ingredients
+d_base ≥ 6 and μ_Z ≥ 6 were SAT-only and recursing down the tower degraded
+them; **both are now corollaries of the small-cycle theorem directly** (a
+nonzero stabilizer is a nonzero cycle), with no recursion. The half-page
+proof of d(gross) ≥ 6: for v a nontrivial cover Z-logical, either p(v) ≠ 0
+— a nonzero base cycle, so |v| ≥ |p(v)| ≥ 6 (uniformly over the safe sector
+AND the dangerous b ≠ 0 slices) — or p(v) = 0, where the Entry-5 slice
+formula gives v = τ(v₀)-form with v₀ a nonzero cycle ([v₀] ∉ imΔ), so
+|v| = 2|v₀| ≥ 12; finish with d_X = d_Z. The classification and (M) are NOT
+needed for ≥ 6 — their value is the **tight dangerous bound ≥ 12**, which
+is exactly the asset goal 1 builds on. The write-up should lead with the
+minimal proof and present (M) as the deeper theorem. (Entry 4's dead-end
+verdict on Fork B is amended accordingly — the objection was to the tower
+recursion, not the bound; A_HANDOFF §5.1 updated.)

@@ -5,44 +5,38 @@ finding an *analytic* lower bound on the minimum distance `d` of bivariate-
 bicycle (BB) quantum codes, especially the gross code `[[144,12,12]]`. It
 supersedes the Tier-1-era parts of `HANDOFF.md` for this specific effort and
 ties together the `A0`–`A3` notes. Date of handoff: 2026-06-10; updated
-2026-06-12 (Entries 5–6: the m(b) collapse and its analytic ladder).
+2026-06-12 (Entries 11–14: all shape lemmas proven; (M) unconditional;
+**d(gross) ≥ 6 fully analytic**).
 
 ---
 
 ## 0. RESUME HERE (the one-paragraph version)
 
-The attack is the **h=2 cover-transfer theorem** (gross is the free-Z₂ double
-cover of `[[72,12,6]]`). As of Entry 5 the previous open "fibre-disjointness /
-s≠0" lemma is **dissolved**: the whole dangerous sector is graded by the
-projected stabilizer `b = p(v)` via the verified, hand-checkable slice identity
-
-> min{|v| : v nontrivial dangerous, p(v) = b} = |b| + 2·m(b),
-> m(b) := min{|(d2c·z_b + u') off supp b| : u' a base 1-cycle, [u'] ∉ imΔ}
-
-(cut-independent — the s=0/s≠0/[c]=0 trichotomy of Entries 1–3 was a
-cut-coordinate artifact), so the factor-2 lemma is exactly **(M): |b| + 2·m(b)
-≥ 12 for every base Z-stabilizer b**. As of Entry 9 **every rung of (M) is
-closed**: b = 0 and |b| ≥ 12 proven; the light-b classification ("every
-stabilizer of weight ≤ 11 is a hexagon or a D-pair") proven by hand for
-face-supports k ≤ 7 (Entries 6–7: overlap ≤ 1, K₄-freeness,
-octahedron-freeness, Turán) and closed in FULL at the verified-finite level
-by the layer-profile route (Entries 8–9: parity + floor + evenness lemmas
-reduce |b| ≤ 10 to 28 profile families; exhaustive syndrome-join checks
-resolve every family to exactly 36 hexagons + 216 D-pairs + nothing); the
-m-rungs (m(hexagon) ≥ 3, m(D-pair) ≥ 1) verified exhaustively. **No
-unbounded-structure gap remains anywhere in the factor-2 lemma.** Entry 10
-began the hand-organization and removed the last machine dependency from
-profile completeness: the d₃ dictionary, the rigidity ENGINE (radical
-ideals are co-point-or-full with 1-parameter values), the ONE-BLOCK lemma
-(|Bz′| ≥ 12 on Ann(A)\ker; exact min 16), and the FLOOR lemma are all
-hand-proven, and the family analysis collapses (pivot on the lighter
-block, weight ≤ 5) to SIX shape lemmas, of which (1,1,1) [⟹ hexagons; R1]
-and (1,1,1,1) [⟹ none] are proven. What is left for the "fully analytic"
-bar (§1): the four remaining shape lemmas R-(2,1,1) [the D-pair lemma],
-R-(2,1,1,1), R-(2,2,1), R-(3,1,1) — statements, tools, and target outputs
-fixed by the G4 master table in `a3_mb_rigidity.py` — plus the two m-rung
-locality proofs. Start at `notes/A3_track1p1_log.md` Entries 9–10 and
-`scripts/a3_mb_rigidity.py`.
+**The program has its first headline theorem (Entry 14): d(gross) ≥ 6,
+fully analytic — triple the published Lin–Pryadko floor of 2. Goal 3 is
+achieved**, pending one owed adversarial re-review pass (see below). The
+chain: gross is the free-Z₂ double cover of `[[72,12,6]]`; d_X = d_Z by the
+inversion duality Φ(w_L,w_R) = (ι(w_R), ι(w_L)) (Entry 13); the safe sector
+(pr_* ≠ 0) gives |v| ≥ |p(v)| ≥ 6 via the **small-cycle theorem** (Entry 13:
+the base code has NO nonzero 1-cycles of weight ≤ 5, either side — proven by
+a per-split hand analysis: parity, the Ann-engine ≥ 6, dA ∩ dB = ∅,
+dB-triangle chirality, π_x/π_y projection bookkeeping); the dangerous sector
+(pr_* = 0) gives |v| = |b| + 2|v₀ off b| ≥ |b| + 2m(b) ≥ 12 via **(M), now
+proven with NO hypothesis**: the light-stabilizer classification (every
+0 < |b| ≤ 11 is one of 36 hexagons or 216 D-pairs) is fully hand-proven
+(Entries 10–12: dictionary, engine, one-block ≥ 16, floor, six shape
+lemmas — R1, R-(1,1,1,1), R-(2,1,1)+endgame, R-(2,1,1,1), R-(2,2,1),
+R-(3,1,1)); the m-rungs m(hexagon) ≥ 3 and m(D-pair) ≥ 1 follow from the
+small-cycle theorem by mod-hexagon coset averaging; and the old transfer
+hypothesis **(H0) d_base ≥ 6 is itself now a theorem** (Entry 13, Cor. 1).
+The Entry-8/9 machine checks are demoted to confirmations end to end.
+**Resume with: (1) an adversarial skeptic pass over the two newest links
+(the Entry-5 slice reduction and the Entry-13 case analysis) before any
+external write-up; (2) the standalone write-up; (3) goal 1 (d = 12) via the
+safe-sector (M)-analogue — |w| + 2|v₀ ∧ v₁| ≥ 12 over nontrivial base
+logicals w (the dangerous side is done and tight).** Start at
+`notes/A3_track1p1_log.md` Entries 13–14 and `scripts/a3_small_cycles.py`,
+`scripts/a3_shape_lemmas.py`.
 
 ---
 
@@ -139,39 +133,45 @@ end to end (`a3_mb_foundations.py` all-PASS, `a3_mb_scan.py`,
 `a3_mb_crosscheck.py`). All SAT encodings pass the sanity ladder (they
 reproduce `d=12`) — the validation the buggy scout script lacked (see §5).
 
-### What is and isn't proven
+### What is and isn't proven (updated, Entries 11–14)
 
-- **Analytically proven** (given `d_base=6` as the transfer input, used only
-  at b=0): safe sector ≥ 6; the m(b) reduction itself; (M) on the rungs b=0,
-  |b| ≥ 12, and light-b classification through face-support k ≤ 7
-  (ov ≤ 1 + K₄-freeness — Entry 6; octahedron-freeness — Entry 7; all full
-  hand proofs).
-- **Verified finite facts with hand-proofs owed:** the two m-rung locality
-  facts (hexagon+2, pair-union+1).
-- **Open** (true with margin per SAT): the k ≥ 8 tail — see §4.
-- **Therefore: no fully-analytic improvement on `d ≥ 2` exists yet.** Do not
-  claim one. (Unchanged — the ladder is not yet closed.)
+- **Analytically proven, no hypothesis:** the m(b) reduction; the full
+  light-stabilizer classification (every 0 < |b| ≤ 11 is a hexagon or
+  D-pair — Entries 10–12); the small-cycle theorem (no nonzero base
+  1-cycles of weight ≤ 5, either side — Entry 13), which discharges (H0)
+  d_base ≥ 6 AND both m-rungs; (M) in full; the inversion duality
+  d_X = d_Z; **hence d(gross) ≥ 6 (Entry 14) and d(base) ≥ 6.**
+- **Owed before external write-up:** one adversarial skeptic re-review of
+  the two newest links (Entry-5 reduction, Entry-13 case analysis) in a
+  fresh session.
+- **Open for goal 1 (d = 12):** the safe-sector (M)-analogue (§4).
 
 ---
 
 ## 4. The precise open problem (where to push)
 
-*(Superseded form: Entries 0–4 posed this as the s≠0 "fibre-disjointness"
-case; Entry 5 proved that case split is a cut artifact and replaced it with
-the b-graded form below. The Entry-3 "affine syndrome class" diagnosis of why
-classical Plotkin fails remains correct — the cure is the puncture in m(b).)*
+*(Superseded forms: Entries 0–4 posed this as the s≠0 "fibre-disjointness"
+case; Entry 5 replaced it with (M); Entries 10–13 PROVED (M) in full. The
+open problem is now the goal-1 frontier below.)*
 
-The factor-2 lemma is exactly **(M): |b| + 2·m(b) ≥ 12 for every base
-Z-stabilizer b** (Entry 5; all reductions verified, `a3_mb_foundations.py`).
-Status of (M) by rung (Entry 6):
+**(M) is proven — every rung, no hypothesis (Entries 10–13):**
 
 | rung | statement | status |
 |---|---|---|
-| b = 0 | m(0) ≥ 6 | PROVEN given d_base ≥ 6 (only place d_base is used) |
+| b = 0 | m(0) ≥ 6 | PROVEN — small-cycle theorem (Entry 13); (H0) is gone |
 | \|b\| ≥ 12 | trivial | PROVEN |
-| classification | light b = 36 hexagons ∪ 216 D-pairs | k ≤ 7 fully hand-proven (Entries 6–7); ALL \|b\| ≤ 10 closed verified-finite by the profile route (Entry 9); rigidity hand-proofs owed |
-| m(hexagon) ≥ 3 | no non-imΔ cycle in hexagon+2 qubits | verified exhaustively; local hand proof owed |
-| m(D-pair) ≥ 1 | cycle space of the 11-qubit pair union = the two columns | verified (rank 9, all 12 types); hand proof owed |
+| classification | light b = 36 hexagons ∪ 216 D-pairs | PROVEN by hand (Entries 10–12: six shape lemmas) |
+| m(hexagon) ≥ 3 | no non-imΔ cycle with ≤ 2 qubits off the hexagon | PROVEN (Entry 13: mod-b rep ≤ 5 ⟹ 0) |
+| m(D-pair) ≥ 1 | no non-imΔ cycle inside the 11-qubit union | PROVEN (Entry 13: four-coset averaging, 22 < 24) |
+
+**The open problem for goal 1 (d = 12) — the safe-sector (M)-analogue.**
+Pointwise |v| = |p(v)| + 2|v₀ ∧ v₁|, so with the dangerous sector done and
+tight, d(gross) = 12 reduces to: for every nontrivial base logical cycle w,
+every cover cycle v with p(v) = w has |w| + 2|v₀ ∧ v₁| ≥ 12. SAT says the
+safe minimum is ≥ 12 (true d = 12), so this is true with structure to find:
+v₀ ranges over a syndrome-shifted coset (the old "s ≠ 0" data, in its
+correct home), and the overlap |v₀ ∧ v₁| is the new quantity to bound below
+on heavy-class slices. The m(b) slice machinery should adapt.
 
 **The former tail (L-C) — now closed verified-finite (Entries 8–9).** The
 classification "every b ∈ Stab_Z(base) with 0 < |b| ≤ 11 is a hexagon or a
@@ -191,19 +191,16 @@ D-pair" is established by the layer-profile route
   contents): {1,1,1}+{1,1,1} → exactly the 36 hexagons;
   {2,1,1}+{2,2,1,1} and mirror → exactly the 216 D-pairs; all 25 other
   families EMPTY.
-Owed for the analytic bar: (a) hand proof of comp-4-aliveness, (b)
-rigidity lemmas replacing the family enumeration (δ-point/ψ-evaluation
-rigidity: a weight-1 layer is a δ-point whose component values are
-character evaluations; co-point ideals are 1-parameter, fixing pairwise
-point differences — one lemma covers the eight A={1,1,1} families, etc.).
-Counting alone (`6k − 2e(S)`) stays vacuous for large k — don't go back
-to it; the profile route replaces it.
+*(Update, Entries 10–12: both owed items are DONE — the floor lemma
+replaced comp-4-aliveness, and the six shape lemmas replaced the family
+enumeration. This whole block is retained for history; nothing here is
+load-bearing anymore.)*
 
 **Verification discipline before trusting any drafted argument:** run an
-adversarial skeptic sweep hunting a light stabilizer with k ≥ 8 (the kill
-criterion for a drafted tail proof is a counterexample to an intermediate
-claim, not to (M) itself — (M) is SAT-validated). Computation may *refute*
-but never *prove*.
+adversarial skeptic sweep hunting a counterexample to an intermediate
+claim (never to the SAT-validated endpoints). Computation may *refute*
+but never *prove*. The owed pass for the new theorem: skeptic review of
+the Entry-5 reduction and the Entry-13 small-cycle case analysis.
 
 ---
 
@@ -217,6 +214,12 @@ but never *prove*.
    fully-analytically it yields only `d_gross ≥ 2`. **The only growth mechanism
    is the symmetric sector's factor-2** — i.e. Fork A is *necessary*. Don't
    re-derive the projection bound expecting it to beat the floor.
+   *(Update, Entry 14 addendum: the small-cycle theorem RESURRECTS Fork B —
+   it proves d_base ≥ 6 and μ_Z ≥ 6 directly, no recursion down the tower
+   needed, so the projection bound + the b = 0 slice now give d(gross) ≥ 6
+   in half a page. The recursion objection was to the tower route, not the
+   bound itself. The full (M) machinery remains what makes the dangerous
+   sector tight at 12 — the goal-1 asset.)*
 2. **Track 1.2 (radical/CMS + Lin–Pryadko) for a gross bound > 2** — arithmetic
    wall, `⌈12/8⌉=2` regardless of numerator (A2). Its only survivor (an analytic
    re-derivation of `d_A^⊥=12`) is a goal-2 classical result that still yields 2
@@ -290,9 +293,12 @@ but never *prove*.
   gross-first), honest gaps, supplementary gap round.
 - `notes/A2_scouting.md` — the 3-tracks-collapse-to-one result; ranking; first
   work-block; kill criterion; serial-vs-ultracode division of labor.
-- `notes/A3_track1p1_log.md` — **the live log.** Entries 0 (framework) → 4 (Fork B
-  killed) → 5 (the m(b) collapse) → 6 (the analytic ladder; k ≤ 7 closed).
-  Resume from Entries 5–6.
+- `notes/A3_track1p1_log.md` — **the live log.** Entries 0 (framework) → 4
+  (Fork B degraded) → 5 (the m(b) collapse) → 6–7 (analytic ladder, k ≤ 7)
+  → 8–9 (profile route, verified-finite closure) → 10–12 (hand-organization:
+  engine, floor, one-block 16, all six shape lemmas — classification fully
+  hand-proven) → 13 (small-cycle theorem: m-rungs + (H0) discharged) →
+  14 (**d(gross) ≥ 6 analytic** + dependency tree). Resume from Entries 13–14.
 
 **Scripts (all under `scripts/`, run via `uv run python scripts/<name>` from
 `experiments/bb_lab/`):**
@@ -316,37 +322,47 @@ but never *prove*.
   (min weight 16), shared-check ≤ 1, octahedron-freeness.
 - `a3_mb_crosscheck.py` — C1: b≠0 dangerous min = 14 (direct cover SAT,
   matches the assembled ladder); C2: imΔ-distance = 12.
+- `a3_mb_rigidity.py` — **Entry 10**: G1 ideal-rigidity catalog, G2 one-block
+  exact minima (16), G3 R1 classification, G4 the master per-shape table.
+- `a3_shape_lemmas.py` — **Entries 11–12, all-PASS**: V1 C-table, V2
+  direction forcing, V3 R-(2,1,1) = dA-pairs, V4 sharpened one-block ≥ 16
+  case analysis, V5 D-pair endgame, V6 R-(3,1,1) κ-table, V7/V8 the
+  weight-5 classifications + kills + the comp-1 transfer identity.
+- `a3_small_cycles.py` — **Entry 13, all-PASS**: W1 Ann minima, W3–W5 the
+  per-split kill intermediates, W6 exhaustive no-cycle-≤5 (both sides),
+  W7 weight-6 census = 120, W8 m-rung scaffolding, W9 the inversion
+  duality (base AND gross).
 - `a1_smith_*.py` — scout scaffolding. **`a1_smith_sector_sat.py` is BUGGY** (§6).
 - `a1_es_four_terms.py`, `a1_es_purity_check.py`, `a1_srb_cover_chain_check.py` —
   substrate (ES exact-sequence (6,6,6,6); purity; SRB cover-chain verification).
 
 **Commits:** `e308e65` (A0) → `b64868d` (A3 entry 4) on branch
-`claude/focused-liskov-7fe9f7`; `b87ce85` (entry 5) → `5a05ab0` (entry 6) on
-branch `claude/eager-hofstadter-6da593` (fast-forward continuation). Each
-`A3` entry is one commit.
+`claude/focused-liskov-7fe9f7`; `b87ce85` (entry 5) → `e6bbaff` (entry 10)
+on branch `claude/eager-hofstadter-6da593`; entries 11–14 on branch
+`claude/competent-proskuriakova-f31540` (rebased continuation, includes the
+buggy-scout flag commit). Each `A3` entry is one commit.
 
 ---
 
 ## 8. Concrete next steps (ranked)
 
-1. **Finish the four remaining shape lemmas (Entry 10 §"Status"):**
-   R-(2,1,1) (the D-pair lemma: 2-point direction forcing + ratio
-   rigidity + endgame, plus its mirror for the (2,2,1,1) heavier-block
-   classes), R-(2,1,1,1), R-(2,2,1), R-(3,1,1) (no such im(A·) element).
-   Each is engine + dictionary casework with the target output fixed by
-   the G4 table. Then the two m-rung locality proofs (shared-check ≤ 1
-   already proven; residue = one-hexagon neighborhood analysis).
-   Time-box; failures are first-class outputs (A3 log).
-2. **Assemble the conditional factor-2 write-up** once 1 lands (theorem +
-   full dependency tree: which steps are hand-proven vs verified-finite),
-   then redo the recursion bookkeeping (Entry 4's caution: the safe sector
-   caps the full-code bound at d_base — the factor-2 protects, not
-   doubles, the inherited bound).
-3. **Generalize down the cover tower (goal 2 route):** the m(b) machinery
-   and the profile route are cover-generic — apply them to the 36→72 step
-   (and the A2 fallback `d([[36,8,4]]) ≥ 4` + odd-h SRB Thm 4.7 for
-   `d(bb_108) ≥ 4` still stands as the modest deliverable).
-4. **Maintain `A3_track1p1_log.md`** as the running log; commit per entry.
+1. **Adversarial re-review of the d(gross) ≥ 6 chain** (fresh session,
+   skeptic mode): the Entry-5 slice reduction and the Entry-13 small-cycle
+   case analysis are the two newest links; hunt for a counterexample to
+   each intermediate claim (not to the SAT-validated endpoints). Only
+   after this pass does the theorem graduate to write-up grade.
+2. **Standalone write-up note**: the half-page minimal proof (small-cycle
+   theorem + projection + b = 0 slice + duality ⟹ d ≥ 6), then the full
+   (M) machinery as the tight dangerous-sector theorem; complete
+   dependency tree (Entry 14); the surveyable case tables.
+3. **Goal 1 (d = 12) — the safe-sector (M)-analogue** (§4): bound
+   |w| + 2|v₀ ∧ v₁| ≥ 12 over nontrivial base logicals w. The dangerous
+   side is done and tight; this is the only remaining gap to d = 12.
+4. **Goal 2 — template runs**: the small-cycle engine analysis on other
+   BB bases (Bravyi instances; bb_90/bb_108 odd-h covers with k′ = 8);
+   each run needs only the CRT components, the difference sets, and the
+   projections of that instance.
+5. **Maintain `A3_track1p1_log.md`** as the running log; commit per entry.
 
 ---
 
