@@ -2018,3 +2018,108 @@ hand-organization proceeds on route A**; the census stays as the
 independent cross-check and the source of the weight-8 structure
 (990 = 9 + 108 + 756 + 108 + 9, a future write-up exhibit).
 
+
+## Entry 22 (2026-06-12) — hand-organization of (M-im), part I: parity, rigidity, the ρ-locks, and the confined floor (two orbits close)
+
+Script: `a3_mim_hand_org.py` (H1–H10, all PASS). The Entry-20 machine
+closure starts converting into hand lemmas; the new **confined-value
+floor closes (M-im) outright on the two wt-24 orbits**, and reduces the
+other three to a single equality analysis at weight exactly 10.
+
+### Hand-proven lemmas (proofs here; machine checks in the script)
+
+**V1 (slot parity).** For a layer f ∈ F₂[Z₃²]: wt(f) ≡ f̂(triv) = v₀
+(mod 2) — the augmentation is the weight mod 2. ∎
+
+**V2 (2-cycle evenness).** ζ ∈ ker ∂₂ = Ann(A) ∩ Ann(B). From Aζ = 0:
+x³ζ = (y+y²)ζ, i.e. columnwise c_{i+3} = (y+y²)c_i; the right side has
+even weight (aug(y+y²) = 0), so **every column of ζ is even**; rows
+mirror via Bζ = 0. ∎
+
+**V3 (even coset weight and cost).** The cut-0 Smith rep w₀ = d2c₀ζ has
+L-block x·P₅ζ + x²·(P₄+P₅)ζ and R-block x³·(P₃+P₄+P₅)ζ (P_c = column
+projections; only those B/A-steps cross the cut), so |w₀_L| ≡ |P₄ζ| and
+|w₀_R| ≡ |P₃ζ|+|P₄ζ|+|P₅ζ| (mod 2) — both 0 by V2. With |∂₂t| even
+(aug(A) = aug(B) = 1), **every element of every Smith coset has even
+weight**; by V1, also even VCOST (cost ≡ Σ_slots v₀ ≡ |w_L| + |w_R|).
+So sub-12 means weight ∈ {6, 8, 10} and cost ∈ {6, 8, 10}. ∎
+
+**V4 (value rigidity, E ≤ 2).** The 512 layers biject with their value
+5-tuples (Fourier inversion + Frobenius). E = 1 exactly at the 9
+δ-point evaluation tuples (1, ψ₁(p), …, ψ₄(p)); E = 2 exactly at the 36
+point-pair sums — v₀ = 0 and exactly ONE dead nontrivial component (the
+kernel direction of p−q; p ≠ q lies in exactly one of the four
+character-kernel lines). Counts match both ways (9 weight-1 and 36
+weight-2 layers), so the lists are complete. ∎
+
+**V5 (the ρ-locks).** In F₄[Z₂²] every element satisfies
+u² = aug(u)²·1: squaring is Frobenius-linear in characteristic 2 and
+g² = e for every g ∈ Z₂², so (Σ u_g g)² = (Σ u_g²)·e = aug(u)²·e.
+Hence for ρ₁ = Â₁B̂₁⁻¹ (aug 0 since Â₁ is radical, B̂₁ a unit):
+**ρ₁² = 0**, so im ρ₁ ⊆ ker ρ₁ has F₄-dimension exactly 2 (16 elements;
+it is 2, not 1, because ρ₁ is not a scalar multiple of Σ_g g), and
+aug(ρ₁u) = 0. On every Smith coset:
+
+    V₁R = c₁ + ρ₁·V₁L  ∈  c₁ + im ρ₁   (16 vectors, independent of V₁L!)
+    V₂L = c₂ + ρ₂·V₂R  ∈  c₂ + im ρ₂   (16 vectors),
+
+and aug(V₁R) = aug(c₁), aug(V₂L) = aug(c₂) — with **aug(c₁) = aug(c₂)
+= 0 on all five orbits** (verified; hand derivation from the offsets
+owed). Comp 4 adds the scalar relation B̂₄ = ω·Â₄. (Comp 3 is NOT a
+graph over its L-value — |im B̂₃| = 16 with 4 partners each; noted.) ∎
+
+**V6 (fibre gap — verified table fact, hand-check owed but surveyable).**
+In every (v₀; v₃, v₄; a₁, a₂)-fibre of the value table (66 nontrivial
+fibres), every non-minimal weight is ≥ fibre-min + 4 (all second-min
+gaps are exactly 4). Consequence: **a slot that misses its d₃ᵛ minimum
+pays at least +4.** The 66 fibres compress under the GL₂(Z₃)-stabilizer
+of the component split — a bounded hand check.
+
+### The confined-value floor (H10) — two orbits close
+
+Taking comps {0, 3, 4} value-exactly AND the confined sides V₁R, V₂L
+over their 16-element ρ-cosets (V5), relaxing only the free sides v₁L,
+v₂R per slot (no grammar at all), the cost decomposes per block
+(L-cost: min over V₂L of a 4-slot M₁-table sum; R-cost: min over V₁R),
+and the floor evaluates to
+
+    wt-16: 10    wt-18a: 10    wt-18b: 10    wt-24a: 12    wt-24b: 12.
+
+**The two wt-24 cosets satisfy (M-im) by the confined floor alone** —
+no combo enumeration, no completion sweep. For the other three, weights
+are even (V3), so the only surviving possibility is weight EXACTLY 10.
+
+### Kill structure (probes H6/H7, machine statistics)
+
+Cross-tab of combo cost vs minimum completion weight, all five orbits:
+cost-10 combos complete to ≥ 14 (one +4 quantum); cost-8 to ≥ 16 (two
+quanta — one would already give 12); cost-6 (only 12 combos, wt-24b
+orbit, now moot by H10) to 22. Minimal-completion deficits are ALWAYS
+quanta of exactly +4 per slot (V6 in action). Combo families per orbit:
+137–239 distinct (m₁, m₂) mask pairs — the classification that the
+confined floor now mostly bypasses.
+
+### Remaining obligations for fully-analytic (M-im) (bounded, shaped)
+
+  (O1) Hand-evaluate the confined floor: ≥ 12 on the wt-24 cosets and
+       ≥ 10 on the rest. Structure available: the minimization runs
+       over (off₀+Γ₀)×(off₃+Γ₃)×(off₄+Γ₄) (16·64·16) with per-block
+       16-element confined minima; compression: translation stabilizers
+       (order 12 on the wt-24 orbits), B̂₄ = ωÂ₄, and the small-ideal
+       module structure. This is the Entry-10/11 "engine + C-table"
+       analogue.
+  (O2) The weight-10 equality analysis (orbits wt-16, 18a, 18b): a
+       confined-floor-10 achiever must also satisfy the dropped link
+       ρ₁V₁L = V₁R + c₁ (and mask consistency); show it cannot, and V6
+       bumps any actual element to ≥ 14. (Machine forms already verified
+       twice: the Entry-20 sweep and the Entry-21 census found no
+       weight-10 non-boundary flux-silent cycles.)
+  (O3) The V6 fibre-gap table, GL-compressed, as a surveyable case list;
+       and the hand derivation of aug(c₁) = aug(c₂) = 0 from the offset
+       structure.
+
+With (O1)–(O3), (M-im) is fully analytic — and with it **d(gross) = 12,
+fully analytic** ((M) + (R) + flux + duality are all already at that
+grade). Next session: O1 first (it carries the wt-24 orbits and the
+floor-10 baseline), then O2.
+
