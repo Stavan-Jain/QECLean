@@ -165,14 +165,23 @@ Status of (M) by rung (Entry 6):
 support (mod ker ∂₂, dim 6, min weight 16) is ≥ 8 has `|b| ≥ 12`. Equivalently:
 the [72,30] image code of `z ↦ (B·z, A·z)` over `F₂[Z₆×Z₆]` has no weight-≤11
 codeword beyond the k ≤ 2 families. True with margin (validated SAT
-enumeration: NO light codewords at any k ≥ 3). Candidate tools, in order:
-- the repeated-root / generalized-van-Lint filtration: `x⁶+1 = ((1+x)(1+x+x²))²`
-  (and same in y) — weights via the (1+x)-adic layers; the x-collapse partial
-  bound `|b| ≥ |z̄| + |(1+y+y²)z̄|` (z̄ = z mod (1+x)) already kills most
-  configurations and bottoms out exactly at `z̄ ∈ (1+y)(1+y³)F₂[y]`;
-- the y-side CRT `F₂[Z₆²] ≅ F₂[Z₂²] × (F₄[Z₂²])⁴` (semisimple 3-part) for
-  rank/support constraints;
-- counting cannot work alone: `6k − 2e(S)` goes vacuous for large k.
+enumeration: NO light codewords at any k ≥ 3).
+
+State of the attack (Entry 8, `a3_mb_tail_dictionary.py`): the CRT frame
+`F₂[Z₆²] ≅ F₂[Z₂²] × (F₄[Z₂²])⁴` is fully instrumented — layer dictionary
+d₃ over F₂[Z₃²] (verified; depends only on (#orbits, trivial-flag)),
+empirical component transforms, support grammar (radical sides are
+co-point-or-full; comp 4 rigid). The bound `|b| ≥ COST(pattern(z))` is tight
+on hexagons (6) and D-pairs (10). **Verified lemma: every b with |b| ≤ 11
+has all five CRT components alive** (killing any one forces COST ≥ 12).
+Remaining for the tail: (i) hand-organize the two finite minimizations;
+(ii) equality analysis showing each sub-12-cost pattern class (explicit
+list: 4 at cost 6 = hexagon patterns; 24/85/136 near-hexagon at 7–9;
+456/904 at 10–11 incl. the D-pair family) is realized at weight ≤ 11 only
+by hexagons and D-pairs mod kernel. Forcing tools: weight-1 full-support
+layers are δ-points; co-point ideal coefficient rigidity; comp-4 support
+equality; S₀ shared between blocks. Counting alone (`6k − 2e(S)`) stays
+vacuous for large k — don't go back to it.
 
 **Verification discipline before trusting any drafted argument:** run an
 adversarial skeptic sweep hunting a light stabilizer with k ≥ 8 (the kill
@@ -304,11 +313,13 @@ branch `claude/eager-hofstadter-6da593` (fast-forward continuation). Each
 
 ## 8. Concrete next steps (ranked)
 
-1. **The k ≥ 8 tail (§4, Entry 6 L-C).** Prove: minimal face support ≥ 8 ⟹
-   stabilizer weight ≥ 12. Tools in order: repeated-root/(1+x)-adic filtration
-   (van Lint lane, citation now verbatim-verified), y-side CRT
-   `F₂[Z₆²] ≅ F₂[Z₂²] × (F₄[Z₂²])⁴`, x-collapse partial bound as the base
-   layer. Time-box per approach; failures are first-class outputs (A3 log).
+1. **The k ≥ 8 tail (§4; Entries 7–8).** The CRT/layer-dictionary frame is
+   instrumented and produced the all-components-alive lemma; continue with
+   the equality analysis over the explicit sub-12-cost pattern list (≤ 9
+   band first: δ-point forcing should give hexagon-only; then the 10–11
+   band where D-pairs live), and hand-organize the two finite
+   minimizations. `scripts/a3_mb_tail_dictionary.py` is the working
+   instrument. Time-box; failures are first-class outputs (A3 log).
 2. **Hand-organize the owed finite checks**: the two rung locality proofs
    (shared-check ≤ 1 is already proven; residue = one-hexagon neighborhood
    analysis). (Octahedron-freeness: DONE by hand, Entry 7.)
