@@ -843,3 +843,91 @@ SB = (1010,1111,1111,1011,1110)) sits there, again tight.
 2. Hand-organize the two finite minimizations (the component-support lemma
    first — it is the cleanest standalone statement).
 3. Keep the rung locality write-ups (Entry 6) on the queue; unchanged.
+
+---
+
+## Entry 9 (2026-06-12) — tail attack II: profile completeness closes (T-tail) at the verified-finite level
+
+The equality analysis planned in Entry 8 turned out to admit a much cleaner
+organization than the 705-pattern list — and it finishes the job
+(`a3_mb_tail_profiles.py`). The light-stabilizer classification, hence the
+whole (M)-ladder, is now closed with no unbounded-structure gap, by a route
+independent of the Entry-6/7 k ≤ 7 combinatorics.
+
+### Profile completeness (three lemmas)
+
+Write b = (Bz, Az) in s-layers over Z₂² (each layer a function on Z₃²,
+weights w_s^B, w_s^A ∈ [0,9], |b| = Σ both blocks).
+
+- **(i) Parity (hand-proven).** The two blocks have identical layer
+  parities: the layer-parity vector of a block is its component-0
+  transform, and A, B have the *same multiset of s-parts* {1, s_x, s_y}
+  (A: x³ ↦ s_x, y ↦ s_y, y² ↦ 1; B: y³ ↦ s_y, x ↦ s_x, x² ↦ 1), so
+  Â₀ = B̂₀ = [1] + [s_x] + [s_y] and both blocks see the same w₀ = Â₀ẑ₀.
+- **(ii) Floor (machine ingredient).** Each block is supported on ≥ 3
+  layers: component 4 is alive for |b| ≤ 11 (Entry-8 component-support
+  lemma) and its radical ideal admits only co-point (3) or full (4)
+  supports (hand-proven ideal structure).
+- **(iii) Evenness (hand-proven).** |Az| ≡ |Bz| ≡ |z| (mod 2), so |b| is
+  even; |b| ≤ 11 means |b| ≤ 10, and Σ of one block ≤ 10 − 3 = 7.
+
+Under (i)–(iii), the layer-weight pair (w^A, w^B) of any b with |b| ≤ 10
+ranges over an explicitly enumerable set: 252 placements in **28 profile
+families** (e.g. {1,1,1}+{1,1,1} at |b| = 6; {2,1,1}+{2,2,1,1} at 10).
+
+### Exhaustive family checks (syndrome hash-join)
+
+For each family, enumerate ALL layer contents (subsets of the 9-cell Z₃²
+grid of the prescribed sizes, both blocks) and keep exactly the pairs that
+form a genuine stabilizer — membership tested exactly via the 42-bit
+syndrome key K = ker(∂₂ᵀ): b ∈ colspan ∂₂ ⟺ K_B·b_B = K_A·b_A, a hash-join
+of the two sides. Results over all 28 families:
+
+    {1,1,1}+{1,1,1}            →  exactly the 36 hexagons
+    {2,1,1}+{2,2,1,1} (+mirror) →  exactly the 216 D-pairs (108 + 108)
+    all 25 other families       →  EMPTY
+
+Cross-checks: every |b| = 8 family is empty (matches SAT: no weight-8
+stabilizers); the D-pairs land exactly in the (4,6)/(6,4) block splits
+predicted by the T1 overlap analysis; total counts 36/216 match the
+Entry-5 enumeration.
+
+**Theorem-grade statement (verified-finite).** Every b ∈ Stab_Z(base) with
+0 < |b| ≤ 11 is a single hexagon or a D-pair. Ingredients: lemmas (i),(iii)
+hand-proven; lemma (ii) = comp-4-aliveness (verified finite minimization,
+Entry 8); the 28-family exhaustive content check. This supersedes the
+k-graded route: the k ≥ 8 tail no longer exists as a separate problem.
+(The Entry-6/7 hand proofs remain the fully-analytic cover of the k ≤ 7
+range and an independent confirmation.)
+
+### Status of the (M)-ladder = the dangerous-sector factor-2 lemma
+
+| rung | status |
+|---|---|
+| b = 0 (m(0) ≥ 6) | PROVEN given d_base ≥ 6 |
+| \|b\| ≥ 12 | PROVEN (trivial) |
+| classification 0 < \|b\| ≤ 11 | k ≤ 7 fully hand-proven (E6–7); ALL \|b\| ≤ 10 closed verified-finite (E9) |
+| m(hexagon) ≥ 3 | verified exhaustive (E6); hand route sketched |
+| m(D-pair) ≥ 1 | verified (12 rank checks, E6); hand route sketched |
+
+**Every step of the factor-2 lemma is now either hand-proven or a verified
+finite check with a bounded hand-proof route. No unbounded-structure gap
+remains.** Per the program's analytic bar (§1 of A_HANDOFF): the finite
+checks are NOT yet human-surveyable residues, so this does NOT yet claim an
+analytic proof — what remains is hand-organization, now a bounded list:
+  (a) comp-4-aliveness for light b (the one machine ingredient of (ii));
+  (b) rigidity arguments replacing the 28-family enumeration — the
+      δ-point/ψ-evaluation rigidity (a weight-1 layer is a δ-point whose
+      component values are the point's character evaluations; co-point
+      ideals are 1-parameter, fixing cross-layer evaluation ratios, hence
+      pairwise point differences) kills whole bands at once: the 8
+      A={1,1,1} families reduce to one lemma, etc.;
+  (c) the two m-rung locality proofs (unchanged from E6).
+
+### Next
+
+1. Hand-organize (a)–(c). Suggested order: (b)'s δ-point rigidity lemma
+   first (it carries the most families), then (a) via the cost-table LP,
+   then (c).
+2. Then assemble the full conditional factor-2 write-up (theorem +
+   dependency tree), and revisit the recursion bookkeeping for goals 2/3.
