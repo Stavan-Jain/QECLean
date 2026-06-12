@@ -23,6 +23,19 @@ what was tried and why it didn't work.
   `attempts/`): [handoff](../experiments/bb_lab/notes/A_HANDOFF.md),
   [A3 log entries 11–14](../experiments/bb_lab/notes/A3_track1p1_log.md).
 
+- 2026-06-12 — gross-bb-analytic-bound (goal 1 closed) — success
+  (pending skeptic review) —
+  **d(gross [[144,12,12]]) = 12, analytic**: the last statement (M-im)
+  is proven by the confined-floor program (A3 Entries 22–26): hand
+  engine lemmas (kill-multiset supports, T-classifiers from ψ₂² = ψ₃ψ₄
+  and ψ₄ = ψ₁ψ₃, slope level-sets, the ρ²= 0 confinement with c₁ = c₂
+  = 0 derived via column transforms) + surveyable finite residues
+  (spine C-tables, 118 one-line ρ-link kills), double-cross-checked by
+  the two independent machine closures. Owed: adversarial skeptic pass
+  over Entries 16–26 before external write-up; goal 2 (BB-class bound)
+  remains open. [A3 log entries
+  19–26](../experiments/bb_lab/notes/A3_track1p1_log.md).
+
 - 2026-06-12 — gross-bb-analytic-bound (goal 1 update) — partial —
   **d(gross) = 12 now holds at the verified-finite level, doubly
   machine-verified** by two independent routes: the value-grammar

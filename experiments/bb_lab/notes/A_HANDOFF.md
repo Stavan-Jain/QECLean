@@ -263,6 +263,31 @@ equality analysis via the dropped ρ-link + the +4 fibre gap, **(O3)**
 the GL-compressed fibre-gap table and aug(c₁) = aug(c₂) = 0 by hand.
 (O1)–(O3) ⟹ (M-im) fully analytic ⟹ **d(gross) = 12 fully analytic**.*
 
+*Update (Entries 23–26, session close): **O1, O2, O3 are ALL CLOSED —
+(M-im) is proven, and with it d(gross) = 12 (goal 1).** The chain:
+(Entry 23) the confined floor organized into 4×4 spine C-tables
+m(a₃, a₄) per orbit, with three hand-proven engine lemmas — the
+kill-multiset support-class lemma, the slot-cost table with the
+T-classifiers (the character identities ψ₂² = ψ₃ψ₄, ψ₄ = ψ₁ψ₃ classify
+the cheap loci), and the slope lemma (simultaneously-cheap slots form a
+level set of an explicit g); c₁ = c₂ = 0 so the confined sets are the
+subspaces im ρ_i. (Entry 24) the engine reproduces every block and cell
+minimum EXACTLY (160 + 80 cells); both wt-24 orbits have block ≥ 6
+everywhere ⟹ all their cells ≥ 12. (Entry 25) at the floor-10 cells of
+wt-16/18a/18b the engine-10 achievers number just 48/48/22, with
+near-singleton minimizer sets, and every one violates both dropped
+ρ-links (ρ₁V₁L = V₁R, ρ₂V₂R = V₂L) — no weight-10 elements; evenness
+gives ≥ 12. (Entry 26) the unpinnedness c₁ = c₂ = 0 derived by hand via
+column y-transforms (D1: Yû₁ = ω²Yû₂; the reduced identity vanishes by
+ω² + ω + 1 = 0), every step machine-verified on all 63 ζ; assembly +
+dependency tree written (log Entry 26). Epistemic grade: all reductions
+hand-proven; the finite residues (18-orbit M-table, per-cell C-table
+evaluations, 118 one-line link kills) are explicit and surveyable, and
+the endpoint is double-verified by the two independent Entry-20/21
+machine routes. **Owed before external write-up: the adversarial
+skeptic pass over Entries 16–26 (plus the outstanding Entry-15 review),
+and the standalone write-up (A4 extension) with the tables typeset.***
+
 **The former tail (L-C) — now closed verified-finite (Entries 8–9).** The
 classification "every b ∈ Stab_Z(base) with 0 < |b| ≤ 11 is a hexagon or a
 D-pair" is established by the layer-profile route
