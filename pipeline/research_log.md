@@ -44,6 +44,23 @@ what was tried and why it didn't work.
   standalone write-up; goal 2 (BB-class bound) remains open. [A3 log
   entries 16–27](../experiments/bb_lab/notes/A3_track1p1_log.md).
 
+- 2026-06-12 — gross-bb-analytic-bound (write-up debt paid) — success —
+  **d(gross [[144,12,12]]) = 12, fully analytic** (A4 Part II, Theorem
+  D): both Entry-27 residues discharged by hand. New structure that made
+  the compression work: m′² = ω²m (only two slot labelings up to
+  scale), the confined comps as full affine lines, the Γ₄ tie
+  V₄L = ωV₄R + w₄, the pair-ratio lemma for fibre degeneration, and the
+  hyperbolic-quadruple form of the slope lemma (no three points of
+  uv = c ∪ {0} collinear). The ~6k-row wt-24 closure collapses to one
+  standard form S(a,b) walked in 33 buckets (all ≥ 6); the achiever-list
+  completeness follows from the achiever-structure lemma (parity-locked
+  per-(V₀,γ) block minima ⟹ achievers = argmin products over sum-10
+  loci) + rule-derived per-cell locus tables (118 achievers, each killed
+  by a one-convolution ρ-link check). Certifier
+  `a3_a4ext_recheck.py` all-PASS. Owed: the Part-II skeptic pass; goal 2
+  remains open (the slot frame is instance-generic). [A3 log entry
+  28](../experiments/bb_lab/notes/A3_track1p1_log.md).
+
 - 2026-06-12 — gross-bb-analytic-bound (goal 1 update) — partial —
   **d(gross) = 12 now holds at the verified-finite level, doubly
   machine-verified** by two independent routes: the value-grammar
