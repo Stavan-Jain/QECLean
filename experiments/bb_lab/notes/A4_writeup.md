@@ -1,18 +1,22 @@
-# A fully analytic distance bound for the gross code: d ≥ 6
+# A fully analytic distance bound for the gross code: d ≥ 6, and d = 12
 
-> **STATUS: REVIEW-CLEARED.** The Entry-15 adversarial re-review (fresh
+> **STATUS: PART I REVIEW-CLEARED; PART II IS THE ENTRY-27 EXTENSION.**
+> Part I (§§1–7, Theorems A–C): the Entry-15 adversarial re-review (fresh
 > session; every machine check re-implemented independently —
 > `a3_adv15_recheck.py`, 49/49 — and every prose argument re-derived by
 > hand) found **all links HOLD**; its two presentational notes are folded
-> in below (§3 d₃ remark; §6.3 (1,1,1,1) bullet). Every numerical
-> statement in this note is *confirmation* of a hand proof, never an
-> ingredient; the verification scripts are listed in Appendix A. Source of
-> record for the proofs: `notes/A3_track1p1_log.md`, Entries 5 and 10–15.
-> The post-review goal-1 closure (Entries 16–26: (R), the flux
-> characterization, the (M-im) confined-floor program — **d(gross) = 12**,
-> review-cleared by Entry 27 at the grade "analytic spine + two
-> machine-certified residues") is NOT yet part of this note; the A4
-> extension covering it is the open write-up debt (Entry 27).
+> in below (§3 d₃ remark; §6.3 (1,1,1,1) bullet). Part II (§§8–14,
+> Theorem D: **d(gross) = 12**) is the A4 extension owed by Entry 27: it
+> walks the goal-1 chain (Entries 16–26, review-cleared by Entry 27) with
+> the two machine-certified residues replaced by compressed, hand-walkable
+> case tables — the standard-form bucket walk (§11) for the wt-24
+> C-tables and the locus tables (§12–13) for the floor-10 achiever lists.
+> Entry 27's two sharpenings (off₀ = off₂ = 0; the comp-2 one-liner) and
+> its owed H₀ paragraph are folded in. Every numerical statement in this
+> note is *confirmation* of a hand proof, never an ingredient; the
+> verification scripts are listed in Appendices A and D. Source of record
+> for the proofs: `notes/A3_track1p1_log.md`, Entries 5, 10–15 (Part I)
+> and 16–28 (Part II).
 
 ---
 
@@ -570,3 +574,706 @@ for dA with constant-x.
 **One-block case minima** (§6.2): (V₃ alive, V₁ full) → 16;
 (V₃ alive, V₁ co-point) → 18; (V₃ alive, V₁ = 0) → 24;
 (V₃ = 0, V₁ co-point) → 18; (V₃ = 0, V₁ full) → 24.
+
+---
+---
+
+# Part II. d(gross) = 12
+
+## 8. Results and route
+
+**Theorem D.** The gross code `[[144,12,12]]` satisfies **d(gross) = 12**,
+analytically: every reduction below is hand-proven, and every finite case
+split is a surveyable table (§11: 33 bucket rows; §12: per-cell locus tables of
+1–4 rows each; §13: 118 one-line field evaluations organized into
+families). No SAT, kernel-`decide`, or machine enumeration is
+load-bearing; the scripts of Appendix D re-verify every table.
+
+The route (Entries 16–26, review-cleared by Entry 27):
+
+1. **Dichotomy.** For a nontrivial cover Z-logical v, either
+   [p(v)] = 0 in H₁(base) (*dangerous*) or not (*safe*). The dangerous
+   sector is ≥ 12 by Theorem C.
+2. **(R)** (§9.1): the safe sector sees only the Smith classes:
+   [p(v)] ∈ im Δ ∖ 0.
+3. **(M-im)** (§§10–13): every base 1-cycle in a nonzero imΔ class has
+   weight ≥ 12. Hence |v| ≥ |p(v)| ≥ 12.
+4. **Duality** (Lemma 2.1): d_X = d_Z. **Tightness** (§14): τ(u\*) is a
+   weight-12 logical.
+
+(M-im) is where the work lives. Its proof has three stages: the CRT
+confined frame (§9.3–§9.4), which parametrizes each Smith coset by a
+shared 16-element block-diagonal comp-0 datum V₀, a shared spine
+(a₃, a₄) ∈ F₄², a shared twisted shift γ, and per-block confined/free
+data; the **C-table floor** (§§11–12): every coset element has weight
+≥ 12 on the two wt-24 orbits and ≥ 10 on the three wt-16/18 orbits; and
+the **weight-10 kill** (§13): the floor-10 achievers all violate one of
+the two ρ-links that the floor relaxes. Translation transport (§9.3)
+carries the five orbit representatives to all 63 nonzero Smith classes.
+
+## 9. The safe-sector reduction
+
+### 9.1 The sector dichotomy and (R)
+
+Cover 1-chains are pairs of base chains v = (v₀, v₁) (sheet
+coordinates); p(v) = v₀ + v₁ is a chain map, |v| ≥ |p(v)|, and the
+deck transformation σ: x ↦ x+6 satisfies (1+σ)v = τ(p(v)) for cycles,
+where τ(u) = (u, u) (§5). The connecting map Δ[ζ] = [d2c_j ζ] on
+H₂(base) = ker ∂₂ is injective with cut-independent image; im Δ =
+ker τ_\* inside H₁(cover).
+
+**Theorem (R).** Every cover cycle v has [p(v)] ∈ im Δ; equivalently
+σ_\* = id on H₁(gross).
+
+*Proof.* Over F₂[Z₁₂×Z₆], squaring B kills its y-dependence (y⁶ = 1):
+B² = 1 + x² + x⁴, so (1+x²)B² = 1+x⁶. For a cover cycle
+v = (v_L, v_R) (A v_L = B v_R), set z := (1+x²)·B·v_L. Then
+∂₂z = ((1+x²)B²v_L, (1+x²)B·A v_L) = ((1+x⁶)v_L, (1+x⁶)v_R) = v + σv.
+So (1+σ) is null-homotopic on cycles, σ_\* = id, and
+τ_\*∘p_\* = (1+σ)_\* = 0: im p_\* ⊆ ker τ_\* = im Δ. ∎
+
+Only this **inclusion** is load-bearing (Entry 27, Link 2): the lower
+bound needs [p(v)] ∈ im Δ ∖ 0, and [p(v)] ≠ 0 is the definition of the
+safe sector. Neither direction of Theorem D uses k = 12 or the equality
+leg of (R).
+
+### 9.2 No double wrap; the seam-flux functionals
+
+**Lemma (no double wrap).** For every cut j: d1c_j·d2c_j = 0,
+d1nc_j·d2nc_j = 0, and d1nc_j·d2c_j = d1c_j·d2nc_j.
+
+*Proof.* An entry of ∂₁∂₂ at (check c, face f) sums over two-step paths
+f → qubit → c, one per factorization c·f⁻¹ = a·b per route (left block:
+B-step then A-step; right block: A-step then B-step) — an even number
+in total since AB = BA. The total x-advance of a path is
+D = sx(a) + sx(b) ≤ 3 + 2 = 5 < 6, and D ≡ (c−f)_x (mod 6) with
+0 ≤ D ≤ 5, so **D is the same integer for every path at the entry**.
+A monotone path of advance D < 6 starting at x_f crosses the cut at
+most once, and whether it crosses is determined by (x_f, D) alone.
+Hence all paths at an entry have equal crossing count: if 0 they cancel
+inside d1nc·d2nc; if 1, each crosses in exactly one of its two steps,
+d1c·d2c and d1nc·d2nc receive nothing, and the paths distribute between
+d1nc·d2c and d1c·d2nc with even total, forcing those entries equal. ∎
+
+**Corollary (flux).** P[ξ, ζ] = ξᵀ(d1c_j d2c_j)ζ = 0 identically, so
+each ξ ∈ ker H_Xᵀ gives a class functional ℓ_ξ(w) = ξᵀ d1c_j w
+(well-defined: ξᵀ d1c ∂₂ = 0 needs the lemma plus ξᵀd1nc = ξᵀd1c, which
+follows from ξᵀ∂₁ = 0), vanishing on im Δ. Only the **easy inclusion**
+im Δ ⊆ ker flux is load-bearing (it feeds the tightness argument, §14).
+
+*Remark (the H₀ paragraph owed by Entry 27, Link 3).* The
+characterization **equality** im Δ^X = (im Δ^Z)^⊥ — decorative for
+Theorem D, used only by the Entry-21 census cross-check — needs
+dim im Δ = 6 on both sides, which the Gysin sequence reduces to
+dim H₀(base) = dim F₂[Z₆²]/(A, B) = 6. By the CRT frame (§3): the
+component quotient dimensions are (0, 0, 0, 2, 4) — components 0–2
+contain a unit among {Â_j, B̂_j}; at component 3 the two radicals
+Â₃ = u+ωv, B̂₃ = ωu+v generate the maximal ideal (u, v) of F₄[Z₂²]
+(their span contains u and v), leaving F₄[Z₂²]/(u,v) ≅ F₄, dimension 2
+over F₂; at component 4, B̂₄ = ωÂ₄ makes the ideal span{Â₄, uv}, of
+F₄-codimension 2, dimension 4 over F₂. Total 0+0+0+2+4 = 6. ∎
+
+### 9.3 The Smith cosets: transport and parity
+
+ker ∂₂ ∖ 0 has five translation orbits, of (size, weight) = (9, 16),
+(12, 18), (36, 18), (3, 24), (3, 24) — written wt-16, wt-18a, wt-18b,
+wt-24a, wt-24b. The transport identities d2c_j∘T_x = T_x∘d2c_{j−1} and
+d2c_j∘T_y = T_y∘d2c_j (exact matrix identities, all cuts), with
+cut-independence of Δ, give class(Tζ) = T·class(ζ): the five orbit
+representatives cover all 63 nonzero Smith classes, and any
+translation-covariant bound transports. Fix the cut j = 0 and the five
+canonical cosets C(ζ) = d2c₀ζ + im ∂₂.
+
+**Parity (Entry 22, V1–V3).** (i) For a layer f ∈ F₂[Z₃²]:
+wt(f) ≡ f̂(triv) (mod 2). (ii) Every ζ ∈ ker ∂₂ has even columns
+(Aζ = 0 gives c_{i+3} = (y+y²)c_i columnwise, and aug(y+y²) = 0; rows
+mirror via B). (iii) Every element of every Smith coset has even weight
+and even value-cost. So sub-12 weights are 6, 8, 10, and by §13's floor
+the only live possibility is weight exactly 10.
+
+### 9.4 Components 0–2: off₀ = off₂ = 0 and the unpinned links
+
+For w = d2c₀ζ + ∂₂t, the CRT component data is
+V_j(w) = off_j + (B̂_j t̂_j, Â_j t̂_j), off_j = comp_j(d2c₀ζ), with the
+five components independent.
+
+**Sharpening 1 (Entry 27): off₀ = off₂ = 0 identically.** At components
+0 and 2 the A-relation multiplier comp(y+y²) equals Y := 1+s_y (the
+component characters are trivial on t_y at j ∈ {0, 2}... at j = 0 both
+characters are trivial; at j = 2 the character is trivial on t_y). The
+column-collapse of ζ at such a component satisfies v_i = Y v_{i+3} =
+Y² v_i = 0, and the cut-marked sums building off₀, off₂ are sums of
+these zero collapses. Hence comp-0 data of any coset element is the
+diagonal pair (V₀, V₀), V₀ = B̂₀t̂₀ ranging over all 16 of F₂[Z₂²] (B̂₀
+is a unit), and comp 2 is a free graph: V₂L = ρ₂·V₂R,
+ρ₂ := B̂₂Â₂⁻¹.
+
+**c₁ = 0 (Entry 26, comp 1 in full).** Write ζ's columns c₀..c₅ and
+their comp-1 transforms û_i ∈ F₄[s_y]. The crossing bookkeeping at cut
+0 gives off₁L = û₄ + û₅ + s_xû₅, off₁R = û₃ + s_xû₄ + û₅. The cycle
+relations transform to û_{i+3} = τû_i (τ = ω² + ωs_y, a unit) and
+û_{i−1} + û_{i−2} = s_yû_i, giving û₀ = û₁ + s_yû₂ and
+**Yû₁ = ω²Yû₂** (D1). Then c₁ := off₁R + ρ₁⁻¹-normalized off₁L
+vanishes: the claim reduces (group coefficients; B̂₁X = s_yX,
+B̂₁Y = s_xY) to Y[(X+ω)û₁ + (ω + ω²s_x)û₂] = 0, which D1 collapses to
+Y(ω² + ω + 1)û₂ = 0 — identically zero. ∎
+
+**Sharpening 2 (Entry 27): c₂ = 0 is a one-liner** — off₂ = 0
+(Sharpening 1), so the comp-2 graph passes through the origin; the
+Entry-26 mirror chain is unnecessary.
+
+Hence on every coset, the comp-1/2 data satisfies the two **ρ-links**
+
+    V₁R = ρ₁·V₁L,    V₂L = ρ₂·V₂R,
+
+and the **confined sets** (the dependent sides, with the free sides
+relaxed) are exactly im ρ₁, im ρ₂ — 16 elements each, since
+ρ_i² = aug(ρ_i)²·1 = 0 (squaring in F₄[Z₂²] is Frobenius-linear and
+g² = e for g ∈ Z₂²) and ρ_i ∉ F₄·ΣG.
+
+## 10. The slot frame
+
+All five orbits are now analyzed in one coordinate system.
+
+### 10.1 Slots, labelings, lines
+
+Slots are the four elements of Z₂² = {e, x, y, xy} (the 2-part layers);
+component data live in R = F₄[Z₂²], identified with functions
+slots → F₄ (slot values). Write X = 1+s_x, Y = 1+s_y, XY = ΣG; the
+slot values of a·1 + αX + βY + δXY are (a+α+β+δ, α+δ, β+δ, δ) over
+(e, x, y, xy). The **kill vector** κ(v) := (a+α+β, α, β, 0) is the slot
+function modulo the constant shift δ: as the free shift varies, the
+zero set of v + δ′XY is a fibre of κ(v). Define
+
+    m  := κ(B̂)  = (ω², ω, 1, 0)      (B̂ := B̂₂ = B̂₃ = B̂₄ = ωX + Y)
+    m′ := κ(Â₃) = (ω², 1, ω, 0) = m∘(x↔y)     (Â₁ = Â₃ = X + ωY)
+    θ  := (1, 0, 1, 0),   θ̃ := (1, 1, 0, 0).
+
+Facts (each a one-line check): m, m′ are bijections slots → F₄;
+m̃ := m + ω² is an additive isomorphism Z₂² ≅ (F₄, +);
+**κ(Â₄) = m′² = ω²·m** and m² = ω²m′ (entrywise Frobenius);
+κ(ρ₂) = m, κ(ρ₁) = m′; θ = 1 + Tr(ω²m̃), θ̃ = 1 + Tr(m̃).
+
+Consequently (machine cross-check F1–F2):
+
+- **conf lines**: slot values of im ρ₂ = {p·m + c : p, c ∈ F₄}; of
+  im ρ₁ = {p·m′ + c} — the full affine line of the labeling.
+- **comp 3**: V₃L = off₃L + a₃B̂ + βXY has slot values
+  κ₃L + a₃m + c₃ with c₃ ∈ F₄ free (β absorbs the offset's XY part) and
+  κ₃L := κ(off₃L); mirror on R with m′ and κ₃R. The spine coordinate a₃
+  is **shared** between blocks; the constants are free and independent.
+- **comp 4**: the Γ₄ ideal is one-dimensional (B̂₄ = ωÂ₄), giving the
+  **tie** V₄L = ω·V₄R + w₄ with w₄ := off₄L + ω·off₄R a fixed vector
+  per orbit (machine check F3). In slot values: directions
+  k₄L = κ₄L + a₄m (the ω-twist absorbs into ωa₄m′² = a₄m) and
+  k₄R = κ₄R + ω²a₄m, with constants tied through the shared γ:
+  d₄L = ωγ + e_L, d₄R = γ + e_R, where e is the XY-coefficient of the
+  block's comp-4 offset and e_L = ωe_R + (XY-coeff of w₄).
+
+Per-orbit data (offsets as kill vectors; verified F4):
+
+| orbit | κ₃L | κ₃R | κ₄L | κ₄R | e_L | e_R |
+|---|---|---|---|---|---|---|
+| wt-16  | ωθ = (ω,0,ω,0) | θ | ωθ | θ | ω | ω |
+| wt-18a | m | m′ | (0,ω,ω²,0) | (ω²,ω²,ω²,0) | ω² | ω² |
+| wt-18b | (1,ω,ω²,0) | ω²m | (ω,ω,1,0) | (ω,ω²,ω,0) | 1 | 1 |
+| wt-24a | 0 | 0 | ωθ | θ | ω² | 1 |
+| wt-24b | ωθ | θ | 0 | 0 | 1 | ω² |
+
+(wt-24b is wt-24a with the comp-3 and comp-4 offsets exchanged.)
+
+### 10.2 The slot-cost rules (Entry 23, recap)
+
+Per slot s, the layer cost given (v₀; v_conf, v₃, v₄)(s), with the
+block's other unit-side component free, is (proven via ψ₂² = ψ₃ψ₄,
+ψ₄ = ψ₁ψ₃, and the E ≤ 2 value rigidity):
+
+    v₀ = 0:  0 alive → 0;  1 alive → 4;  2 alive → 2;
+             3 alive → 2 if T = 1 else 4
+    v₀ = 1:  3 alive with T = 1 → 1 (δ-point);  else → 3
+
+with T_L = v₂²(v₃v₄)⁻¹, T_R = v₄(v₁v₃)⁻¹ ("alive" counts nonzero
+values among the block's three constrained components). The v₀-free
+cost is the minimum over v₀: (0, 3, 2, 1 if cheap else 3) by alive
+count. **Slot parity**: every cost ≡ v₀ (mod 2), so a block's cost
+≡ |V₀| and any two blocks sharing V₀ have costs of equal parity; in
+particular per-(V₀, γ) cost sums are even.
+
+### 10.3 Fibres of affine pencils (the pair-ratio lemma)
+
+**Lemma.** Let k = κ + λu with u: slots → F₄ a bijection. For each of
+the six unordered slot pairs P = {s, s′}, k(s) = k(s′) at exactly one
+pencil parameter λ_P = (κ(s)+κ(s′))·(u(s)+u(s′))⁻¹. The fibre
+partition of k at a given λ is read off from {P : λ_P = λ}. ∎
+
+For the S-form direction k = bm + ωθ (κ = ωθ, u = m): λ_P = 0 on the
+two θ-constant pairs {e,y}, {x,xy}; on the four θ-split pairs
+λ_P = ω·Δm(P)⁻¹, giving λ = ω on {e,x}, {y,xy} and λ = ω² on {e,xy},
+{x,y}. Hence the **comp-4 trichotomy**: b ∈ {0, ω, ω²} ⟹ k is
+double-paired (fibres = one of the three pair-partitions of the slots;
+alive sets of size 2 or 4); b = 1 ⟹ k = (1, ω, ω², 0), a bijection
+(alive sets of size 3, any dead slot). The same computation drives
+every fibre-type entry in the §12 tables.
+
+### 10.4 The chord-slope lemma and hyperbolic quadruples
+
+**Lemma (chord slope).** Let u, k: slots → F₄ with u bijective, fix a
+slot z, and consider g(s) = (u(s)+u(z))·(k(s)+k(z))⁻¹ on the three
+slots s ≠ z (defined when k is injective off z's fibre). Then
+g(s) = g(s′) iff the three points (u(s), k(s)), (u(s′), k(s′)),
+(u(z), k(z)) of AG(2, F₄) are collinear. In particular, if no three of
+the four points (u(s), k(s)) are collinear, g is injective for every z.
+
+**Lemma (hyperbolic quadruple).** For c ∈ F₄ˣ, the four points
+H_c = {(t, c·t⁻¹) : t ∈ F₄ˣ} ∪ {(0,0)} have no three collinear: a line
+through the origin v = λu meets the hyperbola where λu² = c, i.e. in
+exactly one point (squaring is bijective); a line v = λu + c′ with
+c′ ≠ 0 meets it where λu² + c′u + c = 0, at most twice. Moreover every
+chord of H_c satisfies Δu·Δv = c. ∎
+
+The deepest slope case of the §11 walk uses exactly one instance:
+(m, m + ωθ) is the quadruple {(ω²,1), (ω,ω), (1,ω²), (0,0)} = H_{ω²}
+(the four products m·(m+ωθ) are ω², ω², ω², 0).
+
+### 10.5 Cost-preserving moves and the standard form
+
+The block cost is invariant under (each one line, machine check W1):
+
+1. **slot relabelings** applied simultaneously to all components and V₀
+   (the cost is a sum over slots);
+2. **translation scalings** (v_conf, v₃, v₄) ↦ (s₂v₂, s₃v₃, s₄v₄) with
+   s₂² = s₃s₄ (the nine cell symmetries of the M-table); the conf line
+   is scale-invariant;
+3. **Frobenius** on all values (M-table symmetry); and M₂(v₀, ·, ·, v₄)
+   = M₁(v₀, ·, ·, v₄²), so an R block is an M₁-type (L-type) problem
+   after Frobenius on its comp-4 values.
+
+**Standard form.** S(a, b) := the v₀-free block problem with conf line
+⟨m⟩, v₃ = am + c₃, v₄ = bm + ωθ + c₄ (c₃, c₄ free). Then:
+
+    L(24a) at (a₃,a₄) = S(a₃, a₄)          L(24b) = S(a₄, a₃)
+    R(24a) at (a₃,a₄) ≅ S(a₃, a₄²)         R(24b) ≅ S(a₄², a₃)
+
+For L(24a) this is the definition (κ₃L = 0, κ₄L = ωθ). For L(24b)
+use the v₃ ↔ v₄ symmetry of T_L. For R(24a): apply Frobenius to comp 4
+(move 3): (m′; a₃m′; a₄²m′ + θ, since θ² = θ and (ω²a₄m)² = a₄²m′);
+apply the slot swap x↔y (move 1): (m; a₃m; a₄²m + θ̃); apply the slot
+map σ induced by m̃ ↦ ω²m̃ (move 1; it sends θ̃ ↦ θ and m ↦ ω²m + 1);
+finally scale by (ω, ω, ω) (move 2). R(24b) mirrors. ∎
+
+### 10.6 The achiever-structure lemma
+
+Fix an orbit and a spine cell. For shared (V₀, γ) let min_L(V₀, γ),
+min_R(V₀, γ) be the per-block linked minima (over the block's own
+knobs: conf point on its line, c₃, and the free side of its slot
+minimizations). By §10.2 both minima ≡ |V₀| (mod 2), so their sum is
+even. The cell value is m(cell) = min over (V₀, γ) of the sum.
+
+**Lemma.** Suppose m(cell) ≥ 10 for every cell of the orbit. Then a
+weight-10 coset element must sit at some cell with a configuration of
+cost exactly 10, every slot at its M-value, free sides in the per-slot
+argmin sets, and both ρ-links satisfied; and the set of cost-10
+configurations is exactly
+
+    ⋃ {(V₀,γ) : min_L + min_R = 10}  Argmin_L(V₀,γ) × Argmin_R(V₀,γ).
+
+*Proof.* Weight 10 with cost ≥ 10 forces slot-exactness (cost = weight
+means every layer is a minimum-weight layer for its slot data). A
+cost-10 pair (cost_L, cost_R) with cost_i ≥ min_i and
+min_L + min_R ≥ 10 forces cost_i = min_i and min_L + min_R = 10. ∎
+
+So §12 must produce, per cell: (i) min_L + min_R ≥ 10 for all (V₀, γ)
+(the **cost-8 kill**; by parity only the splits (4,4), (3,5), (5,3)
+can occur, given the §12 floors min ≥ 3), and (ii) the **loci**
+{(V₀,γ) : min_L + min_R = 10} with their argmins — the achiever lists.
+§13 then kills every achiever against the ρ-links.
+
+## 11. O1 on the wt-24 orbits: the standard-form walk
+
+**Theorem (wt-24 closure).** S(a, b) ≥ 6 for all (a, b) ∈ F₄², in the
+v₀-free cost. Hence by §10.5 all four wt-24 block tables are ≥ 6
+everywhere, and since the v₀-free cost lower-bounds every fixed-V₀
+cost, every wt-24 spine cell has linked value ≥ 6 + 6 = 12:
+**(M-im) holds on the six wt-24 Smith classes.**
+
+*Proof.* Write the conf value as v₂ = pm + c₂ (dead: p = c₂ = 0; full
+constant: p = 0 ≠ c₂; co-point at z₂: p ≠ 0, v₂ = p(m + m(z₂))). Comp
+3: dead (a = c₃ = 0), full (a = 0 ≠ c₃), or co-point at z₃ (a ≠ 0).
+Comp 4: alive set S₄ with |S₄| ∈ {2, 4} (b ≠ 1, double-paired; v₄ is
+constant on S₄ when |S₄| = 2 and two-valued, constant on the pairs,
+when |S₄| = 4) or |S₄| = 3 with v₄ injective on S₄ (b = 1, dead slot
+z₄ free). Costs per slot: (0, 3, 2, 1/3) by alive count, cheap ⟺
+T = v₂²(v₃v₄)⁻¹ = 1. The walk (bucket minima in brackets are the
+machine-exact values; the derivations give the ≥ 6 bound):
+
+**A. a = 0.**
+- A1 (3 dead, conf dead): cost = 3|S₄| ≥ 6. [6/9/12]
+- A2 (3 dead, conf co-point): z₂ ∉ S₄ and |S₄| = 2: 0 + 2+2 + 3 = 7;
+  z₂ ∈ S₄, |S₄| = 2: 3 + 2 + 3+3 = 11; |S₄| = 3: z₄ = z₂: three
+  2-alive slots and a dead z₂: 6; z₄ ≠ z₂: 3 + 3 + 2+2 = 10;
+  |S₄| = 4: 3 + 2+2+2 = 9. [7/6/9]
+- A3 (3 dead, conf full) and A4 (3 full, conf dead): two constants,
+  one of them everywhere-alive: cost = 2|S₄| + 3(4−|S₄|) = 12 − |S₄|
+  ≥ 8. [10/9/8 each]
+- A5 (3 full, conf co-point z₂): |S₄| = 2: z₂ ∈ S₄: 2 + (≥1) + 2+2 ≥ 7;
+  z₂ ∉ S₄: T = p²(m+m(z₂))²(c₃v₄)⁻¹ has injective numerator and
+  constant denominator on S₄, so ≤ 1 cheap: 3 + 1+3 + 2 = 9.
+  |S₄| = 3: z₄ = z₂: 3 + three 3-alive ≥ 3 + 1+1+1 = 6; z₄ ≠ z₂:
+  2 + 2 + 1+1 = 6. |S₄| = 4: v₄ two-valued and (m+m(z₂))² injective ⟹
+  ≤ 1 cheap per v₄-pair, ≤ 2 total: 2 + 1+1+3 = 7. [7/6/7]
+- A6 (3 full, conf full): |S₄| = 2: v₄ constant on S₄, so both
+  S₄-slots can satisfy c₂² = c₃v₄: 1+1 + 2+2 = 6 (tight); |S₄| = 3:
+  v₄ injective ⟹ ≤ 1 cheap: 1+3+3 + 2 = 9; |S₄| = 4: v₄ two-valued ⟹
+  ≤ 2 cheap: 1+1+3+3 = 8. [6/9/8]
+
+**B. a ≠ 0** (comp 3 co-point at z₃, v₃ = a(m + m(z₃))).
+- B1 (conf dead): b = 1: z₄ = z₃ gives three 2-alive slots: 6; else
+  3+3+2+2 = 10. b ≠ 1: |S₄| = 2: z₃ ∉ S₄: 0 + 2+2 + 3 = 7 (z₃ ∈ S₄:
+  11); |S₄| = 4: 3 + 2+2+2 = 9. [6; 7/9]
+- B2 (conf full): b = 1: z₄ = z₃: 3 + (three 3-alive ≥ 1+1+1) = 6;
+  z₄ ≠ z₃: 2+2+1+1 = 6. b ≠ 1: |S₄| = 2: z₃ ∈ S₄: 2 + ≥1 + 2+2 ≥ 7;
+  z₃ ∉ S₄: T = c₂²(v₃v₄)⁻¹ with v₃ injective, v₄ constant on S₄: ≤ 1
+  cheap: 3 + 1+3 + 2 = 9. |S₄| = 4: v₃v₄ injective on each v₄-pair: ≤2
+  cheap: 2 + 1+1+3 = 7. [6; 7/7]
+- B3 (conf co-point z₂, b ≠ 1): z₂ = z₃ =: z: the conf and comp-3
+  values are **proportional** (both co-points of the m-line at z), so
+  T = (p²/a)(m+m(z))·v₄⁻¹; |S₄| = 2, z ∉ S₄: injective over constant
+  on S₄: ≤ 1 cheap: 0 + 1+3 + 2 = 6 (tight); z ∈ S₄: 3 + ≥1 + 2+2 ≥ 8;
+  |S₄| = 4: ≤ 1 cheap per v₄-pair: 3 + 1+1+3 = 8. z₂ ≠ z₃:
+  |S₄| = 2: each of S₄ ⊇, ⊉ {z₂, z₃} cases gives ≥ 8 (two 2-alive
+  slots cost 4 and either two 1-alive slots or a 3-alive pair join);
+  |S₄| = 4: 2 + 2 + 1+1 = 6. [6/8; 8/6]
+- B4 (conf co-point, b = 1): z₂ = z₃ = z₄ =: z: all of ¬z is 3-alive
+  and z is free; cheapness reads p²(m(s)+m(z))² = a(m(s)+m(z))·v₄(s),
+  i.e. (m(s)+m(z))·(k₄(s)+k₄(z))⁻¹ = a·p⁻², a level condition on the
+  chord slope of the quadruple (m, k₄) = (m, m+ωθ) = H_{ω²} (§10.4):
+  no three collinear ⟹ ≤ 1 cheap: 0 + 1+3+3 = 7. Other alignments:
+  two of {z₂, z₃, z₄} equal: the doubled slot is ≤ 1-alive (cost ≥ 3
+  if v₀-free cost 3 — e.g. z₂ = z₃ ≠ z₄: z costs 3 — or the third
+  dead slot costs 2) and at most two 3-alive slots remain: ≥ 7 in each
+  of the three patterns; all distinct: 2+2+2 + ≥1 = 7. [7/7/9/9/7]
+
+Every bucket is ≥ 6. ∎
+
+The 24-row bucket table with its exact minima is Appendix C.1; the
+recheck script certifies each row and the equality of the four wt-24
+block tables with the S-reindexings.
+
+## 12. The wt-16/18 orbits: locus rules and the per-cell tables
+
+Here the unlinked block floors are 3–5 and the linkage (shared V₀ and
+γ) carries the floor to 10. We produce, per orbit and cell, the
+function (V₀, γ) ↦ (min_L, min_R) far enough to certify the §10.6
+requirements. The locus rules:
+
+**R1 (zero slot).** A slot costs 0 iff v₀ = 0 and all three constrained
+components vanish there.
+
+**R2 (dead-pair rigidity).** Two zero slots {s, s′} force the conf
+component ≡ 0 (a nonzero point of the conf line vanishes at ≤ 1 slot)
+and force {s, s′} inside a single fibre of the comp-3 AND comp-4
+directions. Given the directions' fibre tables (§10.3), this pins the
+spine and the constants (hence γ) up to the listed fibre choices.
+Three zero slots additionally force v₃ ≡ 0 on them, i.e. a fibre of
+size ≥ 3 in the comp-3 direction — available only where comp 3 is
+conf-parallel and the spine kills it (the wt-18a row a₃ = 1), with a
+3+1 fibre of k₄ carrying the rest.
+
+**R3 (δ-slot).** A v₀ = 1 slot costs 1 iff all three components are
+alive and T = 1 there; the conf scale p enters T quadratically on L
+(linearly on R), so matching two δ-slots (or a δ-slot and a 3-alive
+cheap slot) against one p is one consistency equation in F₄, solvable
+or not by inspection.
+
+**R4 (cost-2 slot).** A v₀ = 0 slot costs 2 iff exactly two components
+are alive, or all three with T = 1.
+
+**R5 (shapes).** By parity the per-block slot-cost multisets at cost
+3, 4, 5 are: cost 3: {3,0,0,0}, {1,2,0,0} (|V₀| = 1), {1,1,1,0}
+(|V₀| = 3); cost 4: {4,0,0,0}, {2,2,0,0} (|V₀| = 0), {1,1,2,0},
+{1,3,0,0} (|V₀| = 2), {1,1,1,1} (|V₀| = 4); cost 5: {1,2,2,0},
+{1,4,0,0}, {3,2,0,0} (|V₀| = 1), {1,1,3,0}, {1,1,1,2} (|V₀| = 3).
+
+Each locus table row below is derived by: choose the shape (R5), apply
+R1–R4 to pin the configuration data, and check the F₄ consistency
+equations. We work one cell per orbit in full; the remaining rows are
+the same finite procedure (minutes per cell by hand), and every row is
+machine-certified (Appendix D).
+
+### 12.1 wt-16
+
+L-frame: conf ⟨m⟩; v₃ = a₃m + ωθ + c₃; v₄ = a₄m + ωθ + c₄,
+d₄L = ωγ + ω. R-frame (after Frobenius on comp 4): conf ⟨m′⟩;
+v₃ = a₃m′ + θ + c₃; ṽ₄ = a₄²m′ + θ + c₄. Directions (§10.3): k₃ and k₄
+are double-paired for spine value in {0, ω, ω²} and bijective at 1 — on
+L the pairings are {e,y|x,xy} at 0, {e,x|y,xy} at ω, {e,xy|x,y} at ω²;
+on R (θ-offset against m′) the pairings at ω and ω² are exchanged.
+
+**Worked cell (ω², ω²), the (4,6) locus.** Cost-4 L-shapes: {2,2,0,0}
+needs a dead pair: by R2, conf ≡ 0 and the dead pair lies in a common
+fibre of k₃ = ω²m + ωθ and k₄ = ω²m + ωθ — equal directions with
+pairing {e,xy | x,y} (pair-ratio ω² at a = ω²); both fibres are
+available: dead pair {e, xy} pins c₃ = c₄ = k(e) and d₄L = k₄(e) =
+ω²m(e) + ωθ(e) = ω + ω = 0, i.e. γ = ω²·(0 + ω)·ω⁻¹·… solving
+ωγ + ω = 0 gives γ = 1; dead pair {x, y} pins d₄L = k₄(x) = 1, γ = ω.
+The two live slots then carry v₃ = v₄ = the pair-gap value, two
+components alive each: cost 2 + 2 with V₀ = 0000: **min_L = 4 at
+(V₀, γ) ∈ {(0000, 1), (0000, ω)}**, argmin unique. The |V₀| = 4 all-δ
+shape {1,1,1,1} also solves here: with k₃ = k₄ the δ-condition
+T ≡ 1 reads p²(m-line)² = v₃v₄ = v₃², one equation per slot whose
+consistency across all four slots holds exactly at γ ∈ {0, ω²}
+(V₀ = 1111). The |V₀| = 2 shapes and {4,0,0,0} fail (R3's equations
+are overdetermined with k₃ = k₄). The R block at each of these
+(V₀, γ) has min_R = 6, so the cell contributes (4,6) achievers at the
+four loci 1111@0, 0000@1, 0000@ω, 1111@ω², with |Argmin_R| = 2 each —
+matching the table.
+
+**Worked cell (ω, 1), a (5,5) locus.** Take V₀ = δ_{xy}, γ = 0 (so
+d₄L = ω). Shape {1,2,2,0}: the zero slot s₀ must satisfy
+k₄(s₀) = d₄L; k₄ = m + ωθ = (1, ω, ω², 0) (bijective, a₄ = 1):
+s₀ = x. By R1, conf is the co-point p(m + m(x)); v₃'s direction
+k₃ = ωm + ωθ = (ω², ω², 0, 0) is double-paired {e,x | y,xy}, so v₃
+dies on the whole pair {e, x}: slot e has exactly conf and v₄ alive —
+cost 2 ✓. Slots y, xy have all three alive; the δ-slot is xy (v₀ = 1)
+and y needs T = 1 (R4). Both give one equation for p²:
+at xy: p²·ω² = v₃(xy)·v₄(xy) = ω²·ω, so p² = ω; at y:
+p²·(ω²)² = ω²·1, so p² = ω — **consistent**, p = ω². The
+configuration exists and is unique: a (5,5) locus with singleton
+argmins. The other three (V₀, γ) = (δ_s, ·) loci are its images under
+the slot translations (the stabilizer of ζ has order 4 and acts by the
+three nonzero slot translations, which permute the δ-positions and
+shift γ accordingly).
+
+The full table (every cell, both blocks; certified):
+
+- **floor-10 cells** (ω,1), (ω,ω²), (ω²,1), (ω²,ω²): loci and
+  achiever counts as in Appendix C.2 — per cell four (5,5) loci with
+  singleton argmins and four (6,4)- or (4,6)-loci with two argmin pairs
+  each: 4 + 8 = 12 achievers per cell, 48 in total.
+- **all other cells**: the (4,4)-kill is the disjointness of the L4 and
+  R4 loci visible in Appendix C.2's locus columns — at every cell
+  either one side is empty, or the V₀-sets are disjoint (e.g. cell
+  (ω,1): V₀(L4) ⊂ {0011, 1100} vs V₀(R4) ⊂ {1001, 0110}), or the V₀'s
+  agree and the γ-sets are complementary (e.g. cell (0,0): L4 at
+  (0000, {0,1}) ∪ (1111, {ω,ω²}), R4 at (1111, {0,1}) ∪ (0000,
+  {ω,ω²})).
+- **L3 = R3 = ∅ at every wt-16 cell**, fully derived: the |V₀| = 1
+  shapes {1,2,0,0} and {3,0,0,0} need ≥ 2 zero slots, killing the conf
+  component (R2) — the former then has no alive conf at its δ-slot,
+  and the latter needs v₃ ≡ 0 on three slots, impossible since
+  κ₃L = ωθ is non-constant and k₃ has no fibre of size ≥ 3. The
+  |V₀| = 3 shape {1,1,1,0} (one zero slot s₀, three δ-slots) dies in
+  three steps: at a₃ ≠ 1 the comp-3 direction is double-paired, so
+  v₃(s₀) = 0 kills v₃ on s₀'s partner slot, contradicting that
+  δ-slot; at (1, a₄) with a₄ ≠ 1 the same argument applies to comp 4;
+  and at (1,1), k₃ = k₄ = m + ωθ, so the triple-δ condition says
+  (m + m(s₀))·(k₃ + k₃(s₀))⁻¹ is constant on ¬s₀ — three points of
+  (m, m+ωθ) = H_{ω²} collinear, contradicting §10.4. With parity,
+  every (V₀, γ) has min_L + min_R ≥ 10: **m(cell) ≥ 10 for all 16
+  cells, = 10 exactly at the four floor-10 cells.**
+
+### 12.2 wt-18a
+
+L-frame: v₃ = (1+a₃)m + c₃ (κ₃L = m **is** the labeling: comp 3 is
+conf-parallel, dead/full at a₃ = 1, co-point otherwise); v₄ has
+direction k₄ = (0,ω,ω²,0) + a₄m with fibre types 2+1+1 / 2+1+1 / 3+1 /
+2+1+1 over a₄ = 0, 1, ω, ω²; d₄L = ωγ + ω². R-frame: v₃ = (1+a₃)m′;
+ṽ₄ direction ω(1,1,1,0) + a₄²m′ (types 3+1 at a₄ = 0, else 2+1+1).
+The translation stabilizer of ζ has order 3 and acts on the spine by
+a₃ ↦ ω(1+a₃)+1-type affine maps fixing a₄: the cells (a₃, a₄) with
+1+a₃ ≠ 0 form orbits of three per a₄-column, the row a₃ = 1 is fixed.
+So six cell classes: (ã₃ ≠ 0, a₄) for a₄ ∈ F₄, and (1, 0), (1, ω)
+(the cells (1, 1), (1, ω²) have m = 12 with empty low loci).
+
+Worked class rep (0, 1), |V₀| = 3 loci: shape {1,1,1,2} with the
+δ-equations of R3 solvable at exactly (V₀, γ) ∈ {(1011, 1),
+(1101, ω²)} on the (5,5) side, plus the (6,4) locus (1100, ω²); the
+class transports to (ω, 1) and (ω², 1) verbatim (the stabilizer fixes
+γ and a₄ and permutes nothing else in the table). The isolated row
+a₃ = 1 kills comp 3 entirely (dead or full): at (1, 0) the surviving
+loci are (6,4) at (0000, 0) and (7,3) at (0001, 0); at (1, ω) the
+mirror (3,7)/(4,6). Appendix C.3 lists all 14 floor-10 cells: 48
+achievers (12 per a₄ ∈ {1, ω²} column-orbit, 6 per a₄ ∈ {0, ω}
+column-orbit, 6 + 6 at the two fixed cells).
+
+The cost-8 kill: all L4/R4/L3/R3 loci are singletons (Appendix C.3),
+pairwise disjoint in (V₀, γ) at every cell; the only L3/R3 sites are
+(1, ω)/(1, 0) where the partner block's minimum at that (V₀, γ) is 7.
+
+### 12.3 wt-18b
+
+L-frame: κ₃L = (1,ω,ω²,0) (bijective offset), k₃ = κ₃L + a₃m with
+fibre types 1+1+1+1 / 2+2 / 2+2 / 2+2 over a₃ = 0, 1, ω, ω² (pair-ratio
+table as in §10.3); κ₄L = (ω,ω,1,0), k₄ types 2+1+1 / 3+1 / 2+1+1 /
+2+1+1; d₄L = ωγ + 1. R-frame: κ₃R = ω²m (in the m′-frame a fixed
+non-affine offset), κ̃₄R = (ω²,ω,ω²,0). The translation stabilizer is
+trivial, but the swap-type symmetry of the orbit (translation∘swap
+fixes ζ) exchanges the blocks and pairs the cells: each locus table at
+(a₃, a₄) mirrors a partner cell's with L and R exchanged (visible in
+Appendix C.4: e.g. (0,1) carries (3,7) + (4,6) and (0,ω²) carries
+(7,3) + (6,4) with the same V₀'s). 12 floor-10 cells, 22 achievers;
+the two L3/R3 sites ((0,1) and (0,ω²), V₀ = 0111, the unique |V₀| = 3
+cost-3 shape {1,1,1,0} the frame admits) have partner minima 7.
+
+### 12.4 Summary
+
+Per-cell locus tables: Appendix C.2–C.4. Together with §11:
+
+> **C-table floor.** Every Smith-coset element has weight ≥ 12 on the
+> wt-24 orbits and ≥ 10 on wt-16/18a/18b; per (V₀, γ) the block minima
+> sum to ≥ 10 with equality exactly on the listed loci; the cost-10
+> configurations are exactly the 48 + 48 + 22 = 118 achievers of
+> Appendix C.5.
+
+## 13. The ρ-link kills: no weight-10 elements
+
+By §10.6, a weight-10 element realizes one of the 118 achievers with
+its free sides in the per-slot argmin sets and **both** links
+V₁R = ρ₁·V₁L, V₂L = ρ₂·V₂R (§9.4). For an achiever, V₁R and V₂L are
+part of the configuration; the links demand V₁L ∈ ρ₁⁻¹(V₁R) (a coset
+of ker ρ₁ = F₄Â₁ ⊕ F₄XY, 16 elements; nonempty since V₁R ∈ im ρ₁) to
+meet the product of the four argmin sets Argmin₁(s) ⊆ F₄, and mirror
+for V₂R. The argmin sets are read off the value table: at a slot of
+cost c, Argmin₁(s) = {v₁ : the layer with values (v₀; v₁, v₂, v₃, v₄)
+has weight c} — almost always a singleton (a δ-point pins all five
+values; a weight-2 slot pins the values up to its one dead component).
+
+**Worked kill (the wt-16 (5,5) family head, §12.1's worked cell).**
+At cell (ω,1), V₀ = δ_{xy} = 0001, γ = 0: the achiever's L data is
+V₂L = (ω²,0,ω,1), V₃L = (0,0,ω²,ω²), V₄L = (ω²,0,1,ω) with slot costs
+[2,0,2,1]; the per-slot comp-1 argmin sets are the **singletons**
+({1},{0},{0},{ω²}) — at the zero slot the empty layer forces v₁ = 0,
+at the δ-slot the δ-point pins v₁ = ψ₁(its cell), and at the weight-2
+slots the pair's one dead component is not comp 1. So link 1 holds iff
+the single convolution ρ₁·(1,0,0,ω²) equals V₁R = (ω²,ω,0,1).
+Computing in the X, Y basis: (1,0,0,ω²) = ω·1 + ω²X + ω²Y + ω²XY, and
+(X + ωY + ω²XY)·(ω + ω²X + ω²Y + ω²XY) = ωX + ω²Y + ω²XY, with slot
+values (ω, 1, 0, ω²) ≠ (ω², ω, 0, 1): **link 1 fails.** The mirror
+computation kills link 2 as well. The same one-convolution check,
+transported by the orbit symmetries of §12 across each family, kills
+all achievers; the full table is Appendix C.5: **116 achievers fail
+both links, 2 (wt-18b) fail exactly one — all 118 fail.** ∎
+
+With §§11–12 (no cost ≤ 9 anywhere, no link-compatible cost-10) and
+evenness (§9.3): **no Smith-coset element has weight < 12.** Transport
+(§9.3) extends the bound from the five representatives to all 63
+nonzero classes:
+
+> **(M-im).** Every base 1-cycle in a nonzero imΔ class has weight
+> ≥ 12.
+
+## 14. Theorem D: assembly and status
+
+**Proof of Theorem D.** Lower bound: let v be a nontrivial cover
+Z-logical. If [p(v)] = 0: |v| ≥ 12 by Theorem C. Else p(v) ≠ 0 and by
+(R) (§9.1) [p(v)] ∈ im Δ ∖ 0, so p(v) lies in a coset C(ζ), ζ ≠ 0,
+and |v| ≥ |p(v)| ≥ 12 by (M-im). d_X = d_Z by Lemma 2.1. Upper bound:
+u\* (§4.6) is a weight-6 base logical with nonzero seam flux (a finite
+overlap count, §6.5/Entry 17), so [u\*] ∉ im Δ = ker τ_\*; hence
+τ(u\*) = (u\*, u\*) is a weight-12 cover cycle that is not a boundary:
+d(gross) = 12. **∎**
+
+**Epistemic status.** Every reduction (Part I; §§9–10; the §11 walk;
+the §12 rules; §13's lemma) is hand-proven. The finite case content is:
+the M-table rule (§10.2, hand-proven with an 18-orbit table), the §11
+bucket table (33 buckets, each derived in 1–3 lines), the §12 per-cell
+locus tables (Appendix C.2–C.4; each row a minutes-long application of
+R1–R5), and the §13 kill table (118 one-line F₄ evaluations in
+families). This meets the program's §1 bar at the same grade as Part
+I's §6.3 classification: analytic reductions with surveyable case
+tables, machine-verified as confirmation only. This honestly restores
+the headline **d(gross) = 12, fully analytic** (Entry 27's two
+machine-certified residues are discharged: the wt-24 closure by the
+§11 walk, the achiever-list completeness by §10.6 + §12).
+
+---
+
+## Appendix C. Part-II tables
+
+### C.1 The S(a,b) bucket table (§11)
+
+Machine-exact bucket minima (v₀-free costs; all ≥ 6):
+
+| bucket | min | | bucket | min |
+|---|---|---|---|---|
+| A1 \|S₄\|=2/3/4 | 6/9/12 | | B1 b=1 | 6 |
+| A2 \|S₄\|=2/3/4 | 7/6/9 | | B1 b≠1, \|S₄\|=2/4 | 7/9 |
+| A3 \|S₄\|=2/3/4 | 10/9/8 | | B2 b=1 | 6 |
+| A4 \|S₄\|=2/3/4 | 10/9/8 | | B2 b≠1, \|S₄\|=2/4 | 7/7 |
+| A5 \|S₄\|=2/3/4 | 7/6/7 | | B3 z₂=z₃, \|S₄\|=2/4 | 6/8 |
+| A6 \|S₄\|=2/3/4 | 6/9/8 | | B3 z₂≠z₃, \|S₄\|=2/4 | 8/6 |
+| | | | B4 z₂=z₃=z₄ / z₂=z₃ / z₂=z₄ / z₃=z₄ / distinct | 7/7/9/9/7 |
+
+S-table: S(a,b) = 6 for all 16 (a,b). Block tables: L(24a) = S(a₃,a₄),
+L(24b) = S(a₄,a₃), R(24a) = S(a₃,a₄²), R(24b) = S(a₄²,a₃) (as 4×4
+tables, after the §10.5 moves).
+
+### C.2 wt-16 locus tables (V₀ as a bit-string over (e,x,y,xy); γ ∈ F₄)
+
+Floor-10 cells — achiever loci:
+
+| cell | (5,5) loci (argmins 1×1) | (4,6)/(6,4) loci (argmins 1×2 / 2×1) |
+|---|---|---|
+| (ω,1)   | 0001@0, 0100@1, 0010@ω, 1000@ω² | (6,4): 1001@0, 0110@1, 0110@ω, 1001@ω² |
+| (ω,ω²)  | 0111@0, 1110@0, 1011@ω², 1101@ω² | (6,4): 1111@0, 0000@1, 0000@ω, 1111@ω² |
+| (ω²,1)  | 1000@0, 0010@1, 0100@ω, 0001@ω² | (4,6): 1001@0, 0110@1, 0110@ω, 1001@ω² |
+| (ω²,ω²) | 1011@0, 1101@0, 0111@ω², 1110@ω² | (4,6): 1111@0, 0000@1, 0000@ω, 1111@ω² |
+
+12 achievers per cell; 48 total. Cost-4 loci at the other cells (the
+(4,4) disjointness): L4 and R4 as listed by the recheck (K4 layout);
+at every cell L4 ∩ R4 = ∅, L3 = R3 = ∅.
+
+### C.3 wt-18a locus tables
+
+Cell classes under the order-3 stabilizer (rows ã₃ = 1+a₃ ≠ 0
+transport; row a₃ = 1 fixed):
+
+| class | loci |
+|---|---|
+| (ã₃≠0, 0)  | (4,6): 0110@ω |
+| (ã₃≠0, 1)  | (5,5): 1011@1, 1101@ω²; (6,4): 1100@ω² |
+| (ã₃≠0, ω)  | (6,4): 0110@ω² |
+| (ã₃≠0, ω²) | (4,6): 1100@ω; (5,5): 1011@0, 1101@ω |
+| (1, 0)     | (6,4): 0000@0; (7,3): 0001@0 |
+| (1, ω)     | (3,7): 0001@1; (4,6): 0000@1 |
+
+Achiever counts: 2 per (ã₃≠0, 0)- and (ã₃≠0, ω)-cell, 4 per
+(ã₃≠0, 1)- and (ã₃≠0, ω²)-cell, 6 at each fixed cell: 3·(2+4+2+4) +
+6 + 6 = 48. Cells (1,1), (1,ω²): m = 12, empty loci.
+
+### C.4 wt-18b locus tables
+
+| cell | loci | | swap-partner | loci |
+|---|---|---|---|---|
+| (0,1)  | (3,7): 0111@0; (4,6): 0101@0 | | (0,ω²) | (6,4): 0101@ω; (7,3): 0111@ω |
+| (1,ω)  | (4,6): 0000@1 | | (1,0)  | (6,4): 0000@ω² |
+| (1,ω²) | (4,6): 1010@1; (5,5): 0010@1 | | (1,1)  | (5,5): 0010@ω²; (6,4): 1010@ω² |
+| (ω,0)  | (4,6): 1001@0; (5,5): 1110@1; (6,4): 1100@1 | | (ω²,ω) | (4,6): 1100@ω²; (5,5): 1110@ω²; (6,4): 1001@ω |
+| (ω,1)  | (5,5): 1011@ω | | (ω²,ω²) | (5,5): 1011@0 |
+| (ω²,0) | (4,6): 0000@ω; (5,5): 0001@ω | | (ω,ω)  | (5,5): 0001@0; (6,4): 0000@0 |
+
+(The swap symmetry of the orbit pairs each left row with its right
+partner, exchanging the (cL, cR) splits.) Achiever count
+2+2+1+1+2+2+3+3+1+1+2+2 = 22.
+
+### C.5 The 118 kills
+
+Every achiever fails at least one ρ-link; 116 fail both, the two
+exceptions (wt-18b, cells (ω,ω) and (ω²,0), the (5,5) achievers) fail
+exactly one. Worked family heads: §13; full table: the recheck script
+(per achiever, the argmin product and the 16-element link coset are
+disjoint — one F₄ evaluation per slot).
+
+## Appendix D. Verification map (Part II; confirmation only)
+
+| claim | script / check |
+|---|---|
+| frame: labelings, lines, ties, offsets, fibre types | `a3_a4ext_recheck.py` F1–F6 |
+| S(a,b) ≡ 6; the four wt-24 block tables = S-reindexings | W1–W2 |
+| the §11 bucket minima (33 buckets, all ≥ 6) | W3 |
+| per-cell linked floors: ≥ 10 / ≥ 12; m-values | K1 |
+| per-cell loci (C.2–C.4) and argmin counts | K2 |
+| the 118 achievers and the link kills (116 both / 2 one) | K3 |
+| achiever-structure lemma instance check | K4 |
+| upstream: Entries 16–26 chain re-verified | `a3_adv27_recheck.py` (75 checks) |
+| original machine sweeps (superseded as evidence, kept as cross-checks) | `a3_mim_*.py` |

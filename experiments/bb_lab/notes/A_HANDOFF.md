@@ -7,7 +7,9 @@ supersedes the Tier-1-era parts of `HANDOFF.md` for this specific effort and
 ties together the `A0`–`A3` notes. Date of handoff: 2026-06-10; updated
 2026-06-12 (Entries 11–14: all shape lemmas proven; (M) unconditional;
 **d(gross) ≥ 6 fully analytic**; Entry 15: the owed adversarial re-review
-passed — the chain HOLDS, **write-up grade**).
+passed — the chain HOLDS, **write-up grade**; Entries 16–28: goal 1
+closed, reviewed, and written up — **d(gross) = 12 fully analytic**,
+A4 Theorem D).
 
 ---
 
@@ -37,32 +39,36 @@ The Entry-8/9 machine checks are demoted to confirmations end to end.
 Goal 1 then closed (Entries 16–26): the safe sector sees exactly the
 Smith classes, **(R) is proven** by the one-line homotopy, the flux
 characterization is fully analytic, **d(gross) = 12 ⟺ (M-im)**, and
-(M-im) is proven by the confined-floor program. See the Entry-27 update
-below for the current epistemic grade and the single resume item — the
-A4-extension write-up, which must also fold in Entry 15's Notes 1–2
-(the (3,1,1,1) sub-case derivation order and a sentence fixing the d₃
-dictionary as the support-⊆-W quantity).
-Start at `notes/A3_track1p1_log.md` Entries 15 and 27, then
-`scripts/a3_adv27_recheck.py`, `scripts/a3_adv15_recheck.py`.
+(M-im) is proven by the confined-floor program; the Entry-27 review
+cleared the chain, and **Entry 28 discharged its two residues: the A4
+extension (`notes/A4_writeup.md` Part II, Theorem D) walks the
+compressed C-tables and derives the achiever lists by hand —
+d(gross) = 12 is fully analytic.**
+Start at `notes/A4_writeup.md` (Theorems A–D), then
+`notes/A3_track1p1_log.md` Entries 27–28 and
+`scripts/a3_a4ext_recheck.py`, `scripts/a3_adv27_recheck.py`.
 
 *Update (Entries 16–26): goal 1 was assembled — d(gross) = 12 via (R) +
-the flux characterization + (M-im). **Update (Entry 27, 2026-06-12): the
+the flux characterization + (M-im). Update (Entry 27, 2026-06-12): the
 owed adversarial re-review of Entries 16–26 is DONE — every link HOLDS
 (75/75 independent conjugate-frame checks, `a3_adv27_recheck.py`; every
 prose argument re-derived by hand; two sharpenings found: off₀ = off₂ = 0
-identically, making the comp-2 mirror chain a one-liner). The headline is
-demoted from "fully analytic" to: d(gross) = 12 at the grade "hand-proven
-reductions + the surveyable 18-orbit M-table + two machine-certified
-finite residues" — the Entry-24 per-cell C-table evaluations (~6k engine
-rows for the wt-24 closure; 80 machine-swept linked cells) and the
-Entry-25 achiever-list completeness do not yet meet §1's "few
-human-surveyable cases" bar. This is a write-up debt, not a mathematical
-gap: the compression assets (translation stabilizers of order 12, the
-slope lemma, B̂₄ = ωÂ₄) exist but the compressed tables have not been
-walked. d(gross) ≥ 6 remains fully analytic (Entries 5–15). Resume with
-the A4-extension write-up that walks the compressed C-tables and derives
-the achiever lists by hand — that is what restores "fully analytic"
-honestly.***
+identically, making the comp-2 mirror chain a one-liner). Entry 27
+demoted the headline to "analytic spine + two machine-certified
+residues" — the Entry-24 per-cell C-table evaluations and the Entry-25
+achiever-list completeness. **Update (Entry 28, 2026-06-12): both
+residues are discharged. The wt-24 closure compresses to ONE standard
+form S(a,b) (all four block tables are S-reindexings via Frobenius /
+slot maps / translation scalings, using m′² = ω²m) walked in 33
+hand-derived buckets, with the slope lemma in its final form (the
+hyperbolic-quadruple lemma: the four points (m, m+ωθ) lie on uv = ω²
+plus the origin, no three collinear). The achiever-list completeness
+follows from the achiever-structure lemma (per-(V₀,γ) block minima are
+parity-locked, so achievers = argmin products over the sum-10 loci) +
+the per-cell locus tables derived by rules R1–R5: 48 + 48 + 22 = 118,
+matching Entry 25, all killed by one-convolution ρ-link checks.
+`a3_a4ext_recheck.py` certifies every table (all PASS).
+d(gross) = 12 and d(gross) ≥ 6 are both fully analytic.***
 
 ---
 
@@ -171,7 +177,10 @@ reproduce `d=12`) — the validation the buggy scout script lacked (see §5).
   HOLD; two presentation debts recorded for the write-up (the (3,1,1,1)
   derivation order; the d₃ = support-⊆-W clarification). Independent
   checker: `a3_adv15_recheck.py` (49 checks, different encoding path).
-- **Open for goal 1 (d = 12):** the safe-sector (M)-analogue (§4).
+- **Goal 1 (d = 12): CLOSED** — Entries 16–26 (the chain), Entry 27
+  (review), Entry 28 (the A4 Part-II write-up; fully analytic). See §4's
+  update blocks; the open work is the owed Part-II skeptic pass and
+  goal 2 (§8).
 
 ---
 
@@ -337,6 +346,32 @@ an analytic spine; fully-analytic write-up owed"**, while d ≥ 6 remains
 fully analytic. See log Entry 27 for the per-link detail and the
 load-bearing-only dependency tree.*
 
+*Update (Entry 28, the A4 extension — RESIDUES DISCHARGED): both
+Entry-27 residues are now hand-walked in `notes/A4_writeup.md` Part II
+(§§8–14, **Theorem D: d(gross) = 12, fully analytic**). The keys, all
+new isolated structure: **m′² = ω²m** (kill(Â₄) is a scalar of
+kill(B̂) — only two labelings exist up to scale), the confined comps are
+the full affine lines {pm + c} / {pm′ + c}, and the Γ₄ tie is
+V₄L = ωV₄R + w₄ with an affine γ-dictionary. (Residue 1) the four
+wt-24 block problems are all equivalent (Frobenius / slot maps /
+translation scalings) to ONE standard form S(a,b) = (⟨m⟩; am + c₃;
+bm + ωθ + c₄), walked in 33 hand-derived buckets — the only deep case
+is killed by the **hyperbolic-quadruple lemma** ((m, m+ωθ) lies on
+uv = ω² ∪ {0}, no three collinear ⟹ ≤ 1 cheap slot); S ≡ 6, so every
+wt-24 cell ≥ 12 with no linkage. (Residue 2) the **achiever-structure
+lemma** (per-(V₀,γ) block minima are parity-locked even, so cost-10
+configurations = argmin products over the sum-10 loci) reduces
+completeness to per-cell locus tables derived by rules R1–R5
+(zero-slot/dead-pair rigidity, δ-consistency, the shape ladder):
+48 + 48 + 22 = 118 achievers exactly, each killed by a one-convolution
+ρ-link check (116 fail both, 2 fail one). Entry 27's sharpenings, the
+H₀ paragraph, and the no-double-wrap implicit step are folded in.
+`a3_a4ext_recheck.py` (60+ checks, all PASS) certifies every table.
+Honesty ledger: the §12 locus tables are rule-derived with worked
+representatives per orbit (the Entry-10–12 presentation grade), not
+walked cell-by-cell; a future skeptic pass may demand more worked
+cells. See log Entry 28.*
+
 **The former tail (L-C) — now closed verified-finite (Entries 8–9).** The
 classification "every b ∈ Stab_Z(base) with 0 < |b| ≤ 11 is a hexagon or a
 D-pair" is established by the layer-profile route
@@ -469,15 +504,17 @@ goal-1/goal-2 argument.
   characterization via the no-double-wrap lemma; **d(gross) = 12 ⟺
   (M-im)**) → 19–26 (the (M-im) confined-floor program; **d(gross) = 12
   assembled**) → 27 (adversarial re-review of 16–26: every link HOLDS;
-  grade = analytic spine + two machine-certified residues). Resume from
-  Entries 15 and 27 and the §0/§4 update blocks.
-- `notes/A4_writeup.md` — **the standalone write-up of Theorems A/B/C
-  (review-cleared by Entry 15; fold in its Notes 1–2):** Theorems A (small
-  cycles; d(base) = 6 with explicit exhibit), B (d(gross) ≥ 6, minimal
-  proof), C (dangerous sector ≥ 12 via (M)), with the surveyable case
-  tables and the verification map. Entries 16–26 (the goal-1 closure) are
-  NOT yet covered by it — the A4 extension is the open write-up debt
-  (Entry 27), and it is what restores "fully analytic" for d = 12.
+  grade = analytic spine + two machine-certified residues) → 28 (the A4
+  extension: both residues discharged; **d(gross) = 12 fully
+  analytic**). Resume from Entries 27–28 and the §0/§4 update blocks.
+- `notes/A4_writeup.md` — **the standalone write-up, Theorems A–D.**
+  Part I (review-cleared by Entry 15, Notes 1–2 folded in): Theorems A
+  (small cycles; d(base) = 6 with explicit exhibit), B (d(gross) ≥ 6,
+  minimal proof), C (dangerous sector ≥ 12 via (M)). Part II (Entry 28,
+  review owed): Theorem D (d(gross) = 12, fully analytic) — the slot
+  frame, the S(a,b) bucket walk, the locus tables, the ρ-link kills,
+  with the compressed tables in Appendix C and the verification map in
+  Appendix D.
 
 **Scripts (all under `scripts/`, run via `uv run python scripts/<name>` from
 `experiments/bb_lab/`):**
@@ -518,6 +555,12 @@ goal-1/goal-2 argument.
   re-implementation of Entries 16–26 (75 checks; conjugate CRT frame,
   own weight-6/8/10 census — the (M-im) endpoint is triple-machine-
   verified). Confirmation only.
+- `a3_a4ext_recheck.py` — **Entry 28**: certifies every table of the A4
+  Part-II write-up (the slot-frame facts F1–F6; S(a,b) ≡ 6 and the four
+  wt-24 reindexings W1–W2; the 33 bucket minima W3; the per-cell linked
+  floors and cost-8 kill K1; the C.2–C.4 locus tables K2; the 118
+  achievers, the structure-lemma instance, and the 116/2/0 link-kill
+  split K3–K4). Confirmation only.
 - `a1_smith_*.py` — scout scaffolding. **`a1_smith_sector_sat.py` is BUGGY** (§6).
 - `a1_es_four_terms.py`, `a1_es_purity_check.py`, `a1_srb_cover_chain_check.py` —
   substrate (ES exact-sequence (6,6,6,6); purity; SRB cover-chain verification).
@@ -539,17 +582,22 @@ buggy-scout flag commit). Each `A3` entry is one commit.
    hand-proven reduction spine + the surveyable 18-orbit M-table + two
    machine-certified finite residues (the Entry-24 C-table evaluations
    and the Entry-25 achiever-list completeness).
-3. **The A4 write-up extension (the open item)**: extend A4 with the
-   d = 12 chain — (R), the flux characterization, the (M-im)
-   confined-floor program — folding in Entry 15's Notes 1–2 and
-   Entry 27's findings; walk the stabilizer/slope-compressed C-tables
-   and derive the achiever lists by hand. That is what restores
-   "fully analytic" for d = 12 honestly.
-4. **Goal 2 — template runs**: the small-cycle engine analysis on other
+3. ~~The A4 write-up extension~~ **DONE (Entry 28): A4 Part II
+   (Theorem D) walks the compressed C-tables (the S(a,b) bucket walk)
+   and derives the achiever lists (the locus tables + the
+   achiever-structure lemma); Entry 15's Notes 1–2 and Entry 27's
+   findings folded in. d(gross) = 12 fully analytic.**
+4. **The owed skeptic pass over A4 Part II** (Entry-15/27 style): the
+   prose vs. the certified tables, with special attention to the §12
+   locus-table presentation grade (rule-derived with worked
+   representatives; a reviewer may demand more worked cells).
+5. **Goal 2 — template runs**: the small-cycle engine analysis on other
    BB bases (Bravyi instances; bb_90/bb_108 odd-h covers with k′ = 8);
    each run needs only the CRT components, the difference sets, and the
-   projections of that instance.
-5. **Maintain `A3_track1p1_log.md`** as the running log; commit per entry.
+   projections of that instance. The Entry-28 slot frame is
+   instance-generic (only m, the offsets, and the e/d_w dictionary
+   change).
+6. **Maintain `A3_track1p1_log.md`** as the running log; commit per entry.
 
 ---
 
