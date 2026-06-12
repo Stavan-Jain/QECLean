@@ -145,6 +145,24 @@ lemma conv_add_swap_eq_zero (a b : G → ZMod 2) :
   ext g
   simp [Pi.add_apply, CharTwo.add_self_eq_zero]
 
+/-- Convolving with a point mass on the left translates: `δ_a ⋆ b = b (· - a)`. -/
+lemma conv_single_left [DecidableEq G] (a : G) (b : G → ZMod 2) :
+    conv (Pi.single a 1) b = fun g => b (g - a) := by
+  funext g
+  rw [conv_apply, Finset.sum_eq_single a]
+  · simp
+  · intro h _ hne
+    rw [Pi.single_eq_of_ne hne, zero_mul]
+  · intro habs
+    exact absurd (Finset.mem_univ a) habs
+
+/-- Pointwise form of `conv_single_left` (avoids beta-redex residue when
+rewriting at an applied occurrence). -/
+@[simp] lemma conv_single_left_apply [DecidableEq G] (a : G) (b : G → ZMod 2)
+    (g : G) :
+    conv (Pi.single a 1) b g = b (g - a) := by
+  rw [conv_single_left]
+
 /-! ## Boundary maps for BB chain complex
 
 Cells:
@@ -242,6 +260,14 @@ noncomputable def bbBoundary1 :
       simp only [Finset.mul_sum]; refine Finset.sum_congr rfl (fun x _ => ?_); ring
     rw [hL, hR]
     ring
+
+/-- `rfl` bridge from the LinearMap `∂₂` to its computable underlying function. -/
+@[simp] lemma bbBoundary2_apply (f : G → ZMod 2) :
+    bbBoundary2 A B f = bbBoundary2Fn A B f := rfl
+
+/-- `rfl` bridge from the LinearMap `∂₁` to its computable underlying function. -/
+@[simp] lemma bbBoundary1_apply (c : G × Fin 2 → ZMod 2) :
+    bbBoundary1 A B c = bbBoundary1Fn A B c := rfl
 
 /-- The chain-complex law `∂₁ ∘ ∂₂ = 0`. -/
 lemma bbBoundary_comp : (bbBoundary1 A B).comp (bbBoundary2 A B) = 0 := by

@@ -5,3 +5,5 @@ import QEC.Stabilizer.Framework.Homological.StabGroup
 import QEC.Stabilizer.Framework.Homological.LogicalCorrespondence
 import QEC.Stabilizer.Framework.Homological.Distance
 import QEC.Stabilizer.Framework.Homological.BBChainComplex
+import QEC.Stabilizer.Framework.Homological.Covering
+import QEC.Stabilizer.Framework.Homological.BBDuality
