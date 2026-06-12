@@ -22,3 +22,20 @@ what was tried and why it didn't work.
   (BB-class bound) remain open. Lives in `experiments/bb_lab/` (not
   `attempts/`): [handoff](../experiments/bb_lab/notes/A_HANDOFF.md),
   [A3 log entries 11–14](../experiments/bb_lab/notes/A3_track1p1_log.md).
+
+- 2026-06-12 — gross-bb-analytic-bound (goal 1 update) — partial —
+  **d(gross) = 12 now holds at the verified-finite level, doubly
+  machine-verified** by two independent routes: the value-grammar
+  completion sweep (Entry 20: CRT value dictionary + affine-graph
+  completions, no coset element of weight ≤ 11 in any nonzero Smith
+  class) and the light-cycle flux census (Entry 21: all 990 weight-8 and
+  13248 weight-10 non-boundary cycles have nonzero seam flux). The last
+  open statement (M-im) is reduced to three bounded hand obligations
+  (Entry 22: the confined ρ-floor already closes two of the five orbits
+  outright; the rest reduce to a weight-exactly-10 equality analysis).
+  All other links — (M), (R) ker δ = im Δ via the B²-homotopy, the
+  no-double-wrap flux characterization, the inversion duality — are
+  fully analytic. Support-only COST floors (Entry 19) and route-B hand
+  classification at weight 10 (368 orbits, Entry 21) are documented
+  dead ends. [A3 log entries
+  16–22](../experiments/bb_lab/notes/A3_track1p1_log.md).

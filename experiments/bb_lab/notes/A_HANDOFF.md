@@ -243,6 +243,26 @@ d₃ᵛ dictionary on occurring cells, (c) the cost-≤10 combo
 classification, (d) the ρ-affinity completion kill. Route B (weight-8/10
 flux census) remains the alternative; next entry sizes both.*
 
+*Update (Entries 21–22, session close): **(M-im) is now doubly
+machine-verified** — the light-cycle census (`a3_light_cycle_census.py`)
+enumerated ALL weight-8 (990) and weight-10 (13464) base cycles and
+found zero flux-silent non-boundaries, independently confirming the
+Entry-20 sweep; route B's hand form is dead (368 weight-10 orbits). The
+hand-organization (route A) is underway (`a3_mim_hand_org.py`,
+Entry 22): hand-proven — slot parity, 2-cycle column/row evenness, even
+coset weight and cost, E ≤ 2 value rigidity (δ-points/pairs), and the
+**ρ-locks** (u² = aug(u)²·1 in F₄[Z₂²], so ρ₁² = ρ₂² = 0 and V₁R, V₂L
+are confined to explicit 16-element affine sets with aug 0); verified
+table fact: non-minimal slots cost +4 (66 fibres, all gaps exactly 4).
+The **confined-value floor** evaluates to 10/10/10/12/12 — (M-im)
+closes outright on the two wt-24 orbits; the wt-16/18a/18b orbits
+reduce to killing weight EXACTLY 10. Resume with Entry 22's obligations
+**(O1)** hand-evaluate the confined floor (engine/C-table style;
+translation stabilizers + B̂₄ = ωÂ₄ compress), **(O2)** the weight-10
+equality analysis via the dropped ρ-link + the +4 fibre gap, **(O3)**
+the GL-compressed fibre-gap table and aug(c₁) = aug(c₂) = 0 by hand.
+(O1)–(O3) ⟹ (M-im) fully analytic ⟹ **d(gross) = 12 fully analytic**.*
+
 **The former tail (L-C) — now closed verified-finite (Entries 8–9).** The
 classification "every b ∈ Stab_Z(base) with 0 < |b| ≤ 11 is a hexagon or a
 D-pair" is established by the layer-profile route
