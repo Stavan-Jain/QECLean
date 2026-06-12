@@ -1,4 +1,34 @@
-"""Rigorous min-weight on the dangerous (pr_*=0) sector vs the safe (pr_*!=0) sector.
+"""
+================================================================================
+!!  WARNING — BUGGY SCOUT SCRIPT.  DO NOT RELY ON THIS SCRIPT'S OUTPUT.  !!
+================================================================================
+This script prints "safe sector min = 6". That number is an ENCODING BUG, not a
+real result, and it is IMPOSSIBLE: gross's distance is d = 12 (established by the
+SAT+DRAT certificate in certificates/gross.cert.json), so no nontrivial logical
+of weight < 12 can exist in ANY sector — a weight-6 "safe" logical cannot occur.
+The defect is in the hand-rolled CNF below: the "nontrivial AND safe (pr_* != 0)"
+constraint admits something it shouldn't. This was only a scout; its sector
+numbers were never cross-checked against d=12 + linear algebra, and this one is
+demonstrably wrong.
+
+  => Do NOT cite, trust, or build on any weight this script reports.
+
+VALIDATED REPLACEMENTS (diagnosed and superseded during the A3 Track 1.1
+deep-push). Unlike this script, each one first passes a SANITY LADDER: the
+encoding must reproduce d_cover = 12 with the sector constraints removed, or it
+is not trusted. Both correctly find the s != 0 dangerous minimum = 14:
+  - scripts/a3_s_nonzero_sat.py  — s != 0 dangerous-sector min weight = 14 (UNSAT <= 13)
+  - scripts/a3_s0_subcase.py     — s = 0, [c] = 0 subcase off-minimum (UNSAT <= 14)
+DIAGNOSIS: notes/A3_track1p1_log.md, Entries 1–2 (the bug was first flagged in
+Entry 0 and superseded by the two scripts above in Entry 2).
+
+This file is retained ONLY because the A3 log references it as the caught bug;
+it is kept for provenance, not for use.
+================================================================================
+
+--- Original scout description (retained for provenance; superseded — see above) ---
+
+Rigorous min-weight on the dangerous (pr_*=0) sector vs the safe (pr_*!=0) sector.
 
 Builds two constrained min-weight SAT problems over the 144 cover qubits:
   common: H_Z^cover . v = 0 (v is an X-cycle).
