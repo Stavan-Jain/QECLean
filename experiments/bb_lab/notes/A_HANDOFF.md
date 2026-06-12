@@ -21,16 +21,22 @@ projected stabilizer `b = p(v)` via the verified, hand-checkable slice identity
 
 (cut-independent — the s=0/s≠0/[c]=0 trichotomy of Entries 1–3 was a
 cut-coordinate artifact), so the factor-2 lemma is exactly **(M): |b| + 2·m(b)
-≥ 12 for every base Z-stabilizer b**. Entry 6 built the analytic ladder for
-(M): `b = 0` and `|b| ≥ 12` proven; the light-b classification proven for
-face-supports k ≤ 7 (hexagon-overlap ≤ 1, K₄-freeness, and — Entry 7 —
-octahedron-freeness of the overlap Cayley graph, all with full hand proofs;
-k = 7 closed via Turán uniqueness); the m-rungs (m(hexagon) ≥ 3,
-m(D-pair) ≥ 2) verified exhaustively with hand-proof routes sketched. **The single remaining
-unbounded-structure gap is the k ≥ 8 tail**: every base Z-stabilizer whose
-minimal face support is ≥ 8 has weight ≥ 12 — a *classical* statement about
-one abelian 2-block group code, squarely in the repeated-root/van-Lint lane.
-Start at `notes/A3_track1p1_log.md` Entries 5–6 and `scripts/a3_mb_*.py`.
+≥ 12 for every base Z-stabilizer b**. As of Entry 9 **every rung of (M) is
+closed**: b = 0 and |b| ≥ 12 proven; the light-b classification ("every
+stabilizer of weight ≤ 11 is a hexagon or a D-pair") proven by hand for
+face-supports k ≤ 7 (Entries 6–7: overlap ≤ 1, K₄-freeness,
+octahedron-freeness, Turán) and closed in FULL at the verified-finite level
+by the layer-profile route (Entries 8–9: parity + floor + evenness lemmas
+reduce |b| ≤ 10 to 28 profile families; exhaustive syndrome-join checks
+resolve every family to exactly 36 hexagons + 216 D-pairs + nothing); the
+m-rungs (m(hexagon) ≥ 3, m(D-pair) ≥ 1) verified exhaustively. **No
+unbounded-structure gap remains anywhere in the factor-2 lemma.** What is
+left to meet the program's "fully analytic" bar (§1) is hand-organization
+of the finite checks: (a) the comp-4-aliveness ingredient of the floor
+lemma, (b) rigidity lemmas replacing the 28-family enumeration (the
+δ-point/ψ-evaluation rigidity carries most families at once), (c) the two
+m-rung locality proofs. Start at `notes/A3_track1p1_log.md` Entries 8–9 and
+`scripts/a3_mb_tail_*.py`.
 
 ---
 
@@ -157,31 +163,35 @@ Status of (M) by rung (Entry 6):
 |---|---|---|
 | b = 0 | m(0) ≥ 6 | PROVEN given d_base ≥ 6 (only place d_base is used) |
 | \|b\| ≥ 12 | trivial | PROVEN |
-| classification | light b = 36 hexagons ∪ 216 D-pairs | PROVEN for face-support k ≤ 7 (Entry 7 closed the octahedron check by hand); **OPEN for k ≥ 8 (the tail)** |
+| classification | light b = 36 hexagons ∪ 216 D-pairs | k ≤ 7 fully hand-proven (Entries 6–7); ALL \|b\| ≤ 10 closed verified-finite by the profile route (Entry 9); rigidity hand-proofs owed |
 | m(hexagon) ≥ 3 | no non-imΔ cycle in hexagon+2 qubits | verified exhaustively; local hand proof owed |
 | m(D-pair) ≥ 1 | cycle space of the 11-qubit pair union = the two columns | verified (rank 9, all 12 types); hand proof owed |
 
-**The open tail (L-C).** Prove: every `b ∈ Stab_Z(base)` whose minimal face
-support (mod ker ∂₂, dim 6, min weight 16) is ≥ 8 has `|b| ≥ 12`. Equivalently:
-the [72,30] image code of `z ↦ (B·z, A·z)` over `F₂[Z₆×Z₆]` has no weight-≤11
-codeword beyond the k ≤ 2 families. True with margin (validated SAT
-enumeration: NO light codewords at any k ≥ 3).
-
-State of the attack (Entry 8, `a3_mb_tail_dictionary.py`): the CRT frame
-`F₂[Z₆²] ≅ F₂[Z₂²] × (F₄[Z₂²])⁴` is fully instrumented — layer dictionary
-d₃ over F₂[Z₃²] (verified; depends only on (#orbits, trivial-flag)),
-empirical component transforms, support grammar (radical sides are
-co-point-or-full; comp 4 rigid). The bound `|b| ≥ COST(pattern(z))` is tight
-on hexagons (6) and D-pairs (10). **Verified lemma: every b with |b| ≤ 11
-has all five CRT components alive** (killing any one forces COST ≥ 12).
-Remaining for the tail: (i) hand-organize the two finite minimizations;
-(ii) equality analysis showing each sub-12-cost pattern class (explicit
-list: 4 at cost 6 = hexagon patterns; 24/85/136 near-hexagon at 7–9;
-456/904 at 10–11 incl. the D-pair family) is realized at weight ≤ 11 only
-by hexagons and D-pairs mod kernel. Forcing tools: weight-1 full-support
-layers are δ-points; co-point ideal coefficient rigidity; comp-4 support
-equality; S₀ shared between blocks. Counting alone (`6k − 2e(S)`) stays
-vacuous for large k — don't go back to it.
+**The former tail (L-C) — now closed verified-finite (Entries 8–9).** The
+classification "every b ∈ Stab_Z(base) with 0 < |b| ≤ 11 is a hexagon or a
+D-pair" is established by the layer-profile route
+(`a3_mb_tail_dictionary.py`, `a3_mb_tail_profiles.py`):
+- CRT frame `F₂[Z₆²] ≅ F₂[Z₂²] × (F₄[Z₂²])⁴` instrumented; the layer
+  dictionary d₃ and support grammar verified; the bound |b| ≥ COST is
+  tight on hexagons (6) and D-pairs (10).
+- **Component-support lemma** (verified minimization): every b with
+  |b| ≤ 11 has all five CRT components alive.
+- **Profile completeness**: parity lemma (both blocks share layer
+  parities — hand-proven, since A and B have the same s-parts
+  {1, s_x, s_y}), the ≥ 3-layer floor (from comp-4 aliveness + the
+  co-point-or-full ideal structure), and evenness reduce |b| ≤ 10 to 28
+  layer-weight profile families (252 placements).
+- **Exhaustive family checks** (syndrome hash-join over all layer
+  contents): {1,1,1}+{1,1,1} → exactly the 36 hexagons;
+  {2,1,1}+{2,2,1,1} and mirror → exactly the 216 D-pairs; all 25 other
+  families EMPTY.
+Owed for the analytic bar: (a) hand proof of comp-4-aliveness, (b)
+rigidity lemmas replacing the family enumeration (δ-point/ψ-evaluation
+rigidity: a weight-1 layer is a δ-point whose component values are
+character evaluations; co-point ideals are 1-parameter, fixing pairwise
+point differences — one lemma covers the eight A={1,1,1} families, etc.).
+Counting alone (`6k − 2e(S)`) stays vacuous for large k — don't go back
+to it; the profile route replaces it.
 
 **Verification discipline before trusting any drafted argument:** run an
 adversarial skeptic sweep hunting a light stabilizer with k ≥ 8 (the kill
@@ -313,24 +323,24 @@ branch `claude/eager-hofstadter-6da593` (fast-forward continuation). Each
 
 ## 8. Concrete next steps (ranked)
 
-1. **The k ≥ 8 tail (§4; Entries 7–8).** The CRT/layer-dictionary frame is
-   instrumented and produced the all-components-alive lemma; continue with
-   the equality analysis over the explicit sub-12-cost pattern list (≤ 9
-   band first: δ-point forcing should give hexagon-only; then the 10–11
-   band where D-pairs live), and hand-organize the two finite
-   minimizations. `scripts/a3_mb_tail_dictionary.py` is the working
-   instrument. Time-box; failures are first-class outputs (A3 log).
-2. **Hand-organize the owed finite checks**: the two rung locality proofs
-   (shared-check ≤ 1 is already proven; residue = one-hexagon neighborhood
-   analysis). (Octahedron-freeness: DONE by hand, Entry 7.)
-3. **Assemble the conditional factor-2 write-up** once 1–2 land, then redo the
-   recursion bookkeeping (Entry 4's caution: the safe sector caps the
-   full-code bound at d_base — the factor-2 protects, not doubles, the
-   inherited bound).
-4. **If the tail stalls:** the A2 fallback (structural `d([[36,8,4]]) ≥ 4`
-   composing with odd-h SRB Thm 4.7 for `d(bb_108) ≥ 4`) still stands; note
-   the m(b) machinery is cover-generic and should transfer to the 36→72 step.
-5. **Maintain `A3_track1p1_log.md`** as the running log; commit per entry.
+1. **Hand-organize the remaining finite checks (§4; Entry 9 list).** In
+   order: (b) the δ-point/ψ-evaluation rigidity lemmas replacing the
+   28-family enumeration (one lemma covers the eight A={1,1,1} families;
+   a second the {2,1,1}-A families; etc.); (a) comp-4-aliveness for
+   |b| ≤ 11 (an LP over the layer cost table); (c) the two m-rung
+   locality proofs (shared-check ≤ 1 already proven; residue =
+   one-hexagon neighborhood analysis). Time-box; failures are
+   first-class outputs (A3 log).
+2. **Assemble the conditional factor-2 write-up** once 1 lands (theorem +
+   full dependency tree: which steps are hand-proven vs verified-finite),
+   then redo the recursion bookkeeping (Entry 4's caution: the safe sector
+   caps the full-code bound at d_base — the factor-2 protects, not
+   doubles, the inherited bound).
+3. **Generalize down the cover tower (goal 2 route):** the m(b) machinery
+   and the profile route are cover-generic — apply them to the 36→72 step
+   (and the A2 fallback `d([[36,8,4]]) ≥ 4` + odd-h SRB Thm 4.7 for
+   `d(bb_108) ≥ 4` still stands as the modest deliverable).
+4. **Maintain `A3_track1p1_log.md`** as the running log; commit per entry.
 
 ---
 
