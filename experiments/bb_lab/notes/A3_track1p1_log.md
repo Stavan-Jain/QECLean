@@ -1086,3 +1086,104 @@ machine-confirmed via G4):
 Plus the two m-rung locality proofs (unchanged), and then the assembled
 write-up. The G4 table is the complete specification of what each lemma
 must produce.
+
+## Entry 11 (2026-06-12) — hand-organization II: the D-pair lemma R-(2,1,1), via a sharpened one-block lemma
+
+Second block of the hand-proof program (`a3_shape_lemmas.py`, checks V1–V5,
+all PASS). Outcome: **R-(2,1,1) is fully hand-proven** — the (2,1,1)-shaped
+elements of im(A·) are exactly the 108 A-blocks of dA-pairs, and their only
+light completions are the dA D-pairs at |b| = 10. The endgame needed the
+one-block floor raised from 12 to ≥ 14; the same case analysis gives the
+exact 16. Three of the six shapes are now closed (R1, R-(1,1,1,1), R-(2,1,1)).
+
+### C-table normalization (V1) — used by every remaining shape lemma
+
+For an A-radical component j ∈ {1,3,4} write η_j := ψ_j((0,1)) (so η₁ = η₃ = ω,
+η₄ = ω²; η³ = 1 and η² = 1 + η). The value vector of Â_j over the layers
+(1, s_x, s_y, s_xs_y) is (1+η_j, 1, η_j, 0), so the rigid co-point vector
+vanishing at s₄ = [1] is
+
+    C_j([1]) = Â_j + Â_j[1]·1⃗ = (0, η_j, 1, η_j²),
+
+and in general C_j(s₄)[s] = η_j^{e(s₄,s)} on the co-point, with exponents
+e(s₄,s) ∈ {0,1,2} **independent of j** (translate the s₄ = [1] table). Two
+consequences used throughout: (i) all C-ratios are powers of η_j with a
+j-independent exponent, so a system "ψ_j(τ) = C-ratio_j for j ∈ {1,3,4}" is
+automatically consistent and pins τ to a multiple of (0,1) (ψ₃, ψ₄ separate);
+(ii) any cross-layer ratio equation reduces to η-power bookkeeping.
+
+### Direction forcing (V2)
+
+Let f ∈ im(A·) have a zero layer s₄ and a weight-2 layer s_P = {p, p+δ}, with
+some δ-point layer elsewhere. Each radical V_j = f̂_j is a nonzero ideal
+element vanishing at s₄, hence co-point-supported (engine) — so V_j[s_P] =
+ψ_j(p)(1 + ψ_j(δ)) ≠ 0, i.e. δ ∉ ker ψ_j, **for all three j ∈ {1,3,4}**. The
+kernels are the directions span(1,0), span(1,2), span(1,1); avoiding all three
+leaves δ ∈ {(0,1), (0,2)}: **every weight-2 layer of a co-point shape runs in
+the t_y direction**. (Mirror, B-side: radical j ∈ {2,3,4}, kernels span(0,1),
+span(1,2), span(1,1); pairs run in t_x. Verified for the realized shapes.)
+
+### R-(2,1,1): classification (V3)
+
+Shape: pair layer s_P, two δ-point layers, zero layer s₄; translate s₄ = [1].
+With δ = (0,1) (the (0,2) case is the same 2-set rebased) and e := (0,1):
+1 + ψ_j(δ) = 1 + η_j = η_j², so the pair layer reads ψ_j(p)·η_j² and the
+rigidity V_j = α_j C_j([1]) gives, per choice of s_P:
+
+- **s_P = s_y**: V_j[s_x]/V_j[s_y] = η_j/1 forces ψ_j(a−p)·η_j⁻² = η_j,
+  i.e. ψ_j(a−p) = η_j³ = 1 ⟹ a = p; V_j[s_xs_y]/V_j[s_x] = η_j ⟹ c = a + e.
+  Pattern `(s_x: a) (s_y: {a, a+e}) (s_xs_y: a+e)`.
+- **s_P = s_x**: ψ_j(p−b) = η_j² ⟹ p = b + 2e, then c = b + 2e = p. Pattern
+  `(s_x: {p, p+e}) (s_y: p+e) (s_xs_y: p)`.
+- **s_P = s_xs_y**: ψ_j(p−b) = 1 ⟹ p = b, a = b + e. Pattern
+  `(s_x: b+e) (s_y: b) (s_xs_y: {b, b+e})`.
+
+Every equation is of the uniform form ψ_j(τ) = η_j^k, so the j = 1 line is
+automatically consistent (C-table consequence (i)) and no arrangement dies —
+in each, the solution is unique up to the base cell (9 t-translates). All
+three patterns sit inside a **single t_y-fibre** {t, t+e, t+2e}. Conversely
+each pattern is realized: A(δ_g + δ_{gd}) for d = y, x³y², x³y respectively
+(direct expansion; e.g. A(δ₀+δ_y) = x³ + y + y³ + x³y is the s_P = s_y
+pattern). Verified (V3): the (2,1,1) elements of im(A·), the 36·3 pattern
+translates, and the 108 dA-pair A-blocks are **the same set**. Moreover
+dA ∩ dB = ∅, so every dA-pair has block weights (|A·p|, |B·p|) = (4, 6).
+
+### Sharpened one-block lemma: |Bz′| ≥ 16 on Ann(A) \ ker (V4)
+
+Entry 10's one-block lemma gave ≥ 12; the D-pair endgame needs > 12, and the
+same component analysis yields 16 with one more split. For z′ ∈ Ann(A) \ ker:
+V₀ = V₂ = V₄ = 0, V₃ ∈ F₄·1⃗ (socle), V₁ ∈ (Â₁) with support ∅/co-point/full
+(engine). Cases (layer costs from the d₃ table; W_s ⊆ {1,3} throughout since
+the parity component is dead):
+- **V₃ ≠ 0** (a nonzero constant): all four layers have orbit 3 alive.
+  V₁ full: four layers of W = {1,3}, cost ≥ 4 each: **≥ 16**.
+  V₁ co-point: three layers at 4 plus one at d₃({3}) = 6: ≥ 18.
+  V₁ = 0: four layers at 6: ≥ 24.
+- **V₃ = 0**: Bz′ ≠ 0 forces V₁ ≠ 0; its ≥ 3 alive layers have W = {1},
+  d₃({1}) = 6 each: ≥ 18 (co-point) or ≥ 24 (full).
+Minimum over all cases: **16**, attained (V4: per-case minima 16/18/24/18/24
+match the case bounds exactly; exhaustive min = 16 = G2). Mirror statement
+for Ann(B) \ ker by the x↔y swap. ∎
+
+### Endgame: the light completions of a dA-pair are exactly the D-pairs (V5)
+
+Let f = A·p be one of the 108 classified blocks (p = δ_g + δ_{gd}, d ∈ dA) and
+z = p + z′ any completion (z′ ∈ Ann(A)) with |b| = |Bz| + 4 ≤ 10. Then
+|Bz′| ≤ |Bz| + |Bp| ≤ 6 + 6 = 12 < 16, so z′ ∈ ker by the sharpened one-block
+lemma: z ≡ p mod ker, b is **the** D-pair of p, and |b| = 6 + 4 = 10 exactly.
+(V5: per class, the completions with |Bz| ≤ 6 are exactly the 64 kernel
+translates, all with Bz = Bp; the non-kernel minimum is 12 — which is why the
+12-floor of Entry 10 was not enough and 14 was the real threshold.)
+
+**R-(2,1,1) is closed.** Consequences of the pivot architecture: a light b
+whose lighter block has weight 4 is either killed (shape (1,1,1,1), Entry 10)
+or is a dA-pair (this entry); the x↔y swap covers lighter-B-blocks, i.e. the
+dB-pairs — this is the promised "mirror of (2,1,1)" that handles the twelve
+(2,2,1,1) heavier-block classes without ever pivoting on a weight-6 shape.
+
+### Status
+
+Hand-proven so far: dictionary, engine, one-block (now ≥ 16), floor, R1,
+R-(1,1,1,1), **R-(2,1,1) + endgame**. Remaining: the three weight-5 kills
+R-(2,1,1,1), R-(2,2,1), R-(3,1,1) (next entry), then the two m-rung locality
+proofs, then the assembled write-up.
