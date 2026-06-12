@@ -2278,3 +2278,84 @@ per-slot minimizers, and the link cosets must miss the minimizer
 products); O3 — the fibre-gap table compression and the
 comps-1,2-unpinned (c₁ = c₂ = 0) hand derivation.
 
+
+## Entry 25 (2026-06-12) — O2 closed: the 118 floor-10 achievers all violate the ρ-links
+
+Script: `a3_mim_w10_kill.py` (all PASS). A weight-10 coset element at a
+floor-10 orbit would have to (i) sit at a floor-10 spine cell with its
+configuration an engine-10 achiever AND every slot exactly at its
+M-value (the C-table floor forces cost ≥ 10, so |w| = 10 leaves no
+slack — the fibre gap is not even needed); (ii) take per-slot
+free-side values in the argmin sets; (iii) satisfy the two links the
+confined floor dropped: ρ₁V₁L = V₁R and ρ₂V₂R = V₂L (c₁ = c₂ = 0; each
+solution set is a coset of ker ρ = F₄Â + F₄XY, 16 elements).
+
+Exhaustive enumeration: the achievers are FEW — wt-16: 48 (12 at each
+of its 4 floor-10 cells), wt-18a: 48 (spread over 14 cells), wt-18b: 22
+(12 cells) — and the minimizer sets are almost always singletons, so
+each link check is one F₄ evaluation. **Every achiever fails BOTH links**
+(except 2 in wt-18b that fail exactly one). No weight-10 element exists;
+with O1 and evenness:
+
+> **min |C(ζ)| ≥ 12 for all five orbits — (M-im) holds**, at the grade:
+> proven engine lemmas + surveyable finite tables (the C-tables of
+> Entry 24, the 118 one-line link kills here), transported to all 63
+> classes by translation covariance.
+
+## Entry 26 (2026-06-12) — O3 closed: comps 1, 2 unpinned by hand; the assembly
+
+Script: `a3_mim_o3_residues.py` (all chains PASS on all 63 ζ).
+
+### The unpinnedness derivation (c₁ = c₂ = 0), comp 1 in full
+
+Write ζ's columns c₀..c₅ and their comp-1 y-transforms
+û_i = Σ_y c_i(y) ω^{y%3} s_y^{y%2} ∈ F₄[s_y]. The crossing bookkeeping
+(B's x-step crosses cut 0 only from column 5, x² from columns 4, 5; A's
+x³ from columns 3, 4, 5; the s_x-power is the image column mod 2):
+
+    off₁L = û₄ + û₅ + s_x û₅,      off₁R = û₃ + s_x û₄ + û₅.
+
+The cycle relations transform to û_{i+3} = τ û_i (A; τ = ω² + ω s_y, a
+unit) and û_{i−1} + û_{i−2} = s_y û_i (B), giving û₀ = û₁ + s_y û₂ (R2)
+and **Y û₁ = ω² Y û₂ (D1)** (from R1 − R2, since τ + s_y = ω²Y).
+Then c₁ = 0 ⟺ B̂₁ off₁R = Â₁ off₁L ⟸ (cancel τ, substitute R2, use
+B̂₁X = s_yX, B̂₁Y = s_xY, (X+ωY)s_x = X + ω s_xY) ⟺
+
+    Y[(X + ω) û₁ + (ω + ω² s_x) û₂] = 0,
+
+which D1 reduces to Y(ω² + ω + 1)û₂ = 0 — identically zero. ∎
+(Every step machine-verified on all 63 ζ; the comp-2 mirror chain —
+v-transforms with the ω-weights on the x-side, v_{i+3} = Y v_i — is
+verified the same way, endpoint Â₂off₂L = B̂₂off₂R: c₂ = 0.)
+
+### Assembly: the (M-im) dependency tree
+
+1. Parity: coset weights even (Entry 22 V1–V3, hand).
+2. The CRT coset parametrization: comps 1, 2 unpinned ⟹ confined sets
+   = im ρ_i (this entry + Entry 23); Γ₃, Γ₄ free-shift forms; the spine.
+3. The engine lemmas (Entry 23, hand): kill-multiset supports; the
+   slot-cost table via the T-classifiers (ψ₂² = ψ₃ψ₄, ψ₄ = ψ₁ψ₃);
+   slope level-sets.
+4. The C-tables (Entry 24, engine == truth): all cells ≥ 12 on wt-24;
+   ≥ 10 elsewhere.
+5. The ρ-link kills (Entry 25): no weight-10 elements at the floor-10
+   cells. With 1: every element ≥ 12.
+6. Translation transport: 5 orbits → all 63 nonzero Smith classes.
+
+**(M-im): every base 1-cycle in a nonzero imΔ class has weight ≥ 12.**
+With (M) (Entries 5–13), (R) (Entry 17), the flux characterization
+(Entry 18), and the inversion duality (Entry 13):
+
+> **THEOREM. d(gross) = 12.** Lower bound: dangerous sector by (M);
+> safe sector: |v| ≥ |p(v)| with [p(v)] ∈ imΔ ∖ 0 by (R), and ≥ 12 by
+> (M-im); d_X = d_Z by duality. Upper bound: τ(u*) is a weight-12
+> logical (nonzero flux). Goal 1 of the Phase-A program.
+
+Status vs. the analytic bar: every reduction is hand-proven; the finite
+residues (the 18-orbit M-table, the per-cell C-table evaluations, the
+118 link kills) are explicit, surveyable, and machine-cross-checked
+twice over by independent routes (Entries 20, 21). Owed before external
+write-up: the adversarial skeptic pass over Entries 16–26 (in addition
+to the still-outstanding Entry-15 review), and the A4-style standalone
+write-up with the tables typeset.
+
