@@ -2754,3 +2754,109 @@ entries into one history is an outstanding integration chore.)
    and delete the comp-2 mirror chain).
 3. Merge the Entry-15 branch; then the full d = 12 chain has both owed
    reviews on one history.
+
+
+## Entry 28 (2026-06-12) — the A4 extension: both Entry-27 residues discharged; d(gross) = 12 fully analytic
+
+Deliverables: `notes/A4_writeup.md` Part II (§§8–14 + Appendices C–D,
+Theorem D) and `scripts/a3_a4ext_recheck.py` (the table certifier,
+all PASS). Entry 27's items 1–2 are done (item 3, the Entry-15 branch
+merge, landed earlier in commit `909b31c`).
+
+### The new structure that makes the compression work
+
+The whole §12/§13 analysis runs in one coordinate system (A4 §10, "the
+slot frame"), built on facts that were implicit in Entries 22–24 but
+never isolated:
+
+- **m′² = ω²m and m² = ω²m′** (m = kill(B̂) = (ω²,ω,1,0),
+  m′ = kill(Â₃) = m∘(x↔y)). So kill(Â₄) is a *scalar multiple* of
+  kill(B̂): up to scale there are only TWO labelings, m and its slot
+  swap, and m̃ = m + ω² is an additive isomorphism Z₂² ≅ (F₄, +).
+  Every component direction on the L block is m-affine.
+- **The confined comps are full affine lines**: slot values of
+  im ρ₂ = {p·m + c}, im ρ₁ = {p·m′ + c} — much cleaner than
+  "F₄ρ ⊕ F₄XY".
+- **The comp-4 tie**: V₄L = ω·V₄R + w₄ with w₄ = off₄L + ω·off₄R a
+  fixed vector per orbit (the Γ₄ ideal is a graph; γ-bookkeeping
+  becomes the affine dictionary d₄L = ωγ + e_L, d₄R = γ + e_R).
+- **The pair-ratio lemma**: the fibre partition of a pencil κ + λu
+  (u bijective) degenerates at six explicit ratios λ_P — one line per
+  table entry; it generates every fibre-type/trichotomy table.
+- **The chord-slope + hyperbolic-quadruple lemma**: the deepest
+  cheap-slot counts reduce to "no three of four explicit points of
+  AG(2, F₄) are collinear", and the points that occur form hyperbolas
+  H_c = {uv = c} ∪ {0}, which never have three collinear. This is the
+  slope lemma in its final, reusable form.
+
+### Residue 2 discharged (the wt-24 C-tables, was ~6k machine rows)
+
+All four wt-24 block problems are **one problem**: with the
+cost-preserving moves (slot relabelings; the nine translation scalings
+s₂² = s₃s₄; Frobenius; M₂ = M₁∘Frob₄), L(24a) = S(a₃,a₄),
+L(24b) = S(a₄,a₃), R(24a) ≅ S(a₃,a₄²), R(24b) ≅ S(a₄²,a₃), where
+S(a,b) is the standard form (conf line ⟨m⟩; v₃ = am + c₃;
+v₄ = bm + ωθ + c₄), θ = (1,0,1,0). The walk of S — 33 buckets by
+(comp-3 state × conf mode × comp-4 fibre × dead-slot alignment), each
+1–3 lines, one hyperbola application at the (conf co-point,
+z₂ = z₃ = z₄, b = 1) bucket — gives **S ≥ 6 everywhere** (A4 §11,
+table C.1), hence every wt-24 cell ≥ 12 with no V₀/γ linkage needed.
+
+### Residue 3 discharged (the achiever-list completeness)
+
+The **achiever-structure lemma** (A4 §10.6): per cell, per shared
+(V₀, γ), the two block minima are each ≡ |V₀| (mod 2), so their sum is
+even; cost-10 configurations exist exactly where min_L + min_R = 10 and
+are exactly Argmin_L × Argmin_R. So completeness of the achiever list
+reduces to the per-cell function (V₀, γ) ↦ (min_L, min_R) on its low
+range — derived by the locus rules R1–R5 (zero-slot/dead-pair rigidity,
+δ-slot consistency, shape ladder): per cell 0–4 loci, each pinned by a
+small F₄ system (worked examples: wt-16 cells (ω²,ω²) and (ω,1) in
+full, including the (5,5) family's p²-consistency; the wt-16 L3 = ∅
+derivation ends in the same hyperbola H_{ω²}). Tables C.2–C.4 list all
+loci: 48 + 48 + 22 = 118 achievers — matching Entry 25/27 exactly —
+and the cost-8 kill (m ≥ 10 at every cell) is the visible
+(V₀, γ)-disjointness of the L4/R4/L3/R3 loci. The ρ-link kills are now
+genuinely one-line: at singleton argmin products the check is ONE
+convolution (worked: ρ₁·(1,0,0,ω²) = (ω,1,0,ω²) ≠ V₁R at the wt-16
+(5,5) head); 116 fail both links, 2 fail one, 0 survive.
+
+### Folded in
+
+Entry 27's Sharpening 1 (off₀ = off₂ = 0 identically) and Sharpening 2
+(c₂ = 0 one-liner) are in A4 §9.4; the owed H₀-dimension paragraph
+(component quotient dims (0,0,0,2,4)) is A4 §9.2; the no-double-wrap
+implicit step (path-advance uniqueness) is explicit in A4 §9.2.
+
+### Verification (confirmation only)
+
+`a3_a4ext_recheck.py`: 60+ checks, all PASS — the frame facts (F1–F6),
+S ≡ 6 and the four reindexing identities (W1–W2), the 33 bucket minima
+exactly (W3), per-(V₀,γ) sums even and ≥ 10 at every wt-16/18 cell and
+≥ 12 at every wt-24 cell (K1), the C.2–C.4 locus tables exactly (K2),
+the 118 achievers, the structure-lemma instance, the 116/2/0 kill
+split, and the worked convolution (K3–K4). `uv run pytest`: 265 pass.
+
+### Status
+
+> **d(gross) = 12, fully analytic** (A4 Theorem D): every reduction
+> hand-proven; the finite case content is the M-table rule (18-orbit,
+> previously cleared), the §11 bucket table (24 derived rows), the
+> §12 locus tables (~80 rows over three orbits, each a minutes-long
+> application of stated rules, with worked representatives), and the
+> §13 kill table (118 one-line convolutions). Same epistemic grade as
+> Part I's §6.3 classification. d(gross) ≥ 6 unchanged (Entries 5–15).
+
+Owed (honesty ledger): the §12 locus tables are rule-derived with
+worked representatives per orbit, not walked cell-by-cell in prose —
+the same presentation grade as the Entry-10–12 master tables that the
+Entry-15 review cleared, but a future skeptic pass may demand more
+worked cells; the recheck script certifies every row meanwhile.
+
+### Next
+
+1. The owed adversarial review of THIS write-up (the A4 Part II prose
+   vs. the certified tables), Entry-15/27 style.
+2. Goal 2 — template runs on other BB bases (the §11/§12 frame is
+   instance-generic: only m, the offsets, and the e/d_w dictionary
+   change).
