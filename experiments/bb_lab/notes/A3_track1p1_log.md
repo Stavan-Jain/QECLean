@@ -2235,3 +2235,46 @@ GL-compression; c₁ = c₂ = 0 (comps 1, 2 unpinned) by hand. Entry 24:
 (a), as machine-verified per-cell certificates with the worked
 arguments.
 
+
+## Entry 24 (2026-06-12) — O1 closed: the engine evaluates every cell exactly; block ≥ 6 finishes the wt-24 orbits
+
+Script: `a3_mim_cell_certificates.py` (E1–E4, all PASS).
+
+### Engine exactness (E1, E3)
+
+The Entry-23 engine — using ONLY the proven lemmas (kill-multiset
+supports; the slot-cost table with the T-classifiers; slope level-sets
+h_L = v₃v₄(m+m(z₂))⁻², h_L′ = v₃v₄, h_R = v₄v₃⁻¹(m′+m′(z₁))⁻¹,
+h_R′ = v₄v₃⁻¹; the per-slot v₀-minimization (0,3,2,1/3) unlinked,
+(0,4,2,2/4 | 3,3,3,1/3) linked) — reproduces the TRUE minima exactly:
+
+  - all 160 unlinked block cells (5 orbits × 16 spine cells × 2 blocks);
+  - all 80 linked cell values m(a₃, a₄), with the comp-4 kill-shifts of
+    the two blocks tied through one γ (d₄L = d₀L + ωγ, d₄R = d₀R + γ —
+    the XY-coefficient d₀ of each base must be carried, the kill vector
+    drops it).
+
+So every C-table entry is computed by a finite per-cell minimization
+over (mode₂ ∈ {dead, 4 co-points, full-const}, d₃, d₄ | level) — at
+most ~96 rows per block-cell, each row a 4-slot sum a human evaluates
+from the engine lemmas. This is the same epistemic grade as the
+Entry-10–12 tables.
+
+### The wt-24 closure (E2)
+
+For both wt-24 orbits, **every block at every spine cell costs ≥ 6**
+(exact value 6), hence every cell has m ≥ 12 — no V₀/γ-linkage needed:
+
+> **(M-im) holds for the six wt-24 Smith classes** — analytically,
+> modulo the per-cell tables (surveyable) and the O3 residues.
+
+### Status
+
+O1 is complete: wt-24 closed at ≥ 12; wt-16/18a/18b floors = 10
+engine-exactly, with the floor-10 cells located (4 + 14 + 12 cells).
+Remaining: O2 — kill weight-exactly-10 at those cells via the two
+dropped links (V₁R = ρ₁V₁L, V₂L = ρ₂V₂R; equality at engine-10 forces
+per-slot minimizers, and the link cosets must miss the minimizer
+products); O3 — the fibre-gap table compression and the
+comps-1,2-unpinned (c₁ = c₂ = 0) hand derivation.
+
