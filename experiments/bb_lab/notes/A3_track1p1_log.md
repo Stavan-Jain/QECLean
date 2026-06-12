@@ -394,3 +394,119 @@ exists.
   genuine open new-math step, and Entry 4 shows it is unavoidable.
 - No fully-analytic improvement on the d ≥ 2 floor yet; the path to one is
   Fork A specifically.
+
+---
+
+## Entry 5 (2026-06-12) — the m(b) collapse: the case trichotomy was a coordinate artifact
+
+The s=0 / s≠0 / [c]=0 case split of Entries 1–3 is not intrinsic. There is a
+single exact identity that organizes the whole dangerous sector, indexed by
+the projected stabilizer b = p(v), and it converts the factor-2 lemma into a
+one-parameter family of statements about the **base code alone**. Every claim
+below is script-verified (`a3_mb_foundations.py`, all checks PASS), and the
+derivation is short enough to verify by hand.
+
+### The derivation
+
+**Cuts.** For each cut position j ∈ Z₆ (fundamental domain {j,…,j+5} in x),
+split the base boundaries along the seam: ∂₁ = d1nc_j + d1c_j (= H_X) and
+∂₂ = d2nc_j + d2c_j (= H_Zᵀ). For *every* j the cover boundaries take the
+block form [[nc_j, c_j],[c_j, nc_j]] (V1), the chain identities
+d1nc·d2nc + d1c·d2c = 0 = d1nc·d2c + d1c·d2nc hold (V2), and the snake map
+Δ_j[ζ] = [d2c_j ζ] on H₂ = ker ∂₂ (dim 6, V3) satisfies
+**im Δ_j = ker tr_\*** (V5) — so im Δ is cut-independent, Smith exactness
+holds per cut.
+
+**Parametrization.** Dangerous cycles = τ(Z₁) + im ∂₂^cov, as an exact
+equality of subspaces (dim 72, V6); v = τ(u) + ∂₂^cov w is a nontrivial
+logical iff [u] ∉ im Δ (V8).
+
+**Sheet formula.** Fix v = τ(u) + ∂₂^cov w. Let z := p(w) and
+b := p(v) = ∂₂ z ∈ Stab_Z(base) — both cut-free. In cut-j sheet coordinates
+w = (w₀, w₁):
+
+    v₀ = u + d2c_j z + ∂₂ w₀ ,      v₁ = v₀ + b .          (V7)
+
+(One line: ∂₂^cov w has sheets (d2nc_j w₀ + d2c_j w₁, d2c_j w₀ + d2nc_j w₁)
+= (∂₂ w₀ + d2c_j z, ∂₂ w₁ + d2c_j z).)
+
+**Boolean identity.** For any x, b over F₂: |x| + |x+b| = |b| + 2·|x off supp b|.
+So pointwise, for every cut j simultaneously,
+
+    |v| = |b| + 2·|v₀(j) restricted off supp(b)| .
+
+**Slice minimum.** Fix b and minimize over the slice
+{v nontrivial dangerous : p(v) = b}. As (u, ζ ∈ ker ∂₂, w₀) range, the sheet
+v₀(j) ranges exactly over d2c_j z_b + {u' ∈ Z₁ : [u'] ∉ im Δ} (z_b a fixed
+∂₂-preimage of b; ζ shifts [u'] by Δ_j[ζ] ∈ im Δ, which preserves
+"∉ im Δ"; ∂₂w₀ absorbs Stab). Hence for every j
+
+    min{|v| : v nontriv. dangerous, p(v) = b} = |b| + 2·m_j(b),
+    m_j(b) := min{ |(d2c_j z_b + u') off supp b| : u' ∈ Z₁, [u'] ∉ im Δ } .
+
+The left side does not mention j, so **m_j(b) =: m(b) is cut-independent**;
+and it is G-translation-invariant (the slice for T·b is the T_cover-image of
+the slice for b). The factor-2 lemma is exactly
+
+    **(M)   |b| + 2·m(b) ≥ 12 = 2·d_base   for every b ∈ Stab_Z(base).**
+
+Immediate rungs:
+- **b = 0**: v₁ = v₀, so v = τ(v₀) with [v₀] = [u'] ∉ im Δ nonzero ⟹
+  |v| = 2|v₀| ≥ 2·d_base ✓. (The old clean case, now with the Δ-twist
+  subsumed — no [c]-side condition needed.)
+- **|b| ≥ 12**: trivial ✓.
+- **0 < |b| ≤ 11**: the entire open content. A question about the base
+  [[72,12,6]] code and its seam split only — the cover has left the stage.
+
+### Discovery scan (`a3_mb_scan.py`; numbers are validation only, as always)
+
+- **Light stabilizers**: the b with 0 < |b| ≤ 11 are *exactly* 36 single
+  hexagons (|b| = 6, b = ∂₂δ_g) and 216 overlapping pairs (|b| = 10,
+  b = ∂₂(δ_g + δ_{g+δ}), δ in an explicit 12-element difference set D).
+  Nothing else — no weight-8, no k ≥ 3 face-supports.
+- **m-values**: m(0) = 6 ✓ (= d_base); m(single hexagon) = 4 (all 36, one
+  orbit); m(pair) = 3 at worst. So the slice minima are 12 (b = 0),
+  14 (singles), 16 (pairs): **(M) holds on every light slice, with margin 2,
+  and the global dangerous minimum 12 is carried exactly by b = 0.**
+- **Cut-independence and translation-invariance of m**: verified on samples
+  (m_j identical for j = 0..5; translated b gives equal m).
+- **Witness decode**: the Entry-2 s≠0 weight-14 minimizer has b = a single
+  hexagon, |v₀ off b| = 4 = m(b), i.e. 14 = 6 + 2·4 exactly; its seam-syndrome
+  flags across the six cuts are s_j = [1,1,1,0,0,0] — *the same v is "s≠0" for
+  three cuts and "s=0" for the other three.* The trichotomy was an artifact of
+  fixing j = 0.
+- **Sharpening**: the [c]=0 sub-case is UNSAT at weight ≤ 15 (Entry 2 had only
+  established ≥ 15): its true minimum is ≥ 16.
+
+### Dead reductions (first-class; do not retry)
+
+1. **Single-sheet decoupling is FALSE.** The natural relaxation
+   |v| ≥ 2·dist(u + d2c z, Stab) (drop the shared-β coupling between the two
+   sheets) cannot prove (M): there exist weight-6 *cover stabilizers* whose
+   sheets occupy exactly the same affine data (u' + d2c z_b with u' in a
+   non-im Δ class can lie inside Stab + C_Σ). Concretely, for any class
+   [u] ∈ φ(D)\imΔ realized by a [c]=0 configuration u + d2c z₀ ∈ Stab, the
+   perturbation z = z₀ + (single face with flux) makes dist(u + d2c z, Stab)
+   ≤ 3 while the true slice values stay ≥ 14. Any valid proof must use the
+   same-β coupling — which is exactly what the off-supp(b) puncture in m(b)
+   encodes. This kills the "seam-aware weight argument bounding |a| below"
+   as literally proposed in A_HANDOFF §4; the viable version is the punctured
+   form m(b).
+2. **Multi-cut leverage is VACUOUS for minima.** Since the slice minimum
+   equals |b| + 2·m_j(b) for every j, all six cuts see the same value; for a
+   *fixed* v, |v₀(j) off supp b| = (|v| − |b|)/2 for all j. The six cut
+   decompositions are an invariance, not six independent inequalities. (They
+   remain useful for *choosing* a convenient cut in proofs, e.g. one with
+   d2c_j z_b ⊆ supp b.)
+3. **The s/[c] trichotomy** is the cut-0 shadow of the b-grading: s_j = d1c_j b
+   varies with j at fixed v (witness above). Statements should be made about
+   b-slices, not s-cases.
+
+### Status
+
+- The factor-2 lemma is now **equivalent** (by a verified, hand-checkable
+  reduction) to (M): |b| + 2 m(b) ≥ 12 for all base stabilizers b, with
+  b = 0 and |b| ≥ 12 proven, and the light range 0 < |b| ≤ 11 open.
+- Computationally the light range holds with margin (slices ≥ 14): the open
+  analytic content is the classification of light stabilizers + lower bounds
+  on m for the two families. → Entry 6.
