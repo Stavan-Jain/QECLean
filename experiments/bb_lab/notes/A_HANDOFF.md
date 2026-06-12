@@ -202,6 +202,14 @@ ker ∂₂ ∖ 0 has just 5 orbits under translation+swap, and the class minima
 weight-8/10 light-cycle flux census, or the affine-COST grammar on the
 five cosets d2c_jζ + im ∂₂. See `a3_r_homotopy_mim.py` and Entry 17.*
 
+*Update (Entry 18): the zero linking form is PROVEN — the **no-double-wrap
+lemma**: two-step ∂₁∂₂ paths advance ≤ 5 < 6 columns, so d1c·d2c = 0 =
+d1nc·d2nc as matrix identities (all cuts). The flux characterization is
+now fully analytic end to end. Affine-COST seed: all five Smith-coset
+orbits are pinned exactly in the doubly-radical components {3,4} — next
+session: the offset-COST DP per orbit (machine floor first; if ≥ 12
+everywhere, hand-organize like Entries 9–12 and goal 1 closes).*
+
 **The former tail (L-C) — now closed verified-finite (Entries 8–9).** The
 classification "every b ∈ Stab_Z(base) with 0 < |b| ≤ 11 is a hexagon or a
 D-pair" is established by the layer-profile route
