@@ -2123,3 +2123,115 @@ fully analytic** ((M) + (R) + flux + duality are all already at that
 grade). Next session: O1 first (it carries the wt-24 orbits and the
 floor-10 baseline), then O2.
 
+
+## Entry 23 (2026-06-12) — O1 structure: the confined floor as spine C-tables; the support, cost, and slope engines
+
+Script: `a3_mim_confined_tables.py` (T1–T6). The Entry-22 confined floor
+is now organized into hand-evaluable form: per orbit a 4×4 **spine
+C-table** m(a₃, a₄), with three proven engine lemmas that evaluate its
+cells. The two wt-24 orbits reduce to a single uniform block statement.
+
+### The coordinatization (T1)
+
+In R = F₄[Z₂²] put X = 1+s_x, Y = 1+s_y, XY = ΣG (so X² = Y² = 0). All
+constants are short: Â₁ = Â₃ = X + ωY; B̂₂ = B̂₃ = B̂₄ = ωX + Y;
+Â₂ = B̂₁ = 1 + X + Y (the units); Â₄ = X + ω²Y; ρ₁ = X + ωY + ω²XY,
+ρ₂ = ωX + Y + ω²XY. Verified parametrizations:
+
+    Γ₃ = {(a B̂₃ + βXY, a Â₃ + αXY) : a, β, α ∈ F₄}   (64; the two
+        XY-shifts are FREE and independent),
+    Γ₄ = {(ω(a Â₄ + γXY), a Â₄ + γXY)}               (16; the ω-scalar
+        ties the blocks, one shared shift γ),
+    im ρ_i = F₄ρ_i ⊕ F₄XY,
+
+and **c₁ = c₂ = 0 on every orbit** — the confined sets are the
+subspaces im ρ₁, im ρ₂ themselves. (c_i = 0 is literally "comps 1, 2
+are unpinned", an Entry-19 verified fact; its hand derivation joins O3.)
+A confined configuration is exactly: V₀ ∈ F₂[Z₂²] (16, shared by both
+blocks), spine (a₃, a₄) ∈ F₄² (shared), γ ∈ F₄ (shared, ω-twisted),
+independent XY-shifts β, α of comp 3 per block, and V₂L ∈ im ρ₂,
+V₁R ∈ im ρ₁. The floor = min over spine cells of m(a₃, a₄), each cell
+an exact min over the rest.
+
+### Engine 1: the support-class lemma (kill-multiset form)
+
+For v = c·1 + αX + βY + δXY with δ free, the slot values are
+(c+α+β+δ, α+δ, β+δ, δ), so the zero set at shift δ is the level set
+{s : kill[s] = δ} of the **kill vector** kill(v) = (c+α+β, α, β, 0). ∎
+Consequences: four distinct kill entries ⟹ support is always a
+co-point (each of the 4 positions); a repeated pair ⟹ a 2-set option
+appears; a triple ⟹ a singleton; etc. For the confined comps,
+kill(ρ₂) = (ω², ω, 1, 0) and kill(ρ₁) = (ω², 1, ω, 0) are distinct
+4-sets: **im ρ_i ∖ F₄XY elements have co-point support** (plus ∅/full
+from F₄XY) — the co-point-or-full radical structure reborn one level
+down, now WITH values: on its co-point, v₂(s) = p·(m(s) + m(z)), m =
+kill(ρ₂), z the dead slot, p ∈ F₄ˣ a free scale.
+
+### Engine 2: the slot-cost table and the T-classifier
+
+M₁(v₀, v₂, v₃, v₄) (comp-1 free) has 128 cells in **18 orbits** under
+the 9 translations × Frobenius; census {0:1, 1:9, 2:36, 3:55, 4:27};
+M₂(v₀, v₁, v₃, v₄) = M₁(v₀, v₁, v₃, Frob v₄) (the swap, Frobenius on
+comp 4 only — one table serves both blocks). Hand form:
+
+    v₀ = 0:  0 alive → 0;  1 alive → 4;  2 alive → 2 (always);
+             3 alive → 2 if T = 1 else 4
+    v₀ = 1:  3 alive with T = 1 → 1 (δ-point);  else → 3
+
+with the **slope classifier** T_L = v₂²(v₃v₄)⁻¹ on the L-side and
+T_R = v₄(v₁v₃)⁻¹ on the R-side. Proof: the character identities
+**ψ₂² = ψ₃ψ₄ and ψ₄ = ψ₁ψ₃** (immediate from (1,0), (0,1), (1,1),
+(1,2) exponent arithmetic mod 3) make T = 1 on every δ-point tuple;
+the cheap pair-loci are the scalings (c·ψ₂, c·ψ₃, c·ψ₄) (comp-1-dead
+pairs, c = 1+ψ(r) is the SAME for comps 2, 3, 4 since r ∈ ker ψ₁ has
+r₂ = 0) resp. (c·ψ₁, c·ψ₃, c²·ψ₄) (comp-2-dead pairs), and T is
+invariant under exactly these scalings; the 9 + 9 cells with T = 1 are
+exactly the cost-{1, 2} 3-alive orbits (counts match). ∎
+
+### Engine 3: the slope lemma (cheap-slot counting)
+
+On a common alive set, v₂ = p·(m + m(z₂)) carries ONE free scale p
+(T_L ∝ p²), while v₃ = k₃ + k₃(z₃) and v₄ = k₄ + k₄(z₄) are FIXED by
+(orbit, block, spine, alignment). Hence the slots where T = 1 can be
+made cheap form **a level set of the explicit p-free function
+g(s) = (m(s)+m(z₂))²·[(k₃(s)+k₃(z₃))(k₄(s)+k₄(z₄))]⁻¹**, and the
+number of simultaneously cheap 3-alive slots is at most the largest
+level-set of g over the alignment choices. Worked template (wt-24a,
+cell (1,1), all three comps co-point-aligned on S, |S| = 3): the
+δ-locus demands v₂ ∝ constant·(v₃²v₄⁻¹)^{1/2}-profile; computing,
+v₃²v₄⁻¹ is CONSTANT on S while the available v₂ is a nonconstant
+progression p·(m+m(z)) — at most one slot matches: cost ≥ 1+3+3 = 7 >
+6 on that alignment. ∎ (per-cell instances are the Entry-24 case work)
+
+### The C-tables (T3–T6)
+
+Spine tables m(a₃, a₄) (machine-exact; floors reproduce Entry 22):
+
+    wt-16:  12 except cells {ω,ω²}×{1,ω²} = 10
+    wt-18a: 10 except (1,1) = (1,ω²) = 12
+    wt-18b: 10 except (0,0), (0,ω), (ω,ω²), (ω²,1) = 12
+    wt-24a: all ≥ 12 (14 at (0,0), (0,ω), (0,ω²))
+    wt-24b: all ≥ 12 (14 on rows a₃ ∈ {ω, ω²})
+
+Unlinked per-block tables: **for both wt-24 orbits every block minimum
+is exactly 6 in every cell** — so O1 there reduces to the uniform
+statement "every block costs ≥ 6", no V₀/γ-sharing needed. For
+wt-16/18 the unlinked bound is 8 and the shared-(V₀, γ) linkage (with
+the parity lemma L ≡ R ≡ |V₀| mod 2) carries the floor to 10 — the
+linked analysis is needed exactly at their floor-10 cells. The
+support+parity relaxation alone (T6) gives 3–5 per block: the slope
+lemma carries 1–3 units at essentially every cell — it is the
+workhorse. Translation stabilizers (T5): orders 4, 3, 1, 12, 12 — the
+wt-24 spine tables collapse accordingly.
+
+### Status and next
+
+O1 is reduced to: (a) the per-cell slope-kill case analyses for the two
+wt-24 orbits (block ≥ 6 uniformly — highest value: closes (M-im)
+analytically on those orbits); (b) the linked floor-10 analyses for
+wt-16/18a/18b. O2 then kills weight-exactly-10 at the floor-10 cells
+via the dropped ρ-links + the +4 fibre gap. O3: the fibre-gap table
+GL-compression; c₁ = c₂ = 0 (comps 1, 2 unpinned) by hand. Entry 24:
+(a), as machine-verified per-cell certificates with the worked
+arguments.
+
