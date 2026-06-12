@@ -299,6 +299,11 @@ the Entry-5 reduction and the Entry-13 small-cycle case analysis.
   engine, floor, one-block 16, all six shape lemmas — classification fully
   hand-proven) → 13 (small-cycle theorem: m-rungs + (H0) discharged) →
   14 (**d(gross) ≥ 6 analytic** + dependency tree). Resume from Entries 13–14.
+- `notes/A4_writeup.md` — **the standalone write-up (DRAFT pending the
+  Entry-15 adversarial verdict):** Theorems A (small cycles; d(base) = 6
+  with explicit exhibit), B (d(gross) ≥ 6, minimal proof), C (dangerous
+  sector ≥ 12 via (M)), with the surveyable case tables and the
+  verification map. This is the deliverable form of the result.
 
 **Scripts (all under `scripts/`, run via `uv run python scripts/<name>` from
 `experiments/bb_lab/`):**
