@@ -1966,3 +1966,55 @@ residues; the owed hand-organization, in Entry-10–12 style:
 Alternative hand route still open: the weight-8/10 flux census (route B)
 — next entry sizes both before committing to one.
 
+
+## Entry 21 (2026-06-12) — the light-cycle census: (M-im) re-verified by the flux route; route B sized (and closed to hand work at weight 10)
+
+Script: `a3_light_cycle_census.py` (C1–C5 all PASS). Complete enumeration
+of ALL base 1-cycles of weights 6, 8, 10, with seam-flux and boundary
+status — the Entry-13 split machinery mechanized two weights up, exactly
+as route B prescribed.
+
+### Method (per split (|u_L|, |u_R|), partition — no double counting)
+
+Pure splits from Ann(A), Ann(B) (both 12-dim, 4096 elements, fully
+enumerated); mixed splits with small side ≤ 4 by enumerate-small-side +
+affine solve (row-ops matrix for MA, MB; particular solution + the
+4096-element kernel coset scanned by packed popcounts); the (5,5) split
+by syndrome hash-join over C(36,5) = 376992 per side. Ladder: Ann dims
+12/12 with weight enumerators {6: 36, 8: 9} (the W1 anchor: min 6);
+weight-6 census reproduces the ground truth exactly (120 cycles =
+36 hexagons + 84 logicals, splits 36/48/36, hexagons the only
+flux-silent ones); the weight-10 boundaries come out exactly the 216
+D-pairs in splits (4,6)+(6,4) (Entry-9 cross-check); flux is
+class-invariant on samples; solver spot-checks pass.
+
+### The censuses
+
+    weight 6:   120 cycles;  36 boundaries; 84 loud non-boundaries
+    weight 8:   990 cycles;   0 boundaries; ALL loud; splits
+                (8,0):9 (5,3):108 (4,4):756 (3,5):108 (0,8):9;
+                32 translation orbits
+    weight 10: 13464 cycles; 216 boundaries (the D-pairs); 13248
+                non-boundaries, ALL loud; splits (7,3):972 (6,4):3276
+                (5,5):4968 + mirrors; 368 translation orbits
+
+**FLUX-SILENT non-boundary cycles at weights 8 and 10: ZERO.** With the
+proven weight-6 sub-rung and the small-cycle theorem (no cycles ≤ 5;
+weights are even), this **re-proves (M-im) at the verified-finite level
+by the flux route — fully independent of Entry 20's value grammar.**
+Two independent machine closures of (M-im) now exist; the d(gross) = 12
+chain is double-verified end to end.
+
+### Route decision
+
+Route B's hand version would need the per-orbit classification of 32
+weight-8 orbits (borderline) AND 368 weight-10 non-boundary orbits
+(not feasible as Entry-13-style case analysis). Route A (the value
+grammar of Entry 20) has per-orbit object counts of 1k–2.5k but with
+strong algebraic compression available (even costs; comps 1, 2
+homogeneous; offsets confined to {3, 4} with graph ideals of size
+64/16; ρ-nilpotency ρ³ = 0 at the radical components). **The
+hand-organization proceeds on route A**; the census stays as the
+independent cross-check and the source of the weight-8 structure
+(990 = 9 + 108 + 756 + 108 + 9, a future write-up exhibit).
+
