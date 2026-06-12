@@ -510,3 +510,160 @@ Immediate rungs:
 - Computationally the light range holds with margin (slices ≥ 14): the open
   analytic content is the classification of light stabilizers + lower bounds
   on m for the two families. → Entry 6.
+
+---
+
+## Entry 6 (2026-06-12) — the analytic ladder for (M): k ≤ 7 closed, rungs verified, tail = k ≥ 8
+
+Entry 5 reduced the factor-2 lemma to (M): |b| + 2 m(b) ≥ 12 over base
+stabilizers, open only for 0 < |b| ≤ 11. This entry builds the analytic
+ladder for that range. Structural data in `a3_mb_structure.py` (T1–T6),
+end-to-end SAT crosschecks in `a3_mb_crosscheck.py` (C1–C2).
+
+Notation: hexagon h(g) := supp ∂₂δ_g (one face's stabilizer, |h(g)| = 6);
+for z ∈ C₂ let k(z) = |supp z| (face count) and k_min(b) = min over the
+ker ∂₂-coset of preimages (ker ∂₂ has dim 6, min weight 16 — T5).
+
+### Ladder step 1 — light-stabilizer classification (b with |b| ≤ 11)
+
+**(L-A) Two hexagons overlap in ≤ 1 qubit — PROVEN.** The overlap of h(g)
+and h(g+δ) is the autocorrelation count |A ∩ Aδ| + |B ∩ Bδ|. The difference
+sets are (computed symbolically and machine-confirmed, T1):
+    dA = {(0,±1), (3,±1), (3,±2)},   dB = swap(dA) = {(±1,0), (±1,3), (±2,3)},
+each with 6 *distinct* elements, and disjoint **in both coordinates**:
+x(dA) ⊆ {0,3}, x(dB) ⊆ {1,2,4,5}; y(dA) ⊆ {1,2,4,5}, y(dB) ⊆ {0,3}.
+Hence ov(δ) ≤ 1 for every δ ≠ 0, with ov = 1 exactly on D := dA ∪ dB
+(|D| = 12). Consequences: k = 1 gives |b| = 6 (the 36 hexagons); k = 2 gives
+|b| = 12 − 2·ov ∈ {10, 12}, i.e. the 216 D-pairs at weight 10 and nothing
+else below 12.
+
+**(L-B) k ∈ [3,7] ⟹ |b| ≥ 12 — PROVEN (modulo one finite check at k = 7).**
+Counting lemma: for any z with k faces, every qubit q covered cov_q times
+contributes parity(cov_q) = cov_q − 2⌊cov_q/2⌋ to |b|, and
+Σ_q ⌊cov_q/2⌋ ≤ Σ_q C(cov_q, 2) = Σ_{face pairs} ov(pair) = e(S), the number
+of D-pairs among the k faces (using ov ≤ 1). So
+    **|b| ≥ 6k − 2·e(S)**, valid for every preimage z.
+Now bound e(S) in the Cayley graph Cay(Z₆², D):
+
+*K₄-freeness of Cay(Z₆², D) — full hand proof.*
+(i) *Triangles are monochromatic.* If a ∈ dA and b ∈ dB then
+y(b−a) ∈ {0,3} − {1,2,4,5} ⊆ {1,2,4,5}, so b−a ∉ dB; and
+x(b−a) ∈ {1,2,4,5} − {0,3} ⊆ {1,2,4,5}, so b−a ∉ dA. Hence no triangle mixes
+dA- and dB-edges.
+(ii) A K₄'s four triangles pairwise share edges, so all 6 edges have one
+color; by the swap symmetry assume all in dA. The dA-graph lives on
+Z₂ × Z₆ (x ∈ {0,3} ≅ Z₂), generators {(0,±1), (1,±1), (1,±2)}.
+(iii) Three same-ε points (ε = Z₂-coordinate) would need pairwise y-diffs
+in {±1}: impossible for 3 distinct points (two ±1-steps from any point
+differ by 2). This kills ε-splits 4+0 and 3+1 of a K₄.
+(iv) Split 2+2: WLOG p = (0,0), q = (0,1), r = (1,t), s = (1,t+1). The four
+cross differences force {t−1, t, t+1} ⊆ {1,2,4,5} = Z₆ \ {0,3} — but every
+3 consecutive residues mod 6 contain 0 or 3 (they are antipodal). ∎
+Turán then gives e(S) ≤ ex(k, K₄) = e(T(k,3)), so
+    k=3: |b| ≥ 18−6 = 12;  k=4: 24−10 = 14;  k=5: 30−16 = 14;  k=6: 36−24 = 12.
+*k = 7:* ex(7, K₄) = 16 with the **unique** extremal graph T(7,3) = K(3,2,2)
+⊇ K(2,2,2). Every edge of an octahedron K(2,2,2) lies in a triangle and its
+triangles are edge-connected, so an octahedron is monochromatic and would
+live in the dA-graph; Cay(Z₆², D) contains **zero** octahedra (T6, exhaustive;
+hand case-analysis in Z₂×Z₆ owed — the only nontrivial ε-split is 3+3).
+Hence e(S) ≤ 15 at k = 7 and |b| ≥ 42 − 30 = 12. ∎
+
+**(L-C) k_min ≥ 8 — OPEN (the tail).** Statement to prove: every
+b ∈ Stab_Z(base) whose minimal face support is ≥ 8 has |b| ≥ 12. True with
+margin computationally (the SAT enumeration found NO |b| ≤ 11 beyond k ≤ 2).
+Pure counting cannot close this: for large k, 6k − 2e(S) goes vacuous
+(e(S) ~ k²/6 in a 12-regular graph). Partial analytic result (x-collapse):
+summing the x-columns, |b| ≥ |z̄| + |(1+y+y²)z̄| where z̄ = z mod (1+x) ∈
+F₂[y]/(y⁶+1) — kills configurations with z̄ outside the annihilator pattern
+but bottoms out at z̄ ∈ (1+y)(1+y³)F₂[y] (where (1+y+y²)z̄ = 0). The right
+tool is the repeated-root filtration along BOTH primes of x⁶+1 =
+((1+x)(1+x²+x⁴))·… = ((1+x)(1+x+x²))² — i.e. exactly the van Lint /
+generalized-van-Lint machinery from lane L1 (now verbatim-verified, see
+citation note below). This is the single remaining unbounded-structure claim.
+
+### Ladder step 2 — the m-rungs for the two light families
+
+For a single face, the seam part of one column is a sub-vector of that
+column: supp(d2c_j δ_g) ⊆ h(g) (the c/nc split is an entrywise split of ∂₂).
+So m(hexagon) = min{|u' off h(g)| : u' ∈ Z₁, [u'] ∉ imΔ}, shift-free; and for
+a D-pair, supp(d2c_j z_b) ⊆ h(g) ∪ h(g′) = supp(b) ∪ {q*} (q* the overlap
+qubit), so m(pair) ≥ min{|u' off (h(g) ∪ h(g′))|}.
+
+**(L-D6) m(hexagon) ≥ 3 ⟸ every 1-cycle supported in h(g) ∪ {q₁,q₂} lies in
+{0, ∂₂δ_g}.** Verified exhaustively: rank H_X|h = 5 (cycle space inside a
+hexagon is exactly {0, b}), and over all 2145 choices of 2 extra qubits the
+cycle space never grows (T3) — not even by imΔ-class cycles. Hand-proof
+shape (owed): any two distinct qubits share ≤ 1 X-check — PROVEN: the
+cross-correlation A·B̄ has 9 distinct terms and the autocorrelations are
+multiplicity-free (T6) — so a 1-or-2-qubit tail outside the hexagon cannot
+match the hexagon's check-space except in the finitely many adjacent
+positions, which are then excluded one by one (translation-reduces to ONE
+hexagon).
+
+**(L-D10) m(D-pair) ≥ 2 ⟸ no non-imΔ 1-cycle supported in
+(h(g) ∪ h(g′)) ∪ {1 qubit}.** Verified exhaustively over all 12 pair types ×
+all extra qubits: zero such cycles (T3); the cycle space of the bare 11-qubit
+union is exactly span{∂₂δ_g, ∂₂δ_{g′}} (rank 9, all 12 types). For the
+12-target only m ≥ 1 is needed, i.e. only the bare-union fact (12
+translation-reduced rank checks — surveyable); m ≥ 2 gives the observed
+slice value 14.
+
+Assembly check: 6 + 2·3 = 12 ✓ and 10 + 2·1 = 12 ✓ (with the verified
+margins: 6+2·4 = 14, 10+2·3 = 16). Note (H0) d_base ≥ 6 enters ONLY at the
+b = 0 rung; the b ≠ 0 slices need no distance input at all.
+
+### End-to-end crosschecks (`a3_mb_crosscheck.py`)
+
+- **C1**: direct cover SAT: dangerous ∧ nontrivial ∧ p(v) ≠ 0 is UNSAT at
+  w ≤ 13 and SAT at 14 — exactly the assembled prediction (worst slice =
+  hexagon: 6 + 2·4). The m(b) ladder accounts for the entire dangerous
+  sector; the global minimum 12 sits at b = 0 alone.
+- **C2**: the imΔ-distance of the base code (min weight of a cycle in a
+  NONZERO imΔ class) is **12** = 2·d_base — the Smith-killed classes are
+  exactly twice as heavy as d_base; no weight-6 logical is imΔ (T4: all 84
+  weight-6 logicals are non-imΔ, max hexagon overlap 2, never spanning
+  fewer than 2 x-columns).
+
+### The conditional theorem (current best form)
+
+**Theorem (dangerous-sector factor-2; conditional).** Assume
+  (H0) d_Z(base) ≥ 6   [transfer input, used only at b = 0];
+  (T-tail) every base Z-stabilizer with minimal face support ≥ 8 has
+           weight ≥ 12   [OPEN — Entry-6 L-C];
+  (T-oct) Cay(Z₆², D) is octahedron-free   [verified; finite hand check owed];
+  (T-rungs) the hexagon+2 and pair-union+1 local cycle facts
+           [verified exhaustively; local hand proofs owed].
+Then every nontrivial dangerous gross logical has weight ≥ 12 = 2·d_base.
+All other ingredients (the m(b) reduction; ov ≤ 1; K₄-freeness; k ∈ [3,7];
+the counting lemma) are PROVEN above.
+
+### Status and the honest scoreboard
+
+- No analytic improvement on d ≥ 2 is claimed yet (unchanged); but the
+  "months"-grade obstruction of Entries 3–4 (the s≠0 seam-leakage case) has
+  been **dissolved into the m(b) ladder**, of which every rung except the
+  k ≥ 8 tail is either fully proven or a verified finite local fact with a
+  clear hand-proof route. The tail is a *classical* statement about one
+  abelian 2-block group code — squarely in the repeated-root lane the
+  program already surveyed — and is true with margin.
+- Citation flags from A_HANDOFF §6: both DISCHARGED by source verification
+  (2026-06-12). Chen–Xie–Ding arXiv:2402.02853 Thm 2.1 is verbatim the
+  "generalized van Lint theorem", attributed to Chen–Ding 2023 [5] ← van
+  Lint 1991; its Plotkin hypothesis (first component ranges over a code
+  C₁ ⊇ C₂) is exactly what the gross cover violates, as Entry 3 said.
+  Postema–Kokkelmans arXiv:2502.17052 (authors/title/quote) confirmed; the
+  Otjens-2025 misattributions in T2.3_literature_survey.md relabeled to
+  "PK Thm 2.18 (from Arnault et al. 2026)".
+
+### Next steps (ranked)
+
+1. **The k ≥ 8 tail (L-C)** via the repeated-root/(1+x,1+y)-adic filtration
+   of F₂[Z₆×Z₆] (two squared primes per direction). This is now THE open
+   problem of Track 1.1.
+2. Hand-organize the owed finite checks: octahedron-freeness in Z₂×Z₆ (3+3
+   split only), and the two rung locality proofs (shared-check ≤ 1 is
+   already proven; the residue is a one-hexagon neighborhood analysis).
+3. Then assemble the full conditional factor-2 write-up and revisit the
+   recursion bookkeeping (what (M) at every level + an analytic anchor
+   actually yields for goals 2/3 — note Entry 4's caution that the safe
+   sector caps the full-code bound at d_base).
