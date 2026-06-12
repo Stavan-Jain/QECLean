@@ -1,5 +1,11 @@
 # bb_lab Handoff — Tier 1 of 4 toward an *analytic* BB-code distance bound
 
+> **If you are picking up the active analytic-bound proof effort, read
+> [`notes/A_HANDOFF.md`](notes/A_HANDOFF.md) first** — it supersedes this
+> Tier-1 document for the current work (Phases A0–A3: the gross h=2
+> cover-transfer attack and its single open lemma). This file remains the
+> reference for the overall program structure and the §6 obstruction analysis.
+
 You are continuing a research-engineering program whose end-goal is a
 **closed-form, proof-bearing lower bound on the minimum distance `d` of
 bivariate-bicycle (BB) quantum LDPC codes**, of the form
