@@ -2359,3 +2359,258 @@ write-up: the adversarial skeptic pass over Entries 16–26 (in addition
 to the still-outstanding Entry-15 review), and the A4-style standalone
 write-up with the tables typeset.
 
+
+## Entry 27 (2026-06-12) — adversarial re-review: Entries 16–26 — every link HOLDS; "fully analytic" demoted to "analytic spine + two machine-certified residues"
+
+The owed skeptic pass over the d(gross) = 12 chain (Entry 26's first owed
+item), done in a fresh session under the standing rules: computation may
+refute but never prove; the SAT-validated endpoints (d = 12, the sector
+and class minima) are not attack targets; every load-bearing machine
+check was **re-implemented independently** (`scripts/a3_adv27_recheck.py`,
+75 checks, all PASS) on a deliberately different encoding path — y-major
+indexing vs the lab's x-major, int-bitmask F₂ algebra vs numpy, a
+differently-spelled (provably equivalent) crossing predicate, own
+syndrome-join/kernel-scan census machinery, and an own CRT frame built on
+the **conjugate** character-orbit reps (every F₄ constant is the Frobenius
+conjugate of the lab's: Â₁ = X + ω²Y, B̂₄ = ω²Â₄, D1 reads Yû₁ = ωYû₂ —
+so agreement of all counts/floors/tables is a nontrivial frame-transport
+check). In parallel, every prose argument in Entries 16–26 was re-derived
+by hand. One first-pass artifact, per the Entry-15 honesty standard: my
+own calibration check initially asserted the zero-class linked floor is 6
+and FAILED — correctly (the zero coset contains the zero element; its
+floor is 0). The assertion was mine, not the lab's; fixed and documented
+in the checker.
+
+### Link 1 — Entry 16, the safe-slice framework: **HOLDS**
+
+- **Block equations re-derived**: for v = (v₀, v₁) with p(v) = w, the two
+  cover equations reduce to ∂₁v₀ = d1c_j·w; the second is automatic
+  (∂₁v₀ + d1nc w = d1c w + d1nc w = ∂₁w = 0, w a cycle since p is a
+  chain map). |v| = |w| + 2|v₀ off supp w| is the cleared Entry-5 boolean
+  identity. Lift spot-checks pass (12 random; cover cycle + weight
+  identity exact).
+- **δ is the textbook connecting map.** The identification is immediate
+  from the block form: the lift s_j(w) on sheet 0 has ∂₁^cov s_j(w) =
+  (d1nc_j w, d1c_j w), and w a cycle forces d1nc_j w = d1c_j w, i.e. the
+  image is diagonal = τ(d1c_j w). Class-invariance and cut-independence
+  are then standard diagram chases (two lifts differ by im τ). Both also
+  re-verified exactly: ker δ computed as a class set for every cut —
+  cut-independent, equal to im Δ (64 = 64), Δ injective.
+- **All 84 weight-6 logicals UNREACHABLE**: re-verified exhaustively, all
+  six cuts (and calibration: the Smith reps ARE reachable at every cut,
+  so the test discriminates). Census re-done independently: 120 = 36 +
+  48 + 36, 36 hexagons, 84 logicals in 84 distinct classes, 3 orbits
+  (36/36/12).
+- **Note (bookkeeping, not a gap)**: for the final theorem only the
+  inclusion im pr_* ⊆ im Δ is load-bearing; the equality ker δ = im Δ
+  and the "exactly 63 classes" framing are bookkeeping (see Link 2).
+
+### Link 2 — Entry 17, (R): **HOLDS** (re-derived in full by hand)
+
+The homotopy is correct and genuinely one-line: B² = y⁶ + x² + x⁴ =
+1 + x² + x⁴ over the cover (char 2 kills cross terms; y⁶ = 1), so
+(1+x²)B² = 1 + x⁶, and for any cover cycle (Av_L = Bv_R),
+z := (1+x²)Bv_L gives ∂₂z = ((1+x²)B²v_L, (1+x²)B·Av_L) =
+((1+x⁶)v_L, (1+x⁶)v_R) = (1+σ)v. With τ(p(v)) = (1+σ)v (re-derived as a
+chain identity and machine-verified on the full 78-dim basis), σ_* = id
+and im pr_* ⊆ ker τ_* = im Δ (LES exactness, textbook given the cleared
+SES). Two notes:
+
+- **The equality leg of (R) is decorative for d = 12.** Rank–nullity
+  needs im τ_* = ker pr_* (LES) plus dim H₁(cover) = dim H₁(base) = 12 —
+  k-facts that are currently machine/published. The lower bound uses only
+  the inclusion ([p(v)] ∈ im Δ ∖ 0 ⟹ p(v) lies in some coset C(ζ),
+  ζ ≠ 0); the upper bound uses only im Δ ⊆ ker flux (easy direction).
+  **Neither direction of the theorem depends on a hand proof of k = 12.**
+- The "d(gross) = 12 ⟺ (M-im)" phrasing is fine with the above reading;
+  re-verified the upper-bound witness independently: τ(u*) has weight 12,
+  is a cover cycle, and is NOT a cover boundary.
+
+### Link 3 — Entry 18, the no-double-wrap lemma: **HOLDS** (one implicit
+step made explicit)
+
+Re-derivation: an entry (c, f) of ∂₁∂₂ sums over 2-step paths with total
+x-advance D = sx(a) + sx(b) ≤ 3 + 2 = 5; since D ≡ (c−f)_x (mod 6) and
+0 ≤ D ≤ 5, **D is the same integer for every path at the entry** (the
+prose leaves this implicit). With r = (x_f − j) mod 6, the crossing count
+of a monotone path is exactly [r + D ≥ 6] ∈ {0, 1} (if step 1 crosses,
+step 2 cannot: r + D ≤ 10 < 12). Path-pairing (one left route + one
+right route per factorization, AB = BA) gives even totals, forcing the
+three matrix identities — re-verified for all six cuts in my frame.
+**Bridge spelled out**: flux well-definedness on classes needs
+ξᵀd1c·∂₂ = 0, which is the lemma plus ξᵀd1nc = ξᵀd1c (from ξᵀ∂₁ = 0) —
+one line, implicit in the log, verified. The characterization equality
+im Δ^X = (im Δ^Z)^⊥ additionally needs the perfect H₁ pairing and
+dim im Δ = 6 on both sides; the 6's reduce by the LES to
+dim H₀ = dim F₂[Z₆²]/(A, B) = 6, which I re-derived by hand in the CRT
+frame (component quotient dims (0, 0, 0, 2, 4): comps 0–2 have a unit;
+comp 3's two radicals X+ωY, ωX+Y generate (X, Y); comp 4's ideal is
+span{Â₄, XY}) — **hand-grade, but the paragraph is owed in the A4
+write-up**. Again: only the easy inclusion im Δ ⊆ ker flux is
+load-bearing for the theorem; the equality carries the Entry-21 census
+cross-check only. Pins re-verified: {3,4} / {4} / {3,4} / {4} / {3}.
+
+### Link 4 — Entries 19/22, the (M-im) frame: **HOLDS**, two sharpenings
+
+- **Transport**: re-derived by hand and sharpened to exact matrix
+  identities d2c_j∘T_x = T_x∘d2c_{j−1} and d2c_j∘T_y = T_y∘d2c_j
+  (verified, all cuts), which with cut-independence of the connecting
+  map give class(Tζ) = T·class(ζ); also re-verified exactly for all
+  63 ζ × 36 T. Translation-only orbits already = the five orbits
+  (9, 12, 36, 3, 3), swap stabilizes each — confirmed.
+- **V1–V5 re-derived in full**: slot parity; column/row evenness
+  (c_{i+3} = (y+y²)c_i, aug(y+y²) = 0); the V3 crossing bookkeeping
+  (|w₀L| ≡ |P₄ζ|, |w₀R| ≡ |P₃ζ|+|P₄ζ|+|P₅ζ| ≡ 0) and even coset
+  weight/cost; the 512-layer value bijection with the explicit inverse
+  f(t) = v₀ + Σ_j Tr(v_jψ_j(t)⁻¹) and the E ≤ 2 rigidity (9 δ-tuples /
+  36 pair sums); the ρ-locks (u² = aug(u)²·1 re-proved; ρ_i² = 0;
+  im ρ_i = F₄ρ_i ⊕ F₄XY, 16 elements); the Γ₃ parametrization (the
+  shift map (b, c) ↦ (b+ωc, ωb+c) has determinant 1−ω² = ω ≠ 0, so the
+  two XY-shifts are free; kernel F₄XY gives 64) and Γ₄ (B̂₄ = ωÂ₄ ⟹ 16,
+  one shared twisted shift).
+- **Sharpening 1 (new): off₀ = off₂ = 0 identically** — not merely
+  "diagonal" (Entry 19) or "realizable" (Entry 19 structure result 4).
+  At comps 0 and 2 the A-relation multiplier is comp(y+y²) = Y, so each
+  column collapse satisfies v_i = Yv_{i+3} = Y²v_i = 0. Verified on all
+  63 ζ. Entry 19's parity-lemma content at comp 0 reduces to "V₀ shared,
+  ranging over the 16 diagonals"; nothing downstream changes, but the
+  write-up gets simpler.
+- **V6 (the +4 fibre gap) verified (66 fibres, all gaps exactly 4) and
+  found NOT load-bearing**: Entry 25's equality analysis never needs it
+  (cost = 10 exactness forces per-slot minimality by itself). One fewer
+  residue for the analytic bar.
+- Confined floors re-verified by brute force in the conjugate frame:
+  **10 / 10 / 10 / 12 / 12.** End-to-end: 200 random coset elements per
+  orbit decompose into (spine, shifts, confined values), satisfy BOTH
+  ρ-links, and obey |w| ≥ m(cell) ≥ 10 and |w| ≥ 12.
+
+### Link 5 — Entry 23, the engine lemmas: **HOLDS**
+
+Kill-multiset lemma re-derived (coefficients of c·1 + αX + βY + δXY are
+(c+α+β+δ, α+δ, β+δ, δ); kill(ρ₁), kill(ρ₂) are 4-distinct ⟹ co-point
+supports). The slot-cost hand rules re-verified against an independent
+brute-force M₁ AND M₂ on all 128 cells each (and mutation-tested: a
+wrong classifier or wrong cheap-cost produces 24 resp. 9 mismatches —
+the check is sensitive). Character identities ψ₂² = ψ₃ψ₄, ψ₄ = ψ₁ψ₃
+re-derived from exponent arithmetic; the counting completion re-done by
+hand (census 1/9/36/55/27: 36 = 27 two-alive + 9 T=1 three-alive;
+27 = 9 one-alive + 18 T≠1; 55 = the v₀=1 non-δ cells; totals match the
+rule). 18 orbits under 9 translations × Frobenius confirmed; M₂ =
+M₁∘(Frob on comp 4) re-derived via the t_x↔t_y swap and confirmed.
+
+### Link 6 — Entry 24, engine == truth: **HOLDS as mathematics;
+surveyability disputed (see audit)**
+
+The published outputs were re-verified independently: C-table value
+multisets (wt-16 {10:4, 12:12}; wt-18a {10:14, 12:2}; wt-18b {10:12,
+12:4}; wt-24 all ≥ 12), floors, floor-10 cell counts (4 / 14 / 12),
+translation stabilizers (4, 3, 1, 12, 12), and the wt-24 closure —
+**every unlinked block minimum equals 6 at every cell** (2 × 16 × 2,
+exact). The lab's own engine == truth scripts re-run and pass. So the
+C-tables are true and the wt-24 orbits do close at ≥ 12.
+
+### Link 7 — Entry 25, the ρ-link kills: **HOLDS**
+
+Independent re-enumeration in the conjugate frame: achievers 48 / 48 / 22
+(wt-16: 12 at each of its 4 floor-10 cells; spreads over 14 / 12 cells),
+each tested against BOTH dropped links over the FULL 16-element ker-ρ
+cosets and the full per-slot argmin products (no singleton shortcut):
+**every achiever fails at least one link**; 116 fail both, exactly 2
+(wt-18b) fail exactly one — matching the lab. The logic audited: a
+weight-10 coset element would sit at a floor-10 cell with config cost
+exactly 10, forcing per-slot minimality, argmin free sides, and both
+links (c₁ = c₂ = 0) — the enumeration is complete over the verified
+Γ-parametrization, and the kill machinery is calibrated (on the zero
+class it produces floor 0 and the hexagon as a links-satisfiable
+config; on real coset elements both links hold). With evenness and the
+C-table floors: no sub-12 elements on any orbit; transport extends to
+all 63 classes.
+
+### Link 8 — Entry 26, unpinnedness + assembly: **HOLDS**, one
+simplification found
+
+- **Comp-1 chain re-derived end-to-end by hand** by an independent route:
+  group coefficients directly — the claim reduces to (B̂₁X + Â₁)û₁ +
+  (B̂₁Y + Â₁X)û₂ = (ωY + XY)û₁ + (Y + ω²XY)û₂ = Y[(ω+X)û₁ + (1+ω²X)û₂],
+  and D1 cancels it exactly ((X+ω)ω² + 1 + ω²X = 0). The crossing
+  bookkeeping off₁L = û₄+û₅+s_xû₅, off₁R = û₃+s_xû₄+û₅ independently
+  re-derived from the cut rule and verified on all 63 (conjugate frame
+  throughout: τ′ = ω+ω²s_y, D1′: Yû₁ = ωYû₂).
+- **Sharpening 2 (new): the comp-2 mirror chain is unnecessary.** At
+  comp 2 the offsets vanish identically (off₂ = 0; Sharpening 1), so
+  c₂ = 0 is a one-liner: v_i = Yv_{i+3} = Y²v_i = 0. The lab's mirror
+  chain is correct but proves something weaker than what is true; the
+  A4 write-up should use the one-liner. (Cosmetic: `a3_mim_o3_residues.py`
+  U4 initializes an unused `ok_md` and never checks a D1-mirror — moot
+  given off₂ = 0, but worth knowing it was not checked there.)
+- **Assembly re-audited.** The load-bearing tree for d(gross) = 12:
+  (1) dichotomy on [p(v)]; (2) dangerous: (M) [cleared, Entries 5–15];
+  (3) safe: homotopy + LES ⟹ [p(v)] ∈ im Δ ∖ 0 ⟹ p(v) ∈ C(ζ), ζ ≠ 0;
+  transport ⟹ WLOG one of 5 reps; parity + C-tables + link kills ⟹
+  |p(v)| ≥ 12 ⟹ |v| ≥ |p(v)| ≥ 12; (4) duality d_X = d_Z [cleared];
+  (5) upper bound: τ(u*) weight 12, nontrivial via flux(u*) ≠ 0 +
+  im Δ ⊆ ker flux + ker τ_* = im Δ. min-arithmetic checks. **Not needed
+  anywhere**: ker δ = im Δ equality, k = 12, the flux characterization
+  equality, V6, and the Entry-19/20 superseded floors — all decorative
+  or cross-check-only. The chain as assembled in Entry 26 is correct.
+
+### The surveyability audit (the program's own §1 bar)
+
+1. **The 18-orbit M-table (Entry 23): PASSES.** A 5-line rule + two
+   hand-proven classifier identities + a by-hand counting completion;
+   fully comparable to a published case table.
+2. **The per-cell C-table evaluations (Entry 24): FAIL the bar as
+   currently organized.** The wt-24 closure alone is 2 orbits × 16
+   cells × 2 blocks × ~96 engine rows ≈ 6k rows; the linked floor-10
+   tables are 80 cells, each a min over 64 shared (V₀, γ) choices times
+   two ~96-row block evaluations — these were machine-swept, with
+   exactly ONE worked template cell in the log. "A finite check is
+   allowed only as the residue of an analytic reduction to a few
+   human-surveyable cases" — this residue is currently a machine
+   enumeration with an analytic recipe attached. Entry 24's claim of
+   "the same epistemic grade as the Entry-10–12 tables" is not yet
+   earned: those tables were walked in prose; these are certificate
+   dumps. The compression assets exist (stabilizer orders 12 on the
+   wt-24 spines; the slope lemma; B̂₄ = ωÂ₄) but no compressed table
+   has been written.
+3. **The 118 ρ-link kills (Entry 25): SPLIT verdict.** The per-achiever
+   checks are surveyable (118 one-line F₄ evaluations — an acceptable
+   appendix table), but the **completeness** of the achiever list (that
+   these are ALL engine-10 achievers) inherits the machine status of
+   residue 2.
+
+### Verdict
+
+**Mathematics: the chain HOLDS end to end. No gap found.** 75/75
+independent checks pass; every prose argument re-derived; two
+sharpenings found (off₀ = off₂ = 0; the comp-2 one-liner) and one
+implicit step closed (path-advance uniqueness in no-double-wrap). The
+(M-im) endpoint is now **triple-verified** by independent machine routes
+(Entry 20 value sweep; Entry 21 census; this review's own census + coset
+machinery in a conjugate frame).
+
+**The headline claim demotes from "fully analytic" to: "d(gross) = 12 —
+hand-proven reductions + one surveyable case table (M-table) + two
+machine-certified finite residues (the C-tables and the achiever-list
+completeness)."** This is stands-with-debts, not a break: the debt is
+write-up work (walk the compressed C-tables and derive the achiever
+lists by hand in the A4 extension), not new mathematics. Until that is
+done, external statements should say "verified-finite with an analytic
+spine" for the safe sector, while d(gross) ≥ 6 (Entries 5–15) remains
+fully analytic as previously cleared.
+
+(Process note: the Entry-15 review of the d ≥ 6 chain lives on the
+sibling branch `claude/competent-proskuriakova-f31540` (verdict: HOLDS,
+49 checks); this branch's log jumps 14 → 16. Merging the two review
+entries into one history is an outstanding integration chore.)
+
+### Next
+
+1. A4-extension write-up with the COMPRESSED C-tables walked by hand
+   (stabilizer + slope-lemma compression) and the achiever lists derived
+   from the floor-10 cell structure — this is what restores "fully
+   analytic" honestly.
+2. Fold Sharpenings 1–2 into the write-up (they shorten O3 to two lines
+   and delete the comp-2 mirror chain).
+3. Merge the Entry-15 branch; then the full d = 12 chain has both owed
+   reviews on one history.
