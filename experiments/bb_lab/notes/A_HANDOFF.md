@@ -38,6 +38,25 @@ logicals w (the dangerous side is done and tight).** Start at
 `notes/A3_track1p1_log.md` Entries 13–14 and `scripts/a3_small_cycles.py`,
 `scripts/a3_shape_lemmas.py`.
 
+*Update (Entries 16–26): goal 1 was assembled — d(gross) = 12 via (R) +
+the flux characterization + (M-im). **Update (Entry 27, 2026-06-12): the
+owed adversarial re-review of Entries 16–26 is DONE — every link HOLDS
+(75/75 independent conjugate-frame checks, `a3_adv27_recheck.py`; every
+prose argument re-derived by hand; two sharpenings found: off₀ = off₂ = 0
+identically, making the comp-2 mirror chain a one-liner). The headline is
+demoted from "fully analytic" to: d(gross) = 12 at the grade "hand-proven
+reductions + the surveyable 18-orbit M-table + two machine-certified
+finite residues" — the Entry-24 per-cell C-table evaluations (~6k engine
+rows for the wt-24 closure; 80 machine-swept linked cells) and the
+Entry-25 achiever-list completeness do not yet meet §1's "few
+human-surveyable cases" bar. This is a write-up debt, not a mathematical
+gap: the compression assets (translation stabilizers of order 12, the
+slope lemma, B̂₄ = ωÂ₄) exist but the compressed tables have not been
+walked. d(gross) ≥ 6 remains fully analytic (Entries 5–15). Resume with
+the A4-extension write-up that walks the compressed C-tables and derives
+the achiever lists by hand — that is what restores "fully analytic"
+honestly.***
+
 ---
 
 ## 1. The goal and the hard constraint
@@ -287,6 +306,27 @@ the endpoint is double-verified by the two independent Entry-20/21
 machine routes. **Owed before external write-up: the adversarial
 skeptic pass over Entries 16–26 (plus the outstanding Entry-15 review),
 and the standalone write-up (A4 extension) with the tables typeset.***
+
+*Update (Entry 27, the owed re-review — VERDICT): **all eight links of
+Entries 16–26 HOLD; no gap found.** Independent re-implementation on a
+conjugate CRT frame / y-major / bitmask encoding path
+(`a3_adv27_recheck.py`, 75 checks all-PASS, incl. an own weight-6/8/10
+census making the (M-im) endpoint TRIPLE-machine-verified), and a hand
+re-derivation of every prose argument. Review findings: (i) only the
+inclusion im pr_* ⊆ im Δ is load-bearing — neither direction of the
+theorem depends on k = 12 or on the flux-characterization equality;
+(ii) the no-double-wrap proof needed one implicit step made explicit
+(all 2-step paths at an entry share the same integer x-advance D, since
+D ≡ Δx mod 6 and 0 ≤ D ≤ 5); (iii) sharpening: off₀ = off₂ = 0
+identically (v_i = Y²v_i = 0), so Entry 26's comp-2 mirror chain
+collapses to one line; (iv) V6 (the +4 fibre gap) is NOT load-bearing.
+Surveyability audit: the 18-orbit M-table PASSES the §1 bar; the
+Entry-24 C-table evaluations and the Entry-25 achiever-list completeness
+FAIL it as currently organized (machine sweeps with one worked template
+cell) — so the theorem stands at **"d(gross) = 12, verified-finite with
+an analytic spine; fully-analytic write-up owed"**, while d ≥ 6 remains
+fully analytic. See log Entry 27 for the per-link detail and the
+load-bearing-only dependency tree.*
 
 **The former tail (L-C) — now closed verified-finite (Entries 8–9).** The
 classification "every b ∈ Stab_Z(base) with 0 < |b| ≤ 11 is a hexagon or a
