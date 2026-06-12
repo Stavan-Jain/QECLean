@@ -4,28 +4,33 @@
 finding an *analytic* lower bound on the minimum distance `d` of bivariate-
 bicycle (BB) quantum codes, especially the gross code `[[144,12,12]]`. It
 supersedes the Tier-1-era parts of `HANDOFF.md` for this specific effort and
-ties together the `A0`–`A3` notes. Date of handoff: 2026-06-10.
+ties together the `A0`–`A3` notes. Date of handoff: 2026-06-10; updated
+2026-06-12 (Entries 5–6: the m(b) collapse and its analytic ladder).
 
 ---
 
 ## 0. RESUME HERE (the one-paragraph version)
 
-The effort chose, after a literature sweep and a scouting pass, a single attack:
-the **h=2 cover-transfer theorem** (gross is the free-Z₂ double cover of
-`[[72,12,6]]`). The framework is fully built and verified; the problem is reduced
-to **one open lemma**. The lemma — call it **fibre-disjointness** — is:
+The attack is the **h=2 cover-transfer theorem** (gross is the free-Z₂ double
+cover of `[[72,12,6]]`). As of Entry 5 the previous open "fibre-disjointness /
+s≠0" lemma is **dissolved**: the whole dangerous sector is graded by the
+projected stabilizer `b = p(v)` via the verified, hand-checkable slice identity
 
-> For every nontrivial cover logical `v=(v₀,v₁)` whose two sheets share a
-> **nonzero** base syndrome `s = ∂₁c·p(v)` (the "s≠0" case), `|v| ≥ 2·d_base`.
+> min{|v| : v nontrivial dangerous, p(v) = b} = |b| + 2·m(b),
+> m(b) := min{|(d2c·z_b + u') off supp b| : u' a base 1-cycle, [u'] ∉ imΔ}
 
-This is **true** (validated SAT: such `v` have weight ≥ 14 > 12) but has **no
-analytic proof yet**, and Entry 4 of `A3_track1p1_log.md` proves this lemma is
-*necessary* (no elementary shortcut beats the floor). Start at
-`notes/A3_track1p1_log.md` Entry 3–4 and `scripts/a3_*.py`. The crux in one
-line: in Plotkin coordinates `v=(a, a+b)`, the s≠0 case forces `a` into an
-*affine syndrome class* `{a : ∂₁a = ∂₁c·b}` rather than a distance-`d` code, so
-the classical Plotkin/van-Lint double-cover bound does not apply; bridging that
-is the new mathematics.
+(cut-independent — the s=0/s≠0/[c]=0 trichotomy of Entries 1–3 was a
+cut-coordinate artifact), so the factor-2 lemma is exactly **(M): |b| + 2·m(b)
+≥ 12 for every base Z-stabilizer b**. Entry 6 built the analytic ladder for
+(M): `b = 0` and `|b| ≥ 12` proven; the light-b classification proven for
+face-supports k ≤ 7 (hexagon-overlap ≤ 1 and K₄-freeness of the overlap
+Cayley graph, both with full hand proofs; k = 7 closed via Turán uniqueness +
+verified octahedron-freeness); the m-rungs (m(hexagon) ≥ 3, m(D-pair) ≥ 2)
+verified exhaustively with hand-proof routes sketched. **The single remaining
+unbounded-structure gap is the k ≥ 8 tail**: every base Z-stabilizer whose
+minimal face support is ≥ 8 has weight ≥ 12 — a *classical* statement about
+one abelian 2-block group code, squarely in the repeated-root/van-Lint lane.
+Start at `notes/A3_track1p1_log.md` Entries 5–6 and `scripts/a3_mb_*.py`.
 
 ---
 
@@ -109,63 +114,70 @@ sector** `ker(pr_*)` is where the whole problem lives:
   dangerous ones**. The 6 dangerous reps are `τ(u)` for `u` a nontrivial base
   6-logical, weight `2·6 = 12 = 2·d_base`.
 
-### The factor-2 lemma and its three cases (located — `a3_s_nonzero_sat.py`, `a3_s0_subcase.py`)
+### The factor-2 lemma: from three cases to one function (Entries 2 → 5)
 
 Target: `d_cover ≥ 2·d_base` on the dangerous sector (the only thing that beats
-the floor — see §4). Reparametrize `v=(a, a+b)` with `b = p(v)`, `|v|=|a|+|a+b|`
-(classical `[u|u+v]` shape); cycle condition ⟺ `∂₁a = ∂₁c·b =: s`.
-
-| case | min weight (validated SAT) | analytic status |
-|---|---|---|
-| **s=0, [c]≠0** (both sheets nontrivial base logicals) | **12** (achieved) | **PROVEN**: `|v₀|,|v₁| ≥ d_base ⇒ |v| ≥ 2·d_base` |
-| s=0, [c]=0 | ≥ 15 (UNSAT ≤14) | off-minimum; analytic ≥12 still owed |
-| **s≠0** (seam leakage) | 14 (UNSAT ≤13) | **off-minimum; the open crux** |
-
-The minimum is carried entirely by the one case with a clean proof. The SAT
-encodings **pass a sanity ladder** (they reproduce `d=12`) — this is the
-validation the buggy scout script lacked (see §5).
+the floor — see §4). The Entry-2 case table (s=0/[c]≠0 proven at 12; [c]=0
+≥ 16; s≠0 = 14) is retained in the log for history, but **Entry 5 proved the
+trichotomy is a cut-coordinate artifact**: one decoded weight-14 minimizer has
+s-flags `[1,1,1,0,0,0]` across the six cut positions — the same `v` is "s≠0"
+for three cuts and "s=0" for the others. The invariant object is the b-graded
+slice identity (see §0/§4): `min |v| over {p(v)=b} = |b| + 2·m(b)`, verified
+end to end (`a3_mb_foundations.py` all-PASS, `a3_mb_scan.py`,
+`a3_mb_crosscheck.py`). All SAT encodings pass the sanity ladder (they
+reproduce `d=12`) — the validation the buggy scout script lacked (see §5).
 
 ### What is and isn't proven
 
-- **Analytically proven** (given `d_base=6` as the transfer input): safe sector
-  ≥ 6; clean dangerous case (s=0,[c]≠0) ≥ 12.
-- **Open** (true with margin per SAT, no analytic proof): s≠0 ⇒ ≥12; s=0,[c]=0 ⇒ ≥12.
+- **Analytically proven** (given `d_base=6` as the transfer input, used only
+  at b=0): safe sector ≥ 6; the m(b) reduction itself; (M) on the rungs b=0,
+  |b| ≥ 12, and light-b classification through face-support k ≤ 7
+  (ov ≤ 1 + K₄-freeness, full hand proofs — Entry 6).
+- **Verified finite facts with hand-proofs owed:** octahedron-freeness
+  (k = 7 input), the two m-rung locality facts (hexagon+2, pair-union+1).
+- **Open** (true with margin per SAT): the k ≥ 8 tail — see §4.
 - **Therefore: no fully-analytic improvement on `d ≥ 2` exists yet.** Do not
-  claim one. The clean case alone does not bound the whole code.
+  claim one. (Unchanged — the ladder is not yet closed.)
 
 ---
 
 ## 4. The precise open problem (where to push)
 
-Prove, analytically: **for `v=(a,a+b)` with `b` a nonzero base stabilizer and
-`∂₁a = ∂₁c·b ≠ 0`, `|a|+|a+b| ≥ 2·d_base`.**
+*(Superseded form: Entries 0–4 posed this as the s≠0 "fibre-disjointness"
+case; Entry 5 proved that case split is a cut artifact and replaced it with
+the b-graded form below. The Entry-3 "affine syndrome class" diagnosis of why
+classical Plotkin fails remains correct — the cure is the puncture in m(b).)*
 
-Why it's hard (pinned in `A3` Entry 3): the classical Plotkin/van-Lint
-double-cover bound `d = min{2·d(C₁), d(C₂)}` needs the first component to range
-over a *code with its own distance*. Here `a` ranges over an *affine syndrome
-class* `{a : ∂₁a = ∂₁c·b}`, which contains arbitrarily light vectors. (This is
-the concrete form of the KP-2013 Thm-8 hypothesis `k^(1+x)=k` that gross
-violates.) The crude fix — correct each sheet by a min-weight syndrome rep `e`
-(`∂₁e=s`) — gives `|v| ≥ 2·d_base − 2|e|`, losing `2|e|`; it only closes at `s=0`.
-The validated truth (≥14) shows the seam structure forces `a, a+b` into *heavy*
-classes (not merely nontrivial); capturing that is the new mathematics.
+The factor-2 lemma is exactly **(M): |b| + 2·m(b) ≥ 12 for every base
+Z-stabilizer b** (Entry 5; all reductions verified, `a3_mb_foundations.py`).
+Status of (M) by rung (Entry 6):
 
-**Candidate angles (untried or partial):**
-- A seam-aware weight argument that bounds `|a|` below using that `s = ∂₁c·b` is
-  supported only on the 36-entry seam and `b` is a structured base stabilizer.
-- KP-2013 Thms 8–9 §IV.E `u = (1+σ)w + γᵀG_Z` decomposition adapted to track the
-  γᵀG_Z "degeneracy" terms across the seam (Track 1.3 vocabulary, A1-L2).
-- Smith / equivariant arguments: the residual obstruction is the connecting map
-  `Δ = ∩ω`; no QEC application of Smith theory exists (A1-L2), so this is genuinely
-  new. Degtyarev–Kharlamov App. A.1 / Bredon Ch. 3 are the topology references.
-- Exploit gross's extra `x↔y` automorphism for a finite *structural* reduction —
-  but only if the reduction is analytic and the residue is a few surveyable cases
-  (NOT a `decide` over the whole ball; that fails the constraint, §1).
+| rung | statement | status |
+|---|---|---|
+| b = 0 | m(0) ≥ 6 | PROVEN given d_base ≥ 6 (only place d_base is used) |
+| \|b\| ≥ 12 | trivial | PROVEN |
+| classification | light b = 36 hexagons ∪ 216 D-pairs | PROVEN for face-support k ≤ 7; **OPEN for k ≥ 8 (the tail)** |
+| m(hexagon) ≥ 3 | no non-imΔ cycle in hexagon+2 qubits | verified exhaustively; local hand proof owed |
+| m(D-pair) ≥ 1 | cycle space of the 11-qubit pair union = the two columns | verified (rank 9, all 12 types); hand proof owed |
+
+**The open tail (L-C).** Prove: every `b ∈ Stab_Z(base)` whose minimal face
+support (mod ker ∂₂, dim 6, min weight 16) is ≥ 8 has `|b| ≥ 12`. Equivalently:
+the [72,30] image code of `z ↦ (B·z, A·z)` over `F₂[Z₆×Z₆]` has no weight-≤11
+codeword beyond the k ≤ 2 families. True with margin (validated SAT
+enumeration: NO light codewords at any k ≥ 3). Candidate tools, in order:
+- the repeated-root / generalized-van-Lint filtration: `x⁶+1 = ((1+x)(1+x+x²))²`
+  (and same in y) — weights via the (1+x)-adic layers; the x-collapse partial
+  bound `|b| ≥ |z̄| + |(1+y+y²)z̄|` (z̄ = z mod (1+x)) already kills most
+  configurations and bottoms out exactly at `z̄ ∈ (1+y)(1+y³)F₂[y]`;
+- the y-side CRT `F₂[Z₆²] ≅ F₂[Z₂²] × (F₄[Z₂²])⁴` (semisimple 3-part) for
+  rank/support constraints;
+- counting cannot work alone: `6k − 2e(S)` goes vacuous for large k.
 
 **Verification discipline before trusting any drafted argument:** run an
-adversarial skeptic sweep hunting a cover stabilizer that mixes the two sheets to
-drop a dangerous rep below 12 (this is the kill criterion). Computation may
-*refute* but never *prove*.
+adversarial skeptic sweep hunting a light stabilizer with k ≥ 8 (the kill
+criterion for a drafted tail proof is a counterexample to an intermediate
+claim, not to (M) itself — (M) is SAT-validated). Computation may *refute*
+but never *prove*.
 
 ---
 
@@ -190,6 +202,17 @@ drop a dangerous rep below 12 (this is the kill criterion). Computation may
 5. **Character-theoretic / Fourier bounds on gross** — blocked by non-semisimplicity
    (`HANDOFF.md` §6j, as corrected in A0). The reopened directions are radical-aware
    weight invariants and the homological/cover route (this effort).
+6. **Single-sheet decoupling** (Entry 5): relaxing the shared-β coupling
+   between the two sheets (i.e. bounding `dist(u + d2c·z, Stab)` alone) is
+   provably insufficient — weight-6 cover stabilizers occupy the same affine
+   data. Any valid argument must keep the off-supp(b) puncture of m(b).
+7. **Multi-cut leverage** (Entry 5): all six cut positions give the SAME
+   slice minima (m_j(b) is cut-independent) — the six decompositions are an
+   invariance, not independent inequalities. Useful only for choosing a
+   convenient cut inside a proof.
+8. **Pure counting for the k ≥ 8 tail** (Entry 6): `|b| ≥ 6k − 2e(S)` plus
+   Turán-type bounds closes k ≤ 7 and then goes vacuous; don't try to push
+   clique-freeness past k = 7 (the needed edge densities become realizable).
 
 ---
 
@@ -210,10 +233,19 @@ drop a dangerous rep below 12 (this is the kill criterion). Computation may
   confirm a sampling pattern with a validated exact method, and hunt adversarially.
 - **Citations:** the program was burned by a nonexistent paper ("Pesah–Roffe
   2025") and an over-paraphrased theorem (Jitman–Ling). A1 verified every
-  load-bearing citation against the source. Two still need re-checking before any
-  write-up: the Chen–Xie–Ding `arXiv:2402.02853` "Thm 2.1 Plotkin" attribution
-  (the abstract is a repeated-root cyclic-codes paper), and confirm the
-  Postema–Kokkelmans (not "Otjens 2025") `arXiv:2502.17052` quote.
+  load-bearing citation against the source. The two flagged re-checks are
+  **DISCHARGED (2026-06-12, source-verified)**: Chen–Xie–Ding
+  `arXiv:2402.02853` Thm 2.1 is verbatim the "generalized van Lint theorem"
+  (§2, attributed Chen–Ding 2023 [5] ← van Lint 1991 [28]; Plotkin component
+  code-constrained, exactly the hypothesis gross violates; "may be wrong if q
+  odd" caveat confirmed); Postema–Kokkelmans `arXiv:2502.17052` authors/title/
+  v4-abstract quote confirmed (Otjens appears only in the acknowledgments;
+  the "no closed-form formula" line remains apocryphal — 0 grep hits). The
+  three "Otjens 2025 / Otjens 2.18" rows in `T2.3_literature_survey.md` were
+  relabeled "PK Thm 2.18 (from Arnault et al. 2026)". Bonus: PK Thm 2.18 is
+  the generalised Bravyi–Terhal bound imported from Arnault–Gaborit–Rozendaal–
+  Saussay–Zémor (IEEE TIT 72(1), 2026), vacuous below n = 8192 — "vacuous at
+  gross" inference is valid.
 - **A0 errors I fixed (don't reintroduce):** the saturation claim `d_cover=2·d_base`
   is false at `72→36` (6≠2·4); bb_90 and bb_108 *do* have rigorous odd-h bases
   with `k'=8` (an earlier A0 said none did). See `A0_baseline.md` obs. 2–3.
@@ -233,7 +265,8 @@ drop a dangerous rep below 12 (this is the kill criterion). Computation may
 - `notes/A2_scouting.md` — the 3-tracks-collapse-to-one result; ranking; first
   work-block; kill criterion; serial-vs-ultracode division of labor.
 - `notes/A3_track1p1_log.md` — **the live log.** Entries 0 (framework) → 4 (Fork B
-  killed). Resume from Entry 3–4.
+  killed) → 5 (the m(b) collapse) → 6 (the analytic ladder; k ≤ 7 closed).
+  Resume from Entries 5–6.
 
 **Scripts (all under `scripts/`, run via `uv run python scripts/<name>` from
 `experiments/bb_lab/`):**
@@ -245,29 +278,48 @@ drop a dangerous rep below 12 (this is the kill criterion). Computation may
 - `a3_s0_subcase.py` — **validated** SAT: [c]=0 subcase off-minimum (UNSAT ≤14).
 - `a3_forkB_projection_bound.py` — μ_Z=μ_X=6; the (degrading) Fork-B bound.
 - `a3_syndrome_split_probe.py` — the (sampling) Entry-1 lead; superseded by the SATs.
+- `a3_mb_foundations.py` — **Entry 5 foundations, all-PASS**: per-cut blocks,
+  Smith exactness per cut, dangerous parametrization, sheet formula, the
+  pointwise weight identity, nontriviality bridge, η functionals.
+- `a3_mb_scan.py` — light-b enumeration (exactly 36 hexagons + 216 D-pairs),
+  m(b) for all light b (4 resp. ≥3; zero violations of (M)), cut-independence
+  and translation-invariance checks, witness decodes.
+- `a3_mb_structure.py` — T1–T6: difference sets/ov ≤ 1, clique data, local
+  cycle-space rung facts (hexagon+2 sweep; pair-union+1 sweep), weight-6
+  logical census (84 non-imΔ + 36 stabs, max hexagon overlap 2), ker ∂₂
+  (min weight 16), shared-check ≤ 1, octahedron-freeness.
+- `a3_mb_crosscheck.py` — C1: b≠0 dangerous min = 14 (direct cover SAT,
+  matches the assembled ladder); C2: imΔ-distance = 12.
 - `a1_smith_*.py` — scout scaffolding. **`a1_smith_sector_sat.py` is BUGGY** (§6).
 - `a1_es_four_terms.py`, `a1_es_purity_check.py`, `a1_srb_cover_chain_check.py` —
   substrate (ES exact-sequence (6,6,6,6); purity; SRB cover-chain verification).
 
-**Commits:** `e308e65` (A0) → `b64868d` (A3 entry 4), on branch
-`claude/focused-liskov-7fe9f7`. Each `A3` entry is one commit.
+**Commits:** `e308e65` (A0) → `b64868d` (A3 entry 4) on branch
+`claude/focused-liskov-7fe9f7`; `b87ce85` (entry 5) → `5a05ab0` (entry 6) on
+branch `claude/eager-hofstadter-6da593` (fast-forward continuation). Each
+`A3` entry is one commit.
 
 ---
 
 ## 8. Concrete next steps (ranked)
 
-1. **Attack the s≠0 fibre-disjointness lemma (§4).** This is *the* problem and is
-   now known to be necessary (not just sufficient). Try the seam-aware weight
-   argument and the KP-2013 γᵀG_Z adaptation first; Smith/`Δ=∩ω` if those stall.
-   Time-box per approach; failures are first-class outputs (write them in `A3`).
-2. **Re-verify the two flagged citations** (§6) before any write-up.
-3. **If Track 1.1 stalls:** the fallback per A2 is the goal-2 deliverable
-   *structural* `d([[36,8,4]]) ≥ 4` (NOT a `decide`/ILP — must be a structural
-   argument on the balanced-product logical space), which composes with the
-   already-published *odd-h* SRB Thm 4.7 to give a fully-analytic `d(bb_108) ≥ 4`
-   — the first analytic bound on a Bravyi instance. Test whether the technique
-   scales to gross's 144-qubit space before investing.
-4. **Maintain `A3_track1p1_log.md`** as the running log; commit per entry.
+1. **The k ≥ 8 tail (§4, Entry 6 L-C).** Prove: minimal face support ≥ 8 ⟹
+   stabilizer weight ≥ 12. Tools in order: repeated-root/(1+x)-adic filtration
+   (van Lint lane, citation now verbatim-verified), y-side CRT
+   `F₂[Z₆²] ≅ F₂[Z₂²] × (F₄[Z₂²])⁴`, x-collapse partial bound as the base
+   layer. Time-box per approach; failures are first-class outputs (A3 log).
+2. **Hand-organize the owed finite checks** (Entry 6): octahedron-freeness in
+   Z₂×Z₆ (only the 3+3 ε-split is nontrivial), and the two rung locality
+   proofs (shared-check ≤ 1 is already proven; residue = one-hexagon
+   neighborhood analysis).
+3. **Assemble the conditional factor-2 write-up** once 1–2 land, then redo the
+   recursion bookkeeping (Entry 4's caution: the safe sector caps the
+   full-code bound at d_base — the factor-2 protects, not doubles, the
+   inherited bound).
+4. **If the tail stalls:** the A2 fallback (structural `d([[36,8,4]]) ≥ 4`
+   composing with odd-h SRB Thm 4.7 for `d(bb_108) ≥ 4`) still stands; note
+   the m(b) machinery is cover-generic and should transfer to the 36→72 step.
+5. **Maintain `A3_track1p1_log.md`** as the running log; commit per entry.
 
 ---
 
@@ -280,7 +332,11 @@ drop a dangerous rep below 12 (this is the kill criterion). Computation may
 - **Verified numbers (discovery only, never load-bearing):** `d_gross=12`,
   `d_base=6`, `d_A^⊥=d_B^⊥=12`, LP floor `=2` (c=8), `pr_*` rank 6/ker 6,
   dangerous reps `=τ(u)` weight 12, factor-2 cases (s=0,[c]≠0)=12 / (s≠0)=14 /
-  ([c]=0)≥15, `μ_Z=μ_X=6`, ES terms `(6,6,6,6)`, dangerous = ES non-pure sector.
+  ([c]=0)≥16 (Entry-5 sharpening), `μ_Z=μ_X=6`, ES terms `(6,6,6,6)`,
+  dangerous = ES non-pure sector. Entry 5/6 layer: light stabilizers = 36
+  hexagons (w 6) + 216 D-pairs (w 10) only; m(0)=6, m(hex)=4, m(pair)≥3;
+  slice minima 12/14/16; b≠0 dangerous min = 14; imΔ-distance = 12;
+  ker ∂₂ min weight 16; weight-6 logicals: 84 non-imΔ + 36 stabs.
 - **Don't** run two `lake`/heavy processes concurrently; don't suppress stderr on
   Lean script invocations (a guardrail blocks `2>/dev/null` there); `data/*.duckdb`
   is read-only for this work.
