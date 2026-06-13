@@ -2448,4 +2448,73 @@ lemma closure_packaged_eq :
     · obtain ⟨v, rfl⟩ := hz; exact vertexStabOf_mem_closure v
     · obtain ⟨f, rfl⟩ := hx; exact faceStabOf_mem_closure f
 
+/-! ## §5a  Symplectic-row bridges (for `rowsLinearIndependent`) -/
+
+private lemma zmod2_dich (a : ZMod 2) : a = 0 ∨ a = 1 := by
+  rcases Fin.exists_fin_two.mp ⟨a, rfl⟩ with h | h
+  · exact Or.inl h
+  · exact Or.inr h
+
+/-- Z-half symplectic entry of a vertex stab = the cutMap chain value at that edge. -/
+lemma vertexStabOf_sympl_Z (v : grossComplex.C0) (i : Fin grossComplex.numQubits) :
+    NQubitPauliOperator.toSymplectic (grossComplex.vertexStabOf v).operators
+        (Fin.natAdd grossComplex.numQubits i)
+      = grossComplex.cutMap (grossComplex.singleVtx v) (grossComplex.edgeEquiv.symm i) := by
+  rw [NQubitPauliOperator.toSymplectic_Z_part]
+  change ((grossComplex.chainZOperator (grossComplex.cutMap (grossComplex.singleVtx v))).operators
+    i).toSymplecticSingle.2 = _
+  rw [HomologicalCode.chainZOperator_op_at]
+  set c := grossComplex.cutMap (grossComplex.singleVtx v) with hc
+  by_cases h : ∃ e, grossComplex.edgeEquiv e = i ∧ c e = 1
+  · obtain ⟨e, he, hce⟩ := h
+    rw [if_pos ⟨e, he, hce⟩]
+    have : grossComplex.edgeEquiv.symm i = e := by rw [← he, Equiv.symm_apply_apply]
+    rw [this, hce]; rfl
+  · rw [if_neg h]
+    have hz : c (grossComplex.edgeEquiv.symm i) = 0 := by
+      rcases zmod2_dich (c (grossComplex.edgeEquiv.symm i)) with h0 | h1
+      · exact h0
+      · exact absurd ⟨grossComplex.edgeEquiv.symm i, Equiv.apply_symm_apply _ _, h1⟩ h
+    rw [hz]; rfl
+
+/-- X-half symplectic entry of a face stab = the boundary2 chain value at that edge. -/
+lemma faceStabOf_sympl_X (f : grossComplex.C2) (i : Fin grossComplex.numQubits) :
+    NQubitPauliOperator.toSymplectic (grossComplex.faceStabOf f).operators
+        (Fin.castAdd grossComplex.numQubits i)
+      = grossComplex.boundary2 (grossComplex.singleFace f) (grossComplex.edgeEquiv.symm i) := by
+  rw [NQubitPauliOperator.toSymplectic_X_part]
+  change ((grossComplex.chainXOperator (grossComplex.boundary2 (grossComplex.singleFace f))).operators
+    i).toSymplecticSingle.1 = _
+  rw [HomologicalCode.chainXOperator_op_at]
+  set c := grossComplex.boundary2 (grossComplex.singleFace f) with hc
+  by_cases h : ∃ e, grossComplex.edgeEquiv e = i ∧ c e = 1
+  · obtain ⟨e, he, hce⟩ := h
+    rw [if_pos ⟨e, he, hce⟩]
+    have : grossComplex.edgeEquiv.symm i = e := by rw [← he, Equiv.symm_apply_apply]
+    rw [this, hce]; rfl
+  · rw [if_neg h]
+    have hz : c (grossComplex.edgeEquiv.symm i) = 0 := by
+      rcases zmod2_dich (c (grossComplex.edgeEquiv.symm i)) with h0 | h1
+      · exact h0
+      · exact absurd ⟨grossComplex.edgeEquiv.symm i, Equiv.apply_symm_apply _ _, h1⟩ h
+    rw [hz]; rfl
+
+/-- A vertex stab (Z-type) has zero X-half symplectic entries. -/
+lemma vertexStabOf_sympl_X_zero (v : grossComplex.C0) (i : Fin grossComplex.numQubits) :
+    NQubitPauliOperator.toSymplectic (grossComplex.vertexStabOf v).operators
+        (Fin.castAdd grossComplex.numQubits i) = 0 := by
+  rw [NQubitPauliOperator.toSymplectic_X_part]
+  rcases (HomologicalCode.vertexStabOf_isZType v).2 i with hI | hZ
+  · rw [hI]; rfl
+  · rw [hZ]; rfl
+
+/-- A face stab (X-type) has zero Z-half symplectic entries. -/
+lemma faceStabOf_sympl_Z_zero (f : grossComplex.C2) (i : Fin grossComplex.numQubits) :
+    NQubitPauliOperator.toSymplectic (grossComplex.faceStabOf f).operators
+        (Fin.natAdd grossComplex.numQubits i) = 0 := by
+  rw [NQubitPauliOperator.toSymplectic_Z_part]
+  rcases (HomologicalCode.faceStabOf_isXType f).2 i with hI | hX
+  · rw [hI]; rfl
+  · rw [hX]; rfl
+
 end Quantum.Stabilizer.Homological.BB
