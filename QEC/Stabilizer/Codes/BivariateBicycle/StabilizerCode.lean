@@ -2120,4 +2120,139 @@ lemma vertexStabOf_listProd (L : List grossComplex.C0) :
     rw [List.map_cons, List.prod_cons, List.map_cons, List.sum_cons, map_add,
       HomologicalCode.chainZOperator_add, HomologicalCode.chainZOperator_cutMap_singleVtx, ih]
 
+/-! ## §4b  Boundary-column bridges and the per-drop closure relations -/
+
+lemma boundary2_singleFace_apply (d : GrossGroup) (h : GrossGroup) (j : Fin 2) :
+    grossComplex.boundary2 (grossComplex.singleFace d) (h, j) = d2term d h j := by
+  rw [boundary2_apply_eq_sum_d2term]
+  have hpt : ∀ p : GrossGroup, grossComplex.singleFace d p = (if p = d then 1 else 0) :=
+    fun p => by rw [HomologicalCode.singleFace]; exact Pi.single_apply d 1 p
+  simp_rw [hpt, ite_mul, one_mul, zero_mul]
+  rw [Finset.sum_ite_eq' Finset.univ d (fun p => d2term p h j)]
+  simp
+
+lemma boundary2_listSum_singleFace_apply (L : List grossComplex.C2) (h : GrossGroup) (j : Fin 2) :
+    grossComplex.boundary2 ((L.map (fun f => grossComplex.singleFace f)).sum) (h, j)
+      = (L.map (fun f : grossComplex.C2 => d2term f h j)).sum := by
+  induction L with
+  | nil => simp only [List.map_nil, List.sum_nil, map_zero]; rfl
+  | cons f L ih =>
+    rw [List.map_cons, List.sum_cons, map_add, Pi.add_apply, boundary2_singleFace_apply, ih,
+        List.map_cons, List.sum_cons]
+
+
+def keptCoords : List GrossGroup := [((0 : ZMod 12), (4 : ZMod 6)), ((0 : ZMod 12), (5 : ZMod 6)),
+  ((1 : ZMod 12), (2 : ZMod 6)), ((1 : ZMod 12), (3 : ZMod 6)), ((1 : ZMod 12), (4 : ZMod 6)),
+  ((1 : ZMod 12), (5 : ZMod 6)), ((2 : ZMod 12), (0 : ZMod 6)), ((2 : ZMod 12), (1 : ZMod 6)),
+  ((2 : ZMod 12), (2 : ZMod 6)), ((2 : ZMod 12), (3 : ZMod 6)), ((2 : ZMod 12), (4 : ZMod 6)),
+  ((2 : ZMod 12), (5 : ZMod 6)), ((3 : ZMod 12), (0 : ZMod 6)), ((3 : ZMod 12), (1 : ZMod 6)),
+  ((3 : ZMod 12), (2 : ZMod 6)), ((3 : ZMod 12), (3 : ZMod 6)), ((3 : ZMod 12), (4 : ZMod 6)),
+  ((3 : ZMod 12), (5 : ZMod 6)), ((4 : ZMod 12), (0 : ZMod 6)), ((4 : ZMod 12), (1 : ZMod 6)),
+  ((4 : ZMod 12), (2 : ZMod 6)), ((4 : ZMod 12), (3 : ZMod 6)), ((4 : ZMod 12), (4 : ZMod 6)),
+  ((4 : ZMod 12), (5 : ZMod 6)), ((5 : ZMod 12), (0 : ZMod 6)), ((5 : ZMod 12), (1 : ZMod 6)),
+  ((5 : ZMod 12), (2 : ZMod 6)), ((5 : ZMod 12), (3 : ZMod 6)), ((5 : ZMod 12), (4 : ZMod 6)),
+  ((5 : ZMod 12), (5 : ZMod 6)), ((6 : ZMod 12), (0 : ZMod 6)), ((6 : ZMod 12), (1 : ZMod 6)),
+  ((6 : ZMod 12), (2 : ZMod 6)), ((6 : ZMod 12), (3 : ZMod 6)), ((6 : ZMod 12), (4 : ZMod 6)),
+  ((6 : ZMod 12), (5 : ZMod 6)), ((7 : ZMod 12), (0 : ZMod 6)), ((7 : ZMod 12), (1 : ZMod 6)),
+  ((7 : ZMod 12), (2 : ZMod 6)), ((7 : ZMod 12), (3 : ZMod 6)), ((7 : ZMod 12), (4 : ZMod 6)),
+  ((7 : ZMod 12), (5 : ZMod 6)), ((8 : ZMod 12), (0 : ZMod 6)), ((8 : ZMod 12), (1 : ZMod 6)),
+  ((8 : ZMod 12), (2 : ZMod 6)), ((8 : ZMod 12), (3 : ZMod 6)), ((8 : ZMod 12), (4 : ZMod 6)),
+  ((8 : ZMod 12), (5 : ZMod 6)), ((9 : ZMod 12), (0 : ZMod 6)), ((9 : ZMod 12), (1 : ZMod 6)),
+  ((9 : ZMod 12), (2 : ZMod 6)), ((9 : ZMod 12), (3 : ZMod 6)), ((9 : ZMod 12), (4 : ZMod 6)),
+  ((9 : ZMod 12), (5 : ZMod 6)), ((10 : ZMod 12), (0 : ZMod 6)), ((10 : ZMod 12), (1 : ZMod 6)),
+  ((10 : ZMod 12), (2 : ZMod 6)), ((10 : ZMod 12), (3 : ZMod 6)), ((10 : ZMod 12), (4 : ZMod 6)),
+  ((10 : ZMod 12), (5 : ZMod 6)), ((11 : ZMod 12), (0 : ZMod 6)), ((11 : ZMod 12), (1 : ZMod 6)),
+  ((11 : ZMod 12), (2 : ZMod 6)), ((11 : ZMod 12), (3 : ZMod 6)), ((11 : ZMod 12), (4 : ZMod 6)),
+  ((11 : ZMod 12), (5 : ZMod 6))]
+
+def keptPartX : List (List grossComplex.C2) := [[((0 : ZMod 12), (4 : ZMod 6)), ((1 : ZMod 12),
+  (2 : ZMod 6)), ((1 : ZMod 12), (4 : ZMod 6)), ((2 : ZMod 12), (3 : ZMod 6)), ((2 : ZMod 12),
+  (5 : ZMod 6)), ((3 : ZMod 12), (0 : ZMod 6)), ((3 : ZMod 12), (1 : ZMod 6)), ((3 : ZMod 12),
+  (2 : ZMod 6)), ((3 : ZMod 12), (5 : ZMod 6)), ((4 : ZMod 12), (0 : ZMod 6)), ((4 : ZMod 12),
+  (3 : ZMod 6)), ((4 : ZMod 12), (4 : ZMod 6)), ((4 : ZMod 12), (5 : ZMod 6)), ((5 : ZMod 12),
+  (0 : ZMod 6)), ((5 : ZMod 12), (1 : ZMod 6)), ((5 : ZMod 12), (4 : ZMod 6)), ((5 : ZMod 12),
+  (5 : ZMod 6)), ((6 : ZMod 12), (0 : ZMod 6)), ((6 : ZMod 12), (4 : ZMod 6)), ((7 : ZMod 12),
+  (2 : ZMod 6)), ((7 : ZMod 12), (4 : ZMod 6)), ((8 : ZMod 12), (3 : ZMod 6)), ((8 : ZMod 12),
+  (5 : ZMod 6)), ((9 : ZMod 12), (0 : ZMod 6)), ((9 : ZMod 12), (1 : ZMod 6)), ((9 : ZMod 12),
+  (2 : ZMod 6)), ((9 : ZMod 12), (5 : ZMod 6)), ((10 : ZMod 12), (0 : ZMod 6)), ((10 : ZMod 12),
+  (3 : ZMod 6)), ((10 : ZMod 12), (4 : ZMod 6)), ((10 : ZMod 12), (5 : ZMod 6)), ((11 : ZMod 12),
+  (0 : ZMod 6)), ((11 : ZMod 12), (1 : ZMod 6)), ((11 : ZMod 12), (4 : ZMod 6)), ((11 : ZMod 12),
+  (5 : ZMod 6))], [((0 : ZMod 12), (5 : ZMod 6)), ((1 : ZMod 12), (3 : ZMod 6)), ((1 : ZMod 12),
+  (5 : ZMod 6)), ((2 : ZMod 12), (0 : ZMod 6)), ((2 : ZMod 12), (4 : ZMod 6)), ((3 : ZMod 12),
+  (0 : ZMod 6)), ((3 : ZMod 12), (1 : ZMod 6)), ((3 : ZMod 12), (2 : ZMod 6)), ((3 : ZMod 12),
+  (3 : ZMod 6)), ((4 : ZMod 12), (0 : ZMod 6)), ((4 : ZMod 12), (1 : ZMod 6)), ((4 : ZMod 12),
+  (4 : ZMod 6)), ((4 : ZMod 12), (5 : ZMod 6)), ((5 : ZMod 12), (0 : ZMod 6)), ((5 : ZMod 12),
+  (1 : ZMod 6)), ((5 : ZMod 12), (2 : ZMod 6)), ((5 : ZMod 12), (5 : ZMod 6)), ((6 : ZMod 12),
+  (1 : ZMod 6)), ((6 : ZMod 12), (5 : ZMod 6)), ((7 : ZMod 12), (3 : ZMod 6)), ((7 : ZMod 12),
+  (5 : ZMod 6)), ((8 : ZMod 12), (0 : ZMod 6)), ((8 : ZMod 12), (4 : ZMod 6)), ((9 : ZMod 12),
+  (0 : ZMod 6)), ((9 : ZMod 12), (1 : ZMod 6)), ((9 : ZMod 12), (2 : ZMod 6)), ((9 : ZMod 12),
+  (3 : ZMod 6)), ((10 : ZMod 12), (0 : ZMod 6)), ((10 : ZMod 12), (1 : ZMod 6)), ((10 : ZMod 12),
+  (4 : ZMod 6)), ((10 : ZMod 12), (5 : ZMod 6)), ((11 : ZMod 12), (0 : ZMod 6)), ((11 : ZMod 12),
+  (1 : ZMod 6)), ((11 : ZMod 12), (2 : ZMod 6)), ((11 : ZMod 12), (5 : ZMod 6))], [((0 : ZMod 12),
+  (4 : ZMod 6)), ((1 : ZMod 12), (3 : ZMod 6)), ((1 : ZMod 12), (5 : ZMod 6)), ((2 : ZMod 12),
+  (0 : ZMod 6)), ((2 : ZMod 12), (1 : ZMod 6)), ((2 : ZMod 12), (2 : ZMod 6)), ((2 : ZMod 12),
+  (5 : ZMod 6)), ((3 : ZMod 12), (0 : ZMod 6)), ((3 : ZMod 12), (3 : ZMod 6)), ((3 : ZMod 12),
+  (4 : ZMod 6)), ((3 : ZMod 12), (5 : ZMod 6)), ((4 : ZMod 12), (0 : ZMod 6)), ((4 : ZMod 12),
+  (1 : ZMod 6)), ((4 : ZMod 12), (4 : ZMod 6)), ((4 : ZMod 12), (5 : ZMod 6)), ((5 : ZMod 12),
+  (0 : ZMod 6)), ((5 : ZMod 12), (4 : ZMod 6)), ((6 : ZMod 12), (2 : ZMod 6)), ((6 : ZMod 12),
+  (4 : ZMod 6)), ((7 : ZMod 12), (3 : ZMod 6)), ((7 : ZMod 12), (5 : ZMod 6)), ((8 : ZMod 12),
+  (0 : ZMod 6)), ((8 : ZMod 12), (1 : ZMod 6)), ((8 : ZMod 12), (2 : ZMod 6)), ((8 : ZMod 12),
+  (5 : ZMod 6)), ((9 : ZMod 12), (0 : ZMod 6)), ((9 : ZMod 12), (3 : ZMod 6)), ((9 : ZMod 12),
+  (4 : ZMod 6)), ((9 : ZMod 12), (5 : ZMod 6)), ((10 : ZMod 12), (0 : ZMod 6)), ((10 : ZMod 12),
+  (1 : ZMod 6)), ((10 : ZMod 12), (4 : ZMod 6)), ((10 : ZMod 12), (5 : ZMod 6)), ((11 : ZMod 12),
+  (0 : ZMod 6)), ((11 : ZMod 12), (4 : ZMod 6))], [((0 : ZMod 12), (5 : ZMod 6)), ((1 : ZMod 12),
+  (2 : ZMod 6)), ((1 : ZMod 12), (3 : ZMod 6)), ((1 : ZMod 12), (4 : ZMod 6)), ((1 : ZMod 12),
+  (5 : ZMod 6)), ((2 : ZMod 12), (1 : ZMod 6)), ((2 : ZMod 12), (5 : ZMod 6)), ((3 : ZMod 12),
+  (0 : ZMod 6)), ((3 : ZMod 12), (1 : ZMod 6)), ((3 : ZMod 12), (4 : ZMod 6)), ((3 : ZMod 12),
+  (5 : ZMod 6)), ((4 : ZMod 12), (1 : ZMod 6)), ((4 : ZMod 12), (3 : ZMod 6)), ((5 : ZMod 12),
+  (0 : ZMod 6)), ((5 : ZMod 12), (1 : ZMod 6)), ((5 : ZMod 12), (2 : ZMod 6)), ((5 : ZMod 12),
+  (3 : ZMod 6)), ((6 : ZMod 12), (3 : ZMod 6)), ((6 : ZMod 12), (5 : ZMod 6)), ((7 : ZMod 12),
+  (2 : ZMod 6)), ((7 : ZMod 12), (3 : ZMod 6)), ((7 : ZMod 12), (4 : ZMod 6)), ((7 : ZMod 12),
+  (5 : ZMod 6)), ((8 : ZMod 12), (1 : ZMod 6)), ((8 : ZMod 12), (5 : ZMod 6)), ((9 : ZMod 12),
+  (0 : ZMod 6)), ((9 : ZMod 12), (1 : ZMod 6)), ((9 : ZMod 12), (4 : ZMod 6)), ((9 : ZMod 12),
+  (5 : ZMod 6)), ((10 : ZMod 12), (1 : ZMod 6)), ((10 : ZMod 12), (3 : ZMod 6)), ((11 : ZMod 12),
+  (0 : ZMod 6)), ((11 : ZMod 12), (1 : ZMod 6)), ((11 : ZMod 12), (2 : ZMod 6)), ((11 : ZMod 12),
+  (3 : ZMod 6))], [((1 : ZMod 12), (2 : ZMod 6)), ((1 : ZMod 12), (3 : ZMod 6)), ((1 : ZMod 12),
+  (5 : ZMod 6)), ((2 : ZMod 12), (0 : ZMod 6)), ((2 : ZMod 12), (2 : ZMod 6)), ((2 : ZMod 12),
+  (3 : ZMod 6)), ((2 : ZMod 12), (5 : ZMod 6)), ((4 : ZMod 12), (0 : ZMod 6)), ((4 : ZMod 12),
+  (2 : ZMod 6)), ((4 : ZMod 12), (3 : ZMod 6)), ((4 : ZMod 12), (5 : ZMod 6)), ((5 : ZMod 12),
+  (0 : ZMod 6)), ((5 : ZMod 12), (2 : ZMod 6)), ((5 : ZMod 12), (3 : ZMod 6)), ((5 : ZMod 12),
+  (5 : ZMod 6)), ((7 : ZMod 12), (0 : ZMod 6)), ((7 : ZMod 12), (2 : ZMod 6)), ((7 : ZMod 12),
+  (3 : ZMod 6)), ((7 : ZMod 12), (5 : ZMod 6)), ((8 : ZMod 12), (0 : ZMod 6)), ((8 : ZMod 12),
+  (2 : ZMod 6)), ((8 : ZMod 12), (3 : ZMod 6)), ((8 : ZMod 12), (5 : ZMod 6)), ((10 : ZMod 12),
+  (0 : ZMod 6)), ((10 : ZMod 12), (2 : ZMod 6)), ((10 : ZMod 12), (3 : ZMod 6)), ((10 : ZMod 12),
+  (5 : ZMod 6)), ((11 : ZMod 12), (0 : ZMod 6)), ((11 : ZMod 12), (2 : ZMod 6)), ((11 : ZMod 12),
+  (3 : ZMod 6)), ((11 : ZMod 12), (5 : ZMod 6))], [((1 : ZMod 12), (2 : ZMod 6)), ((1 : ZMod 12),
+  (4 : ZMod 6)), ((1 : ZMod 12), (5 : ZMod 6)), ((2 : ZMod 12), (1 : ZMod 6)), ((2 : ZMod 12),
+  (2 : ZMod 6)), ((2 : ZMod 12), (4 : ZMod 6)), ((2 : ZMod 12), (5 : ZMod 6)), ((4 : ZMod 12),
+  (1 : ZMod 6)), ((4 : ZMod 12), (2 : ZMod 6)), ((4 : ZMod 12), (4 : ZMod 6)), ((4 : ZMod 12),
+  (5 : ZMod 6)), ((5 : ZMod 12), (1 : ZMod 6)), ((5 : ZMod 12), (2 : ZMod 6)), ((5 : ZMod 12),
+  (4 : ZMod 6)), ((5 : ZMod 12), (5 : ZMod 6)), ((7 : ZMod 12), (1 : ZMod 6)), ((7 : ZMod 12),
+  (2 : ZMod 6)), ((7 : ZMod 12), (4 : ZMod 6)), ((7 : ZMod 12), (5 : ZMod 6)), ((8 : ZMod 12),
+  (1 : ZMod 6)), ((8 : ZMod 12), (2 : ZMod 6)), ((8 : ZMod 12), (4 : ZMod 6)), ((8 : ZMod 12),
+  (5 : ZMod 6)), ((10 : ZMod 12), (1 : ZMod 6)), ((10 : ZMod 12), (2 : ZMod 6)), ((10 : ZMod 12),
+  (4 : ZMod 6)), ((10 : ZMod 12), (5 : ZMod 6)), ((11 : ZMod 12), (1 : ZMod 6)), ((11 : ZMod 12),
+  (2 : ZMod 6)), ((11 : ZMod 12), (4 : ZMod 6)), ((11 : ZMod 12), (5 : ZMod 6))]]
+
+/-- Generic drop relation: if `df`'s boundary column equals the sum of `kp`'s
+columns (a kernel relation) and each `kp` face stab is in `S`, then
+`faceStabOf df ∈ closure S`. -/
+lemma faceStab_drop_mem_closure {S : Set (NQubitPauliGroupElement grossComplex.numQubits)}
+    (df : GrossGroup) (kp : List grossComplex.C2)
+    (hrel : ∀ (h : GrossGroup) (j : Fin 2),
+       d2term df h j = (kp.map (fun f : grossComplex.C2 => d2term f h j)).sum)
+    (hkept : ∀ f ∈ kp, grossComplex.faceStabOf f ∈ S) :
+    grossComplex.faceStabOf df ∈ Subgroup.closure S := by
+  have hbd : grossComplex.boundary2 (grossComplex.singleFace df)
+      = grossComplex.boundary2 ((kp.map (fun f => grossComplex.singleFace f)).sum) := by
+    funext q; obtain ⟨h, j⟩ := q
+    rw [boundary2_singleFace_apply, boundary2_listSum_singleFace_apply]
+    exact hrel h j
+  have heq : grossComplex.faceStabOf df = (kp.map grossComplex.faceStabOf).prod := by
+    rw [faceStabOf_listProd, ← HomologicalCode.chainXOperator_boundary2_singleFace, hbd]
+  rw [heq]
+  exact Subgroup.list_prod_mem _ (fun g hg => by
+    obtain ⟨f, hf, rfl⟩ := List.mem_map.mp hg
+    exact Subgroup.subset_closure (hkept f hf))
+
 end Quantum.Stabilizer.Homological.BB
