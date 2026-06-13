@@ -2614,4 +2614,119 @@ lemma get_packaged_X (i : Fin keptCoords.length)
   simp only [hidx]
   rfl
 
+/-! ## §5d  rowsLinearIndependent (block-split) and generators_independent -/
+
+private lemma zidx_lt (i : Fin keptCoords.length) : i.val < genListPackaged.length := by
+  have := genListPackaged_length; have := i.isLt; omega
+
+private lemma xidx_lt (i : Fin keptCoords.length) :
+    keptCoords.length + i.val < genListPackaged.length := by
+  have := genListPackaged_length; have := i.isLt; omega
+
+set_option maxRecDepth 4096 in
+private lemma sum_split_Z {M : Type*} [AddCommMonoid M]
+    (F : Fin genListPackaged.length → M)
+    (hX : ∀ i : Fin keptCoords.length, F ⟨keptCoords.length + i.val, xidx_lt i⟩ = 0) :
+    ∑ k, F k = ∑ i : Fin keptCoords.length, F ⟨i.val, zidx_lt i⟩ := by
+  have hlen := genListPackaged_length
+  rw [← Equiv.sum_comp (finCongr hlen.symm) F, Fin.sum_univ_add]
+  have hXsum : (∑ i : Fin keptCoords.length,
+      F (finCongr hlen.symm (Fin.natAdd keptCoords.length i))) = 0 := by
+    refine Finset.sum_eq_zero fun i _ => ?_
+    rw [← hX i]; congr 1
+  rw [hXsum, add_zero]
+  refine Finset.sum_congr rfl fun i _ => ?_
+  congr 1
+
+set_option maxRecDepth 4096 in
+private lemma sum_split_X {M : Type*} [AddCommMonoid M]
+    (F : Fin genListPackaged.length → M)
+    (hZ : ∀ i : Fin keptCoords.length, F ⟨i.val, zidx_lt i⟩ = 0) :
+    ∑ k, F k = ∑ i : Fin keptCoords.length, F ⟨keptCoords.length + i.val, xidx_lt i⟩ := by
+  have hlen := genListPackaged_length
+  rw [← Equiv.sum_comp (finCongr hlen.symm) F, Fin.sum_univ_add]
+  have hZsum : (∑ i : Fin keptCoords.length,
+      F (finCongr hlen.symm (Fin.castAdd keptCoords.length i))) = 0 := by
+    refine Finset.sum_eq_zero fun i _ => ?_
+    rw [← hZ i]; congr 1
+  rw [hZsum, zero_add]
+  refine Finset.sum_congr rfl fun i _ => ?_
+  congr 1
+
+set_option maxRecDepth 4096 in
+set_option maxHeartbeats 1000000 in
+/-- The trimmed 132-generator list has linearly independent check-matrix rows. -/
+theorem rowsLinearIndependent_packaged :
+    NQubitPauliGroupElement.rowsLinearIndependent genListPackaged := by
+  rw [NQubitPauliGroupElement.rowsLinearIndependent, Fintype.linearIndependent_iff]
+  intro g hsum
+  set n := grossComplex.numQubits with hn
+  have hZchain : grossComplex.cutMap (∑ i : Fin keptCoords.length,
+      g ⟨i.val, zidx_lt i⟩ • grossComplex.singleVtx (keptCoords.get i)) = 0 := by
+    funext e
+    rw [map_sum]
+    simp only [map_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply]
+    have hcol := congr_fun hsum (Fin.natAdd n (grossComplex.edgeEquiv e))
+    simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply] at hcol
+    rw [← hcol, sum_split_Z (fun k => g k *
+      NQubitPauliGroupElement.checkMatrix genListPackaged k
+        (Fin.natAdd n (grossComplex.edgeEquiv e)))]
+    · refine Finset.sum_congr rfl fun i _ => ?_
+      have hterm : NQubitPauliGroupElement.checkMatrix genListPackaged ⟨i.val, zidx_lt i⟩
+          (Fin.natAdd n (grossComplex.edgeEquiv e))
+          = grossComplex.cutMap (grossComplex.singleVtx (keptCoords.get i)) e := by
+        unfold NQubitPauliGroupElement.checkMatrix
+        rw [get_packaged_Z i, vertexStabOf_sympl_Z, Equiv.symm_apply_apply]
+      rw [hterm]
+    · intro i
+      have hterm : NQubitPauliGroupElement.checkMatrix genListPackaged
+          ⟨keptCoords.length + i.val, xidx_lt i⟩ (Fin.natAdd n (grossComplex.edgeEquiv e)) = 0 := by
+        unfold NQubitPauliGroupElement.checkMatrix
+        rw [get_packaged_X i, faceStabOf_sympl_Z_zero]
+      rw [hterm, mul_zero]
+  have hZ0 := combo_singleVtx_kernel_zero _ hZchain
+  have hXchain : grossComplex.boundary2 (∑ i : Fin keptCoords.length,
+      g ⟨keptCoords.length + i.val, xidx_lt i⟩ • grossComplex.singleFace (keptCoords.get i)) = 0 := by
+    funext e
+    rw [map_sum]
+    simp only [map_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply]
+    have hcol := congr_fun hsum (Fin.castAdd n (grossComplex.edgeEquiv e))
+    simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply] at hcol
+    rw [← hcol, sum_split_X (fun k => g k *
+      NQubitPauliGroupElement.checkMatrix genListPackaged k
+        (Fin.castAdd n (grossComplex.edgeEquiv e)))]
+    · refine Finset.sum_congr rfl fun i _ => ?_
+      have hterm : NQubitPauliGroupElement.checkMatrix genListPackaged
+          ⟨keptCoords.length + i.val, xidx_lt i⟩ (Fin.castAdd n (grossComplex.edgeEquiv e))
+          = grossComplex.boundary2 (grossComplex.singleFace (keptCoords.get i)) e := by
+        unfold NQubitPauliGroupElement.checkMatrix
+        rw [get_packaged_X i, faceStabOf_sympl_X, Equiv.symm_apply_apply]
+      rw [hterm]
+    · intro i
+      have hterm : NQubitPauliGroupElement.checkMatrix genListPackaged ⟨i.val, zidx_lt i⟩
+          (Fin.castAdd n (grossComplex.edgeEquiv e)) = 0 := by
+        unfold NQubitPauliGroupElement.checkMatrix
+        rw [get_packaged_Z i, vertexStabOf_sympl_X_zero]
+      rw [hterm, mul_zero]
+  have hX0 := combo_singleFace_kernel_zero _ hXchain
+  intro k
+  by_cases hk : k.val < keptCoords.length
+  · have hz := hZ0 ⟨k.val, hk⟩
+    rwa [Fin.eta] at hz
+  · push_neg at hk
+    have hlen := genListPackaged_length
+    have hkl := k.isLt
+    have hsub : k.val - keptCoords.length < keptCoords.length := by omega
+    have hx := hX0 ⟨k.val - keptCoords.length, hsub⟩
+    have hidx : (⟨keptCoords.length + (k.val - keptCoords.length), by omega⟩ :
+        Fin genListPackaged.length) = k := by
+      apply Fin.ext; show keptCoords.length + (k.val - keptCoords.length) = k.val; omega
+    rwa [hidx] at hx
+
+/-- The trimmed generator list is an independent generating set. -/
+theorem generators_independent_packaged :
+    Quantum.StabilizerGroup.GeneratorsIndependent grossComplex.numQubits genListPackaged :=
+  Quantum.StabilizerGroup.GeneratorsIndependent_of_rowsLinearIndependent
+    grossComplex.numQubits genListPackaged rowsLinearIndependent_packaged
+
 end Quantum.Stabilizer.Homological.BB
