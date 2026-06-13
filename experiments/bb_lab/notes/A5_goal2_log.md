@@ -378,3 +378,155 @@ d < 6 exceptions; censuses (c)/(d) not yet swept (next session).
   analytic target: prove (iv)/(v) follow from (b) + coordinate
   conditions in SOME presentation, or find a counterexample instance
   where a census match actually occurs (none seen yet).
+
+---
+
+## Entry 4 (2026-06-12) — bb_90: the semisimple template run; d ≥ 6, μ(Ann) = 10
+
+Target: bb_90 = (Z₁₅×Z₃, A = x⁹+y+y², B = 1+x²+x⁷) — [[90,8,10]],
+the SEMISIMPLE frame (the Entry-1 stress test). Confirmation:
+`scripts/a5_bb90_smallcycles.py`, W1–W7 all PASS (first run).
+
+**Theorem A″ (bb_90 small cycles).** The instance has no nonzero
+X-type or Z-type 1-cycle of weight ≤ 5. In particular d(bb_90) ≥ 6,
+and μ(Ann A) = μ(Ann B) = 10 (attained).
+
+The expected stress test turned out to be the EASIEST of the three
+frames — every kill is projection arithmetic, no censuses needed:
+
+### 4.1 The semisimple engine and the third pullback
+
+Ann(A) = I(V_A) exactly (no radical), V_A = {(0,1),(5,1),(5,2)},
+V_B = {(5,0),(5,1),(5,2)} — and every vanishing character has order
+3, factoring through Q = Z₃² via (x mod 3, y), kernel K = 3Z₁₅ ≅ Z₅.
+So I(V) = {5-fold pullbacks π*h, ĥ ⊆ V̄}, |π*h| = 5|h|, with
+
+    V̄_A = {ψ₁, ψ₃, ψ₄},   V̄_B = {ψ₂, ψ₃, ψ₄}
+
+— the gross base's radical sets a THIRD time (after gross itself and
+bb_108's 3-fold pullback). μ(Ann) = 5·d₃((3,F)) = 5·2 = 10, attained.
+One-sided splits dead for all k ≤ 9.
+
+### 4.2 The grid (everything dies on π_y / π_x weights)
+
+Structural facts: dB ⊂ {y = 0} (B is a polynomial in x alone);
+dA ⊂ {y ∈ {1,2}}; hence dA ∩ dB = ∅ for free, and:
+
+* **(1,1)**: dead (disjoint difference sets, as always).
+* **(1,3)**: mult-free dB ⟹ z is a dB-triangle ⟹ z constant-y
+  (dB lives in one y-row!) ⟹ π_y(B·z) = y^c·ε(...) has weight ≤ 1,
+  but π_y(A·g) = (1+y+y²)y^{g_y} = 1+y+y² has weight 3. Dead — no
+  per-class analysis at all.
+* **(3,1)**: census-free. In F₂[Z₃] the all-ones element absorbs:
+  (1+y+y²)·v = ε(v)·(1+y+y²). |z| = 3 odd ⟹ π_y(A·z) = 1+y+y²
+  (weight 3); π_y(B·r) = y^{r_y} (weight 1, π_y(B) = 1). Dead.
+* **(2,2)**: π_y(σ_L) = (1+y+y²)π_y(u_L) = 0 ALWAYS (|u_L| = 2
+  even); so π_y(u_R) = 0, forcing the r-pair y-gap to 0, whence
+  r-diff = (g, 0) with g ≠ 0. Then π_x: left x⁹(1+x^{g_ℓ}) has
+  weight ∈ {0,2}; right (1+x²+x⁷)(1+x^g) has weight ∈ {4,6} for all
+  g ≠ 0 (mult-free dB ⟹ translate overlap ≤ 1 ⟹ weight ≥ 6−2 = 4;
+  W6 table: exactly {4,6}). Weight mismatch — dead. (σ = 0 is
+  excluded: it would put both u-sides in weight-2 annihilators,
+  μ = 10.)
+
+(PAR) kills the mixed-parity splits as always. All splits dead. ∎
+(W7: SAT-UNSAT w ≤ 5, both kernels, confirmation.)
+
+### 4.3 Theorem-B transfer
+
+Any free-Z₂ double cover of bb_90 with the same polynomials —
+(Z₃₀×Z₃, A, B) or (Z₁₅×Z₆, A, B), both n = 180 — has no nonzero
+cycle of weight < 6; in particular d ≥ 6.
+
+### 4.4 The grid is now 3-for-3 across frame shapes
+
+| frame | instance | floor | floor mechanism | published d |
+|---|---|---|---|---|
+| Z₂×Z₂ | bb_72 (base) | 6 | §3 co-point engine + d₃ | 6 (tight!) |
+| Z₂ | bb_108 | 6 | (1+s)⊗I + 3-fold pullback to d₃, μ = 12 | 10 |
+| semisimple | bb_90 | 6 | I(V) + 5-fold pullback to d₃, μ = 10 | 10 |
+
+All three floors trace to the SAME dictionary row d₃((3,F)) = 2 —
+the gross base's Z₃² layer dictionary is doing all the one-sided
+work across the family. This is the concrete content of "the
+Entry-28 frame is instance-generic" at the small-cycle level.
+
+### Next
+
+* Entry 5: the (iv)/(v) census sweep over the empirical class.
+
+---
+
+## Entry 5 (2026-06-12) — the census sweep: (iv)/(v) NEVER fail on the class
+
+`scripts/a5_class_census_sweep.py` sweeps the Entry-3 hypotheses
+(iv) (triangle censuses kill) and (v) ((2,2) table empty) over the
+full empirical class — membership: floor-bearing frame
+(Z₂×Z₂ with (i), or semisimple) ∧ mult-free ∧ dA ∩ dB = ∅, over all
+exact-d Z6xZ6 + Z15xZ3 rows. Artifact: `data/a5/class_census.jsonl`.
+
+**Corrigendum to Entry 1 §4:** the "29 members" figure on Z15xZ3 was
+read off the cross-tab cell that also requires
+coordinate-disjointness; plain {mult-free ∧ disjoint} has **33**
+members there. The class is 25 + 33 = **58 members**, d ∈
+{6: 24, 8: 19, 10: 15} — still zero d < 6 exceptions.
+
+**Result: 58/58 pass the FULL grid (a)–(d).**
+
+* (iv) passes 58/58 — no weight-3 triangle image is ever a translate
+  of the partner polynomial. Census sizes are tiny: exactly 1
+  weight-3 class per side on the Z6xZ6 members, 2 per side on the
+  Z15xZ3 members — hand-surveyable in every case.
+* (v) passes 58/58 — the (2,2) translate-match table is empty for
+  every member.
+* Floors: all 25 Z6xZ6 members carry the Z₂²-engine (analytic ≥ 6);
+  all 33 Z15xZ3 members have floors (10,10) and are
+  pullback-friendly (every vanishing character of order 3) — the
+  Entry-4 analytic route applies verbatim to each.
+
+### Epistemic grade (stated carefully, per A_HANDOFF §1)
+
+For the three template instances (bb_72 by A4, bb_108 by Entry 2,
+bb_90 by Entry 4) the small-cycle theorem is fully analytic. For the
+other 55 class members, what exists today is: (a)+(b) analytic,
+(iv)/(v) MACHINE-verified. The (iv) censuses are small enough to
+hand-survey per instance; the (v) check as run is a |G|³ enumeration
+— NOT surveyable directly; the surveyable route is the per-instance
+projection bookkeeping (gross §4.4 / Entry 2.3 / Entry 4.2 style),
+demonstrated 3-for-3 but not yet written for the other 55. So the
+honest statement is:
+
+> the class theorem's hypotheses hold machine-verified on all 58
+> members, its proof mechanism is hand-proven for all three frame
+> shapes that occur, and zero counterexamples exist in the corpus —
+> but "every member has an analytic d ≥ 6" awaits either 55 short
+> per-instance write-ups or (better) the uniform lemma below.
+
+### The sharpened analytic target
+
+(iv)/(v) never failing is strong evidence they are THEOREMS of
+(a)+(b), not independent hypotheses. Two concrete conjectures, in
+decreasing strength:
+
+* **(C-v)** mult-free + dA ∩ dB = ∅ + floor ≥ 6 ⟹ the (2,2) table
+  is empty. (The bb_90 proof pattern suggests the mechanism: σ = 0
+  is excluded by the floor, and σ ≠ 0 forces projection-weight
+  mismatches; the missing piece is a presentation-free version of
+  the weight bookkeeping.)
+* **(C-iv)** same hypotheses ⟹ no weight-3 triangle image is a
+  translate of the partner. (All observed kills: the image either
+  repeats a coordinate value the partner takes distinctly, or
+  vice versa — a difference-set-vs-support incidence statement.)
+
+Proving these would upgrade all 58 (and every future class member)
+to analytic in one stroke — the actual class theorem. That is the
+ranked next step for this track.
+
+### Next
+
+1. Attack (C-v)/(C-iv) — the uniform kills (the class theorem
+   proper).
+2. The owed skeptic pass over Entries 2/4 (Entry-15/27 style).
+3. Past d ≥ 6: the (M)-analogue on the bb_108/bb_90 covers (their
+   true d is 10; the dangerous-sector factor-2 machinery is the
+   gross playbook).

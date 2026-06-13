@@ -69,13 +69,16 @@ the per-cell locus tables derived by rules R1–R5: 48 + 48 + 22 = 118,
 matching Entry 25, all killed by one-convolution ρ-link checks.
 `a3_a4ext_recheck.py` certifies every table (all PASS).
 d(gross) = 12 and d(gross) ≥ 6 are both fully analytic.***
-**Update (A5 Entries 1–3, 2026-06-12): goal 2 STARTED —
-`notes/A5_goal2_log.md`. First class result: d(bb_108) ≥ 6 fully
-analytic (Z₂-frame engine + the gross d₃ dictionary via pullback),
-with the Theorem-B transfer to its n = 216 covers; corpus sweeps
-(812 Z6xZ6 + 68 Z15xZ3) locate a 54-member empirical class with zero
-d < 6 exceptions; gap analysis for the single class theorem in
-Entry 3.**
+**Update (A5 Entries 1–5, 2026-06-12): goal 2 STARTED and producing —
+`notes/A5_goal2_log.md`. d(bb_108) ≥ 6 AND d(bb_90) ≥ 6, both fully
+analytic: the small-cycle grid now runs on all three occurring frame
+shapes (Z₂² base / Z₂ bb_108 / semisimple bb_90), every one-sided
+floor tracing to the single gross dictionary row d₃((3,F)) = 2 via
+pullbacks; Theorem-B transfers stated for the four n ∈ {216, 180}
+covers. Corpus: the 58-member empirical class (Z6xZ6 + Z15xZ3) passes
+the full grid 58/58 — the finite-verification hypotheses (iv)/(v)
+never fail, sharpening the class theorem to conjectures (C-iv)/(C-v)
+in Entry 5.**
 
 ---
 
@@ -610,8 +613,17 @@ buggy-scout flag commit). Each `A3` entry is one commit.
    transfer to its two n = 216 free-Z₂ covers. Entry 3: gap analysis —
    proposed class-theorem shape with hypotheses (a)–(d); the missing
    deeper-2-part engine and the census-dependence of the (1,3)/(2,2)
-   kills are the open gaps. Next: bb_90 (semisimple variant) run;
-   (iv)/(v) census sweep over the 54-member class.
+   kills are the open gaps. Entry 4: **bb_90 template run DONE —
+   d(bb_90) ≥ 6 analytic** (semisimple engine, μ(Ann) = 10 via 5-fold
+   pullback to d₃; every kill is projection arithmetic, census-free;
+   `scripts/a5_bb90_smallcycles.py` W1–W7 PASS) — the grid is 3-for-3
+   across frame shapes, all floors tracing to the single dictionary
+   row d₃((3,F)) = 2. Entry 5: the (iv)/(v) census sweep — **58/58
+   class members pass the full grid** (corrigendum: the class is 58,
+   not 54); sharpened analytic target: conjectures (C-iv)/(C-v)
+   (the uniform kills) would upgrade all 58 to analytic in one
+   stroke. Next: (C-iv)/(C-v); skeptic pass over Entries 2/4;
+   (M)-analogue on the bb_108/bb_90 covers.
 6. **Maintain `A3_track1p1_log.md`** as the running log for the gross
    arc, and `A5_goal2_log.md` for goal 2; commit per entry.
 
