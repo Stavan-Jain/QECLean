@@ -1,10 +1,28 @@
--- Phase 5 obligations 3+4 DRAFT (structurally correct, needs whnf perf tuning).
--- Append into StabilizerCode.lean §6. Issues: centralizer rw + commute_or_anticommute
--- whnf-timeout on the noncomputable grossComplex + 132-element-literal defeq.
--- TODO: avoid whnf — e.g. anticommute via anticommutes_iff_odd_anticommutes + the
--- inner-product count (no commute_or_anticommute compute); centralizer via a
--- subgroup-eq membership lemma that doesn't reduce packagedSG.toSubgroup; consider
--- attribute [irreducible] on the literal lists scoped to §6.
+-- Phase 5 obligations 3+4 DRAFT (math complete + TYPE-CHECKS; blocked on perf).
+--
+-- BLOCKER (confirmed by lake build, NOT the lean-lsp MCP which false-positives):
+-- runaway `whnf` timeout (does NOT terminate even at maxHeartbeats 4_000_000) in
+-- `logicalQubit`'s centralizer + cycle-membership proofs. ROOT CAUSE: the
+-- noncomputable `grossComplex` (its operators/edgeEquiv/boundary1/cycles, built on
+-- a 66-element LITERAL keptCoords) — every defeq check (∈ centralizer homSG, ∈
+-- cycles) whnf-explodes through grossComplex's noncomputable internals. Toric's
+-- analogous logicals BUILD because they are PARAMETRIC (L), not concrete literals.
+--
+-- Tried (none sufficient): maxHeartbeats up to 4M (still runs away); maxRecDepth
+-- 4096; attribute [local irreducible] logXchain logZchain genListPackaged
+-- Quantum.StabilizerGroup.centralizer (moves the whnf from centralizer to the
+-- cycles-membership, whack-a-mole); term-mode ▸ instead of rw (same).
+--
+-- LIKELY REAL FIX (next session): make the grossComplex operator/group chain
+-- irreducible-stop WITHOUT breaking the GrossGroup×Fin2 = C1 typing — e.g. opaque
+-- wrappers for grossComplex.cycles/dualCycles membership and for centralizer
+-- membership of chainX/ZOperator, proven once at the framework level; OR a
+-- code-specific `…_mem_centralizer_iff_cycle` mirroring toric's
+-- toricXOperatorOfChain_mem_centralizer_iff_cycle (which sidesteps the generic
+-- chainXOperator path). The dualBoundary_eq_dualBfn fix (change+unfold+sum_prod)
+-- and the native_decide facts + identity intersection matrix are all CORRECT.
+--
+-- NOTE: requires `open Quantum.StabilizerGroup` added to StabilizerCode.lean.
 
 /-! ## §6  Packaged stabilizer group, logical operators, the StabilizerCode + HasCodeDistance -/
 
