@@ -1,5 +1,13 @@
 # Phase 5 — gross `StabilizerCode 144 12` packaging: continuation plan
 
+> **✅ DONE (2026-06-13).** All 4 obligations are implemented and building in
+> `QEC/Stabilizer/Codes/BivariateBicycle/StabilizerCode.lean` (§1–§6); whole-repo
+> `lake build` green; axiom audit clean (standard + native_decide oracles, no
+> `sorryAx`). The §6 perf blocker (kernel whnf runaway in `logicalQubit`) was
+> resolved with **abstract-chain helper lemmas** — see the file's §6 header and the
+> `bb-phase5-packaging` memory. The obligation breakdown below is retained as the
+> design record.
+
 **Goal:** `grossStabilizerCode : StabilizerCode 144 12` + `HasCodeDistance
 grossStabilizerCode 12` (conditional on the two engine Props
 `LightStabilizerClassification`, `MImBound`), with the ≥6 bound unconditional.

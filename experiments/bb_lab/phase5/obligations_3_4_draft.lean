@@ -1,3 +1,15 @@
+-- ============================================================================
+-- SUPERSEDED (2026-06-13): obligations 3+4 are now INTEGRATED and BUILDING in
+-- QEC/Stabilizer/Codes/BivariateBicycle/StabilizerCode.lean §6. The perf blocker
+-- below was resolved by extracting the centralizer/(anti)commute facts into
+-- top-level helper lemmas with the chain held ABSTRACT
+-- (chainXOperator_mem_centralizer_packagedSG, chainZOperator_mem_centralizer_packagedSG,
+-- chainXOperator_anticommute_chainZOperator, chainXOperator_commute_chainZOperator),
+-- so logicalQubit only applies them by substitution — the kernel whnf never reduces
+-- the concrete chainXOperator or the 132-literal list. Whole-repo lake build green;
+-- axioms clean (no sorryAx). This file is kept only as the diagnostic record below.
+-- ============================================================================
+--
 -- Phase 5 obligations 3+4 DRAFT (math complete + TYPE-CHECKS; blocked on perf).
 --
 -- BLOCKER (confirmed by lake build, NOT the lean-lsp MCP which false-positives):

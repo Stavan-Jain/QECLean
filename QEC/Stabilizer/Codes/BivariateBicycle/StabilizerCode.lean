@@ -20,8 +20,12 @@ This file embeds offline-validated `𝔽₂` linear-algebra data
 * `logX` / `logZ` — a symplectic basis of 12 X-cycles + 12 Z-dual-cycles
   with identity `12×12` intersection matrix (the 12 logical qubits).
 
-Status: WIP skeleton. The two `native_decide` decoder identities (the
-independence hard-core) are proven; the framework wiring is `sorry`-stubbed.
+Status: complete. `grossStabilizerCode : StabilizerCode 144 12` is built (all
+four packaging obligations — closure equality, generator independence via the
+decoder identities, the 12 logical qubits, and assembly), and the chain-level
+distance theorems are transported to `grossStabilizerCode_logical_weight_ge_6`
+(unconditional `≥ 6`) and `grossStabilizerCode_hasCodeDistance_12` (`= 12`,
+conditional on the two CRT-engine inputs).
 -/
 
 import QEC.Stabilizer.Codes.BivariateBicycle.BaseDistance
@@ -2483,8 +2487,8 @@ lemma faceStabOf_sympl_X (f : grossComplex.C2) (i : Fin grossComplex.numQubits) 
         (Fin.castAdd grossComplex.numQubits i)
       = grossComplex.boundary2 (grossComplex.singleFace f) (grossComplex.edgeEquiv.symm i) := by
   rw [NQubitPauliOperator.toSymplectic_X_part]
-  change ((grossComplex.chainXOperator (grossComplex.boundary2 (grossComplex.singleFace f))).operators
-    i).toSymplecticSingle.1 = _
+  change ((grossComplex.chainXOperator
+      (grossComplex.boundary2 (grossComplex.singleFace f))).operators i).toSymplecticSingle.1 = _
   rw [HomologicalCode.chainXOperator_op_at]
   set c := grossComplex.boundary2 (grossComplex.singleFace f) with hc
   by_cases h : ∃ e, grossComplex.edgeEquiv e = i ∧ c e = 1
@@ -2655,6 +2659,8 @@ private lemma sum_split_X {M : Type*} [AddCommMonoid M]
 
 set_option maxRecDepth 4096 in
 set_option maxHeartbeats 1000000 in
+-- the block-split reduction unifies 132 check-matrix rows against the chain maps,
+-- which exceeds the default heartbeat budget.
 /-- The trimmed 132-generator list has linearly independent check-matrix rows. -/
 theorem rowsLinearIndependent_packaged :
     NQubitPauliGroupElement.rowsLinearIndependent genListPackaged := by
@@ -2686,7 +2692,8 @@ theorem rowsLinearIndependent_packaged :
       rw [hterm, mul_zero]
   have hZ0 := combo_singleVtx_kernel_zero _ hZchain
   have hXchain : grossComplex.boundary2 (∑ i : Fin keptCoords.length,
-      g ⟨keptCoords.length + i.val, xidx_lt i⟩ • grossComplex.singleFace (keptCoords.get i)) = 0 := by
+      g ⟨keptCoords.length + i.val, xidx_lt i⟩ • grossComplex.singleFace (keptCoords.get i))
+        = 0 := by
     funext e
     rw [map_sum]
     simp only [map_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply]
@@ -2713,14 +2720,14 @@ theorem rowsLinearIndependent_packaged :
   by_cases hk : k.val < keptCoords.length
   · have hz := hZ0 ⟨k.val, hk⟩
     rwa [Fin.eta] at hz
-  · push_neg at hk
+  · push Not at hk
     have hlen := genListPackaged_length
     have hkl := k.isLt
     have hsub : k.val - keptCoords.length < keptCoords.length := by omega
     have hx := hX0 ⟨k.val - keptCoords.length, hsub⟩
     have hidx : (⟨keptCoords.length + (k.val - keptCoords.length), by omega⟩ :
         Fin genListPackaged.length) = k := by
-      apply Fin.ext; show keptCoords.length + (k.val - keptCoords.length) = k.val; omega
+      apply Fin.ext; change keptCoords.length + (k.val - keptCoords.length) = k.val; omega
     rwa [hidx] at hx
 
 /-- The trimmed generator list is an independent generating set. -/
@@ -2728,5 +2735,232 @@ theorem generators_independent_packaged :
     Quantum.StabilizerGroup.GeneratorsIndependent grossComplex.numQubits genListPackaged :=
   Quantum.StabilizerGroup.GeneratorsIndependent_of_rowsLinearIndependent
     grossComplex.numQubits genListPackaged rowsLinearIndependent_packaged
+
+/-! ## §6  Packaged stabilizer group, logical operators, the `StabilizerCode` + `HasCodeDistance`
+
+The 12 logical-qubit operators are the `grossComplex.chainXOperator`/`chainZOperator`
+of the offline-validated symplectic basis `logX`/`logZ` (identity `12×12`
+intersection matrix). The performance trap — kernel `whnf` exploding through the
+noncomputable `grossComplex` and the 132-element literal generator list when a
+`centralizer`-transport `rw` or `commute_or_anticommute` runs against a *concrete*
+chain operator — is dodged by proving every centralizer / (anti)commutation fact
+in a helper lemma with the **chain held abstract** (a stuck variable that blocks
+`chainXOperator c` from reducing and keeps `packagedSG` behind the precompiled
+`packagedSG_toSubgroup_eq`). `logicalQubit` then only *applies* those helpers by
+substitution, paying the heavy defeq once, generically. -/
+
+open Quantum.StabilizerGroup
+
+/-- The 132 trimmed generators all lie in the full homological generator set. -/
+lemma listToSet_packaged_subset_homGens :
+    listToSet genListPackaged ⊆ grossComplex.homologicalGenerators := by
+  intro g hg
+  have hg' : g ∈ genListZ ++ genListX := hg
+  rcases List.mem_append.mp hg' with hz | hx
+  · obtain ⟨v, _, rfl⟩ := List.mem_map.mp hz
+    exact HomologicalCode.ZGenerators_subset_homologicalGenerators ⟨v, rfl⟩
+  · obtain ⟨f, _, rfl⟩ := List.mem_map.mp hx
+    exact HomologicalCode.XGenerators_subset_homologicalGenerators ⟨f, rfl⟩
+
+/-- The trimmed generators pairwise commute. -/
+lemma gens_commute_packaged :
+    ∀ g ∈ listToSet genListPackaged, ∀ h ∈ listToSet genListPackaged, g * h = h * g := by
+  intro g hg h hh
+  exact HomologicalCode.homologicalGenerators_commute g (listToSet_packaged_subset_homGens hg)
+    h (listToSet_packaged_subset_homGens hh)
+
+/-- `-I` is not in the closure of the trimmed generators. -/
+lemma gens_no_neg_packaged :
+    negIdentity grossComplex.numQubits ∉ Subgroup.closure (listToSet genListPackaged) := by
+  rw [closure_packaged_eq]
+  exact grossComplex.homologicalStabilizerGroup.no_neg_identity
+
+/-- The packaged stabilizer group (closure of the trimmed 132-generator list). -/
+noncomputable def packagedSG : StabilizerGroup grossComplex.numQubits :=
+  mkStabilizerFromGenerators grossComplex.numQubits genListPackaged
+    gens_commute_packaged gens_no_neg_packaged
+
+/-- The packaged stabilizer subgroup equals the gross homological stabilizer
+subgroup — the bridge transporting the chain-level distance theorems. -/
+lemma packagedSG_toSubgroup_eq :
+    packagedSG.toSubgroup = grossComplex.homologicalStabilizerGroup.toSubgroup := by
+  change Subgroup.closure (listToSet genListPackaged) = _
+  exact closure_packaged_eq
+
+/-- Centralizer membership for an X-chain operator, **chain abstract**: the stuck
+`c` blocks `grossComplex.chainXOperator` from reducing and `packagedSG` stays behind
+`packagedSG_toSubgroup_eq`, so the `centralizer`-transport defeq is paid once here. -/
+lemma chainXOperator_mem_centralizer_packagedSG (c : grossComplex.C1 → ZMod 2)
+    (hc : grossComplex.boundary1 c = 0) :
+    grossComplex.chainXOperator c ∈ centralizer packagedSG := by
+  rw [centralizer_eq_of_toSubgroup_eq packagedSG grossComplex.homologicalStabilizerGroup
+    packagedSG_toSubgroup_eq]
+  exact (HomologicalCode.chainXOperator_mem_centralizer_iff_mem_cycles c).mpr
+    ((grossComplex.mem_cycles_iff c).mpr hc)
+
+/-- Centralizer membership for a Z-chain operator (chain abstract; mirror of the X case). -/
+lemma chainZOperator_mem_centralizer_packagedSG (c : grossComplex.C1 → ZMod 2)
+    (hc : grossComplex.dualBoundary c = 0) :
+    grossComplex.chainZOperator c ∈ centralizer packagedSG := by
+  rw [centralizer_eq_of_toSubgroup_eq packagedSG grossComplex.homologicalStabilizerGroup
+    packagedSG_toSubgroup_eq]
+  refine (HomologicalCode.chainZOperator_mem_centralizer_iff_mem_dualCycles c).mpr ?_
+  change c ∈ LinearMap.ker grossComplex.dualBoundary
+  rw [LinearMap.mem_ker]
+  exact hc
+
+/-- An X-chain and a Z-chain operator anticommute when their inner product is `1`
+(chains abstract — `commute_or_anticommute` never reduces the concrete operators). -/
+lemma chainXOperator_anticommute_chainZOperator (c c' : grossComplex.C1 → ZMod 2)
+    (h : grossComplex.chainInnerProduct c c' = 1) :
+    NQubitPauliGroupElement.Anticommute
+      (grossComplex.chainXOperator c) (grossComplex.chainZOperator c') := by
+  rcases NQubitPauliGroupElement.commute_or_anticommute
+    (grossComplex.chainXOperator c) (grossComplex.chainZOperator c') with hcomm | ha
+  · exfalso
+    have hzero := (HomologicalCode.chainXOperator_commutes_chainZOperator_iff c c').mp hcomm
+    rw [h] at hzero
+    exact one_ne_zero hzero
+  · exact ha
+
+/-- An X-chain and a Z-chain operator commute when their inner product is `0`
+(chains abstract). -/
+lemma chainXOperator_commute_chainZOperator (c c' : grossComplex.C1 → ZMod 2)
+    (h : grossComplex.chainInnerProduct c c' = 0) :
+    grossComplex.chainXOperator c * grossComplex.chainZOperator c'
+      = grossComplex.chainZOperator c' * grossComplex.chainXOperator c :=
+  (HomologicalCode.chainXOperator_commutes_chainZOperator_iff c c').mpr h
+
+/-- Indicator chain of the `i`-th X-logical support. -/
+def logXchain (i : Fin 12) : GrossGroup × Fin 2 → ZMod 2 :=
+  fun e => if e ∈ logX.getD i.val [] then 1 else 0
+
+/-- Indicator chain of the `i`-th Z-logical support. -/
+def logZchain (i : Fin 12) : GrossGroup × Fin 2 → ZMod 2 :=
+  fun e => if e ∈ logZ.getD i.val [] then 1 else 0
+
+/-- Computable form of `dualBoundary` on a 1-chain: the transpose of `∂₂`. -/
+def dualBfn (c : GrossGroup × Fin 2 → ZMod 2) (f : GrossGroup) : ZMod 2 :=
+  ∑ h : GrossGroup, (c (h, 0) * d2term f h 0 + c (h, 1) * d2term f h 1)
+
+lemma dualBoundary_eq_dualBfn (c : GrossGroup × Fin 2 → ZMod 2) (f : GrossGroup) :
+    grossComplex.dualBoundary c f = dualBfn c f := by
+  rw [HomologicalCode.dualBoundary_apply]
+  change (∑ e : GrossGroup × Fin 2,
+    c e * grossComplex.boundary2 (grossComplex.singleFace f) e) = dualBfn c f
+  unfold dualBfn
+  rw [Fintype.sum_prod_type]
+  refine Finset.sum_congr rfl fun h _ => ?_
+  rw [Fin.sum_univ_two, boundary2_singleFace_apply, boundary2_singleFace_apply]
+
+/-- All 12 X-logicals are cycles (`∂₁ = 0`). -/
+lemma logXchain_cycle (i : Fin 12) : grossComplex.boundary1 (logXchain i) = 0 := by
+  have h : ∀ k : Fin 12, bbBoundary1Fn grossA grossB (logXchain k) = 0 := by native_decide
+  exact h i
+
+/-- All 12 Z-logicals are dual cycles (`dualBoundary = 0`). -/
+lemma logZchain_dualCycle (i : Fin 12) : grossComplex.dualBoundary (logZchain i) = 0 := by
+  have h : ∀ k : Fin 12, ∀ f : GrossGroup, dualBfn (logZchain k) f = 0 := by native_decide
+  funext f
+  rw [dualBoundary_eq_dualBfn]
+  exact h i f
+
+/-- The `12×12` intersection matrix is the identity. -/
+lemma logChain_inner (i j : Fin 12) :
+    grossComplex.chainInnerProduct (logXchain i) (logZchain j) = (if i = j then 1 else 0) := by
+  have h : ∀ a b : Fin 12,
+      (∑ e : GrossGroup × Fin 2, logXchain a e * logZchain b e) = (if a = b then 1 else 0) := by
+    native_decide
+  exact h i j
+
+set_option maxRecDepth 4096 in
+/-- The `i`-th logical qubit operator pair: the abstract helpers above are simply
+*applied* to the concrete chains, so no heavy defeq is re-run here. -/
+noncomputable def logicalQubit (i : Fin 12) :
+    LogicalQubitOps grossComplex.numQubits packagedSG where
+  xOp := grossComplex.chainXOperator (logXchain i)
+  zOp := grossComplex.chainZOperator (logZchain i)
+  x_mem_centralizer := chainXOperator_mem_centralizer_packagedSG (logXchain i) (logXchain_cycle i)
+  z_mem_centralizer :=
+    chainZOperator_mem_centralizer_packagedSG (logZchain i) (logZchain_dualCycle i)
+  anticommute := chainXOperator_anticommute_chainZOperator (logXchain i) (logZchain i)
+    (by rw [logChain_inner i i, if_pos rfl])
+
+set_option maxRecDepth 4096 in
+/-- Logical operators for different logical qubits commute (the `12×12` matrix is
+diagonal off the diagonal). -/
+theorem logical_commute_cross : ∀ ℓ ℓ' : Fin 12, ℓ ≠ ℓ' →
+    ((logicalQubit ℓ).xOp * (logicalQubit ℓ').xOp
+        = (logicalQubit ℓ').xOp * (logicalQubit ℓ).xOp ∧
+      (logicalQubit ℓ).xOp * (logicalQubit ℓ').zOp
+        = (logicalQubit ℓ').zOp * (logicalQubit ℓ).xOp ∧
+      (logicalQubit ℓ).zOp * (logicalQubit ℓ').xOp
+        = (logicalQubit ℓ').xOp * (logicalQubit ℓ).zOp ∧
+      (logicalQubit ℓ).zOp * (logicalQubit ℓ').zOp
+        = (logicalQubit ℓ').zOp * (logicalQubit ℓ).zOp) := by
+  intro ℓ ℓ' hne
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · exact Quantum.StabilizerGroup.CSSCommutationLemmas.XType_commutes
+      (HomologicalCode.chainXOperator_isXType _) (HomologicalCode.chainXOperator_isXType _)
+  · exact chainXOperator_commute_chainZOperator (logXchain ℓ) (logZchain ℓ')
+      (by rw [logChain_inner ℓ ℓ', if_neg hne])
+  · exact (chainXOperator_commute_chainZOperator (logXchain ℓ') (logZchain ℓ)
+      (by rw [logChain_inner ℓ' ℓ, if_neg (Ne.symm hne)])).symm
+  · exact Quantum.StabilizerGroup.CSSCommutationLemmas.ZType_commutes
+      (HomologicalCode.chainZOperator_isZType _) (HomologicalCode.chainZOperator_isZType _)
+
+set_option maxRecDepth 4096 in
+/-- The gross `[[144, 12, 12]]` bivariate-bicycle code as a `StabilizerCode`. -/
+noncomputable def grossStabilizerCode : StabilizerCode grossComplex.numQubits 12 where
+  hk := by rw [grossComplex_numQubits]; omega
+  generatorsList := genListPackaged
+  generators_length := by
+    have h66 : keptCoords.length = 66 := by decide
+    have hn := grossComplex_numQubits
+    rw [genListPackaged_length]; omega
+  generators_phaseZero := by
+    intro g hg
+    rcases List.mem_append.mp (show g ∈ genListZ ++ genListX from hg) with hz | hx
+    · obtain ⟨v, _, rfl⟩ := List.mem_map.mp hz
+      exact (HomologicalCode.vertexStabOf_isZType v).1
+    · obtain ⟨f, _, rfl⟩ := List.mem_map.mp hx
+      exact (HomologicalCode.faceStabOf_isXType f).1
+  generators_independent := generators_independent_packaged
+  generators_commute := gens_commute_packaged
+  closure_no_neg_identity := gens_no_neg_packaged
+  logicalOps := logicalQubit
+  logical_commute_cross := logical_commute_cross
+
+/-- The packaged code's stabilizer subgroup is the gross homological stabilizer
+subgroup — the bridge that transports the chain-level distance theorems. -/
+theorem grossStabilizerCode_toSubgroup_eq :
+    grossStabilizerCode.toStabilizerGroup.toSubgroup
+      = grossComplex.homologicalStabilizerGroup.toSubgroup := by
+  change Subgroup.closure (listToSet genListPackaged) = _
+  exact closure_packaged_eq
+
+/-- **Unconditional lower bound**: every nontrivial logical operator of the
+packaged gross code has weight ≥ 6 (triple the Lin–Pryadko floor). -/
+theorem grossStabilizerCode_logical_weight_ge_6
+    (g : NQubitPauliGroupElement grossComplex.numQubits)
+    (hg : IsNontrivialLogicalOperator g grossStabilizerCode.toStabilizerGroup) :
+    6 ≤ NQubitPauliGroupElement.weight g :=
+  gross_logical_weight_ge_6 g
+    ((IsNontrivialLogicalOperator_of_toSubgroup_eq g grossStabilizerCode_toSubgroup_eq).mp hg)
+
+/-- **`HasCodeDistance grossStabilizerCode 12`**, conditional on the two CRT-engine
+inputs (`LightStabilizerClassification`, `MImBound`). Everything else — the
+packaging and the chain-level distance — is unconditional. -/
+theorem grossStabilizerCode_hasCodeDistance_12
+    (hC : LightStabilizerClassification) (hMim : MImBound) :
+    HasCodeDistance grossStabilizerCode 12 := by
+  have hleast := gross_pauli_distance_eq_12_of_engine hC hMim
+  refine ⟨by norm_num, ?_, ?_⟩
+  · intro g hg _
+    exact hleast.2 ⟨g, (IsNontrivialLogicalOperator_of_toSubgroup_eq g
+      grossStabilizerCode_toSubgroup_eq).mp hg, rfl⟩
+  · obtain ⟨g, hg, hw⟩ := hleast.1
+    exact ⟨g, (IsNontrivialLogicalOperator_of_toSubgroup_eq g
+      grossStabilizerCode_toSubgroup_eq).mpr hg, hw⟩
 
 end Quantum.Stabilizer.Homological.BB
