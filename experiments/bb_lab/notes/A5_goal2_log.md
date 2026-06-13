@@ -446,10 +446,19 @@ cycle of weight < 6; in particular d ≥ 6.
 | Z₂ | bb_108 | 6 | (1+s)⊗I + 3-fold pullback to d₃, μ = 12 | 10 |
 | semisimple | bb_90 | 6 | I(V) + 5-fold pullback to d₃, μ = 10 | 10 |
 
-All three floors trace to the SAME dictionary row d₃((3,F)) = 2 —
-the gross base's Z₃² layer dictionary is doing all the one-sided
-work across the family. This is the concrete content of "the
-Entry-28 frame is instance-generic" at the small-cycle level.
+All three floors share the SAME radical/vanishing orbit set
+{ψ₁,ψ₃,ψ₄} (resp. {ψ₂,ψ₃,ψ₄}) — the gross base's Z₃² layer
+structure — so the d₃ analysis applies across the family. **[Correction,
+Entry 7 skeptic pass:** the original phrasing here, "all three floors
+trace to the row d₃((3,F)) = 2", is overstated. It holds for the two
+PULLBACK frames — bb_108: 6 = 2·3·d₃((3,F)) with the Z₂ layer factor 2
+and the 3-fold pullback; bb_90: 10 = 5·d₃((3,F)) — but NOT for the
+Z₂² base itself, whose one-sided floor 6 comes from the §3 layer engine
+("≥ 3 nonzero layers, each even ⟹ ≥ 6", i.e. the d₃({1}) = 6 single-
+orbit row), with no pullback (κ = 1, which would give d₃((3,F)) = 2,
+not 6). The literally-shared object is the orbit SET, not one floor
+formula.**] This is the concrete content of "the Entry-28 frame is
+instance-generic" at the small-cycle level.
 
 ### Next
 
@@ -458,6 +467,16 @@ Entry-28 frame is instance-generic" at the small-cycle level.
 ---
 
 ## Entry 5 (2026-06-12) — the census sweep: (iv)/(v) NEVER fail on the class
+
+> **⚠ SUPERSEDED IN PART (Entries 6–7).** The "58/58 ⟹ (iv)/(v) are
+> theorems of (a)+(b)" inference below is **WRONG**: the 58/58 holds
+> only because every DB-stored member happens to carry the
+> mirrored-projection pattern (iii). Broadening the sweep to other
+> groups (Entry 6, verified Entry 7) found the **Z3×Z5 family: 6
+> members with (a)+(b) but d = 4**. The corrected hypothesis adds
+> (iii); see Entry 6 for the counterexamples and Entry 7 for the
+> independent verification. The raw 58/58 numbers below are correct;
+> the conjecture they were taken to support is not.
 
 `scripts/a5_class_census_sweep.py` sweeps the Entry-3 hypotheses
 (iv) (triangle censuses kill) and (v) ((2,2) table empty) over the
@@ -474,9 +493,8 @@ members there. The class is 25 + 33 = **58 members**, d ∈
 **Result: 58/58 pass the FULL grid (a)–(d).**
 
 * (iv) passes 58/58 — no weight-3 triangle image is ever a translate
-  of the partner polynomial. Census sizes are tiny: exactly 1
-  weight-3 class per side on the Z6xZ6 members, 2 per side on the
-  Z15xZ3 members — hand-surveyable in every case.
+  of the partner polynomial. Census sizes are tiny (1–3 weight-3
+  classes per side, hand-surveyable in every case).
 * (v) passes 58/58 — the (2,2) translate-match table is empty for
   every member.
 * Floors: all 25 Z6xZ6 members carry the Z₂²-engine (analytic ≥ 6);
@@ -530,3 +548,258 @@ ranked next step for this track.
 3. Past d ≥ 6: the (M)-analogue on the bb_108/bb_90 covers (their
    true d is 10; the dangerous-sector factor-2 machinery is the
    gross playbook).
+
+---
+
+## Entry 6 (2026-06-13) — (C-iv)/(C-v) as stated are FALSE; the fix is (iii)
+
+Attacked (C-iv)/(C-v) via the CRT component picture. The honest
+verdict: **both conjectures as literally stated in Entry 5 (mult-free
++ dA∩dB=∅ + floor ≥ 6 ⟹ kill) are FALSE.** They omit a load-bearing
+hypothesis — the mirrored-projection pattern (iii) — and the corpus
+58/58 pass only because every DB-stored member carries (iii).
+
+All numbers below are discovery/validation (A_HANDOFF §1); the
+falsifying counterexamples are exhibits, the corrected statement is a
+strengthened conjecture, and the located gap is presentation-bound.
+
+### 6.1 Floor ≥ 6 must mean "Ann ≠ 0 with μ(Ann) ≥ 6" (a clarification)
+
+First subtlety: literal "floor ≥ 6" is satisfied **vacuously** when
+Ann(A) = 0 (no annihilator), which is the k = 0 case (A invertible in
+F₂[G]). Z₅×Z₅ has 2160 mult-free+disjoint pairs with a (2,2) match,
+all with Ann(A) = Ann(B) = 0 (k = 0, not codes). These are correctly
+excluded by reading the floor hypothesis as "Ann(A), Ann(B) ≠ 0 and
+μ ≥ 6". Even with that reading, the conjecture still fails (§6.2).
+
+Also discovered: for mult-free weight-3 A, μ(Ann A) is NOT always
+≥ 6 when nonzero — **Z₇×Z₃ and Z₁₄×Z₃ have mult-free A with
+μ(Ann A) = 4** (the Z_ℓ-axis-confined sets a + (1+x^d+x^{2d})). So
+"floor ≥ 6" is a genuine, non-vacuous, non-redundant condition. Good:
+it makes (C-v) substantive, not a tautology.
+
+### 6.2 The counterexamples (floor ≥ 6, mult-free, disjoint, (v) FAILS)
+
+Exhaustive sweep over weight-3 (A, B) with mult-free dA, dB and
+dA ∩ dB = ∅, cross-classified by (μ(Ann A), μ(Ann B)):
+
+* **Z₁₅×Z₃**: 144 (2,2)-matches with **both floors = 8 ≥ 6**.
+  Exhibit: A = {0, x, x⁴}, B = {0, x², x⁸} (both **monomials in the
+  Z₁₅ axis**, y ≡ 0); match A·{0,x³} = x·B·{0,x⁶}, image
+  {1, x, x³, x⁷}. k = 24 (a degenerate stacked code).
+* **Z₉×Z₅**: 144 matches, **both floors = 24**; A, B confined to the
+  Z₉ axis (x ≡ 0 mod the y-pattern), k = 8.
+* (C-iv) mirror: 36/324/1872/1764 floor-≥6 (iv)-failures on
+  Z₇×Z₃ / Z₉×Z₃ / Z₁₅×Z₃ / Z₉×Z₅.
+
+So d ≥ 6's would-be class theorem is **not implied** by (a)+(b) alone.
+
+### 6.3 The discriminator IS hypothesis (iii): mirrored projections
+
+Comparing the counterexamples to a genuine member (bb_90) under the
+ring homs π_x (collapse y) and π_y (collapse x):
+
+| code | π_x(A) wt | π_y(A) wt | π_x(B) wt | π_y(B) wt | orient |
+|---|---|---|---|---|---|
+| bb_90 (member) | 1 | 3 | 3 | 1 | **mirrored** |
+| Z₁₅×Z₃ ce | 1 | 3 | 1 | 3 | same |
+| Z₉×Z₅ ce | 3 | 1 | 3 | 1 | same |
+
+The members are **mirrored** (one polynomial monomial-in-x and the
+other monomial-in-y — exactly (iii) / gross §4.4); the counterexamples
+have **A, B with the same orientation**. Re-running the full sweep:
+
+> **floor ≥ 6 + (iii) mirrored ⟹ ZERO (v)-failures and ZERO
+> (iv)-failures** across Z₇×Z₃, Z₉×Z₃, Z₁₅×Z₃, Z₉×Z₅, Z₁₅×Z₅
+> (28080 + 9216 + 3456 + 432 + 251280 mirror members checked; the
+> 144+144 same-orientation failures are exactly the non-mirror cases).
+
+**Corrected conjectures.** (C-iv′)/(C-v′): mult-free + dA∩dB=∅ +
+[Ann ≠ 0, μ ≥ 6] + **(iii) mirrored-projection** ⟹ the (iv)/(v)
+kills. These match the corpus (all 58 members have (iii)) and are the
+honest class-theorem hypotheses — i.e. (iii) is NOT a presentation
+artifact to be eliminated (the Entry-3.5/3.6 hope) but a TRUE
+load-bearing structural hypothesis. The Entry-3.5 Aut-orbit
+observation (only the 6 base-family members have (iii) in some
+presentation on Z6×Z6) is the warning sign read correctly: the other
+19 satisfy d ≥ 6 for reasons OUTSIDE the (iii)-route, so the class
+theorem as provable by this mechanism covers only the (iii)-carrying
+members.
+
+### 6.4 The mechanism (semisimple), and the precise remaining gap
+
+CRT/character route for the mirror case. Apply π_y (a ring hom, =
+restriction to the trivial-on-x character block). For (iii): π_y(A) is
+a full weight-3 polynomial a(y) ∈ F₂[Z_m], π_y(B) = monomial y^β. A
+size-4 (2,2)-match A·(1+x^{δ_L}) = x^t B·(1+x^{δ_R}) projects to
+
+    a(y)·(1+y^{δ_L,y}) = y^{t_y+β}·(1+y^{δ_R,y}),
+
+RHS weight ∈ {0, 2}. **Weight lemma (proven, probe18):** for weight-3
+a, |a·(1+y^δ)| ≤ 2 ⟺ supp(a) is a 3-term AP with common difference δ
+(then weight exactly 2); otherwise ≥ 4. So the y-projection forces
+either δ_L,y = 0 or supp(π_y A) a 3-AP. **[Correction, Entry 7: this
+lemma is FALSE on even-period axes. The correct form has a second
+branch — |a·(1+y^δ)| ≤ 2 ⟺ (3-AP with difference δ) OR (2δ ≡ 0 and
+supp(a) contains a δ-orbit pair {p, p+δ}). The order-2 branch is LIVE
+on bb_108's Z₆ y-axis; the templates dodge it by accident. Verified
+0/29510. Any uniform class-theorem proof must use the corrected
+form.]**
+
+**The residue (the gap).** In EVERY mirror member, π_y(A) IS a 3-AP
+(bb_90: π_y A = 1+y+y² = AP{0,1,2}) — 100% of 28080+... members. So
+the y-projection alone never closes; it narrows to the AP common
+difference. The mirror x-projection then narrows the x-gaps the same
+way. But **both projections passing is NOT sufficient**: on Z₉×Z₃ /
+Z₁₅×Z₃ there are 19008 / 67392 (δ_L, δ_R) pairs passing BOTH
+projection tests while the full (v) still holds. The final kill is the
+**translate-comparison of the actual 4-sets** (gross §4.4's
+"x-multiplicity profile {2,1,1} vs {1,1,1}" / Entry 2.3's
+"3 distinct y-coords vs profile {2,1}"). This residue is:
+real, finite per instance, and the SAME presentation-bound step
+flagged in Entry 3.4 — it has a uniform SHAPE (compare multiplicity
+profiles of A·{0,δ_L} vs the partner translate) but no
+presentation-free closed form yet. **That residue is the precise
+remaining gap; it is exactly the part hand-done for the 3 template
+instances and not yet for the other 55.**
+
+### 6.5 Status
+
+* (C-iv)/(C-v) as stated: **FALSE** (counterexamples §6.2). Not a
+  theorem of (a)+(b).
+* (C-iv′)/(C-v′) with (iii) added: **0 corpus counterexamples**,
+  matches all 58 members; the right statement.
+* Proof of (C-v′): the two-projection reduction is rigorous and
+  presentation-free (the weight lemma is proven); the **multiplicity-
+  profile residue** after both projections match is the open uniform
+  lemma. Most likely break point of any "projections suffice" claim:
+  the 3-AP residue branch, where members live and the residue is
+  forced.
+* Net for the track: the class theorem covers the (iii)-mirror
+  members (which is all 58, and the gross/bb_90/bb_108 family) once
+  the profile-residue lemma is written; it does NOT cover the
+  non-mirror 19 of Entry 3.5 — those need a different argument or are
+  outside this theorem.
+
+### Next (revised)
+
+1. The multiplicity-profile residue lemma (§6.4) — the one open
+   uniform step; write it presentation-free or accept it as the
+   per-instance finite check (then the theorem is (a)+(b)+(iii) ⟹
+   d ≥ 6, with a surveyable residue per member).
+2. Re-state the Entry-3.6 conjecture with (iii) as hypothesis (e);
+   drop the Entry-3.5 hope that (iii) is eliminable.
+3. (unchanged) skeptic pass over Entries 2/4; the cover (M)-analogue.
+
+---
+
+## Entry 7 (2026-06-13) — verification pass over the workflow outputs
+
+**Provenance.** Entries 6 and the §6.x analysis, plus the corpus
+counterexample hunt and the skeptic re-derivations, were produced by a
+26-agent multi-agent workflow ("De-risk + verify + attack the BB
+goal-2 class theorem", run 2026-06-13). Entry 6 is **machine-authored**
+(the character-Fourier proof-panel agent). This entry is the
+human-in-the-loop verification of the load-bearing claims, in the
+Entry-15/27 skeptic tradition — nothing from the workflow is taken on
+faith. Three of the workflow's own claims were checked and one of its
+"corrections" was itself rejected (§7.3).
+
+### 7.1 The refutation is REAL — verified independently, two ways
+
+The core claim "(C-iv)/(C-v) as stated are false" is **confirmed**. I
+verified the decisive Z3×Z5 family **before the workflow finished**,
+from the live hunt scratch files, end to end:
+
+* Canonical exhibit `262f0556…`: A = x + y² + y³, B = x² + y + y⁴
+  over Z₃×Z₅. **Independent SAT: d_X = d_Z = 4** (matches the DB).
+* mult-free dA, dB ✓; dA ∩ dB = ∅ ✓; one-sided floor
+  μ(Ann A) = μ(Ann B) = **8 ≥ 6** (computed directly from the
+  circulant kernel, not via d_H).
+* Explicit witness from the substrate H_X (convention-correct): a
+  weight-4 **(3,1)** Z-logical, u_L = {(0,2),(0,3),(1,0)} a
+  dA-triangle whose A-image equals B·{(0,0)} — i.e. a triangle image
+  that IS a translate of the partner. A textbook (C-iv) failure.
+
+So the conclusion stands on the six Z3×Z5 stored rows, which I
+verified, **independently of** the proof panel's messier fresh
+witnesses (one of which — the synthesis flagged — was not even
+mult-free, so not a real member; the refutation does NOT depend on
+it).
+
+### 7.2 (iii) is exactly the discriminator — confirmed
+
+All six Z3×Z5 violators have **(iii) = False** (projection pattern
+"other": both A and B monomial in the SAME axis, π_x both singletons).
+Both templates have **(iii) = True** (mirrored/gross pattern). So the
+Entry-6 correction "add (iii) mirrored-projection" is the right fix,
+and Entry 6's §6.3 framing is sound.
+
+### 7.3 Corrections to the workflow's own output
+
+* **Entry 6 §6.4 weight lemma is BUGGY** (caught by the
+  character-Fourier refute agent, verified here). "|a·(1+y^δ)| ≤ 2 ⟺
+  3-AP with difference δ" is false on even-period axes: S = {0,1,3} in
+  Z₆ with δ = 3 gives weight 2 without being a 3-AP, because 2δ ≡ 0
+  and {0,3} is a δ-orbit pair. Corrected form (the second branch added
+  inline at §6.4): **(3-AP, diff δ) OR (2δ ≡ 0 and supp ⊇ a δ-orbit
+  pair)** — exhaustively verified **0/29510** violations over Z_n,
+  n = 4..16. This branch is **live on bb_108's Z₆ y-axis**; the three
+  templates dodge it by accident (bb_90's axis is the odd Z₃;
+  bb_108's π_y A = 1+y+y² has no 3-orbit pair), so the template kills
+  in Entries 2/4 are unaffected — but **any uniform class-theorem
+  proof must use the corrected lemma**. This is the sharpest technical
+  finding of the run.
+* **Entry 4 §4.4 "all three floors trace to d₃((3,F)) = 2" was
+  overstated** — corrected inline. True for the two pullback frames;
+  the Z₂² base floor 6 comes from the layer engine (d₃({1}) = 6), not
+  κ·d₃((3,F)). Shared object is the orbit set, not one formula.
+* **Entry 6 §6.1 spot-check**: the substantive claim "floor ≥ 6 is
+  non-vacuous — mult-free weight-3 A can have μ(Ann A) = 4" is
+  **confirmed on Z₇×Z₃** (e.g. A = {0,1,3} on the x-axis, 6 such sets,
+  μ = 4, dim 9). The Z₁₄×Z₃ half of that claim did NOT reproduce in my
+  search (likely the dim-16 enumeration cap) — treat as unverified.
+* **REJECTED skeptic "correction":** the bb_108 skeptic agent claimed
+  Entry 2 §2.3's triangle-class counts are wrong ("3 → 4 up to
+  transl+neg"). My re-derivation gives **2 translation-classes for
+  (1,3) and 3 for (3,1)** — exactly what Entry 2 states. The agent
+  used an inconsistent canonicalization; **Entry 2 is correct, no
+  change made.** (Recorded as a reminder that agent "corrections" get
+  re-derived too.)
+
+### 7.4 Skeptic verdict on the standing theorems (accepted)
+
+The three template results — d(gross) (A4), d(bb_108) ≥ 6 (Entry 2),
+d(bb_90) ≥ 6 (Entry 4) — **survive** independent re-derivation
+(scb = true, SAT-independent = true for each). The flagged gaps are
+all non-load-bearing prose (the §4.4 overstatement above; the §4.1
+"Ann = I(V)" notation being an F₂-semisimple-annihilator shorthand,
+not a literal complex-Fourier-support statement; the Theorem-B
+transfers inherited-as-generic rather than re-derived entrywise).
+None touches a d ≥ 6 conclusion. The analytic core is intact.
+
+### 7.5 Net state of the track
+
+* **(C-iv)/(C-v) as stated [(a)+(b) only]: dead.** Z3×Z5 d = 4 family,
+  verified.
+* **(C-iv′)/(C-v′) [+ (iii) mirrored]: the live conjecture**, zero
+  counterexamples across every sweep; the honest class-theorem
+  hypothesis set.
+* **The single open uniform step**: the multiplicity-profile residue
+  lemma (§6.4) — now with the corrected even-period weight lemma as
+  its first ingredient. Either prove it presentation-free, or accept
+  it as a per-instance finite surveyable check, yielding
+  **"(a)+(b)+(iii) ⟹ d ≥ 6, with a 2-step surveyable residue per
+  member"** — which already covers all 58 corpus members and the full
+  gross/bb_90/bb_108 family.
+* The six Z3×Z5 d = 4 rows are the canonical **non-mirror exclusions**;
+  any future sweep that re-admits them has dropped (iii).
+
+### Next (consolidated)
+
+1. The multiplicity-profile residue lemma, using the corrected
+   even-period weight lemma (§6.4 + §7.3) — the one open uniform step.
+2. The cover (M)-analogue to push the template family past 6 (true
+   d = 10 for bb_90/bb_108) — the gross Entries 16–28 playbook.
+3. Housekeeping: fold (iii) into the Entry-3.6 conjecture as a
+   load-bearing hypothesis (Entry 6 did this; it is now the headline).

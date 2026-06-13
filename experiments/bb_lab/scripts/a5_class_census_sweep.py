@@ -183,14 +183,22 @@ def floor_data(rep) -> dict:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--jsonl", type=Path, default=None)
+    ap.add_argument(
+        "--groups", type=str, default="Z6xZ6,Z15xZ3",
+        help="comma-separated group_struct labels to sweep "
+        "(default the two original; pass e.g. 'Z5xZ6' for one group)",
+    )
     args = ap.parse_args()
 
+    groups = [g.strip() for g in args.groups.split(",") if g.strip()]
+    placeholders = ", ".join("?" for _ in groups)
     con = duckdb.connect(str(LAB_ROOT / "data" / "bb_instances.duckdb"),
                          read_only=True)
     rows = con.execute(
         "select instance_id, ell, m, A_poly, B_poly, n, k, d_exact "
-        "from bb_instances where group_struct in ('Z6xZ6', 'Z15xZ3') "
-        "and d_exact is not null order by group_struct, instance_id"
+        f"from bb_instances where group_struct in ({placeholders}) "
+        "and d_exact is not null order by group_struct, instance_id",
+        groups,
     ).fetchall()
 
     out_f = args.jsonl.open("w") if args.jsonl else None
