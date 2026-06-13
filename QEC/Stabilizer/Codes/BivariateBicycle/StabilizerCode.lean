@@ -2517,4 +2517,66 @@ lemma faceStabOf_sympl_Z_zero (f : grossComplex.C2) (i : Fin grossComplex.numQub
   · rw [hI]; rfl
   · rw [hX]; rfl
 
+/-! ## §5b  Coefficient-collapse helpers (consume the kernel-trivial cores) -/
+
+lemma keptCoords_nodup : keptCoords.Nodup := by native_decide
+
+private lemma singleVtx_apply' (a b : GrossGroup) :
+    grossComplex.singleVtx a b = if b = a then (1 : ZMod 2) else 0 := by
+  rw [HomologicalCode.singleVtx]; exact Pi.single_apply a 1 b
+
+private lemma singleFace_apply' (a b : GrossGroup) :
+    grossComplex.singleFace a b = if b = a then (1 : ZMod 2) else 0 := by
+  rw [HomologicalCode.singleFace]; exact Pi.single_apply a 1 b
+
+private lemma keptCoords_get_not_dropSet (i : Fin keptCoords.length) :
+    (keptCoords.get i : GrossGroup) ∉ dropSet := by
+  have hmem : (keptCoords.get i) ∈ keptCoords := List.get_mem _ _
+  have hsub : ∀ x ∈ keptCoords, x ∉ dropSet := by native_decide
+  exact hsub _ hmem
+
+lemma combo_singleVtx_kernel_zero (c : Fin keptCoords.length → ZMod 2)
+    (hker : grossComplex.cutMap
+      (∑ i, c i • grossComplex.singleVtx (keptCoords.get i)) = 0) :
+    ∀ i, c i = 0 := by
+  set s := ∑ i, c i • grossComplex.singleVtx (keptCoords.get i) with hs
+  have hd : ∀ d ∈ dropSet, s d = 0 := by
+    intro d hdmem
+    rw [hs, Finset.sum_apply]
+    refine Finset.sum_eq_zero fun i _ => ?_
+    have hne : d ≠ keptCoords.get i := fun h => keptCoords_get_not_dropSet i (h ▸ hdmem)
+    simp only [Pi.smul_apply, singleVtx_apply', smul_eq_mul, if_neg hne, mul_zero]
+  have hs0 : s = 0 := vtx_kernel_trivial hker hd
+  intro j
+  have hsj := congr_fun hs0 (keptCoords.get j)
+  rw [hs, Finset.sum_apply, Finset.sum_eq_single j] at hsj
+  · simpa [singleVtx_apply'] using hsj
+  · intro i _ hij
+    have hne : keptCoords.get j ≠ keptCoords.get i :=
+      fun h => hij (List.nodup_iff_injective_get.mp keptCoords_nodup h.symm)
+    simp only [Pi.smul_apply, singleVtx_apply', smul_eq_mul, if_neg hne, mul_zero]
+  · intro hc; exact absurd (Finset.mem_univ j) hc
+
+lemma combo_singleFace_kernel_zero (c : Fin keptCoords.length → ZMod 2)
+    (hker : grossComplex.boundary2
+      (∑ i, c i • grossComplex.singleFace (keptCoords.get i)) = 0) :
+    ∀ i, c i = 0 := by
+  set s := ∑ i, c i • grossComplex.singleFace (keptCoords.get i) with hs
+  have hd : ∀ d ∈ dropSet, s d = 0 := by
+    intro d hdmem
+    rw [hs, Finset.sum_apply]
+    refine Finset.sum_eq_zero fun i _ => ?_
+    have hne : d ≠ keptCoords.get i := fun h => keptCoords_get_not_dropSet i (h ▸ hdmem)
+    simp only [Pi.smul_apply, singleFace_apply', smul_eq_mul, if_neg hne, mul_zero]
+  have hs0 : s = 0 := face_kernel_trivial hker hd
+  intro j
+  have hsj := congr_fun hs0 (keptCoords.get j)
+  rw [hs, Finset.sum_apply, Finset.sum_eq_single j] at hsj
+  · simpa [singleFace_apply'] using hsj
+  · intro i _ hij
+    have hne : keptCoords.get j ≠ keptCoords.get i :=
+      fun h => hij (List.nodup_iff_injective_get.mp keptCoords_nodup h.symm)
+    simp only [Pi.smul_apply, singleFace_apply', smul_eq_mul, if_neg hne, mul_zero]
+  · intro hc; exact absurd (Finset.mem_univ j) hc
+
 end Quantum.Stabilizer.Homological.BB
