@@ -2084,4 +2084,40 @@ lemma vtx_kernel_trivial {s : GrossGroup → ZMod 2}
   rw [hfirst, hsecond, add_zero] at hA
   exact hA
 
+/-! ## §4  Closure equality (obligation 1)
+
+The trimmed 132-generator list (66 kept vertex stabs ++ 66 kept face stabs)
+generates the same subgroup as the full homological generator set. The dropped
+generators re-enter via the reduced kernel relations `redP2` / `redCM`. -/
+
+-- NB: list-mapped generators must be typed `List grossComplex.C2` / `.C0`, not
+-- `List GrossGroup`: the projection `C2`/`C0` is defeq but not syntactically
+-- `GrossGroup`, which silently breaks `rw`/`simp` list-lemma matching.
+
+/-- Product of face stabs over a list = `chainXOperator (∂₂ (Σ indicators))`. -/
+lemma faceStabOf_listProd (L : List grossComplex.C2) :
+    (L.map grossComplex.faceStabOf).prod
+      = grossComplex.chainXOperator
+          (grossComplex.boundary2 ((L.map (fun f => grossComplex.singleFace f)).sum)) := by
+  induction L with
+  | nil =>
+    simp only [List.map_nil, List.prod_nil, List.sum_nil, map_zero,
+      HomologicalCode.chainXOperator_zero]
+  | cons f L ih =>
+    rw [List.map_cons, List.prod_cons, List.map_cons, List.sum_cons, map_add,
+      HomologicalCode.chainXOperator_add, HomologicalCode.chainXOperator_boundary2_singleFace, ih]
+
+/-- Product of vertex stabs over a list = `chainZOperator (cutMap (Σ indicators))`. -/
+lemma vertexStabOf_listProd (L : List grossComplex.C0) :
+    (L.map grossComplex.vertexStabOf).prod
+      = grossComplex.chainZOperator
+          (grossComplex.cutMap ((L.map (fun v => grossComplex.singleVtx v)).sum)) := by
+  induction L with
+  | nil =>
+    simp only [List.map_nil, List.prod_nil, List.sum_nil, map_zero,
+      HomologicalCode.chainZOperator_zero]
+  | cons v L ih =>
+    rw [List.map_cons, List.prod_cons, List.map_cons, List.sum_cons, map_add,
+      HomologicalCode.chainZOperator_add, HomologicalCode.chainZOperator_cutMap_singleVtx, ih]
+
 end Quantum.Stabilizer.Homological.BB
