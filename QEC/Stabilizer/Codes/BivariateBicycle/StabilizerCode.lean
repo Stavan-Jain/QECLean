@@ -28,6 +28,7 @@ import QEC.Stabilizer.Codes.BivariateBicycle.BaseDistance
 import QEC.Stabilizer.Codes.BivariateBicycle.SafeSector
 import QEC.Stabilizer.Framework.Homological.LogicalCorrespondence
 import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
+import Mathlib.Data.List.GetD
 
 namespace Quantum.Stabilizer.Homological.BB
 
@@ -1922,5 +1923,165 @@ theorem decoder_identity_Z :
     ∀ p p' : GrossGroup,
       decodeZAt p p' + kerCorrection redCM p p' = (if p' = p then 1 else 0) := by
   native_decide
+
+/-! ## §3  Lift the decoder identities to all chains (the independence core)
+
+`decoder_identity_X` is a per-basis-vector fact; here we lift it by linearity
+to `face_kernel_trivial : ∂₂ f = 0 ∧ f|_dropSet = 0 → f = 0` (and the mirror
+`vtx_kernel_trivial`). These feed the block-split `rowsLinearIndependent`. -/
+
+/-- A `ZMod 2`-valued left fold with `+` from `0` is the sum of the mapped list. -/
+private lemma foldl_add_eq_sum {α : Type*} (l : List α) (g : α → ZMod 2) :
+    l.foldl (fun acc x => acc + g x) 0 = (l.map g).sum := by
+  have gen : ∀ (a : ZMod 2), l.foldl (fun acc x => acc + g x) a = a + (l.map g).sum := by
+    induction l with
+    | nil => intro a; simp
+    | cons x xs ih => intro a; simp [ih (a + g x), add_assoc]
+  simpa using gen 0
+
+/-- **(L1, X)** Basis expansion of `∂₂` in the sparse `d2term` form. -/
+lemma boundary2_apply_eq_sum_d2term (f : GrossGroup → ZMod 2) (h : GrossGroup) (j : Fin 2) :
+    grossComplex.boundary2 f (h, j) = ∑ p : GrossGroup, f p * d2term p h j := by
+  have hgr : grossComplex.boundary2 f = bbBoundary2Fn grossA grossB f := rfl
+  rw [hgr]
+  by_cases hj : j = 0
+  · subst hj
+    change conv grossA f h = ∑ p : GrossGroup, f p * d2term p h 0
+    rw [conv_apply]
+    refine (Equiv.sum_comp (Equiv.subLeft h) (fun x => grossA x * f (h - x))).symm.trans ?_
+    refine Finset.sum_congr rfl fun p _ => ?_
+    have hp : h - (h - p) = p := by abel
+    simp [d2term, Equiv.subLeft_apply, hp, mul_comm]
+  · have hj1 : j = 1 := by omega
+    subst hj1
+    change conv grossB f h = ∑ p : GrossGroup, f p * d2term p h 1
+    rw [conv_apply]
+    refine (Equiv.sum_comp (Equiv.subLeft h) (fun x => grossB x * f (h - x))).symm.trans ?_
+    refine Finset.sum_congr rfl fun p _ => ?_
+    have hp : h - (h - p) = p := by abel
+    simp [d2term, Equiv.subLeft_apply, hp, mul_comm]
+
+/-- **(L1, Z)** `cutMap(δ_v)` per qubit, in the sparse `cmTerm` form. -/
+lemma cmTerm_eq (v h : GrossGroup) (j : Fin 2) :
+    grossComplex.boundary1 (Pi.single (h, j) 1) v = cmTerm v h j := by
+  have hgr : grossComplex.boundary1 (Pi.single (h, j) (1:ZMod 2))
+      = bbBoundary1Fn grossA grossB (Pi.single (h, j) 1) := rfl
+  rw [hgr, bbBoundary1Fn]
+  by_cases hj : j = 0
+  · subst hj
+    have hL : leftHalf (Pi.single ((h, (0:Fin 2))) (1:ZMod 2)) = Pi.single h 1 := by
+      funext g; simp [leftHalf, Pi.single_apply, Prod.ext_iff]
+    have hR : rightHalf (Pi.single ((h, (0:Fin 2))) (1:ZMod 2)) = 0 := by
+      funext g; simp [rightHalf, Prod.ext_iff]
+    rw [hL, hR, conv_comm grossB (Pi.single h 1), conv_single_left_apply]
+    simp [cmTerm, conv_apply]
+  · have hj1 : j = 1 := by omega
+    subst hj1
+    have hL : leftHalf (Pi.single ((h, (1:Fin 2))) (1:ZMod 2)) = 0 := by
+      funext g; simp [leftHalf, Prod.ext_iff]
+    have hR : rightHalf (Pi.single ((h, (1:Fin 2))) (1:ZMod 2)) = Pi.single h 1 := by
+      funext g; simp [rightHalf, Pi.single_apply, Prod.ext_iff]
+    rw [hL, hR, conv_comm grossA (Pi.single h 1), conv_single_left_apply]
+    simp [cmTerm, conv_apply]
+
+lemma cutMap_apply_eq_sum_cmTerm (s : GrossGroup → ZMod 2) (h : GrossGroup) (j : Fin 2) :
+    grossComplex.cutMap s (h, j) = ∑ v : GrossGroup, s v * cmTerm v h j := by
+  rw [HomologicalCode.cutMap_apply]
+  exact Finset.sum_congr rfl fun v _ => by rw [cmTerm_eq]
+
+/-- Interchange a `Fintype` sum with a `List` sum (over `ZMod 2`). -/
+private lemma finset_sum_list_sum_comm {ι α : Type*} [Fintype ι] (l : List α)
+    (k : ι → α → ZMod 2) :
+    ∑ p : ι, (l.map (k p)).sum = (l.map (fun x => ∑ p : ι, k p x)).sum := by
+  induction l with
+  | nil => simp
+  | cons x xs ih => simp only [List.map_cons, List.sum_cons, Finset.sum_add_distrib, ih]
+
+/-- `kerCorrection` vanishes off the drop-set. -/
+private lemma kerCorrection_eq_zero_of_not_mem (red : List (List GrossGroup)) {p : GrossGroup}
+    (hp : p ∉ dropSet) (p' : GrossGroup) : kerCorrection red p p' = 0 := by
+  have hempty : (List.range 6).filter (fun j => dropSet.getD j 0 = p) = [] := by
+    rw [List.filter_eq_nil_iff]
+    intro j hj hcond
+    rw [List.mem_range] at hj
+    have hlen : dropSet.length = 6 := by decide
+    have hmem : dropSet.getD j 0 ∈ dropSet := by
+      rw [List.getD_eq_getElem dropSet 0 (by omega)]; exact List.getElem_mem _
+    have : dropSet.getD j 0 = p := by simpa using hcond
+    exact hp (this ▸ hmem)
+  rw [kerCorrection, hempty]; rfl
+
+/-- **(A, X)** A `∂₂`-cycle makes the `phiX`-decoder sum vanish. -/
+lemma sum_decodeXAt_eq_zero_of_boundary {f : GrossGroup → ZMod 2}
+    (hf : grossComplex.boundary2 f = 0) (p' : GrossGroup) :
+    ∑ p : GrossGroup, f p * decodeXAt p p' = 0 := by
+  have hstep : ∀ p : GrossGroup, f p * decodeXAt p p'
+      = ((phiX.filter (fun pr => pr.1 = p')).map
+          (fun pr => f p * d2term p pr.2.1 pr.2.2)).sum := fun p => by
+    rw [decodeXAt, foldl_add_eq_sum, List.sum_map_mul_left]
+  simp_rw [hstep]
+  rw [finset_sum_list_sum_comm]
+  have hz : ∀ pr : GrossGroup × (GrossGroup × Fin 2),
+      (∑ p : GrossGroup, f p * d2term p pr.2.1 pr.2.2) = 0 := fun pr => by
+    rw [← boundary2_apply_eq_sum_d2term, hf]; rfl
+  simp [hz]
+
+/-- **(A, Z)** A `cutMap`-kernel chain makes the `phiZ`-decoder sum vanish. -/
+lemma sum_decodeZAt_eq_zero_of_cutMap {s : GrossGroup → ZMod 2}
+    (hs : grossComplex.cutMap s = 0) (p' : GrossGroup) :
+    ∑ v : GrossGroup, s v * decodeZAt v p' = 0 := by
+  have hstep : ∀ v : GrossGroup, s v * decodeZAt v p'
+      = ((phiZ.filter (fun pr => pr.1 = p')).map
+          (fun pr => s v * cmTerm v pr.2.1 pr.2.2)).sum := fun v => by
+    rw [decodeZAt, foldl_add_eq_sum, List.sum_map_mul_left]
+  simp_rw [hstep]
+  rw [finset_sum_list_sum_comm]
+  have hz : ∀ pr : GrossGroup × (GrossGroup × Fin 2),
+      (∑ v : GrossGroup, s v * cmTerm v pr.2.1 pr.2.2) = 0 := fun pr => by
+    rw [← cutMap_apply_eq_sum_cmTerm, hs]; rfl
+  simp [hz]
+
+/-- **Face block independence core**: a `∂₂`-cycle vanishing on `dropSet` is `0`. -/
+lemma face_kernel_trivial {f : GrossGroup → ZMod 2}
+    (hf : grossComplex.boundary2 f = 0) (hd : ∀ d ∈ dropSet, f d = 0) : f = 0 := by
+  funext p'
+  have hId : ∀ p, decodeXAt p p' = (if p' = p then 1 else 0) + kerCorrection redP2 p p' :=
+    fun p => by rw [← decoder_identity_X p p', add_assoc, CharTwo.add_self_eq_zero, add_zero]
+  have hA := sum_decodeXAt_eq_zero_of_boundary hf p'
+  simp_rw [hId, mul_add, Finset.sum_add_distrib] at hA
+  have hfirst : (∑ p : GrossGroup, f p * (if p' = p then (1:ZMod 2) else 0)) = f p' := by
+    rw [Finset.sum_eq_single p']
+    · simp
+    · intro b _ hb; rw [if_neg (Ne.symm hb)]; ring
+    · intro h; exact absurd (Finset.mem_univ p') h
+  have hsecond : (∑ p : GrossGroup, f p * kerCorrection redP2 p p') = 0 := by
+    refine Finset.sum_eq_zero fun p _ => ?_
+    by_cases hpd : p ∈ dropSet
+    · rw [hd p hpd]; ring
+    · rw [kerCorrection_eq_zero_of_not_mem redP2 hpd]; ring
+  rw [hfirst, hsecond, add_zero] at hA
+  exact hA
+
+/-- **Vertex block independence core**: a `cutMap`-kernel chain vanishing on
+`dropSet` is `0`. -/
+lemma vtx_kernel_trivial {s : GrossGroup → ZMod 2}
+    (hs : grossComplex.cutMap s = 0) (hd : ∀ d ∈ dropSet, s d = 0) : s = 0 := by
+  funext p'
+  have hId : ∀ v, decodeZAt v p' = (if p' = v then 1 else 0) + kerCorrection redCM v p' :=
+    fun v => by rw [← decoder_identity_Z v p', add_assoc, CharTwo.add_self_eq_zero, add_zero]
+  have hA := sum_decodeZAt_eq_zero_of_cutMap hs p'
+  simp_rw [hId, mul_add, Finset.sum_add_distrib] at hA
+  have hfirst : (∑ v : GrossGroup, s v * (if p' = v then (1:ZMod 2) else 0)) = s p' := by
+    rw [Finset.sum_eq_single p']
+    · simp
+    · intro b _ hb; rw [if_neg (Ne.symm hb)]; ring
+    · intro h; exact absurd (Finset.mem_univ p') h
+  have hsecond : (∑ v : GrossGroup, s v * kerCorrection redCM v p') = 0 := by
+    refine Finset.sum_eq_zero fun v _ => ?_
+    by_cases hvd : v ∈ dropSet
+    · rw [hd v hvd]; ring
+    · rw [kerCorrection_eq_zero_of_not_mem redCM hvd]; ring
+  rw [hfirst, hsecond, add_zero] at hA
+  exact hA
 
 end Quantum.Stabilizer.Homological.BB
