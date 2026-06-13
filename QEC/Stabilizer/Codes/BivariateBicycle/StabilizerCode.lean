@@ -2579,4 +2579,39 @@ lemma combo_singleFace_kernel_zero (c : Fin keptCoords.length → ZMod 2)
     simp only [Pi.smul_apply, singleFace_apply', smul_eq_mul, if_neg hne, mul_zero]
   · intro hc; exact absurd (Finset.mem_univ j) hc
 
+/-! ## §5c  Packaged-list indexing -/
+
+lemma genListPackaged_length :
+    genListPackaged.length = keptCoords.length + keptCoords.length := by
+  have h : genListPackaged.length = (keptCoords.map grossComplex.vertexStabOf).length
+    + (keptCoords.map grossComplex.faceStabOf).length := rfl
+  simpa [List.length_map] using h
+
+lemma get_packaged_Z (i : Fin keptCoords.length)
+    (hi : i.val < genListPackaged.length) :
+    genListPackaged.get ⟨i.val, hi⟩ = grossComplex.vertexStabOf (keptCoords.get i) := by
+  have hlt : i.val < (keptCoords.map grossComplex.vertexStabOf).length := by
+    rw [List.length_map]; exact i.isLt
+  change (keptCoords.map grossComplex.vertexStabOf
+    ++ keptCoords.map grossComplex.faceStabOf).get ⟨i.val, hi⟩ = _
+  rw [List.get_eq_getElem, List.getElem_append_left hlt, List.getElem_map]
+  rfl
+
+set_option maxRecDepth 4096 in
+lemma get_packaged_X (i : Fin keptCoords.length)
+    (hi : keptCoords.length + i.val < genListPackaged.length) :
+    genListPackaged.get ⟨keptCoords.length + i.val, hi⟩
+      = grossComplex.faceStabOf (keptCoords.get i) := by
+  have hZlen : (keptCoords.map grossComplex.vertexStabOf).length = keptCoords.length :=
+    List.length_map _
+  have hge : (keptCoords.map grossComplex.vertexStabOf).length ≤ keptCoords.length + i.val := by
+    rw [hZlen]; omega
+  have hidx : keptCoords.length + i.val - (keptCoords.map grossComplex.vertexStabOf).length
+      = i.val := by rw [hZlen]; omega
+  change (keptCoords.map grossComplex.vertexStabOf
+    ++ keptCoords.map grossComplex.faceStabOf).get ⟨keptCoords.length + i.val, hi⟩ = _
+  rw [List.get_eq_getElem, List.getElem_append_right hge, List.getElem_map]
+  simp only [hidx]
+  rfl
+
 end Quantum.Stabilizer.Homological.BB
