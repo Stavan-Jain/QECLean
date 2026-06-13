@@ -163,6 +163,24 @@ rewriting at an applied occurrence). -/
     conv (Pi.single a 1) b g = b (g - a) := by
   rw [conv_single_left]
 
+/-! ## Translation of chains -/
+
+/-- Translation of a chain by a group element: `(translate c v) g = v (g + c)`. -/
+def translate (c : G) (v : G → ZMod 2) : G → ZMod 2 := fun g => v (g + c)
+
+omit [Fintype G] in
+@[simp] lemma translate_apply (c : G) (v : G → ZMod 2) (g : G) :
+    translate c v g = v (g + c) := rfl
+
+/-- Convolution commutes with translation of the right factor. -/
+lemma conv_translate (a v : G → ZMod 2) (c : G) :
+    conv a (translate c v) = translate c (conv a v) := by
+  funext g
+  simp only [conv_apply, translate_apply]
+  refine Finset.sum_congr rfl fun h _ => ?_
+  congr 1
+  abel_nf
+
 /-! ## Boundary maps for BB chain complex
 
 Cells:
@@ -261,6 +279,47 @@ noncomputable def bbBoundary1 :
     rw [hL, hR]
     ring
 
+/-- Translation of a 1-chain by a group element (qubit blocks fixed). -/
+def translate1 (c : G) (v : G × Fin 2 → ZMod 2) : G × Fin 2 → ZMod 2 :=
+  fun p => v (p.1 + c, p.2)
+
+omit [Fintype G] in
+@[simp] lemma translate1_apply (c : G) (v : G × Fin 2 → ZMod 2)
+    (p : G × Fin 2) :
+    translate1 c v p = v (p.1 + c, p.2) := rfl
+
+omit [Fintype G] in
+lemma leftHalf_translate1 (c : G) (v : G × Fin 2 → ZMod 2) :
+    leftHalf (translate1 c v) = translate c (leftHalf v) := rfl
+
+omit [Fintype G] in
+lemma rightHalf_translate1 (c : G) (v : G × Fin 2 → ZMod 2) :
+    rightHalf (translate1 c v) = translate c (rightHalf v) := rfl
+
+/-- `∂₁` is translation-equivariant. -/
+lemma bbBoundary1Fn_translate1 (c : G) (v : G × Fin 2 → ZMod 2) :
+    bbBoundary1Fn A B (translate1 c v) = translate c (bbBoundary1Fn A B v) := by
+  funext g
+  rw [bbBoundary1Fn, leftHalf_translate1, rightHalf_translate1,
+    conv_translate, conv_translate]
+  rfl
+
+/-- `∂₂` is translation-equivariant. -/
+lemma bbBoundary2Fn_translate (c : G) (f : G → ZMod 2) :
+    bbBoundary2Fn A B (translate c f) = translate1 c (bbBoundary2Fn A B f) := by
+  funext p
+  obtain ⟨h, j⟩ := p
+  by_cases hj : j = 0
+  · subst hj
+    change conv A (translate c f) h = bbBoundary2Fn A B f (h + c, 0)
+    rw [conv_translate]
+    rfl
+  · have hj1 : j = 1 := by omega
+    subst hj1
+    change conv B (translate c f) h = bbBoundary2Fn A B f (h + c, 1)
+    rw [conv_translate]
+    rfl
+
 /-- `rfl` bridge from the LinearMap `∂₂` to its computable underlying function. -/
 @[simp] lemma bbBoundary2_apply (f : G → ZMod 2) :
     bbBoundary2 A B f = bbBoundary2Fn A B f := rfl
@@ -268,6 +327,18 @@ noncomputable def bbBoundary1 :
 /-- `rfl` bridge from the LinearMap `∂₁` to its computable underlying function. -/
 @[simp] lemma bbBoundary1_apply (c : G × Fin 2 → ZMod 2) :
     bbBoundary1 A B c = bbBoundary1Fn A B c := rfl
+
+/-- `∂₂` (computable form) is additive. -/
+lemma bbBoundary2Fn_add (f₁ f₂ : G → ZMod 2) :
+    bbBoundary2Fn A B (f₁ + f₂) = bbBoundary2Fn A B f₁ + bbBoundary2Fn A B f₂ := by
+  have h := map_add (bbBoundary2 A B) f₁ f₂
+  simpa [bbBoundary2_apply] using h
+
+/-- `∂₁` (computable form) is additive. -/
+lemma bbBoundary1Fn_add (c₁ c₂ : G × Fin 2 → ZMod 2) :
+    bbBoundary1Fn A B (c₁ + c₂) = bbBoundary1Fn A B c₁ + bbBoundary1Fn A B c₂ := by
+  have h := map_add (bbBoundary1 A B) c₁ c₂
+  simpa [bbBoundary1_apply] using h
 
 /-- The chain-complex law `∂₁ ∘ ∂₂ = 0`. -/
 lemma bbBoundary_comp : (bbBoundary1 A B).comp (bbBoundary2 A B) = 0 := by
@@ -290,6 +361,12 @@ lemma bbBoundary_comp : (bbBoundary1 A B).comp (bbBoundary2 A B) = 0 := by
   -- Goal: conv (conv A B) f g + conv (conv A B) f g = 0
   -- That's `x + x = 0` in `ZMod 2` (i.e. `char F_2 = 2`).
   exact CharTwo.add_self_eq_zero _
+
+/-- The chain-complex law in computable form: `∂₁ (∂₂ f) = 0`. -/
+lemma bbBoundaryFn_comp (f : G → ZMod 2) :
+    bbBoundary1Fn A B (bbBoundary2Fn A B f) = 0 := by
+  have h := LinearMap.congr_fun (bbBoundary_comp A B) f
+  simpa [bbBoundary1_apply, bbBoundary2_apply] using h
 
 /-! ## Packaging as a `HomologicalCode`
 

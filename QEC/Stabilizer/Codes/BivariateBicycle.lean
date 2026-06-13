@@ -3,6 +3,9 @@ import QEC.Stabilizer.Codes.BivariateBicycle.CoverTransfer
 import QEC.Stabilizer.Codes.BivariateBicycle.DeckHomotopy
 import QEC.Stabilizer.Codes.BivariateBicycle.Witness
 import QEC.Stabilizer.Codes.BivariateBicycle.Assembly
+import QEC.Stabilizer.Codes.BivariateBicycle.BaseDistance
+import QEC.Stabilizer.Codes.BivariateBicycle.DangerousSector
+import QEC.Stabilizer.Codes.BivariateBicycle.SafeSector
 
 /-!
 # Bivariate bicycle codes
@@ -19,7 +22,15 @@ code and its `[[72, 12, 6]]` base, related by a 2:1 covering:
                     `DangerousSectorGe12`, `SafeSectorGe12`) as named
                     hypotheses, the `b = 0` rung discharged, and the
                     Pauli-level corollaries
+- `BaseDistance`  — `BaseDistanceGe6` discharged (small-cycle theorem,
+                    verified-finite leaf) ⟹ **unconditional d(gross) ≥ 6**
+- `DangerousSector` — the slice identity, the m-rungs, and (M) modulo the
+                    single `LightStabilizerClassification` hypothesis
+- `SafeSector`    — the Smith-coset reduction (from the deck homotopy (R))
+                    of the safe sector to the single `MImBound` hypothesis;
+                    final assembly `gross_pauli_distance_eq_12_of_engine`
 
-The full `StabilizerCode` packaging and the discharge of the three sector
-hypotheses (A4 Theorems A/C/D) are later phases.
+The full `StabilizerCode` packaging and the discharge of the two remaining
+CRT-engine hypotheses (A4 §6.3 classification; A4 Part II (M-im)) are later
+phases.
 -/
