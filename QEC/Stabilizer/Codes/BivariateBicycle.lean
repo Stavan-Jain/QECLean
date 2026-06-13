@@ -6,6 +6,7 @@ import QEC.Stabilizer.Codes.BivariateBicycle.Assembly
 import QEC.Stabilizer.Codes.BivariateBicycle.BaseDistance
 import QEC.Stabilizer.Codes.BivariateBicycle.DangerousSector
 import QEC.Stabilizer.Codes.BivariateBicycle.SafeSector
+import QEC.Stabilizer.Codes.BivariateBicycle.StabilizerCode
 
 /-!
 # Bivariate bicycle codes
