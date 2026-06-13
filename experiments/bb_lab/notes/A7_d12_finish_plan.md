@@ -24,6 +24,47 @@ VERIFICATION (re-run by hand, `lake env lean`, this session):
 
 ---
 
+> ### Session update — 2026-06-13 (M-R3 DONE + corrections)
+>
+> **M-R3 is landed and committed-ready in `SafeSector.lean`** (clean `lake build`,
+> axiom-clean: only the standard three + pre-existing `native_decide` axioms, no
+> new axioms, no sorries). Two new theorems:
+> - **`seamC_mem_cycles`** — the chain-level Smith connecting map lands in cycles:
+>   `∂₂ ζ = 0 → seamC ζ ∈ bb72Complex.cycles`. This is the load-bearing foundation
+>   the entire `MImBound` floor program rests on (it is what makes
+>   `chainWeight (seamC ζ + ∂₂ f)` a *cycle* weight to bound).
+> - **`mim_bound_ge_6`** — `MImBound` with the target relaxed 12→6, unconditional:
+>   `∀ ζ ∈ ker ∂₂, ∀ f, seamC ζ + ∂₂ f ∉ boundaries → 6 ≤ chainWeight (…)`.
+>
+> **Key insight (corrects the plan below):** `seamC_mem_cycles` is proved by
+> **double-cover exactness** (`coverPush1_eq_zero_iff`: `ker p = im τ`), **NOT seam
+> geometry**. `liftStab ζ` is a gross cycle pushing to `∂₂ ζ = 0`, so it equals
+> `coverPull1 u`; `u` is a base cycle (`τ` injective chain map) and
+> `seamC ζ = seamN ζ = sheet0(liftStab ζ) = u`. The naive abstract-nonsense route
+> fails — the seamN↔seamC symmetry is char-2-degenerate (`∂₁ seamN = ∂₁ seamC`
+> gives `2·∂₁ seamC = 0`, i.e. nothing) — so M-R3 was **not** "zero new infra" as
+> §5/§7 claim; it needed this one lemma, which turned out tractable via exactness.
+>
+> **Three more corrections found this session:**
+> 1. **Unconditional `d ≥ 6` is already proven in-repo** — `gross_chainWeight_ge_6`
+>    (`BaseDistance.lean:356`), `gross_logical_weight_ge_6` (`:385`),
+>    `grossStabilizerCode_logical_weight_ge_6` (`StabilizerCode.lean:2944`). So the
+>    "honest fallback (d≥6 unconditional)" in §1 is *already banked*; M-R3's distinct
+>    value is the **base-coset / `seamC` form** specifically (exercises the plumbing
+>    the engine needs).
+> 2. **Stale path:** `CoverTransfer.lean` is at
+>    `QEC/Stabilizer/Codes/BivariateBicycle/CoverTransfer.lean`, **not**
+>    `Framework/Homological/` (the §7 "Relevant files" citation is wrong).
+> 3. **Probe-1 as literally written is infeasible:** the LHS
+>    `∃ f : BaseGroup → ZMod 2, bbBoundary2Fn baseA baseB f = b` is an existential
+>    over `2³⁶ ≈ 7×10¹⁰` functions — `Fintype.decidableExistsFintype` would try to
+>    enumerate all of them, so it is **not** `native_decide`-able directly. M-DEC must
+>    route through the parity matrices (`H_A`/`H_B`) or span membership, never the
+>    raw existential. (The plan calls `decidableExistsFintype` a "soundness anchor";
+>    it is a *correctness reference*, not a runnable decision procedure here.)
+
+---
+
 ## 1. Bottom line
 
 **Feasible, but frame-gated, with exactly one genuine research gamble — and it is NOT the piece everyone fears.**
@@ -134,7 +175,7 @@ QEC/Stabilizer/Codes/BivariateBicycle/CRTFrame.lean
 | **L5b** | 252-boundary witness oracle + total `decode` function | native_decide | med | `decode b` yields correct g/(g,d) for all 252 table entries (native_decide) |
 | **L5c** | Six-shape resolution finite leaf (translation-normalized, **plain tuples**, gated by M-DEC) | native_decide | high | ~10⁵ leaf GREEN; 4 shapes killed, 2 pinned to hexagon/D-pair A-blocks |
 | **L5d** | **DISCHARGE LightStab**: assemble L4a/L4b/L4c/L5b/L5c + x↔y swap; `theorem lightStabilizerClassification_holds : LightStabilizerClassification`; drop `hC` | hybrid | high | `dangerous_sector_of_classification` becomes unconditional; axiom-clean |
-| **M-R3** | Warm-up: ≥6 coset bound (parity + `base_cycle_weight_ge_6`), zero new infra | analytic | low | `6 ≤ chainWeight (seamC ζ + ∂₂f)` for nonzero coset elements |
+| **M-R3** ✅ | **DONE** — Warm-up: ≥6 coset bound. Needed `seamC_mem_cycles` (1 new lemma via cover exactness, *not* "zero infra"), then `base_cycle_weight_ge_6`. Landed in `SafeSector.lean` as `seamC_mem_cycles` + `mim_bound_ge_6` | analytic | low | ✅ `6 ≤ chainWeight (seamC ζ + ∂₂f)` for nonzero coset elements; clean build, axiom-clean |
 | **M-PAR** | Even-weight reduction: sub-12 weights ⊆ {6,8,10} | analytic | med | augmentation argument; Â₀=B̂₀ shared parity |
 | **M-ORBIT** | ker ∂₂ → 5 translation orbits + transport covariance | hybrid | med | 63 ζ enumerated → 5 reps; `d2c∘T = T∘d2c` |
 | **M-VANISH** | §9.4 off₀=off₂=0, c₁=c₂=0, ρ-link confinement (native_decide over the 63 ζ) | analytic | high | the ρ-links proven; V₁R/V₂L confined to im ρ₁/im ρ₂ |
@@ -178,7 +219,17 @@ Create **`experiments/bb_lab/phase6/MembershipProbe.lean`** (sibling to the alre
 
 2. **Full-scale six-shape leaf probe (L5c, the one unvalidated *shape*).** native_decide a representative *single-shape* ~10⁵ plain-tuple weight-≤5 `Fin 36` enumeration gated by a cheap parity predicate — mirroring `smallCycleCheck_four`'s plain-tuple idiom (`BaseDistance.lean:209`), **NOT** `Finset.powersetCard`, **NOT** conv-predicates. Confirms the L5c budget at the real shape (LeafProbe already cleared 1.68×10⁶; this confirms the *gated* shape).
 
-3. **Bank the warm-up immediately (zero new infra, committable today).** In `SafeSector.lean` (or a scratch lemma), prove `M-R3`: for `ζ ∈ ker ∂₂` and any `f`, `seamC ζ + ∂₂f` is a base 1-cycle (reuse `safe_sector_of_mim`'s `hwform` plumbing, `SafeSector.lean:228–247`), rewrite via `bb72Complex_chainWeight_eq` (`CoverTransfer.lean:228`), apply `base_cycle_weight_ge_6` (`BaseDistance.lean:221`) → `6 ≤ chainWeight`. This validates the ζ→ker∂₂→coset plumbing end-to-end and forces the M-DEC question into the open.
+3. ✅ **DONE this session — the warm-up is banked in `SafeSector.lean`.** The crux
+   was *not* "reuse `hwform` plumbing" (that is the reverse direction, `coverPush1 v →
+   seamC ζ + ∂₂ sheet0`); for arbitrary `ζ ∈ ker ∂₂, f` the coset element's
+   cycle-ness needed a genuinely new lemma, **`seamC_mem_cycles`** (`∂₂ ζ = 0 →
+   seamC ζ ∈ cycles`), proved via double-cover exactness `coverPush1_eq_zero_iff`
+   (`CoverTransfer.lean:198`) — `liftStab ζ` pushes to `0`, so it is `coverPull1 u`
+   with `u` a base cycle, and `seamC ζ = seamN ζ = sheet0(liftStab ζ) = u`. Then
+   `mim_bound_ge_6` follows by `base_cycle_weight_ge_6` (`BaseDistance.lean:221`) +
+   `bb72Complex_chainWeight_eq`. Clean build, axiom-clean. This validated the
+   ζ→ker∂₂→coset plumbing end-to-end and **resolved** the cycle-ness question that
+   the whole `MImBound` floor program implicitly needs.
 
 **Run via** `lake env lean experiments/bb_lab/phase6/MembershipProbe.lean` (symlinked packages verified; manifests match).
 
@@ -191,7 +242,7 @@ Create **`experiments/bb_lab/phase6/MembershipProbe.lean`** (sibling to the alre
 - `/Users/stavanjain/Code/QuantumErrorCorrectionLean-fresh/.claude/worktrees/nifty-elion-8d9df3/QEC/Stabilizer/Codes/BivariateBicycle/StabilizerCode.lean` (`grossStabilizerCode_hasCodeDistance_12` `:2954`)
 - `/Users/stavanjain/Code/QuantumErrorCorrectionLean-fresh/.claude/worktrees/nifty-elion-8d9df3/QEC/Stabilizer/Codes/BivariateBicycle/BaseDistance.lean` (`cycle_weight_even` `:175`, `base_cycle_weight_ge_6` `:221`, `smallCycleCheck_four` `:209`)
 - `/Users/stavanjain/Code/QuantumErrorCorrectionLean-fresh/.claude/worktrees/nifty-elion-8d9df3/QEC/Stabilizer/Framework/Homological/BBChainComplex.lean` (`bbBoundary2Fn` `:208`, `conv` `:49`, `_translate` `:308`, `_add` `:332`)
-- `/Users/stavanjain/Code/QuantumErrorCorrectionLean-fresh/.claude/worktrees/nifty-elion-8d9df3/QEC/Stabilizer/Framework/Homological/CoverTransfer.lean` (`bb72Complex_chainWeight_eq` `:228`)
+- `/Users/stavanjain/Code/QuantumErrorCorrectionLean-fresh/.claude/worktrees/nifty-elion-8d9df3/QEC/Stabilizer/Codes/BivariateBicycle/CoverTransfer.lean` (`bb72Complex_chainWeight_eq` `:228`, `coverPush1_eq_zero_iff` `:198`, `coverPull_boundary1_comm` `:157`, `coverPull0_injective` `:189` — the exactness package M-R3's `seamC_mem_cycles` is built from) **[path corrected: this file is under `Codes/BivariateBicycle/`, not `Framework/Homological/`]**
 - `/Users/stavanjain/Code/QuantumErrorCorrectionLean-fresh/.claude/worktrees/nifty-elion-8d9df3/experiments/bb_lab/phase6/{FrameProbe,EngineProbe,LeafProbe,Probe}.lean` (GREEN; promote into CRTFrame.lean) — **currently untracked; commit them**
 - `/Users/stavanjain/Code/QuantumErrorCorrectionLean-fresh/.claude/worktrees/nifty-elion-8d9df3/experiments/bb_lab/notes/A4_writeup.md` (§3 frame `:110–175`, §6.2–6.3 LightStab `:347–446`, §§9.4–13 MImBound `:694–1265`)
 - New module to create: `/Users/stavanjain/Code/QuantumErrorCorrectionLean-fresh/.claude/worktrees/nifty-elion-8d9df3/QEC/Stabilizer/Codes/BivariateBicycle/CRTFrame.lean`
