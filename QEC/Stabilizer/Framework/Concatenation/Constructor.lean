@@ -102,26 +102,67 @@ lemma promote_count_eq_sum (h₁ h₂ : NQubitPauliGroupElement n₂) :
       exact hi
   rw [himg, Finset.card_image_of_injective _ (fun i i' h => (qIdx_injective h).2)]
 
+/-- `1 ≠ -1` in the `n`-qubit Pauli group (distinct phase powers). -/
+lemma one_ne_minusOne {n : ℕ} : (1 : NQubitPauliGroupElement n) ≠ minusOne n := by
+  intro he
+  have := congrArg NQubitPauliGroupElement.phasePower he
+  simp at this
+
+/-- An element never anticommutes with itself (it would force `1 = -1`). -/
+lemma not_anticommute_self {n : ℕ} (p : NQubitPauliGroupElement n) : ¬ Anticommute p p := by
+  intro h
+  rw [Anticommute] at h
+  exact one_ne_minusOne (mul_right_cancel (b := p * p) (by rw [one_mul]; exact h))
+
+/-- The identity never anticommutes with anything on the left. -/
+lemma not_anticommute_one_left {n : ℕ} (g : NQubitPauliGroupElement n) : ¬ Anticommute 1 g := by
+  intro h
+  rw [Anticommute, one_mul, mul_one] at h
+  exact one_ne_minusOne (mul_right_cancel (b := g) (by rw [one_mul]; exact h))
+
+/-- The identity never anticommutes with anything on the right. -/
+lemma not_anticommute_one_right {n : ℕ} (g : NQubitPauliGroupElement n) : ¬ Anticommute g 1 :=
+  fun h => not_anticommute_one_left g (anticommute_symm _ _ h)
+
+/-- The zero-phase embedding of the identity operator is the group identity. -/
+@[simp] lemma ofOperator_identity {n : ℕ} :
+    ofOperator (NQubitPauliOperator.identity n) = 1 := rfl
+
 open Classical in
 /-- Per-block parity: the single-qubit promoted count at block `b` is odd iff the
-underlying outer operators anticommute at `b` (requires no-`Y` at `b`). -/
+underlying outer operators anticommute at `b` (requires no-`Y` at `b`).
+
+Proved filter-free: convert `Odd (filter …).card` to `Anticommute (ofOperator …)` via
+`anticommutes_iff_odd_anticommutes`, then a `{I,X,Z}²` case analysis using the group-level
+`Anticommute` facts (self / `1` / `X̄·Z̄`). This sidesteps the `DecidablePred` instance
+mismatch that blocks any `card = 0` rewrite on the goal's filter. -/
 lemma cnt_odd_iff (h₁ h₂ : NQubitPauliGroupElement n₂) (b : Fin n₂)
     (hY₁ : h₁.operators b ≠ PauliOperator.Y) (hY₂ : h₂.operators b ≠ PauliOperator.Y) :
     Odd (Finset.univ.filter (anticommutesAt (promoteSingle D.Xbar D.Zbar (h₁.operators b))
         (promoteSingle D.Xbar D.Zbar (h₂.operators b)))).card
       ↔ anticommutesAt h₁.operators h₂.operators b := by
-  sorry
-  -- TODO(concat-m3,R6): the MATH is settled and the case structure is correct —
-  -- `rcases` on (h₁ b, h₂ b) ∈ {I,X,Z}² (Y excluded by hY); the 2 off-diagonal cases
-  -- (X,Z)/(Z,X) are odd via `anticommutes_iff_odd_anticommutes` + `Xbar_Zbar_anticommute`
-  -- (+`anticommute_symm`); the 7 commuting cases have an empty filter (card 0) via
-  -- `not_anticommutesAt_self` / `not_anticommutesAt_of_{left,right}_I`; `decide` then
-  -- closes each concrete iff (it reduces the noncomputable `mulOp` through the rfl table).
-  -- BLOCKER: closing the 7 even cases requires reducing `(filter (anticommutesAt A B) univ).card`
-  -- to 0, but the goal's `DecidablePred` instance on that filter won't unify with any
-  -- constructed `card = 0` / `filter = ∅` / `sum_eq_zero` term (rw/simp metavars don't pin
-  -- to the goal's instance). Needs an instance-alignment fix (e.g. `Finset.filter_congr_decidable`,
-  -- a `classical`-uniform restatement, or a `Finset.card_filter`-sum form proven by `Finset.sum_congr`).
+  have hodd : Odd (Finset.univ.filter (anticommutesAt
+        (promoteSingle D.Xbar D.Zbar (h₁.operators b))
+        (promoteSingle D.Xbar D.Zbar (h₂.operators b)))).card
+      ↔ Anticommute (ofOperator (promoteSingle D.Xbar D.Zbar (h₁.operators b)))
+          (ofOperator (promoteSingle D.Xbar D.Zbar (h₂.operators b))) :=
+    (anticommutes_iff_odd_anticommutes
+      (ofOperator (promoteSingle D.Xbar D.Zbar (h₁.operators b)))
+      (ofOperator (promoteSingle D.Xbar D.Zbar (h₂.operators b)))).symm
+  rw [hodd]
+  rcases hP : h₁.operators b with _ | _ | _ | _ <;>
+      rcases hQ : h₂.operators b with _ | _ | _ | _ <;>
+      first
+        | exact absurd hP hY₁
+        | exact absurd hQ hY₂
+        | (conv_rhs => unfold NQubitPauliGroupElement.anticommutesAt
+           simp only [hP, hQ, promoteSingle, ofOperator_identity]
+           first
+             | exact iff_of_true D.Xbar_Zbar_anticommute (by decide)
+             | exact iff_of_true (anticommute_symm _ _ D.Xbar_Zbar_anticommute) (by decide)
+             | exact iff_of_false (not_anticommute_self _) (by decide)
+             | exact iff_of_false (not_anticommute_one_left _) (by decide)
+             | exact iff_of_false (not_anticommute_one_right _) (by decide))
 
 open Classical in
 /-- **(R6)** Promotion preserves the parity of the anticommuting-position count:
@@ -132,19 +173,28 @@ This is exactly why promoted outer generators commute on the nose.
 The `no-Y` hypotheses are essential: `promoteSingle` sends `Y ↦ I`, which would break
 the per-block parity at any `Y`. CSS outer generators (Z-type or X-type) satisfy them.
 
-Foundations in place (`ofOperator_Xbar/Zbar`, `Xbar_Zbar_anticommute`,
-`not_anticommutesAt_self`, `anticommutesAt_promoteE`). Remaining: block-decompose the
-LHS count (`card_eq_sum_card_fiberwise` by `blockOf`, per-fiber bijection via `qIdx`);
-per-block parity (`Odd cnt_b ↔ anticommutesAt h₁ h₂ b`) by `{I,X,Z}²` case analysis
-using `anticommutes_iff_odd_anticommutes` + `Xbar_Zbar_anticommute` + the two falsity
-lemmas; then mod-2 assembly via `Finset.card_filter` + `Finset.sum_nat_mod`. -/
+Proof: block-decompose the promoted count (`promote_count_eq_sum`), reduce mod 2 to a
+sum of per-block parities (`cnt_odd_iff`), and match against the outer count written as
+`∑ indicators` (`Finset.card_filter`). -/
 lemma promote_anticommute_parity (h₁ h₂ : NQubitPauliGroupElement n₂)
     (hY₁ : ∀ b, h₁.operators b ≠ PauliOperator.Y)
     (hY₂ : ∀ b, h₂.operators b ≠ PauliOperator.Y) :
     Even (Finset.univ.filter (anticommutesAt (promoteE D.Xbar D.Zbar h₁).operators
         (promoteE D.Xbar D.Zbar h₂).operators)).card
       ↔ Even (Finset.univ.filter (anticommutesAt h₁.operators h₂.operators)).card := by
-  sorry -- TODO(concat-m3,R6): block-decomp + per-block parity + mod-2 assembly (see docstring).
+  have key : (Finset.univ.filter (anticommutesAt (promoteE D.Xbar D.Zbar h₁).operators
+        (promoteE D.Xbar D.Zbar h₂).operators)).card % 2
+      = (Finset.univ.filter (anticommutesAt h₁.operators h₂.operators)).card % 2 := by
+    rw [D.promote_count_eq_sum h₁ h₂, Finset.card_filter, Finset.sum_nat_mod]
+    congr 1
+    refine Finset.sum_congr rfl (fun b _ => ?_)
+    by_cases hb : anticommutesAt h₁.operators h₂.operators b
+    · simp only [if_pos hb]
+      exact Nat.odd_iff.mp ((D.cnt_odd_iff h₁ h₂ b (hY₁ b) (hY₂ b)).mpr hb)
+    · simp only [if_neg hb]
+      exact Nat.even_iff.mp (Nat.not_odd_iff_even.mp
+        (fun ho => hb ((D.cnt_odd_iff h₁ h₂ b (hY₁ b) (hY₂ b)).mp ho)))
+  rw [Nat.even_iff, Nat.even_iff, key]
 
 /-- All concatenated generators pairwise commute. -/
 lemma concat_generators_commute :

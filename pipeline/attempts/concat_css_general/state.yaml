@@ -9,7 +9,7 @@ status: formalization          # M1, M2 landed; M3–M7 pending
 track: engineering
 started_at: '2026-06-15'
 worktree_branch: claude/beautiful-lalande-04ce1f
-phase: stage-4-m3-skeleton     # M3 constructor structure typechecks; 8 obligation proofs pending
+phase: stage-4-m3-r6-done      # M3 crux R6 (promote_anticommute_parity) fully proven; 7 obligations pending
 estimated_loc: 1650            # ~1560-1740 across 8 new modules
 sorries_closed: 35             # M1 (18) + M2 (17 decls), all proven; M3 structure typechecks
 sorries_open: 8                # M3 obligations in Constructor.lean (R6 parity core + dependents)
