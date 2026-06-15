@@ -78,10 +78,17 @@ VERIFICATION (re-run by hand, `lake env lean`, this session):
 > `V_add : V psi s (f+g) = V psi s f + V psi s g` (`CRTFrame.lean §6`) — the piece the
 > plan calls "the one delicate piece" — via a generic char-2 fold-split `foldl_char2`
 > whose only arithmetic is one `decide` over 256 cells; **kernel-checked, no
-> native_decide** (`foldl_char2` axioms = `[propext]`). **Remaining for M2 (C):** the
-> mechanical basis→∀z assembly (additivity of `baseP⋆·`, `conv2`, and `V` ⟹ the
-> general `V_j(baseP⋆z)=P̂_j·V_j(z)` for all z by support induction). Then LightStab
-> (M-DEC, L4a–L5d) to drop hC.
+> native_decide** (`foldl_char2` axioms = `[propext]`). **(C) DONE too** (`CRTFrame.lean
+> §7`): `mult_of_basis` lifts the basis case to the general `V_j(baseP⋆z)=P̂_j·V_j(z)`
+> ∀z by a `Pi.single` support induction (`conv`/`V`/`rmul` all F₂-additive) — itself
+> kernel-checked (standard-3, no native_decide); the six radical instances
+> `mult_A1/A3/A4/B2/B3/B4` add only the sanctioned basis oracle.
+>
+> **⟹ The CRT frame (M1 + M2 + M3) is now structurally COMPLETE** — computable F₄,
+> the ring, the engine support-shape lemma, and the full multiplicativity engine all
+> built and wired into the umbrella. **Next: LightStab** (M-DEC decidable boundary
+> membership, then L4a–L5d) to discharge `LightStabilizerClassification` and drop
+> `hC`; then MImBound (the research gamble) for `hMim`.
 
 ---
 
@@ -186,7 +193,7 @@ QEC/Stabilizer/Codes/BivariateBicycle/CRTFrame.lean
 |---|---|---|---|---|
 | **M0** | Extend `phase6/` probes: (a) decidable `b ∈ im ∂₂ ↔ H_A·b=0` on ~10 b; (b) re-confirm `EngineProbe`/`FrameProbe` GREEN | native_decide | low | both probes exit 0; membership check matches `Fintype.decidableExistsFintype` on a hexagon, a D-pair, a non-boundary |
 | **M1** ✅ | **DONE** — `CRTFrame.lean`: computable F4 + `F₄[Z₂²]` ring (rmul), field axioms by decide, CRT layer/torus coords, radical multipliers Â₁/Â₄/B̂₂. Wired into umbrella | infrastructure | low | ✅ `lake build …CRTFrame` clean; F4 axioms `by decide` (kernel-checked, no native_decide); axiom-clean |
-| **M2** ◑ | V_j transforms (all 5) + **F₂-linearity bridge lemma** + multiplicativity (all ~10 (j,P) instances). **(A) DONE**: all 10 basis-chain instances `V_j(baseP⋆δ_p)=P̂_j·V_j(δ_p)` native_decide GREEN (`MultProbe.lean`) — conventions certified, no flip. **(B) bridge DONE**: `V_add : V psi s (f+g) = V psi s f + V psi s g` in `CRTFrame.lean §6`, via the generic char-2 fold-split `foldl_char2` (kernel-checked — `foldl_char2` axioms = `[propext]` only, no native_decide; the char-2 cancellation is one `decide` over 256 cells). **(C) remains**: the mechanical basis→∀z *assembly* (`baseP⋆·`, `conv2`, `V` all additive ⟹ general `V_j(baseP⋆z)=P̂_j·V_j(z)` ∀z by support induction) — linearity bookkeeping, not delicate | hybrid | med | (A) ✅ ×10 GREEN; (B) ✅ bridge kernel-checked; (C) ∀z assembly pending |
+| **M2** ✅ | **DONE** — V_j transforms + F₂-linearity bridge + general multiplicativity. **(A)** all 10 basis-chain instances certified native_decide GREEN (`MultProbe.lean`). **(B)** `V_add` bridge (`CRTFrame.lean §6`) via char-2 fold-split `foldl_char2` (kernel-checked, axioms `[propext]`). **(C)** general `V_j(baseP⋆z)=P̂_j·V_j(z)` ∀z (`CRTFrame.lean §7`): `mult_of_basis` (support induction; `conv`/`V`/`rmul` all additive) lifts the basis case — `mult_of_basis` is **kernel-checked** (standard-3, no native_decide); the six radical instances `mult_A1/A3/A4/B2/B3/B4` add only the sanctioned basis oracle | hybrid | med | ✅ all of A/B/C GREEN; `mult_of_basis` axioms = standard-3 (no native_decide) |
 | **M3** ✅ | **DONE** — Engine support-shape lemma (D²=0, Ann(D)=(D), ≥3 layers) as named Lean lemmas over the 256-ring, for all three distinct radical multipliers (Â₁=Â₃, Â₄, B̂₂=B̂₃=B̂₄). In `CRTFrame.lean` §5 | hybrid | med | ✅ `EngineProbe` facts promoted to named lemmas, GREEN (native_decide) |
 | **M-DEC** | Decidable boundary membership: parity matrices `H_A,H_B`; `b ∈ boundaries ↔ H_A·b_A=0 ∧ H_B·b_B=0`, with basis-correctness proven *equivalent* to `LinearMap.range` (not asserted) | hybrid | med | `↔` proven; native_decide that H is a basis for the left-nullspace |
 | **L4a** | PARITY for boundaries (reuse `cycle_weight_even`) ⇒ \|b\|≤11 ⟹ \|b\|≤10 | analytic | low | `(card supp ∂₂f) % 2 = 0` via `cycle_weight_even` + `bbBoundaryFn_comp` |

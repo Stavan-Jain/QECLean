@@ -243,6 +243,156 @@ theorem V_add (psi : BaseGroup → Fin 4) (s : ZMod 2 × ZMod 2)
   funext h
   rw [Pi.add_apply, hz, hb]
 
+/-! ## §7 General multiplicativity `V_j(baseP⋆z) = P̂_j·V_j(z)` for all chains.
+
+The basis-chain identity (M2-(A): `V_j(baseP⋆δ_p) = P̂_j·V_j(δ_p)`, native_decide
+on the `Pi.single p 1`, all 10 (j,P) instances GREEN in `phase6/MultProbe.lean`)
+lifts to **all** chains `z` because every map in sight is F₂-linear: the
+convolution `conv baseP ·` (`conv_add_right`), the transform `V` (`V_add`), and
+the ring product `rmul` (`rmul_add_right`).  `mult_of_basis` packages the support
+induction; the six radical-multiplier instances the engine (§5) consumes are
+spelled out below. -/
+
+/-- Generic F₄ fold-additivity: a `fadd`-fold of a pointwise sum splits. -/
+theorem foldl_add {α : Type} (m n : α → Fin 4) :
+    ∀ (L : List α) (aM aN : Fin 4),
+      L.foldl (fun acc s' => fadd acc (fadd (m s') (n s'))) (fadd aM aN)
+        = fadd (L.foldl (fun acc s' => fadd acc (m s')) aM)
+               (L.foldl (fun acc s' => fadd acc (n s')) aN) := by
+  have step : ∀ (w x y z : Fin 4),
+      fadd (fadd w x) (fadd y z) = fadd (fadd w y) (fadd x z) := by decide
+  intro L
+  induction L with
+  | nil => intro aM aN; rfl
+  | cons h t ih =>
+    intro aM aN
+    simp only [List.foldl_cons]
+    rw [step aM aN (m h) (n h)]
+    exact ih (fadd aM (m h)) (fadd aN (n h))
+
+/-- `rmul` is additive in its second argument. -/
+theorem rmul_add_right (P q q' : ZMod 2 × ZMod 2 → Fin 4) :
+    rmul P (fun t => fadd (q t) (q' t)) = fun s => fadd (rmul P q s) (rmul P q' s) := by
+  funext s
+  unfold rmul
+  simp only [fmul_fadd]
+  exact foldl_add (fun s' => fmul (P s') (q (s - s')))
+    (fun s' => fmul (P s') (q' (s - s'))) allS 0 0
+
+/-- `V` of the zero chain is `0`. -/
+theorem V_zero (psi : BaseGroup → Fin 4) (s : ZMod 2 × ZMod 2) :
+    V psi s (0 : BaseGroup → ZMod 2) = 0 := by
+  unfold V fsum
+  have : (fun h => decide (layer h = s) && decide ((0 : BaseGroup → ZMod 2) h = 1))
+      = (fun _ : BaseGroup => false) := by funext h; simp
+  rw [this]
+  induction allG with
+  | nil => rfl
+  | cons a t ih => simp only [Bool.false_eq_true, if_false]; exact ih
+
+/-- `rmul P 0 = 0`. -/
+theorem rmul_zero_right (P : ZMod 2 × ZMod 2 → Fin 4) :
+    rmul P (fun _ => 0) = fun _ => 0 := by
+  funext s
+  unfold rmul
+  have hmul : ∀ x : Fin 4, fmul x 0 = 0 := by decide
+  simp only [hmul]
+  induction allS with
+  | nil => rfl
+  | cons a t ih => simpa [fadd] using ih
+
+/-- Indicator of a finset as a `ZMod 2` chain. -/
+def ind (S : Finset BaseGroup) : BaseGroup → ZMod 2 := fun g => if g ∈ S then 1 else 0
+
+theorem ind_empty : ind ∅ = 0 := by funext g; simp [ind]
+
+theorem ind_insert {p : BaseGroup} {S : Finset BaseGroup} (hp : p ∉ S) :
+    ind (insert p S) = Pi.single p 1 + ind S := by
+  funext g
+  simp only [ind, Finset.mem_insert, Pi.add_apply, Pi.single_apply]
+  by_cases hgp : g = p
+  · have hgS : g ∉ S := by rw [hgp]; exact hp
+    rw [if_pos (Or.inl hgp), if_pos hgp, if_neg hgS, add_zero]
+  · by_cases hgS : g ∈ S
+    · rw [if_pos (Or.inr hgS), if_neg hgp, if_pos hgS, zero_add]
+    · rw [if_neg (not_or.mpr ⟨hgp, hgS⟩), if_neg hgp, if_neg hgS, add_zero]
+
+theorem self_eq_ind_filter (z : BaseGroup → ZMod 2) :
+    z = ind (Finset.univ.filter (fun p => z p = 1)) := by
+  have hz : ∀ a : ZMod 2, (if a = 1 then (1 : ZMod 2) else 0) = a := by decide
+  funext g
+  simp only [ind, Finset.mem_filter, Finset.mem_univ, true_and]
+  exact (hz (z g)).symm
+
+/-- **General multiplicativity from the basis case.**  If the multiplicativity
+identity holds on every point-mass chain `Pi.single p 1`, it holds for every
+chain `z` — by F₂-linearity of `conv baseP ·`, `V`, and `rmul`. -/
+theorem mult_of_basis (psi : BaseGroup → Fin 4) (P : BaseGroup → ZMod 2)
+    (Phat : ZMod 2 × ZMod 2 → Fin 4)
+    (hbasis : ∀ (p : BaseGroup) (s : ZMod 2 × ZMod 2),
+      V psi s (conv P (Pi.single p 1)) = rmul Phat (fun s' => V psi s' (Pi.single p 1)) s)
+    (z : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) :
+    V psi s (conv P z) = rmul Phat (fun s' => V psi s' z) s := by
+  have goal_add : ∀ (a b : BaseGroup → ZMod 2),
+      (∀ s, V psi s (conv P a) = rmul Phat (fun s' => V psi s' a) s) →
+      (∀ s, V psi s (conv P b) = rmul Phat (fun s' => V psi s' b) s) →
+      (∀ s, V psi s (conv P (a + b)) = rmul Phat (fun s' => V psi s' (a + b)) s) := by
+    intro a b ha hb s
+    rw [conv_add_right, V_add]
+    rw [show (fun s' => V psi s' (a + b))
+        = (fun s' => fadd (V psi s' a) (V psi s' b)) from by funext s'; rw [V_add]]
+    rw [rmul_add_right, ha s, hb s]
+  have goal_zero : ∀ s, V psi s (conv P (0 : BaseGroup → ZMod 2))
+      = rmul Phat (fun s' => V psi s' (0 : BaseGroup → ZMod 2)) s := by
+    intro s
+    have hc0 : conv P (0 : BaseGroup → ZMod 2) = 0 := by funext g; simp [conv_apply]
+    rw [hc0, V_zero,
+      show (fun s' => V psi s' (0 : BaseGroup → ZMod 2)) = (fun _ => 0) from by
+        funext s'; exact V_zero psi s',
+      rmul_zero_right]
+  have key : ∀ (S : Finset BaseGroup) (s),
+      V psi s (conv P (ind S)) = rmul Phat (fun s' => V psi s' (ind S)) s := by
+    intro S
+    induction S using Finset.induction with
+    | empty => rw [ind_empty]; exact goal_zero
+    | @insert p S hp ih => rw [ind_insert hp]; exact goal_add _ _ (hbasis p) ih
+  rw [self_eq_ind_filter z]
+  exact key _ s
+
+/-! ### The six radical-multiplier multiplicativity identities (engine inputs).
+Each `by native_decide` discharges the 36-`δ_p` basis case; `mult_of_basis`
+lifts it to all `z`. -/
+
+/-- `Â₁`: `V₁(A⋆z) = Â₁·V₁(z)`. -/
+theorem mult_A1 (z : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) :
+    V psi1 s (conv baseA z) = rmul Ahat1 (fun s' => V psi1 s' z) s :=
+  mult_of_basis psi1 baseA Ahat1 (by native_decide) z s
+
+/-- `Â₃ = Â₁`: `V₃(A⋆z) = Â₁·V₃(z)`. -/
+theorem mult_A3 (z : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) :
+    V psi3 s (conv baseA z) = rmul Ahat1 (fun s' => V psi3 s' z) s :=
+  mult_of_basis psi3 baseA Ahat1 (by native_decide) z s
+
+/-- `Â₄`: `V₄(A⋆z) = Â₄·V₄(z)`. -/
+theorem mult_A4 (z : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) :
+    V psi4 s (conv baseA z) = rmul Ahat4 (fun s' => V psi4 s' z) s :=
+  mult_of_basis psi4 baseA Ahat4 (by native_decide) z s
+
+/-- `B̂₂`: `V₂(B⋆z) = B̂₂·V₂(z)`. -/
+theorem mult_B2 (z : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) :
+    V psi2 s (conv baseB z) = rmul Bhat2 (fun s' => V psi2 s' z) s :=
+  mult_of_basis psi2 baseB Bhat2 (by native_decide) z s
+
+/-- `B̂₃ = B̂₂`: `V₃(B⋆z) = B̂₂·V₃(z)`. -/
+theorem mult_B3 (z : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) :
+    V psi3 s (conv baseB z) = rmul Bhat2 (fun s' => V psi3 s' z) s :=
+  mult_of_basis psi3 baseB Bhat2 (by native_decide) z s
+
+/-- `B̂₄ = B̂₂`: `V₄(B⋆z) = B̂₂·V₄(z)`. -/
+theorem mult_B4 (z : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) :
+    V psi4 s (conv baseB z) = rmul Bhat2 (fun s' => V psi4 s' z) s :=
+  mult_of_basis psi4 baseB Bhat2 (by native_decide) z s
+
 end CRTFrame
 end BB
 end Homological
