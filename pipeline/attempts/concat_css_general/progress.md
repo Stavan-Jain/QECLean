@@ -84,6 +84,48 @@ Worktree prep: symlinked `.lake/packages` to main's prebuilt mathlib
 - **M4** (`centralizer_classify_of_k1`) can proceed in parallel — it depends
   only on `Framework/Symplectic`, not on M2/M3.
 
+## Session 2 — M2 (Tier 1a promotion + ConcatCSSData) (2026-06-15)
+
+**Summary: M2 COMPLETE.** `QEC/Stabilizer/Framework/Concatenation/Promotion.lean`
+written and fully proven — 0 sorries, 0 warnings, 17 declarations, verified by
+`lake build QEC.Stabilizer.Framework.Concatenation` (3354 jobs). Wired into the
+`Framework.Concatenation` umbrella.
+
+### Closed (17 decls)
+- `promoteSingle` / `promoteOp` / `promoteE` (zero-phase `ofOperator`), with
+  `promoteE_phasePower` / `_operators`.
+- `promoteE_isZ` / `promoteE_isX` — a Z-type (resp. X-type) outer operator
+  promotes to a Z-type (resp. X-type) element, given a CSS-typed `Z̄`/`X̄`. The
+  `promoteSingle` `Y` branch is provably never reached.
+- `ConcatCSSData` bundle: `Cin`/`Cout`, the typed `innerZ/X`, `outerZ/X` splits
+  (`List.Perm` to the real generator lists), and the CSS-typed phase-0 inner
+  logical reps `Xbar`/`Zbar`.
+- Generator list: `s1PerBlockList` (inner stabs per block, via M1 `embedBlock`),
+  `promotedOuterList` (typed), `concatGeneratorsList`; plus `s1PerBlockList_length`
+  (`n₂*(n₁-1)`), `promotedOuterList_length` (`n₂-k₂`), `concatGeneratorsList_length`
+  (`n₁*n₂-k₂`), `concatGeneratorsList_phaseZero`.
+
+### Patterns / gotchas
+- `StabilizerCode` is `Quantum.StabilizerGroup.StabilizerCode` (nested under the
+  `StabilizerGroup` namespace) → need `open StabilizerGroup`.
+- `List.Perm` infix `~` is NOT in scope here; write `List.Perm a b` explicitly.
+- `AllPhaseZero` / `listToSet` / `GeneratorsIndependent` live in
+  `Framework.Symplectic.IndependentEquiv`, so Promotion imports `Framework.Core`
+  + `Framework.Symplectic` (it is NOT Foundations-only, unlike Embedding).
+- Length arithmetic `n₂*(n₁-1) + (n₂-k₂) = n₁*n₂-k₂`: omega can't multiply, so
+  feed it `e1 : n₂*(n₁-1) = n₁*n₂-n₂` (`Nat.mul_sub`+`mul_one`+`mul_comm`) and
+  `e2 : n₂ ≤ n₁*n₂` (`Nat.le_mul_of_pos_left`), then omega.
+
+### Next step
+- **M3** — `Codes/Concat/Constructor.lean`: the hard `generators_commute` (via M1
+  `anticommutesAt_count_eq` + a per-block parity lemma over the promoted list),
+  `closure_no_neg_identity` (CSS union lemma), `generators_independent`, the
+  concat logicals, and the `concatenate : ConcatCSSData → StabilizerCode (n₁*n₂) k₂`
+  packaging. Build `promote_anticommute_filter_card_parity` standalone first (R6).
+- **M4** (`centralizer_classify_of_k1`) remains available to run in parallel —
+  it only touches `Framework/Symplectic`.
+
 <!-- Stage-4 runner: append "Session N" sections here as work proceeds. -->
+
 
 </content>
