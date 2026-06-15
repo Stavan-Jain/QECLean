@@ -24,7 +24,7 @@ VERIFICATION (re-run by hand, `lake env lean`, this session):
 
 ---
 
-> ### Session update — 2026-06-13 (M-R3 DONE + corrections)
+> ### Session update — 2026-06-15 (M-R3 + CRTFrame M1/M3 DONE + corrections)
 >
 > **M-R3 is landed and committed-ready in `SafeSector.lean`** (clean `lake build`,
 > axiom-clean: only the standard three + pre-existing `native_decide` axioms, no
@@ -62,6 +62,17 @@ VERIFICATION (re-run by hand, `lake env lean`, this session):
 >    route through the parity matrices (`H_A`/`H_B`) or span membership, never the
 >    raw existential. (The plan calls `decidableExistsFintype` a "soundness anchor";
 >    it is a *correctness reference*, not a runnable decision procedure here.)
+>
+> **CRT frame M1 + M3 also landed** (`CRTFrame.lean`, wired into the umbrella,
+> clean single-module build). M1: computable F₄ (`Fin 4` + explicit tables) with
+> field axioms `by decide` (kernel-checked, no native_decide), the `F₄[Z₂²]` ring
+> (`rmul`), CRT layer/torus coordinates, and the three distinct radical multipliers
+> `Â₁=Â₃=(3,1,2,0)`, `Â₄=(2,1,3,0)`, `B̂₂=B̂₃=B̂₄=(3,2,1,0)`. M3: the engine
+> support-shape lemma (`D²=0`, `Ann(D)=(D)`, ≥3-layer dichotomy) as named theorems
+> over the 256-ring for all three multipliers (native_decide GREEN). **Next: M2** —
+> the `V_j` transforms + the F₂-linearity multiplicativity bridge `V_j(A·z)=Â_j·ẑ_j`
+> (the one delicate piece; carries the repo-left=lab-right / ω-vs-ω² convention
+> risk flagged in §6's risk register), then drive LightStab (M-DEC, L4a–L5d).
 
 ---
 
@@ -165,9 +176,9 @@ QEC/Stabilizer/Codes/BivariateBicycle/CRTFrame.lean
 | # | Milestone | Kind | Diff | Acceptance criterion |
 |---|---|---|---|---|
 | **M0** | Extend `phase6/` probes: (a) decidable `b ∈ im ∂₂ ↔ H_A·b=0` on ~10 b; (b) re-confirm `EngineProbe`/`FrameProbe` GREEN | native_decide | low | both probes exit 0; membership check matches `Fintype.decidableExistsFintype` on a hexagon, a D-pair, a non-boundary |
-| **M1** | `CRTFrame.lean`: computable F4 + `F₄[Z₂²]` ring, field axioms by decide, wired into umbrella | infrastructure | low | `lake build QEC.Stabilizer.Codes.BivariateBicycle.CRTFrame` clean; F4 axioms `by decide` |
+| **M1** ✅ | **DONE** — `CRTFrame.lean`: computable F4 + `F₄[Z₂²]` ring (rmul), field axioms by decide, CRT layer/torus coords, radical multipliers Â₁/Â₄/B̂₂. Wired into umbrella | infrastructure | low | ✅ `lake build …CRTFrame` clean; F4 axioms `by decide` (kernel-checked, no native_decide); axiom-clean |
 | **M2** | V_j transforms (all 5) + **F₂-linearity bridge lemma** + multiplicativity (all ~10 (j,P) instances) | hybrid | med | `V_j(baseA⋆z)=Â_j·V_j(z)` ∀z proven (bridge + 144-case native_decide ×10); a convention-flip fails loudly here, not downstream |
-| **M3** | Engine support-shape lemma (Ann(D)=(D), ≥3 layers) as Lean lemmas over the 256-ring | hybrid | med | the `EngineProbe` facts promoted to named lemmas, GREEN |
+| **M3** ✅ | **DONE** — Engine support-shape lemma (D²=0, Ann(D)=(D), ≥3 layers) as named Lean lemmas over the 256-ring, for all three distinct radical multipliers (Â₁=Â₃, Â₄, B̂₂=B̂₃=B̂₄). In `CRTFrame.lean` §5 | hybrid | med | ✅ `EngineProbe` facts promoted to named lemmas, GREEN (native_decide) |
 | **M-DEC** | Decidable boundary membership: parity matrices `H_A,H_B`; `b ∈ boundaries ↔ H_A·b_A=0 ∧ H_B·b_B=0`, with basis-correctness proven *equivalent* to `LinearMap.range` (not asserted) | hybrid | med | `↔` proven; native_decide that H is a basis for the left-nullspace |
 | **L4a** | PARITY for boundaries (reuse `cycle_weight_even`) ⇒ \|b\|≤11 ⟹ \|b\|≤10 | analytic | low | `(card supp ∂₂f) % 2 = 0` via `cycle_weight_even` + `bbBoundaryFn_comp` |
 | **L4b** | FLOOR lemma (both blocks ≥3 nonzero layers) over the frame, using M3 | analytic | high | for `b=∂₂f≠0`, \|b\|≤10 ⟹ each block ≥3 layers |

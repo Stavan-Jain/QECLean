@@ -1,4 +1,5 @@
 import QEC.Stabilizer.Codes.BivariateBicycle.Defs
+import QEC.Stabilizer.Codes.BivariateBicycle.CRTFrame
 import QEC.Stabilizer.Codes.BivariateBicycle.CoverTransfer
 import QEC.Stabilizer.Codes.BivariateBicycle.DeckHomotopy
 import QEC.Stabilizer.Codes.BivariateBicycle.Witness
@@ -15,6 +16,10 @@ Chain-level formalization of the gross `[[144, 12, 12]]` bivariate bicycle
 code and its `[[72, 12, 6]]` base, related by a 2:1 covering:
 
 - `Defs`          — groups, polynomials, chain complexes, covering data
+- `CRTFrame`      — the CRT layer frame (A4 §3): computable F₄, the group
+                    algebra `F₄[Z₂²]`, layer/torus coordinates, and the engine
+                    support-shape lemma (M1 + M3 foundation for discharging the
+                    two CRT-engine hypotheses; M2 multiplicativity is next)
 - `CoverTransfer` — pushforward/pullback chain maps, exactness, weight identity
 - `DeckHomotopy`  — the deck homotopy (R): `v + σv` bounds for every cycle `v`
 - `Witness`       — the explicit weight-12 nontrivial cycle `τ(u*)`
