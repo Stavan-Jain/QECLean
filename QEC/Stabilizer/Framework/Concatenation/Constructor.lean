@@ -74,6 +74,56 @@ lemma anticommutesAt_promoteE (h₁ h₂ : NQubitPauliGroupElement n₂) (q : Fi
 /-! ## Commutation obligation (R6 parity core) -/
 
 open Classical in
+/-- Block-decomposition: the promoted anticommuting-position count is the sum over
+blocks of the per-block single-qubit promoted counts. -/
+lemma promote_count_eq_sum (h₁ h₂ : NQubitPauliGroupElement n₂) :
+    (Finset.univ.filter (anticommutesAt (promoteE D.Xbar D.Zbar h₁).operators
+        (promoteE D.Xbar D.Zbar h₂).operators)).card
+      = ∑ b : Fin n₂, (Finset.univ.filter (anticommutesAt
+          (promoteSingle D.Xbar D.Zbar (h₁.operators b))
+          (promoteSingle D.Xbar D.Zbar (h₂.operators b)))).card := by
+  rw [Finset.card_eq_sum_card_fiberwise (fun q _ => Finset.mem_univ (blockOf q))]
+  refine Finset.sum_congr rfl (fun b _ => ?_)
+  rw [Finset.filter_filter]
+  have himg : Finset.univ.filter (fun q => anticommutesAt (promoteE D.Xbar D.Zbar h₁).operators
+        (promoteE D.Xbar D.Zbar h₂).operators q ∧ blockOf q = b)
+      = (Finset.univ.filter (anticommutesAt (promoteSingle D.Xbar D.Zbar (h₁.operators b))
+          (promoteSingle D.Xbar D.Zbar (h₂.operators b)))).image (qIdx b) := by
+    ext q
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_image]
+    constructor
+    · rintro ⟨hac, hb⟩
+      refine ⟨posOf q, ?_, by rw [← hb]; exact qIdx_blockOf_posOf q⟩
+      rw [D.anticommutesAt_promoteE, hb] at hac
+      exact hac
+    · rintro ⟨i, hi, rfl⟩
+      refine ⟨?_, blockOf_qIdx b i⟩
+      rw [D.anticommutesAt_promoteE, blockOf_qIdx, posOf_qIdx]
+      exact hi
+  rw [himg, Finset.card_image_of_injective _ (fun i i' h => (qIdx_injective h).2)]
+
+open Classical in
+/-- Per-block parity: the single-qubit promoted count at block `b` is odd iff the
+underlying outer operators anticommute at `b` (requires no-`Y` at `b`). -/
+lemma cnt_odd_iff (h₁ h₂ : NQubitPauliGroupElement n₂) (b : Fin n₂)
+    (hY₁ : h₁.operators b ≠ PauliOperator.Y) (hY₂ : h₂.operators b ≠ PauliOperator.Y) :
+    Odd (Finset.univ.filter (anticommutesAt (promoteSingle D.Xbar D.Zbar (h₁.operators b))
+        (promoteSingle D.Xbar D.Zbar (h₂.operators b)))).card
+      ↔ anticommutesAt h₁.operators h₂.operators b := by
+  sorry
+  -- TODO(concat-m3,R6): the MATH is settled and the case structure is correct —
+  -- `rcases` on (h₁ b, h₂ b) ∈ {I,X,Z}² (Y excluded by hY); the 2 off-diagonal cases
+  -- (X,Z)/(Z,X) are odd via `anticommutes_iff_odd_anticommutes` + `Xbar_Zbar_anticommute`
+  -- (+`anticommute_symm`); the 7 commuting cases have an empty filter (card 0) via
+  -- `not_anticommutesAt_self` / `not_anticommutesAt_of_{left,right}_I`; `decide` then
+  -- closes each concrete iff (it reduces the noncomputable `mulOp` through the rfl table).
+  -- BLOCKER: closing the 7 even cases requires reducing `(filter (anticommutesAt A B) univ).card`
+  -- to 0, but the goal's `DecidablePred` instance on that filter won't unify with any
+  -- constructed `card = 0` / `filter = ∅` / `sum_eq_zero` term (rw/simp metavars don't pin
+  -- to the goal's instance). Needs an instance-alignment fix (e.g. `Finset.filter_congr_decidable`,
+  -- a `classical`-uniform restatement, or a `Finset.card_filter`-sum form proven by `Finset.sum_congr`).
+
+open Classical in
 /-- **(R6)** Promotion preserves the parity of the anticommuting-position count:
 the count of physical qubits where two promoted outer operators anticommute has the
 same parity as the count of outer qubits where the underlying operators anticommute.

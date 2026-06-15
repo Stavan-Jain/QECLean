@@ -207,7 +207,38 @@ satisfy them, so the callers can supply them.
 3. **Mod-2 assembly**: `card_filter` (RHS = ∑ indicators) + `Finset.sum_nat_mod` +
    per-block parity ⇒ `card_promoted % 2 = card_outer % 2` ⇒ the `Even` iff.
 
+## Session 5 — R6 Step 1 proven; Step 2 blocked on filter-instance plumbing (2026-06-15)
+
+### Proven
+- **`promote_count_eq_sum`** (R6 Step 1, the hardest structural piece): the promoted
+  anticommuting-position count = `∑_b` per-block single-qubit promoted counts. Via
+  `Finset.card_eq_sum_card_fiberwise` (by `blockOf`) + per-fiber `qIdx` bijection
+  (filter=image, like M1's `anticommutesAt_count_eq`) + `anticommutesAt_promoteE`.
+  **Compiles first try.**
+- De-privatized M1's `not_anticommutesAt_of_left_I` / `_right_I` for reuse.
+
+### Step 2 (`cnt_odd_iff`) — math settled, blocked on Lean plumbing
+The case structure is correct and verified empirically: `rcases (h₁ b, h₂ b)` over
+`{I,X,Z}²` (Y excluded by hY); the (X,Z)/(Z,X) cases close via
+`anticommutes_iff_odd_anticommutes` + `Xbar_Zbar_anticommute`; the 7 commuting cases
+have empty filters. `decide` DOES reduce the noncomputable `mulOp` (confirmed), so the
+concrete iffs close.
+
+**BLOCKER (engineering, not math):** the 7 even cases need
+`(filter (anticommutesAt A B) univ).card = 0`, but the goal's `DecidablePred` instance
+on that filter won't unify with any constructed `card=0` / `filter=∅` / `card_filter`+
+`sum_eq_zero` term — `rw`/`simp` metavars don't pin to the goal's instance.
+`rw [Finset.card_filter]` succeeds (card → ∑ if), but `Finset.sum_eq_zero` then can't
+match (then-branch `1` vs metavar). Left as a tagged `sorry` with the full recipe.
+Fix ideas: `Finset.filter_congr_decidable` to normalize the instance; restate the
+filters `classical`-uniformly; or `conv` into the goal's filter (concrete predicate).
+
+### R6 status: ~70%
+Foundations (5) + Step 1 (block-decomposition) proven. Remaining: Step 2 instance fix,
+then Step 3 (mod-2 assembly: `card_filter` + `Finset.sum_nat_mod` + Steps 1&2).
+
 <!-- Stage-4 runner: append "Session N" sections here as work proceeds. -->
+
 
 
 

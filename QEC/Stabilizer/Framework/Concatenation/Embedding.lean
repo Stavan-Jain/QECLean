@@ -166,14 +166,14 @@ theorem weight_ge_of_blocks_ge (d₁ : ℕ) (g : NQubitPauliGroupElement (n₁ *
 /-! ## Commutation (parity route only) -/
 
 /-- `anticommutesAt` is false wherever the left operator is `I`. -/
-private lemma not_anticommutesAt_of_left_I {m : ℕ} (P Q : NQubitPauliOperator m) (i : Fin m)
+lemma not_anticommutesAt_of_left_I {m : ℕ} (P Q : NQubitPauliOperator m) (i : Fin m)
     (hI : P i = PauliOperator.I) :
     ¬ NQubitPauliGroupElement.anticommutesAt P Q i := by
   simp only [NQubitPauliGroupElement.anticommutesAt, hI]
   cases Q i <;> simp
 
 /-- `anticommutesAt` is false wherever the right operator is `I`. -/
-private lemma not_anticommutesAt_of_right_I {m : ℕ} (P Q : NQubitPauliOperator m) (i : Fin m)
+lemma not_anticommutesAt_of_right_I {m : ℕ} (P Q : NQubitPauliOperator m) (i : Fin m)
     (hI : Q i = PauliOperator.I) :
     ¬ NQubitPauliGroupElement.anticommutesAt P Q i := by
   simp only [NQubitPauliGroupElement.anticommutesAt, hI]
