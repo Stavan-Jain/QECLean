@@ -196,14 +196,106 @@ lemma promote_anticommute_parity (h₁ h₂ : NQubitPauliGroupElement n₂)
         (fun ho => hb ((D.cnt_odd_iff h₁ h₂ b (hY₁ b) (hY₂ b)).mp ho)))
   rw [Nat.even_iff, Nat.even_iff, key]
 
+/-- An inner generator commutes with the inner logical `X` (it lies in `Cin`'s stabilizer,
+which the logical centralizes). -/
+lemma inner_gen_comm_logicalX (g : NQubitPauliGroupElement n₁)
+    (hg : g ∈ NQubitPauliGroupElement.listToSet D.Cin.generatorsList) :
+    g * (D.Cin.logicalOps 0).xOp = (D.Cin.logicalOps 0).xOp * g :=
+  (mem_centralizer_iff _ _).mp (D.Cin.logicalOps 0).x_mem_centralizer g
+    (Subgroup.subset_closure hg)
+
+/-- An inner generator commutes with the inner logical `Z`. -/
+lemma inner_gen_comm_logicalZ (g : NQubitPauliGroupElement n₁)
+    (hg : g ∈ NQubitPauliGroupElement.listToSet D.Cin.generatorsList) :
+    g * (D.Cin.logicalOps 0).zOp = (D.Cin.logicalOps 0).zOp * g :=
+  (mem_centralizer_iff _ _).mp (D.Cin.logicalOps 0).z_mem_centralizer g
+    (Subgroup.subset_closure hg)
+
+/-- An inner generator commutes with the zero-phase embedding of any single-qubit promotion
+`I ↦ 1`, `X ↦ X̄`, `Z ↦ Z̄` (the `Y` branch is excluded). -/
+lemma inner_gen_comm_promoteSingle (g : NQubitPauliGroupElement n₁)
+    (hg : g ∈ NQubitPauliGroupElement.listToSet D.Cin.generatorsList)
+    (P : PauliOperator) (hPY : P ≠ PauliOperator.Y) :
+    g * ofOperator (promoteSingle D.Xbar D.Zbar P)
+      = ofOperator (promoteSingle D.Xbar D.Zbar P) * g := by
+  rcases P with _ | _ | _ | _
+  · change g * (1 : NQubitPauliGroupElement n₁) = 1 * g
+    rw [mul_one, one_mul]
+  · rw [show promoteSingle D.Xbar D.Zbar PauliOperator.X = D.Xbar from rfl, D.ofOperator_Xbar]
+    exact D.inner_gen_comm_logicalX g hg
+  · exact absurd rfl hPY
+  · rw [show promoteSingle D.Xbar D.Zbar PauliOperator.Z = D.Zbar from rfl, D.ofOperator_Zbar]
+    exact D.inner_gen_comm_logicalZ g hg
+
+/-- An embedded inner generator commutes with any promoted (`Y`-free) outer operator:
+they agree where the inner operator is non-`I` (block `b`), reducing to the inner generator
+commuting with the inner logical there. -/
+lemma embedBlock_promoteE_commute (b : Fin n₂) (g : NQubitPauliGroupElement n₁)
+    (hg : g ∈ NQubitPauliGroupElement.listToSet D.Cin.generatorsList)
+    (h : NQubitPauliGroupElement n₂) (hhY : ∀ b', h.operators b' ≠ PauliOperator.Y) :
+    embedBlock b g * promoteE D.Xbar D.Zbar h
+      = promoteE D.Xbar D.Zbar h * embedBlock b g := by
+  classical
+  rw [commutes_iff_even_anticommutes]
+  have hpred : anticommutesAt (embedBlock b g).operators (promoteE D.Xbar D.Zbar h).operators
+      = anticommutesAt (embedBlock b g).operators
+          (embedBlock b (ofOperator (promoteSingle D.Xbar D.Zbar (h.operators b)))).operators := by
+    funext q
+    by_cases hbq : blockOf q = b
+    · have hval : (promoteE D.Xbar D.Zbar h).operators q
+          = (embedBlock b
+              (ofOperator (promoteSingle D.Xbar D.Zbar (h.operators b)))).operators q := by
+        simp [embedBlock_operators, embedBlockOp, promoteE_operators, promoteOp, hbq]
+      unfold NQubitPauliGroupElement.anticommutesAt
+      rw [hval]
+    · have hI : (embedBlock b g).operators q = PauliOperator.I := by
+        simp [embedBlock_operators, embedBlockOp, hbq]
+      rw [eq_iff_iff]
+      constructor <;> intro hac <;>
+        exact absurd hac (not_anticommutesAt_of_left_I _ _ q hI)
+  rw [hpred, ← commutes_iff_even_anticommutes, embedBlock_commute_iff]
+  exact D.inner_gen_comm_promoteSingle g hg (h.operators b) (hhY b)
+
+/-- The typed outer generators are `Y`-free (Z-type or X-type). -/
+lemma outer_gen_noY (y : NQubitPauliGroupElement n₂) (hy : y ∈ D.outerZ ++ D.outerX) :
+    ∀ b', y.operators b' ≠ PauliOperator.Y := by
+  intro b'
+  rcases List.mem_append.mp hy with hz | hx
+  · rcases (D.outerZ_isZ y hz).2 b' with h | h <;> rw [h] <;> decide
+  · rcases (D.outerX_isX y hx).2 b' with h | h <;> rw [h] <;> decide
+
+/-- Membership in the concatenated generator list: every element is an embedded inner
+generator or a promoted (typed) outer generator. -/
+lemma mem_concatGeneratorsList (x : NQubitPauliGroupElement (n₁ * n₂))
+    (hx : x ∈ NQubitPauliGroupElement.listToSet D.concatGeneratorsList) :
+    (∃ b z, z ∈ NQubitPauliGroupElement.listToSet D.Cin.generatorsList ∧ embedBlock b z = x) ∨
+      (∃ y, y ∈ D.outerZ ++ D.outerX ∧ promoteE D.Xbar D.Zbar y = x) := by
+  simp only [NQubitPauliGroupElement.listToSet, Set.mem_setOf_eq,
+    ConcatCSSData.concatGeneratorsList, ConcatCSSData.s1PerBlockList,
+    ConcatCSSData.promotedOuterList, List.mem_append, List.mem_flatMap, List.mem_map] at hx
+  rcases hx with ⟨b, _, z, hz, rfl⟩ | ⟨y, hy, rfl⟩
+  · exact Or.inl ⟨b, z, hz, rfl⟩
+  · exact Or.inr ⟨y, List.mem_append.mpr hy, rfl⟩
+
 /-- All concatenated generators pairwise commute. -/
 lemma concat_generators_commute :
-    ∀ g ∈ listToSet D.concatGeneratorsList,
-      ∀ h ∈ listToSet D.concatGeneratorsList, g * h = h * g := by
-  sorry -- TODO(concat-m3): 4-case dispatch. inner/inner: embedBlock_commute_iff /
-  -- embedBlock_cross_commute + Cin.generators_commute. inner/promoted: inner logicals are
-  -- in Cin's centralizer ⇒ embedded stab commutes with promoted block op. promoted/promoted:
-  -- commutes_iff_even_anticommutes + promote_anticommute_parity + Cout.generators_commute.
+    ∀ g ∈ NQubitPauliGroupElement.listToSet D.concatGeneratorsList,
+      ∀ h ∈ NQubitPauliGroupElement.listToSet D.concatGeneratorsList, g * h = h * g := by
+  intro g hg h hh
+  rcases D.mem_concatGeneratorsList g hg with ⟨b₁, z₁, hz₁, rfl⟩ | ⟨y₁, hy₁, rfl⟩ <;>
+    rcases D.mem_concatGeneratorsList h hh with ⟨b₂, z₂, hz₂, rfl⟩ | ⟨y₂, hy₂, rfl⟩
+  · by_cases hbb : b₁ = b₂
+    · subst hbb
+      rw [embedBlock_commute_iff]
+      exact D.Cin.generators_commute z₁ hz₁ z₂ hz₂
+    · exact embedBlock_cross_commute hbb z₁ z₂
+  · exact D.embedBlock_promoteE_commute b₁ z₁ hz₁ y₂ (D.outer_gen_noY y₂ hy₂)
+  · exact (D.embedBlock_promoteE_commute b₂ z₂ hz₂ y₁ (D.outer_gen_noY y₁ hy₁)).symm
+  · rw [commutes_iff_even_anticommutes,
+      D.promote_anticommute_parity y₁ y₂ (D.outer_gen_noY y₁ hy₁) (D.outer_gen_noY y₂ hy₂),
+      ← commutes_iff_even_anticommutes]
+    exact D.Cout.generators_commute y₁ (D.outer_split.mem_iff.mpr hy₁)
+      y₂ (D.outer_split.mem_iff.mpr hy₂)
 
 /-! ## No `-I`, independence -/
 
