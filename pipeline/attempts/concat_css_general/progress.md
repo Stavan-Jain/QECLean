@@ -237,7 +237,37 @@ filters `classical`-uniformly; or `conv` into the goal's filter (concrete predic
 Foundations (5) + Step 1 (block-decomposition) proven. Remaining: Step 2 instance fix,
 then Step 3 (mod-2 assembly: `card_filter` + `Finset.sum_nat_mod` + Steps 1&2).
 
+## Session 6 — R6 COMPLETE (filter-instance wall cracked) (2026-06-15)
+
+**`promote_anticommute_parity` (R6) is fully proven.** The M3 crux is done; build green.
+
+### The fix
+The Step-2 blocker (the goal's `DecidablePred` instance on `Finset.filter (anticommutesAt …)`
+wouldn't unify with any `card = 0` term) is **sidestepped by never touching the filter in
+the per-block fact**. `cnt_odd_iff` now:
+1. converts `Odd (filter …).card` → `Anticommute (ofOperator (promoteSingle … P)) (ofOperator
+   (promoteSingle … Q))` via `anticommutes_iff_odd_anticommutes` (passing explicit `ofOperator`
+   args so Lean infers the witness instead of failing HO-unification on `.operators`);
+2. does the `{I,X,Z}²` case analysis purely with group-level `Anticommute` facts — no filters,
+   no instances.
+
+New group lemmas: `one_ne_minusOne`, `not_anticommute_self`, `not_anticommute_one_left/right`
+(each forces `1 = -1` via `mul_right_cancel` + phase powers), `ofOperator_identity`.
+
+### R6 chain proven (12 lemmas)
+`ofOperator_Xbar/Zbar`, `Xbar_Zbar_anticommute`, `not_anticommutesAt_self`,
+`anticommutesAt_promoteE`, `promote_count_eq_sum` (block-decomp, Step 1),
+`one_ne_minusOne`, `not_anticommute_self`, `not_anticommute_one_left/right`,
+`ofOperator_identity`, `cnt_odd_iff` (Step 2), `promote_anticommute_parity` (Step 3 assembly:
+`promote_count_eq_sum` + `Finset.card_filter` + `Finset.sum_nat_mod` + `cnt_odd_iff`).
+
+### Remaining M3 obligations (7, all unblocked by R6)
+`concat_generators_commute` (4-case: M1 embedBlock lemmas + inner-logical centralizer + R6),
+`concat_closure_no_neg_identity` (Z∪X regroup + CSS lemma), `concat_generators_independent`
+(symplectic bridge or `ConcatCSSData` field), and the 4 logical lemmas (R6 + outer logicals).
+
 <!-- Stage-4 runner: append "Session N" sections here as work proceeds. -->
+
 
 
 
