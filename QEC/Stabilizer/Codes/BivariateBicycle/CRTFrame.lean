@@ -169,6 +169,80 @@ theorem Bhat2_ideal_ge3 : all16.all (fun ab =>
     let r : Ring := fun s => fadd (fmul ab.1 (Bhat2 s)) (fmul ab.2 (uv s))
     decide (r = (fun _ => 0)) || decide (nLayers r ≥ 3)) = true := by native_decide
 
+/-! ## §6 The component transform `V` and its F₂-linearity (M2 bridge).
+
+`V psi s f = Σ_{h : layer h = s, f h = 1} psi h` (sum in F₄).  The load-bearing
+fact for the multiplicativity engine is that `V` is **F₂-linear in the chain**
+`f` (`V_add`), proved from a generic char-2 fold-splitting lemma (`foldl_char2`,
+whose only arithmetic content is one `decide` over the 256 `Bool²×Fin 4³`
+accumulator cases).  This is what lifts the basis-chain multiplicativity
+(M2-(A): `V_j(baseP⋆δ_p) = P̂_j·V_j(δ_p)`, native_decide on the 36 `δ_p`, all 10
+(j,P) instances GREEN in `phase6/MultProbe.lean`) to all chains `z`.  The five
+component characters are the A4 §3 frame characters. -/
+
+/-- Enumeration of the base group (36 cells). -/
+def allG : List BaseGroup :=
+  (List.range 6).flatMap (fun a => (List.range 6).map (fun b => ((a : ZMod 6), (b : ZMod 6))))
+
+/-- Component characters (A4 §3): ψ₀=1, ψ₁=ω^{t_y}, ψ₂=ω^{t_x},
+ψ₃=ω^{t_x+t_y}, ψ₄=ω^{t_x+2t_y}. -/
+def psi0 : BaseGroup → Fin 4 := fun _ => 1
+def psi1 : BaseGroup → Fin 4 := fun g => omegaPow (torus1 g.2)
+def psi2 : BaseGroup → Fin 4 := fun g => omegaPow (torus1 g.1)
+def psi3 : BaseGroup → Fin 4 := fun g => omegaPow (torus1 g.1 + torus1 g.2)
+def psi4 : BaseGroup → Fin 4 := fun g => omegaPow (torus1 g.1 + 2 * torus1 g.2)
+
+/-- Generic char-2 transform: `fadd`-fold of `b` over the cells where `P` holds. -/
+def fsum (b : BaseGroup → Fin 4) (P : BaseGroup → Bool) : Fin 4 :=
+  allG.foldl (fun acc h => if P h then fadd acc (b h) else acc) 0
+
+/-- **The char-2 fold splits over an XOR predicate** (generic over any list /
+predicates; the Fin-4 accumulator step is one `decide` over all 256
+`Bool²×Fin 4³` cases). -/
+theorem foldl_char2 (b : BaseGroup → Fin 4) (Pf Pg : BaseGroup → Bool) :
+    ∀ (L : List BaseGroup) (aF aG : Fin 4),
+      fadd (L.foldl (fun acc h => if Pf h then fadd acc (b h) else acc) aF)
+           (L.foldl (fun acc h => if Pg h then fadd acc (b h) else acc) aG)
+      = L.foldl (fun acc h => if (Pf h != Pg h) then fadd acc (b h) else acc)
+          (fadd aF aG) := by
+  have accStep : ∀ (p q : Bool) (x y z : Fin 4),
+      fadd (if p then fadd x z else x) (if q then fadd y z else y)
+        = if (p != q) then fadd (fadd x y) z else fadd x y := by decide
+  intro L
+  induction L with
+  | nil => intro aF aG; rfl
+  | cons h t ih =>
+    intro aF aG
+    simp only [List.foldl_cons]
+    rw [ih, accStep (Pf h) (Pg h) aF aG (b h)]
+
+/-- `fsum` is F₂-additive on predicates: XOR of predicates adds the sums. -/
+theorem fsum_xor (b : BaseGroup → Fin 4) (Pf Pg : BaseGroup → Bool) :
+    fadd (fsum b Pf) (fsum b Pg) = fsum b (fun h => Pf h != Pg h) := by
+  have h := foldl_char2 b Pf Pg allG 0 0
+  simpa [fsum] using h
+
+/-- The CRT component transform at layer `s`:
+`V psi s f = Σ_{h : layer h = s, f h = 1} psi h` (sum in F₄). -/
+def V (psi : BaseGroup → Fin 4) (s : ZMod 2 × ZMod 2) (f : BaseGroup → ZMod 2) : Fin 4 :=
+  fsum psi (fun h => decide (layer h = s) && decide (f h = 1))
+
+/-- **The F₂-linearity bridge (M2-(B)): `V` is additive in the chain.**  This is
+the load-bearing step that lifts the basis-chain multiplicativity (M2-(A),
+native_decide on the 36 `δ_p`) to all chains `z`; it is the piece with no
+mathlib analogue (F₄ is `Fin 4`+tables, so there is no `AddCommMonoid` to borrow
+`Finset.sum` additivity from — hence the hand-rolled char-2 `foldl_char2`). -/
+theorem V_add (psi : BaseGroup → Fin 4) (s : ZMod 2 × ZMod 2)
+    (f g : BaseGroup → ZMod 2) :
+    V psi s (f + g) = fadd (V psi s f) (V psi s g) := by
+  have hz : ∀ a b : ZMod 2, decide (a + b = 1) = (decide (a = 1) != decide (b = 1)) := by decide
+  have hb : ∀ L F G : Bool, (L && (F != G)) = ((L && F) != (L && G)) := by decide
+  unfold V
+  rw [fsum_xor]
+  congr 1
+  funext h
+  rw [Pi.add_apply, hz, hb]
+
 end CRTFrame
 end BB
 end Homological
