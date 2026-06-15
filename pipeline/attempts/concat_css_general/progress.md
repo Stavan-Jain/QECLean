@@ -266,7 +266,40 @@ New group lemmas: `one_ne_minusOne`, `not_anticommute_self`, `not_anticommute_on
 `concat_closure_no_neg_identity` (Z∪X regroup + CSS lemma), `concat_generators_independent`
 (symplectic bridge or `ConcatCSSData` field), and the 4 logical lemmas (R6 + outer logicals).
 
+## Session 7 — concat_generators_commute proven (M3 obligation 1/7) (2026-06-15)
+
+**`concat_generators_commute` proven** (build green) — the linchpin obligation,
+the main R6 consumer. 4-case dispatch:
+- inner/inner: `embedBlock_commute_iff` / `embedBlock_cross_commute` + `Cin.generators_commute`
+- inner/promoted: new `embedBlock_promoteE_commute` (they agree where the inner op is
+  non-I, reducing to the inner gen commuting with X̄/Z̄ via centralizer membership)
+- promoted/promoted: `commutes_iff_even` + `promote_anticommute_parity` (R6) + `Cout.generators_commute`
+
+New helpers: `inner_gen_comm_logicalX/Z` (centralizer extraction via `mem_centralizer_iff` +
+`Subgroup.subset_closure`), `inner_gen_comm_promoteSingle`, `embedBlock_promoteE_commute`,
+`outer_gen_noY`, `mem_concatGeneratorsList`.
+
+### Remaining M3 (6 obligations) — scoped
+1. **`concat_closure_no_neg_identity`** (fiddly, ~70 lines): regroup `listToSet
+   concatGeneratorsList = ZGens ∪ XGens` (set-ext over `inner_split`/`outer_split`
+   perms + new `embedBlock_isZ/isX` typing + `promoteE_isZ/isX`), then
+   `negIdentity_not_mem_closure_union`. `hZX` is free from `concat_generators_commute`.
+2. **`concat_generators_independent`** (hard): block check-matrix independence via the
+   `SymplecticSpan` bridge, OR add `rowsLinearIndependent_concat` as a `ConcatCSSData`
+   field (structural change to M2) discharged per-instance (`native_decide` at small n).
+3-6. **The 4 logical lemmas** — BLOCKED on a structural gap: they need the *outer*
+   logicals `(Cout.logicalOps ℓ).xOp/.zOp` to be **Y-free**, which `ConcatCSSData`
+   does NOT carry. Fix: augment `ConcatCSSData` (M2) with `outerLogX_isX`/`outerLogZ_isZ`
+   (or pointwise no-Y) fields. Then: `_mem_centralizer` via `embedBlock_promoteE_commute`
+   (inner gens) + R6 (promoted gens, using outer-logical ∈ Cout centralizer);
+   `_anticommute` via an odd-parity analog of R6 (derivable: `Even ↔ Even` ⇒ `Odd ↔ Odd`)
+   from `(Cout.logicalOps ℓ).anticommute`; `_commute_cross` via R6 + `Cout.logical_commute_cross`.
+
+Two of the three remaining work-classes (independence field, outer-logical typing)
+touch the committed `ConcatCSSData` structure — a deliberate, scoped M2 revision.
+
 <!-- Stage-4 runner: append "Session N" sections here as work proceeds. -->
+
 
 
 
