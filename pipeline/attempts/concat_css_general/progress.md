@@ -171,7 +171,44 @@ Placement decision: the constructor lives in `Framework/Concatenation/`
   promoteE" helper (generalising M1's `anticommutesAt_count_eq`) is the first sub-step.
 - **M4** (`centralizer_classify_of_k1`) still independent / parallelizable.
 
+## Session 4 — R6 foundations (2026-06-15)
+
+Started closing the M3 crux `promote_anticommute_parity` (R6). **5 foundation
+lemmas proven** in `Constructor.lean` (build clean); R6 main + 7 dependents still
+`sorry`.
+
+### Correctness catch
+R6 as originally stated is **FALSE** for general operators: `promoteSingle` maps
+`Y ↦ I`, so any qubit carrying `Y` breaks the per-block parity. Fixed by adding
+`no-Y` hypotheses (`∀ b, hᵢ.operators b ≠ Y`); CSS outer generators (Z-/X-type)
+satisfy them, so the callers can supply them.
+
+### Proven foundations
+- `ofOperator_Xbar` / `ofOperator_Zbar` — `ofOperator X̄ = (Cin.logicalOps 0).xOp`
+  (they agree because the inner logical reps have phase 0, a `ConcatCSSData` field).
+- `Xbar_Zbar_anticommute` — `Anticommute (ofOperator X̄) (ofOperator Z̄)` from the
+  inner logical pair's `anticommute` field.
+- `not_anticommutesAt_self` — a Pauli never anticommutes with itself at a position
+  (`x = x + 2` impossible in `Fin 4`; via `Fin.val_add` + `omega`). Handles the
+  diagonal (X,X)/(Z,Z) empty-filter cases.
+- `anticommutesAt_promoteE` — per-position reduction: the promoted operators
+  anticommute at `q` iff the single-qubit promotions at block `blockOf q`
+  anticommute at `posOf q` (definitional via `promoteE_operators`+`promoteOp`).
+
+### Remaining for R6 (next push)
+1. **Block-decomposition** (`promote_count_eq_sum`): `card (filter promoted) =
+   ∑ b, cnt_b` via `Finset.card_eq_sum_card_fiberwise` (by `blockOf`) + per-fiber
+   bijection `qIdx b` (mirror M1's `anticommutesAt_count_eq`), using
+   `anticommutesAt_promoteE`.
+2. **Per-block parity**: `Odd cnt_b ↔ anticommutesAt h₁ h₂ b` by `{I,X,Z}²` cases
+   (no-Y): I/diagonal → `cnt_b = 0` (`not_anticommutesAt_self` + an identity-left/right
+   falsity — M1's are `private`, so reprove locally or de-private them); (X,Z)/(Z,X)
+   → odd via `anticommutes_iff_odd_anticommutes` + `Xbar_Zbar_anticommute`(+`anticommute_symm`).
+3. **Mod-2 assembly**: `card_filter` (RHS = ∑ indicators) + `Finset.sum_nat_mod` +
+   per-block parity ⇒ `card_promoted % 2 = card_outer % 2` ⇒ the `Even` iff.
+
 <!-- Stage-4 runner: append "Session N" sections here as work proceeds. -->
+
 
 
 
