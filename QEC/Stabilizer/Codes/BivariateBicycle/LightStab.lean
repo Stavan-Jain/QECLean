@@ -36,6 +36,7 @@ in a tracked file carries a `sorry`.
 orbit suffices for support confinement.
 -/
 import QEC.Stabilizer.Codes.BivariateBicycle.CRTFrame
+import QEC.Stabilizer.Codes.BivariateBicycle.DangerousSector
 
 open Quantum.Stabilizer.Homological.BB.CRTFrame
 
@@ -560,6 +561,79 @@ theorem transfer_hexagon (f : BaseGroup → ZMod 2) (g : BaseGroup)
   funext ⟨h, j⟩
   show (if j = 0 then conv baseA f h else conv baseB f h)
       = (if j = 0 then conv baseA δ h else conv baseB δ h)
+  by_cases hj : j = 0
+  · rw [if_pos hj, if_pos hj]; exact congrFun hA h
+  · rw [if_neg hj, if_neg hj]; exact congrFun hBeq h
+
+/-- Block-weight decomposition (≤): the two blocks' weights sum to at most `|∂₂f|`
+(disjoint `h↦(h,0)` / `h↦(h,1)` injections into the boundary support). -/
+theorem bwt_blocks_le_boundary (f : BaseGroup → ZMod 2) :
+    bwt (conv baseA f) + bwt (conv baseB f) ≤
+    (Finset.univ.filter (fun j : BaseGroup × Fin 2 => bbBoundary2Fn baseA baseB f j ≠ 0)).card := by
+  unfold bwt
+  have injA : Function.Injective (fun h : BaseGroup => (h, (0 : Fin 2))) :=
+    fun a b h => (Prod.mk.injEq ..).mp h |>.1
+  have injB : Function.Injective (fun h : BaseGroup => (h, (1 : Fin 2))) :=
+    fun a b h => (Prod.mk.injEq ..).mp h |>.1
+  rw [← Finset.card_image_of_injective _ injA, ← Finset.card_image_of_injective _ injB,
+    ← Finset.card_union_of_disjoint]
+  · apply Finset.card_le_card
+    intro p hp
+    simp only [Finset.mem_union, Finset.mem_image, Finset.mem_filter, Finset.mem_univ,
+      true_and] at hp
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+    rcases hp with ⟨h, hh, rfl⟩ | ⟨h, hh, rfl⟩
+    · rw [bb2_zero, hh]; exact one_ne_zero
+    · rw [bb2_one, hh]; exact one_ne_zero
+  · rw [Finset.disjoint_left]
+    intro p hpa hpb
+    simp only [Finset.mem_image, Finset.mem_filter] at hpa hpb
+    obtain ⟨a, _, rfl⟩ := hpa
+    obtain ⟨b, _, hb⟩ := hpb
+    exact absurd ((Prod.mk.injEq ..).mp hb).2 (by decide)
+
+/-- D-pair A-block is nonzero (weight ≥ 1). -/
+theorem bwt_baseA_dpair_ge1 : ∀ g : BaseGroup, ∀ d ∈ pairDirections,
+    1 ≤ bwt (conv baseA (Pi.single g 1 + Pi.single (g + d) 1)) := by native_decide
+/-- D-pair B-block has weight ≤ 6. -/
+theorem bwt_baseB_dpair_le6 : ∀ g : BaseGroup, ∀ d ∈ pairDirections,
+    bwt (conv baseB (Pi.single g 1 + Pi.single (g + d) 1)) ≤ 6 := by native_decide
+
+/-- **Endgame transfer (D-pair)**: if the A-block of `∂₂f` is `A·(δ_g+δ_{g+d})`,
+`d ∈ pairDirections`, and `|∂₂f| ≤ 10`, then `∂₂f = ∂₂(δ_g+δ_{g+d})`.  The crude
+`10+6` bound only gives `≤16`; the block decomposition tightens `|B·f| ≤ 10−w_A ≤ 9`
+(`w_A = bwt(A·witness) ≥ 1`), so `|B·w| ≤ 15 < 16`. -/
+theorem transfer_dpair (f : BaseGroup → ZMod 2) (g d : BaseGroup) (hd : d ∈ pairDirections)
+    (hA : conv baseA f = conv baseA (Pi.single g 1 + Pi.single (g + d) 1))
+    (hwt : (Finset.univ.filter (fun j : BaseGroup × Fin 2 =>
+      bbBoundary2Fn baseA baseB f j ≠ 0)).card ≤ 10) :
+    bbBoundary2Fn baseA baseB f
+      = bbBoundary2Fn baseA baseB (Pi.single g 1 + Pi.single (g + d) 1) := by
+  set wit : BaseGroup → ZMod 2 := Pi.single g 1 + Pi.single (g + d) 1 with hwit
+  have hself : ∀ x : ZMod 2, x + x = 0 := by decide
+  have hAw : conv baseA (f + wit) = 0 := by
+    rw [conv_add_right, hA]; funext h; rw [Pi.add_apply]; exact hself _
+  have hbound : bwt (conv baseB (f + wit)) < 16 := by
+    rw [conv_add_right]
+    have hBf : bwt (conv baseB f) ≤ 9 := by
+      have hdec := bwt_blocks_le_boundary f
+      have hA1 : 1 ≤ bwt (conv baseA f) := by rw [hA]; exact bwt_baseA_dpair_ge1 g d hd
+      omega
+    have hBwit : bwt (conv baseB wit) ≤ 6 := bwt_baseB_dpair_le6 g d hd
+    calc bwt (conv baseB f + conv baseB wit)
+          ≤ bwt (conv baseB f) + bwt (conv baseB wit) := bwt_add_le _ _
+      _ ≤ 9 + 6 := add_le_add hBf hBwit
+      _ < 16 := by norm_num
+  have hBw : conv baseB (f + wit) = 0 := oneBlock_contra _ hAw hbound
+  have hBeq : conv baseB f = conv baseB wit := by
+    funext h
+    have hpt : conv baseB f h + conv baseB wit h = 0 := by
+      have := congrFun hBw h; rwa [conv_add_right, Pi.add_apply] at this
+    have key : ∀ x y : ZMod 2, x + y = 0 → x = y := by decide
+    exact key _ _ hpt
+  funext ⟨h, j⟩
+  show (if j = 0 then conv baseA f h else conv baseB f h)
+      = (if j = 0 then conv baseA wit h else conv baseB wit h)
   by_cases hj : j = 0
   · rw [if_pos hj, if_pos hj]; exact congrFun hA h
   · rw [if_neg hj, if_neg hj]; exact congrFun hBeq h
