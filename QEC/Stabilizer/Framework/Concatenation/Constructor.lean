@@ -35,20 +35,66 @@ namespace ConcatCSSData
 
 variable (D : ConcatCSSData n₁ n₂ k₂)
 
+/-! ## R6 foundations: the inner logicals as zero-phase operators -/
+
+/-- `ofOperator Xbar` is the inner logical `X` (they agree because `X̄` has phase 0). -/
+lemma ofOperator_Xbar : ofOperator D.Xbar = (D.Cin.logicalOps 0).xOp := by
+  apply NQubitPauliGroupElement.ext
+  · rw [ofOperator_phasePower, D.innerLogX_phaseZero]
+  · rfl
+
+/-- `ofOperator Zbar` is the inner logical `Z`. -/
+lemma ofOperator_Zbar : ofOperator D.Zbar = (D.Cin.logicalOps 0).zOp := by
+  apply NQubitPauliGroupElement.ext
+  · rw [ofOperator_phasePower, D.innerLogZ_phaseZero]
+  · rfl
+
+/-- The promotion targets `X̄`, `Z̄` anticommute (they are the inner logical pair). -/
+lemma Xbar_Zbar_anticommute : Anticommute (ofOperator D.Xbar) (ofOperator D.Zbar) := by
+  rw [D.ofOperator_Xbar, D.ofOperator_Zbar]; exact (D.Cin.logicalOps 0).anticommute
+
+/-- A Pauli operator never anticommutes with itself at any position. -/
+lemma not_anticommutesAt_self {m : ℕ} (A : NQubitPauliOperator m) (i : Fin m) :
+    ¬ anticommutesAt A A i := by
+  intro h
+  rw [NQubitPauliGroupElement.anticommutesAt] at h
+  have hv := congrArg Fin.val h
+  simp only [Fin.val_add] at hv
+  omega
+
+/-- Per-position reduction: two promoted operators anticommute at physical qubit `q`
+exactly when the single-qubit promotions of `h₁`,`h₂` at block `blockOf q` anticommute
+at the in-block position `posOf q`. -/
+lemma anticommutesAt_promoteE (h₁ h₂ : NQubitPauliGroupElement n₂) (q : Fin (n₁ * n₂)) :
+    anticommutesAt (promoteE D.Xbar D.Zbar h₁).operators (promoteE D.Xbar D.Zbar h₂).operators q
+      = anticommutesAt (promoteSingle D.Xbar D.Zbar (h₁.operators (blockOf q)))
+          (promoteSingle D.Xbar D.Zbar (h₂.operators (blockOf q))) (posOf q) := by
+  simp only [NQubitPauliGroupElement.anticommutesAt, promoteE_operators, promoteOp]
+
 /-! ## Commutation obligation (R6 parity core) -/
 
 open Classical in
 /-- **(R6)** Promotion preserves the parity of the anticommuting-position count:
 the count of physical qubits where two promoted outer operators anticommute has the
 same parity as the count of outer qubits where the underlying operators anticommute.
-This is exactly why promoted outer generators commute on the nose. -/
-lemma promote_anticommute_parity (h₁ h₂ : NQubitPauliGroupElement n₂) :
+This is exactly why promoted outer generators commute on the nose.
+
+The `no-Y` hypotheses are essential: `promoteSingle` sends `Y ↦ I`, which would break
+the per-block parity at any `Y`. CSS outer generators (Z-type or X-type) satisfy them.
+
+Foundations in place (`ofOperator_Xbar/Zbar`, `Xbar_Zbar_anticommute`,
+`not_anticommutesAt_self`, `anticommutesAt_promoteE`). Remaining: block-decompose the
+LHS count (`card_eq_sum_card_fiberwise` by `blockOf`, per-fiber bijection via `qIdx`);
+per-block parity (`Odd cnt_b ↔ anticommutesAt h₁ h₂ b`) by `{I,X,Z}²` case analysis
+using `anticommutes_iff_odd_anticommutes` + `Xbar_Zbar_anticommute` + the two falsity
+lemmas; then mod-2 assembly via `Finset.card_filter` + `Finset.sum_nat_mod`. -/
+lemma promote_anticommute_parity (h₁ h₂ : NQubitPauliGroupElement n₂)
+    (hY₁ : ∀ b, h₁.operators b ≠ PauliOperator.Y)
+    (hY₂ : ∀ b, h₂.operators b ≠ PauliOperator.Y) :
     Even (Finset.univ.filter (anticommutesAt (promoteE D.Xbar D.Zbar h₁).operators
         (promoteE D.Xbar D.Zbar h₂).operators)).card
       ↔ Even (Finset.univ.filter (anticommutesAt h₁.operators h₂.operators)).card := by
-  sorry -- TODO(concat-m3,R6): block-decompose the LHS count; per-block parity =
-  -- single-qubit anticommute of (h₁ b, h₂ b) via promoteSingle and X̄·Z̄ anticommutation;
-  -- then parity-of-sum = parity-of-#odd-blocks = RHS count.
+  sorry -- TODO(concat-m3,R6): block-decomp + per-block parity + mod-2 assembly (see docstring).
 
 /-- All concatenated generators pairwise commute. -/
 lemma concat_generators_commute :
