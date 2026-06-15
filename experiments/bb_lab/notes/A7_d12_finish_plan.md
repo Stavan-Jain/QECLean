@@ -89,6 +89,21 @@ VERIFICATION (re-run by hand, `lake env lean`, this session):
 > built and wired into the umbrella. **Next: LightStab** (M-DEC decidable boundary
 > membership, then L4a–L5d) to discharge `LightStabilizerClassification` and drop
 > `hC`; then MImBound (the research gamble) for `hMim`.
+>
+> **LightStab — started; foundation banked, research core is the wall.** Landed
+> `phase6/LightStabProbe.lean` (complete, no sorries): **L4a** (boundary weight even
+> ⟹ ≤10), **ENG** (the engine→Floor input `∀ r, rmul Â_j r = 0 ∨ nLayers ≥ 3`, the
+> M3 lemma in the exact form Floor consumes), and **BRG** (layer-vanishing bridge:
+> a block zero on F₂-layer `s` ⟹ `V_j` of it vanishes at `s`, so #F₂-layers ≥
+> #nonzero-F₄-layers of any `V_j`). **Critical issue (verified by reading §6.3):**
+> the Floor lemma is **NOT** a corollary of ENG — `b_A ≠ 0 ⟹ ≥3 layers` is *false*
+> in the unit-only-Fourier case (`Â₀`/`Â₂` units don't force ≥3 layers), so Floor
+> genuinely needs the `|b|≤10` weight constraint + the per-shape exclusion. The
+> classification's core — Floor (L4b) ← sharp one-block ≥16 (L4c) ← d₃ dictionary;
+> the six per-shape kills + endgame transfers (§6.3) — is the interlocked,
+> research-grade ~2–4 person-week proof; it is the genuine wall, not formalizable in
+> a single session. **Honest state: `hC` NOT dropped this session; foundation +
+> the entire CRT engine it consumes are now in place.**
 
 ---
 
@@ -196,7 +211,7 @@ QEC/Stabilizer/Codes/BivariateBicycle/CRTFrame.lean
 | **M2** ✅ | **DONE** — V_j transforms + F₂-linearity bridge + general multiplicativity. **(A)** all 10 basis-chain instances certified native_decide GREEN (`MultProbe.lean`). **(B)** `V_add` bridge (`CRTFrame.lean §6`) via char-2 fold-split `foldl_char2` (kernel-checked, axioms `[propext]`). **(C)** general `V_j(baseP⋆z)=P̂_j·V_j(z)` ∀z (`CRTFrame.lean §7`): `mult_of_basis` (support induction; `conv`/`V`/`rmul` all additive) lifts the basis case — `mult_of_basis` is **kernel-checked** (standard-3, no native_decide); the six radical instances `mult_A1/A3/A4/B2/B3/B4` add only the sanctioned basis oracle | hybrid | med | ✅ all of A/B/C GREEN; `mult_of_basis` axioms = standard-3 (no native_decide) |
 | **M3** ✅ | **DONE** — Engine support-shape lemma (D²=0, Ann(D)=(D), ≥3 layers) as named Lean lemmas over the 256-ring, for all three distinct radical multipliers (Â₁=Â₃, Â₄, B̂₂=B̂₃=B̂₄). In `CRTFrame.lean` §5 | hybrid | med | ✅ `EngineProbe` facts promoted to named lemmas, GREEN (native_decide) |
 | **M-DEC** | Decidable boundary membership: parity matrices `H_A,H_B`; `b ∈ boundaries ↔ H_A·b_A=0 ∧ H_B·b_B=0`, with basis-correctness proven *equivalent* to `LinearMap.range` (not asserted) | hybrid | med | `↔` proven; native_decide that H is a basis for the left-nullspace |
-| **L4a** | PARITY for boundaries (reuse `cycle_weight_even`) ⇒ \|b\|≤11 ⟹ \|b\|≤10 | analytic | low | `(card supp ∂₂f) % 2 = 0` via `cycle_weight_even` + `bbBoundaryFn_comp` |
+| **L4a** ✅ | **DONE** — PARITY for boundaries ⇒ \|b\|≤11 ⟹ \|b\|≤10. `boundary_weight_even` + `boundary_weight_le_ten` in `phase6/LightStabProbe.lean` | analytic | low | ✅ `(card supp ∂₂f) % 2 = 0` via `cycle_weight_even` + `bbBoundaryFn_comp` |
 | **L4b** | FLOOR lemma (both blocks ≥3 nonzero layers) over the frame, using M3 | analytic | high | for `b=∂₂f≠0`, \|b\|≤10 ⟹ each block ≥3 layers |
 | **L4c** | Sharp one-block \|B·z'\|≥16 (Ann(A)∖ker∂₂); d₃ dictionary fragment d₃({1})=d₃({3})=6, d₃({1,3})=4 | hybrid | high | the ≥16 bound proven; d₃ rows native_decide over 9-element F₂[Z₃²] |
 | **L5b** | 252-boundary witness oracle + total `decode` function | native_decide | med | `decode b` yields correct g/(g,d) for all 252 table entries (native_decide) |
