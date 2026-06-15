@@ -481,6 +481,89 @@ theorem oneBlock_ge16 (w : BaseGroup → ZMod 2) (hA : conv baseA w = 0)
     rw [hb1]; exact Ahat1_unitHat_ann _ hkey1
   · exact hB
 
+/-! ## §4 Endgame transfer (block → boundary)
+
+L4c, contrapositive, lifts a block-level match to the full boundary: if the A-block
+of `∂₂f` equals a hexagon/D-pair A-block, the residual `w = f − witness ∈ Ann(A)`
+has `|B·w| < 16`, so (L4c) `B·w = 0` and `∂₂f = ∂₂(witness)`. -/
+
+/-- L4c contrapositive: `w ∈ Ann(A)` with `|B·w| < 16` forces `B·w = 0`. -/
+theorem oneBlock_contra (w : BaseGroup → ZMod 2) (hA : conv baseA w = 0)
+    (hlt : bwt (conv baseB w) < 16) : conv baseB w = 0 := by
+  by_contra hne
+  exact absurd (oneBlock_ge16 w hA hne) (Nat.not_le.mpr hlt)
+
+/-- Hamming weight (`bwt`) is subadditive. -/
+theorem bwt_add_le (a b : BaseGroup → ZMod 2) : bwt (a + b) ≤ bwt a + bwt b := by
+  unfold bwt
+  have hsub : (Finset.univ.filter (fun h => (a + b) h = 1)) ⊆
+      (Finset.univ.filter (fun h => a h = 1)) ∪ (Finset.univ.filter (fun h => b h = 1)) := by
+    intro h hh
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Pi.add_apply] at hh
+    simp only [Finset.mem_union, Finset.mem_filter, Finset.mem_univ, true_and]
+    have key : ∀ x y : ZMod 2, x + y = 1 → x = 1 ∨ y = 1 := by decide
+    exact key (a h) (b h) hh
+  exact le_trans (Finset.card_le_card hsub) (Finset.card_union_le _ _)
+
+/-- A single hexagon A-block has weight exactly 3. -/
+theorem bwt_baseA_single : ∀ g : BaseGroup, bwt (conv baseA (Pi.single g 1)) = 3 := by
+  native_decide
+/-- A single hexagon B-block has weight exactly 3. -/
+theorem bwt_baseB_single : ∀ g : BaseGroup, bwt (conv baseB (Pi.single g 1)) = 3 := by
+  native_decide
+
+/-- `∂₂` block values (definitional). -/
+theorem bb2_zero (z : BaseGroup → ZMod 2) (h : BaseGroup) :
+    bbBoundary2Fn baseA baseB z (h, 0) = conv baseA z h := rfl
+theorem bb2_one (z : BaseGroup → ZMod 2) (h : BaseGroup) :
+    bbBoundary2Fn baseA baseB z (h, 1) = conv baseB z h := rfl
+
+/-- The B-block weight is at most the full boundary weight (`h ↦ (h,1)` injection). -/
+theorem bwt_baseB_le_boundary (f : BaseGroup → ZMod 2) :
+    bwt (conv baseB f) ≤ (Finset.univ.filter (fun j : BaseGroup × Fin 2 =>
+      bbBoundary2Fn baseA baseB f j ≠ 0)).card := by
+  unfold bwt
+  apply Finset.card_le_card_of_injOn (fun h => (h, (1 : Fin 2)))
+  · intro h hh
+    simp only [Finset.coe_filter, Finset.mem_univ, true_and, Set.mem_setOf_eq] at hh ⊢
+    show bbBoundary2Fn baseA baseB f (h, 1) ≠ 0
+    rw [bb2_one, hh]; exact one_ne_zero
+  · intro a _ b _ hab; exact congrArg Prod.fst hab
+
+/-- **Endgame transfer (hexagon)**: if the A-block of `∂₂f` is `A·δ_g` and `|∂₂f| ≤ 10`,
+then `∂₂f = ∂₂δ_g`. -/
+theorem transfer_hexagon (f : BaseGroup → ZMod 2) (g : BaseGroup)
+    (hA : conv baseA f = conv baseA (Pi.single g 1))
+    (hwt : (Finset.univ.filter (fun j : BaseGroup × Fin 2 =>
+      bbBoundary2Fn baseA baseB f j ≠ 0)).card ≤ 10) :
+    bbBoundary2Fn baseA baseB f = bbBoundary2Fn baseA baseB (Pi.single g 1) := by
+  set δ : BaseGroup → ZMod 2 := Pi.single g 1 with hδ
+  have hself : ∀ x : ZMod 2, x + x = 0 := by decide
+  have hAw : conv baseA (f + δ) = 0 := by
+    rw [conv_add_right, hA]; funext h; rw [Pi.add_apply]; exact hself _
+  have hbound : bwt (conv baseB (f + δ)) < 16 := by
+    rw [conv_add_right]
+    calc bwt (conv baseB f + conv baseB δ)
+          ≤ bwt (conv baseB f) + bwt (conv baseB δ) := bwt_add_le _ _
+      _ ≤ 10 + 3 := by
+          gcongr
+          · exact le_trans (bwt_baseB_le_boundary f) hwt
+          · rw [hδ, bwt_baseB_single g]
+      _ < 16 := by norm_num
+  have hBw : conv baseB (f + δ) = 0 := oneBlock_contra _ hAw hbound
+  have hBeq : conv baseB f = conv baseB δ := by
+    funext h
+    have hpt : conv baseB f h + conv baseB δ h = 0 := by
+      have := congrFun hBw h; rwa [conv_add_right, Pi.add_apply] at this
+    have key : ∀ x y : ZMod 2, x + y = 0 → x = y := by decide
+    exact key _ _ hpt
+  funext ⟨h, j⟩
+  show (if j = 0 then conv baseA f h else conv baseB f h)
+      = (if j = 0 then conv baseA δ h else conv baseB δ h)
+  by_cases hj : j = 0
+  · rw [if_pos hj, if_pos hj]; exact congrFun hA h
+  · rw [if_neg hj, if_neg hj]; exact congrFun hBeq h
+
 end LightStab
 end BB
 end Homological
