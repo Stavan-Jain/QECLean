@@ -125,7 +125,54 @@ written and fully proven — 0 sorries, 0 warnings, 17 declarations, verified by
 - **M4** (`centralizer_classify_of_k1`) remains available to run in parallel —
   it only touches `Framework/Symplectic`.
 
+## Session 3 — M3 skeleton (Tier 1b constructor) (2026-06-15)
+
+**Summary: M3 SKELETON complete and typechecking.**
+`QEC/Stabilizer/Framework/Concatenation/Constructor.lean` written; the full
+`concatenate : ConcatCSSData → StabilizerCode (n₁*n₂) k₂` constructor assembles
+and typechecks (verified by `lake build`, 3355 jobs). 8 obligation proofs remain
+as `sorry`-tagged TODOs (`concat-m3`). No type errors, no non-sorry warnings.
+
+Placement decision: the constructor lives in `Framework/Concatenation/`
+(alongside Promotion), **not** `Codes/Concat/` as the plan's file map suggested
+— it is parametric Framework-tier infrastructure with no `Codes` dependency
+(same as Promotion). Only the concrete M7 Steane⊗Steane instance needs `Codes/`.
+
+### Structure validated (typechecks)
+- `concatStabGroup D` = `mkStabilizerFromGenerators ...` (closure of the gen list).
+- `concatLogicalX/Z D ℓ` = promoted outer logicals; `concatLogicalOps D` bundles
+  them as `LogicalQubitOps (n₁*n₂) (concatStabGroup D)`.
+- `concatenate D` structure literal: `hk` closed (k₂ ≤ n₂ ≤ n₁*n₂); `generators_length`
+  / `generators_phaseZero` discharged by the M2 lemmas; the rest reference the
+  obligation lemmas below. The trickiest type-match — `logicalOps` against
+  `mkStabilizerFromGenerators` with the field's own commute/no-negI proofs — works.
+
+### Remaining (8 sorries, the focused next effort)
+- **`promote_anticommute_parity` (R6)** — the crux. Plan: block-decompose the
+  promoted anticommuting-count (Finset.card_eq_sum_card_fiberwise by `blockOf`);
+  per-block count at `qIdx b i` reduces (M1 `blockOf_qIdx`/`posOf_qIdx`) to
+  `cnt(promoteSingle (h₁ b), promoteSingle (h₂ b))` over `Fin n₁`; its parity =
+  `[h₁ b, h₂ b single-anticommute]` by a 3×3 case analysis on `{I,X,Z}` using
+  `(Cin.logicalOps 0).anticommute : Anticommute X̄ Z̄`; then parity-of-sum =
+  parity-of-#odd-blocks = RHS. NOTE: likely needs CSS-typing hyps on h₁,h₂
+  (outer gens are Z-/X-type, so OK) — the `Y` case is excluded.
+- `concat_generators_commute` — 4-case (inner/inner via M1; inner/promoted via
+  inner logicals ∈ Cin centralizer; promoted/promoted via R6).
+- `concat_closure_no_neg_identity` — regroup gen set as `Z ∪ X`, apply
+  `negIdentity_not_mem_closure_union`.
+- `concat_generators_independent` — block check-matrix; or add a `ConcatCSSData`
+  field as fallback.
+- `concatLogicalX/Z_mem_centralizer`, `concatLogical_anticommute`,
+  `concat_logical_commute_cross` — all via R6 + the outer logical facts.
+
+### Next step
+- Prove **R6** (`promote_anticommute_parity`) first, in isolation — it unblocks
+  6 of the other 7. A reusable "anticommuting-count decomposes over blocks for
+  promoteE" helper (generalising M1's `anticommutesAt_count_eq`) is the first sub-step.
+- **M4** (`centralizer_classify_of_k1`) still independent / parallelizable.
+
 <!-- Stage-4 runner: append "Session N" sections here as work proceeds. -->
+
 
 
 </content>
