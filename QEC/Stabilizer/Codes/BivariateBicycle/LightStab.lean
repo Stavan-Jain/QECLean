@@ -289,6 +289,198 @@ theorem weight_bridge (b : BaseGroup → ZMod 2) :
   rw [Fintype.sum_prod_type]
   rfl
 
+/-! ## §3 The sharp one-block lemma (L4c)
+
+`w ∈ Ann(A) ∖ ker ∂₂` (`A·w = 0`, `B·w ≠ 0`) ⟹ `|B·w| ≥ 16` (A4 §6.3, one-block
+lemma, sharp form).  This is the completeness-free route: a forward implication
+from `A·w = 0` via multiplicativity + the engine (the Fourier profile of `B·w`) and
+the `§1`/`§2` dictionary + bridge (the per-layer weight floor).  The sharp `16` (not
+the old `≥ 12`) is what closes the d=12 gap at exactly 12 in the endgame transfers.
+
+`CRTFrame` supplies the radical-multiplier multiplicativity (`mult_A1/A3/A4`,
+`mult_B2/B3/B4`); the unit components (`Â₀=Â₂=B̂₀=B̂₁=1+u+v`) are completed here. -/
+
+/-- The unit multiplier value vector `Â₀ = Â₂ = B̂₀ = B̂₁ = 1+u+v = (1,1,1,0)`. -/
+def unitHat : Ring := fun s =>
+  if s = (0, 0) then 1 else if s = (1, 0) then 1 else if s = (0, 1) then 1 else 0
+
+/-- `V₀(A⋆z) = Â₀·V₀(z)`, `Â₀ = unitHat`. -/
+theorem mult_A0 (z : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) :
+    V psi0 s (conv baseA z) = rmul unitHat (fun s' => V psi0 s' z) s :=
+  mult_of_basis psi0 baseA unitHat (by native_decide) z s
+/-- `V₂(A⋆z) = Â₂·V₂(z)`, `Â₂ = unitHat`. -/
+theorem mult_A2 (z : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) :
+    V psi2 s (conv baseA z) = rmul unitHat (fun s' => V psi2 s' z) s :=
+  mult_of_basis psi2 baseA unitHat (by native_decide) z s
+/-- `V₀(B⋆z) = B̂₀·V₀(z)`, `B̂₀ = unitHat`. -/
+theorem mult_B0 (z : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) :
+    V psi0 s (conv baseB z) = rmul unitHat (fun s' => V psi0 s' z) s :=
+  mult_of_basis psi0 baseB unitHat (by native_decide) z s
+/-- `V₁(B⋆z) = B̂₁·V₁(z)`, `B̂₁ = unitHat`. -/
+theorem mult_B1 (z : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) :
+    V psi1 s (conv baseB z) = rmul unitHat (fun s' => V psi1 s' z) s :=
+  mult_of_basis psi1 baseB unitHat (by native_decide) z s
+
+/-! ### Ring facts for the Fourier profile of `B·w` (native_decide over the
+256-element ring). -/
+
+/-- `V₂`: a `unitHat`-annihilated component is killed by `B̂₂` too. -/
+theorem unitHat_zero_to_Bhat2 : ∀ r : Ring,
+    rmul unitHat r = (fun _ => 0) → rmul Bhat2 r = (fun _ => 0) := by native_decide
+
+/-- `V₄`: an `Â₄`-annihilated component is killed by `B̂₂` (since `B̂₄ = ω·Â₄`). -/
+theorem Ahat4_zero_to_Bhat2 : ∀ r : Ring,
+    rmul Ahat4 r = (fun _ => 0) → rmul Bhat2 r = (fun _ => 0) := by native_decide
+
+/-- `V₃`: an `Â₁`-annihilated component, hit by `B̂₂`, lands in the socle — a
+constant vector, i.e. `0` or everywhere-nonzero. -/
+theorem Ahat1_zero_Bhat2_const : ∀ r : Ring,
+    rmul Ahat1 r = (fun _ => 0) →
+    rmul Bhat2 r = (fun _ => 0) ∨ (∀ s, rmul Bhat2 r s ≠ 0) := by native_decide
+
+/-- `V₁`: `rmul unitHat r` stays in `Ann(Â₁)` when `r` does (`B̂₁` is a unit). -/
+theorem Ahat1_unitHat_ann : ∀ r : Ring,
+    rmul Ahat1 r = (fun _ => 0) → rmul Ahat1 (rmul unitHat r) = (fun _ => 0) := by native_decide
+
+/-- `V₁` structure: a nonzero `Ann(Â₁)` element has `≥ 3` nonzero layers. -/
+theorem annAhat1_zero_or_ge3 : ∀ r : Ring,
+    rmul Ahat1 r = (fun _ => 0) → r = (fun _ => 0) ∨ nLayers r ≥ 3 := by native_decide
+
+/-! ### Layer-count and Fourier-injectivity helpers. -/
+
+theorem allS_complete : ∀ s : ZMod 2 × ZMod 2, s ∈ allS := by decide
+
+/-- `nLayers` (a `List` length) equals the `Finset.card` of the nonzero layers. -/
+theorem nLayers_eq_card (p : Ring) :
+    nLayers p = (Finset.univ.filter (fun s => p s ≠ 0)).card := by
+  have hnd : allS.Nodup := by decide
+  unfold nLayers
+  rw [← List.toFinset_card_of_nodup (hnd.filter _)]
+  congr 1
+  ext s
+  simp only [List.mem_toFinset, List.mem_filter, decide_eq_true_eq, Finset.mem_filter,
+    Finset.mem_univ, true_and, and_iff_right_iff_imp]
+  intro _; exact allS_complete s
+
+/-- Torus-Fourier injectivity at the 5 orbit reps (contrapositive form): a nonzero
+function has a nonzero `fhat3` at some representative (`native_decide` over 512). -/
+theorem fhat3_nonzero_reps : ∀ f : ZMod 3 × ZMod 3 → ZMod 2, f ≠ 0 →
+    fhat3 f (0, 0) ≠ 0 ∨ fhat3 f (0, 1) ≠ 0 ∨ fhat3 f (1, 0) ≠ 0 ∨
+    fhat3 f (1, 1) ≠ 0 ∨ fhat3 f (1, 2) ≠ 0 := by native_decide
+
+/-- If every layer slice of `b` is zero then `b` is zero. -/
+theorem b_zero_of_slices (b : BaseGroup → ZMod 2) (h : ∀ s, slice b s = 0) : b = 0 := by
+  funext g
+  have := congrFun (h (layer g)) (torus g)
+  rwa [slice, combineCell_layer_torus] at this
+
+/-- Core: a block `b` with the Fourier profile of `B·w` (`w ∈ Ann(A)`) — `V₀=V₂=V₄=0`,
+`V₃` constant, `V₁ ∈ Ann(Â₁)` — has weight `≥ 16`. -/
+theorem oneBlock_core (b : BaseGroup → ZMod 2)
+    (hV0 : ∀ s, V psi0 s b = 0) (hV2 : ∀ s, V psi2 s b = 0) (hV4 : ∀ s, V psi4 s b = 0)
+    (hV3 : (∀ s, V psi3 s b = 0) ∨ (∀ s, V psi3 s b ≠ 0))
+    (hV1ann : rmul Ahat1 (fun s => V psi1 s b) = (fun _ => 0))
+    (hbne : b ≠ 0) : 16 ≤ bwt b := by
+  have hf00 : ∀ s, fhat3 (slice b s) (0, 0) = 0 := fun s => (fourier_bridge0 b s).symm.trans (hV0 s)
+  have hf10 : ∀ s, fhat3 (slice b s) (1, 0) = 0 := fun s => (fourier_bridge2 b s).symm.trans (hV2 s)
+  have hf12 : ∀ s, fhat3 (slice b s) (1, 2) = 0 := fun s => (fourier_bridge4 b s).symm.trans (hV4 s)
+  have hsupp13 : ∀ s, suppOutsideZero (slice b s) dead13 = true := by
+    intro s
+    unfold suppOutsideZero dead13
+    rw [List.all_eq_true]
+    intro c hc
+    rw [decide_eq_true_eq]
+    simp only [List.mem_cons, List.not_mem_nil, or_false] at hc
+    rcases hc with rfl | rfl | rfl
+    · exact hf00 s
+    · exact hf10 s
+    · exact hf12 s
+  have hsl_ne : ∀ s, (V psi1 s b ≠ 0 ∨ V psi3 s b ≠ 0) → slice b s ≠ 0 := by
+    intro s hor hsl
+    rcases hor with h | h
+    · exact h (by rw [fourier_bridge1 b s, hsl, fhat3_zero])
+    · exact h (by rw [fourier_bridge3 b s, hsl, fhat3_zero])
+  rw [weight_bridge]
+  rcases hV3 with h3z | h3nz
+  · -- V₃ ≡ 0: b ≠ 0 forces V₁ ≠ 0, which has ≥ 3 nonzero layers, each costing ≥ 6.
+    have hV1ne : (fun s => V psi1 s b) ≠ (fun _ => 0) := by
+      intro h1z
+      apply hbne
+      apply b_zero_of_slices
+      intro s
+      by_contra hsl
+      have hb01 : fhat3 (slice b s) (0, 1) = 0 :=
+        (fourier_bridge1 b s).symm.trans (congrFun h1z s)
+      have hb11 : fhat3 (slice b s) (1, 1) = 0 := (fourier_bridge3 b s).symm.trans (h3z s)
+      rcases fhat3_nonzero_reps (slice b s) hsl with h | h | h | h | h
+      · exact h (hf00 s)
+      · exact h hb01
+      · exact h (hf10 s)
+      · exact h hb11
+      · exact h (hf12 s)
+    have hn1 : 3 ≤ nLayers (fun s => V psi1 s b) := by
+      rcases annAhat1_zero_or_ge3 _ hV1ann with h | h
+      · exact absurd h hV1ne
+      · exact h
+    have hfloor : ∀ s, 6 * (if V psi1 s b ≠ 0 then 1 else 0) ≤ weight3 (slice b s) := by
+      intro s
+      by_cases hv1 : V psi1 s b ≠ 0
+      · rw [if_pos hv1, mul_one]
+        refine d3_psi1_ge6 (slice b s) (hsl_ne s (Or.inl hv1)) ?_
+        have h11 : fhat3 (slice b s) (1, 1) = 0 := (fourier_bridge3 b s).symm.trans (h3z s)
+        unfold suppOutsideZero dead1
+        rw [List.all_eq_true]
+        intro c hc
+        rw [decide_eq_true_eq]
+        simp only [List.mem_cons, List.not_mem_nil, or_false] at hc
+        rcases hc with rfl | rfl | rfl | rfl
+        · exact hf00 s
+        · exact hf10 s
+        · exact h11
+        · exact hf12 s
+      · rw [if_neg hv1, mul_zero]; exact Nat.zero_le _
+    calc 16 ≤ 6 * nLayers (fun s => V psi1 s b) := by omega
+      _ = 6 * (Finset.univ.filter (fun s => V psi1 s b ≠ 0)).card := by rw [nLayers_eq_card]
+      _ = ∑ s : ZMod 2 × ZMod 2, 6 * (if V psi1 s b ≠ 0 then 1 else 0) := by
+            rw [Finset.card_filter, Finset.mul_sum]
+      _ ≤ ∑ s : ZMod 2 × ZMod 2, weight3 (slice b s) := Finset.sum_le_sum (fun s _ => hfloor s)
+  · -- V₃ everywhere nonzero: every slice nonzero, each costing ≥ 4.
+    have hfloor4 : ∀ s, 4 ≤ weight3 (slice b s) := fun s =>
+      d3_psi1or3_ge4 (slice b s) (hsl_ne s (Or.inr (h3nz s))) (hsupp13 s)
+    have h4 : ∑ _s : ZMod 2 × ZMod 2, (4 : ℕ) = 16 := by
+      rw [Finset.sum_const, Finset.card_univ]; rfl
+    calc (16 : ℕ) = ∑ _s : ZMod 2 × ZMod 2, 4 := h4.symm
+      _ ≤ ∑ s : ZMod 2 × ZMod 2, weight3 (slice b s) := Finset.sum_le_sum (fun s _ => hfloor4 s)
+
+/-- **The sharp one-block lemma (L4c)**: `w ∈ Ann(A) ∖ ker ∂₂` (`A·w = 0`, `B·w ≠ 0`)
+forces `|B·w| ≥ 16`. -/
+theorem oneBlock_ge16 (w : BaseGroup → ZMod 2) (hA : conv baseA w = 0)
+    (hB : conv baseB w ≠ 0) : 16 ≤ bwt (conv baseB w) := by
+  apply oneBlock_core (conv baseB w)
+  · intro s
+    have hkey : rmul unitHat (fun s' => V psi0 s' w) = (fun _ => 0) := by
+      funext s'; rw [← mult_A0 w s', hA]; exact V_zero psi0 s'
+    rw [mult_B0 w s, hkey]
+  · intro s
+    have hkeyU : rmul unitHat (fun s' => V psi2 s' w) = (fun _ => 0) := by
+      funext s'; rw [← mult_A2 w s', hA]; exact V_zero psi2 s'
+    rw [mult_B2 w s, unitHat_zero_to_Bhat2 _ hkeyU]
+  · intro s
+    have hkeyA : rmul Ahat4 (fun s' => V psi4 s' w) = (fun _ => 0) := by
+      funext s'; rw [← mult_A4 w s', hA]; exact V_zero psi4 s'
+    rw [mult_B4 w s, Ahat4_zero_to_Bhat2 _ hkeyA]
+  · have hkey3 : rmul Ahat1 (fun s' => V psi3 s' w) = (fun _ => 0) := by
+      funext s'; rw [← mult_A3 w s', hA]; exact V_zero psi3 s'
+    rcases Ahat1_zero_Bhat2_const _ hkey3 with h | h
+    · left; intro s; rw [mult_B3 w s]; exact congrFun h s
+    · right; intro s; rw [mult_B3 w s]; exact h s
+  · have hkey1 : rmul Ahat1 (fun s' => V psi1 s' w) = (fun _ => 0) := by
+      funext s'; rw [← mult_A1 w s', hA]; exact V_zero psi1 s'
+    have hb1 : (fun s => V psi1 s (conv baseB w)) = rmul unitHat (fun s' => V psi1 s' w) := by
+      funext s; exact mult_B1 w s
+    rw [hb1]; exact Ahat1_unitHat_ann _ hkey1
+  · exact hB
+
 end LightStab
 end BB
 end Homological
