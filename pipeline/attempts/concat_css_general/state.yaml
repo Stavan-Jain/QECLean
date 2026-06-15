@@ -9,12 +9,14 @@ status: formalization          # M1, M2 landed; M3–M7 pending
 track: engineering
 started_at: '2026-06-15'
 worktree_branch: claude/beautiful-lalande-04ce1f
-phase: stage-4-m2-complete     # Tier 0 (embedding) + Tier 1a (promotion) done; next is M3 (constructor)
+phase: stage-4-m3-skeleton     # M3 constructor structure typechecks; 8 obligation proofs pending
 estimated_loc: 1650            # ~1560-1740 across 8 new modules
-sorries_closed: 35             # M1 (18) + M2 (17 decls), all 0 sorries / 0 warnings, verified by lake build
+sorries_closed: 35             # M1 (18) + M2 (17 decls), all proven; M3 structure typechecks
+sorries_open: 8                # M3 obligations in Constructor.lean (R6 parity core + dependents)
 sorries_blocked: 0
 milestones_done: [M1, M2]
-current_lean_file: QEC/Stabilizer/Framework/Concatenation/Promotion.lean
+milestones_skeleton: [M3]      # concatenate constructor assembled + typechecking; proofs pending
+current_lean_file: QEC/Stabilizer/Framework/Concatenation/Constructor.lean
 covering_lean_file: QEC/Stabilizer/Codes/Concat/Distance.lean   # PLANNED final location (M6, not yet created)
 umbrella_file: QEC/Stabilizer/Codes/Concat.lean                  # PLANNED (not yet created)
 headline_theorem: 'concat_hasCodeDistance : HasCodeDistance (concatenate D) (d1 * d2)'
