@@ -1,0 +1,39 @@
+code_id: concat_css_general
+display_name: 'CSS code concatenation \([[n_1 n_2,\ k_2,\ \ge d_1 d_2]]\)'
+parametric: true
+parameters: {n: 'n1*n2', k: 'k2', d: '>= d1*d2'}
+parameter: 'inner [[n1,1,d1]] CSS, outer [[n2,k2,d2]] CSS'
+parameter_constraint: 'NeZero n1; k1 = 1; both inner and outer codes CSS'
+validating_instance: {code: 'Steane (x) Steane', n: 49, k: 1, d: 9}
+status: formalization          # M1 landed; M2–M7 pending
+track: engineering
+started_at: '2026-06-15'
+worktree_branch: claude/beautiful-lalande-04ce1f
+phase: stage-4-m1-complete     # Tier-0 embedding calculus done; next is M2 (promotion)
+estimated_loc: 1650            # ~1560-1740 across 8 new modules
+sorries_closed: 18             # M1: all defs + lemmas in Embedding.lean, 0 sorries, 0 warnings
+sorries_blocked: 0
+milestones_done: [M1]          # M1 = Framework/Concatenation/Embedding.lean (verified by lake build)
+current_lean_file: QEC/Stabilizer/Framework/Concatenation/Embedding.lean
+covering_lean_file: QEC/Stabilizer/Codes/Concat/Distance.lean   # PLANNED final location (M6, not yet created)
+umbrella_file: QEC/Stabilizer/Codes/Concat.lean                  # PLANNED (not yet created)
+headline_theorem: 'concat_hasCodeDistance : HasCodeDistance (concatenate D) (d1 * d2)'
+long_pole: 'M4 centralizer_classify_of_k1 — inner centralizer = stabilizer (join) closure {Xbar1, Zbar1}'
+next_step: 'M2 — Framework/Concatenation/Promotion.lean: ConcatCSSData bundle, promoteE, typed generator list'
+introduced_refs:
+  - 'Knill-Laflamme 1996 (concatenated codes / threshold)'
+  - 'Gottesman 1997, "A Theory of Fault-Tolerant Quantum Computation" (arxiv:quant-ph/9702029)'
+ec_zoo_url: 'https://errorcorrectionzoo.org/c/concatenated'
+notes: |
+  Plan produced 2026-06-15 via a 12-agent grounding -> design -> adversarial
+  critique -> synthesis workflow. NO Lean has been written. See:
+    - plan.md       : 7-PR milestone breakdown (M1..M7), dependency graph, risk register
+    - informal_spec : the construction, scope (CSS, k1=1), and theorem statements
+    - reuse_audit   : verified existing APIs to reuse (line numbers spot-checked 2026-06-15)
+    - gap_audit     : the single net-new framework theorem (M4) + critic soundness fixes
+  Two pleasant findings from grounding: (1) the symplectic span<->subgroup bridge
+  needed for the long-pole M4 already exists (SymplecticSpan.lean), so M4 is reuse
+  not author-from-scratch; (2) phase/Y-agnostic operator-part lemmas already exist
+  (LogicalOperators.lean, NQubitElement.lean), fixing the distance-critic's R4.
+</content>
+</invoke>
