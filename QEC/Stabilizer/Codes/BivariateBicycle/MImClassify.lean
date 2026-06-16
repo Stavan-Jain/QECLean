@@ -426,4 +426,35 @@ theorem weight3_eq_wt5_slice (b : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) :
   rw [weight3_eq_wt5 (slice b s), ← fourier_bridge0, ← fourier_bridge1, ← fourier_bridge2,
     ← fourier_bridge3, ← fourier_bridge4]
 
+/-! ## §6 The chain weight as a per-slot `wt5` sum of the ten CRT components
+
+The exact per-slot weight (§5) lifts the layer-sum decomposition (§0) to a closed
+form: `chainWeight` of any base 1-chain is the sum, over the four `Z₂²` slots, of
+`wt5OfComps` applied to the chain's ten CRT components (five per block).  This is the
+form the §10 slot frame minimizes over the coset's free data — composing it with the
+`f`-dependence (§3) expresses the coset weight as `costFromComps` of the seam offsets
+`⊕ Â/B̂·(Vⱼ f)`, the input to the confined-floor enumeration. -/
+
+/-- The chain weight as a sum over `Z₂²` slots of the two blocks' per-slot `wt5`
+of their five CRT components. -/
+def costFromComps (vL0 vL1 vL2 vL3 vL4 vR0 vR1 vR2 vR3 vR4 : ZMod 2 × ZMod 2 → Fin 4) : Nat :=
+  ∑ s : ZMod 2 × ZMod 2,
+    (wt5OfComps (vL0 s) (vL1 s) (vL2 s) (vL3 s) (vL4 s)
+     + wt5OfComps (vR0 s) (vR1 s) (vR2 s) (vR3 s) (vR4 s))
+
+/-- **The closed weight form** (§0 ▸ §5): `chainWeight` is `costFromComps` of the chain's
+ten CRT components (`V ψⱼ s` on each block).  Structural — `chainWeight_eq_layer_sum`
+followed by `weight3_eq_wt5_slice` on each block-slice. -/
+theorem chainWeight_eq_costFromComps (c : BaseGroup × Fin 2 → ZMod 2) :
+    bb72Complex.chainWeight c = costFromComps
+      (fun s => V psi0 s (leftHalf c)) (fun s => V psi1 s (leftHalf c))
+      (fun s => V psi2 s (leftHalf c)) (fun s => V psi3 s (leftHalf c))
+      (fun s => V psi4 s (leftHalf c))
+      (fun s => V psi0 s (rightHalf c)) (fun s => V psi1 s (rightHalf c))
+      (fun s => V psi2 s (rightHalf c)) (fun s => V psi3 s (rightHalf c))
+      (fun s => V psi4 s (rightHalf c)) := by
+  rw [chainWeight_eq_layer_sum]
+  simp_rw [weight3_eq_wt5_slice]
+  simp only [costFromComps, Finset.sum_add_distrib]
+
 end Quantum.Stabilizer.Homological.BB.LightStab
