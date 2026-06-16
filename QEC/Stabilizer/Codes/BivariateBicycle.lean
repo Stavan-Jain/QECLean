@@ -15,11 +15,19 @@ import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorData
 import QEC.Stabilizer.Codes.BivariateBicycle.MImFloor
 import QEC.Stabilizer.Codes.BivariateBicycle.MImMembership
 import QEC.Stabilizer.Codes.BivariateBicycle.MImTransport
-import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorO0
-import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorO1
-import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorO2
-import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorO3
-import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorO4
+import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY0
+import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY1
+import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY2
+import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY3
+import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY4
+import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY5
+import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY6
+import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY7
+import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY8
+import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY9
+import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY10
+import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY11
+import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY12
 
 /-!
 # Bivariate bicycle codes
