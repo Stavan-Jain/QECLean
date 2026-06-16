@@ -358,6 +358,63 @@ Per `gap_audit`, the symplectic span↔subgroup bridge it needs already exists
 M6 (distance ≥ d₁·d₂), M7 (Steane⊗Steane instance — also discharges the `concatenate`
 independence hypothesis via `native_decide`).
 
+## Session 9 — M4 started: weak dichotomy proven, decisive kernel scoped + de-risked (2026-06-16)
+
+New module `Framework/Symplectic/CentralizerStructure.lean` (in the
+`Framework.Symplectic` umbrella; whole-repo `lake build` clean — global-content
+discipline satisfied).
+
+**`centralizer_classify_of_k1` — PROVEN.** The weak inner-centralizer dichotomy: any
+`g ∈ centralizer C.toStabilizerGroup` either has its operator part realized by a
+stabilizer element (`∃ s ∈ stab, s.operators = g.operators`) or is a nontrivial logical.
+Proof = the symplectic-span split (`mem_closure_implies_symp_in_span` /
+`exists_mem_closure_of_symp_in_span`) + the three `IsNontrivialLogicalOperator_iff`
+clauses. No dimension count, no `k = 1`. **This is the lemma the distance argument's
+per-block step actually invokes** (per `informal_spec.md`).
+
+Statement correction vs. the plan: the plan's "trivial branch = `g ∈ stabilizer`"
+over-claims (phase subtlety — `g` may be a phased copy of a stabilizer element, hence
+neither in the stabilizer nor a *nontrivial* logical). The phase-clean operator-part form
+is what is true and what downstream consumes; it subsumes the plan's separate
+`mem_stabilizer_of_operators_eq`.
+
+**`operators_eq_stab_of_commutes_both_logicals` — SCOPED `sorry` (the long pole).**
+Reduced to the clean symplectic core goal `toSymplectic g.operators ∈ sympSpan
+C.generatorsList`. The remaining mathematical content is the `k = 1` dimension-2 quotient
+fact `sympOrthogonal(span{stab rows, X̄, Z̄}) = span(stab rows)`.
+
+**Feasibility (de-risked this session):** mathlib **provides the hard dimension lemma** —
+`LinearMap.BilinForm.finrank_orthogonal (hB : B.Nondegenerate) (W) : finrank (B.orthogonal
+W) = finrank V - finrank W` (`Mathlib/LinearAlgebra/BilinearForm/Orthogonal.lean:280`),
+valid over any field (`ZMod 2` qualifies; `V = Fin (n+n) → ZMod 2` is finite-dim). So the
+kernel is **feasible, not blocked**. Remaining build (~150–250 LOC):
+1. Bundle `symplecticBilinear` as a `LinearMap.BilinForm (ZMod 2) (Fin (n+n) → ZMod 2)`
+   and prove `Nondegenerate` (the form's matrix `J = [[0,I],[I,0]]` satisfies `J² = I`).
+2. Identify `B.orthogonal W` with the repo's `sympOrthogonal W`.
+3. `finrank (sympSpan L) = n − 1` from row-independence (`finrank_span_eq_card` on the
+   independent `checkMatrix` family).
+4. `finrank (span{rows, X̄, Z̄}) = n + 1` (rows independent; `X̄, Z̄ ∉ span rows` via
+   `not_mem_subgroup_of_symp_not_in_span`; `X̄, Z̄` independent of each other via their
+   anticommutation = symplectic non-orthogonality).
+5. Containment `span rows ⊆ sympOrthogonal(span{rows, X̄, Z̄})` + equal dim ⇒ equality;
+   then `symp(g) ∈ that orthogonal = span rows`.
+
+**Design decision the kernel forces:** it needs **row-independence of the inner
+generators** (`rowsLinearIndependent Cin.generatorsList`), which `StabilizerCode` does NOT
+carry (only the weaker subgroup `GeneratorsIndependent`; the reverse implication is false).
+Resolution mirrors the M3 independence call: add `rowsLinearIndependent`-flavored fields to
+`ConcatCSSData` (or hypotheses to the kernel lemma), discharged per-instance by
+`native_decide` (Steane: `by decide`, as Steane7 already does). Plus the inner-logical
+symplectic-independence facts (derivable from `X̄/Z̄ ∈ centralizer \ stabilizer` and their
+anticommutation).
+
+### Commit this session
+- M4 weak dichotomy proven; decisive kernel reduced to the symplectic in-span goal and
+  scoped (CentralizerStructure.lean).
+
+### Next: the M4 dimension kernel (per items 1–5 above), then M5/M6/M7.
+M5/M6 must not start before the kernel closes (unsound otherwise — gap_audit).
+
 <!-- Stage-4 runner: append "Session N" sections here as work proceeds. -->
 
 

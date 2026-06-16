@@ -9,13 +9,13 @@ status: formalization          # M1, M2, M3 landed; M4–M7 pending
 track: engineering
 started_at: '2026-06-15'
 worktree_branch: claude/beautiful-lalande-04ce1f
-phase: stage-4-m3-done         # M3 complete: concatenate constructor is sorry-free
+phase: stage-4-m4-partial      # M4 weak dichotomy proven; decisive dimension kernel scoped (feasible via mathlib finrank_orthogonal)
 estimated_loc: 1650            # ~1560-1740 across 8 new modules
-sorries_closed: 40             # M1 + M2 + all M3 obligations (R6 core, commute, no-neg-I, 4 logicals)
-sorries_open: 0                # concatenate is sorry-free (independence is an explicit hypothesis)
-sorries_blocked: 0
+sorries_closed: 41             # M1 + M2 + all M3 + M4 weak dichotomy (centralizer_classify_of_k1)
+sorries_open: 1                # M4 operators_eq_stab_of_commutes_both_logicals (the dimension-2 kernel)
+sorries_blocked: 0             # kernel is feasible, not blocked: mathlib BilinForm.finrank_orthogonal exists
 milestones_done: [M1, M2, M3]
-milestones_skeleton: []        # concatenate fully proven
+milestones_skeleton: [M4]      # weak dichotomy done; decisive kernel scoped to symp-in-span goal
 current_lean_file: QEC/Stabilizer/Framework/Concatenation/Constructor.lean
 covering_lean_file: QEC/Stabilizer/Codes/Concat/Distance.lean   # PLANNED final location (M6, not yet created)
 umbrella_file: QEC/Stabilizer/Codes/Concat.lean                  # PLANNED (not yet created)
