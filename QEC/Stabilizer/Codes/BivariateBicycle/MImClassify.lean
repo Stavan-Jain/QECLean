@@ -25,6 +25,7 @@ Repo `∂₂ f = (A⋆f | B⋆f)`: A-block at `j = 0`, B-block at `j = 1`.
 
 import QEC.Stabilizer.Codes.BivariateBicycle.SafeSector
 import QEC.Stabilizer.Codes.BivariateBicycle.LightStab
+import QEC.Stabilizer.Codes.BivariateBicycle.LightStabClassify
 
 open Quantum.Stabilizer.Homological.BB
 open Quantum.Stabilizer.Homological.BB.CRTFrame
@@ -98,52 +99,187 @@ theorem coset_weight_even (ζ f : BaseGroup → ZMod 2)
   rw [bb72Complex_chainWeight_eq, Nat.even_iff]
   exact cycle_weight_even _ hcyc
 
-/-! ## §2 The `ker ∂₂` basis and M-VANISH on the basis (A4 §9.4)
+/-! ## §2 The `ker ∂₂` basis, spanning, and M-VANISH (A4 §9.3–§9.4)
 
-`ker ∂₂ = {ζ : conv baseA ζ = 0 ∧ conv baseB ζ = 0}` is 6-dimensional (64
-elements, 63 nonzero in 5 translation orbits of weights 16/18/18/24/24 — matching
-A4 §9.3).  We pin a basis and verify, by `native_decide`, that the CRT
-components 0 and 2 of `seamC` vanish on each basis vector (A4 §9.4 Sharpening 1:
-`off₀ = off₂ = 0`).  Since `V ψⱼ s ∘ leftHalf ∘ seamC` is F₂-linear in `ζ`, this
-extends to all of `ker ∂₂` once the basis is shown to span it (§2 spanning, todo). -/
+`ker ∂₂ = {ζ : conv baseA ζ = 0 ∧ conv baseB ζ = 0}` is 6-dimensional (64 elements,
+63 nonzero in 5 translation orbits of weights 16/18/18/24/24 — matching A4 §9.3).  We
+pin a systematic basis `kb0..kb5` (with `kbᵢ` supported so that `kbᵢ(freeCellⱼ) = δᵢⱼ`),
+prove it spans `ker ∂₂` (every `ζ ∈ ker ∂₂` is reconstructed from its 6 free-cell
+coordinates, `kerBasis_spans`), and deduce A4 §9.4 Sharpening 1 — the CRT components 0
+and 2 of `seamC ζ` vanish (`off_vanish`) — by a `native_decide` over the 64 combinations. -/
 
 /-- Indicator of a finite support set. -/
 def mkZeta (supp : List BaseGroup) : BaseGroup → ZMod 2 := fun h => if h ∈ supp then 1 else 0
 
-/-- The four `Z₂²` layers (slots). -/
-def slots4 : List (ZMod 2 × ZMod 2) := [(0, 0), (0, 1), (1, 0), (1, 1)]
+def kb0 : BaseGroup → ZMod 2 :=
+  mkZeta [(0,0),(0,1),(0,3),(0,4),(1,0),(1,1),(1,3),(1,4),
+          (3,0),(3,1),(3,3),(3,4),(4,0),(4,1),(4,3),(4,4)]
+def kb1 : BaseGroup → ZMod 2 :=
+  mkZeta [(0,0),(0,2),(0,3),(0,5),(1,0),(1,2),(1,3),(1,5),
+          (3,0),(3,2),(3,3),(3,5),(4,0),(4,2),(4,3),(4,5)]
+def kb2 : BaseGroup → ZMod 2 :=
+  mkZeta [(0,0),(0,4),(1,1),(1,5),(2,1),(2,2),(2,3),(2,4),(3,0),
+          (3,1),(3,2),(3,5),(4,0),(4,1),(4,2),(4,3),(5,0),(5,2)]
+def kb3 : BaseGroup → ZMod 2 :=
+  mkZeta [(0,0),(0,3),(0,4),(0,5),(1,1),(1,2),(1,3),(1,4),(2,2),
+          (2,3),(2,4),(2,5),(3,2),(3,4),(4,0),(4,2),(5,1),(5,3)]
+def kb4 : BaseGroup → ZMod 2 :=
+  mkZeta [(0,1),(0,5),(1,1),(1,2),(1,3),(1,4),(2,0),(2,1),(2,2),
+          (2,5),(3,0),(3,1),(3,2),(3,3),(4,0),(4,2),(5,0),(5,4)]
+def kb5 : BaseGroup → ZMod 2 :=
+  mkZeta [(0,0),(0,2),(1,2),(1,3),(1,4),(1,5),(2,0),(2,1),(2,2),
+          (2,3),(3,1),(3,2),(3,3),(3,4),(4,1),(4,3),(5,1),(5,5)]
 
-/-- A basis of `ker ∂₂` (GF(2) nullspace of `[conv baseA ; conv baseB]`). -/
-def kerBasis : List (BaseGroup → ZMod 2) :=
-  [ mkZeta [(0,0),(0,1),(0,3),(0,4),(1,0),(1,1),(1,3),(1,4),
-            (3,0),(3,1),(3,3),(3,4),(4,0),(4,1),(4,3),(4,4)],
-    mkZeta [(0,0),(0,2),(0,3),(0,5),(1,0),(1,2),(1,3),(1,5),
-            (3,0),(3,2),(3,3),(3,5),(4,0),(4,2),(4,3),(4,5)],
-    mkZeta [(0,0),(0,4),(1,1),(1,5),(2,1),(2,2),(2,3),(2,4),(3,0),
-            (3,1),(3,2),(3,5),(4,0),(4,1),(4,2),(4,3),(5,0),(5,2)],
-    mkZeta [(0,0),(0,3),(0,4),(0,5),(1,1),(1,2),(1,3),(1,4),(2,2),
-            (2,3),(2,4),(2,5),(3,2),(3,4),(4,0),(4,2),(5,1),(5,3)],
-    mkZeta [(0,1),(0,5),(1,1),(1,2),(1,3),(1,4),(2,0),(2,1),(2,2),
-            (2,5),(3,0),(3,1),(3,2),(3,3),(4,0),(4,2),(5,0),(5,4)],
-    mkZeta [(0,0),(0,2),(1,2),(1,3),(1,4),(1,5),(2,0),(2,1),(2,2),
-            (2,3),(3,1),(3,2),(3,3),(3,4),(4,1),(4,3),(5,1),(5,5)] ]
+def freeCells : List BaseGroup := [(4,4),(4,5),(5,2),(5,3),(5,4),(5,5)]
+
+-- 324 (out, in, block) factorization entries
+def cPairs : List (BaseGroup × BaseGroup × Fin 2) :=
+  [((0,0),((0,0),0)),((0,0),((0,5),0)),((0,0),((1,2),0)),((0,0),((1,5),0)),((0,0),((2,0),0)),
+   ((0,0),((2,1),0)),((0,0),((2,3),0)),((0,0),((2,4),0)),((0,0),((2,5),0)),((0,0),((3,1),0)),
+   ((0,0),((4,0),0)),((0,0),((4,1),0)),((0,0),((5,0),0)),((0,0),((5,1),0)),((0,0),((0,0),1)),
+   ((0,0),((0,2),1)),((0,0),((1,0),1)),((0,0),((1,1),1)),((0,1),((0,0),0)),((0,1),((0,5),0)),
+   ((0,1),((1,2),0)),((0,1),((2,2),0)),((0,1),((3,1),0)),((0,1),((4,0),0)),((0,1),((4,1),0)),
+   ((0,1),((5,0),0)),((0,1),((5,1),0)),((0,1),((0,0),1)),((0,1),((0,2),1)),((0,2),((0,4),0)),
+   ((0,2),((0,5),0)),((0,2),((1,0),0)),((0,2),((1,1),0)),((0,2),((1,3),0)),((0,2),((1,4),0)),
+   ((0,2),((1,5),0)),((0,2),((2,0),0)),((0,2),((2,1),0)),((0,2),((2,3),0)),((0,2),((2,4),0)),
+   ((0,2),((2,5),0)),((0,2),((3,0),0)),((0,2),((4,0),0)),((0,2),((4,1),0)),((0,2),((5,0),0)),
+   ((0,2),((5,1),0)),((0,2),((0,1),1)),((0,2),((0,3),1)),((0,3),((1,3),0)),((0,3),((1,4),0)),
+   ((0,3),((4,1),0)),((0,3),((0,0),1)),((0,3),((0,3),1)),((0,3),((1,0),1)),((0,4),((0,0),0)),
+   ((0,4),((0,5),0)),((0,4),((1,0),0)),((0,4),((1,1),0)),((0,4),((1,2),0)),((0,4),((1,3),0)),
+   ((0,4),((1,4),0)),((0,4),((3,1),0)),((0,4),((0,0),1)),((0,4),((0,1),1)),((0,4),((0,2),1)),
+   ((0,4),((0,3),1)),((0,4),((1,0),1)),((0,4),((1,1),1)),((0,5),((1,2),0)),((0,5),((1,3),0)),
+   ((0,5),((1,4),0)),((0,5),((2,2),0)),((0,5),((4,0),0)),((0,5),((5,0),0)),((0,5),((5,1),0)),
+   ((0,5),((0,2),1)),((0,5),((0,3),1)),((0,5),((1,0),1)),((1,0),((4,0),0)),((1,1),((1,3),0)),
+   ((1,1),((1,4),0)),((1,1),((2,2),0)),((1,1),((5,0),0)),((1,1),((5,1),0)),((1,1),((0,3),1)),
+   ((1,1),((1,0),1)),((1,2),((0,0),0)),((1,2),((0,5),0)),((1,2),((1,2),0)),((1,2),((1,4),0)),
+   ((1,2),((1,5),0)),((1,2),((2,0),0)),((1,2),((2,1),0)),((1,2),((2,2),0)),((1,2),((2,3),0)),
+   ((1,2),((2,4),0)),((1,2),((2,5),0)),((1,2),((3,1),0)),((1,2),((4,0),0)),((1,2),((4,1),0)),
+   ((1,2),((0,0),1)),((1,2),((0,2),1)),((1,2),((1,1),1)),((1,3),((0,0),0)),((1,3),((0,5),0)),
+   ((1,3),((1,2),0)),((1,3),((1,5),0)),((1,3),((2,0),0)),((1,3),((2,1),0)),((1,3),((2,2),0)),
+   ((1,3),((2,3),0)),((1,3),((2,4),0)),((1,3),((2,5),0)),((1,3),((3,1),0)),((1,3),((4,0),0)),
+   ((1,3),((4,1),0)),((1,3),((0,0),1)),((1,3),((0,2),1)),((1,3),((1,1),1)),((1,4),((0,0),0)),
+   ((1,4),((0,5),0)),((1,4),((1,2),0)),((1,4),((2,0),0)),((1,4),((2,1),0)),((1,4),((2,2),0)),
+   ((1,4),((2,3),0)),((1,4),((2,4),0)),((1,4),((2,5),0)),((1,4),((3,1),0)),((1,4),((4,0),0)),
+   ((1,4),((4,1),0)),((1,4),((0,0),1)),((1,4),((0,2),1)),((1,4),((1,1),1)),((1,5),((0,0),0)),
+   ((1,5),((0,5),0)),((1,5),((1,0),0)),((1,5),((1,2),0)),((1,5),((1,3),0)),((1,5),((1,4),0)),
+   ((1,5),((2,0),0)),((1,5),((2,1),0)),((1,5),((2,3),0)),((1,5),((2,4),0)),((1,5),((2,5),0)),
+   ((1,5),((3,1),0)),((1,5),((4,0),0)),((1,5),((5,0),0)),((1,5),((5,1),0)),((1,5),((0,0),1)),
+   ((1,5),((0,2),1)),((1,5),((0,3),1)),((1,5),((1,0),1)),((1,5),((1,1),1)),((2,0),((5,0),0)),
+   ((2,1),((2,2),0)),((2,1),((5,0),0)),((2,2),((2,2),0)),((2,2),((2,3),0)),((2,2),((5,0),0)),
+   ((2,3),((2,2),0)),((2,3),((2,3),0)),((2,3),((2,4),0)),((2,3),((5,0),0)),((2,4),((2,2),0)),
+   ((2,4),((2,3),0)),((2,4),((2,4),0)),((2,4),((2,5),0)),((2,4),((5,0),0)),((2,5),((2,0),0)),
+   ((2,5),((2,3),0)),((2,5),((2,4),0)),((2,5),((2,5),0)),((2,5),((5,1),0)),((3,0),((0,5),0)),
+   ((3,0),((1,0),0)),((3,0),((1,1),0)),((3,0),((2,2),0)),((3,0),((3,1),0)),((3,0),((4,0),0)),
+   ((3,0),((5,0),0)),((3,0),((5,1),0)),((3,0),((0,0),1)),((3,0),((0,1),1)),((3,0),((1,1),1)),
+   ((3,1),((0,0),0)),((3,1),((0,1),0)),((3,1),((0,5),0)),((3,1),((1,3),0)),((3,1),((1,4),0)),
+   ((3,1),((1,5),0)),((3,1),((2,0),0)),((3,1),((2,1),0)),((3,1),((2,2),0)),((3,1),((2,3),0)),
+   ((3,1),((2,4),0)),((3,1),((2,5),0)),((3,1),((3,1),0)),((3,1),((4,1),0)),((3,1),((0,0),1)),
+   ((3,1),((0,3),1)),((3,1),((1,1),1)),((3,2),((0,2),0)),((3,2),((1,5),0)),((3,2),((2,0),0)),
+   ((3,2),((2,1),0)),((3,2),((2,2),0)),((3,2),((2,3),0)),((3,2),((2,4),0)),((3,2),((2,5),0)),
+   ((3,2),((1,0),1)),((3,2),((1,1),1)),((3,3),((0,0),0)),((3,3),((0,3),0)),((3,3),((0,4),0)),
+   ((3,3),((1,0),0)),((3,3),((1,1),0)),((3,3),((1,2),0)),((3,3),((1,3),0)),((3,3),((1,4),0)),
+   ((3,3),((1,5),0)),((3,3),((2,0),0)),((3,3),((2,1),0)),((3,3),((2,2),0)),((3,3),((2,3),0)),
+   ((3,3),((2,4),0)),((3,3),((2,5),0)),((3,3),((3,0),0)),((3,3),((3,1),0)),((3,3),((0,0),1)),
+   ((3,3),((0,1),1)),((3,3),((0,2),1)),((3,3),((0,3),1)),((3,4),((0,5),0)),((3,4),((1,0),0)),
+   ((3,4),((1,1),0)),((3,4),((1,5),0)),((3,4),((2,0),0)),((3,4),((2,1),0)),((3,4),((2,3),0)),
+   ((3,4),((2,4),0)),((3,4),((2,5),0)),((3,4),((3,0),0)),((3,4),((4,0),0)),((3,4),((5,0),0)),
+   ((3,4),((5,1),0)),((3,4),((0,0),1)),((3,4),((0,1),1)),((3,4),((1,0),1)),((3,5),((0,0),0)),
+   ((3,5),((1,0),0)),((3,5),((1,1),0)),((3,5),((1,2),0)),((3,5),((3,1),0)),((3,5),((4,1),0)),
+   ((3,5),((0,1),1)),((3,5),((0,2),1)),((3,5),((1,1),1)),((4,0),((1,3),0)),((4,0),((1,4),0)),
+   ((4,0),((2,2),0)),((4,0),((4,1),0)),((4,0),((5,0),0)),((4,0),((5,1),0)),((4,0),((0,3),1)),
+   ((4,0),((1,0),1)),((4,1),((0,0),0)),((4,1),((0,5),0)),((4,1),((1,0),0)),((4,1),((1,1),0)),
+   ((4,1),((1,2),0)),((4,1),((1,3),0)),((4,1),((1,4),0)),((4,1),((2,0),0)),((4,1),((2,1),0)),
+   ((4,1),((2,3),0)),((4,1),((2,4),0)),((4,1),((2,5),0)),((4,1),((3,1),0)),((4,1),((5,0),0)),
+   ((4,1),((5,1),0)),((4,1),((0,0),1)),((4,1),((0,2),1)),((4,1),((0,3),1)),((4,1),((1,0),1)),
+   ((4,1),((1,1),1)),((4,2),((1,2),0)),((4,2),((1,3),0)),((4,2),((1,4),0)),((4,2),((2,2),0)),
+   ((4,2),((4,0),0)),((4,2),((5,0),0)),((4,2),((5,1),0)),((4,2),((0,3),1)),((4,2),((1,0),1)),
+   ((4,3),((0,0),0)),((4,3),((0,5),0)),((4,3),((1,2),0)),((4,3),((1,5),0)),((4,3),((2,0),0)),
+   ((4,3),((2,1),0)),((4,3),((2,3),0)),((4,3),((2,4),0)),((4,3),((2,5),0)),((4,3),((3,1),0)),
+   ((4,3),((4,0),0)),((4,3),((4,1),0)),((4,3),((5,0),0)),((4,3),((5,1),0)),((4,3),((0,0),1)),
+   ((4,3),((0,2),1)),((4,3),((0,3),1)),((4,3),((1,0),1)),((4,3),((1,1),1)),((5,0),((2,2),0)),
+   ((5,0),((5,0),0)),((5,0),((5,1),0)),((5,1),((2,0),0)),((5,1),((2,1),0)),((5,1),((2,3),0)),
+   ((5,1),((2,4),0)),((5,1),((2,5),0)),((5,1),((5,0),0)),((5,1),((5,1),0))]
+
+/-- The `ker ∂₂` basis as a list (for the membership sanity check). -/
+def kerBasis : List (BaseGroup → ZMod 2) := [kb0, kb1, kb2, kb3, kb4, kb5]
 
 /-- Each basis vector lies in `ker ∂₂`. -/
 theorem kerBasis_mem :
     kerBasis.all (fun v => decide (bbBoundary2Fn baseA baseB v = 0)) = true := by
   native_decide
 
-/-- The components-0 and -2 of `seamC` (both blocks) vanish for a chain. -/
-def offVanishes (v : BaseGroup → ZMod 2) : Bool :=
-  slots4.all (fun s => decide (V psi0 s (leftHalf (seamC v)) = 0)) &&
-  slots4.all (fun s => decide (V psi0 s (rightHalf (seamC v)) = 0)) &&
-  slots4.all (fun s => decide (V psi2 s (leftHalf (seamC v)) = 0)) &&
-  slots4.all (fun s => decide (V psi2 s (rightHalf (seamC v)) = 0))
+/-- `recon ζ = Σᵢ ζ(freeCellᵢ) • kbᵢ` (systematic basis: `kbᵢ(freeCellⱼ) = δᵢⱼ`). -/
+def recon (z : BaseGroup → ZMod 2) : BaseGroup → ZMod 2 := fun h =>
+  z (4,4) * kb0 h + z (4,5) * kb1 h + z (5,2) * kb2 h +
+  z (5,3) * kb3 h + z (5,4) * kb4 h + z (5,5) * kb5 h
 
-/-- **M-VANISH on the basis** (A4 §9.4 Sharpening 1): `off₀ = off₂ = 0` for each
-`ker ∂₂` basis vector.  By F₂-linearity of `V ψⱼ s ∘ leftHalf ∘ seamC`, this
-extends to all of `ker ∂₂`. -/
-theorem mvanish_basis : kerBasis.all offVanishes = true := by
+theorem recon_add (a b : BaseGroup → ZMod 2) : recon (a + b) = recon a + recon b := by
+  funext h; simp only [recon, Pi.add_apply]; ring
+
+theorem recon_zero : recon 0 = 0 := by funext h; simp [recon]
+
+/-- The factorization map `C` with `recon + id = C ∘ ∂₂` (matrix form, additive). -/
+def cCoef (h : BaseGroup) (p : BaseGroup × Fin 2) : ZMod 2 := if (h, p) ∈ cPairs then 1 else 0
+def C (w : BaseGroup × Fin 2 → ZMod 2) : BaseGroup → ZMod 2 :=
+  fun h => ∑ p : BaseGroup × Fin 2, cCoef h p * w p
+
+theorem C_add (a b : BaseGroup × Fin 2 → ZMod 2) : C (a + b) = C a + C b := by
+  funext h
+  simp only [C, Pi.add_apply, mul_add, Finset.sum_add_distrib]
+
+theorem C_zero : C 0 = 0 := by funext h; simp [C]
+
+theorem bb2_zero_chain : bbBoundary2Fn baseA baseB (0 : BaseGroup → ZMod 2) = 0 := by
+  funext p; obtain ⟨g, j⟩ := p
+  simp only [bbBoundary2Fn, conv_apply, Pi.zero_apply, mul_zero, Finset.sum_const_zero]
+  split <;> rfl
+
+/-- The factorization `recon + id = C ∘ ∂₂` holds on the `δ_g` basis. -/
+theorem factor_basis : ∀ g : BaseGroup,
+    recon (Pi.single g 1) + Pi.single g 1
+      = C (bbBoundary2Fn baseA baseB (Pi.single g 1)) := by
   native_decide
+
+/-- **Spanning**: every `ker ∂₂` element equals its reconstruction from free-cell coords.
+Proved by lifting the `δ_g` factorization to all chains (`funLift`): `recon ζ + ζ = C(∂₂ζ)`
+for all `ζ`, which collapses to `recon ζ = ζ` when `∂₂ ζ = 0`. -/
+theorem kerBasis_spans (z : BaseGroup → ZMod 2)
+    (hz : bbBoundary2Fn baseA baseB z = 0) : recon z = z := by
+  have key : recon z + z = C (bbBoundary2Fn baseA baseB z) :=
+    funLift (fun z => recon z + z) (fun z => C (bbBoundary2Fn baseA baseB z))
+      (by simp only [recon_zero, add_zero])
+      (by simp only [bb2_zero_chain, C_zero])
+      (by intro a b; dsimp only; rw [recon_add]; abel)
+      (by intro a b; dsimp only; rw [bbBoundary2Fn_add, C_add])
+      factor_basis z
+  rw [hz, C_zero] at key
+  funext h
+  have hh := congrFun key h
+  have hkey : ∀ a b : ZMod 2, a + b = 0 → a = b := by decide
+  exact hkey _ _ hh
+
+/-- The 6-parameter combination of basis vectors (the systematic form of `recon`). -/
+def kcombo (c0 c1 c2 c3 c4 c5 : ZMod 2) : BaseGroup → ZMod 2 := fun h =>
+  c0 * kb0 h + c1 * kb1 h + c2 * kb2 h + c3 * kb3 h + c4 * kb4 h + c5 * kb5 h
+
+theorem recon_eq_kcombo (z : BaseGroup → ZMod 2) :
+    recon z = kcombo (z (4,4)) (z (4,5)) (z (5,2)) (z (5,3)) (z (5,4)) (z (5,5)) := rfl
+
+/-- M-VANISH on all 64 combinations: `off₀ = off₂ = 0` (both blocks). -/
+theorem offVanish_combo : ∀ c0 c1 c2 c3 c4 c5 : ZMod 2, ∀ s : ZMod 2 × ZMod 2,
+    V psi0 s (leftHalf (seamC (kcombo c0 c1 c2 c3 c4 c5))) = 0 ∧
+    V psi0 s (rightHalf (seamC (kcombo c0 c1 c2 c3 c4 c5))) = 0 ∧
+    V psi2 s (leftHalf (seamC (kcombo c0 c1 c2 c3 c4 c5))) = 0 ∧
+    V psi2 s (rightHalf (seamC (kcombo c0 c1 c2 c3 c4 c5))) = 0 := by
+  native_decide
+
+/-- **M-VANISH for all ζ ∈ ker ∂₂** (A4 §9.4 Sharpening 1): the CRT components 0 and 2
+of `seamC ζ` vanish on both blocks.  (Spanning reduces `ζ` to one of 64 combos.) -/
+theorem off_vanish (z : BaseGroup → ZMod 2) (hz : bbBoundary2Fn baseA baseB z = 0)
+    (s : ZMod 2 × ZMod 2) :
+    V psi0 s (leftHalf (seamC z)) = 0 ∧ V psi0 s (rightHalf (seamC z)) = 0 ∧
+    V psi2 s (leftHalf (seamC z)) = 0 ∧ V psi2 s (rightHalf (seamC z)) = 0 := by
+  rw [← kerBasis_spans z hz, recon_eq_kcombo]
+  exact offVanish_combo _ _ _ _ _ _ s
 
 end Quantum.Stabilizer.Homological.BB.LightStab
