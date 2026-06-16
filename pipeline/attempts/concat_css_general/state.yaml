@@ -9,19 +9,19 @@ status: formalization          # M1, M2, M3 landed; M4–M7 pending
 track: engineering
 started_at: '2026-06-15'
 worktree_branch: claude/beautiful-lalande-04ce1f
-phase: stage-4-m5-mostly-done  # M5 phases 1-2 + R7 kernel proven; ONE deeper existence lemma remains
+phase: stage-4-m5-done         # M5 COMPLETE and sorry-free (incl. R7 coset injectivity)
 estimated_loc: 1650            # ~1560-1740 across 8 new modules
-sorries_closed: 64             # M1 + M2 + M3 + M4 + M5 phases 1-2 + R7 infra (gluing, embed-span) + R7 kernel assembly
-sorries_open: 1                # Correspondence.lean: exists_concatStab_matching_induced (R7 class-matching stabilizer)
+sorries_closed: 67             # M1 + M2 + M3 + M4 + ALL of M5 (incl. R7 kernel + exists_concatStab_matching_induced)
+sorries_open: 0                # whole concatenation development is sorry-free
 sorries_blocked: 0
-milestones_done: [M1, M2, M3, M4]
-milestones_skeleton: [M5]      # M5 all PROVEN except one isolated existence lemma (exists_concatStab_matching_induced)
+milestones_done: [M1, M2, M3, M4, M5]
+milestones_skeleton: []        # M5 fully proven
 current_lean_file: QEC/Stabilizer/Framework/Concatenation/Correspondence.lean
 covering_lean_file: QEC/Stabilizer/Codes/Concat/Distance.lean   # PLANNED final location (M6, not yet created)
 umbrella_file: QEC/Stabilizer/Codes/Concat.lean                  # PLANNED (not yet created)
 headline_theorem: 'concat_hasCodeDistance : HasCodeDistance (concatenate D) (d1 * d2)'
-long_pole: 'M4 DONE. M5 essentially done: restrictBlock calculus, weight_eq_sum_restrictBlock, restrictBlock_mem_centralizer, inducedOuter, inducedOuter_support_eq, inducedOuter_mem_centralizer, inducedOuter_isNontrivialLogical, AND the R7 kernel inducedOuter_symp_in_span are ALL PROVEN (the kernel assembled from the new symplectic gluing + embed-preserves-span lemmas + M4). The single remaining sorry is exists_concatStab_matching_induced: a class-matching concatenated stabilizer u (with inducedOuterOp D u = t.operators) via Subgroup.closure_induction on t ∈ Cout.stab. KEY INSIGHT: promoteE t is lossy on Y (promoteSingle Y = I), so u must be the concat-GROUP product of promoted Y-free generators (the group product realizes Y = X̄₁Z̄₁ correctly).'
-next_step: 'Finish R7: prove exists_concatStab_matching_induced (Correspondence.lean). Plan: (a) inducedOuterOp class-homomorphism inducedOuterOp D (u₁*u₂) = mulPauli (inducedOuterOp D u₁) (inducedOuterOp D u₂) [via symplecticInner bilinearity + toSymplectic_mul, OR anticommute-additivity under product]; (b) base case inducedOuterOp D (promoteE y) = y.operators for Y-free outer gen y; (c) closure_induction on t carrying invariant inducedOuterOp D u = t.operators; (d) conclude restrict b (g*u) commutes both logicals since inducedOuterOp D u = inducedOuterOp D g (htop). Then M6 (distance: weight_ge_d1_mul_d2 via weight_ge_of_blocks_ge + inducedOuter_support_eq + inducedOuter_isNontrivialLogical; concatWitness; concat_hasCodeDistance), M7 (Steane⊗Steane).'
+long_pole: 'M4 + M5 DONE, both sorry-free. M5 deliverables all PROVEN: restrictBlock calculus, weight_eq_sum_restrictBlock, restrictBlock_mem_centralizer, inducedOuter, inducedOuter_support_eq, inducedOuter_mem_centralizer, inducedOuter_isNontrivialLogical (headline), and R7 coset injectivity (inducedOuter_symp_in_span + exists_concatStab_matching_induced). No long pole remains for M6 — it is pure assembly of existing lemmas.'
+next_step: 'M6 (distance, the headline): weight_ge_d1_mul_d2 — for a nontrivial concat logical g of positive weight, d1*d2 ≤ g.weight via weight_eq_sum_restrictBlock + (per nontrivial block, weight ≥ d1 from HasCodeDistance Cin) + (#nontrivial blocks = weight(inducedOuter g) ≥ d2 from inducedOuter_isNontrivialLogical + inducedOuter_support_eq + HasCodeDistance Cout) + weight_ge_of_blocks_ge (M1). Then concatWitness (promote of min-weight outer X̄ with min-weight inner X̄ per block; weight = d1*d2; nontrivial) and concat_hasCodeDistance via hasCodeDistance_of. Then M7 (Steane⊗Steane, native_decide for concatenate GeneratorsIndependent + inner rowsLinearIndependent).'
 introduced_refs:
   - 'Knill-Laflamme 1996 (concatenated codes / threshold)'
   - 'Gottesman 1997, "A Theory of Fault-Tolerant Quantum Computation" (arxiv:quant-ph/9702029)'
