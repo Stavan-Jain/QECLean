@@ -9,19 +9,19 @@ status: formalization          # M1, M2, M3 landed; M4–M7 pending
 track: engineering
 started_at: '2026-06-15'
 worktree_branch: claude/beautiful-lalande-04ce1f
-phase: stage-4-m6-done         # M1–M6 COMPLETE and sorry-free; only the M7 concrete instance remains
+phase: stage-4-m7-partial      # M1–M6 complete + sorry-free; M7 = bundle + Steane d=3 + conditional [[49,1,9]]
 estimated_loc: 1650            # ~1560-1740 across 8 new modules
-sorries_closed: 70             # M1 + M2 + M3 + M4 + ALL of M5 + M6 (weight_ge_d1_mul_d2 + concat_hasCodeDistance)
-sorries_open: 0                # whole concatenation framework is sorry-free
+sorries_closed: 73             # M1..M6 + steaneConcatData + Steane d=3 + steaneConcat_hasCodeDistance_nine
+sorries_open: 0                # everything committed is sorry-free (the 2 remaining M7 inputs are explicit hypotheses)
 sorries_blocked: 0
 milestones_done: [M1, M2, M3, M4, M5, M6]
-milestones_skeleton: []        # M6 fully proven; M7 not yet started
-current_lean_file: QEC/Stabilizer/Framework/Concatenation/Distance.lean
+milestones_skeleton: [M7]      # M7 partial: bundle + Steane d=3 + conditional distance; unconditional blocked (see below)
+current_lean_file: QEC/Stabilizer/Codes/Concat/SteaneSteane.lean
 covering_lean_file: QEC/Stabilizer/Framework/Concatenation/Distance.lean   # M6 headline (actual location)
-umbrella_file: QEC/Stabilizer/Framework/Concatenation.lean                 # wired
+umbrella_file: QEC/Stabilizer/Framework/Concatenation.lean                 # wired; Codes/Concat.lean → Codes.lean
 headline_theorem: 'concat_hasCodeDistance : HasCodeDistance (concatenate D) (d1 * d2)'
-long_pole: 'M4 + M5 + M6 DONE, all sorry-free. The full abstract framework is complete: concatenate constructor (M3), inner-centralizer classification (M4), induced-outer correspondence + R7 coset injectivity (M5), and the distance bound weight_ge_d1_mul_d2 + concat_hasCodeDistance (M6). Only M7 (the Steane⊗Steane concrete instance) remains.'
-next_step: 'M7 (Steane⊗Steane [[49,1,9]], the validating instance). Build steaneConcatData : ConcatCSSData 7 7 1 from Steane7.stabilizerCode (Cin=Cout): innerZ=[Z1,Z2,Z3], innerX=[X1,X2,X3] (generatorsList = innerZ++innerX, so inner_split = Perm.refl); type proofs from ZGenerators_are_ZType/XGenerators_are_XType; logical X/Z type+phase from logicalOpsSteane7 (all-X/all-Z, phase 0). Then steaneConcat := concatenate steaneConcatData hindep and steaneConcat_distance := concat_hasCodeDistance ... steane_d3 steane_d3 hwit. FRICTION: native_decide for the 48-generator/49-qubit GeneratorsIndependent + the d=9 witness needs a COMPUTABLE restatement of concatGeneratorsList (it flows through Steane7.stabilizerCode noncomputable fields; native_decide needs compiled code). Plan: prove concatGeneratorsList steaneConcatData = <explicit computable list built from Steane7.generatorsList + the logical operators> by rfl/decide, then native_decide on that.'
+long_pole: 'M1–M6 DONE, sorry-free (the full abstract framework). M7 partially done: steaneConcatData : ConcatCSSData 7 7 1 (bundle typechecks); HasCodeDistance Steane7.stabilizerCode 3 PROVEN (Steane7Distance.lean, native_decide via symplecticInner); steaneConcat_hasCodeDistance_nine : conditional [[49,1,9]] given (hindep, hwit). UNCONDITIONAL M7 needs TWO things, both real framework gaps: (1) a structural rowsLinearIndependent_concat lemma — the only Decidable rowsLinearIndependent instance is 2^(#gens)=2^48, infeasible (the plan R5 native_decide fallback does NOT scale); (2) a computable weight-9 witness (the fixed concatLogicalX has weight ≥9, not =9; the minimum-weight rep routes through the noncomputable concat stabilizer).'
+next_step: 'For unconditional [[49,1,9]]: (A) structural concat-independence lemma rowsLinearIndependent_concat (D) (hCin : rowsLinearIndependent Cin.generatorsList) (hCout) (logicals-not-in-span) : rowsLinearIndependent D.concatGeneratorsList — derive from disjoint block-supports of embedded inner gens + inner logicals ∉ inner rowspan; ≈M4-scale. (B) a weight-9 witness: a computable min-weight nontrivial concat logical (e.g. promote a min-weight Steane X-logical with a min-weight inner X̄), proven nontrivial + weight 9 via the computable restatement trick. Both are new work; the conditional steaneConcat_hasCodeDistance_nine already wires Steane d=3 into M6 and isolates exactly these two inputs.'
 introduced_refs:
   - 'Knill-Laflamme 1996 (concatenated codes / threshold)'
   - 'Gottesman 1997, "A Theory of Fault-Tolerant Quantum Computation" (arxiv:quant-ph/9702029)'
