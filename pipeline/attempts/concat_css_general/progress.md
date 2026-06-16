@@ -555,9 +555,40 @@ via `closure_induction` on `t`, with the `inducedOuterOp` class-homomorphism). P
 - `≠` is `Ne` (hides the `= I`); `Finset.sum_nat_mod` hits the first `(∑)%2`; `Fin.addCases`
   to split a symplectic index into X-part/Z-part (`toSymplectic_X_part`/`_Z_part`).
 
-### Next: finish `exists_concatStab_matching_induced`, then M6 (distance) + M7 (Steane⊗Steane).
-Once it lands, M6's `weight_ge_d1_mul_d2` follows from `weight_ge_of_blocks_ge` (M1) +
-`inducedOuter_support_eq` + `inducedOuter_isNontrivialLogical` + `HasCodeDistance Cin/Cout`.
+### R7 CLOSED — M5 fully proven, sorry-free.
+`exists_concatStab_matching_induced` is now proven, so the whole concatenation development is
+sorry-free (whole-repo `lake build` green, 3433 jobs).
+
+Proof of `exists_concatStab_matching_induced` (the class-matching concat stabilizer `u`):
+- Work with the ZMod 2 *signature* `(symplecticInner (restrict b ·) Z̄₁, symplecticInner (restrict
+  b ·) X̄₁)` rather than the Pauli class — it is genuinely bilinear, dodging the Y-handling
+  trap entirely.
+- `symplecticInner_group_mul_left` / `symplecticInner_restrictBlock_mul`: bilinearity of
+  `symplecticInner` under the group product, via the M4 `symplecticBilinear` + `toSymplectic_mul`
+  (the restriction of a product multiplies block-wise, so its inner product is additive).
+- `inducedOuterOp_toSymplecticSingle`: the induced class Pauli's `(x,z)` bits ARE the signature
+  (`split_ifs <;> rfl` after rewriting each `symplecticInner` to its `if Anticommute … then 1
+  else 0` form).
+- `Subgroup.closure_induction` on `t ∈ Cout.stab` builds `u ∈ concat.stab` with `signature(u) =
+  toSymplecticSingle ∘ t.operators`: the `mem` case promotes a Y-free outer generator (signature
+  = the generator's own `toSymplecticSingle`, computed from `X̄₁ Z̄₁` (anti)commutation); the
+  `mul` case uses `toSymplecticSingle_add`; `one`/`inv` are immediate. **The concat-group product
+  is what makes the `mul` case work for Y — `promoteE t` alone is lossy.**
+- Conclusion: `signature(u) = signature(g)` (via `htop` + `inducedOuterOp_toSymplecticSingle`), so
+  `symplecticInner (restrict b (g*u)) L = signature_L(g) + signature_L(u) = 0` (`CharTwo`) — i.e.
+  `restrict b (g*u)` commutes with both inner logicals.
+
+### Gotchas (R7 final)
+- The `if Anticommute …` needs `classical` in scope (the `Decidable (Anticommute …)` instance is
+  noncomputable); matches `inducedOuterOp`'s own `open Classical`.
+- Lemmas using `symplecticInner` / `commutes_iff_symplectic_inner_zero` etc. need
+  `open NQubitPauliOperator in` (they live in that namespace).
+- `omit [NeZero n₁] in` on the general `symplecticInner_restrictBlock_mul` (it doesn't use it).
+
+### Next: M6 (distance, the headline) + M7 (Steane⊗Steane).
+`weight_ge_d1_mul_d2` follows from `weight_eq_sum_restrictBlock` + `weight_ge_of_blocks_ge` (M1) +
+`inducedOuter_support_eq` + `inducedOuter_isNontrivialLogical` + `HasCodeDistance Cin/Cout`. No
+long pole remains — M6 is assembly of proven lemmas.
 
 
 
