@@ -1,5 +1,7 @@
 import Mathlib.Data.ZMod.Basic
 import Mathlib.LinearAlgebra.Span.Basic
+import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
+import Mathlib.LinearAlgebra.Dimension.Constructions
 import Mathlib.Tactic
 import QEC.Stabilizer.Foundations.BinarySymplectic.Core
 import QEC.Stabilizer.Foundations.BinarySymplectic.SymplecticInner
@@ -144,41 +146,208 @@ lemma sympBilinForm_nondegenerate : (sympBilinForm (n := n)).Nondegenerate := by
     rw [sympBilinForm_apply, key] at this
     simpa using this
 
+/-- Membership in the symplectic orthogonal of a span reduces to orthogonality against the
+spanning set (the form is linear in the first argument). -/
+lemma mem_sympBilinForm_orthogonal_span_iff (S : Set (Fin (n + n) → ZMod 2))
+    (m : Fin (n + n) → ZMod 2) :
+    m ∈ LinearMap.BilinForm.orthogonal (sympBilinForm n) (Submodule.span (ZMod 2) S) ↔
+      ∀ s ∈ S, symplecticBilinear s m = 0 := by
+  rw [LinearMap.BilinForm.mem_orthogonal_iff]
+  constructor
+  · intro h s hs
+    have := h s (Submodule.subset_span hs)
+    rwa [LinearMap.BilinForm.isOrtho_def, sympBilinForm_apply] at this
+  · intro h w hw
+    rw [LinearMap.BilinForm.isOrtho_def, sympBilinForm_apply]
+    induction hw using Submodule.span_induction with
+    | mem x hx => exact h x hx
+    | zero => simp [symplecticBilinear]
+    | add x y _ _ hx hy => rw [symplecticBilinear_add_left, hx, hy, add_zero]
+    | smul c x _ hx => rw [symplecticBilinear_smul_left, hx, mul_zero]
+
+/-- The symplectic orthogonal sends `⊔` to `⊓`. -/
+lemma sympBilinForm_orthogonal_sup (P Q : Submodule (ZMod 2) (Fin (n + n) → ZMod 2)) :
+    LinearMap.BilinForm.orthogonal (sympBilinForm n) (P ⊔ Q) =
+      LinearMap.BilinForm.orthogonal (sympBilinForm n) P ⊓
+        LinearMap.BilinForm.orthogonal (sympBilinForm n) Q := by
+  refine le_antisymm (le_inf (LinearMap.BilinForm.orthogonal_le le_sup_left)
+    (LinearMap.BilinForm.orthogonal_le le_sup_right)) ?_
+  intro m hm
+  rw [LinearMap.BilinForm.mem_orthogonal_iff]
+  intro w hw
+  obtain ⟨p, hp, q, hq, rfl⟩ := Submodule.mem_sup.mp hw
+  rw [LinearMap.BilinForm.isOrtho_def, map_add, LinearMap.add_apply,
+    show (sympBilinForm n) p m = 0 from
+      LinearMap.BilinForm.isOrtho_def.mp ((LinearMap.BilinForm.mem_orthogonal_iff.mp hm.1) p hp),
+    show (sympBilinForm n) q m = 0 from
+      LinearMap.BilinForm.isOrtho_def.mp ((LinearMap.BilinForm.mem_orthogonal_iff.mp hm.2) q hq),
+    add_zero]
+
 end BilinForm
 
-/-- **(M4, decisive direction — the long pole, still `sorry`.)** For a `k = 1` code, a
-centralizing element that commutes with *both* inner logicals `X̄₁`, `Z̄₁` has its operator
-part realized by a stabilizer element.
+section Kernel
 
-The proof reduces (via `exists_mem_closure_of_symp_in_span`) to the symplectic core:
+open NQubitPauliOperator Module
 
-  `toSymplectic g.operators ∈ sympSpan C.generatorsList`.
+/-- **(M4, decisive direction — the long pole.)** For a `k = 1` code with linearly-independent
+check-matrix rows, a centralizing element that commutes with *both* inner logicals `X̄₁`, `Z̄₁`
+has its operator part realized by a stabilizer element.
 
-That is the `k = 1` *dimension-2 quotient* fact. With `L = C.generatorsList`:
-`g ∈ centralizer` gives `symp(g) ⊥ rows(L)`; commuting with `X̄₁`, `Z̄₁` gives
-`symp(g) ⊥ symp(X̄₁)`, `symp(g) ⊥ symp(Z̄₁)`. So `symp(g) ∈ sympOrthogonal(span{rows(L),
-X̄₁, Z̄₁})`. Because the form is nondegenerate on `F₂^{2n}`, the stabilizer rows are
-independent (`n - 1` of them), and `X̄₁, Z̄₁` are independent logicals (in the centralizer
-but not the stabilizer, and mutually anticommuting), `span{rows(L), X̄₁, Z̄₁}` has dimension
-`n + 1`, its orthogonal has dimension `n - 1`, and that orthogonal *equals* `span(rows L)`
-(the stabilizer span is contained in it and has the same dimension). Hence `symp(g) ∈
-sympSpan L`.
+The proof reduces (via `exists_mem_closure_of_symp_in_span`) to the symplectic core
+`toSymplectic g.operators ∈ sympSpan C.generatorsList`, the `k = 1` *dimension-2 quotient*
+fact. Writing `V = sympSpan L` (row span), `U = span{X̄, Z̄}`, and `W = V ⊔ U`:
+`g ∈ centralizer` and commuting with `X̄, Z̄` put `symp(g) ∈ Wᗮ`. The form is nondegenerate,
+so `dim Wᗮ = 2n − dim W`. The rows are independent (`dim V = n − 1`); `X̄, Z̄` are independent
+(anticommuting pair, `dim U = 2`) and meet `V` trivially (`X̄, Z̄ ⊥ V`), so `dim W = n + 1` and
+`dim Wᗮ = n − 1 = dim V`. Since `V ⊆ Wᗮ` (the stabilizer is isotropic and commutes with the
+logicals), `V = Wᗮ`, whence `symp(g) ∈ V`.
 
-Formalizing this needs symplectic-form nondegeneracy + `dim(W^⊥) = 2n - dim(W)` (no repo
-machinery yet; mathlib's `LinearMap.BilinForm` API) **and** row-independence of the inner
-generators (which `StabilizerCode` does not currently carry — it only provides subgroup
-`GeneratorsIndependent`, strictly weaker than `rowsLinearIndependent`). Both are scoped as
-follow-on work; see `pipeline/attempts/concat_css_general/progress.md` (Session 9). -/
+Row-independence (`rowsLinearIndependent`) is an explicit hypothesis: `StabilizerCode` carries
+only the weaker subgroup `GeneratorsIndependent`. For a concrete code it is `native_decide`-able
+(as the small CSS codes discharge `by decide`). -/
 theorem operators_eq_stab_of_commutes_both_logicals (C : StabilizerCode n 1)
+    (hindep : rowsLinearIndependent C.generatorsList)
     (g : NQubitPauliGroupElement n) (hg : g ∈ centralizer C.toStabilizerGroup)
     (hX : g * (C.logicalOps 0).xOp = (C.logicalOps 0).xOp * g)
     (hZ : g * (C.logicalOps 0).zOp = (C.logicalOps 0).zOp * g) :
     ∃ s ∈ C.toStabilizerGroup.toSubgroup, s.operators = g.operators := by
+  classical
   apply exists_mem_closure_of_symp_in_span C.generatorsList g.operators
-  -- Remaining goal: `toSymplectic g.operators ∈ sympSpan C.generatorsList`, fed by the
-  -- orthogonality facts from `hg`, `hX`, `hZ` via the k=1 dimension-2 quotient argument.
-  -- TODO(concat-m4): symplectic dimension count —
-  -- sympOrthogonal(span{rows, X̄, Z̄}) = span rows for k=1.
-  sorry
+  have hn1 : 1 ≤ n := C.hk
+  set xv := toSymplectic (C.logicalOps 0).xOp.operators with hxv
+  set zv := toSymplectic (C.logicalOps 0).zOp.operators with hzv
+  set U : Submodule (ZMod 2) (Fin (n + n) → ZMod 2) := Submodule.span (ZMod 2) {xv, zv} with hU
+  -- Pairing values of the symplectic form on the logicals.
+  have hXZ : sympBilinForm n xv zv = 1 := by
+    rw [hxv, hzv, sympBilinForm_apply, symplecticBilinear_toSymplectic]
+    exact (anticommutes_iff_symplectic_inner_one _ _).mp (C.logicalOps 0).anticommute
+  have hZX : sympBilinForm n zv xv = 1 := by
+    rw [hxv, hzv, sympBilinForm_apply, symplecticBilinear_comm, symplecticBilinear_toSymplectic]
+    exact (anticommutes_iff_symplectic_inner_one _ _).mp (C.logicalOps 0).anticommute
+  have hXX : sympBilinForm n xv xv = 0 := by
+    rw [hxv, sympBilinForm_apply, symplecticBilinear_toSymplectic]
+    exact (commutes_iff_symplectic_inner_zero _ _).mp rfl
+  have hZZ : sympBilinForm n zv zv = 0 := by
+    rw [hzv, sympBilinForm_apply, symplecticBilinear_toSymplectic]
+    exact (commutes_iff_symplectic_inner_zero _ _).mp rfl
+  -- Any centralizing element is symplectically orthogonal to every generator row.
+  have hcomm : ∀ p : NQubitPauliGroupElement n, p ∈ centralizer C.toStabilizerGroup →
+      ∀ i : Fin C.generatorsList.length,
+      symplecticBilinear (checkMatrix C.generatorsList i) (toSymplectic p.operators) = 0 := by
+    intro p hp i
+    rw [show checkMatrix C.generatorsList i
+          = toSymplectic (C.generatorsList.get i).operators from by ext j; rfl,
+        symplecticBilinear_toSymplectic]
+    exact (commutes_iff_symplectic_inner_zero _ _).mp
+      ((mem_centralizer_iff p C.toStabilizerGroup).mp hp (C.generatorsList.get i)
+        (Subgroup.subset_closure (List.get_mem _ _)))
+  -- The logicals lie in `Vᗮ` (they commute with every generator).
+  have hxv_V : xv ∈ LinearMap.BilinForm.orthogonal (sympBilinForm n)
+      (sympSpan C.generatorsList) := by
+    rw [sympSpan, mem_sympBilinForm_orthogonal_span_iff]
+    rintro _ ⟨i, rfl⟩; rw [hxv]; exact hcomm _ (C.logicalOps 0).x_mem_centralizer i
+  have hzv_V : zv ∈ LinearMap.BilinForm.orthogonal (sympBilinForm n)
+      (sympSpan C.generatorsList) := by
+    rw [sympSpan, mem_sympBilinForm_orthogonal_span_iff]
+    rintro _ ⟨i, rfl⟩; rw [hzv]; exact hcomm _ (C.logicalOps 0).z_mem_centralizer i
+  -- `g ∈ Vᗮ` and `g ∈ Uᗮ`.
+  have hgv_V : toSymplectic g.operators ∈ LinearMap.BilinForm.orthogonal (sympBilinForm n)
+      (sympSpan C.generatorsList) := by
+    rw [sympSpan, mem_sympBilinForm_orthogonal_span_iff]
+    rintro _ ⟨i, rfl⟩; exact hcomm _ hg i
+  have hgv_U : toSymplectic g.operators ∈ LinearMap.BilinForm.orthogonal (sympBilinForm n) U := by
+    rw [hU, mem_sympBilinForm_orthogonal_span_iff]
+    intro s hs
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+    rcases hs with rfl | rfl
+    · rw [hxv, symplecticBilinear_toSymplectic]
+      exact (commutes_iff_symplectic_inner_zero _ _).mp hX.symm
+    · rw [hzv, symplecticBilinear_toSymplectic]
+      exact (commutes_iff_symplectic_inner_zero _ _).mp hZ.symm
+  -- `g ∈ Wᗮ`.
+  have hgv_W : toSymplectic g.operators ∈ LinearMap.BilinForm.orthogonal (sympBilinForm n)
+      (sympSpan C.generatorsList ⊔ U) := by
+    rw [sympBilinForm_orthogonal_sup]; exact ⟨hgv_V, hgv_U⟩
+  -- Dimensions.
+  have hfinV : finrank (ZMod 2) (sympSpan C.generatorsList) = n - 1 := by
+    have h := finrank_span_eq_card hindep
+    rw [Fintype.card_fin] at h
+    rw [sympSpan, show n - 1 = C.generatorsList.length from C.generators_length.symm]
+    exact h
+  have hind : LinearIndependent (ZMod 2) ![xv, zv] := by
+    rw [LinearIndependent.pair_iff]
+    intro s t hst
+    refine ⟨?_, ?_⟩
+    · have h := congrArg (fun w => sympBilinForm n w zv) hst
+      simp only [map_add, map_smul, map_zero, LinearMap.add_apply, LinearMap.smul_apply,
+        LinearMap.zero_apply, smul_eq_mul, hXZ, hZZ, _root_.mul_one, mul_zero, add_zero] at h
+      exact h
+    · have h := congrArg (fun w => sympBilinForm n w xv) hst
+      simp only [map_add, map_smul, map_zero, LinearMap.add_apply, LinearMap.smul_apply,
+        LinearMap.zero_apply, smul_eq_mul, hXX, hZX, _root_.mul_one, mul_zero, zero_add] at h
+      exact h
+  have hfinU : finrank (ZMod 2) U = 2 := by
+    rw [hU, show ({xv, zv} : Set (Fin (n + n) → ZMod 2)) = Set.range ![xv, zv] by
+        ext w
+        simp only [Set.mem_insert_iff, Set.mem_singleton_iff, Set.mem_range, Fin.exists_fin_two,
+          Matrix.cons_val_zero, Matrix.cons_val_one, eq_comm],
+      finrank_span_eq_card hind, Fintype.card_fin]
+  have hinf : sympSpan C.generatorsList ⊓ U = ⊥ := by
+    rw [Submodule.eq_bot_iff]
+    intro w hw
+    rw [Submodule.mem_inf] at hw
+    obtain ⟨hwV, hwU⟩ := hw
+    rw [hU, Submodule.mem_span_pair] at hwU
+    obtain ⟨a, b, hab⟩ := hwU
+    have hwz : sympBilinForm n w zv = 0 := LinearMap.BilinForm.isOrtho_def.mp
+      ((LinearMap.BilinForm.mem_orthogonal_iff.mp hzv_V) w hwV)
+    have hwx : sympBilinForm n w xv = 0 := LinearMap.BilinForm.isOrtho_def.mp
+      ((LinearMap.BilinForm.mem_orthogonal_iff.mp hxv_V) w hwV)
+    have ha : a = 0 := by
+      have e : sympBilinForm n w zv = a := by
+        rw [← hab]
+        simp only [map_add, map_smul, LinearMap.add_apply, LinearMap.smul_apply, smul_eq_mul,
+          hXZ, hZZ, _root_.mul_one, mul_zero, add_zero]
+      rw [hwz] at e; exact e.symm
+    have hb : b = 0 := by
+      have e : sympBilinForm n w xv = b := by
+        rw [← hab]
+        simp only [map_add, map_smul, LinearMap.add_apply, LinearMap.smul_apply, smul_eq_mul,
+          hXX, hZX, _root_.mul_one, mul_zero, zero_add]
+      rw [hwx] at e; exact e.symm
+    rw [← hab, ha, hb]; simp
+  have hfinW : finrank (ZMod 2) ↥(sympSpan C.generatorsList ⊔ U) = n + 1 := by
+    have h := Submodule.finrank_sup_add_finrank_inf_eq (sympSpan C.generatorsList) U
+    rw [hinf, finrank_bot, add_zero, hfinV, hfinU] at h
+    omega
+  have hfinOrth : finrank (ZMod 2) (LinearMap.BilinForm.orthogonal (sympBilinForm n)
+      (sympSpan C.generatorsList ⊔ U)) = n - 1 := by
+    rw [LinearMap.BilinForm.finrank_orthogonal sympBilinForm_nondegenerate,
+      Module.finrank_fintype_fun_eq_card, Fintype.card_fin, hfinW]
+    omega
+  -- `V ⊆ Wᗮ`: the stabilizer is isotropic and commutes with the logicals.
+  have hV_le : sympSpan C.generatorsList ≤ LinearMap.BilinForm.orthogonal (sympBilinForm n)
+      (sympSpan C.generatorsList ⊔ U) := by
+    rw [sympBilinForm_orthogonal_sup]
+    refine le_inf ?_ ?_
+    · rw [sympSpan, Submodule.span_le]
+      rintro _ ⟨i, rfl⟩
+      rw [SetLike.mem_coe, mem_sympBilinForm_orthogonal_span_iff]
+      rintro _ ⟨j, rfl⟩
+      exact hcomm _ (stabilizer_le_centralizer C.toStabilizerGroup
+        (Subgroup.subset_closure (List.get_mem _ _))) j
+    · rw [sympSpan, Submodule.span_le]
+      rintro _ ⟨i, rfl⟩
+      rw [SetLike.mem_coe, hU, mem_sympBilinForm_orthogonal_span_iff]
+      intro s hs
+      simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+      rcases hs with rfl | rfl
+      · rw [hxv, symplecticBilinear_comm]; exact hcomm _ (C.logicalOps 0).x_mem_centralizer i
+      · rw [hzv, symplecticBilinear_comm]; exact hcomm _ (C.logicalOps 0).z_mem_centralizer i
+  -- `V = Wᗮ` (containment + equal finrank), so `symp(g) ∈ V`.
+  rw [Submodule.eq_of_le_of_finrank_eq hV_le (by rw [hfinV, hfinOrth])]
+  exact hgv_W
+
+end Kernel
 
 end Quantum.StabilizerGroup
