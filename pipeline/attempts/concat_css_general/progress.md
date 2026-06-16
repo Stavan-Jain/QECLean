@@ -652,10 +652,55 @@ embedded inner gens + inner logicals ∉ inner rowspan) — ≈M4-scale, deferre
 ### Next: unconditional [[49,1,9]] needs (A) structural concat-independence lemma, (B) a
 computable weight-9 witness. Both are new framework work; everything else is in place.
 
+---
 
+## Session 14 — (A) the structural concat-independence lemma: DONE
 
+New module `Framework/Concatenation/Independence.lean` (~410 LOC, sorry-free; axioms of the
+headline = `{propext, Classical.choice, Quot.sound}` only — **no `native_decide` trust**).
 
+**Headline:** `ConcatCSSData.rowsLinearIndependent_concat` (and its `GeneratorsIndependent`
+corollary `generatorsIndependent_concat`) derives the `2^48`-infeasible concat-generator
+independence from **two small inputs**:
+- `hin : rowsLinearIndependent (Cin.generatorsList ++ [X̄₁, Z̄₁])`  (Steane: `2^8`)
+- `hout : rowsLinearIndependent (outerZ ++ outerX)`                  (Steane: `2^6`)
 
+**Engine — `blockRestrictSymp b` LinearMap.** Built as `LinearMap.funLeft` of a coordinate map
+`blockEmbedIdx b` (so linearity is free), it reads off block `b`'s symplectic coordinates;
+`blockRestrictSymp_toSymplectic` shows it commutes with `toSymplectic ∘ operators` and
+`restrictBlock b`. Two facts power everything: an embedded inner gen restricts to the gen on its
+own block and to `0` elsewhere; a promoted outer gen restricts to a combination of `X̄₁, Z̄₁`
+(via `outer_gen_noY`, since `promoteSingle` is lossy on `Y`).
 
+**Proof skeleton:**
+1. `rowsLinearIndependent_append_iff` (general, in `NQubitPauliGroupElement`): reindex the row
+   family along `Fin A.length ⊕ Fin B.length ≃ Fin (A++B).length` (`finSumFinEquiv`/`finCongr`)
+   and apply mathlib's `linearIndependent_sum`. Splits a list-append into independence of each
+   half + disjoint `sympSpan`s. Used both to *destructure* `hin` and to *assemble* the concat.
+2. Inner part (`s1PerBlockList`, a `flatMap` over blocks): induction on a `Nodup` block list,
+   each step `append_iff` with the per-block map (`rowsLinearIndependent_map_embedBlock`, via
+   `blockRestrictSymp` being a left inverse on its block) + disjointness from
+   `blockRestrictSymp` vanishing on every other block.
+3. Promoted part: each `blockRestrictSymp b` of `∑ βₜ·pr(t)` is `c₁·X̄₁ + c₂·Z̄₁`; `hin`'s
+   logical-independence kills both coefficients at every block, which reassembles into an outer
+   relation killed by `hout`.
+4. Disjointness of the inner and promoted spans: every block restriction of a shared vector lies
+   in `sympSpan(Cin.gens) ⊓ span{X̄₁, Z̄₁} = 0` (from `hin`), so the vector is `0`
+   (`eq_zero_of_forall_blockRestrictSymp_zero`).
 
-</content>
+**Steane discharge** (`SteaneSteane.lean`): `steaneConcat_generatorsIndependent` proves
+`GeneratorsIndependent 49 …` by `native_decide` on the two small concrete inputs (the
+`stabilizerCode` projections reduce to `generatorsList`/`logicalX`/`logicalZ` by `rfl`).
+`steaneConcat_hasCodeDistance_nine` now **drops the `hindep` hypothesis** — only the weight-9
+witness `hwit` remains.
+
+mathlib-API notes (v4.30): `linearIndependent_sum`, `linearIndependent_equiv`,
+`LinearIndependent.of_comp`, `Fintype.linearIndependent_iff`, `LinearMap.funLeft[_apply]`,
+`finSumFinEquiv_apply_left/right`, `finCongr`, `List.getElem_append_left/right`,
+`List.getElem_map`, `List.flatMap_cons`, `List.mem_flatMap`, `List.nodup_finRange`,
+`Submodule.{map_span,span_le,disjoint_def}`. Quirks: `List.length_append`/`List.mem_cons_self`
+take implicit args (use `by rw`/`by simp`); the `show` that changes a goal is a linter error
+(use `change`); `IsEmpty (Fin [].length)` needs a `haveI` (no auto-reduce of `[].length`).
+
+### Next: ONLY (B) remains — a computable weight-9 witness for the unconditional [[49,1,9]].
+

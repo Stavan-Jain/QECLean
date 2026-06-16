@@ -4,6 +4,7 @@ import QEC.Stabilizer.Framework.Concatenation.Constructor
 import QEC.Stabilizer.Framework.Concatenation.Restriction
 import QEC.Stabilizer.Framework.Concatenation.Correspondence
 import QEC.Stabilizer.Framework.Concatenation.Distance
+import QEC.Stabilizer.Framework.Concatenation.Independence
 
 /-!
 # Framework.Concatenation
@@ -39,4 +40,11 @@ Sub-modules:
   bound `weight_ge_d1_mul_d2` (every nontrivial logical has weight ≥ d₁·d₂) and
   the headline `concat_hasCodeDistance : HasCodeDistance (concatenate D) (d₁·d₂)`
   (the weight-d₁·d₂ witness is a hypothesis, discharged per-instance in M7).
+- `QEC.Stabilizer.Framework.Concatenation.Independence` — the structural
+  generator-independence lemma `rowsLinearIndependent_concat` /
+  `generatorsIndependent_concat`, discharging the `GeneratorsIndependent`
+  hypothesis of `concatenate` from two *small* inputs (inner generators with
+  the two inner logicals, and the outer generators) instead of the
+  `2^(n₁n₂−k₂)`-infeasible direct check. Engine: the `blockRestrictSymp`
+  linear map plus the general `rowsLinearIndependent_append_iff`.
 -/
