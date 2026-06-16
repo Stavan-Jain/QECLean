@@ -442,6 +442,15 @@ def bch_per_orbit_lower_bound(poly: Poly, G: AbelianGroup | None = None) -> int:
     function therefore restricts to rank-1 groups; multi-axis
     cases return the trivial lower bound 1.
 
+    NOTE (2026-06 adversarial review): the rank-1 restriction is
+    *conservative* — the counterexample above is axis-degenerate
+    (zero support on the y-axis), which is exactly the case a
+    careful multivariate statement would exclude by hypothesis. No
+    counterexample is known for polynomials with support on every
+    axis; whether per-axis BCH is valid under a full-axis-support
+    hypothesis is open (HANDOFF §6j "Reopened directions" item 3).
+    Behavior is unchanged here pending that investigation.
+
     Returns a lower bound on `d_A^⊥`.
 
     Parameters

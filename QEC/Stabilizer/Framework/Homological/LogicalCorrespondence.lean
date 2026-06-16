@@ -66,6 +66,24 @@ noncomputable def dualBoundaries : Submodule (ZMod 2) (X.C1 → ZMod 2) :=
 
 variable {X}
 
+/-- Dual-pairing certificate for non-boundaryness: if `w` is a dual cycle
+(`dualBoundary w = 0`) and pairs oddly with `c`, then `c` is not a boundary.
+This is the cheap direction of Poincaré-style duality: boundaries pair evenly
+with dual cycles, by the transpose identity for `∂₂`. -/
+theorem not_mem_boundaries_of_dual_witness
+    {w c : X.C1 → ZMod 2}
+    (hw : X.dualBoundary w = 0) (hpair : ∑ e : X.C1, w e * c e = 1) :
+    c ∉ X.boundaries := by
+  rintro ⟨f, rfl⟩
+  have h0 : ∑ e : X.C1, X.boundary2 f e * w e = 0 := by
+    rw [X.boundary2_dualBoundary_transpose f w, hw]
+    simp
+  have h1 : ∑ e : X.C1, X.boundary2 f e * w e = 1 := by
+    rw [← hpair]
+    exact Finset.sum_congr rfl fun e _ => mul_comm _ _
+  rw [h0] at h1
+  exact zero_ne_one h1
+
 /-- Helper: `ZMod 2` dichotomy. -/
 private lemma zmod2_dichotomy_local (a : ZMod 2) : a = 0 ∨ a = 1 := by
   have hvalle : a.val ≤ 1 := Nat.le_of_lt_succ a.val_lt
