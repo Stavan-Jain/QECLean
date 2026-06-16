@@ -2,6 +2,7 @@ import QEC.Stabilizer.Framework.Concatenation.Embedding
 import QEC.Stabilizer.Framework.Concatenation.Promotion
 import QEC.Stabilizer.Framework.Concatenation.Constructor
 import QEC.Stabilizer.Framework.Concatenation.Restriction
+import QEC.Stabilizer.Framework.Concatenation.Correspondence
 
 /-!
 # Framework.Concatenation
@@ -27,4 +28,9 @@ Sub-modules:
   (`weight_eq_sum_restrictBlock`), the anticommuting-count parity bridge, and
   `restrictBlock_mem_centralizer` (every block restriction of a centralizing
   element centralizes the inner stabilizer).
+- `QEC.Stabilizer.Framework.Concatenation.Correspondence` (M5, part 2) — the
+  induced outer operator `inducedOuter D g` (the per-block inner logical class),
+  the induced parity bridge, `inducedOuter_mem_centralizer`, and
+  `inducedOuter_support_eq` (a block is in the support iff its restriction is a
+  nontrivial inner logical — uses M4).
 -/
