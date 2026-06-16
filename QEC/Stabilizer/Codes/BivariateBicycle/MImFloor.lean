@@ -380,6 +380,64 @@ theorem floorOK_sound (oL oR : Array Nat) (hfloor : floorOK oL oR = true)
     · have he := all_range_elim (all_range_elim hfib d1 hd1) d2 hd2
       exact of_decide_eq_true he
 
+/-! ## §12b Flat-index soundness: address cosets by flat Γ₁/Γ₂ indices
+
+Membership (`MImMembership`) delivers the comp-1,2 free datum as a FLAT index `k1 < |Γ₁|`,
+`k2 < |Γ₂|`, but `floorOK_sound` enumerates fibers as `(class, position)`.  `classOf` recovers
+the class of a flat index (largest `i` with `off[i] ≤ k`); the decomposition is `native_decide`
+data, and `floorOK_sound_flat` wraps `floorOK_sound` through it. -/
+
+/-- The fiber class of a flat index `k`: the largest class `i < nc` with `off[i] ≤ k`. -/
+def classOf (off : Array Nat) (nc k : Nat) : Nat :=
+  (List.range nc).foldl (fun acc i => if off.getD i 0 ≤ k then i else acc) 0
+
+/-- Every flat Γ₁ index `< |Γ₁|` decomposes into a valid class + in-range position. -/
+def decompOK1 : Bool :=
+  (List.range (F1off.getD nC1 0)).all (fun k =>
+    let i := classOf F1off nC1 k
+    decide (i < nC1) && decide (F1off.getD i 0 ≤ k) && decide (k < F1off.getD (i + 1) 0))
+
+theorem decompOK1_holds : decompOK1 = true := by native_decide
+
+/-- Every flat Γ₂ index `< |Γ₂|` decomposes into a valid class + in-range position. -/
+def decompOK2 : Bool :=
+  (List.range (F2off.getD nC2 0)).all (fun k =>
+    let i := classOf F2off nC2 k
+    decide (i < nC2) && decide (F2off.getD i 0 ≤ k) && decide (k < F2off.getD (i + 1) 0))
+
+theorem decompOK2_holds : decompOK2 = true := by native_decide
+
+theorem fiber_decomp1 {k : Nat} (hk : k < F1off.getD nC1 0) :
+    classOf F1off nC1 k < nC1 ∧ F1off.getD (classOf F1off nC1 k) 0 ≤ k ∧
+      k < F1off.getD (classOf F1off nC1 k + 1) 0 := by
+  have h := all_range_elim decompOK1_holds k hk
+  rw [Bool.and_eq_true, Bool.and_eq_true] at h
+  exact ⟨of_decide_eq_true h.1.1, of_decide_eq_true h.1.2, of_decide_eq_true h.2⟩
+
+theorem fiber_decomp2 {k : Nat} (hk : k < F2off.getD nC2 0) :
+    classOf F2off nC2 k < nC2 ∧ F2off.getD (classOf F2off nC2 k) 0 ≤ k ∧
+      k < F2off.getD (classOf F2off nC2 k + 1) 0 := by
+  have h := all_range_elim decompOK2_holds k hk
+  rw [Bool.and_eq_true, Bool.and_eq_true] at h
+  exact ⟨of_decide_eq_true h.1.1, of_decide_eq_true h.1.2, of_decide_eq_true h.2⟩
+
+/-- **Flat-index structural soundness**: `floorOK = true` ⟹ every coset addressed by flat Γ
+indices `k1 < |Γ₁|`, `k2 < |Γ₂|` has weight `≥ 12`.  Wraps `floorOK_sound` via `classOf`. -/
+theorem floorOK_sound_flat (oL oR : Array Nat) (hfloor : floorOK oL oR = true)
+    (hoL4 : ∀ i, oL.getD i 0 < 4) (hoR4 : ∀ i, oR.getD i 0 < 4)
+    (hoL0 : ∀ s, s < 4 → ov oL 0 s < 2) (hoR0 : ∀ s, s < 4 → ov oR 0 s < 2)
+    {a0 a3 a4 k1 k2 : Nat} (ha0 : a0 < nG0) (ha3 : a3 < nG3) (ha4 : a4 < nG4)
+    (hk1 : k1 < F1off.getD nC1 0) (hk2 : k2 < F2off.getD nC2 0) :
+    12 ≤ exCost oL oR a0 a3 a4 k1 k2 := by
+  obtain ⟨hi1, hlo1, hhi1⟩ := fiber_decomp1 hk1
+  obtain ⟨hi2, hlo2, hhi2⟩ := fiber_decomp2 hk2
+  have hk1eq : k1 =
+      F1off.getD (classOf F1off nC1 k1) 0 + (k1 - F1off.getD (classOf F1off nC1 k1) 0) := by omega
+  have hk2eq : k2 =
+      F2off.getD (classOf F2off nC2 k2) 0 + (k2 - F2off.getD (classOf F2off nC2 k2) 0) := by omega
+  rw [hk1eq, hk2eq]
+  exact floorOK_sound oL oR hfloor hoL4 hoR4 hoL0 hoR0 ha0 ha3 ha4 hi1 hi2 (by omega) (by omega)
+
 /-! ## §13 The chain-weight bridge: `costFromComps` (the closed coset weight) `=` `exCost`
 
 `MImClassify`'s `chainWeight_coset_eq` (§7) writes the safe-sector coset weight as
