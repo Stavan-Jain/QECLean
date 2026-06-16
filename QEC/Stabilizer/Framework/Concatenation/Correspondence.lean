@@ -274,60 +274,82 @@ theorem inducedOuter_support_eq (g : NQubitPauliGroupElement (n₁ * n₂))
     rintro ⟨s, hs, hsop⟩
     exact ((IsNontrivialLogicalOperator_iff _ _).mp hnt).2.2 s hs hsop
 
-/-! ## Coset injectivity (plan risk R7 — the remaining M5 sub-pole)
+/-! ## Coset injectivity (plan risk R7)
 
-The nontriviality of `inducedOuter D g` rests on a single symplectic fact,
-`inducedOuter_symp_in_span` below: if some outer stabilizer `t` has the same operator
-part as `inducedOuter D g`, then `g`'s symplectic vector already lies in the span of the
-concatenated check matrix — i.e. `g` is concatenated-stabilizer-like. Contrapositively, a
-*nontrivial* concatenated logical `g` cannot have a stabilizer-like induced operator, so
-`inducedOuter D g` is itself a nontrivial outer logical.
+The nontriviality of `inducedOuter D g` rests on the symplectic fact `inducedOuter_symp_in_span`
+below: if some outer stabilizer `t` matches the operator part of `inducedOuter D g`, then `g`'s
+symplectic vector already lies in the span of the concatenated check matrix — i.e. `g` is
+concatenated-stabilizer-like. Contrapositively, a *nontrivial* concatenated logical `g` cannot
+have a stabilizer-like induced operator, so `inducedOuter D g` is itself a nontrivial outer
+logical.
 
-Everything downstream (`inducedOuter_not_mem_stabilizer`, `inducedOuter_isNontrivialLogical`)
-is proven unconditionally from this one lemma; only `inducedOuter_symp_in_span` carries a
-`sorry`, isolating the genuine content exactly as M4 isolated its dimension kernel. -/
+`inducedOuter_symp_in_span` is now fully assembled from the symplectic gluing lemma
+(`toSymplectic_eq_sum_embed_restrictBlock`), the embed-preserves-span lemma
+(`toSymplectic_embedBlock_mem_concatSpan`), and the M4 kernel; the *only* remaining `sorry` is
+the class-matching concatenated stabilizer `exists_concatStab_matching_induced`. -/
+
+/-- **(M5, R7 sub-pole — SCOPED.)** The class-matching concatenated stabilizer: given an outer
+stabilizer `t` matching the operator part of `inducedOuter D g`, there is a concatenated
+stabilizer `u` such that `g * u` restricts, on every block, to an operator commuting with *both*
+inner logicals (i.e. inner-stabilizer-like).
+
+`u` is the concat-group product of promoted outer generators in a decomposition of `t`. The
+concat-group multiplication — unlike `promoteE t`, which is lossy on `Y` (`promoteSingle Y = I`)
+— correctly realizes the `Y = X̄₁Z̄₁` class on `Y`-blocks. The construction is a
+`Subgroup.closure_induction` on `t ∈ Cout.stab` carrying the per-block class-match invariant
+`inducedOuterOp D u = t.operators` (base: `promoteE` of a `Y`-free outer generator, where the
+class equals the generator's Pauli; multiplicative step: the inner-logical class is additive
+under multiplication). Since `t.operators = inducedOuterOp D g` and the classes match, each
+`restrictBlock b (g * u)` has trivial class and so commutes with both inner logicals. This is
+the entirety of the remaining M5 work. -/
+lemma exists_concatStab_matching_induced (g : NQubitPauliGroupElement (n₁ * n₂))
+    (hg : g ∈ centralizer D.concatStabGroup)
+    (hindep : rowsLinearIndependent D.Cin.generatorsList)
+    (t : NQubitPauliGroupElement n₂) (ht : t ∈ D.Cout.toStabilizerGroup.toSubgroup)
+    (htop : t.operators = (inducedOuter D g).operators) :
+    ∃ u ∈ D.concatStabGroup.toSubgroup, ∀ b : Fin n₂,
+      restrictBlock b (g * u) * (D.Cin.logicalOps 0).xOp
+          = (D.Cin.logicalOps 0).xOp * restrictBlock b (g * u)
+        ∧ restrictBlock b (g * u) * (D.Cin.logicalOps 0).zOp
+          = (D.Cin.logicalOps 0).zOp * restrictBlock b (g * u) := by
+  sorry  -- TODO(concat-m5-r7): class-matching concat stabilizer via closure_induction on t
 
 open NQubitPauliOperator in
-/-- **(M5, R7 sub-pole — SCOPED.)** Coset injectivity, symplectic form: if an outer
-stabilizer `t` matches the operator part of `inducedOuter D g`, then `toSymplectic g.operators`
-lies in the concatenated row span (so `g` is stabilizer-like).
+/-- **(M5.)** Coset injectivity, symplectic form: if an outer stabilizer `t` matches the
+operator part of `inducedOuter D g`, then `toSymplectic g.operators` lies in the concatenated
+row span (so `g` is concatenated-stabilizer-like).
 
-**Proof plan (the remaining work).** Writing `restrict b := restrictBlock b g`:
-
-1. `toSymplectic g.operators = ∑ b, toSymplectic (embedBlock b (restrict b)).operators` — `g`
-   is the disjoint-support gluing of its block restrictions, so its symplectic vector is the
-   (XOR) sum of the embedded block restrictions. [pure index lemma]
-2. A symplectic-level embedding map `Lembed b` with
-   `toSymplectic (embedBlock b s).operators = Lembed b (toSymplectic s.operators)`, linear, and
-   sending `sympSpan Cin.generatorsList` into `sympSpan concatGeneratorsList` (the embedded
-   inner generators are concatenated generators). [new symplectic infrastructure]
-3. A symplectic-level promotion map with
-   `toSymplectic (promoteE Xbar Zbar h).operators ∈ sympSpan concatGeneratorsList` whenever
-   `toSymplectic h.operators ∈ sympSpan Cout.generatorsList` (promoted outer generators are
-   concatenated generators); in particular for `t ∈ Cout` this gives
-   `toSymplectic (promoteE Xbar Zbar t).operators ∈ sympSpan concatGeneratorsList`. [new]
-4. Per block, `restrict b` and `restrictBlock b (promoteE Xbar Zbar t) =
-   ofOperator (promoteSingle … (t.operators b))` share an inner logical class (because
-   `t.operators b = inducedOuterOp D g b`), so their product commutes with both inner logicals
-   and is `Cin`-stabilizer-like (M4 kernel). Hence
-   `toSymplectic (restrict b).operators + toSymplectic (promoteSingle … (t.operators b)) ∈
-   sympSpan Cin.generatorsList`.
-
-Combining (1)+(2)+(4): `toSymplectic g.operators` differs from
-`toSymplectic (promoteE Xbar Zbar t).operators` (which is `∑ b` of the embedded
-`promoteSingle … (t.operators b)`, by (1) applied to `promoteE … t`) by an element of
-`sympSpan concatGeneratorsList`; with (3) the whole vector lands in the span.
-
-The new infrastructure (2)+(3) — `toSymplectic` of `embedBlock` / `promoteE` as linear maps,
-and their images inside `sympSpan concatGeneratorsList` — is M4-scale and is the entirety of
-the remaining M5 work. -/
+Assembled from `exists_concatStab_matching_induced` (the class-matching stabilizer `u`), the
+gluing lemma, the embed-preserves-span lemma, and the M4 kernel: `g * u` restricts per block to
+an inner-stabilizer-like operator, so (gluing + embed-span) `toSymplectic (g * u) ∈ sympSpan`;
+`toSymplectic u ∈ sympSpan` since `u` is a concatenated stabilizer; and over `ZMod 2`
+`toSymplectic g = toSymplectic (g * u) + toSymplectic u`. -/
 lemma inducedOuter_symp_in_span (g : NQubitPauliGroupElement (n₁ * n₂))
     (hg : g ∈ centralizer D.concatStabGroup)
     (hindep : rowsLinearIndependent D.Cin.generatorsList)
     (t : NQubitPauliGroupElement n₂) (ht : t ∈ D.Cout.toStabilizerGroup.toSubgroup)
     (htop : t.operators = (inducedOuter D g).operators) :
     toSymplectic g.operators ∈ sympSpan D.concatGeneratorsList := by
-  sorry  -- TODO(concat-m5-r7): symplectic embed/promote infrastructure (see proof plan above)
+  obtain ⟨u, hu_mem, hu_comm⟩ := D.exists_concatStab_matching_induced g hg hindep t ht htop
+  have hgu_cent : g * u ∈ centralizer D.concatStabGroup :=
+    Subgroup.mul_mem _ hg (stabilizer_le_centralizer _ hu_mem)
+  have hgu_span : toSymplectic (g * u).operators ∈ sympSpan D.concatGeneratorsList := by
+    rw [toSymplectic_eq_sum_embed_restrictBlock (g * u)]
+    refine Submodule.sum_mem _ (fun b _ => ?_)
+    refine D.toSymplectic_embedBlock_mem_concatSpan b (restrictBlock b (g * u)) ?_
+    obtain ⟨s, hs_mem, hs_op⟩ := operators_eq_stab_of_commutes_both_logicals D.Cin hindep
+      (restrictBlock b (g * u)) (D.restrictBlock_mem_centralizer (g * u) hgu_cent b)
+      (hu_comm b).1 (hu_comm b).2
+    rw [← hs_op]
+    exact mem_closure_implies_symp_in_span D.Cin.generatorsList D.Cin.generators_phaseZero s hs_mem
+  have hu_span : toSymplectic u.operators ∈ sympSpan D.concatGeneratorsList :=
+    mem_closure_implies_symp_in_span D.concatGeneratorsList D.concatGeneratorsList_phaseZero u hu_mem
+  have hsum : toSymplectic g.operators
+      = toSymplectic (g * u).operators + toSymplectic u.operators := by
+    funext j
+    rw [Pi.add_apply, toSymplectic_mul g u j, add_assoc, CharTwo.add_self_eq_zero, add_zero]
+  rw [hsum]
+  exact Submodule.add_mem _ hgu_span hu_span
 
 /-- Coset injectivity: an outer stabilizer matching `inducedOuter D g`'s operator part forces
 `g` to be concatenated-stabilizer-like. -/
