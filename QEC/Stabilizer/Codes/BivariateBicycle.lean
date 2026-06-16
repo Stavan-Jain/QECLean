@@ -60,27 +60,35 @@ code and its `[[72, 12, 6]]` base, related by a 2:1 covering:
                     (`lightStabilizerClassification_holds`) by the effective
                     CRT-engine classification, making `DangerousSectorGe12`
                     unconditional
-- `MImClassify`   — the safe-sector confined-frame floor (A4 §§9–13) toward
-                    discharging `MImBound`: the weight join (`chainWeight` as a
-                    per-block per-layer sum), the coset parity, and the `ker ∂₂`
-                    basis with M-VANISH (`off₀ = off₂ = 0`), the closed weight
-                    form (`costFromComps`), and the coset `f`-dependence. WIP.
+- `MImClassify`   — the safe-sector confined-frame floor *reduction* (A4 §§9–13): the weight
+                    join (`chainWeight` as a per-block per-layer sum), the `ker ∂₂` basis with
+                    M-VANISH (`off₀ = off₂ = 0`), the exact per-slot weight (Fourier bijection),
+                    and the closed coset weight form `chainWeight_coset_eq` (= `costFromComps` of
+                    the seam offsets ⊕ engine-multiplied free datum)
 - `MImFloorData`  — machine-generated cost tables (`D3V`, `RCELL`) and Γⱼ coset-generator
                     / fiber data for the floor engine (orbit-independent; emitted by
                     `scripts/gen_floor_lean.py`)
-- `MImFloor`      — the native-decidable confined-floor engine: the Nat-encoded per-cell
-                    cost (`exCost`), the slab-min / offset-aware relaxed lower bounds
-                    (`slabMin`, `relaxed`), their soundness keystones (`cellMin_le`,
-                    `rcell_le`) and monotone lemmas (`slabMin_le_exCost`,
-                    `relaxed_le_exCost`), underpinning the `floorOK` two-phase decision
-                    (validated `true` for all five orbits). WIP toward `mimBound_holds`.
+- `MImFloor`      — the native-decidable confined-floor engine: the Nat-encoded per-cell cost
+                    (`exCost`), the slab-min / offset-aware relaxed lower bounds (`slabMin`,
+                    `relaxed`), their soundness keystones (`cellMin_le`, `rcell_le`) and monotone
+                    lemmas, plus the structural / flat-index soundness (`floorOK_sound`/`_flat`)
+                    and the chain-weight bridge (`costFromComps_eq_exCost`)
 - `MImMembership` — the Γ-membership indices (`gammaIdx0`..`gammaIdx4`) and their correctness
-                    (`mem0`..`mem4`, `native_decide`): each `rmul P̂ⱼ (Vⱼ f)` sits at the
-                    computed index in Γⱼ, on both blocks (the B̂/Â engine-multiplier
-                    convention, verified against `seamC`)
+                    (`mem0`..`mem4`, `native_decide`: each `rmul P̂ⱼ (Vⱼ f)` sits at the computed
+                    index in Γⱼ), plus the general per-orbit floor `floor_of_data`
+- `MImTransport`  — the y-translation symmetry: `seamC` is y-covariant at the chain level
+                    (`seamC_shiftYk_combo`) and `chainWeight` is translation-invariant, giving
+                    the transport reduction `floor_shiftYk_combo` (a class's floor lifts to its
+                    `(0,k)`-translate)
+- `MImFloorY0..Y12` — the safe-sector floor proven for each of the 13 y-orbit representatives
+                    (per-orbit `native_decide` `floorOK = true` leaf + `floor_of_data`)
+- `MImAssembly`   — **discharges `MImBound`** (`mimBound_holds`): the 64-case y-orbit dispatch
+                    (`floor_kcombo`) reduces every `ker ∂₂` class to a y-orbit rep; then the
+                    **unconditional** `grossStabilizerCode_hasCodeDistance_12_uncond` and the
+                    bundled `grossStabilizerCodeWithDistance : StabilizerCodeWithDistance 144 12 12`
 
-The full `StabilizerCode` packaging is complete and the A4 §6.3 classification
-hypothesis is discharged in `LightStabClassify`, leaving `MImBound` (A4 Part II
-(M-im)) as the single remaining CRT-engine hypothesis for `d = 12`; its discharge
-is under construction in `MImClassify`.
+Both CRT-engine inputs — `LightStabilizerClassification` (`LightStabClassify`) and `MImBound`
+(`MImAssembly`) — are now discharged, so the distance of the gross `[[144,12,12]]` code is
+**unconditional and axiom-clean** (the standard three axioms + the `native_decide` compiler
+axiom; no `sorry`).
 -/
