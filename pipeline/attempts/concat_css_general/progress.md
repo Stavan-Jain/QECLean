@@ -702,5 +702,35 @@ mathlib-API notes (v4.30): `linearIndependent_sum`, `linearIndependent_equiv`,
 take implicit args (use `by rw`/`by simp`); the `show` that changes a goal is a linter error
 (use `change`); `IsEmpty (Fin [].length)` needs a `haveI` (no auto-reduce of `[].length`).
 
-### Next: ONLY (B) remains — a computable weight-9 witness for the unconditional [[49,1,9]].
+## Session 14 (cont.) — (B) the weight-9 witness: DONE → **unconditional [[49,1,9]]**
+
+`steaneConcat_hasCodeDistance_nine : HasCodeDistance (steaneConcatData.concatenate …) 9` now
+takes **no hypotheses**. `#print axioms` = `{propext, Classical.choice, Quot.sound}` + the
+`native_decide` axioms only — **no `sorryAx`**.
+
+**Witness** (`SteaneSteane.lean`, `steaneConcat_witness`): `witnessE = X` on the inner `{3,5,6}`
+of the three active outer blocks `{3,5,6}` (9 qubits) — the inner weight-3 logical promoted onto
+the outer weight-3 logical's support. Nontriviality via the centralizer-anticommutes pattern:
+- `witnessE_weight : weight = 3·3` by `native_decide`.
+- `witnessE_mem_centralizer` / `allZ_mem_centralizer`: `mem_centralizer_of_commutes_list` with
+  `∀ s ∈ concatGensConcrete, symplecticInner s.op _ = 0` by `native_decide`.
+- `allZ = ⟨0, Z 49⟩` is a centralizer member anticommuting with `witnessE`
+  (`symplecticInner witnessOp (Z 49) = 1`), so `not_mem_stabilizer_of_anticommutes_centralizer`
+  gives both `∉ subgroup` and (with a local `anticommute_of_operators_eq`) the third
+  `IsNontrivialLogicalOperator` clause.
+
+**The key trick — concrete-list bridge for `native_decide`.** `steaneConcatData.concatGeneratorsList`
+is *not* native-computable (its `stabilizerCode` projections sit behind a `noncomputable def`),
+so `native_decide` on it fails. Fix: define `concatGensConcrete` — the same list with the
+projections written as the explicit `generatorsList` / `logicalX` / `logicalZ` — which **is**
+`rfl`-equal to it (the projections reduce by `rfl`). Run every `native_decide` against
+`concatGensConcrete`; pass it to `mem_centralizer_of_commutes_list` with `h_closure := rfl`
+(`concatStabGroup.toSubgroup ≡ closure (listToSet concatGensConcrete)`). This is the same
+defeq-bridge used for `steaneConcat_generatorsIndependent`, and is the general recipe for
+`native_decide` against any value behind a noncomputable concrete-data projection.
+
+### M7 COMPLETE. Entire M1–M7 concatenation program done and sorry-free.
+Optional next: open a PR; promote reusable patterns (blockRestrictSymp, append-independence,
+the noncomputable→concrete+rfl+native_decide bridge) to `lean-patterns.md`; generalize beyond
+`k1 = 1` or instantiate other inner⊗outer pairs.
 
