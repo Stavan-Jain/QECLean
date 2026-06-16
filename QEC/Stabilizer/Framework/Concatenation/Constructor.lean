@@ -261,8 +261,8 @@ lemma outer_gen_noY (y : NQubitPauliGroupElement n₂) (hy : y ∈ D.outerZ ++ D
     ∀ b', y.operators b' ≠ PauliOperator.Y := by
   intro b'
   rcases List.mem_append.mp hy with hz | hx
-  · rcases (D.outerZ_isZ y hz).2 b' with h | h <;> rw [h] <;> decide
-  · rcases (D.outerX_isX y hx).2 b' with h | h <;> rw [h] <;> decide
+  · exact noY_of_isZType (D.outerZ_isZ y hz).2 b'
+  · exact noY_of_isXType (D.outerX_isX y hx).2 b'
 
 /-- Membership in the concatenated generator list: every element is an embedded inner
 generator or a promoted (typed) outer generator. -/
@@ -299,12 +299,39 @@ lemma concat_generators_commute :
 
 /-! ## No `-I`, independence -/
 
-/-- The closure of the concatenated generators omits `-I`. -/
+/-- The closure of the concatenated generators omits `-I`.
+
+Regroup `listToSet concatGeneratorsList` as `Z ∪ X`: the embedded inner Z/X generators
+(across all blocks, split via `inner_split`) together with the promoted outer Z/X
+generators (split via `outer_split`). Each side is provably Z-type / X-type
+(`embedBlock_isZ`/`promoteE_isZ`, resp. the X analogues), and the cross-commutation
+hypothesis is exactly `concat_generators_commute`. Then `negIdentity_not_mem_closure_union`. -/
 lemma concat_closure_no_neg_identity :
     negIdentity (n₁ * n₂) ∉ Subgroup.closure (listToSet D.concatGeneratorsList) := by
-  sorry -- TODO(concat-m3): regroup listToSet concatGeneratorsList = Zset ∪ Xset
-  -- (embedded innerZ + promoted outerZ, resp. innerX/outerX) via inner_split/outer_split,
-  -- typed by promoteE_isZ/isX + embedBlock typing; apply negIdentity_not_mem_closure_union.
+  classical
+  have hset : listToSet D.concatGeneratorsList =
+      {g | (∃ b, ∃ z ∈ D.innerZ, embedBlock b z = g) ∨
+           (∃ y ∈ D.outerZ, promoteE D.Xbar D.Zbar y = g)} ∪
+      {g | (∃ b, ∃ x ∈ D.innerX, embedBlock b x = g) ∨
+           (∃ y ∈ D.outerX, promoteE D.Xbar D.Zbar y = g)} := by
+    ext g
+    simp only [Set.mem_union, Set.mem_setOf_eq, listToSet,
+      ConcatCSSData.concatGeneratorsList, ConcatCSSData.s1PerBlockList,
+      ConcatCSSData.promotedOuterList, List.mem_append, List.mem_flatMap, List.mem_map,
+      List.mem_finRange, true_and, D.inner_split.mem_iff, or_and_right, exists_or]
+    rw [or_or_or_comm]
+  rw [hset]
+  apply CSSCommutationLemmas.negIdentity_not_mem_closure_union
+  · rintro z (⟨b, w, hw, rfl⟩ | ⟨y, hy, rfl⟩)
+    · exact embedBlock_isZ b (D.innerZ_isZ w hw)
+    · exact promoteE_isZ D.innerLogZ_isZ (D.outerZ_isZ y hy).2
+  · rintro x (⟨b, w, hw, rfl⟩ | ⟨y, hy, rfl⟩)
+    · exact embedBlock_isX b (D.innerX_isX w hw)
+    · exact promoteE_isX D.innerLogX_isX (D.outerX_isX y hy).2
+  · intro z hz x hx
+    apply D.concat_generators_commute
+    · rw [hset]; exact Set.mem_union_left _ hz
+    · rw [hset]; exact Set.mem_union_right _ hx
 
 /-- The concatenated generator list is independent. -/
 lemma concat_generators_independent :
@@ -328,18 +355,61 @@ def concatLogicalX (ℓ : Fin k₂) : NQubitPauliGroupElement (n₁ * n₂) :=
 def concatLogicalZ (ℓ : Fin k₂) : NQubitPauliGroupElement (n₁ * n₂) :=
   promoteE D.Xbar D.Zbar (D.Cout.logicalOps ℓ).zOp
 
+/-- The promoted outer logical `X` centralizes the concatenated stabilizer. Against an
+embedded inner generator it is `embedBlock_promoteE_commute`; against a promoted outer
+generator it is `promote_anticommute_parity` plus `(Cout.logicalOps ℓ).xOp` centralizing
+`Cout`'s stabilizer. -/
 lemma concatLogicalX_mem_centralizer (ℓ : Fin k₂) :
     concatLogicalX D ℓ ∈ centralizer (concatStabGroup D) := by
-  sorry -- TODO(concat-m3): commutes with each generator; inner stabs via X̄ ∈ Cin centralizer,
-  -- promoted outer via promote_anticommute_parity + (Cout.logicalOps ℓ).xOp in Cout centralizer.
+  classical
+  simp only [concatLogicalX]
+  apply CentralizerLemmas.mem_centralizer_of_commutes_list _ (concatStabGroup D)
+    D.concatGeneratorsList rfl
+  intro s hs
+  rcases D.mem_concatGeneratorsList s hs with ⟨b, z, hz, rfl⟩ | ⟨y, hy, rfl⟩
+  · exact D.embedBlock_promoteE_commute b z hz (D.Cout.logicalOps ℓ).xOp
+      (noY_of_isXType (D.outerLogX_isX ℓ))
+  · rw [commutes_iff_even_anticommutes,
+      D.promote_anticommute_parity y (D.Cout.logicalOps ℓ).xOp
+        (D.outer_gen_noY y hy) (noY_of_isXType (D.outerLogX_isX ℓ)),
+      ← commutes_iff_even_anticommutes]
+    have hy_mem : y ∈ NQubitPauliGroupElement.listToSet D.Cout.generatorsList :=
+      D.outer_split.mem_iff.mpr hy
+    exact (mem_centralizer_iff _ _).mp (D.Cout.logicalOps ℓ).x_mem_centralizer y
+      (Subgroup.subset_closure hy_mem)
 
+/-- The promoted outer logical `Z` centralizes the concatenated stabilizer (symmetric to
+`concatLogicalX_mem_centralizer`). -/
 lemma concatLogicalZ_mem_centralizer (ℓ : Fin k₂) :
     concatLogicalZ D ℓ ∈ centralizer (concatStabGroup D) := by
-  sorry -- TODO(concat-m3): symmetric to concatLogicalX_mem_centralizer.
+  classical
+  simp only [concatLogicalZ]
+  apply CentralizerLemmas.mem_centralizer_of_commutes_list _ (concatStabGroup D)
+    D.concatGeneratorsList rfl
+  intro s hs
+  rcases D.mem_concatGeneratorsList s hs with ⟨b, z, hz, rfl⟩ | ⟨y, hy, rfl⟩
+  · exact D.embedBlock_promoteE_commute b z hz (D.Cout.logicalOps ℓ).zOp
+      (noY_of_isZType (D.outerLogZ_isZ ℓ))
+  · rw [commutes_iff_even_anticommutes,
+      D.promote_anticommute_parity y (D.Cout.logicalOps ℓ).zOp
+        (D.outer_gen_noY y hy) (noY_of_isZType (D.outerLogZ_isZ ℓ)),
+      ← commutes_iff_even_anticommutes]
+    have hy_mem : y ∈ NQubitPauliGroupElement.listToSet D.Cout.generatorsList :=
+      D.outer_split.mem_iff.mpr hy
+    exact (mem_centralizer_iff _ _).mp (D.Cout.logicalOps ℓ).z_mem_centralizer y
+      (Subgroup.subset_closure hy_mem)
 
+/-- The concatenated logicals `X̄_ℓ`, `Z̄_ℓ` anticommute: the outer logical pair
+anticommutes (odd outer count), and `promote_anticommute_parity` preserves the parity. -/
 lemma concatLogical_anticommute (ℓ : Fin k₂) :
     Anticommute (concatLogicalX D ℓ) (concatLogicalZ D ℓ) := by
-  sorry -- TODO(concat-m3): odd-parity side from (Cout.logicalOps ℓ).anticommute via R6
+  classical
+  simp only [concatLogicalX, concatLogicalZ]
+  rw [anticommutes_iff_odd_anticommutes, ← Nat.not_even_iff_odd,
+    D.promote_anticommute_parity (D.Cout.logicalOps ℓ).xOp (D.Cout.logicalOps ℓ).zOp
+      (noY_of_isXType (D.outerLogX_isX ℓ)) (noY_of_isZType (D.outerLogZ_isZ ℓ)),
+    Nat.not_even_iff_odd]
+  exact (anticommutes_iff_odd_anticommutes _ _).mp (D.Cout.logicalOps ℓ).anticommute
 
 /-- The bundled logical operators of the concatenated code. -/
 def concatLogicalOps (ℓ : Fin k₂) : LogicalQubitOps (n₁ * n₂) (concatStabGroup D) where
@@ -358,7 +428,25 @@ lemma concat_logical_commute_cross (ℓ ℓ' : Fin k₂) (hne : ℓ ≠ ℓ') :
         (concatLogicalOps D ℓ').xOp * (concatLogicalOps D ℓ).zOp ∧
       (concatLogicalOps D ℓ).zOp * (concatLogicalOps D ℓ').zOp =
         (concatLogicalOps D ℓ').zOp * (concatLogicalOps D ℓ).zOp := by
-  sorry -- TODO(concat-m3): promote_anticommute_parity + Cout.logical_commute_cross ℓ ℓ' hne.
+  classical
+  -- Promotion preserves commutation of any `Y`-free outer pair (parity is preserved and
+  -- the underlying pair commutes).
+  have key : ∀ a b : NQubitPauliGroupElement n₂,
+      (∀ i, a.operators i ≠ PauliOperator.Y) → (∀ i, b.operators i ≠ PauliOperator.Y) →
+      a * b = b * a →
+      promoteE D.Xbar D.Zbar a * promoteE D.Xbar D.Zbar b
+        = promoteE D.Xbar D.Zbar b * promoteE D.Xbar D.Zbar a := by
+    intro a b ha hb hab
+    rw [commutes_iff_even_anticommutes, D.promote_anticommute_parity a b ha hb,
+      ← commutes_iff_even_anticommutes]
+    exact hab
+  obtain ⟨hXX, hXZ, hZX, hZZ⟩ := D.Cout.logical_commute_cross ℓ ℓ' hne
+  simp only [concatLogicalOps, concatLogicalX, concatLogicalZ]
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · exact key _ _ (noY_of_isXType (D.outerLogX_isX ℓ)) (noY_of_isXType (D.outerLogX_isX ℓ')) hXX
+  · exact key _ _ (noY_of_isXType (D.outerLogX_isX ℓ)) (noY_of_isZType (D.outerLogZ_isZ ℓ')) hXZ
+  · exact key _ _ (noY_of_isZType (D.outerLogZ_isZ ℓ)) (noY_of_isXType (D.outerLogX_isX ℓ')) hZX
+  · exact key _ _ (noY_of_isZType (D.outerLogZ_isZ ℓ)) (noY_of_isZType (D.outerLogZ_isZ ℓ')) hZZ
 
 /-! ## The constructor -/
 
