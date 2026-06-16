@@ -1,5 +1,6 @@
 import QEC.Stabilizer.Codes.Small.Shor9
 import QEC.Stabilizer.Codes.Small.Steane7
+import QEC.Stabilizer.Codes.Small.Steane7Distance
 import QEC.Stabilizer.Codes.Small.Steane7TransversalGates
 import QEC.Stabilizer.Codes.Small.FourQubit_4_2_2
 import QEC.Stabilizer.Codes.Small.QuantumHamming
