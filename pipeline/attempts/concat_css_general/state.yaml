@@ -9,19 +9,19 @@ status: formalization          # M1, M2, M3 landed; M4–M7 pending
 track: engineering
 started_at: '2026-06-15'
 worktree_branch: claude/beautiful-lalande-04ce1f
-phase: stage-4-m5-done         # M5 COMPLETE and sorry-free (incl. R7 coset injectivity)
+phase: stage-4-m6-done         # M1–M6 COMPLETE and sorry-free; only the M7 concrete instance remains
 estimated_loc: 1650            # ~1560-1740 across 8 new modules
-sorries_closed: 67             # M1 + M2 + M3 + M4 + ALL of M5 (incl. R7 kernel + exists_concatStab_matching_induced)
-sorries_open: 0                # whole concatenation development is sorry-free
+sorries_closed: 70             # M1 + M2 + M3 + M4 + ALL of M5 + M6 (weight_ge_d1_mul_d2 + concat_hasCodeDistance)
+sorries_open: 0                # whole concatenation framework is sorry-free
 sorries_blocked: 0
-milestones_done: [M1, M2, M3, M4, M5]
-milestones_skeleton: []        # M5 fully proven
-current_lean_file: QEC/Stabilizer/Framework/Concatenation/Correspondence.lean
-covering_lean_file: QEC/Stabilizer/Codes/Concat/Distance.lean   # PLANNED final location (M6, not yet created)
-umbrella_file: QEC/Stabilizer/Codes/Concat.lean                  # PLANNED (not yet created)
+milestones_done: [M1, M2, M3, M4, M5, M6]
+milestones_skeleton: []        # M6 fully proven; M7 not yet started
+current_lean_file: QEC/Stabilizer/Framework/Concatenation/Distance.lean
+covering_lean_file: QEC/Stabilizer/Framework/Concatenation/Distance.lean   # M6 headline (actual location)
+umbrella_file: QEC/Stabilizer/Framework/Concatenation.lean                 # wired
 headline_theorem: 'concat_hasCodeDistance : HasCodeDistance (concatenate D) (d1 * d2)'
-long_pole: 'M4 + M5 DONE, both sorry-free. M5 deliverables all PROVEN: restrictBlock calculus, weight_eq_sum_restrictBlock, restrictBlock_mem_centralizer, inducedOuter, inducedOuter_support_eq, inducedOuter_mem_centralizer, inducedOuter_isNontrivialLogical (headline), and R7 coset injectivity (inducedOuter_symp_in_span + exists_concatStab_matching_induced). No long pole remains for M6 — it is pure assembly of existing lemmas.'
-next_step: 'M6 (distance, the headline): weight_ge_d1_mul_d2 — for a nontrivial concat logical g of positive weight, d1*d2 ≤ g.weight via weight_eq_sum_restrictBlock + (per nontrivial block, weight ≥ d1 from HasCodeDistance Cin) + (#nontrivial blocks = weight(inducedOuter g) ≥ d2 from inducedOuter_isNontrivialLogical + inducedOuter_support_eq + HasCodeDistance Cout) + weight_ge_of_blocks_ge (M1). Then concatWitness (promote of min-weight outer X̄ with min-weight inner X̄ per block; weight = d1*d2; nontrivial) and concat_hasCodeDistance via hasCodeDistance_of. Then M7 (Steane⊗Steane, native_decide for concatenate GeneratorsIndependent + inner rowsLinearIndependent).'
+long_pole: 'M4 + M5 + M6 DONE, all sorry-free. The full abstract framework is complete: concatenate constructor (M3), inner-centralizer classification (M4), induced-outer correspondence + R7 coset injectivity (M5), and the distance bound weight_ge_d1_mul_d2 + concat_hasCodeDistance (M6). Only M7 (the Steane⊗Steane concrete instance) remains.'
+next_step: 'M7 (Steane⊗Steane [[49,1,9]], the validating instance). Build steaneConcatData : ConcatCSSData 7 7 1 from Steane7.stabilizerCode (Cin=Cout): innerZ=[Z1,Z2,Z3], innerX=[X1,X2,X3] (generatorsList = innerZ++innerX, so inner_split = Perm.refl); type proofs from ZGenerators_are_ZType/XGenerators_are_XType; logical X/Z type+phase from logicalOpsSteane7 (all-X/all-Z, phase 0). Then steaneConcat := concatenate steaneConcatData hindep and steaneConcat_distance := concat_hasCodeDistance ... steane_d3 steane_d3 hwit. FRICTION: native_decide for the 48-generator/49-qubit GeneratorsIndependent + the d=9 witness needs a COMPUTABLE restatement of concatGeneratorsList (it flows through Steane7.stabilizerCode noncomputable fields; native_decide needs compiled code). Plan: prove concatGeneratorsList steaneConcatData = <explicit computable list built from Steane7.generatorsList + the logical operators> by rfl/decide, then native_decide on that.'
 introduced_refs:
   - 'Knill-Laflamme 1996 (concatenated codes / threshold)'
   - 'Gottesman 1997, "A Theory of Fault-Tolerant Quantum Computation" (arxiv:quant-ph/9702029)'
