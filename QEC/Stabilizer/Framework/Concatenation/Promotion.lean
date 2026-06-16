@@ -73,6 +73,36 @@ lemma promoteE_isX {Xbar Zbar : NQubitPauliOperator n₁} (hXbar : NQubitPauliOp
   · rw [hI]; exact Or.inl rfl
   · rw [hX]; exact hXbar (posOf q)
 
+/-- Embedding a Z-type element into a block yields a Z-type element (the off-block
+positions are `I`, which is Z-type). -/
+lemma embedBlock_isZ (b : Fin n₂) {g : NQubitPauliGroupElement n₁}
+    (hg : IsZTypeElement g) : IsZTypeElement (embedBlock b g) := by
+  refine ⟨rfl, fun q => ?_⟩
+  simp only [embedBlock_operators, embedBlockOp]
+  by_cases hbq : blockOf q = b
+  · rw [if_pos hbq]; exact hg.2 (posOf q)
+  · rw [if_neg hbq]; exact Or.inl rfl
+
+/-- Embedding an X-type element into a block yields an X-type element. -/
+lemma embedBlock_isX (b : Fin n₂) {g : NQubitPauliGroupElement n₁}
+    (hg : IsXTypeElement g) : IsXTypeElement (embedBlock b g) := by
+  refine ⟨rfl, fun q => ?_⟩
+  simp only [embedBlock_operators, embedBlockOp]
+  by_cases hbq : blockOf q = b
+  · rw [if_pos hbq]; exact hg.2 (posOf q)
+  · rw [if_neg hbq]; exact Or.inl rfl
+
+/-- An X-type operator tensor has no `Y` component (feeds the `no-Y` hypotheses of
+`promote_anticommute_parity`). -/
+lemma noY_of_isXType {n : ℕ} {op : NQubitPauliOperator n}
+    (h : NQubitPauliOperator.IsXType op) (i : Fin n) : op i ≠ PauliOperator.Y := by
+  rcases h i with hi | hi <;> rw [hi] <;> decide
+
+/-- A Z-type operator tensor has no `Y` component. -/
+lemma noY_of_isZType {n : ℕ} {op : NQubitPauliOperator n}
+    (h : NQubitPauliOperator.IsZType op) (i : Fin n) : op i ≠ PauliOperator.Y := by
+  rcases h i with hi | hi <;> rw [hi] <;> decide
+
 /-! ## The concatenated-code data bundle -/
 
 /-- Input data for concatenating a `k₁ = 1` CSS inner code with a CSS outer code.
@@ -96,6 +126,12 @@ structure ConcatCSSData (n₁ n₂ k₂ : ℕ) [NeZero n₁] where
   innerLogX_phaseZero : (Cin.logicalOps 0).xOp.phasePower = 0
   innerLogZ_isZ : NQubitPauliOperator.IsZType (Cin.logicalOps 0).zOp.operators
   innerLogZ_phaseZero : (Cin.logicalOps 0).zOp.phasePower = 0
+  /-- The outer logical `X` representatives are X-type (hence `Y`-free): required so that
+  `promote_anticommute_parity` applies to the promoted logicals. A CSS outer code admits
+  such representatives. -/
+  outerLogX_isX : ∀ ℓ : Fin k₂, NQubitPauliOperator.IsXType (Cout.logicalOps ℓ).xOp.operators
+  /-- The outer logical `Z` representatives are Z-type (hence `Y`-free). -/
+  outerLogZ_isZ : ∀ ℓ : Fin k₂, NQubitPauliOperator.IsZType (Cout.logicalOps ℓ).zOp.operators
 
 namespace ConcatCSSData
 
