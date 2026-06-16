@@ -139,6 +139,33 @@ lemma restrictBlock_commute_embed_iff (b : Fin n₂) (g : NQubitPauliGroupElemen
   rw [commutes_iff_even_anticommutes, commutes_iff_even_anticommutes,
     anticommutesAt_count_restrictBlock]
 
+/-! ## Symplectic gluing (for the M5 coset-injectivity kernel) -/
+
+open NQubitPauliOperator in
+/-- An `n₁·n₂`-qubit operator's symplectic vector is the sum of its blocks' embedded
+restriction vectors. The blocks have disjoint support, so at each symplectic coordinate
+(qubit `q`) only the `blockOf q` summand is nonzero. -/
+lemma toSymplectic_eq_sum_embed_restrictBlock (x : NQubitPauliGroupElement (n₁ * n₂)) :
+    toSymplectic x.operators
+      = ∑ b : Fin n₂, toSymplectic (embedBlock b (restrictBlock b x)).operators := by
+  funext j
+  rw [Finset.sum_apply]
+  have hsingle : ∀ q : Fin (n₁ * n₂),
+      (∀ b, b ≠ blockOf q → (embedBlock b (restrictBlock b x)).operators q = PauliOperator.I)
+      ∧ (embedBlock (blockOf q) (restrictBlock (blockOf q) x)).operators q = x.operators q := by
+    intro q
+    refine ⟨fun b hb => ?_, ?_⟩
+    · simp only [embedBlock_operators, embedBlockOp]; exact if_neg (Ne.symm hb)
+    · simp only [embedBlock_operators, embedBlockOp, restrictBlock_operators,
+        restrictBlockOp, if_true, qIdx_blockOf_posOf]
+  refine Fin.addCases (fun q => ?_) (fun q => ?_) j
+  · rw [toSymplectic_X_part, Finset.sum_eq_single (blockOf q)
+        (fun b _ hb => by rw [toSymplectic_X_part, (hsingle q).1 b hb]; rfl)
+        (fun h => absurd (Finset.mem_univ _) h), toSymplectic_X_part, (hsingle q).2]
+  · rw [toSymplectic_Z_part, Finset.sum_eq_single (blockOf q)
+        (fun b _ hb => by rw [toSymplectic_Z_part, (hsingle q).1 b hb]; rfl)
+        (fun h => absurd (Finset.mem_univ _) h), toSymplectic_Z_part, (hsingle q).2]
+
 namespace ConcatCSSData
 
 variable (D : ConcatCSSData n₁ n₂ k₂)
@@ -151,6 +178,43 @@ lemma embedBlock_mem_concatGeneratorsList (b : Fin n₂) (s : NQubitPauliGroupEl
   simp only [ConcatCSSData.concatGeneratorsList, ConcatCSSData.s1PerBlockList, List.mem_append,
     List.mem_flatMap, List.mem_map, List.mem_finRange]
   exact Or.inl ⟨b, trivial, s, hs, rfl⟩
+
+open NQubitPauliOperator in
+/-- **(M5 kernel infra.)** Embedding into block `b` sends the inner symplectic span into the
+concatenated span: if `toSymplectic s ∈ sympSpan Cin.generatorsList`, then
+`toSymplectic (embedBlock b s) ∈ sympSpan concatGeneratorsList`. Proven by realizing `s`'s
+operator part with a closure element (`exists_mem_closure_of_symp_in_span`) and inducting over
+the closure (embedding is operator-multiplicative via `mulOp_embedBlockOp_operators`, so its
+symplectic vector is additive). -/
+lemma toSymplectic_embedBlock_mem_concatSpan (b : Fin n₂) (s : NQubitPauliGroupElement n₁)
+    (hs : toSymplectic s.operators ∈ sympSpan D.Cin.generatorsList) :
+    toSymplectic (embedBlock b s).operators ∈ sympSpan D.concatGeneratorsList := by
+  obtain ⟨s', hs'mem, hs'op⟩ :=
+    exists_mem_closure_of_symp_in_span D.Cin.generatorsList s.operators hs
+  have hss' : (embedBlock b s).operators = (embedBlock b s').operators := by
+    simp only [embedBlock_operators, hs'op]
+  rw [hss']
+  refine Subgroup.closure_induction
+    (p := fun k _ => toSymplectic (embedBlock b k).operators ∈ sympSpan D.concatGeneratorsList)
+    ?_ ?_ ?_ ?_ hs'mem
+  · intro c hc
+    rw [sympSpan_eq_span_listToSet]
+    exact Submodule.subset_span
+      (Set.mem_image_of_mem _ (D.embedBlock_mem_concatGeneratorsList b c hc))
+  · simp only [embedBlock_one, toSymplectic_one_operators]
+    exact Submodule.zero_mem _
+  · intro a a' _ _ ha ha'
+    rw [show toSymplectic (embedBlock b (a * a')).operators
+        = toSymplectic (embedBlock b a).operators + toSymplectic (embedBlock b a').operators from by
+      have hop : (embedBlock b (a * a')).operators
+          = (embedBlock b a * embedBlock b a').operators :=
+        (mulOp_embedBlockOp_operators b a.operators a'.operators).symm
+      rw [hop]; funext j; exact toSymplectic_mul _ _ j]
+    exact Submodule.add_mem _ ha ha'
+  · intro a _ ha
+    rw [show toSymplectic (embedBlock b a⁻¹).operators
+        = toSymplectic (embedBlock b a).operators from rfl]
+    exact ha
 
 /-- **(M5.)** If `g` centralizes the concatenated stabilizer, every block restriction
 centralizes the inner stabilizer. The hinge that lets M4's `centralizer_classify_of_k1`
