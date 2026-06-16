@@ -418,16 +418,18 @@ every slot.  Pure sum/`wt5` algebra; the val-equalities bundle offData + Γ-memb
 theorem costFromComps_eq_exCost
     (oL oR : Array Nat) (a0 a3 a4 k1 k2 : Nat)
     (vL0 vL1 vL2 vL3 vL4 vR0 vR1 vR2 vR3 vR4 : Ring)
-    (hL0 : ∀ s, (vL0 s).val = gadd (ov oL 0 (natslot s)) (pv G0gen a0 (natslot s) 0))
-    (hL1 : ∀ s, (vL1 s).val = gadd (ov oL 1 (natslot s)) (pv F1gen k1 (natslot s) 0))
-    (hL2 : ∀ s, (vL2 s).val = gadd (ov oL 2 (natslot s)) (pv F2gen k2 (natslot s) 0))
-    (hL3 : ∀ s, (vL3 s).val = gadd (ov oL 3 (natslot s)) (pv G3gen a3 (natslot s) 0))
-    (hL4 : ∀ s, (vL4 s).val = gadd (ov oL 4 (natslot s)) (pv G4gen a4 (natslot s) 0))
-    (hR0 : ∀ s, (vR0 s).val = gadd (ov oR 0 (natslot s)) (pv G0gen a0 (natslot s) 1))
-    (hR1 : ∀ s, (vR1 s).val = gadd (ov oR 1 (natslot s)) (pv F1gen k1 (natslot s) 1))
-    (hR2 : ∀ s, (vR2 s).val = gadd (ov oR 2 (natslot s)) (pv F2gen k2 (natslot s) 1))
-    (hR3 : ∀ s, (vR3 s).val = gadd (ov oR 3 (natslot s)) (pv G3gen a3 (natslot s) 1))
-    (hR4 : ∀ s, (vR4 s).val = gadd (ov oR 4 (natslot s)) (pv G4gen a4 (natslot s) 1)) :
+    -- Convention: gen_floor's side-0 array `oL` = repo `rightHalf` (= §7 `seamOffR`/`vR`);
+    -- side-1 `oR` = `leftHalf` (= §7 `seamOffL`/`vL`).  Verified by `#eval` against `seamC`.
+    (hL0 : ∀ s, (vL0 s).val = gadd (ov oR 0 (natslot s)) (pv G0gen a0 (natslot s) 1))
+    (hL1 : ∀ s, (vL1 s).val = gadd (ov oR 1 (natslot s)) (pv F1gen k1 (natslot s) 1))
+    (hL2 : ∀ s, (vL2 s).val = gadd (ov oR 2 (natslot s)) (pv F2gen k2 (natslot s) 1))
+    (hL3 : ∀ s, (vL3 s).val = gadd (ov oR 3 (natslot s)) (pv G3gen a3 (natslot s) 1))
+    (hL4 : ∀ s, (vL4 s).val = gadd (ov oR 4 (natslot s)) (pv G4gen a4 (natslot s) 1))
+    (hR0 : ∀ s, (vR0 s).val = gadd (ov oL 0 (natslot s)) (pv G0gen a0 (natslot s) 0))
+    (hR1 : ∀ s, (vR1 s).val = gadd (ov oL 1 (natslot s)) (pv F1gen k1 (natslot s) 0))
+    (hR2 : ∀ s, (vR2 s).val = gadd (ov oL 2 (natslot s)) (pv F2gen k2 (natslot s) 0))
+    (hR3 : ∀ s, (vR3 s).val = gadd (ov oL 3 (natslot s)) (pv G3gen a3 (natslot s) 0))
+    (hR4 : ∀ s, (vR4 s).val = gadd (ov oL 4 (natslot s)) (pv G4gen a4 (natslot s) 0)) :
     costFromComps vL0 vL1 vL2 vL3 vL4 vR0 vR1 vR2 vR3 vR4 = exCost oL oR a0 a3 a4 k1 k2 := by
   unfold costFromComps
   rw [sum_zmod2sq]
