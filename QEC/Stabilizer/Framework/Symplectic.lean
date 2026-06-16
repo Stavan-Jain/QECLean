@@ -3,6 +3,7 @@ import QEC.Stabilizer.Framework.Symplectic.SymplecticOrthogonal
 import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
 import QEC.Stabilizer.Framework.Symplectic.WeightTwoInSpan
 import QEC.Stabilizer.Framework.Symplectic.SupportLemmas
+import QEC.Stabilizer.Framework.Symplectic.CentralizerStructure
 
 /-!
 # Symplectic ↔ stabilizer bridge
@@ -18,4 +19,7 @@ transitively on stabilizer-group content, so they cannot live in `Foundations`.
   generators (added in the [[5,1,3]] formalization)
 - `WeightTwoInSpan`: weight-two structure of the symplectic image
 - `SupportLemmas`: Pauli operator support, used in CSS reasoning
+- `CentralizerStructure`: inner-centralizer classification for `k = 1` codes
+  (concatenation M4) — the weak operator-part dichotomy (proven) and the
+  decisive commutes-both-logicals direction (the dimension-2 long pole)
 -/
