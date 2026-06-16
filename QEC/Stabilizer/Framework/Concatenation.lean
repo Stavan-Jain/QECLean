@@ -1,6 +1,7 @@
 import QEC.Stabilizer.Framework.Concatenation.Embedding
 import QEC.Stabilizer.Framework.Concatenation.Promotion
 import QEC.Stabilizer.Framework.Concatenation.Constructor
+import QEC.Stabilizer.Framework.Concatenation.Restriction
 
 /-!
 # Framework.Concatenation
@@ -20,6 +21,10 @@ Sub-modules:
   `StabilizerCode`, the CSS predicates, and `AllPhaseZero`).
 - `QEC.Stabilizer.Framework.Concatenation.Constructor` (M3) — the
   `concatenate : ConcatCSSData → StabilizerCode (n₁ * n₂) k₂` constructor.
-  Structure complete and typechecking; the obligation proofs (the R6 parity
-  core and what it feeds) are in progress (`sorry`-tagged `concat-m3`).
+  All obligation proofs discharged; `concatenate` is `sorry`-free.
+- `QEC.Stabilizer.Framework.Concatenation.Restriction` (M5, part 1) — the
+  block-restriction calculus `restrictBlock b g`, weight additivity
+  (`weight_eq_sum_restrictBlock`), the anticommuting-count parity bridge, and
+  `restrictBlock_mem_centralizer` (every block restriction of a centralizing
+  element centralizes the inner stabilizer).
 -/
