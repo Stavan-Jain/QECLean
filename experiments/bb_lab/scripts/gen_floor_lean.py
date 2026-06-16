@@ -85,7 +85,7 @@ for fb in range(512):
         vv.append(acc)
     v0, v1, v2, v3, v4 = vv
     WT5[v0 + 2*(v1+4*(v2+4*(v3+4*v4)))] = bin(fb).count("1")
-# D3V[(v0*16+v3*4+v4)*4 + (a1+2a2)]
+# D3V[(v0*16+v3*4+v4)*4 + (a1+2a2)] — slab-min table (comps 1,2 by raw support; offset-free)
 D3V = [99]*128
 for v0 in range(2):
     for v3 in range(4):
@@ -95,6 +95,24 @@ for v0 in range(2):
                     dom1 = (0,) if a1 == 0 else (1, 2, 3); dom2 = (0,) if a2 == 0 else (1, 2, 3)
                     D3V[(v0*16+v3*4+v4)*4+a1+2*a2] = min(
                         WT5[v0+2*(v1+4*(v2+4*(v3+4*v4)))] for v1 in dom1 for v2 in dom2)
+# RCELL: the OFFSET-AWARE relaxed per-cell table.  comps 1,2 are support-masked but
+# their seam OFFSETS (o1,o2) shift the actual value gadd(oj,qj); the raw-mask d3 is NOT
+# a valid lower bound when oj≠0 (comp-1 offsets are nonzero).  rcell bakes oj in: it mins
+# wt5 over comp-j ∈ {oj} (support bit 0) resp. {oj^1,oj^2,oj^3} (support bit 1), so it is a
+# genuine lower bound on wt5(v0, gadd(o1,q1), gadd(o2,q2), v3, v4) for every fiber entry
+# (q1,q2) with raw supports (b1,b2).  idx = ((((v0*4+v3)*4+v4)*4+o1)*4+o2)*4 + b1*2+b2.
+RCELL = [99]*2048
+for v0 in range(2):
+    for v3 in range(4):
+        for v4 in range(4):
+            for o1 in range(4):
+                for o2 in range(4):
+                    for b1 in range(2):
+                        for b2 in range(2):
+                            S1 = (o1,) if b1 == 0 else (o1 ^ 1, o1 ^ 2, o1 ^ 3)
+                            S2 = (o2,) if b2 == 0 else (o2 ^ 1, o2 ^ 2, o2 ^ 3)
+                            RCELL[((((v0*4+v3)*4+v4)*4+o1)*4+o2)*4+b1*2+b2] = min(
+                                WT5[v0+2*(c1+4*(c2+4*(v3+4*v4)))] for c1 in S1 for c2 in S2)
 def offs(w): return {j: (ch(w[:nb], j), ch(w[nb:], j)) for j in range(5)}
 # orbits
 def sw(z):
@@ -138,6 +156,7 @@ L.append("set_option maxRecDepth 4096\n")
 L.append(arr("ADD", [int(ADD[a, b]) for a in range(4) for b in range(4)]))
 L.append(arr("WT5", WT5))
 L.append(arr("D3V", D3V))
+L.append(arr("RCELL", RCELL))
 # offsets: oL[j*4+s], oR[j*4+s]
 oL = [o[j][0][s] for j in range(5) for s in range(4)]
 oR = [o[j][1][s] for j in range(5) for s in range(4)]
@@ -158,6 +177,8 @@ L.append(r'''
 @[inline] def gadd (a b : Nat) : Nat := ADD.getD (a*4+b) 0
 @[inline] def wt5 (v0 v1 v2 v3 v4 : Nat) : Nat := WT5.getD (v0+2*(v1+4*(v2+4*(v3+4*v4)))) 99
 @[inline] def d3 (v0 v3 v4 a1 a2 : Nat) : Nat := D3V.getD ((v0*16+v3*4+v4)*4+a1+2*a2) 99
+@[inline] def rcell (v0 v3 v4 o1 o2 b1 b2 : Nat) : Nat :=
+  RCELL.getD (((((v0*4+v3)*4+v4)*4+o1)*4+o2)*4+b1*2+b2) 99
 
 -- pair value: array G, pair index k, slot s, side (0=L,1=R)
 @[inline] def pv (G : Array Nat) (k s side : Nat) : Nat := G.getD (k*8+side*4+s) 0
@@ -176,13 +197,16 @@ L.append(r'''
         + cellMin (gadd (ov oR 0 s) (pv G0 a0 s 1)) (gadd (ov oR 3 s) (pv G3 a3 s 1))
                   (gadd (ov oR 4 s) (pv G4 a4 s 1))) 0
 
--- relaxed cost: comps0,3,4 exact, comps1,2 by support mask m1,m2 (per block)
+-- relaxed cost: comps0,3,4 exact, comps1,2 by support mask m1,m2 (per block), with the
+-- comp-1,2 seam OFFSETS (o1,o2) baked into rcell so the bound stays valid under offsets.
 @[inline] def relaxed (a0 a3 a4 m1L m1R m2L m2R : Nat) : Nat :=
   (List.range 4).foldl (fun acc s =>
-    acc + d3 (gadd (ov oL 0 s) (pv G0 a0 s 0)) (gadd (ov oL 3 s) (pv G3 a3 s 0))
-             (gadd (ov oL 4 s) (pv G4 a4 s 0)) ((m1L >>> s) &&& 1) ((m2L >>> s) &&& 1)
-        + d3 (gadd (ov oR 0 s) (pv G0 a0 s 1)) (gadd (ov oR 3 s) (pv G3 a3 s 1))
-             (gadd (ov oR 4 s) (pv G4 a4 s 1)) ((m1R >>> s) &&& 1) ((m2R >>> s) &&& 1)) 0
+    acc + rcell (gadd (ov oL 0 s) (pv G0 a0 s 0)) (gadd (ov oL 3 s) (pv G3 a3 s 0))
+             (gadd (ov oL 4 s) (pv G4 a4 s 0)) (ov oL 1 s) (ov oL 2 s)
+             ((m1L >>> s) &&& 1) ((m2L >>> s) &&& 1)
+        + rcell (gadd (ov oR 0 s) (pv G0 a0 s 1)) (gadd (ov oR 3 s) (pv G3 a3 s 1))
+             (gadd (ov oR 4 s) (pv G4 a4 s 1)) (ov oR 1 s) (ov oR 2 s)
+             ((m1R >>> s) &&& 1) ((m2R >>> s) &&& 1)) 0
 
 -- exact cost over all five comps at pair indices a0,a1,a2,a3,a4 (G1,G2 via fiber arrays)
 @[inline] def exCost (a0 a3 a4 : Nat) (p1 : Array Nat) (k1 : Nat) (p2 : Array Nat) (k2 : Nat) : Nat :=

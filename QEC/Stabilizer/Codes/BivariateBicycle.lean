@@ -11,6 +11,7 @@ import QEC.Stabilizer.Codes.BivariateBicycle.StabilizerCode
 import QEC.Stabilizer.Codes.BivariateBicycle.LightStab
 import QEC.Stabilizer.Codes.BivariateBicycle.LightStabClassify
 import QEC.Stabilizer.Codes.BivariateBicycle.MImClassify
+import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorData
 import QEC.Stabilizer.Codes.BivariateBicycle.MImFloor
 
 /-!
@@ -48,11 +49,15 @@ code and its `[[72, 12, 6]]` base, related by a 2:1 covering:
                     per-block per-layer sum), the coset parity, and the `ker ∂₂`
                     basis with M-VANISH (`off₀ = off₂ = 0`), the closed weight
                     form (`costFromComps`), and the coset `f`-dependence. WIP.
-- `MImFloor`      — the native-decidable confined-floor engine: the Nat-encoded
-                    per-cell cost and the slab-min/relaxed soundness keystones
-                    (`cellMin_le`, `d3_le`) underpinning the `floorOK` two-phase
-                    decision (validated `true` for all five orbits). WIP toward
-                    `mimBound_holds`.
+- `MImFloorData`  — machine-generated cost tables (`D3V`, `RCELL`) and Γⱼ coset-generator
+                    / fiber data for the floor engine (orbit-independent; emitted by
+                    `scripts/gen_floor_lean.py`)
+- `MImFloor`      — the native-decidable confined-floor engine: the Nat-encoded per-cell
+                    cost (`exCost`), the slab-min / offset-aware relaxed lower bounds
+                    (`slabMin`, `relaxed`), their soundness keystones (`cellMin_le`,
+                    `rcell_le`) and monotone lemmas (`slabMin_le_exCost`,
+                    `relaxed_le_exCost`), underpinning the `floorOK` two-phase decision
+                    (validated `true` for all five orbits). WIP toward `mimBound_holds`.
 
 The full `StabilizerCode` packaging is complete and the A4 §6.3 classification
 hypothesis is discharged in `LightStabClassify`, leaving `MImBound` (A4 Part II
