@@ -266,4 +266,12 @@ theorem grossStabilizerCode_hasCodeDistance_12_uncond :
     Quantum.StabilizerGroup.HasCodeDistance grossStabilizerCode 12 :=
   grossStabilizerCode_hasCodeDistance_12 LightStab.mimBound_holds
 
+/-- **The Gross `[[144, 12, 12]]` code as a fully-parametrized object.**  Bundles the
+stabilizer code (`StabilizerCode 144 12`) with its now-unconditional distance proof into a
+single `StabilizerCodeWithDistance` carrying all three `[[n, k, d]]` parameters in its type. -/
+noncomputable def grossStabilizerCodeWithDistance :
+    Quantum.StabilizerGroup.StabilizerCodeWithDistance 144 12 12 where
+  toStabilizerCode := grossStabilizerCode
+  hasDistance := grossStabilizerCode_hasCodeDistance_12_uncond
+
 end Quantum.Stabilizer.Homological.BB
