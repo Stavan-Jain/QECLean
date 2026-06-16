@@ -14,6 +14,7 @@ import QEC.Stabilizer.Codes.BivariateBicycle.MImClassify
 import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorData
 import QEC.Stabilizer.Codes.BivariateBicycle.MImFloor
 import QEC.Stabilizer.Codes.BivariateBicycle.MImMembership
+import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorO4
 
 /-!
 # Bivariate bicycle codes

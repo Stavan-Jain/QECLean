@@ -1,0 +1,55 @@
+/-
+# Phase 6: the safe-sector floor for orbit 4 (weight-24 class)
+
+Instantiates the general `floor_of_data` (`MImMembership §14c`) for orbit representative 4,
+supplying its `ker ∂₂` support, the seam offset arrays (`oL = rightHalf`, `oR = leftHalf`),
+the offData / offset-bound `native_decide`s, and the heavy floor leaf
+`floorOK oL4 oR4 = true` (the `~50 s` two-phase decision over the `2³⁰` coset product).
+-/
+import QEC.Stabilizer.Codes.BivariateBicycle.MImMembership
+
+open Quantum.Stabilizer.Homological.BB
+open Quantum.Stabilizer.Homological.BB.CRTFrame
+open Quantum.Stabilizer.Homological.BB.LightStab
+
+namespace Quantum.Stabilizer.Homological.BB.LightStab.O4
+
+set_option maxRecDepth 4096
+
+/-- Orbit-4 (weight-24) `ker ∂₂` representative. -/
+def zrep : BaseGroup → ZMod 2 := mkZeta
+  [(0,0),(0,2),(0,3),(0,5),(1,1),(1,2),(1,4),(1,5),(2,0),(2,1),(2,3),(2,4),
+   (3,0),(3,2),(3,3),(3,5),(4,1),(4,2),(4,4),(4,5),(5,0),(5,1),(5,3),(5,4)]
+
+/-- Side-0 (rightHalf) seam offsets, flat `j*4+s`. -/
+def oL : Array Nat := #[0,0,0,0,2,3,2,3,0,0,0,0,2,1,2,1,3,3,3,3]
+/-- Side-1 (leftHalf) seam offsets, flat `j*4+s`. -/
+def oR : Array Nat := #[0,0,0,0,1,1,1,1,0,0,0,0,0,2,0,2,2,2,2,2]
+
+theorem oLoff0 : ∀ s, (seamOffR zrep psi0 s).val = ov oL 0 (natslot s) := by native_decide
+theorem oLoff1 : ∀ s, (seamOffR zrep psi1 s).val = ov oL 1 (natslot s) := by native_decide
+theorem oLoff2 : ∀ s, (seamOffR zrep psi2 s).val = ov oL 2 (natslot s) := by native_decide
+theorem oLoff3 : ∀ s, (seamOffR zrep psi3 s).val = ov oL 3 (natslot s) := by native_decide
+theorem oLoff4 : ∀ s, (seamOffR zrep psi4 s).val = ov oL 4 (natslot s) := by native_decide
+theorem oRoff0 : ∀ s, (seamOffL zrep psi0 s).val = ov oR 0 (natslot s) := by native_decide
+theorem oRoff1 : ∀ s, (seamOffL zrep psi1 s).val = ov oR 1 (natslot s) := by native_decide
+theorem oRoff2 : ∀ s, (seamOffL zrep psi2 s).val = ov oR 2 (natslot s) := by native_decide
+theorem oRoff3 : ∀ s, (seamOffL zrep psi3 s).val = ov oR 3 (natslot s) := by native_decide
+theorem oRoff4 : ∀ s, (seamOffL zrep psi4 s).val = ov oR 4 (natslot s) := by native_decide
+
+theorem hoL4 : ∀ i, oL.getD i 0 < 4 := getD_lt (by norm_num) (by native_decide)
+theorem hoR4 : ∀ i, oR.getD i 0 < 4 := getD_lt (by norm_num) (by native_decide)
+theorem hoL0 : ∀ s, s < 4 → ov oL 0 s < 2 := by intro s hs; interval_cases s <;> native_decide
+theorem hoR0 : ∀ s, s < 4 → ov oR 0 s < 2 := by intro s hs; interval_cases s <;> native_decide
+
+/-- The heavy floor leaf: the two-phase decision certifies `12 ≤ exCost` over the whole
+`2³⁰` coset product for this orbit's offsets. -/
+theorem floor_holds : floorOK oL oR = true := by native_decide
+
+/-- **Orbit-4 safe-sector floor**: every base 1-cycle in `[seamC zrep]` has weight `≥ 12`. -/
+theorem floor (f : BaseGroup → ZMod 2) :
+    12 ≤ bb72Complex.chainWeight (seamC zrep + bbBoundary2Fn baseA baseB f) :=
+  floor_of_data zrep oL oR floor_holds hoL4 hoR4 hoL0 hoR0
+    oLoff0 oLoff1 oLoff2 oLoff3 oLoff4 oRoff0 oRoff1 oRoff2 oRoff3 oRoff4 f
+
+end Quantum.Stabilizer.Homological.BB.LightStab.O4
