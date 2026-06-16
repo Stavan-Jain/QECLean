@@ -77,6 +77,75 @@ theorem centralizer_classify_of_k1 (C : StabilizerCode n k)
       have hs' := mem_closure_implies_symp_in_span C.generatorsList C.generators_phaseZero s hs
       rwa [heq] at hs'
 
+/-! ## The symplectic form as a nondegenerate `BilinForm` (for the dimension count) -/
+
+section BilinForm
+
+open NQubitPauliOperator
+
+/-- The two halves of `Fin (n + n)` are disjoint: an X-index never equals a Z-index. -/
+private lemma castAdd_ne_natAdd (i k : Fin n) : Fin.castAdd n i ≠ Fin.natAdd n k := by
+  intro h; have := Fin.ext_iff.mp h; simp [Fin.val_castAdd] at this; omega
+
+/-- The symplectic bilinear form on `F₂^{2n}`, bundled as a mathlib `BilinForm`. -/
+noncomputable def sympBilinForm (n : ℕ) :
+    LinearMap.BilinForm (ZMod 2) (Fin (n + n) → ZMod 2) :=
+  LinearMap.mk₂ (ZMod 2) symplecticBilinear
+    symplecticBilinear_add_left
+    (fun c v w => by rw [symplecticBilinear_smul_left, smul_eq_mul])
+    symplecticBilinear_add_right
+    (fun c v w => by rw [symplecticBilinear_smul_right, smul_eq_mul])
+
+@[simp] lemma sympBilinForm_apply (v w : Fin (n + n) → ZMod 2) :
+    sympBilinForm n v w = symplecticBilinear v w := rfl
+
+/-- The symplectic form is symmetric (over `ZMod 2`, the cross terms coincide). -/
+lemma symplecticBilinear_comm (v w : Fin (n + n) → ZMod 2) :
+    symplecticBilinear v w = symplecticBilinear w v := by
+  unfold symplecticBilinear
+  exact Finset.sum_congr rfl (fun i _ => by ring)
+
+lemma sympBilinForm_isRefl : (sympBilinForm (n := n)).IsRefl := by
+  intro x y h
+  rw [sympBilinForm_apply, symplecticBilinear_comm]
+  rwa [sympBilinForm_apply] at h
+
+/-- The symplectic form is nondegenerate: testing against the standard basis vectors
+`Pi.single` recovers each coordinate. -/
+lemma sympBilinForm_nondegenerate : (sympBilinForm (n := n)).Nondegenerate := by
+  refine (LinearMap.IsRefl.nondegenerate_iff_separatingLeft sympBilinForm_isRefl).mpr ?_
+  intro v hv
+  funext j
+  refine Fin.addCases (fun i => ?_) (fun i => ?_) j
+  · -- X-index: test against `single (natAdd i) 1`, recovering `v (castAdd i)`.
+    have key : symplecticBilinear v (Pi.single (Fin.natAdd n i) (1 : ZMod 2)) =
+        v (Fin.castAdd n i) := by
+      unfold symplecticBilinear
+      rw [Finset.sum_eq_single i]
+      · rw [Pi.single_eq_same, Pi.single_eq_of_ne (castAdd_ne_natAdd i i)]; ring
+      · intro k _ hk
+        rw [Pi.single_eq_of_ne (show Fin.natAdd n k ≠ Fin.natAdd n i by simp [hk]),
+            Pi.single_eq_of_ne (castAdd_ne_natAdd k i)]; ring
+      · intro h; exact absurd (Finset.mem_univ i) h
+    have := hv (Pi.single (Fin.natAdd n i) (1 : ZMod 2))
+    rw [sympBilinForm_apply, key] at this
+    simpa using this
+  · -- Z-index: test against `single (castAdd i) 1`, recovering `v (natAdd i)`.
+    have key : symplecticBilinear v (Pi.single (Fin.castAdd n i) (1 : ZMod 2)) =
+        v (Fin.natAdd n i) := by
+      unfold symplecticBilinear
+      rw [Finset.sum_eq_single i]
+      · rw [Pi.single_eq_same, Pi.single_eq_of_ne (Ne.symm (castAdd_ne_natAdd i i))]; ring
+      · intro k _ hk
+        rw [Pi.single_eq_of_ne (Ne.symm (castAdd_ne_natAdd i k)),
+            Pi.single_eq_of_ne (show Fin.castAdd n k ≠ Fin.castAdd n i by simp [hk])]; ring
+      · intro h; exact absurd (Finset.mem_univ i) h
+    have := hv (Pi.single (Fin.castAdd n i) (1 : ZMod 2))
+    rw [sympBilinForm_apply, key] at this
+    simpa using this
+
+end BilinForm
+
 /-- **(M4, decisive direction — the long pole, still `sorry`.)** For a `k = 1` code, a
 centralizing element that commutes with *both* inner logicals `X̄₁`, `Z̄₁` has its operator
 part realized by a stabilizer element.
