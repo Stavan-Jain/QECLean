@@ -13,6 +13,7 @@ import QEC.Stabilizer.Codes.BivariateBicycle.LightStabClassify
 import QEC.Stabilizer.Codes.BivariateBicycle.MImClassify
 import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorData
 import QEC.Stabilizer.Codes.BivariateBicycle.MImFloor
+import QEC.Stabilizer.Codes.BivariateBicycle.MImMembership
 
 /-!
 # Bivariate bicycle codes
@@ -58,6 +59,10 @@ code and its `[[72, 12, 6]]` base, related by a 2:1 covering:
                     `rcell_le`) and monotone lemmas (`slabMin_le_exCost`,
                     `relaxed_le_exCost`), underpinning the `floorOK` two-phase decision
                     (validated `true` for all five orbits). WIP toward `mimBound_holds`.
+- `MImMembership` — the Γ-membership indices (`gammaIdx0`..`gammaIdx4`) and their correctness
+                    (`mem0`..`mem4`, `native_decide`): each `rmul P̂ⱼ (Vⱼ f)` sits at the
+                    computed index in Γⱼ, on both blocks (the B̂/Â engine-multiplier
+                    convention, verified against `seamC`)
 
 The full `StabilizerCode` packaging is complete and the A4 §6.3 classification
 hypothesis is discharged in `LightStabClassify`, leaving `MImBound` (A4 Part II
