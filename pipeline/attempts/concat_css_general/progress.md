@@ -618,6 +618,40 @@ all-X/all-Z phase-0). **Friction:** `native_decide` for the 48-generator/49-qubi
 computable list from Steane7.generatorsList + logical ops>` by `rfl`/`decide`, then
 `native_decide`.
 
+## Session 13 — M7 (partial): bundle + Steane d=3 + conditional [[49,1,9]].
+
+`steaneConcatData : ConcatCSSData 7 7 1` typechecks (the framework's input bundle instantiates
+on Steane). The 16 fields are easy: `inner_split/outer_split = Perm.refl` (`generatorsList =
+[Z1,Z2,Z3]++[X1,X2,X3]`); Z/X-type from `ZGenerators_are_ZType`/`XGenerators_are_XType` (list→set
+membership by `simp`); logical type/phase by `fun _ => Or.inr rfl` / `rfl` (the all-X/all-Z
+operators reduce to `X 7`/`Z 7`; `by decide` fails — noncomputable term + free `ℓ`).
+
+**Steane distance-3 PROVEN** (`Steane7Distance.lean`, sorry-free) —
+`stabilizerCode_hasCodeDistance_three`, the inner/outer distance M6 consumes:
+- weight-3 witness `logicalX_w3 = X on {3,5,6}` (explicit `ofOperator`, `= logicalX·X1`); the
+  3-part nontriviality copies the FiveQubit pattern (`anticommute_of_operators_eq` lifted local).
+- weight-1: `weight_one_anticomm_witness` by `fin_cases i <;> match P <;> first | ⟨gen, by simp, by decide⟩`.
+- weight-2: the 7·7·4·4 table **times out** via `Anticommute`-`decide` (200000 heartbeats — the
+  noncomputable `*` makes each `decide` a heavy kernel `whnf`). FIX: recast through the
+  *computable* `symplecticInner = 1` and close by **`native_decide`** (~ms), then convert with
+  `anticommutes_iff_symplectic_inner_one`. File-local `DecidableEq`/`decidableAnticommute`
+  instances (mirroring FiveQubit) — NOT global (the global ones break RotatedSurface's
+  native_decide; see Commutation.lean's removed-instance note).
+
+**Conditional [[49,1,9]]** — `steaneConcat_hasCodeDistance_nine` instantiates M6's
+`concat_hasCodeDistance` with Steane d=3 for both inner & outer, leaving exactly two hypotheses:
+the concat `GeneratorsIndependent` and a weight-9 witness.
+
+### KEY FINDING: the concat independence is not `native_decide`-able.
+`Decidable (rowsLinearIndependent L)` (`CheckMatrixDecidable.lean`) enumerates all `2^L.length`
+coefficient vectors. For the concat code that's `2^48` → OOM (exit 137). The plan's R5
+"native_decide per instance" fallback works only for small single codes (Steane: `2^6`). The
+real fix is a **structural** `rowsLinearIndependent_concat` lemma (disjoint block-supports of
+embedded inner gens + inner logicals ∉ inner rowspan) — ≈M4-scale, deferred.
+
+### Next: unconditional [[49,1,9]] needs (A) structural concat-independence lemma, (B) a
+computable weight-9 witness. Both are new framework work; everything else is in place.
+
 
 
 
