@@ -28,6 +28,7 @@ import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY9
 import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY10
 import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY11
 import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY12
+import QEC.Stabilizer.Codes.BivariateBicycle.MImAssembly
 
 /-!
 # Bivariate bicycle codes
