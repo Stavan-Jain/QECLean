@@ -457,4 +457,49 @@ theorem chainWeight_eq_costFromComps (c : BaseGroup × Fin 2 → ZMod 2) :
   simp_rw [weight3_eq_wt5_slice]
   simp only [costFromComps, Finset.sum_add_distrib]
 
+/-! ## §7 The coset weight in component form (the `f`-dependence)
+
+Composing the closed weight form (§6) with the coset CRT profile (§3) writes the
+safe-sector coset weight `chainWeight (seamC ζ + ∂₂ f)` as `costFromComps` of the ten
+coset components `shifted (seam offset) multiplier (Vⱼ f)`: each component is the seam
+offset `Vⱼ(seamC ζ)` plus the engine-multiplied free datum `P̂ⱼ · Vⱼ f`, with
+`Â = (unitHat, Ahat1, unitHat, Ahat1, Ahat4)` on the A-block and
+`B̂ = (unitHat, unitHat, Bhat2, Bhat2, Bhat2)` on the B-block.  The helpers
+`seamOffL/R` (the per-orbit offsets) and `compF` (the free datum) are the data the
+confined-floor enumeration ranges over. -/
+
+/-- The `ζ`-seam offset of CRT component `ψ` on the A-block (`leftHalf (seamC ζ)`). -/
+def seamOffL (ζ : BaseGroup → ZMod 2) (psi : BaseGroup → Fin 4) : Ring :=
+  fun s => V psi s (leftHalf (seamC ζ))
+/-- The `ζ`-seam offset of CRT component `ψ` on the B-block (`rightHalf (seamC ζ)`). -/
+def seamOffR (ζ : BaseGroup → ZMod 2) (psi : BaseGroup → Fin 4) : Ring :=
+  fun s => V psi s (rightHalf (seamC ζ))
+/-- The `j`-th CRT component of the free datum `f`. -/
+def compF (f : BaseGroup → ZMod 2) (psi : BaseGroup → Fin 4) : Ring :=
+  fun s => V psi s f
+/-- A coset component: seam offset `⊕` engine-multiplied free datum. -/
+def shifted (o mult vf : Ring) : Ring := fun s => fadd (o s) (rmul mult vf s)
+
+/-- **The coset weight in component form**: `chainWeight (seamC ζ + ∂₂ f)` is
+`costFromComps` of the ten coset components `shifted (seam offset) multiplier (Vⱼ f)`
+(§6 ▸ §3).  The substitution is the per-block `Vcoset` profile; `rfl` matches the
+`shifted` helpers definitionally. -/
+theorem chainWeight_coset_eq (ζ f : BaseGroup → ZMod 2) :
+    bb72Complex.chainWeight (seamC ζ + bbBoundary2Fn baseA baseB f)
+      = costFromComps
+        (shifted (seamOffL ζ psi0) unitHat (compF f psi0))
+        (shifted (seamOffL ζ psi1) Ahat1 (compF f psi1))
+        (shifted (seamOffL ζ psi2) unitHat (compF f psi2))
+        (shifted (seamOffL ζ psi3) Ahat1 (compF f psi3))
+        (shifted (seamOffL ζ psi4) Ahat4 (compF f psi4))
+        (shifted (seamOffR ζ psi0) unitHat (compF f psi0))
+        (shifted (seamOffR ζ psi1) unitHat (compF f psi1))
+        (shifted (seamOffR ζ psi2) Bhat2 (compF f psi2))
+        (shifted (seamOffR ζ psi3) Bhat2 (compF f psi3))
+        (shifted (seamOffR ζ psi4) Bhat2 (compF f psi4)) := by
+  rw [chainWeight_eq_costFromComps]
+  simp_rw [Vcoset_L0, Vcoset_L1, Vcoset_L2, Vcoset_L3, Vcoset_L4,
+           Vcoset_R0, Vcoset_R1, Vcoset_R2, Vcoset_R3, Vcoset_R4]
+  rfl
+
 end Quantum.Stabilizer.Homological.BB.LightStab
