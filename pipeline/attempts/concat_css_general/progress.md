@@ -585,10 +585,38 @@ Proof of `exists_concatStab_matching_induced` (the class-matching concat stabili
   `open NQubitPauliOperator in` (they live in that namespace).
 - `omit [NeZero n₁] in` on the general `symplecticInner_restrictBlock_mul` (it doesn't use it).
 
-### Next: M6 (distance, the headline) + M7 (Steane⊗Steane).
-`weight_ge_d1_mul_d2` follows from `weight_eq_sum_restrictBlock` + `weight_ge_of_blocks_ge` (M1) +
-`inducedOuter_support_eq` + `inducedOuter_isNontrivialLogical` + `HasCodeDistance Cin/Cout`. No
-long pole remains — M6 is assembly of proven lemmas.
+## Session 12 — M6 (distance) DONE, sorry-free.
+
+`Framework/Concatenation/Distance.lean`:
+- `weight_ge_d1_mul_d2`: every nontrivial concat logical has weight ≥ d₁·d₂. Assembled exactly
+  as planned — `inducedOuter_support_eq` makes the nontrivial-block set the support of
+  `inducedOuter`, `inducedOuter_isNontrivialLogical` + `HasCodeDistance.min_weight Cout` gives
+  ≥ d₂ such blocks, `HasCodeDistance.min_weight Cin` gives ≥ d₁ each, `weight_ge_of_blocks_ge`
+  (M1) sums it. Helpers: `weight_pos_of_nontrivial` (nontrivial ⟹ weight>0 via
+  `weight_eq_zero_iff` + the identity stabilizer), `card_block_filter_eq_restrictBlock_weight`.
+- `concat_hasCodeDistance : HasCodeDistance (concatenate D) (d₁·d₂)`. Lower bound from the
+  above; `d₁·d₂ ≥ 1` from `Nat.mul_pos`. The exact-distance WITNESS is an explicit hypothesis:
+  the weight-(d₁·d₂) nontrivial logical depends on the codes' minimum-weight representatives,
+  which abstract `ConcatCSSData` does not pin down (the fixed `concatLogicalX D ℓ` has weight
+  ≥ d₁·d₂ but not necessarily =). It is discharged concretely in M7.
+
+Gotchas: `HasCodeDistance.min_weight`/`one_le_d` have `C d` as explicit args *before* the
+`HasCodeDistance` arg, so dot notation misbinds — use full application
+`HasCodeDistance.min_weight D.Cin d₁ h1 _ hnt hpos`. The bridge
+`(concatenate D hindep).toStabilizerGroup = concatStabGroup D` holds by `rfl` (defeq), so the
+M5 lemmas (stated against `concatStabGroup D`) apply directly to `concat_hasCodeDistance`'s
+`(concatenate D).toStabilizerGroup` hypotheses with no explicit conversion.
+
+### Next: M7 (Steane⊗Steane [[49,1,9]], the validating instance).
+`steaneConcatData : ConcatCSSData 7 7 1` from `Steane7.stabilizerCode` (Cin=Cout); the
+structural fields are easy (`generatorsList = [Z1,Z2,Z3,X1,X2,X3] = innerZ++innerX`, so
+`inner_split = Perm.refl`; types from `ZGenerators_are_ZType`/`XGenerators_are_XType`; logicals
+all-X/all-Z phase-0). **Friction:** `native_decide` for the 48-generator/49-qubit
+`GeneratorsIndependent` and the d=9 witness needs a COMPUTABLE restatement of
+`concatGeneratorsList` (it flows through `Steane7.stabilizerCode`'s noncomputable fields;
+`native_decide` needs compiled code). Plan: `concatGeneratorsList steaneConcatData = <explicit
+computable list from Steane7.generatorsList + logical ops>` by `rfl`/`decide`, then
+`native_decide`.
 
 
 
