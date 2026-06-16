@@ -274,6 +274,99 @@ theorem inducedOuter_support_eq (g : NQubitPauliGroupElement (n₁ * n₂))
     rintro ⟨s, hs, hsop⟩
     exact ((IsNontrivialLogicalOperator_iff _ _).mp hnt).2.2 s hs hsop
 
+/-! ## Coset injectivity (plan risk R7 — the remaining M5 sub-pole)
+
+The nontriviality of `inducedOuter D g` rests on a single symplectic fact,
+`inducedOuter_symp_in_span` below: if some outer stabilizer `t` has the same operator
+part as `inducedOuter D g`, then `g`'s symplectic vector already lies in the span of the
+concatenated check matrix — i.e. `g` is concatenated-stabilizer-like. Contrapositively, a
+*nontrivial* concatenated logical `g` cannot have a stabilizer-like induced operator, so
+`inducedOuter D g` is itself a nontrivial outer logical.
+
+Everything downstream (`inducedOuter_not_mem_stabilizer`, `inducedOuter_isNontrivialLogical`)
+is proven unconditionally from this one lemma; only `inducedOuter_symp_in_span` carries a
+`sorry`, isolating the genuine content exactly as M4 isolated its dimension kernel. -/
+
+open NQubitPauliOperator in
+/-- **(M5, R7 sub-pole — SCOPED.)** Coset injectivity, symplectic form: if an outer
+stabilizer `t` matches the operator part of `inducedOuter D g`, then `toSymplectic g.operators`
+lies in the concatenated row span (so `g` is stabilizer-like).
+
+**Proof plan (the remaining work).** Writing `restrict b := restrictBlock b g`:
+
+1. `toSymplectic g.operators = ∑ b, toSymplectic (embedBlock b (restrict b)).operators` — `g`
+   is the disjoint-support gluing of its block restrictions, so its symplectic vector is the
+   (XOR) sum of the embedded block restrictions. [pure index lemma]
+2. A symplectic-level embedding map `Lembed b` with
+   `toSymplectic (embedBlock b s).operators = Lembed b (toSymplectic s.operators)`, linear, and
+   sending `sympSpan Cin.generatorsList` into `sympSpan concatGeneratorsList` (the embedded
+   inner generators are concatenated generators). [new symplectic infrastructure]
+3. A symplectic-level promotion map with
+   `toSymplectic (promoteE Xbar Zbar h).operators ∈ sympSpan concatGeneratorsList` whenever
+   `toSymplectic h.operators ∈ sympSpan Cout.generatorsList` (promoted outer generators are
+   concatenated generators); in particular for `t ∈ Cout` this gives
+   `toSymplectic (promoteE Xbar Zbar t).operators ∈ sympSpan concatGeneratorsList`. [new]
+4. Per block, `restrict b` and `restrictBlock b (promoteE Xbar Zbar t) =
+   ofOperator (promoteSingle … (t.operators b))` share an inner logical class (because
+   `t.operators b = inducedOuterOp D g b`), so their product commutes with both inner logicals
+   and is `Cin`-stabilizer-like (M4 kernel). Hence
+   `toSymplectic (restrict b).operators + toSymplectic (promoteSingle … (t.operators b)) ∈
+   sympSpan Cin.generatorsList`.
+
+Combining (1)+(2)+(4): `toSymplectic g.operators` differs from
+`toSymplectic (promoteE Xbar Zbar t).operators` (which is `∑ b` of the embedded
+`promoteSingle … (t.operators b)`, by (1) applied to `promoteE … t`) by an element of
+`sympSpan concatGeneratorsList`; with (3) the whole vector lands in the span.
+
+The new infrastructure (2)+(3) — `toSymplectic` of `embedBlock` / `promoteE` as linear maps,
+and their images inside `sympSpan concatGeneratorsList` — is M4-scale and is the entirety of
+the remaining M5 work. -/
+lemma inducedOuter_symp_in_span (g : NQubitPauliGroupElement (n₁ * n₂))
+    (hg : g ∈ centralizer D.concatStabGroup)
+    (hindep : rowsLinearIndependent D.Cin.generatorsList)
+    (t : NQubitPauliGroupElement n₂) (ht : t ∈ D.Cout.toStabilizerGroup.toSubgroup)
+    (htop : t.operators = (inducedOuter D g).operators) :
+    toSymplectic g.operators ∈ sympSpan D.concatGeneratorsList := by
+  sorry  -- TODO(concat-m5-r7): symplectic embed/promote infrastructure (see proof plan above)
+
+/-- Coset injectivity: an outer stabilizer matching `inducedOuter D g`'s operator part forces
+`g` to be concatenated-stabilizer-like. -/
+lemma inducedOuter_coset_injective (g : NQubitPauliGroupElement (n₁ * n₂))
+    (hg : g ∈ centralizer D.concatStabGroup)
+    (hindep : rowsLinearIndependent D.Cin.generatorsList)
+    (t : NQubitPauliGroupElement n₂) (ht : t ∈ D.Cout.toStabilizerGroup.toSubgroup)
+    (htop : t.operators = (inducedOuter D g).operators) :
+    ∃ S ∈ D.concatStabGroup.toSubgroup, S.operators = g.operators :=
+  exists_mem_closure_of_symp_in_span D.concatGeneratorsList g.operators
+    (D.inducedOuter_symp_in_span g hg hindep t ht htop)
+
+/-- **(M5.)** The induced outer operator of a *nontrivial* concatenated logical is not an
+outer stabilizer (else `g` would be concatenated-stabilizer-like, contradicting nontriviality).
+-/
+theorem inducedOuter_not_mem_stabilizer (g : NQubitPauliGroupElement (n₁ * n₂))
+    (hg : IsNontrivialLogicalOperator g D.concatStabGroup)
+    (hindep : rowsLinearIndependent D.Cin.generatorsList) :
+    inducedOuter D g ∉ D.Cout.toStabilizerGroup.toSubgroup := by
+  intro hmem
+  obtain ⟨S, hS, hSop⟩ :=
+    D.inducedOuter_coset_injective g hg.1 hindep (inducedOuter D g) hmem rfl
+  exact ((IsNontrivialLogicalOperator_iff _ _).mp hg).2.2 S hS hSop
+
+/-- **(M5, headline correspondence.)** The induced outer operator of a nontrivial concatenated
+logical is a nontrivial outer logical: it centralizes the outer stabilizer
+(`inducedOuter_mem_centralizer`) and its coset is nontrivial (coset injectivity, both the
+not-in-stabilizer and the distinct-operator-part clauses). This is the bridge that, with
+`inducedOuter_support_eq` and `weight_eq_sum_restrictBlock`, yields the M6 distance bound. -/
+theorem inducedOuter_isNontrivialLogical (g : NQubitPauliGroupElement (n₁ * n₂))
+    (hg : IsNontrivialLogicalOperator g D.concatStabGroup)
+    (hindep : rowsLinearIndependent D.Cin.generatorsList) :
+    IsNontrivialLogicalOperator (inducedOuter D g) D.Cout.toStabilizerGroup := by
+  refine (IsNontrivialLogicalOperator_iff _ _).mpr
+    ⟨D.inducedOuter_mem_centralizer g hg.1, D.inducedOuter_not_mem_stabilizer g hg hindep, ?_⟩
+  intro t ht htop
+  obtain ⟨S, hS, hSop⟩ := D.inducedOuter_coset_injective g hg.1 hindep t ht htop
+  exact ((IsNontrivialLogicalOperator_iff _ _).mp hg).2.2 S hS hSop
+
 end ConcatCSSData
 
 end Quantum.Concatenation
