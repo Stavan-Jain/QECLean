@@ -342,4 +342,47 @@ theorem Vcoset_R4 : V psi4 s (rightHalf (seamC ζ + bbBoundary2Fn baseA baseB f)
     = fadd (V psi4 s (rightHalf (seamC ζ))) (rmul Bhat2 (fun s' => V psi4 s' f) s) := by
   rw [rightHalf_coset, V_add, mult_B4]
 
+/-! ## §4 The per-slot floor: a comprehensive d₃ table (A4 §10.2 input)
+
+The §10 slot frame bounds each `Z₂²`-layer's weight by the d₃ cost of its `Z₃²`-torus
+Fourier-support pattern.  `oneBlock_core` (`LightStab`) used three hand-picked patterns
+(`d3_psi1/3_ge6`, `d3_psi1or3_ge4`); the safe-sector orbits exercise the full range, so we
+tabulate the d₃ lower bound for **all 32** support patterns (`dlbTable`, `native_decide` over
+the 512 layers) and phrase it on a block-slice in terms of the CRT components `V psiⱼ` that
+the §3 f-dependence produces. -/
+
+/-- 5-bit Fourier-support pattern of a torus layer (chars ψ₀..ψ₄). -/
+def suppPat (g : ZMod 3 × ZMod 3 → ZMod 2) : Nat :=
+  (if fhat3 g (0,0) ≠ 0 then 1 else 0) + (if fhat3 g (0,1) ≠ 0 then 2 else 0) +
+  (if fhat3 g (1,0) ≠ 0 then 4 else 0) + (if fhat3 g (1,1) ≠ 0 then 8 else 0) +
+  (if fhat3 g (1,2) ≠ 0 then 16 else 0)
+
+/-- d₃ lower bound per support pattern (`P = 0..31`): the minimum `weight3` over nonzero
+torus layers whose Fourier support is `⊆ P`. -/
+def dlbTable : Array Nat :=
+  #[0,9,6,3,6,3,4,3,6,3,4,3,4,3,2,2,6,3,4,3,4,3,2,2,4,3,2,2,2,2,2,1]
+
+/-- **Comprehensive d₃ table** (generalizes `d3_psi1_ge6`/`d3_psi3_ge6`/`d3_psi1or3_ge4`):
+every nonzero torus layer has weight ≥ the table value of its support pattern. -/
+theorem d3_table : ∀ g : ZMod 3 × ZMod 3 → ZMod 2, g ≠ 0 →
+    dlbTable.getD (suppPat g) 0 ≤ weight3 g := by
+  native_decide
+
+/-- The support pattern of a block's slice, in terms of the CRT components `V psiⱼ`. -/
+def Vpat (b : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) : Nat :=
+  (if V psi0 s b ≠ 0 then 1 else 0) + (if V psi1 s b ≠ 0 then 2 else 0) +
+  (if V psi2 s b ≠ 0 then 4 else 0) + (if V psi3 s b ≠ 0 then 8 else 0) +
+  (if V psi4 s b ≠ 0 then 16 else 0)
+
+theorem Vpat_eq_suppPat (b : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) :
+    Vpat b s = suppPat (slice b s) := by
+  unfold Vpat suppPat
+  rw [fourier_bridge0, fourier_bridge1, fourier_bridge2, fourier_bridge3, fourier_bridge4]
+
+/-- **Per-slice floor**: a nonzero block-slice has weight ≥ the d₃-table value of its
+CRT-component support pattern. -/
+theorem slice_floor (b : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) (h : slice b s ≠ 0) :
+    dlbTable.getD (Vpat b s) 0 ≤ weight3 (slice b s) := by
+  rw [Vpat_eq_suppPat]; exact d3_table _ h
+
 end Quantum.Stabilizer.Homological.BB.LightStab
