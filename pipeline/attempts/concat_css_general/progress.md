@@ -298,6 +298,66 @@ New helpers: `inner_gen_comm_logicalX/Z` (centralizer extraction via `mem_centra
 Two of the three remaining work-classes (independence field, outer-logical typing)
 touch the committed `ConcatCSSData` structure — a deliberate, scoped M2 revision.
 
+## Session 8 — M3 COMPLETE: `concatenate` is sorry-free (2026-06-16)
+
+Closed all 6 remaining M3 obligations. The `concatenate` constructor builds with
+zero sorries.
+
+**Scoped M2 revision (safe — no `ConcatCSSData` instances exist yet):** added fields
+`outerLogX_isX : ∀ ℓ, IsXType (Cout.logicalOps ℓ).xOp.operators` and
+`outerLogZ_isZ : ∀ ℓ, IsZType (Cout.logicalOps ℓ).zOp.operators` to `ConcatCSSData`.
+Added reusable helpers in Promotion.lean: `noY_of_isXType`/`noY_of_isZType` (X/Z-type ⇒
+no Y component) and `embedBlock_isZ`/`embedBlock_isX` (embedding preserves CSS type);
+refactored `outer_gen_noY` onto the noY helpers.
+
+**`concat_closure_no_neg_identity`** — regroup `listToSet concatGeneratorsList = Z ∪ X`
+as set-builders (embedded inner Z/X via `inner_split.mem_iff`, promoted outer Z/X via
+`outer_split`), typed by `embedBlock_isZ/isX` + `promoteE_isZ/isX`; cross-commutation
+free from `concat_generators_commute`; close via
+`CSSCommutationLemmas.negIdentity_not_mem_closure_union`. The set-ext reduces, after
+`simp` distributes ∃/∨ (`or_and_right`, `exists_or`), to `rw [or_or_or_comm]` (the two
+sides differ only by swapping the middle two disjuncts — `tauto` could NOT crunch the
+existential atoms, `or_or_or_comm` is exact).
+
+**The 4 logical lemmas:**
+- `concatLogicalX/Z_mem_centralizer` — `mem_centralizer_of_commutes_list` (h_closure = `rfl`,
+  since `mkStabilizerFromGenerators.toSubgroup` IS the closure) + per-generator dispatch:
+  `embedBlock_promoteE_commute` for embedded inner gens, `promote_anticommute_parity` +
+  `(Cout.logicalOps ℓ).x/z_mem_centralizer` for promoted outer gens.
+- `concatLogical_anticommute` — odd-parity transfer: `anticommutes_iff_odd_anticommutes`,
+  then `Odd ↔ ¬Even` (`Nat.not_even_iff_odd`) bridges R6's `Even ↔ Even` to the outer
+  pair's `(Cout.logicalOps ℓ).anticommute`.
+- `concat_logical_commute_cross` — a local `key` helper (R6 + outer commutation) applied
+  to the 4 conjuncts of `Cout.logical_commute_cross ℓ ℓ' hne`.
+
+**`concat_generators_independent` — made an explicit hypothesis of `concatenate`, not derived.**
+`StabilizerCode.generators_independent` needs `GeneratorsIndependent` (subgroup independence);
+its only proof route is `rowsLinearIndependent` (check-matrix row independence over `ZMod 2`),
+which is strictly stronger and NOT recoverable from the subgroup-independence `Cin`/`Cout`
+carry (reverse implication false — IndependentEquiv.lean:33). An abstract derivation would
+have to add `rowsLinearIndependent` (+ inner-logical symplectic-independence) hypotheses to
+`ConcatCSSData` anyway — not cleanly more general, ~200 lines of block linear algebra for no
+real gain. Made it a `native_decide`-able side condition (as Steane7/Shor9 do `by decide`):
+
+```
+concatenate (D : ConcatCSSData n₁ n₂ k₂)
+  (hindep : GeneratorsIndependent (n₁*n₂) D.concatGeneratorsList)
+  : StabilizerCode (n₁*n₂) k₂
+```
+
+Deleted the sorried `concat_generators_independent` lemma.
+
+### Commits this session
+- M3 5/6: 4 logical lemmas + no-neg-I + M2 outer-logical-typing revision
+- M3 6/6: `concatenate` sorry-free (independence as explicit hypothesis)
+
+### Next: M4 — `centralizer_classify_of_k1`
+The long-pole framework theorem (inner centralizer = stabilizer join `closure {X̄₁, Z̄₁}`).
+Per `gap_audit`, the symplectic span↔subgroup bridge it needs already exists
+(`SymplecticSpan.lean`), so M4 is reuse, not author-from-scratch. Then M5 (restriction),
+M6 (distance ≥ d₁·d₂), M7 (Steane⊗Steane instance — also discharges the `concatenate`
+independence hypothesis via `native_decide`).
+
 <!-- Stage-4 runner: append "Session N" sections here as work proceeds. -->
 
 

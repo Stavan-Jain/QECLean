@@ -5,23 +5,23 @@ parameters: {n: 'n1*n2', k: 'k2', d: '>= d1*d2'}
 parameter: 'inner [[n1,1,d1]] CSS, outer [[n2,k2,d2]] CSS'
 parameter_constraint: 'NeZero n1; k1 = 1; both inner and outer codes CSS'
 validating_instance: {code: 'Steane (x) Steane', n: 49, k: 1, d: 9}
-status: formalization          # M1, M2 landed; M3–M7 pending
+status: formalization          # M1, M2, M3 landed; M4–M7 pending
 track: engineering
 started_at: '2026-06-15'
 worktree_branch: claude/beautiful-lalande-04ce1f
-phase: stage-4-m3-commute-done # R6 + concat_generators_commute proven; 6 obligations pending (2 need ConcatCSSData revision)
+phase: stage-4-m3-done         # M3 complete: concatenate constructor is sorry-free
 estimated_loc: 1650            # ~1560-1740 across 8 new modules
-sorries_closed: 35             # M1 (18) + M2 (17 decls), all proven; M3 structure typechecks
-sorries_open: 8                # M3 obligations in Constructor.lean (R6 parity core + dependents)
+sorries_closed: 40             # M1 + M2 + all M3 obligations (R6 core, commute, no-neg-I, 4 logicals)
+sorries_open: 0                # concatenate is sorry-free (independence is an explicit hypothesis)
 sorries_blocked: 0
-milestones_done: [M1, M2]
-milestones_skeleton: [M3]      # concatenate constructor assembled + typechecking; proofs pending
+milestones_done: [M1, M2, M3]
+milestones_skeleton: []        # concatenate fully proven
 current_lean_file: QEC/Stabilizer/Framework/Concatenation/Constructor.lean
 covering_lean_file: QEC/Stabilizer/Codes/Concat/Distance.lean   # PLANNED final location (M6, not yet created)
 umbrella_file: QEC/Stabilizer/Codes/Concat.lean                  # PLANNED (not yet created)
 headline_theorem: 'concat_hasCodeDistance : HasCodeDistance (concatenate D) (d1 * d2)'
 long_pole: 'M4 centralizer_classify_of_k1 — inner centralizer = stabilizer (join) closure {Xbar1, Zbar1}'
-next_step: 'M3 — Codes/Concat/Constructor.lean: generators_commute (parity), no-neg-I, independence, logicals → the concatenate constructor. M4 (centralizer_classify) can run in parallel.'
+next_step: 'M4 — centralizer_classify_of_k1: the inner centralizer = stabilizer join closure {Xbar1, Zbar1}, the long-pole framework theorem (SymplecticSpan.lean bridge already exists per gap_audit). Then M5 (restriction), M6 (distance), M7 (Steane⊗Steane instance, discharging the concatenate independence hypothesis via native_decide).'
 introduced_refs:
   - 'Knill-Laflamme 1996 (concatenated codes / threshold)'
   - 'Gottesman 1997, "A Theory of Fault-Tolerant Quantum Computation" (arxiv:quant-ph/9702029)'
