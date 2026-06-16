@@ -9,6 +9,7 @@ import QEC.Stabilizer.Codes.BivariateBicycle.DangerousSector
 import QEC.Stabilizer.Codes.BivariateBicycle.SafeSector
 import QEC.Stabilizer.Codes.BivariateBicycle.StabilizerCode
 import QEC.Stabilizer.Codes.BivariateBicycle.LightStab
+import QEC.Stabilizer.Codes.BivariateBicycle.LightStabClassify
 
 /-!
 # Bivariate bicycle codes
@@ -32,12 +33,16 @@ code and its `[[72, 12, 6]]` base, related by a 2:1 covering:
 - `BaseDistance`  — `BaseDistanceGe6` discharged (small-cycle theorem,
                     verified-finite leaf) ⟹ **unconditional d(gross) ≥ 6**
 - `DangerousSector` — the slice identity, the m-rungs, and (M) modulo the
-                    single `LightStabilizerClassification` hypothesis
+                    `LightStabilizerClassification` hypothesis
 - `SafeSector`    — the Smith-coset reduction (from the deck homotopy (R))
                     of the safe sector to the single `MImBound` hypothesis;
                     final assembly `gross_pauli_distance_eq_12_of_engine`
+- `LightStabClassify` — **discharges `LightStabilizerClassification`**
+                    (`lightStabilizerClassification_holds`) by the effective
+                    CRT-engine classification, making `DangerousSectorGe12`
+                    unconditional
 
-The full `StabilizerCode` packaging and the discharge of the two remaining
-CRT-engine hypotheses (A4 §6.3 classification; A4 Part II (M-im)) are later
-phases.
+The full `StabilizerCode` packaging is complete and the A4 §6.3 classification
+hypothesis is discharged in `LightStabClassify`, leaving `MImBound` (A4 Part II
+(M-im)) as the single remaining CRT-engine hypothesis for `d = 12`.
 -/

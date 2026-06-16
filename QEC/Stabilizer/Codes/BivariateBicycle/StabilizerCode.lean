@@ -25,11 +25,13 @@ four packaging obligations — closure equality, generator independence via the
 decoder identities, the 12 logical qubits, and assembly), and the chain-level
 distance theorems are transported to `grossStabilizerCode_logical_weight_ge_6`
 (unconditional `≥ 6`) and `grossStabilizerCode_hasCodeDistance_12` (`= 12`,
-conditional on the two CRT-engine inputs).
+conditional only on `MImBound`; the `LightStabilizerClassification` input is
+discharged by `LightStab.lightStabilizerClassification_holds`).
 -/
 
 import QEC.Stabilizer.Codes.BivariateBicycle.BaseDistance
 import QEC.Stabilizer.Codes.BivariateBicycle.SafeSector
+import QEC.Stabilizer.Codes.BivariateBicycle.LightStabClassify
 import QEC.Stabilizer.Framework.Homological.LogicalCorrespondence
 import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
 import Mathlib.Data.List.GetD
@@ -2948,13 +2950,14 @@ theorem grossStabilizerCode_logical_weight_ge_6
   gross_logical_weight_ge_6 g
     ((IsNontrivialLogicalOperator_of_toSubgroup_eq g grossStabilizerCode_toSubgroup_eq).mp hg)
 
-/-- **`HasCodeDistance grossStabilizerCode 12`**, conditional on the two CRT-engine
-inputs (`LightStabilizerClassification`, `MImBound`). Everything else — the
-packaging and the chain-level distance — is unconditional. -/
-theorem grossStabilizerCode_hasCodeDistance_12
-    (hC : LightStabilizerClassification) (hMim : MImBound) :
+/-- **`HasCodeDistance grossStabilizerCode 12`**, conditional only on `MImBound`.
+The `LightStabilizerClassification` input (`hC`) is discharged by
+`LightStab.lightStabilizerClassification_holds`; everything else — the packaging and
+the chain-level distance — is unconditional. -/
+theorem grossStabilizerCode_hasCodeDistance_12 (hMim : MImBound) :
     HasCodeDistance grossStabilizerCode 12 := by
-  have hleast := gross_pauli_distance_eq_12_of_engine hC hMim
+  have hleast := gross_pauli_distance_eq_12_of_engine
+    LightStab.lightStabilizerClassification_holds hMim
   refine ⟨by norm_num, ?_, ?_⟩
   · intro g hg _
     exact hleast.2 ⟨g, (IsNontrivialLogicalOperator_of_toSubgroup_eq g
