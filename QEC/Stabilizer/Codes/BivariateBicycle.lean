@@ -10,6 +10,7 @@ import QEC.Stabilizer.Codes.BivariateBicycle.SafeSector
 import QEC.Stabilizer.Codes.BivariateBicycle.StabilizerCode
 import QEC.Stabilizer.Codes.BivariateBicycle.LightStab
 import QEC.Stabilizer.Codes.BivariateBicycle.LightStabClassify
+import QEC.Stabilizer.Codes.BivariateBicycle.MImClassify
 
 /-!
 # Bivariate bicycle codes
@@ -41,8 +42,13 @@ code and its `[[72, 12, 6]]` base, related by a 2:1 covering:
                     (`lightStabilizerClassification_holds`) by the effective
                     CRT-engine classification, making `DangerousSectorGe12`
                     unconditional
+- `MImClassify`   — the safe-sector confined-frame floor (A4 §§9–13) toward
+                    discharging `MImBound`: the weight join (`chainWeight` as a
+                    per-block per-layer sum), the coset parity, and the `ker ∂₂`
+                    basis with M-VANISH (`off₀ = off₂ = 0`). Work in progress.
 
 The full `StabilizerCode` packaging is complete and the A4 §6.3 classification
 hypothesis is discharged in `LightStabClassify`, leaving `MImBound` (A4 Part II
-(M-im)) as the single remaining CRT-engine hypothesis for `d = 12`.
+(M-im)) as the single remaining CRT-engine hypothesis for `d = 12`; its discharge
+is under construction in `MImClassify`.
 -/
