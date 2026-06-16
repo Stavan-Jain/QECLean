@@ -162,8 +162,8 @@ def relaxed (oL oR : Array Nat) (a0 a3 a4 m1L m1R m2L m2R : Nat) : Nat :=
 
 /-- Fiber phase: every `(k1,k2)` in support classes `(i1,i2)` has exact weight `≥ 12`. -/
 def fiberOK (oL oR : Array Nat) (a0 a3 a4 i1 i2 : Nat) : Bool :=
-  let lo1 := F1off.getD i1 0; let hi1 := F1off.getD (i1+1) 0
-  let lo2 := F2off.getD i2 0; let hi2 := F2off.getD (i2+1) 0
+  let lo1 := F1off.getD i1 0; let hi1 := F1off.getD (i1 + 1) 0
+  let lo2 := F2off.getD i2 0; let hi2 := F2off.getD (i2 + 1) 0
   (List.range (hi1-lo1)).all (fun d1 =>
     (List.range (hi2-lo2)).all (fun d2 =>
       decide (12 ≤ exCost oL oR a0 a3 a4 (lo1+d1) (lo2+d2))))
@@ -302,7 +302,7 @@ theorem all_range_elim {n : Nat} {p : Nat → Bool} (h : (List.range n).all p = 
 slot-supports of every entry in the class (both sides).  `native_decide` over Γ₁. -/
 def maskOK1 : Bool :=
   (List.range nC1).all (fun i1 =>
-    let lo := F1off.getD i1 0; let hi := F1off.getD (i1+1) 0
+    let lo := F1off.getD i1 0; let hi := F1off.getD (i1 + 1) 0
     (List.range (hi-lo)).all (fun d1 =>
       (List.range 4).all (fun s =>
         decide ((F1mL.getD i1 0 >>> s) &&& 1 = supp (pv F1gen (lo+d1) s 0)) &&
@@ -313,7 +313,7 @@ theorem maskOK1_holds : maskOK1 = true := by native_decide
 /-- The comp-2 fiber classes group entries by raw support (both sides). -/
 def maskOK2 : Bool :=
   (List.range nC2).all (fun i2 =>
-    let lo := F2off.getD i2 0; let hi := F2off.getD (i2+1) 0
+    let lo := F2off.getD i2 0; let hi := F2off.getD (i2 + 1) 0
     (List.range (hi-lo)).all (fun d2 =>
       (List.range 4).all (fun s =>
         decide ((F2mL.getD i2 0 >>> s) &&& 1 = supp (pv F2gen (lo+d2) s 0)) &&
@@ -322,28 +322,28 @@ def maskOK2 : Bool :=
 theorem maskOK2_holds : maskOK2 = true := by native_decide
 
 theorem mask1L_eq {i1 d1 : Nat} (hi1 : i1 < nC1)
-    (hd1 : d1 < F1off.getD (i1+1) 0 - F1off.getD i1 0) {s : Nat} (hs : s < 4) :
+    (hd1 : d1 < F1off.getD (i1 + 1) 0 - F1off.getD i1 0) {s : Nat} (hs : s < 4) :
     (F1mL.getD i1 0 >>> s) &&& 1 = supp (pv F1gen (F1off.getD i1 0 + d1) s 0) := by
   have h := all_range_elim (all_range_elim (all_range_elim maskOK1_holds i1 hi1) d1 hd1) s hs
   rw [Bool.and_eq_true] at h
   exact of_decide_eq_true h.1
 
 theorem mask1R_eq {i1 d1 : Nat} (hi1 : i1 < nC1)
-    (hd1 : d1 < F1off.getD (i1+1) 0 - F1off.getD i1 0) {s : Nat} (hs : s < 4) :
+    (hd1 : d1 < F1off.getD (i1 + 1) 0 - F1off.getD i1 0) {s : Nat} (hs : s < 4) :
     (F1mR.getD i1 0 >>> s) &&& 1 = supp (pv F1gen (F1off.getD i1 0 + d1) s 1) := by
   have h := all_range_elim (all_range_elim (all_range_elim maskOK1_holds i1 hi1) d1 hd1) s hs
   rw [Bool.and_eq_true] at h
   exact of_decide_eq_true h.2
 
 theorem mask2L_eq {i2 d2 : Nat} (hi2 : i2 < nC2)
-    (hd2 : d2 < F2off.getD (i2+1) 0 - F2off.getD i2 0) {s : Nat} (hs : s < 4) :
+    (hd2 : d2 < F2off.getD (i2 + 1) 0 - F2off.getD i2 0) {s : Nat} (hs : s < 4) :
     (F2mL.getD i2 0 >>> s) &&& 1 = supp (pv F2gen (F2off.getD i2 0 + d2) s 0) := by
   have h := all_range_elim (all_range_elim (all_range_elim maskOK2_holds i2 hi2) d2 hd2) s hs
   rw [Bool.and_eq_true] at h
   exact of_decide_eq_true h.1
 
 theorem mask2R_eq {i2 d2 : Nat} (hi2 : i2 < nC2)
-    (hd2 : d2 < F2off.getD (i2+1) 0 - F2off.getD i2 0) {s : Nat} (hs : s < 4) :
+    (hd2 : d2 < F2off.getD (i2 + 1) 0 - F2off.getD i2 0) {s : Nat} (hs : s < 4) :
     (F2mR.getD i2 0 >>> s) &&& 1 = supp (pv F2gen (F2off.getD i2 0 + d2) s 1) := by
   have h := all_range_elim (all_range_elim (all_range_elim maskOK2_holds i2 hi2) d2 hd2) s hs
   rw [Bool.and_eq_true] at h
@@ -358,8 +358,8 @@ theorem floorOK_sound (oL oR : Array Nat) (hfloor : floorOK oL oR = true)
     {a0 a3 a4 i1 d1 i2 d2 : Nat}
     (ha0 : a0 < nG0) (ha3 : a3 < nG3) (ha4 : a4 < nG4)
     (hi1 : i1 < nC1) (hi2 : i2 < nC2)
-    (hd1 : d1 < F1off.getD (i1+1) 0 - F1off.getD i1 0)
-    (hd2 : d2 < F2off.getD (i2+1) 0 - F2off.getD i2 0) :
+    (hd1 : d1 < F1off.getD (i1 + 1) 0 - F1off.getD i1 0)
+    (hd2 : d2 < F2off.getD (i2 + 1) 0 - F2off.getD i2 0) :
     12 ≤ exCost oL oR a0 a3 a4 (F1off.getD i1 0 + d1) (F2off.getD i2 0 + d2) := by
   have hdisj := all_range_elim (all_range_elim (all_range_elim hfloor a0 ha0) a3 ha3) a4 ha4
   rw [Bool.or_eq_true] at hdisj
