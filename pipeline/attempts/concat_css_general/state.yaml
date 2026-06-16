@@ -9,19 +9,19 @@ status: formalization          # M1, M2, M3 landed; M4–M7 pending
 track: engineering
 started_at: '2026-06-15'
 worktree_branch: claude/beautiful-lalande-04ce1f
-phase: stage-4-m4-done         # M4 complete: both the weak dichotomy and the decisive dimension kernel proven
+phase: stage-4-m5-mostly-done  # M5 phases 1-2 fully proven; phase 3 (R7 coset injectivity) reduced to one scoped symplectic kernel
 estimated_loc: 1650            # ~1560-1740 across 8 new modules
-sorries_closed: 42             # M1 + M2 + all M3 + all M4 (weak dichotomy + decisive dimension kernel)
-sorries_open: 0                # CentralizerStructure.lean fully proven
+sorries_closed: 60             # M1 + M2 + all M3 + all M4 + M5 phases 1-2 + M5 phase-3 reductions
+sorries_open: 1                # Correspondence.lean: inducedOuter_symp_in_span (R7, scoped with full plan)
 sorries_blocked: 0
 milestones_done: [M1, M2, M3, M4]
-milestones_skeleton: []        # M4 fully proven
-current_lean_file: QEC/Stabilizer/Framework/Concatenation/Constructor.lean
+milestones_skeleton: [M5]      # M5 infrastructure proven; one scoped symplectic kernel remains (inducedOuter_symp_in_span)
+current_lean_file: QEC/Stabilizer/Framework/Concatenation/Correspondence.lean
 covering_lean_file: QEC/Stabilizer/Codes/Concat/Distance.lean   # PLANNED final location (M6, not yet created)
 umbrella_file: QEC/Stabilizer/Codes/Concat.lean                  # PLANNED (not yet created)
 headline_theorem: 'concat_hasCodeDistance : HasCodeDistance (concatenate D) (d1 * d2)'
-long_pole: 'M4 DONE (operators_eq_stab_of_commutes_both_logicals, the dimension-2 kernel). Remaining long pole: M5 block-restriction + induced-outer correspondence (uses M4).'
-next_step: 'M5 — Codes/Concat/Restriction.lean + Correspondence.lean: restrictBlock, weight_eq_sum_restrictBlock, inducedOuter, inducedOuter_support_eq (uses centralizer_classify_of_k1), inducedOuter_mem_centralizer, inducedOuter_not_mem_stabilizer (uses operators_eq_stab_of_commutes_both_logicals for coset injectivity), inducedOuter_isNontrivialLogical. Then M6 (distance), M7 (Steane⊗Steane, discharging concatenate independence + inner rowsLinearIndependent via native_decide).'
+long_pole: 'M4 DONE. M5 mostly done: restrictBlock calculus, weight_eq_sum_restrictBlock, restrictBlock_mem_centralizer, inducedOuter, inducedOuter_support_eq, inducedOuter_mem_centralizer, inducedOuter_isNontrivialLogical all PROVEN. Remaining long pole: inducedOuter_symp_in_span (R7 coset injectivity) — needs symplectic-level embed/promote infrastructure (M4-scale), plan recorded in Correspondence.lean doc-comment.'
+next_step: 'Finish M5: prove inducedOuter_symp_in_span (Correspondence.lean). Needs (a) toSymplectic g = ∑_b toSymplectic(embedBlock b (restrict b g)) [disjoint-support gluing], (b) toSymplectic∘embedBlock and toSymplectic∘promoteE as linear maps landing inside sympSpan(concatGeneratorsList), (c) per-block M4 kernel for the class-match correction. Then M6 (distance: weight_ge_d1_mul_d2 via weight_ge_of_blocks_ge + inducedOuter_support_eq + inducedOuter_isNontrivialLogical; concatWitness; concat_hasCodeDistance), M7 (Steane⊗Steane, native_decide for concatenate GeneratorsIndependent + inner rowsLinearIndependent).'
 introduced_refs:
   - 'Knill-Laflamme 1996 (concatenated codes / threshold)'
   - 'Gottesman 1997, "A Theory of Fault-Tolerant Quantum Computation" (arxiv:quant-ph/9702029)'

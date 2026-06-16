@@ -464,6 +464,71 @@ the inner `rowsLinearIndependent` (M4) hypothesis by `native_decide`.
 
 <!-- Stage-4 runner: append "Session N" sections here as work proceeds. -->
 
+## Session 11 — M5 (block restriction + induced-outer correspondence)
+
+Three commits, three phases. M5 infrastructure fully proven; one scoped symplectic
+kernel remains.
+
+### Phase 1 — `Framework/Concatenation/Restriction.lean` (sorry-free)
+- `restrictBlock b g` = read off block `b` of an `n₁·n₂`-qubit operator as a phase-0
+  inner Pauli (`ofOperator (fun i => g.operators (qIdx b i))`).
+- `weight_eq_sum_restrictBlock`: `g.weight = ∑ b, (restrictBlock b g).weight` — via
+  `weight_eq_sum_block_weights` (M1) + `image_qIdx_support_restrictBlock` (qIdx-image of
+  the restriction support = the block-`b` fiber of `g.support`).
+- `anticommutesAt_count_restrictBlock`: count parity bridge dual to `anticommutesAt_count_eq`,
+  via a per-position helper `anticommutesAt_restrictBlock_iff` (mirrors
+  `anticommutesAt_embedBlock_iff`).
+- `restrictBlock_commute_embed_iff` and `restrictBlock_mem_centralizer`: `g ∈ centralizer
+  concat ⟹ restrictBlock b g ∈ centralizer Cin` (each `embedBlock b s` is a concat
+  generator). The hinge for applying M4 per block.
+
+### Phase 2 — `Framework/Concatenation/Correspondence.lean` (sorry-free)
+- `inducedOuterOp` / `inducedOuter`: per-block inner-logical class from commutation with
+  `X̄₁/Z̄₁` (nested `if Anticommute …`, `open Classical`).
+- `inducedOuterOp_eq_I_iff` + per-block bridge `induced_block_anticommute_iff` (single-block
+  analogue of `cnt_odd_iff`; `rcases h.operators b` then `split_ifs with h1 h2 h3` +
+  `iff_of_true/false (by decide) (by assumption)`).
+- `count_promoteE_eq_sum_restrict` + `induced_count_mod_two` + `induced_commute_iff`: the
+  induced parity bridge (dual of `promote_anticommute_parity`); for Y-free `h`,
+  `inducedOuter` commutes with `h` ↔ `g` commutes with `promoteE h`.
+- `inducedOuter_mem_centralizer` (promoted outer gens are concat gens).
+- `restrict_commutes_both_iff_stab` (uses M4 `operators_eq_stab_of_commutes_both_logicals`
+  forward; operator-part commutation backward) → `inducedOuter_support_eq`:
+  `b ∈ support(inducedOuter) ↔ restrictBlock b g is a nontrivial inner logical`.
+
+### Phase 3 — coset injectivity reduced to one scoped kernel (Correspondence.lean)
+- `inducedOuter_symp_in_span` (the ONLY `sorry`, R7): an outer stabilizer matching
+  `inducedOuter`'s operator part ⟹ `toSymplectic g ∈ sympSpan(concatGeneratorsList)`.
+  Full proof plan in its doc-comment (disjoint-support gluing + symplectic embed/promote
+  maps into `sympSpan concat` + per-block M4 kernel).
+- PROVEN unconditionally from it: `inducedOuter_coset_injective` (via
+  `exists_mem_closure_of_symp_in_span`), `inducedOuter_not_mem_stabilizer`,
+  `inducedOuter_isNontrivialLogical` (the M5 headline). Mirrors how M4 isolated its kernel.
+
+### Gotchas this session
+- `(restrictBlock b g).operators` shows as `restrictBlockOp b g` after some rewrites but not
+  others (defeq via `ofOperator_operators`); match the form the goal actually displays
+  (`rw [← hsop]` vs `rw [show restrictBlockOp … = …]`).
+- `rcases hPb : h.operators b` substitutes the scrutinee where it appears as a direct
+  subterm (RHS `promoteSingle … (h.operators b)`) but NOT inside `anticommutesAt … h.operators b`
+  (there it's the partial app `h.operators`); rely on a later `simp only [… hPb]` to finish.
+- Nested `if c1 then (if c2 …) else (if c2 …)` needs `split_ifs with h1 h2 h3` (three names:
+  the second `c2` split gets `h3`); `by assumption` then finds whichever `c2`-hyp is in scope.
+- `≠` (= `Ne`) hides the inner `= I` from `rw`; insert `ne_eq` first.
+- `Finset.sum_nat_mod` rewrites the first `(∑) % 2`; use `conv_rhs => rw [Finset.sum_nat_mod]`
+  to target the intended side.
+
+### Commits this session
+- M5 phase 1 (block-restriction calculus).
+- M5 phase 2 (induced outer logical: support_eq + centralizer).
+- M5 phase 3 (nontriviality reduced to one scoped symplectic kernel).
+
+### Next: finish `inducedOuter_symp_in_span`, then M6 (distance) + M7 (Steane⊗Steane).
+The remaining R7 kernel needs M4-scale symplectic-level `embedBlock`/`promoteE` infrastructure
+(linear maps into `sympSpan concatGeneratorsList`). Once it lands, M6's `weight_ge_d1_mul_d2`
+follows from `weight_ge_of_blocks_ge` (M1) + `inducedOuter_support_eq` +
+`inducedOuter_isNontrivialLogical` + `HasCodeDistance Cin/Cout`.
+
 
 
 
