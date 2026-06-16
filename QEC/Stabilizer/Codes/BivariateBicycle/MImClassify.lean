@@ -300,4 +300,46 @@ theorem rightHalf_coset (ζ f : BaseGroup → ZMod 2) :
     rightHalf (seamC ζ + bbBoundary2Fn baseA baseB f)
       = rightHalf (seamC ζ) + conv baseB f := rfl
 
+/-! ## §3 The coset CRT profile: `V_j(coset) = off_j(ζ) ⊕ P̂_j · V_j f`
+
+Composing the block split (§2b) with the additivity (`V_add`) and multiplicativity
+(`mult_*`) of the CRT transform, the `j`-th component of a coset element is the seam
+offset `off_j(ζ) = V_j(seamC ζ)` plus the engine-multiplied free datum `P̂_j · V_j f`
+(`P̂ = Â` on the A-block `j=0`, `B̂` on the B-block `j=1`).  The radical multipliers are
+`Â₁=Â₃=Ahat1`, `Â₄=Ahat4`, `B̂₂=B̂₃=B̂₄=Bhat2`; the rest are `unitHat`.  These are the
+per-slot inputs the §10 slot frame minimizes over the free datum `t̂_j = V_j f`. -/
+
+variable (ζ f : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2)
+
+theorem Vcoset_L0 : V psi0 s (leftHalf (seamC ζ + bbBoundary2Fn baseA baseB f))
+    = fadd (V psi0 s (leftHalf (seamC ζ))) (rmul unitHat (fun s' => V psi0 s' f) s) := by
+  rw [leftHalf_coset, V_add, mult_A0]
+theorem Vcoset_L1 : V psi1 s (leftHalf (seamC ζ + bbBoundary2Fn baseA baseB f))
+    = fadd (V psi1 s (leftHalf (seamC ζ))) (rmul Ahat1 (fun s' => V psi1 s' f) s) := by
+  rw [leftHalf_coset, V_add, mult_A1]
+theorem Vcoset_L2 : V psi2 s (leftHalf (seamC ζ + bbBoundary2Fn baseA baseB f))
+    = fadd (V psi2 s (leftHalf (seamC ζ))) (rmul unitHat (fun s' => V psi2 s' f) s) := by
+  rw [leftHalf_coset, V_add, mult_A2]
+theorem Vcoset_L3 : V psi3 s (leftHalf (seamC ζ + bbBoundary2Fn baseA baseB f))
+    = fadd (V psi3 s (leftHalf (seamC ζ))) (rmul Ahat1 (fun s' => V psi3 s' f) s) := by
+  rw [leftHalf_coset, V_add, mult_A3]
+theorem Vcoset_L4 : V psi4 s (leftHalf (seamC ζ + bbBoundary2Fn baseA baseB f))
+    = fadd (V psi4 s (leftHalf (seamC ζ))) (rmul Ahat4 (fun s' => V psi4 s' f) s) := by
+  rw [leftHalf_coset, V_add, mult_A4]
+theorem Vcoset_R0 : V psi0 s (rightHalf (seamC ζ + bbBoundary2Fn baseA baseB f))
+    = fadd (V psi0 s (rightHalf (seamC ζ))) (rmul unitHat (fun s' => V psi0 s' f) s) := by
+  rw [rightHalf_coset, V_add, mult_B0]
+theorem Vcoset_R1 : V psi1 s (rightHalf (seamC ζ + bbBoundary2Fn baseA baseB f))
+    = fadd (V psi1 s (rightHalf (seamC ζ))) (rmul unitHat (fun s' => V psi1 s' f) s) := by
+  rw [rightHalf_coset, V_add, mult_B1]
+theorem Vcoset_R2 : V psi2 s (rightHalf (seamC ζ + bbBoundary2Fn baseA baseB f))
+    = fadd (V psi2 s (rightHalf (seamC ζ))) (rmul Bhat2 (fun s' => V psi2 s' f) s) := by
+  rw [rightHalf_coset, V_add, mult_B2]
+theorem Vcoset_R3 : V psi3 s (rightHalf (seamC ζ + bbBoundary2Fn baseA baseB f))
+    = fadd (V psi3 s (rightHalf (seamC ζ))) (rmul Bhat2 (fun s' => V psi3 s' f) s) := by
+  rw [rightHalf_coset, V_add, mult_B3]
+theorem Vcoset_R4 : V psi4 s (rightHalf (seamC ζ + bbBoundary2Fn baseA baseB f))
+    = fadd (V psi4 s (rightHalf (seamC ζ))) (rmul Bhat2 (fun s' => V psi4 s' f) s) := by
+  rw [rightHalf_coset, V_add, mult_B4]
+
 end Quantum.Stabilizer.Homological.BB.LightStab
