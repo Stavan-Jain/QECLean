@@ -5,23 +5,23 @@ parameters: {n: 'n1*n2', k: 'k2', d: '>= d1*d2'}
 parameter: 'inner [[n1,1,d1]] CSS, outer [[n2,k2,d2]] CSS'
 parameter_constraint: 'NeZero n1; k1 = 1; both inner and outer codes CSS'
 validating_instance: {code: 'Steane (x) Steane', n: 49, k: 1, d: 9}
-status: formalization          # M1, M2, M3 landed; M4–M7 pending
+status: pr-ready               # M1–M7 ALL COMPLETE; unconditional [[49,1,9]] proven
 track: engineering
 started_at: '2026-06-15'
 worktree_branch: claude/beautiful-lalande-04ce1f
-phase: stage-4-m7-partial      # M1–M6 complete; M7 = bundle + Steane d=3 + independence DONE; only weight-9 witness left
-estimated_loc: 2050            # ~1560-1740 + ~410 (Independence.lean)
-sorries_closed: 73             # M1..M6 + steaneConcatData + Steane d=3 + concat independence (structural lemma)
-sorries_open: 0                # everything committed is sorry-free (only the weight-9 witness remains, as a hypothesis)
+phase: stage-4-complete        # M1–M7 done; steaneConcat_hasCodeDistance_nine is UNCONDITIONAL (no hypotheses)
+estimated_loc: 2200            # ~2050 + ~150 (weight-9 witness in SteaneSteane.lean)
+sorries_closed: 73             # entire program sorry-free (no sorryAx anywhere; native_decide only on small enumerations)
+sorries_open: 0
 sorries_blocked: 0
-milestones_done: [M1, M2, M3, M4, M5, M6]
-milestones_skeleton: [M7]      # M7: bundle + Steane d=3 + independence DONE; conditional [[49,1,9]] on weight-9 witness
-current_lean_file: QEC/Stabilizer/Framework/Concatenation/Independence.lean
+milestones_done: [M1, M2, M3, M4, M5, M6, M7]
+milestones_skeleton: []        # none — M7 fully closed
+current_lean_file: QEC/Stabilizer/Codes/Concat/SteaneSteane.lean
 covering_lean_file: QEC/Stabilizer/Framework/Concatenation/Distance.lean   # M6 headline (actual location)
 umbrella_file: QEC/Stabilizer/Framework/Concatenation.lean                 # wired; Codes/Concat.lean → Codes.lean
 headline_theorem: 'concat_hasCodeDistance : HasCodeDistance (concatenate D) (d1 * d2)'
-long_pole: 'M1–M6 DONE, sorry-free (the full abstract framework). M7: steaneConcatData : ConcatCSSData 7 7 1 (bundle typechecks); HasCodeDistance Steane7.stabilizerCode 3 PROVEN (Steane7Distance.lean). STRUCTURAL INDEPENDENCE NOW DONE: ConcatCSSData.rowsLinearIndependent_concat / generatorsIndependent_concat (Concatenation/Independence.lean, ~410 LOC, axioms = {propext, Classical.choice, Quot.sound} only — no native_decide trust) derive the 2^48-infeasible GeneratorsIndependent 49 from two SMALL inputs: rowsLinearIndependent (Cin.gens ++ [Xbar,Zbar]) and rowsLinearIndependent (outerZ++outerX). For Steane these are 2^8 and 2^6, settled by steaneConcat_generatorsIndependent (native_decide). steaneConcat_hasCodeDistance_nine now drops hindep — only hwit (weight-9 witness) remains. ONLY ONE gap left for unconditional [[49,1,9]]: the computable weight-9 witness.'
-next_step: 'For unconditional [[49,1,9]]: ONLY (B) remains — a weight-9 witness: a computable min-weight nontrivial concat logical (e.g. promote a min-weight Steane X-logical with a min-weight inner X̄), proven nontrivial + weight 9 via the computable restatement trick (the fixed concatLogicalX has weight ≥9, not =9; the min-weight rep routes through the noncomputable concat stabilizer, so it needs a computable restatement). (A) the structural concat-independence lemma is DONE (Independence.lean) and discharged for Steane. Architecture of (A) for reference: blockRestrictSymp LinearMap (funLeft of a coordinate map) is the engine; rowsLinearIndependent_append_iff (general, via linearIndependent_sum) splits the list; inner part by flatMap-over-distinct-blocks induction, promoted part by reassembling per-block restrictions into an outer relation, two spans disjoint via blockRestrictSymp into sympSpan(gens) ⊓ span{Xbar,Zbar} = 0.'
+long_pole: 'DONE — entire M1–M7 program complete and sorry-free. Abstract framework M1–M6: concat_hasCodeDistance : HasCodeDistance (concatenate D) (d1*d2). Structural independence (Independence.lean): rowsLinearIndependent_concat / generatorsIndependent_concat (axioms = {propext, Classical.choice, Quot.sound} only). Validating instance: steaneConcat_hasCodeDistance_nine : HasCodeDistance (steaneConcatData.concatenate …) 9 is UNCONDITIONAL — all three concat_hasCodeDistance inputs discharged: (i) Steane d=3 (Steane7Distance.lean), (ii) GeneratorsIndependent 49 via the structural lemma + native_decide on 2^8/2^6 inputs (steaneConcat_generatorsIndependent), (iii) weight-9 witness steaneConcat_witness (X on inner {3,5,6} of outer blocks {3,5,6}; centralizer + anticommute-with-allZ by native_decide on concatGensConcrete, the rfl-equal concrete generator list). #print axioms steaneConcat_hasCodeDistance_nine = standard 3 axioms + native_decide axioms only (NO sorryAx).'
+next_step: 'Program complete. Optional Stage 5/6: open a PR for the concatenation framework + [[49,1,9]] instance; post-merge reflection (promote generalizable patterns — blockRestrictSymp / append-independence / the noncomputable-projection→concrete-list+rfl+native_decide trick — to lean-patterns.md). Generalization opportunities: drop k1=1 to general k1; instantiate other inner⊗outer pairs (Shor⊗Steane, etc.) now that generatorsIndependent_concat + the witness recipe are reusable.'
 introduced_refs:
   - 'Knill-Laflamme 1996 (concatenated codes / threshold)'
   - 'Gottesman 1997, "A Theory of Fault-Tolerant Quantum Computation" (arxiv:quant-ph/9702029)'
