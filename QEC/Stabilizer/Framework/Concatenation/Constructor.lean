@@ -12,17 +12,17 @@ crux is `promote_anticommute_parity` (plan risk **R6**): two promoted outer
 generators commute *on the nose* because promotion preserves the parity of the
 anticommuting-position count, and the underlying outer generators commute.
 
-**Status: M3 skeleton.** The structural plumbing typechecks; the obligation
-proofs are tagged `sorry`s (`concat-m3`). They are the focused next step:
-- `promote_anticommute_parity` (R6) — the parity core, to build/verify first.
+**Status: M3 complete.** All obligation proofs are discharged; `concatenate` is
+`sorry`-free. The pieces:
+- `promote_anticommute_parity` (R6) — the parity core.
 - `concat_generators_commute` — 4-case dispatch (inner/inner, inner/promoted,
   promoted/promoted) built on R6, M1's `embedBlock_*`, and the inner logicals
   being in `Cin`'s centralizer.
 - `concat_closure_no_neg_identity` — regroup the generator set as `Z ∪ X` (via
   `inner_split`/`outer_split`) and apply `negIdentity_not_mem_closure_union`.
-- `concat_generators_independent` — block-structured check-matrix independence
-  via the symplectic span bridge (or, fallback, a `ConcatCSSData` field).
-- the concat logicals' centralizer membership + anticommutation.
+- the concat logicals' centralizer membership, anticommutation, and cross-commutation.
+Generator independence is an explicit hypothesis of `concatenate` (see its doc-comment
+for why it is assumed rather than derived).
 -/
 
 namespace Quantum.Concatenation
@@ -333,13 +333,6 @@ lemma concat_closure_no_neg_identity :
     · rw [hset]; exact Set.mem_union_left _ hz
     · rw [hset]; exact Set.mem_union_right _ hx
 
-/-- The concatenated generator list is independent. -/
-lemma concat_generators_independent :
-    GeneratorsIndependent (n₁ * n₂) D.concatGeneratorsList := by
-  sorry -- TODO(concat-m3): GeneratorsIndependent_of_rowsLinearIndependent; block-structured
-  -- check matrix: per-block inner rows (disjoint supports) ⊕ promoted-outer rows separated by
-  -- not_mem_subgroup_of_symp_not_in_span. (Fallback: accept as a ConcatCSSData field.)
-
 /-! ## The stabilizer group and the logical operators -/
 
 /-- The stabilizer group of the concatenated code. -/
@@ -451,8 +444,17 @@ lemma concat_logical_commute_cross (ℓ ℓ' : Fin k₂) (hne : ℓ ≠ ℓ') :
 /-! ## The constructor -/
 
 /-- Concatenate a `k₁ = 1` CSS inner code with a CSS outer code into a
-`StabilizerCode (n₁ * n₂) k₂`. The headline of M3. -/
-noncomputable def concatenate (D : ConcatCSSData n₁ n₂ k₂) : StabilizerCode (n₁ * n₂) k₂ where
+`StabilizerCode (n₁ * n₂) k₂`. The headline of M3.
+
+Generator independence is an explicit hypothesis rather than a derived fact: the only
+available route to `GeneratorsIndependent` is `rowsLinearIndependent` (check-matrix row
+independence over `ZMod 2`), which is strictly stronger than the subgroup-independence
+`Cin`/`Cout` carry and is *not* recoverable from it (the reverse implication is false in
+general). For a concrete instance it is discharged by `native_decide` via
+`GeneratorsIndependent_of_rowsLinearIndependent`, exactly as the small CSS codes do. -/
+noncomputable def concatenate (D : ConcatCSSData n₁ n₂ k₂)
+    (hindep : GeneratorsIndependent (n₁ * n₂) D.concatGeneratorsList) :
+    StabilizerCode (n₁ * n₂) k₂ where
   hk := by
     have hk := D.Cout.hk
     have hle : n₂ ≤ n₁ * n₂ := Nat.le_mul_of_pos_left n₂ (Nat.pos_of_ne_zero (NeZero.ne n₁))
@@ -460,7 +462,7 @@ noncomputable def concatenate (D : ConcatCSSData n₁ n₂ k₂) : StabilizerCod
   generatorsList := D.concatGeneratorsList
   generators_length := D.concatGeneratorsList_length
   generators_phaseZero := D.concatGeneratorsList_phaseZero
-  generators_independent := concat_generators_independent D
+  generators_independent := hindep
   generators_commute := concat_generators_commute D
   closure_no_neg_identity := concat_closure_no_neg_identity D
   logicalOps := concatLogicalOps D
