@@ -385,4 +385,45 @@ theorem slice_floor (b : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) (h : slice
     dlbTable.getD (Vpat b s) 0 ≤ weight3 (slice b s) := by
   rw [Vpat_eq_suppPat]; exact d3_table _ h
 
+/-! ## §5 The exact per-slot weight (the Fourier bijection)
+
+The torus-Fourier map `g ↦ (V₀,…,V₄)` is a BIJECTION on the 512 layers (Z₃² is
+coprime to char 2), so `weight3` is an EXACT function of the 5 CRT components — upgrading
+the d₃ table (§4) from an inequality to an equality `weight3 (slice b s) = wt5OfComps (V ψⱼ s b)`.
+This is the form the §10 slot frame minimizes over the coset's free data. -/
+
+/-- The exact weight of a torus layer as a function of its 5 CRT-Fourier components
+(`v₀ ∈ {0,1}`; index `v₀ + 2·(v₁ + 4·(v₂ + 4·(v₃ + 4·v₄)))`). -/
+def WT5_TABLE : Array Nat :=
+  #[0,9,6,3,6,3,6,3,6,3,4,5,4,5,4,5,6,3,4,5,4,5,4,5,6,3,4,5,4,5,4,5,6,3,4,5,4,5,4,5,4,5,2,7,6,3,
+    6,3,4,5,6,3,6,3,2,7,4,5,6,3,2,7,6,3,6,3,4,5,4,5,4,5,4,5,6,3,2,7,6,3,4,5,2,7,6,3,6,3,4,5,6,3,
+    6,3,2,7,6,3,4,5,4,5,4,5,4,5,6,3,6,3,2,7,4,5,6,3,2,7,6,3,4,5,2,7,6,3,6,3,6,3,4,5,4,5,4,5,4,5,
+    2,7,6,3,6,3,4,5,6,3,2,7,6,3,4,5,6,3,6,3,2,7,4,5,2,7,6,3,6,3,2,7,8,1,4,5,4,5,6,3,4,5,4,5,4,5,
+    6,3,4,5,4,5,4,5,4,5,6,3,6,3,2,7,6,3,4,5,4,5,4,5,6,3,4,5,4,5,4,5,2,7,4,5,4,5,8,1,4,5,6,3,2,7,
+    6,3,6,3,4,5,4,5,4,5,2,7,4,5,8,1,4,5,6,3,4,5,4,5,4,5,6,3,4,5,4,5,4,5,4,5,6,3,6,3,2,7,4,5,2,7,
+    6,3,6,3,4,5,6,3,2,7,6,3,4,5,6,3,2,7,6,3,6,3,4,5,4,5,4,5,6,3,4,5,4,5,4,5,2,7,4,5,8,1,4,5,4,5,
+    2,7,6,3,6,3,6,3,4,5,4,5,4,5,2,7,8,1,4,5,4,5,6,3,4,5,4,5,4,5,4,5,6,3,6,3,2,7,2,7,4,5,4,5,8,1,
+    6,3,4,5,4,5,4,5,6,3,4,5,4,5,4,5,6,3,4,5,4,5,4,5,4,5,6,3,2,7,6,3,4,5,6,3,6,3,2,7,4,5,2,7,6,3,
+    6,3,4,5,6,3,6,3,2,7,6,3,4,5,4,5,4,5,2,7,4,5,4,5,8,1,6,3,4,5,4,5,4,5,4,5,6,3,2,7,6,3,2,7,4,5,
+    8,1,4,5,6,3,4,5,4,5,4,5,6,3,4,5,4,5,4,5,4,5,2,7,6,3,6,3,6,3,4,5,4,5,4,5,6,3,4,5,4,5,4,5,2,7,
+    8,1,4,5,4,5]
+
+/-- `weight3` read off the 5 CRT components. -/
+def wt5OfComps (v0 v1 v2 v3 v4 : Fin 4) : Nat :=
+  WT5_TABLE.getD (v0.val + 2*(v1.val + 4*(v2.val + 4*(v3.val + 4*v4.val)))) 99
+
+/-- **The Fourier bijection**: `weight3` is the exact `wt5OfComps` of the layer's
+five torus-Fourier coefficients (`native_decide` over the 512 layers). -/
+theorem weight3_eq_wt5 : ∀ g : ZMod 3 × ZMod 3 → ZMod 2,
+    weight3 g = wt5OfComps (fhat3 g (0,0)) (fhat3 g (0,1)) (fhat3 g (1,0)) (fhat3 g (1,1))
+      (fhat3 g (1,2)) := by
+  native_decide
+
+/-- The exact per-slot weight of a block-slice, in CRT components (`V ψⱼ`). -/
+theorem weight3_eq_wt5_slice (b : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) :
+    weight3 (slice b s)
+      = wt5OfComps (V psi0 s b) (V psi1 s b) (V psi2 s b) (V psi3 s b) (V psi4 s b) := by
+  rw [weight3_eq_wt5 (slice b s), ← fourier_bridge0, ← fourier_bridge1, ← fourier_bridge2,
+    ← fourier_bridge3, ← fourier_bridge4]
+
 end Quantum.Stabilizer.Homological.BB.LightStab
