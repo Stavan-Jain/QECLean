@@ -415,6 +415,53 @@ anticommutation).
 ### Next: the M4 dimension kernel (per items 1–5 above), then M5/M6/M7.
 M5/M6 must not start before the kernel closes (unsound otherwise — gap_audit).
 
+## Session 10 — M4 COMPLETE: the decisive dimension kernel proven (2026-06-16)
+
+`CentralizerStructure.lean` is now fully `sorry`-free. The long pole
+`operators_eq_stab_of_commutes_both_logicals` is proven.
+
+**Phase 1 — nondegenerate symplectic `BilinForm`.** Bundled `symplecticBilinear` as a
+mathlib `LinearMap.BilinForm (ZMod 2) (Fin (n+n) → ZMod 2)` (`sympBilinForm`); proved
+symmetric (`symplecticBilinear_comm`), reflexive, and `Nondegenerate` (separating-left via
+`Pi.single` basis-vector extraction over the two `Fin (n+n)` halves).
+
+**Phase 2 — the dimension count.** Two reusable helpers:
+`mem_sympBilinForm_orthogonal_span_iff` (orthogonal membership ↔ orthogonality vs the
+spanning set) and `sympBilinForm_orthogonal_sup` (orthogonal sends `⊔` to `⊓`). Then the
+k=1 dimension-2 argument with `V = sympSpan L`, `U = span{X̄,Z̄}`, `W = V ⊔ U`:
+`symp(g) ∈ Wᗮ`; `dim V = n−1` (`finrank_span_eq_card` on the independent rows);
+`dim U = 2` (the anticommuting pair independent via `LinearIndependent.pair_iff` + the
+symplectic pairing values); `V ⊓ U = ⊥` (logicals ⊥ V); so `dim W = n+1`
+(`finrank_sup_add_finrank_inf_eq`) and `dim Wᗮ = 2n−(n+1) = n−1` (mathlib
+`BilinForm.finrank_orthogonal`, nondegenerate); `V ⊆ Wᗮ` + equal dim ⇒ `V = Wᗮ`
+(`eq_of_le_of_finrank_eq`), whence `symp(g) ∈ V`.
+
+**Gotchas this session (for future BilinForm work in this repo):**
+- The `orthogonal` / `finrank_orthogonal` API lives in
+  `Mathlib.LinearAlgebra.BilinearForm.Orthogonal`, which was NOT transitively imported
+  (Phase 1 only pulled BilinForm *Basic*). Symptom: `Unknown constant
+  LinearMap.BilinForm.orthogonal` and a cascading `motive`/`m ∈ sorry`. Fix: add the import.
+- `BilinForm` is `open LinearMap (BilinForm)` over a reducible arrow type, so `(B).orthogonal`
+  dot-notation resolves to the nonexistent `LinearMap.orthogonal`. Use fully-qualified
+  `LinearMap.BilinForm.orthogonal B N`. Do NOT `open LinearMap.BilinForm` — it breaks the
+  fully-qualified resolution.
+- `finrank (ZMod 2) (P ⊔ Q)` elaborates the `⊔` with expected type `Type` → `failed to
+  synthesize Max Type`. Write `finrank (ZMod 2) ↥(P ⊔ Q)`.
+- `mul_one` is ambiguous (`_root_.mul_one` vs `NQubitPauliGroupElement.mul_one`); qualify
+  `_root_.mul_one` in `simp` sets. `mul_zero` is fine unqualified.
+- Don't `rw` a `Nat` (e.g. `generatorsList.length`) that also indexes a `Fin` — the motive
+  fails; rewrite a standalone copy instead.
+
+### Commits this session
+- M4 kernel phase 1 (nondegenerate BilinForm).
+- M4 COMPLETE (decisive dimension kernel).
+
+### Next: M5 (block restriction + induced-outer correspondence), then M6 (distance), M7.
+M4 unblocks them: `centralizer_classify_of_k1` for the per-block split,
+`operators_eq_stab_of_commutes_both_logicals` for the induced-outer coset injectivity.
+M7's Steane⊗Steane instance discharges both the `concatenate` independence hypothesis and
+the inner `rowsLinearIndependent` (M4) hypothesis by `native_decide`.
+
 <!-- Stage-4 runner: append "Session N" sections here as work proceeds. -->
 
 
