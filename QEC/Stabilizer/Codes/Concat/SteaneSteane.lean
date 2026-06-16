@@ -10,33 +10,30 @@ The validating concrete instance of the CSS concatenation framework
 itself. `steaneConcatData` bundles `Steane7.stabilizerCode` as both inner and outer code into a
 `ConcatCSSData 7 7 1` — the data the whole framework consumes.
 
-## Status and the two instantiation blockers
+## Status
 
 `steaneConcatData` typechecks (below), so the framework's input bundle instantiates on a real
 code. The inner/outer distance `HasCodeDistance Steane7.stabilizerCode 3`
-(`Steane7.stabilizerCode_hasCodeDistance_three`) is now formalized, so
-`steaneConcat_hasCodeDistance_nine` reduces the `[[49, 1, 9]]` distance to exactly **two
-remaining inputs**, the generator
-independence and a weight-9 witness:
+(`Steane7.stabilizerCode_hasCodeDistance_three`) is formalized, and the **generator independence
+is now discharged** (`steaneConcat_generatorsIndependent`) via the structural framework lemma
+`ConcatCSSData.generatorsIndependent_concat` (`Concatenation/Independence.lean`): it derives the
+`2⁴⁸`-infeasible `GeneratorsIndependent 49 concatGeneratorsList` from two *small*,
+`native_decide`-able inputs —
 
-* **Generator independence is not `native_decide`-able.** `concatenate` requires
-  `GeneratorsIndependent 49 concatGeneratorsList`. The only available decision procedure,
-  `Decidable (rowsLinearIndependent L)` (`CheckMatrixDecidable.lean`), enumerates *all*
-  `2 ^ L.length` coefficient vectors. The concatenated list has `49 − 1 = 48` generators, so
-  that is `2⁴⁸` — infeasible (OOM). The plan's "`native_decide` per instance" fallback (risk
-  R5) works only for small single codes (Steane itself: `2⁶`); it does **not** scale. The real
-  fix is a *structural* `rowsLinearIndependent_concat` lemma deriving concat-independence from
-  the inner/outer independence and the disjoint block-support of the embedded inner generators —
-  a new framework lemma (≈ M4-scale), not a decision.
+* the Steane generators together with the two logical representatives are symplectically
+  independent (`rowsLinearIndependent (generatorsList ++ [logicalX, logicalZ])`, `2⁸`), and
+* the outer Steane generators are symplectically independent (`2⁶`).
+
+So `steaneConcat_hasCodeDistance_nine` now reduces the `[[49, 1, 9]]` distance to exactly **one
+remaining input**:
 
 * **A weight-9 witness** — a nontrivial concatenated logical of weight exactly `9`. (The fixed
-  `concatLogicalX` has weight `≥ 9` but a minimum-weight representative is the witness; it too
-  routes through the noncomputable concatenated stabilizer, so it needs the same computable
-  restatement the independence does.)
+  `concatLogicalX` has weight `≥ 9` but a minimum-weight representative is the witness; it
+  routes through the noncomputable concatenated stabilizer, so it needs a computable
+  restatement.)
 
-Both are recorded in `pipeline/attempts/concat_css_general/state.yaml`. The abstract framework
-(M1–M6) is complete and sorry-free; `steaneConcat_hasCodeDistance_nine` is the honest end state
-for M7 with the current infrastructure.
+Recorded in `pipeline/attempts/concat_css_general/state.yaml`. The abstract framework (M1–M6) is
+complete and sorry-free.
 -/
 
 namespace Quantum.StabilizerGroup.Steane7
@@ -69,19 +66,32 @@ noncomputable def steaneConcatData : ConcatCSSData 7 7 1 where
 
 open Quantum.StabilizerGroup
 
-/-- **(M7, conditional headline.)** Steane ⊗ Steane has distance `9 = 3 · 3`, *given* the two
-remaining concrete inputs: the concatenated generator independence `hindep` and a weight-9
-nontrivial-logical witness `hwit`. The inner/outer distance-3 is supplied by
-`stabilizerCode_hasCodeDistance_three`; everything else is M6's `concat_hasCodeDistance`.
+/-- **(M7.)** The concatenated generators are independent — `GeneratorsIndependent 49`,
+discharging the hypothesis `concatenate` takes. Proven via the structural framework lemma
+`ConcatCSSData.generatorsIndependent_concat`, whose two inputs are small enough to settle by
+`native_decide` (`2⁸` for the inner-with-logicals list, `2⁶` for the outer), sidestepping the
+`2⁴⁸` direct check on the 48 concatenated generators. -/
+theorem steaneConcat_generatorsIndependent :
+    GeneratorsIndependent (7 * 7) steaneConcatData.concatGeneratorsList := by
+  have hin : NQubitPauliGroupElement.rowsLinearIndependent
+      (generatorsList ++ [logicalX, logicalZ]) := by native_decide
+  have hout : NQubitPauliGroupElement.rowsLinearIndependent
+      ([Z1, Z2, Z3] ++ [X1, X2, X3]) := by native_decide
+  exact steaneConcatData.generatorsIndependent_concat hin hout
+
+/-- **(M7, conditional headline.)** Steane ⊗ Steane has distance `9 = 3 · 3`, *given* the one
+remaining concrete input: a weight-9 nontrivial-logical witness `hwit`. The generator
+independence is now supplied by `steaneConcat_generatorsIndependent`, the inner/outer distance-3
+by `stabilizerCode_hasCodeDistance_three`; everything else is M6's `concat_hasCodeDistance`.
 
 This pins down exactly what an unconditional `[[49, 1, 9]]` proof still needs (see the module
-doc): a structural concat-independence lemma and a computable minimum-weight witness. -/
+doc): a computable minimum-weight witness. -/
 theorem steaneConcat_hasCodeDistance_nine
-    (hindep : GeneratorsIndependent (7 * 7) steaneConcatData.concatGeneratorsList)
     (hwit : ∃ g, IsNontrivialLogicalOperator g steaneConcatData.concatStabGroup
       ∧ NQubitPauliGroupElement.weight g = 3 * 3) :
-    HasCodeDistance (steaneConcatData.concatenate hindep) 9 :=
-  steaneConcatData.concat_hasCodeDistance hindep rowsLinearIndependent_generatorsList
+    HasCodeDistance (steaneConcatData.concatenate steaneConcat_generatorsIndependent) 9 :=
+  steaneConcatData.concat_hasCodeDistance steaneConcat_generatorsIndependent
+    rowsLinearIndependent_generatorsList
     stabilizerCode_hasCodeDistance_three stabilizerCode_hasCodeDistance_three hwit
 
 end Quantum.StabilizerGroup.Steane7
