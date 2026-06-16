@@ -282,4 +282,22 @@ theorem off_vanish (z : BaseGroup → ZMod 2) (hz : bbBoundary2Fn baseA baseB z 
   rw [← kerBasis_spans z hz, recon_eq_kcombo]
   exact offVanish_combo _ _ _ _ _ _ s
 
+/-! ## §2b The coset block decomposition
+
+A Smith-coset element `seamC ζ + ∂₂ f` splits, block by block, into the seam profile
+plus the `f`-convolution: the A-block (`j = 0`) is `leftHalf (seamC ζ) + conv baseA f`,
+the B-block (`j = 1`) is `rightHalf (seamC ζ) + conv baseB f`.  Composed with the CRT
+transform `V` (additive, multiplicative through `conv baseA/baseB`), this exposes the
+coset's per-component data `off_j(ζ) ⊕ P̂_j · V_j f` that the §10 slot frame bounds. -/
+
+/-- A-block of a coset element: `leftHalf (seamC ζ + ∂₂ f) = leftHalf (seamC ζ) + A⋆f`. -/
+theorem leftHalf_coset (ζ f : BaseGroup → ZMod 2) :
+    leftHalf (seamC ζ + bbBoundary2Fn baseA baseB f)
+      = leftHalf (seamC ζ) + conv baseA f := rfl
+
+/-- B-block of a coset element: `rightHalf (seamC ζ + ∂₂ f) = rightHalf (seamC ζ) + B⋆f`. -/
+theorem rightHalf_coset (ζ f : BaseGroup → ZMod 2) :
+    rightHalf (seamC ζ + bbBoundary2Fn baseA baseB f)
+      = rightHalf (seamC ζ) + conv baseB f := rfl
+
 end Quantum.Stabilizer.Homological.BB.LightStab
