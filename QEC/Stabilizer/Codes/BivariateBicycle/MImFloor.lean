@@ -66,4 +66,38 @@ theorem d3_le : ∀ (v0 : Fin 2) (v1 v2 v3 v4 : Fin 4),
       ≤ wt5N v0.val v1.val v2.val v3.val v4.val := by
   native_decide
 
+/-! ## §9 The per-cell soundness bridge (keystone applied to coset values)
+
+The coset's per-cell component values are `gadd (seam offset) (Γ-pair value)`.  These
+lemmas lift the keystones (§8) to those values, discharging the F₄ bounds: `gadd = xor`
+keeps `< 2` (comp 0, the `F₂`-valued trivial character) and `< 4` (comps 1–4). -/
+
+theorem gadd_lt_two {a b : Nat} (ha : a < 2) (hb : b < 2) : gadd a b < 2 := by
+  interval_cases a <;> interval_cases b <;> decide
+
+theorem gadd_lt_four {a b : Nat} (ha : a < 4) (hb : b < 4) : gadd a b < 4 := by
+  interval_cases a <;> interval_cases b <;> decide
+
+/-- Per-cell **slab-min** soundness on actual coset values `gadd offset pair`. -/
+theorem cell_slab_sound {o0 q0 o1 q1 o2 q2 o3 q3 o4 q4 : Nat}
+    (h0o : o0 < 2) (h0q : q0 < 2) (h1o : o1 < 4) (h1q : q1 < 4) (h2o : o2 < 4) (h2q : q2 < 4)
+    (h3o : o3 < 4) (h3q : q3 < 4) (h4o : o4 < 4) (h4q : q4 < 4) :
+    cellMin (gadd o0 q0) (gadd o3 q3) (gadd o4 q4)
+      ≤ wt5N (gadd o0 q0) (gadd o1 q1) (gadd o2 q2) (gadd o3 q3) (gadd o4 q4) := by
+  have h := cellMin_le ⟨gadd o0 q0, gadd_lt_two h0o h0q⟩ ⟨gadd o1 q1, gadd_lt_four h1o h1q⟩
+    ⟨gadd o2 q2, gadd_lt_four h2o h2q⟩ ⟨gadd o3 q3, gadd_lt_four h3o h3q⟩
+    ⟨gadd o4 q4, gadd_lt_four h4o h4q⟩
+  simpa using h
+
+/-- Per-cell **relaxed** soundness on actual coset values (comps 1,2 by their support). -/
+theorem cell_relaxed_sound {o0 q0 o1 q1 o2 q2 o3 q3 o4 q4 : Nat}
+    (h0o : o0 < 2) (h0q : q0 < 2) (h1o : o1 < 4) (h1q : q1 < 4) (h2o : o2 < 4) (h2q : q2 < 4)
+    (h3o : o3 < 4) (h3q : q3 < 4) (h4o : o4 < 4) (h4q : q4 < 4) :
+    d3 (gadd o0 q0) (gadd o3 q3) (gadd o4 q4) (supp (gadd o1 q1)) (supp (gadd o2 q2))
+      ≤ wt5N (gadd o0 q0) (gadd o1 q1) (gadd o2 q2) (gadd o3 q3) (gadd o4 q4) := by
+  have h := d3_le ⟨gadd o0 q0, gadd_lt_two h0o h0q⟩ ⟨gadd o1 q1, gadd_lt_four h1o h1q⟩
+    ⟨gadd o2 q2, gadd_lt_four h2o h2q⟩ ⟨gadd o3 q3, gadd_lt_four h3o h3q⟩
+    ⟨gadd o4 q4, gadd_lt_four h4o h4q⟩
+  simpa using h
+
 end Quantum.Stabilizer.Homological.BB.LightStab
