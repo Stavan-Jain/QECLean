@@ -523,11 +523,41 @@ kernel remains.
 - M5 phase 2 (induced outer logical: support_eq + centralizer).
 - M5 phase 3 (nontriviality reduced to one scoped symplectic kernel).
 
-### Next: finish `inducedOuter_symp_in_span`, then M6 (distance) + M7 (Steane⊗Steane).
-The remaining R7 kernel needs M4-scale symplectic-level `embedBlock`/`promoteE` infrastructure
-(linear maps into `sympSpan concatGeneratorsList`). Once it lands, M6's `weight_ge_d1_mul_d2`
-follows from `weight_ge_of_blocks_ge` (M1) + `inducedOuter_support_eq` +
-`inducedOuter_isNontrivialLogical` + `HasCodeDistance Cin/Cout`.
+### R7 kernel (this session, continued): `inducedOuter_symp_in_span` now PROVEN.
+Two more commits drove the R7 kernel from "one big sorry" to "proven, modulo one deeper
+existence lemma":
+
+- `Restriction.lean`: `toSymplectic_eq_sum_embed_restrictBlock` (symplectic gluing — per
+  coordinate only the `blockOf q` summand survives) and `toSymplectic_embedBlock_mem_concatSpan`
+  (embed preserves the span; `exists_mem_closure_of_symp_in_span` + `closure_induction`, using
+  `mulOp_embedBlockOp_operators` for additivity and `inv_operators` for the inverse case). Both
+  sorry-free.
+- `Correspondence.lean`: `inducedOuter_symp_in_span` fully assembled and PROVEN —
+  `toSymplectic g = toSymplectic (g*u) + toSymplectic u` over `ZMod 2`
+  (`CharTwo.add_self_eq_zero`), with `toSymplectic (g*u) ∈ sympSpan` from gluing + embed-span +
+  the M4 kernel (each `restrict b (g*u)` is inner-stabilizer-like) and `toSymplectic u ∈ sympSpan`
+  from `u ∈ concat.stab`.
+
+**Key correctness insight discovered:** `promoteE t` is LOSSY on `Y` (`promoteSingle Y = I`),
+so the naive "promote `t`" correction fails on Y-class blocks. The matching stabilizer `u` must
+be the concat-GROUP product of promoted Y-free generators — the group multiplication realizes
+the `Y = X̄₁Z̄₁` class on Y-blocks correctly. This is recorded in the scoped lemma's doc-comment.
+
+The single remaining concat sorry: `exists_concatStab_matching_induced` (the class-matching `u`
+via `closure_induction` on `t`, with the `inducedOuterOp` class-homomorphism). Plan in
+`state.yaml`'s `next_step`.
+
+### Gotchas (R7 continued)
+- The MCP LSP serves a STALE import olean for a sibling file edited earlier the same session:
+  after adding lemmas to `Restriction.lean`, `lean_diagnostic_messages` on `Correspondence.lean`
+  reported the new names as "unknown identifier" even though `lake build` resolved them fine.
+  Confirm cross-file references with `lake build`, not the LSP, after editing a dependency.
+- `≠` is `Ne` (hides the `= I`); `Finset.sum_nat_mod` hits the first `(∑)%2`; `Fin.addCases`
+  to split a symplectic index into X-part/Z-part (`toSymplectic_X_part`/`_Z_part`).
+
+### Next: finish `exists_concatStab_matching_induced`, then M6 (distance) + M7 (Steane⊗Steane).
+Once it lands, M6's `weight_ge_d1_mul_d2` follows from `weight_ge_of_blocks_ge` (M1) +
+`inducedOuter_support_eq` + `inducedOuter_isNontrivialLogical` + `HasCodeDistance Cin/Cout`.
 
 
 
