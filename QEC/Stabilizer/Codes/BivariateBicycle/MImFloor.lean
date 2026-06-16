@@ -29,7 +29,10 @@ by baking the offsets `(o1,o2)` into the per-cell min.
 import QEC.Stabilizer.Codes.BivariateBicycle.MImClassify
 import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorData
 
+open Quantum.Stabilizer.Homological.BB
+open Quantum.Stabilizer.Homological.BB.CRTFrame
 open Quantum.Stabilizer.Homological.BB.LightStab
+open scoped BigOperators
 
 namespace Quantum.Stabilizer.Homological.BB.LightStab
 
@@ -376,5 +379,61 @@ theorem floorOK_sound (oL oR : Array Nat) (hfloor : floorOK oL oR = true)
       · exact fun s hs => mask2R_eq hi2 hd2 hs
     · have he := all_range_elim (all_range_elim hfib d1 hd1) d2 hd2
       exact of_decide_eq_true he
+
+/-! ## §13 The chain-weight bridge: `costFromComps` (the closed coset weight) `=` `exCost`
+
+`MImClassify`'s `chainWeight_coset_eq` (§7) writes the safe-sector coset weight as
+`costFromComps` of the ten shifted CRT components.  This section closes the remaining gap to
+the engine: `costFromComps = exCost`, given that each component's `.val` matches the engine
+cell `gadd (seam offset) (Γ-pair)` at every `Z₂²` slot.  The proof is pure `wt5`/sum algebra
+(`gadd = fadd` on vals, `wt5OfComps = wt5N`, the four-layer sum); the val-equalities are the
+offData (per-orbit) and Γ-membership (per-`f`) facts, discharged downstream. -/
+
+/-- Nat slot index of a `Z₂²` layer (`allS` order): `(0,0)↦0,(1,0)↦1,(0,1)↦2,(1,1)↦3`. -/
+def natslot (s : ZMod 2 × ZMod 2) : Nat := s.1.val + 2 * s.2.val
+
+/-- `gadd` (Nat xor) on `.val`s agrees with `fadd` (F₄ add). -/
+theorem gadd_eq_fadd : ∀ a b : Fin 4, gadd a.val b.val = (fadd a b).val := by decide
+
+/-- `wt5OfComps` (Fin 4) `=` `wt5N` on the underlying `.val`s. -/
+theorem wt5OfComps_eq_wt5N (v0 v1 v2 v3 v4 : Fin 4) :
+    wt5OfComps v0 v1 v2 v3 v4 = wt5N v0.val v1.val v2.val v3.val v4.val := rfl
+
+/-- Sum over the four `Z₂²` layers as an explicit four-term sum (`allS` order). -/
+theorem sum_zmod2sq (g : ZMod 2 × ZMod 2 → Nat) :
+    ∑ s : ZMod 2 × ZMod 2, g s = g (0,0) + g (1,0) + g (0,1) + g (1,1) := by
+  rw [show (Finset.univ : Finset (ZMod 2 × ZMod 2)) = {(0,0),(1,0),(0,1),(1,1)} from by decide,
+    Finset.sum_insert (by decide), Finset.sum_insert (by decide),
+    Finset.sum_insert (by decide), Finset.sum_singleton]
+  ring
+
+theorem natslot00 : natslot (0,0) = 0 := by decide
+theorem natslot10 : natslot (1,0) = 1 := by decide
+theorem natslot01 : natslot (0,1) = 2 := by decide
+theorem natslot11 : natslot (1,1) = 3 := by decide
+
+/-- **The chain-weight bridge**: `costFromComps` of ten ring components equals `exCost` of
+the engine, given each component's `.val` matches the engine cell `gadd (offset) (Γ-pair)` at
+every slot.  Pure sum/`wt5` algebra; the val-equalities bundle offData + Γ-membership. -/
+theorem costFromComps_eq_exCost
+    (oL oR : Array Nat) (a0 a3 a4 k1 k2 : Nat)
+    (vL0 vL1 vL2 vL3 vL4 vR0 vR1 vR2 vR3 vR4 : Ring)
+    (hL0 : ∀ s, (vL0 s).val = gadd (ov oL 0 (natslot s)) (pv G0gen a0 (natslot s) 0))
+    (hL1 : ∀ s, (vL1 s).val = gadd (ov oL 1 (natslot s)) (pv F1gen k1 (natslot s) 0))
+    (hL2 : ∀ s, (vL2 s).val = gadd (ov oL 2 (natslot s)) (pv F2gen k2 (natslot s) 0))
+    (hL3 : ∀ s, (vL3 s).val = gadd (ov oL 3 (natslot s)) (pv G3gen a3 (natslot s) 0))
+    (hL4 : ∀ s, (vL4 s).val = gadd (ov oL 4 (natslot s)) (pv G4gen a4 (natslot s) 0))
+    (hR0 : ∀ s, (vR0 s).val = gadd (ov oR 0 (natslot s)) (pv G0gen a0 (natslot s) 1))
+    (hR1 : ∀ s, (vR1 s).val = gadd (ov oR 1 (natslot s)) (pv F1gen k1 (natslot s) 1))
+    (hR2 : ∀ s, (vR2 s).val = gadd (ov oR 2 (natslot s)) (pv F2gen k2 (natslot s) 1))
+    (hR3 : ∀ s, (vR3 s).val = gadd (ov oR 3 (natslot s)) (pv G3gen a3 (natslot s) 1))
+    (hR4 : ∀ s, (vR4 s).val = gadd (ov oR 4 (natslot s)) (pv G4gen a4 (natslot s) 1)) :
+    costFromComps vL0 vL1 vL2 vL3 vL4 vR0 vR1 vR2 vR3 vR4 = exCost oL oR a0 a3 a4 k1 k2 := by
+  unfold costFromComps
+  rw [sum_zmod2sq]
+  simp only [wt5OfComps_eq_wt5N, hL0, hL1, hL2, hL3, hL4, hR0, hR1, hR2, hR3, hR4,
+    natslot00, natslot10, natslot01, natslot11]
+  unfold exCost exCell
+  ring
 
 end Quantum.Stabilizer.Homological.BB.LightStab
