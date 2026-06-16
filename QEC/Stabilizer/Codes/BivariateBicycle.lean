@@ -11,6 +11,7 @@ import QEC.Stabilizer.Codes.BivariateBicycle.StabilizerCode
 import QEC.Stabilizer.Codes.BivariateBicycle.LightStab
 import QEC.Stabilizer.Codes.BivariateBicycle.LightStabClassify
 import QEC.Stabilizer.Codes.BivariateBicycle.MImClassify
+import QEC.Stabilizer.Codes.BivariateBicycle.MImFloor
 
 /-!
 # Bivariate bicycle codes
@@ -45,7 +46,13 @@ code and its `[[72, 12, 6]]` base, related by a 2:1 covering:
 - `MImClassify`   — the safe-sector confined-frame floor (A4 §§9–13) toward
                     discharging `MImBound`: the weight join (`chainWeight` as a
                     per-block per-layer sum), the coset parity, and the `ker ∂₂`
-                    basis with M-VANISH (`off₀ = off₂ = 0`). Work in progress.
+                    basis with M-VANISH (`off₀ = off₂ = 0`), the closed weight
+                    form (`costFromComps`), and the coset `f`-dependence. WIP.
+- `MImFloor`      — the native-decidable confined-floor engine: the Nat-encoded
+                    per-cell cost and the slab-min/relaxed soundness keystones
+                    (`cellMin_le`, `d3_le`) underpinning the `floorOK` two-phase
+                    decision (validated `true` for all five orbits). WIP toward
+                    `mimBound_holds`.
 
 The full `StabilizerCode` packaging is complete and the A4 §6.3 classification
 hypothesis is discharged in `LightStabClassify`, leaving `MImBound` (A4 Part II
