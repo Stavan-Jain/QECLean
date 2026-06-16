@@ -28,8 +28,10 @@ is **`[[336,12,12]]`**: its distance is exactly
 
     d(x-cover) = 12 = 2 · d(base),
 
-verified by exact SAT (UNSAT through weight 11, SAT at 12). The y-cover over `Z₆ × Z₂₈`
-likewise has `d ≥ 7` (a doubling effect; exact value not pushed).
+verified by exact SAT (UNSAT through weight 11, SAT at 12). The **y-cover** over
+`Z₆ × Z₂₈` (same `A, B`, deck `y ↦ y+14`) is **also `[[336,12,12]]` with `d = 12`**
+(SAT-exact, UNSAT through 11). So **both** free-ℤ₂ covers of the base double — and both
+carry the (R) null-homotopy (§4.1).
 
 **Why it matters.** This is the **first** evidence that the gross "confined-frame
 collapse" doubling (A4: `d(gross) = 2·d(base) = 12`) is **not specific to gross's
@@ -114,9 +116,12 @@ in-process, no proofs) on `d_X` (= `d_Z` by the BB inversion duality):
     w ≤ 6  UNSAT (2.5s)   w ≤ 11 UNSAT
     w ≤ 7  UNSAT (5.6s)   w = 12 SAT     ⟹  d(x-cover) = 12.
 
-So `d(x-cover) = 2·d(base)`, the gross value, over a different group. (The earlier
-worry that the [[336]] UNSAT direction would hang was unfounded — the in-process pysat
-path resolves each weight in seconds to a few minutes.)
+So `d(x-cover) = 2·d(base)`, the gross value, over a different group. The **y-cover**
+(over `Z₆ × Z₂₈`, deck `y ↦ y+14`) is exact `d = 12` as well (UNSAT through 11, SAT at
+12; the w≤11 UNSAT took ~43 min, the longest single call). So both free-ℤ₂ cover
+directions double. (The earlier worry that the [[336]] UNSAT direction would hang was
+unfounded — the in-process pysat path resolves each weight in seconds to ~tens of
+minutes.)
 
 ---
 
@@ -144,12 +149,16 @@ The gross proof (A4 §§5–13) forces **both** homological sectors of `H₁(cov
 
 Two of these deserve a line of proof.
 
-**The (R) null-homotopy is verbatim.** `B² = (1+x+x²y⁷)² = 1 + x² + x⁴y¹⁴ = 1 + x² + x⁴`
-because `y¹⁴ = 1` (the y-axis has order 14 in both base and cover). Then
-`(1+x²)·B² = (1+x²)(1+x²+x⁴) = 1 + x⁶` as a polynomial. In the cover ring (x of order
-12, `x⁶ ≠ 1`) this is the nontrivial null-homotopy generator `z = (1+x²)·B·v_L` with
-`∂₂ z = v + σv`, giving `σ_* = id` and hence `im p_* ⊆ ker τ_* = im Δ` — the safe sector
-sees only the Smith classes. Gross uses the identical identity via `y⁶ = 1`.
+**The (R) null-homotopy transfers for BOTH covers.** *x-cover:*
+`B² = (1+x+x²y⁷)² = 1 + x² + x⁴y¹⁴ = 1 + x² + x⁴` because `y¹⁴ = 1` (the y-axis has order
+14 in base and x-cover). Then `(1+x²)·B² = (1+x²)(1+x²+x⁴) = 1 + x⁶` as a polynomial; in
+the cover ring (x of order 12, `x⁶ ≠ 1`) this is the null-homotopy generator
+`z = (1+x²)·B·v_L` with `∂₂ z = v + σv`, giving `σ_* = id` and `im p_* ⊆ ker τ_* = im Δ`.
+Gross uses the identical identity via `y⁶ = 1`. *y-cover:* by the x↔y symmetry, `A` is the
+relevant polynomial — `A² = (1+y+x³y³)² = 1 + y² + x⁶y⁶ = 1 + y² + y⁶` (x-free, since
+`x⁶ = 1` on the Z₆ x-axis) — and `1 + y¹⁴` factors as `(1+y²+y⁴+y⁸)·A²` (a weight-4
+multiplier rather than the x-cover's weight-2 `1+x²`, but a genuine factorization). So the
+y-cover carries the same (R) reduction; its safe sector also sees only the Smith classes.
 
 **The confinement is field-independent.** The radical of `F_q[Z₂²] = F_q[X,Y]/(X²,Y²)`
 is `(X,Y)`, and for any `D ∈ (X,Y)`, `D² = 0` in characteristic 2 regardless of `q`
@@ -237,12 +246,14 @@ Smith domain, confinement, one-sided floor (analytic / structural); the dangerou
 **Open:**
 1. The safe-sector confined floor over `Z₃ × Z₇` — re-derive the slot-cost walk and the
    achiever-kill with the heterogeneous dictionary (8/12/14). The single missing piece
-   of a full analytic `d(x-cover) = 12`.
-2. The y-cover `Z₆ × Z₂₈` exact distance (only `≥ 7` checked).
-3. Test the conjecture on the `Z₆ × Z₁₈` k=12 anchorable codes (SAT their covers).
-4. A presentation-free analytic argument for `m(weight-8) ≥ 2` (off the critical path,
+   of a full analytic `d(cover) = 12` (applies to both cover directions).
+2. Test the conjecture on the `Z₆ × Z₁₈` k=12 anchorable codes (SAT their covers).
+3. A presentation-free analytic argument for `m(weight-8) ≥ 2` (off the critical path,
    since the class is non-binding, but it would make the dangerous-sector write-up
    self-contained without the constrained SAT).
+
+**Resolved since first draft:** the y-cover `Z₆ × Z₂₈` is exact `d = 12` (both cover
+directions double), and its (R) homotopy transfers (§4.1).
 
 ---
 
