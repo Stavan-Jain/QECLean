@@ -2953,7 +2953,9 @@ theorem grossStabilizerCode_logical_weight_ge_6
 /-- **`HasCodeDistance grossStabilizerCode 12`**, conditional only on `MImBound`.
 The `LightStabilizerClassification` input (`hC`) is discharged by
 `LightStab.lightStabilizerClassification_holds`; everything else — the packaging and
-the chain-level distance — is unconditional. -/
+the chain-level distance — is unconditional.  `MImBound` itself is discharged in
+`MImAssembly` (`LightStab.mimBound_holds`); for the fully unconditional statement see
+`grossStabilizerCode_hasCodeDistance_12_uncond` there. -/
 theorem grossStabilizerCode_hasCodeDistance_12 (hMim : MImBound) :
     HasCodeDistance grossStabilizerCode 12 := by
   have hleast := gross_pauli_distance_eq_12_of_engine

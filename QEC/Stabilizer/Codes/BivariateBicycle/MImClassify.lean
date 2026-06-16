@@ -1,21 +1,39 @@
 /-
-# Phase 6: discharging `MImBound` — the safe-sector confined-frame floor
+# Phase 6: reducing `MImBound` to the confined-frame floor (§§0–7)
 
-`MImBound` (`SafeSector.lean`, A4 Part II / Theorem D) is the last assumed `Prop`
-for an unconditional `d(gross) = 12`: every base 1-cycle in a nonzero Smith class
-`[seamC ζ]` (`ζ ∈ ker ∂₂`) has weight ≥ 12.  The paper proof is the confined-frame
-collapse of A4 §§9–13; this module formalizes it, reusing the CRT frame
-(`CRTFrame.lean`) and the layer/Fourier machinery built for the dangerous sector
-(`LightStab.lean`).
+`MImBound` (`SafeSector.lean`, A4 Part II / Theorem D) was the last assumed `Prop` for an
+unconditional `d(gross) = 12`: every base 1-cycle in a nonzero Smith class `[seamC ζ]`
+(`ζ ∈ ker ∂₂`) has weight ≥ 12, even though the base `[[72,12,6]]` code has distance only 6.
 
-## Structure
+This module performs the **algebraic reduction**: it rewrites the coset weight
+`chainWeight (seamC ζ + ∂₂ f)` into the closed `costFromComps` form that the native-decidable
+floor engine consumes.  The discharge is then completed downstream — `MImClassify` (reduction)
+→ `MImFloorData` / `MImFloor` (engine + soundness) → `MImMembership` (Γ-membership + the
+general per-orbit floor) → `MImTransport` (the y-translation symmetry) → `MImFloorY0..Y12`
+(the 13 y-orbit-rep floors) → `MImAssembly` (`mimBound_holds`, and the unconditional distance
+theorem).  Reuses the CRT frame (`CRTFrame.lean`) and the layer/Fourier machinery built for
+the dangerous sector (`LightStab.lean`).
 
-* **§0 weight join** — `chainWeight w = bwt (leftHalf w) + bwt (rightHalf w)`
-  and its layer-sum corollary, bridging the noncomputable `bb72Complex.chainWeight`
-  to the per-block, per-`Z₂²`-layer `weight3 (slice …)` decomposition that the
-  CRT frame bounds.  (This is the "join" the route hinges on; it is structural,
-  not a research item, because `seamC ζ + ∂₂ f` is a base 1-chain and `weight_bridge`
-  already decomposes a block over its `Z₂²` layers.)
+## Structure (the section numbers track A4 §§9–13)
+
+* **§0 weight join** — `chainWeight w = bwt (leftHalf w) + bwt (rightHalf w)` and its layer-sum
+  corollary, bridging the noncomputable `bb72Complex.chainWeight` to the per-block, per-`Z₂²`-
+  layer `weight3 (slice …)` decomposition.  (The "join" the route hinges on; structural, since
+  `seamC ζ + ∂₂ f` is a base 1-chain and `weight_bridge` already decomposes a block.)
+* **§2 `ker ∂₂` basis, spanning, M-VANISH** — the systematic basis `kb0..kb5`, `kerBasis_spans`
+  (every `ζ ∈ ker ∂₂` is reconstructed from its six free-cell coordinates via `recon`/`kcombo`),
+  and A4 §9.4 Sharpening 1, `off_vanish` (CRT components 0 and 2 of `seamC ζ` vanish).
+* **§2b coset block decomposition** — `leftHalf_coset`/`rightHalf_coset`: the coset splits as
+  the seam profile plus `A⋆f` / `B⋆f`.
+* **§3 coset CRT profile** — `Vcoset_L0..R4`: `Vⱼ(coset) = offⱼ(ζ) ⊕ P̂ⱼ · Vⱼ f` (the
+  `f`-dependence, via `V_add` and the engine multipliers `Ahat1`/`Ahat4`/`Bhat2`/`unitHat`).
+* **§5 exact per-slot weight** — `weight3_eq_wt5` (the Fourier bijection on `Z₃²`): `weight3`
+  is an EXACT function of the five CRT components (`WT5_TABLE`, `native_decide`).
+* **§6 closed weight form** — `chainWeight_eq_costFromComps`: `chainWeight` as the `Z₂²`-slot
+  sum of the ten CRT components' `wt5OfComps`.
+* **§7 coset weight in component form** — `chainWeight_coset_eq`: composes §6 with §3 to write
+  the coset weight as `costFromComps` of `shifted (seam offset) multiplier (Vⱼ f)` — the exact
+  input the floor engine ranges over.
 
 ## Convention bridge (lab notes → repo)
 
@@ -82,23 +100,6 @@ theorem chainWeight_eq_layer_sum (w : BaseGroup × Fin 2 → ZMod 2) :
         + (∑ s : ZMod 2 × ZMod 2, weight3 (slice (rightHalf w) s)) := by
   rw [chainWeight_eq_bwt_blocks, weight_bridge, weight_bridge]
 
-/-! ## §1 Parity: every Smith-coset element has even weight
-
-The coset element `seamC ζ + ∂₂ f` is a base 1-cycle (`seamC_mem_cycles` puts
-`seamC ζ` in cycles; `∂₂ f` is a boundary, hence a cycle), so it has even weight
-(A4 §9.3 (PAR)).  Combined with the §§11–13 floor of ≥ 10 and the §13 kill of the
-weight-10 achievers, evenness lifts the bound to ≥ 12 on the wt-16/18 orbits. -/
-
-/-- Every Smith-coset element is a base 1-cycle, hence has even chain weight. -/
-theorem coset_weight_even (ζ f : BaseGroup → ZMod 2)
-    (hζ : bbBoundary2Fn baseA baseB ζ = 0) :
-    Even (bb72Complex.chainWeight (seamC ζ + bbBoundary2Fn baseA baseB f)) := by
-  have hbd : bbBoundary2Fn baseA baseB f ∈ bb72Complex.boundaries := ⟨f, rfl⟩
-  have hcyc : seamC ζ + bbBoundary2Fn baseA baseB f ∈ bb72Complex.cycles :=
-    Submodule.add_mem _ (seamC_mem_cycles hζ) (bb72Complex.boundaries_le_cycles hbd)
-  rw [bb72Complex_chainWeight_eq, Nat.even_iff]
-  exact cycle_weight_even _ hcyc
-
 /-! ## §2 The `ker ∂₂` basis, spanning, and M-VANISH (A4 §9.3–§9.4)
 
 `ker ∂₂ = {ζ : conv baseA ζ = 0 ∧ conv baseB ζ = 0}` is 6-dimensional (64 elements,
@@ -129,8 +130,6 @@ def kb4 : BaseGroup → ZMod 2 :=
 def kb5 : BaseGroup → ZMod 2 :=
   mkZeta [(0,0),(0,2),(1,2),(1,3),(1,4),(1,5),(2,0),(2,1),(2,2),
           (2,3),(3,1),(3,2),(3,3),(3,4),(4,1),(4,3),(5,1),(5,5)]
-
-def freeCells : List BaseGroup := [(4,4),(4,5),(5,2),(5,3),(5,4),(5,5)]
 
 -- 324 (out, in, block) factorization entries
 def cPairs : List (BaseGroup × BaseGroup × Fin 2) :=
@@ -342,55 +341,12 @@ theorem Vcoset_R4 : V psi4 s (rightHalf (seamC ζ + bbBoundary2Fn baseA baseB f)
     = fadd (V psi4 s (rightHalf (seamC ζ))) (rmul Bhat2 (fun s' => V psi4 s' f) s) := by
   rw [rightHalf_coset, V_add, mult_B4]
 
-/-! ## §4 The per-slot floor: a comprehensive d₃ table (A4 §10.2 input)
-
-The §10 slot frame bounds each `Z₂²`-layer's weight by the d₃ cost of its `Z₃²`-torus
-Fourier-support pattern.  `oneBlock_core` (`LightStab`) used three hand-picked patterns
-(`d3_psi1/3_ge6`, `d3_psi1or3_ge4`); the safe-sector orbits exercise the full range, so we
-tabulate the d₃ lower bound for **all 32** support patterns (`dlbTable`, `native_decide` over
-the 512 layers) and phrase it on a block-slice in terms of the CRT components `V psiⱼ` that
-the §3 f-dependence produces. -/
-
-/-- 5-bit Fourier-support pattern of a torus layer (chars ψ₀..ψ₄). -/
-def suppPat (g : ZMod 3 × ZMod 3 → ZMod 2) : Nat :=
-  (if fhat3 g (0,0) ≠ 0 then 1 else 0) + (if fhat3 g (0,1) ≠ 0 then 2 else 0) +
-  (if fhat3 g (1,0) ≠ 0 then 4 else 0) + (if fhat3 g (1,1) ≠ 0 then 8 else 0) +
-  (if fhat3 g (1,2) ≠ 0 then 16 else 0)
-
-/-- d₃ lower bound per support pattern (`P = 0..31`): the minimum `weight3` over nonzero
-torus layers whose Fourier support is `⊆ P`. -/
-def dlbTable : Array Nat :=
-  #[0,9,6,3,6,3,4,3,6,3,4,3,4,3,2,2,6,3,4,3,4,3,2,2,4,3,2,2,2,2,2,1]
-
-/-- **Comprehensive d₃ table** (generalizes `d3_psi1_ge6`/`d3_psi3_ge6`/`d3_psi1or3_ge4`):
-every nonzero torus layer has weight ≥ the table value of its support pattern. -/
-theorem d3_table : ∀ g : ZMod 3 × ZMod 3 → ZMod 2, g ≠ 0 →
-    dlbTable.getD (suppPat g) 0 ≤ weight3 g := by
-  native_decide
-
-/-- The support pattern of a block's slice, in terms of the CRT components `V psiⱼ`. -/
-def Vpat (b : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) : Nat :=
-  (if V psi0 s b ≠ 0 then 1 else 0) + (if V psi1 s b ≠ 0 then 2 else 0) +
-  (if V psi2 s b ≠ 0 then 4 else 0) + (if V psi3 s b ≠ 0 then 8 else 0) +
-  (if V psi4 s b ≠ 0 then 16 else 0)
-
-theorem Vpat_eq_suppPat (b : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) :
-    Vpat b s = suppPat (slice b s) := by
-  unfold Vpat suppPat
-  rw [fourier_bridge0, fourier_bridge1, fourier_bridge2, fourier_bridge3, fourier_bridge4]
-
-/-- **Per-slice floor**: a nonzero block-slice has weight ≥ the d₃-table value of its
-CRT-component support pattern. -/
-theorem slice_floor (b : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) (h : slice b s ≠ 0) :
-    dlbTable.getD (Vpat b s) 0 ≤ weight3 (slice b s) := by
-  rw [Vpat_eq_suppPat]; exact d3_table _ h
-
 /-! ## §5 The exact per-slot weight (the Fourier bijection)
 
 The torus-Fourier map `g ↦ (V₀,…,V₄)` is a BIJECTION on the 512 layers (Z₃² is
-coprime to char 2), so `weight3` is an EXACT function of the 5 CRT components — upgrading
-the d₃ table (§4) from an inequality to an equality `weight3 (slice b s) = wt5OfComps (V ψⱼ s b)`.
-This is the form the §10 slot frame minimizes over the coset's free data. -/
+coprime to char 2), so `weight3` is an EXACT function of the 5 CRT components:
+`weight3 (slice b s) = wt5OfComps (V ψⱼ s b)`.  This exact per-slot weight is what the
+confined-floor engine (`MImFloor`) minimizes over the coset's free data. -/
 
 /-- The exact weight of a torus layer as a function of its 5 CRT-Fourier components
 (`v₀ ∈ {0,1}`; index `v₀ + 2·(v₁ + 4·(v₂ + 4·(v₃ + 4·v₄)))`). -/
