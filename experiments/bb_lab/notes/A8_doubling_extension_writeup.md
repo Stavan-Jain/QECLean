@@ -289,10 +289,14 @@ are SAT-confirmed).
 1. The safe-sector confined floor over `Z₃ × Z₇` — re-derive the slot-cost walk and the
    achiever-kill with the heterogeneous dictionary (8/12/14). The main missing piece
    of a full analytic `d(cover) = 12` (applies to both cover directions).
-2. **Test the conjecture on the `Z₆ × Z₁₈` k=12 anchorable codes.** The adversarial review
-   found **324** Z₆×Z₁₈ codes satisfying *all* hypotheses (k=12, dim ker∂₂=6, the squaring
-   identity with B's y-exponent = 9) but did not finish SAT-ing their covers — this is the
-   live falsification probe (if any such cover has a weight-≤6 logical, the conjecture dies).
+2. **Confirm the doubling value on `Z₆ × Z₁₈` (conjecture survives the falsification probe).**
+   The hunt has hundreds of Z₆×Z₁₈ codes satisfying *all* hypotheses (k=12, dim ker∂₂=6, the
+   squaring identity); 6 clean ones with `d(base)=6` were probed and **every x-cover
+   (Z₁₂×Z₁₈, n=432) has `d > 7`** (UNSAT ≤7) — no low-weight logical, consistent with
+   doubling to 12 (a weight-≤7 cover logical would have *killed* the conjecture; none found).
+   This is a *necessary-condition* pass, not full confirmation: pinning `d(cover)=12` needs
+   the ~40-min UNSAT-to-11 ladder per candidate, still TODO. So the conjecture now has 3
+   supporting groups (gross, Z₆×Z₁₄ at d=12 exact, Z₆×Z₁₈ at d>7) and zero counterexamples.
 3. A presentation-free analytic argument for `m(weight-8) ≥ 2` (off the critical path,
    since the class is non-binding — SAT gives `m ≥ 8` — but it is the lone dangerous-sector
    rung without a clean analytic lower bound, because the class is global).
