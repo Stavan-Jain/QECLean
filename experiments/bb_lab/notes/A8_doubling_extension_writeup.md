@@ -1,13 +1,17 @@
 # The d=12 doubling mechanism extends beyond gross: a [[336,12,12]] BB code over Z₃×Z₇
 
-> **STATUS.** The distance value `d=12` is **SAT-exact** (computational, load-bearing).
-> The *mechanism* — why the cover doubles — is given an **analytic account**: the
-> cover-split skeleton, the (R) null-homotopy, the Smith-class domain, the
-> confinement, and the entire **dangerous sector** transfer from / re-derive over the
-> new group; the **safe-sector confined floor** is the single piece still developed
-> only computationally. This note is the honest write-up of that state. It is NOT a
-> claim of "fully analytic d=12" for this code (the A4 §0 bar) — it is "verified value
-> + analytic mechanism modulo one sector."
+> **STATUS.** The distance value `d=12` (both covers) is **SAT-exact** (computational,
+> load-bearing). The *mechanism* — why the cover doubles — is given a partial **analytic
+> account**: the cover-split and the (R) null-homotopy transfer; the dangerous sector is
+> `≥ 12` binding at `b = 0`, with the `b=0`/hexagon/D-pair (M) lower bounds transferring
+> analytically from gross (the *achieved* minima, and the new weight-8 rung, are
+> SAT-confirmed only). The Smith-class domain matches gross in *dimension* but not
+> structure; the confinement transfers only as a char-2 skeleton. The **safe-sector
+> confined floor** over Z₃×Z₇ is the main piece still developed only computationally. This
+> is NOT "fully analytic d=12" (the A4 §0 bar) — it is "verified value + a partial analytic
+> mechanism." See §6 for the exact open list. *(This draft was hardened by an adversarial
+> review that corrected an earlier overclaim — the dangerous rungs reach 16/20/≥24, not 12;
+> only `b=0` binds.)*
 
 Source session artifacts: tool `scripts/a5_cover_cascade.py` (commit `73008c9`),
 memory `bb-cover-cascade`. Companion: `A4_writeup.md` (the gross proof this extends),
@@ -42,12 +46,15 @@ F₄-specific "co-point rigidity" engine does **not** apply — yet the doubling
 holds. The mechanism is more robust than the gross machinery that proves it.
 
 **Analytic status, sector by sector** (the body of this note):
-- The cover-split, the (R) null-homotopy, the 6-dimensional Smith-class domain, and the
-  ρ-link confinement all **transfer** (some verbatim, some by a field-independent
-  argument). The one-sided floor is *stronger* than gross's.
-- The **dangerous sector** `≥ 12` is **closed** (its binding rungs transfer; the one new
-  stabilizer class is shown non-binding).
-- The **safe-sector confined floor** `≥ 12` over `Z₃ × Z₇` is the single open piece.
+- The cover-split, the (R) null-homotopy, and the ρ-link confinement *skeleton* all
+  **transfer**. The Smith-class domain has the same *dimension* (6) but a different internal
+  structure; the one-sided floor is stronger on the A-side only.
+- The **dangerous sector** `≥ 12` holds, **binding uniquely at `b = 0`** (every nonzero
+  stabilizer clears 12 with margin — hexagon 16, D-pair 20, weight-8 ≥24). The `b=0`,
+  hexagon, and D-pair lower bounds transfer analytically from gross; the lone gap is a
+  presentation-free `m(weight-8) ≥ 2` (the new class is global, so gross's local argument
+  fails — but it is far from binding, so off the critical path).
+- The **safe-sector confined floor** `≥ 12` over `Z₃ × Z₇` is the main open piece.
 
 **Conjecture.** Every Z₂²-frame *anchorable* BB base (in the sense of A5: floor-bearing
 frame + multiplicity-free disjoint difference sets + mirrored projections) with
@@ -142,10 +149,26 @@ The gross proof (A4 §§5–13) forces **both** homological sectors of `H₁(cov
 |---|---|---|---|
 | Cover-split `\|v\|≥\|p(v)\|`, diagonal doubling | generic | generic | verbatim |
 | (R) null-homotopy `(1+x²)B² = 1+x⁶` | via `y⁶=1` | via `y¹⁴=1` | **verbatim** |
-| Smith domain `dim ker ∂₂ = dim(Ann A ∩ Ann B)` | 6 (63 classes) | **6 (63 classes)** | **identical** |
-| Confinement `ρ² = 0` | radical of F₄[Z₂²] | radical of F_q[Z₂²], any q | **field-independent** |
-| One-sided floor `μ(Ann A)` | 6 | **12** | stronger |
+| Smith domain `dim ker ∂₂ = dim(Ann A ∩ Ann B)` | 6 (63 classes) | **6 (63 classes)** | **dimension only** (†) |
+| Confinement `ρ² = 0` | radical of F₄[Z₂²] | radical of F_q[Z₂²], any q | **field-independent** (‡) |
+| One-sided floor `μ(Ann A)` | 6 | **12** | stronger on the A-side only (§) |
 | Target value | 12 | 12 (SAT) | — |
+
+(†) **Only the dimension (6) and class count (63) match — the *structure* does NOT.**
+The new code's nonzero `ker ∂₂` elements have weight multiset **{32:21, 48:42}** in **3
+translation orbits of size 21**, versus gross's **{16:9, 18:48, 24:6}** in **5 orbits**
+(sizes 9,12,36,3,3). The weights are roughly doubled but not cleanly (no 36-analogue, no
+18-analogue). So the safe-sector *domain* has the same dimension to analyze, but a different
+internal structure — consistent with the confined-floor dictionary being different (§4.3).
+
+(‡) Correct but only the *skeleton*: `ρ²=0` is a formal char-2 fact and transfers to any
+F_q, but the confined floor also needs the *value-rigidity* of the components, which IS
+field-specific (F₄'s "one zero + three distinct values" fails over F₈/F₆₄). `ρ²=0` alone
+does not reach 12; it is necessary, not sufficient.
+
+(§) Asymmetric: `μ(Ann A) = 12` but `μ(Ann B) = 6` (same as gross's 6). The safe-sector
+floor uses the A-side, so "stronger" holds where it's used, but the one-sided floor is not
+uniformly stronger.
 
 Two of these deserve a line of proof.
 
@@ -167,39 +190,57 @@ that drive the confined floor satisfy `ρ_i² = 0` over `F₈`/`F₆₄` exactly
 The radical *skeleton* of the confined frame transfers; only the value-rigidity (used by
 the weight dictionary) is F₄-specific.
 
-### 4.2 The dangerous sector — closed
+### 4.2 The dangerous sector — ≥ 12, binding only at `b = 0`
 
 The light-stabilizer classification, verified computationally complete through weight 11
-(SAT-enumerate `rowspan(H_Z)` via `v = x·H_Z`; parity kills odd weights):
+(SAT-enumerate `rowspan(H_Z)` via `v = x·H_Z`; parity kills odd weights), is
 
-| Class | count | structure | m-rung | `\|b\|+2m` |
-|---|---|---|---|---|
-| `b = 0` | — | — | `m ≥ 6` | 12 |
-| hexagon (wt 6) | 84 | `∂₂δ_g`, **local** | `m ≥ 3` | **12** |
-| D-pair (wt 10) | 504 | `∂₂(δ_g+δ_{g+d})`, **local** | `m ≥ 1` | **12** |
-| weight-8 | 21 (1 orbit) | **global** (NEW) | `m ≥ 3` | 14 |
-| `\|b\| ≥ 12` | — | — | `m ≥ 0` | ≥12 |
+    84 hexagons (wt 6, μ_Z = 6)  +  21 weight-8 (one orbit, NEW)  +  504 D-pairs (wt 10)
 
-- `μ_Z = 6`; the 84 weight-6 stabilizers are exactly the hexagons, the 504 weight-10
-  exactly the D-pairs — the **binding** rungs, both giving exactly 12. They are *local*
-  (hexagon support 6, D-pair support/union 11), so the gross m-rung bounds
-  (`m(hexagon) ≥ 3`, `m(D-pair) ≥ 1`) — which are the generic coset-counting arguments
-  depending only on Theorem A (`d(base) = 6` ⟹ no base cycle of weight ≤ 5) — **transfer
-  verbatim**.
-- **The new class.** `dA ∩ dB = ∅` forces every *pairwise* hexagon sum to weight 10 or
-  12, never 8. So the 21 weight-8 stabilizers (one translation orbit) are **not** local
-  pairwise objects: each has minimum decomposition **36 hexagons** with hexagon-union
-  `U = 110` of 168 cells. The gross local coset m-rung (which needs `U ≤ 9`) is therefore
-  hopeless for them. **But** a constrained cover-SAT — the minimum-weight dangerous
-  logical `v` with `p(v) = b` — returns `|v| > 12`, i.e. `m(weight-8) ≥ 3` and a
-  contribution `8 + 2·3 = 14 > 12`. The resolution is structural: the very *globalness*
-  that breaks the local argument is exactly why `m` is large — a dangerous logical
-  projecting to a spread-out stabilizer must itself be heavy. The weight-8 class is
-  **non-binding** and harmless. (By the single orbit + seam-transport covariance, `m ≥ 3`
-  for all 21.)
+with nothing else at weight ≤ 11. The factor-2 lemma `(M)` needs `|b|+2m(b) ≥ 12` for every
+`b`. Two columns must NOT be conflated — the (M) *lower bound* that proves ≥12, and the
+*achieved* dangerous minimum (the actual min-weight dangerous logical projecting to `b`,
+from constrained cover-SAT; an earlier draft of this note wrongly reported the lower bound
+as the achieved value):
 
-Net: the dangerous sector `≥ 12` rests on the binding hexagon/D-pair rungs, which
-transfer from gross; the one genuinely new feature is confirmed off the critical path.
+| Class | count | (M) lower bound | **achieved** `\|b\|+2m` (SAT) |
+|---|---|---|---|
+| `b = 0` (diagonal) | — | `m ≥ 6` → ≥12 | **12** ← the UNIQUE binding rung |
+| hexagon (wt 6) | 84 | `m ≥ 3` → ≥12 | 16 (`m = 5`) |
+| D-pair (wt 10) | 504 | `m ≥ 1` → ≥12 | 20 (`m = 5`) |
+| weight-8 | 21 (1 orbit) | `m ≥ 2` → ≥12 | ≥24 (`m ≥ 8`) |
+| `\|b\| ≥ 12` | — | `m ≥ 0` → ≥12 | ≥12 |
+
+So the dangerous-sector minimum is **exactly 12, achieved uniquely at `b = 0`** — the
+diagonal `τ(u*)` of a weight-6 base logical `u*`, i.e. the doubling tightness witness. Every
+*nonzero* stabilizer clears 12 with large margin (16 / 20 / ≥24). This mirrors gross, whose
+own `b≠0` dangerous minimum is **14**, not 12 (A4 Appendix A): the hexagon/D-pair rungs are
+*not* binding in either code.
+
+- **What's analytic.** The (M) lower bounds `m(hexagon) ≥ 3`, `m(D-pair) ≥ 1`, `m(0) ≥ 6`
+  are the gross coset-counting arguments; they depend on Theorem A (`d(base)=6` ⟹ no base
+  cycle of weight ≤5) plus the *geometry* `|hexagon| = 6`, `|D-pair union| = 11`, which is
+  identical in the new code. These **transfer** (not *purely* "given Theorem A" — they also
+  use the support shapes, which happen to match). Together they prove dangerous ≥ 12.
+- **The new class is non-binding, but its rung is the one analytic gap.** `dA ∩ dB = ∅`
+  forces pairwise hexagon sums to weight 10 or 12, never 8, so the 21 weight-8 stabilizers
+  (one orbit) are **global**: minimum decomposition **36 hexagons**, hexagon-union `U = 110`
+  of 168 cells. The gross *local* coset m-rung (which needs `U ≤ 9`) is hopeless for them,
+  so there is no clean analytic `m(weight-8) ≥ 2`. Computationally it is far from binding
+  (achieved `m ≥ 8`, contribution ≥24) — the very globalness that defeats the local argument
+  forces `m` large — so it is off the critical path for the ≥12 bound, but a presentation-
+  free `m(weight-8) ≥ 2` remains open (§6).
+- **Reproduction caveat (a documentation defect this review caught).** Measuring the
+  achieved minima by constrained cover-SAT requires applying the BB inversion duality `Φ`
+  (Lemma 2.1) to carry the stabilizer `b` into `ker(H_Z)` *before* fixing `p(v) = b`. A
+  same-side reading is structurally UNSAT for every `b ≠ 0` (a `Z`-stabilizer `b` lives in
+  `ker H_X`, while `p(v)` always lands in `ker H_Z`); the `b=0` control is satisfiable either
+  way and returns 12, which is what validates the encoding.
+
+Net: the dangerous sector `≥ 12` is binding only at `b = 0` (the diagonal, analytic via
+Theorem A); the hexagon/D-pair lower bounds transfer from gross and clear 12 with margin;
+the one genuinely new feature (weight-8) is confirmed off the critical path but lacks a
+clean analytic lower bound.
 
 ### 4.3 The safe sector — the open core
 
@@ -239,18 +280,22 @@ analytic."
 
 ## 6. Status and next steps
 
-**Established:** `d(base) = 6` and `d(x-cover) = 12` (SAT-exact); the cover-split, (R),
-Smith domain, confinement, one-sided floor (analytic / structural); the dangerous sector
-`≥ 12` (binding rungs transfer analytically; the new weight-8 class verified non-binding).
+**Established:** `d(base) = 6` and `d(both covers) = 12` (SAT-exact); the cover-split and the
+(R) homotopy (analytic); the dangerous sector `≥ 12` binding at `b = 0` (the `b=0`/hexagon/
+D-pair (M) lower bounds transfer analytically from gross; the achieved minima 12/16/20/≥24
+are SAT-confirmed).
 
 **Open:**
 1. The safe-sector confined floor over `Z₃ × Z₇` — re-derive the slot-cost walk and the
-   achiever-kill with the heterogeneous dictionary (8/12/14). The single missing piece
+   achiever-kill with the heterogeneous dictionary (8/12/14). The main missing piece
    of a full analytic `d(cover) = 12` (applies to both cover directions).
-2. Test the conjecture on the `Z₆ × Z₁₈` k=12 anchorable codes (SAT their covers).
+2. **Test the conjecture on the `Z₆ × Z₁₈` k=12 anchorable codes.** The adversarial review
+   found **324** Z₆×Z₁₈ codes satisfying *all* hypotheses (k=12, dim ker∂₂=6, the squaring
+   identity with B's y-exponent = 9) but did not finish SAT-ing their covers — this is the
+   live falsification probe (if any such cover has a weight-≤6 logical, the conjecture dies).
 3. A presentation-free analytic argument for `m(weight-8) ≥ 2` (off the critical path,
-   since the class is non-binding, but it would make the dangerous-sector write-up
-   self-contained without the constrained SAT).
+   since the class is non-binding — SAT gives `m ≥ 8` — but it is the lone dangerous-sector
+   rung without a clean analytic lower bound, because the class is global).
 
 **Resolved since first draft:** the y-cover `Z₆ × Z₂₈` is exact `d = 12` (both cover
 directions double), and its (R) homotopy transfers (§4.1).
@@ -277,10 +322,18 @@ gitignored and regenerate on demand.
 | `μ(Ann A) = 12` | `nullspace_f2(M_A)` + min-weight-in-basis |
 | light-stab classification (84 hex + 504 D-pair + 21 wt-8) | SAT-enumerate `rowspan H_Z` at each even weight ≤ 10 |
 | weight-8 globalness `r=36, U=110`, 1 orbit | GF(2) solve `x·H_Z=b` over the 64-coset; translation orbits |
-| `m(weight-8) ≥ 3` (`\|v\|>12`) | constrained cover-SAT: cover cycle, nontrivial, `p(v)=b`, min weight |
+| Smith-domain structure {32:21, 48:42}, 3 orbits | weights + translation orbits of nonzero `ker ∂₂` |
+| achieved dangerous minima (b=0→12, hex→16, D-pair→20, wt8→≥24) | constrained cover-SAT with the duality fix below |
 | dictionary `8/12/14` over Z₃×Z₇ | `layer_dictionary((3,7), orbit_fields((3,7)))` |
 
-The cover-SAT projection map (x-double): cover qubit `(blk, x', y')` ↦ base
+**The constrained cover-SAT (corrected encoding).** To find the min-weight dangerous logical
+projecting to a stabilizer `b`: constrain a cover `X`-logical `v` (`H_Z^cov v = 0`, nontrivial
+against `find_logical_z`), and fix `p(v) = Φ(b)` where `Φ` is the BB inversion duality
+(Lemma 2.1, `g ↦ −g`, swapping the L/R blocks) that carries the `Z`-stabilizer `b` (which
+lives in `ker H_X`) into `ker H_Z` so that `p(v)` can equal it. **Without `Φ` the constraint
+`p(v) = b` is UNSAT for every `b ≠ 0`** (type mismatch) — a defect in an earlier draft of
+this appendix that the adversarial review caught; the `b = 0` control is satisfiable either
+way and must return 12. Projection (x-double): cover qubit `(blk, x', y')` ↦ base
 `(blk, x' mod 6, y')`; the two cover preimages of base `(blk, x, y)` are `(x, y)` and
-`(x+6, y)` in the same block; `p(v) = b` is encoded as 168 constraints
-`XOR(v[p₀], v[p₁]) = b[q]`.
+`(x+6, y)` in the same block; `p(v) = Φ(b)` is encoded as 168 constraints
+`XOR(v[p₀], v[p₁]) = Φ(b)[q]`.
