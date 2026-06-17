@@ -5,6 +5,7 @@ import QEC.Stabilizer.Codes.Repetition
 import QEC.Stabilizer.Codes.Iceberg
 import QEC.Stabilizer.Codes.BivariateBicycle
 import QEC.Stabilizer.Codes.Small
+import QEC.Stabilizer.Codes.Concat
 
 /-!
 # Codes
