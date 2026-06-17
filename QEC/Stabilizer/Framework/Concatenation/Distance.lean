@@ -97,6 +97,20 @@ theorem concat_hasCodeDistance
   intro g hg hw
   exact D.weight_ge_d1_mul_d2 hindepCin h1 h2 g hg hw
 
+/-- **(M6, packaged.)** The concatenated code as a `StabilizerCodeWithDistance` — one object
+carrying all three `[[n₁ n₂, k₂, d₁ d₂]]` parameters in its type, combining `concatenate` with
+`concat_hasCodeDistance`. With this, any inner⊗outer instance becomes a first-class
+`[[n, k, d]]` code once its five inputs (independence, inner-row independence, inner/outer
+distances, and a `d₁·d₂`-weight witness) are discharged. -/
+noncomputable def concatenateWithDistance
+    (hindep : GeneratorsIndependent (n₁ * n₂) D.concatGeneratorsList)
+    (hindepCin : rowsLinearIndependent D.Cin.generatorsList)
+    {d₁ d₂ : ℕ} (h1 : HasCodeDistance D.Cin d₁) (h2 : HasCodeDistance D.Cout d₂)
+    (hwit : ∃ g, IsNontrivialLogicalOperator g D.concatStabGroup ∧ weight g = d₁ * d₂) :
+    StabilizerCodeWithDistance (n₁ * n₂) k₂ (d₁ * d₂) where
+  toStabilizerCode := D.concatenate hindep
+  hasDistance := D.concat_hasCodeDistance hindep hindepCin h1 h2 hwit
+
 end ConcatCSSData
 
 end Quantum.Concatenation

@@ -163,4 +163,11 @@ theorem steane422_hasCodeDistance_six :
     rowsLinearIndependent_generatorsList
     stabilizerCode_hasCodeDistance_three FourQubit_4_2_2.code_has_distance_two steane422_witness
 
+/-- **The Steane ⊗ [[4,2,2]] `[[28, 2, 6]]` code as a first-class `StabilizerCodeWithDistance`**
+(`k₂ = 2`), via the framework bundler `concatenateWithDistance`. -/
+noncomputable def steane422CodeWithDistance : StabilizerCodeWithDistance 28 2 6 :=
+  steane422Data.concatenateWithDistance steane422_generatorsIndependent
+    rowsLinearIndependent_generatorsList
+    stabilizerCode_hasCodeDistance_three FourQubit_4_2_2.code_has_distance_two steane422_witness
+
 end Quantum.StabilizerGroup.Steane7

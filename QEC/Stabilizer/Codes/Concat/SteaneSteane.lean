@@ -173,4 +173,11 @@ theorem steaneConcat_hasCodeDistance_nine :
     rowsLinearIndependent_generatorsList
     stabilizerCode_hasCodeDistance_three stabilizerCode_hasCodeDistance_three steaneConcat_witness
 
+/-- **The Steane ⊗ Steane `[[49, 1, 9]]` code as a first-class `StabilizerCodeWithDistance`** —
+all three parameters in its type, via the framework bundler `concatenateWithDistance`. -/
+noncomputable def steaneConcatCodeWithDistance : StabilizerCodeWithDistance 49 1 9 :=
+  steaneConcatData.concatenateWithDistance steaneConcat_generatorsIndependent
+    rowsLinearIndependent_generatorsList
+    stabilizerCode_hasCodeDistance_three stabilizerCode_hasCodeDistance_three steaneConcat_witness
+
 end Quantum.StabilizerGroup.Steane7
