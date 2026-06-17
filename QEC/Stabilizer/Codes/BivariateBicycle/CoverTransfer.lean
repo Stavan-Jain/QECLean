@@ -32,7 +32,7 @@ open scoped BigOperators
 -- Defeq checks through `fiberSum (Prod.map ⇑coverPi id)` (the `coverPush1`
 -- bridges and `change`-steps below) unfold deep `Prod`/`ZMod` instance
 -- chains and exceed the default recursion depth of 512.
-set_option maxRecDepth 4096
+set_option maxRecDepth 40000
 
 /-! ## Deck data on qubits (`C1 = GrossGroup × Fin 2`) -/
 
@@ -128,10 +128,10 @@ noncomputable def coverPull1 :
 /-! ## The polynomials descend -/
 
 theorem coverPush_grossA : fiberSumFn ⇑coverPi grossA = baseA := by
-  native_decide
+  decide
 
 theorem coverPush_grossB : fiberSumFn ⇑coverPi grossB = baseB := by
-  native_decide
+  decide
 
 /-! ## Chain maps -/
 

@@ -14,7 +14,8 @@ open Quantum.Stabilizer.Homological.BB.LightStab
 
 namespace Quantum.Stabilizer.Homological.BB.LightStab.Y0
 
-set_option maxRecDepth 4096
+-- `decide` (kernel) needs more recursion headroom than compiled `native_decide`.
+set_option maxRecDepth 40000
 
 /-- Y-orbit-0 representative `ker ∂₂` element. -/
 def zrep : BaseGroup → ZMod 2 := kcombo 1 0 0 0 0 0
@@ -24,21 +25,21 @@ def oL : Array Nat := #[0,0,0,0,3,0,3,0,0,0,0,0,3,0,3,0,2,0,2,0]
 /-- Side-1 (leftHalf) seam offsets, flat `j*4+s`. -/
 def oR : Array Nat := #[0,0,0,0,3,3,3,3,0,0,0,0,3,1,3,1,2,3,2,3]
 
-theorem oLoff0 : ∀ s, (seamOffR zrep psi0 s).val = ov oL 0 (natslot s) := by native_decide
-theorem oLoff1 : ∀ s, (seamOffR zrep psi1 s).val = ov oL 1 (natslot s) := by native_decide
-theorem oLoff2 : ∀ s, (seamOffR zrep psi2 s).val = ov oL 2 (natslot s) := by native_decide
-theorem oLoff3 : ∀ s, (seamOffR zrep psi3 s).val = ov oL 3 (natslot s) := by native_decide
-theorem oLoff4 : ∀ s, (seamOffR zrep psi4 s).val = ov oL 4 (natslot s) := by native_decide
-theorem oRoff0 : ∀ s, (seamOffL zrep psi0 s).val = ov oR 0 (natslot s) := by native_decide
-theorem oRoff1 : ∀ s, (seamOffL zrep psi1 s).val = ov oR 1 (natslot s) := by native_decide
-theorem oRoff2 : ∀ s, (seamOffL zrep psi2 s).val = ov oR 2 (natslot s) := by native_decide
-theorem oRoff3 : ∀ s, (seamOffL zrep psi3 s).val = ov oR 3 (natslot s) := by native_decide
-theorem oRoff4 : ∀ s, (seamOffL zrep psi4 s).val = ov oR 4 (natslot s) := by native_decide
+theorem oLoff0 : ∀ s, (seamOffR zrep psi0 s).val = ov oL 0 (natslot s) := by decide
+theorem oLoff1 : ∀ s, (seamOffR zrep psi1 s).val = ov oL 1 (natslot s) := by decide
+theorem oLoff2 : ∀ s, (seamOffR zrep psi2 s).val = ov oL 2 (natslot s) := by decide
+theorem oLoff3 : ∀ s, (seamOffR zrep psi3 s).val = ov oL 3 (natslot s) := by decide
+theorem oLoff4 : ∀ s, (seamOffR zrep psi4 s).val = ov oL 4 (natslot s) := by decide
+theorem oRoff0 : ∀ s, (seamOffL zrep psi0 s).val = ov oR 0 (natslot s) := by decide
+theorem oRoff1 : ∀ s, (seamOffL zrep psi1 s).val = ov oR 1 (natslot s) := by decide
+theorem oRoff2 : ∀ s, (seamOffL zrep psi2 s).val = ov oR 2 (natslot s) := by decide
+theorem oRoff3 : ∀ s, (seamOffL zrep psi3 s).val = ov oR 3 (natslot s) := by decide
+theorem oRoff4 : ∀ s, (seamOffL zrep psi4 s).val = ov oR 4 (natslot s) := by decide
 
-theorem hoL4 : ∀ i, oL.getD i 0 < 4 := getD_lt (by norm_num) (by native_decide)
-theorem hoR4 : ∀ i, oR.getD i 0 < 4 := getD_lt (by norm_num) (by native_decide)
-theorem hoL0 : ∀ s, s < 4 → ov oL 0 s < 2 := by intro s hs; interval_cases s <;> native_decide
-theorem hoR0 : ∀ s, s < 4 → ov oR 0 s < 2 := by intro s hs; interval_cases s <;> native_decide
+theorem hoL4 : ∀ i, oL.getD i 0 < 4 := getD_lt (by norm_num) (by decide)
+theorem hoR4 : ∀ i, oR.getD i 0 < 4 := getD_lt (by norm_num) (by decide)
+theorem hoL0 : ∀ s, s < 4 → ov oL 0 s < 2 := by intro s hs; interval_cases s <;> decide
+theorem hoR0 : ∀ s, s < 4 → ov oR 0 s < 2 := by intro s hs; interval_cases s <;> decide
 
 /-- The heavy floor leaf: `12 ≤ exCost` over the whole `2³⁰` coset product. -/
 theorem floor_holds : floorOK oL oR = true := by native_decide

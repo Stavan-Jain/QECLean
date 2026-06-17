@@ -29,6 +29,9 @@ namespace Homological
 namespace BB
 namespace CRTFrame
 
+-- `decide` (kernel) needs more recursion headroom than compiled `native_decide`.
+set_option maxRecDepth 40000
+
 /-! ## §1 Computable F₄ as `Fin 4`: `(0, 1, ω, ω²) ↦ (0, 1, 2, 3)`.
 
 Characteristic-2 addition table and the F₄ multiplication table. -/
@@ -142,32 +145,32 @@ def annihilatedBy (D : Ring) (r : Ring) : Bool :=
 
 /-! ### Engine (D² = 0) for the three radical multipliers. -/
 
-theorem Ahat1_sq : rmul Ahat1 Ahat1 = (fun _ => 0) := by native_decide
-theorem Ahat4_sq : rmul Ahat4 Ahat4 = (fun _ => 0) := by native_decide
-theorem Bhat2_sq : rmul Bhat2 Bhat2 = (fun _ => 0) := by native_decide
+theorem Ahat1_sq : rmul Ahat1 Ahat1 = (fun _ => 0) := by decide
+theorem Ahat4_sq : rmul Ahat4 Ahat4 = (fun _ => 0) := by decide
+theorem Bhat2_sq : rmul Bhat2 Bhat2 = (fun _ => 0) := by decide
 
 /-! ### Engine (i): `Ann(D) = (D)`.  The 256-element annihilator set equals the
 16-element ideal `{αD + β·uv}`. -/
 
 theorem Ahat1_ann_eq_ideal :
-    allRing.all (fun r => annihilatedBy Ahat1 r == inIdeal Ahat1 r) = true := by native_decide
+    allRing.all (fun r => annihilatedBy Ahat1 r == inIdeal Ahat1 r) = true := by decide
 theorem Ahat4_ann_eq_ideal :
-    allRing.all (fun r => annihilatedBy Ahat4 r == inIdeal Ahat4 r) = true := by native_decide
+    allRing.all (fun r => annihilatedBy Ahat4 r == inIdeal Ahat4 r) = true := by decide
 theorem Bhat2_ann_eq_ideal :
-    allRing.all (fun r => annihilatedBy Bhat2 r == inIdeal Bhat2 r) = true := by native_decide
+    allRing.all (fun r => annihilatedBy Bhat2 r == inIdeal Bhat2 r) = true := by decide
 
 /-! ### Engine (ii): every NONZERO ideal element has `≥ 3` nonzero layers.
 This is the exact L4b "Floor" input. -/
 
 theorem Ahat1_ideal_ge3 : all16.all (fun ab =>
     let r : Ring := fun s => fadd (fmul ab.1 (Ahat1 s)) (fmul ab.2 (uv s))
-    decide (r = (fun _ => 0)) || decide (nLayers r ≥ 3)) = true := by native_decide
+    decide (r = (fun _ => 0)) || decide (nLayers r ≥ 3)) = true := by decide
 theorem Ahat4_ideal_ge3 : all16.all (fun ab =>
     let r : Ring := fun s => fadd (fmul ab.1 (Ahat4 s)) (fmul ab.2 (uv s))
-    decide (r = (fun _ => 0)) || decide (nLayers r ≥ 3)) = true := by native_decide
+    decide (r = (fun _ => 0)) || decide (nLayers r ≥ 3)) = true := by decide
 theorem Bhat2_ideal_ge3 : all16.all (fun ab =>
     let r : Ring := fun s => fadd (fmul ab.1 (Bhat2 s)) (fmul ab.2 (uv s))
-    decide (r = (fun _ => 0)) || decide (nLayers r ≥ 3)) = true := by native_decide
+    decide (r = (fun _ => 0)) || decide (nLayers r ≥ 3)) = true := by decide
 
 /-! ## §6 The component transform `V` and its F₂-linearity (M2 bridge).
 

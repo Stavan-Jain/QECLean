@@ -54,7 +54,7 @@ namespace Quantum.Stabilizer.Homological.BB.LightStab
 open scoped BigOperators
 
 -- The seam/lift defeq chains unfold deep `Prod`/`ZMod` instance towers.
-set_option maxRecDepth 4096
+set_option maxRecDepth 40000
 
 /-! ## §0 The weight join: `chainWeight` as a sum of per-block layer weights -/
 
@@ -205,7 +205,7 @@ def kerBasis : List (BaseGroup → ZMod 2) := [kb0, kb1, kb2, kb3, kb4, kb5]
 /-- Each basis vector lies in `ker ∂₂`. -/
 theorem kerBasis_mem :
     kerBasis.all (fun v => decide (bbBoundary2Fn baseA baseB v = 0)) = true := by
-  native_decide
+  decide
 
 /-- `recon ζ = Σᵢ ζ(freeCellᵢ) • kbᵢ` (systematic basis: `kbᵢ(freeCellⱼ) = δᵢⱼ`). -/
 def recon (z : BaseGroup → ZMod 2) : BaseGroup → ZMod 2 := fun h =>
@@ -373,7 +373,7 @@ five torus-Fourier coefficients (`native_decide` over the 512 layers). -/
 theorem weight3_eq_wt5 : ∀ g : ZMod 3 × ZMod 3 → ZMod 2,
     weight3 g = wt5OfComps (fhat3 g (0,0)) (fhat3 g (0,1)) (fhat3 g (1,0)) (fhat3 g (1,1))
       (fhat3 g (1,2)) := by
-  native_decide
+  decide
 
 /-- The exact per-slot weight of a block-slice, in CRT components (`V ψⱼ`). -/
 theorem weight3_eq_wt5_slice (b : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) :

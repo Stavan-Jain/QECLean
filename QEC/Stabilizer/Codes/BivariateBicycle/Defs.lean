@@ -28,6 +28,9 @@ namespace Stabilizer
 namespace Homological
 namespace BB
 
+-- kernel `decide` needs more recursion headroom here.
+set_option maxRecDepth 40000
+
 /-! ## Groups -/
 
 /-- The gross-code group `Z₁₂ × Z₆` (`x` has order 12, `y` has order 6). -/
@@ -106,17 +109,17 @@ def coverPi : GrossGroup →+ BaseGroup :=
 /-- Fibers of `coverPi` are deck orbits: `π g' = π g ↔ g' = g ∨ g' = g + deckS`. -/
 theorem coverPi_fiber :
     ∀ g g' : GrossGroup, coverPi g' = coverPi g ↔ g' = g ∨ g' = g + deckS := by
-  native_decide
+  decide
 
 theorem coverPi_surjective : Function.Surjective ⇑coverPi := by
-  native_decide
+  decide
 
 /-- A set-theoretic section of `coverPi` (lift the `x`-coordinate by its
 canonical representative). -/
 def coverSec : BaseGroup → GrossGroup := fun p => ((p.1.val : ZMod 12), p.2)
 
 theorem coverPi_coverSec : ∀ p : BaseGroup, coverPi (coverSec p) = p := by
-  native_decide
+  decide
 
 /-! ## Deck shifts on chains -/
 

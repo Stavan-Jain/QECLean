@@ -25,7 +25,7 @@ open Quantum.Stabilizer.Homological.BB.LightStab
 
 namespace Quantum.Stabilizer.Homological.BB.LightStab
 
-set_option maxRecDepth 4096
+set_option maxRecDepth 40000
 
 /-! ## §14a The trivial-character component is `F₂`-valued -/
 
@@ -108,8 +108,8 @@ theorem mem4 : ∀ vf : Ring,
   native_decide
 
 /-- The fiber-count abbreviations agree with the flat totals `F*off.getD nC* 0`. -/
-theorem nF1_eq : nF1 = F1off.getD nC1 0 := by native_decide
-theorem nF2_eq : nF2 = F2off.getD nC2 0 := by native_decide
+theorem nF1_eq : nF1 = F1off.getD nC1 0 := by decide
+theorem nF2_eq : nF2 = F2off.getD nC2 0 := by decide
 
 /-! ## §14c The general per-orbit safe-sector floor
 
