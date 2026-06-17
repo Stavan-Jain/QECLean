@@ -734,3 +734,36 @@ Optional next: open a PR; promote reusable patterns (blockRestrictSymp, append-i
 the noncomputable→concrete+rfl+native_decide bridge) to `lean-patterns.md`; generalize beyond
 `k1 = 1` or instantiate other inner⊗outer pairs.
 
+---
+
+## Session 15 — rebase on main + generalize to k₂ > 1
+
+**Rebase.** Branch rebased onto `main` (was 32 ahead / 110 behind; main had the BB gross-code
+`MImBound` work). Clean: only `Codes.lean` (umbrella) overlapped and git auto-merged the import
+additions (mine `Codes.Concat`, main's `Iceberg`/`BivariateBicycle`); `lake-manifest.json`
+identical so the prebuilt-mathlib symlink stayed valid; main touched only `Framework/Homological`
+(BB), which concat does not depend on. Full repo build green (3472 jobs) post-rebase.
+
+**Generalization: the k₂ > 1 path.** New `Codes/Concat/SteaneFourQubit.lean` —
+**Steane ⊗ [[4,2,2]] = [[28, 2, 6]]** (`steane422_hasCodeDistance_six`, unconditional, no
+`sorryAx`). The framework was already parametric in `k₂`; Steane ⊗ Steane only tested `k₂ = 1`,
+so this is the first end-to-end `k₂ = 2` validation. Built by **direct reuse** of the M6/M7
+machinery — same shape as `SteaneSteane.lean`, with:
+- `Cout = FourQubit_4_2_2.stabilizerCode` (`k₂ = 2`), `outerZ/outerX = [Z1]/[X1]`,
+  `code_has_distance_two` as the outer `HasCodeDistance` input.
+- `outerLogX_isX`/`outerLogZ_isZ` for **both** `ℓ : Fin 2` (the multi-logical fields) — the
+  `[[4,2,2]]` logicals aren't all-X/all-Z (`X̄₁=IXIX`, `X̄₂=IIXX`, …), so the `fun _ => Or.inr rfl`
+  trick fails; discharge with `fin_cases ℓ <;> (unfold NQubitPauliOperator.IsXType
+  PauliOperator.IsXType; decide)` — the `unfold` exposes the decidable `∀`/`=` that the bare
+  `IsXType` def hides from instance synthesis.
+- independence via `generatorsIndependent_concat` + `native_decide` (Steane `2⁸`, `[[4,2,2]]` `2²`).
+- weight-`6` witness: inner logical `X` on `{3,5,6}` of the **two** blocks `{1,3}` (support of
+  outer `X̄₁=IXIX`); anticommuting partner `Z` on blocks `{2,3}` (support of `Z̄₁=IIZZ`), overlap
+  `3` (odd). Same concrete-list + `rfl` + `native_decide` centralizer recipe as Steane⊗Steane.
+
+Takeaway: a new `[[n₁n₂, k₂, d₁d₂]]` instance (any `k₂`) is now a ~160-line mechanical
+instantiation. `#print axioms` = standard 3 + `native_decide` only.
+
+### Next (optional): drop k₁=1 (major, M4-specific); more instances; reusable instance-recipe /
+StabilizerCodeWithDistance bundling; open a PR.
+
