@@ -22,6 +22,7 @@ import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY11
 import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY12
 import QEC.Stabilizer.Codes.BivariateBicycle.MImAssembly
 import QEC.Stabilizer.Codes.BivariateBicycle.SlotFrame
+import QEC.Stabilizer.Codes.BivariateBicycle.WtFloor24
 
 /-!
 # Bivariate bicycle codes
@@ -93,6 +94,11 @@ code and its `[[72, 12, 6]]` base, related by a 2:1 covering:
                     facts (Lemmas 21, 24).  This is the §10 substrate; the per-orbit floor
                     walks (§§11–13) that consume it are still TODO, so the floor remains
                     discharged by `MImAssembly`'s engine for now.
+- `WtFloor24`     — **(Tier 3, A4 §11) the weight-24 standard-form walk** (M1a).  The per-slot
+                    cost `slotCost` (Lemma 20) + soundness `slotCost_le`, the standard form
+                    `Sab` (Def 26), and **Proposition 29** `Sab_ge_6` (`S(a,b) ≥ 6` ∀ 16 pairs,
+                    so every wt-24 spine cell has linked block cost `≥ 12`).  Axiom-clean
+                    (kernel `decide`).  The bridge to the actual wt-24 floor (M1b) is TODO.
 
 Both CRT-engine inputs — `LightStabilizerClassification` (`LightStabClassify`) and `MImBound`
 (`MImAssembly`) — are now discharged, so the distance of the gross `[[144,12,12]]` code is
