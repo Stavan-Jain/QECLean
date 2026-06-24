@@ -83,4 +83,35 @@ theorem floor_shiftYk_combo (c0 c1 c2 c3 c4 c5 : ZMod 2) (k : ZMod 6)
     chainWeight_translate1]
   exact hf (translate ((0,-k) : BaseGroup) f)
 
+/-! ## §17 General 2-D transport (x and y), via an explicit boundary defect
+
+`seamC` is covariant only in `y` at the chain level; in `x` the §9.3 cut-shift produces a
+nonzero boundary defect.  Both directions are captured by the single class-level statement
+`seamC z' = T_c (seamC z) + ∂₂ δ`, which `floor_transfer` turns into a floor-transport step
+(the defect `δ` is absorbed into the re-indexed free chain `f`).  This lets a floor proved for
+one representative cover its whole **2-D** translation orbit, reducing the 13 `y`-orbit reps to
+the 5 full-orbit reps `Y0, Y1, Y4, Y11, Y12`. -/
+
+/-- `∂₂ f` is a `c`-translate of another boundary, for an arbitrary base translation `c`
+(the general `boundary_shuffle_k`). -/
+theorem boundary_shuffle (c : BaseGroup) (f : BaseGroup → ZMod 2) :
+    bbBoundary2Fn baseA baseB f
+      = translate1 c (bbBoundary2Fn baseA baseB (translate (-c) f)) := by
+  have h0 : (c + (-c) : BaseGroup) = 0 := by simp
+  rw [← bbBoundary2Fn_translate, translate_comp, h0, translate_zero]
+
+/-- **General floor transport.**  Given the class-level covariance
+`seamC z' = T_c (seamC z) + ∂₂ δ` (`δ` the explicit boundary defect) and the floor for `z`,
+the floor holds for `z'`.  Mirrors `floor_shiftYk_combo`, with the defect folded into the
+re-indexed free chain.  (For `c` a pure `y`-shift the defect is `0`; for `x` it is nonzero —
+see `MImAssembly`.) -/
+theorem floor_transfer (z z' : BaseGroup → ZMod 2) (c : BaseGroup) (δ : BaseGroup → ZMod 2)
+    (hcov : seamC z' = translate1 c (seamC z) + bbBoundary2Fn baseA baseB δ)
+    (hf : ∀ f, 12 ≤ bb72Complex.chainWeight (seamC z + bbBoundary2Fn baseA baseB f))
+    (f : BaseGroup → ZMod 2) :
+    12 ≤ bb72Complex.chainWeight (seamC z' + bbBoundary2Fn baseA baseB f) := by
+  rw [hcov, add_assoc, ← bbBoundary2Fn_add, boundary_shuffle c (δ + f), ← translate1_add,
+    chainWeight_translate1]
+  exact hf (translate (-c) (δ + f))
+
 end Quantum.Stabilizer.Homological.BB.LightStab

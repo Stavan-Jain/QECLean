@@ -17,15 +17,7 @@ import QEC.Stabilizer.Codes.BivariateBicycle.MImMembership
 import QEC.Stabilizer.Codes.BivariateBicycle.MImTransport
 import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY0
 import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY1
-import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY2
-import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY3
 import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY4
-import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY5
-import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY6
-import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY7
-import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY8
-import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY9
-import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY10
 import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY11
 import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY12
 import QEC.Stabilizer.Codes.BivariateBicycle.MImAssembly
@@ -76,14 +68,16 @@ code and its `[[72, 12, 6]]` base, related by a 2:1 covering:
 - `MImMembership` — the Γ-membership indices (`gammaIdx0`..`gammaIdx4`) and their correctness
                     (`mem0`..`mem4`, `native_decide`: each `rmul P̂ⱼ (Vⱼ f)` sits at the computed
                     index in Γⱼ), plus the general per-orbit floor `floor_of_data`
-- `MImTransport`  — the y-translation symmetry: `seamC` is y-covariant at the chain level
-                    (`seamC_shiftYk_combo`) and `chainWeight` is translation-invariant, giving
-                    the transport reduction `floor_shiftYk_combo` (a class's floor lifts to its
-                    `(0,k)`-translate)
-- `MImFloorY0..Y12` — the safe-sector floor proven for each of the 13 y-orbit representatives
-                    (per-orbit `native_decide` `floorOK = true` leaf + `floor_of_data`)
-- `MImAssembly`   — **discharges `MImBound`** (`mimBound_holds`): the 64-case y-orbit dispatch
-                    (`floor_kcombo`) reduces every `ker ∂₂` class to a y-orbit rep; then the
+- `MImTransport`  — the translation symmetry.  `seamC` is y-covariant at the chain level
+                    (`seamC_shiftYk_combo`); in x it is covariant only up to an explicit
+                    boundary defect (the §9.3 cut-shift).  Both are captured by the general
+                    `floor_transfer` (§17), which lifts a class's floor to any `(j,k)`-translate;
+                    `chainWeight` translation-invariance does the rest.
+- `MImFloorY{0,1,4,11,12}` — the safe-sector floor proven for the 5 full-translation-orbit
+                    representatives (per-orbit `native_decide` `floorOK = true` leaf +
+                    `floor_of_data`)
+- `MImAssembly`   — **discharges `MImBound`** (`mimBound_holds`): the 64-case 2-D-orbit dispatch
+                    (`floor_kcombo`) reduces every `ker ∂₂` class to one of the 5 reps; then the
                     **unconditional** `grossStabilizerCode_hasCodeDistance_12_uncond` and the
                     bundled `grossStabilizerCodeWithDistance : StabilizerCodeWithDistance 144 12 12`
 
