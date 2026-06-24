@@ -63,6 +63,37 @@ over the 512 value-tuples — **axiom-clean** (no `native_decide`). -/
 theorem slotCost_le : ∀ (v0 : Fin 2) (v1 v2 v3 v4 : Fin 4),
     slotCost v2 v3 v4 ≤ wt5OfComps (v0.castLE (by norm_num)) v1 v2 v3 v4 := by decide
 
+/-! ### The L-block per-slot cost `slotCostL` (the bridge counterpart)
+
+The A/left block (repo `leftHalf`) has unit multipliers at components `0` and `2`
+(`chainWeight_coset_eq`: `(unitHat, Ahat1, unitHat, Ahat1, Ahat4)`), so its free
+components are `0, 2` and its constrained slot datum is `(v₁, v₃, v₄)`.  Its
+per-slot cost is therefore the minimum over `v₀ ∈ F₂`, `v₂ ∈ F₄` (the dual of
+`slotCost`, which frees `v₀, v₁` for the B/right block).
+
+The M1b bridge sums these per-slot bounds: `exCost ≥ ∑ₛ slotCostL(L₁,L₃,L₄) +
+∑ₛ slotCost(R₂,R₃,R₄)`.  **This per-slot sum alone is NOT enough** — minimized
+over the spine it reaches only `9` for the (non-standard-offset) `Y4` rep, because
+(a) the block costs are not yet `S(a,b)` (the offsets need the Lemma-27 reduction
+to standard form) and (b) it frees the *shared* `V₀` independently per block,
+discarding the parity coupling (Remark 3: both blocks `≡ |V₀| mod 2`).  Closing
+to `12` therefore needs the standard-form reduction + the shared-`V₀` assembly,
+exactly the §11 structure — the remaining M1b work. -/
+
+/-- The L-block per-slot cost table (`v₁*16 + v₃*4 + v₄`), `= min_{v₀∈F₂, v₂∈F₄} wt5OfComps`. -/
+def SLOTCOSTL : Array Nat :=
+  #[0,3,3,3,3,2,2,2,3,2,2,2,3,2,2,2,3,2,2,2,2,1,3,3,2,3,1,3,2,3,3,1,
+    3,2,2,2,2,3,1,3,2,3,3,1,2,1,3,3,3,2,2,2,2,3,3,1,2,1,3,3,2,3,1,3]
+
+/-- The A/left-block per-slot cost: the minimum layer weight for the constrained
+slot datum `(v₁, v₃, v₄)`, with the free `v₀ ∈ F₂` and `v₂ ∈ F₄` minimized out. -/
+def slotCostL (v1 v3 v4 : Fin 4) : Nat := SLOTCOSTL.getD (v1.val * 16 + v3.val * 4 + v4.val) 99
+
+/-- **L-block slot-cost soundness.** `slotCostL` lower-bounds the exact per-slot
+layer weight for every free `v₀ ∈ F₂`, `v₂ ∈ F₄` (kernel `decide`, axiom-clean). -/
+theorem slotCostL_le : ∀ (v0 : Fin 2) (v1 v2 v3 v4 : Fin 4),
+    slotCostL v1 v3 v4 ≤ wt5OfComps (v0.castLE (by norm_num)) v1 v2 v3 v4 := by decide
+
 /-! ## §11.2 The standard form `S(a,b)` (Def 26) and the walk (Prop 29)
 
 `S(a,b)` is the `v₀`-free block cost in standard form: over the four slots
