@@ -159,6 +159,15 @@ theorem mFree2_le (v0 v1 v2 v3 v4 : Fin 4) :
   have h : v2 = 0 ∨ v2 = 1 ∨ v2 = 2 ∨ v2 = 3 := by omega
   rcases h with rfl | rfl | rfl | rfl <;> omega
 
+/-- **Remark 3** (slot parity).  Every per-slot layer cost is `≡ v₀ (mod 2)`
+(an odd layer has odd weight, an even layer even).  Over the 512 value-tuples,
+by kernel `decide` (~12 s) — **axiom-clean** (no `native_decide`).  Summing over
+slots, a block's total cost is `≡ |V₀| (mod 2)`; this parity is what the
+achiever-structure lemma (Lem 28) uses to force the `(min_L + min_R)` splits to
+be even, ruling out the would-be odd weight-`10` configurations. -/
+theorem slot_parity : ∀ (v0 : Fin 2) (v1 v2 v3 v4 : Fin 4),
+    wt5OfComps (v0.castLE (by norm_num)) v1 v2 v3 v4 % 2 = v0.val := by decide
+
 /-! ### Block-cost lower bounds: sum the per-slot bound over the four slots.
 
 `costFromComps` splits as an A-block sum plus a B-block sum (`Finset.sum_add_distrib`);
