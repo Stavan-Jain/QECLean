@@ -21,6 +21,7 @@ import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY4
 import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY11
 import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY12
 import QEC.Stabilizer.Codes.BivariateBicycle.MImAssembly
+import QEC.Stabilizer.Codes.BivariateBicycle.SlotFrame
 
 /-!
 # Bivariate bicycle codes
@@ -80,6 +81,18 @@ code and its `[[72, 12, 6]]` base, related by a 2:1 covering:
                     (`floor_kcombo`) reduces every `ker ∂₂` class to one of the 5 reps; then the
                     **unconditional** `grossStabilizerCode_hasCodeDistance_12_uncond` and the
                     bundled `grossStabilizerCodeWithDistance : StabilizerCodeWithDistance 144 12 12`
+
+- `SlotFrame`     — **(Tier 3, A4 §10) analytic slot-frame infrastructure** that will replace
+                    the `native_decide` confined-floor engine (`MImFloor`/`floorOK`).  The
+                    integration bridge `floor_of_data_analytic` (mirrors `floor_of_data`'s
+                    signature, via `chainWeight_coset_eq`), the slot algebra (kill vector
+                    `kappa`, labelings `ellL`/`ellR`, `theta`), Lemma 19 (labeling facts),
+                    the per-slot cost lower bounds `mFree1`/`mFree2` + soundness (Lemma 20,
+                    by `omega` — axiom-clean), the link-free block bound
+                    `costFromComps_ge_blockLB`, and the affine-pencil / hyperbolic-quadruple
+                    facts (Lemmas 21, 24).  This is the §10 substrate; the per-orbit floor
+                    walks (§§11–13) that consume it are still TODO, so the floor remains
+                    discharged by `MImAssembly`'s engine for now.
 
 Both CRT-engine inputs — `LightStabilizerClassification` (`LightStabClassify`) and `MImBound`
 (`MImAssembly`) — are now discharged, so the distance of the gross `[[144,12,12]]` code is
