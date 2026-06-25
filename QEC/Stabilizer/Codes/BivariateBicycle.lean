@@ -77,8 +77,12 @@ code and its `[[72, 12, 6]]` base, related by a 2:1 covering:
                     `floor_transfer` (§17), which lifts a class's floor to any `(j,k)`-translate;
                     `chainWeight` translation-invariance does the rest.
 - `MImFloorY{0,1,4,11,12}` — the safe-sector floor proven for the 5 full-translation-orbit
-                    representatives (per-orbit `native_decide` `floorOK = true` leaf +
-                    `floor_of_data`)
+                    representatives.  The **light orbits** `Y0, Y1, Y4` use the per-orbit
+                    `native_decide` `floorOK = true` engine leaf (`floor_of_data`); the
+                    **weight-24 orbits** `Y11, Y12` are discharged **analytically** (Tier 3,
+                    M1) via the slot-frame walk (`WtFloor24Bridge.costFromComps_ge_12_of_blocks`
+                    + per-block `slotCost` `decide`s), with **no `floorOK` leaf** (the `2³⁰`
+                    `native_decide` is gone for these two)
 - `MImAssembly`   — **discharges `MImBound`** (`mimBound_holds`): the 64-case 2-D-orbit dispatch
                     (`floor_kcombo`) reduces every `ker ∂₂` class to one of the 5 reps; then the
                     **unconditional** `grossStabilizerCode_hasCodeDistance_12_uncond` and the
@@ -99,20 +103,20 @@ code and its `[[72, 12, 6]]` base, related by a 2:1 covering:
                     cost `slotCost` (Lemma 20) + soundness `slotCost_le`, the standard form
                     `Sab` (Def 26), and **Proposition 29** `Sab_ge_6` (`S(a,b) ≥ 6` ∀ 16 pairs,
                     so every wt-24 spine cell has linked block cost `≥ 12`).  Axiom-clean
-                    (kernel `decide`).  The bridge to the actual wt-24 floor (M1b) is TODO.
-- `WtFloor24Bridge` — **(Tier 3, A4 §§10–11) the weight-24 floor bridge substrate** (M1b).
-                    The verified plumbing connecting the closed coset weight `costFromComps`
-                    (the `floor_of_data_analytic` hypothesis) to the `slotCost` machinery:
-                    radical-multiplier image membership (`rmul_{Bhat2,Ahat1,Ahat4}_mem`,
-                    `inIdeal_to_exists`), the slot-sum expansion (`sum_zmod2sq`), the
-                    `Fin 2 ↪ Fin 4` component-0 bridge (`slotCost(L)_le'`), component 0's
-                    `F₂`-valuedness (`V_psi0_lt2`, `comp0_lt2_{L,R}`), the block split
-                    (`costFromComps_ge_blockSlotCost`), the cost-preserving moves (Lemma 25:
-                    `slotCost(L)_frob`, `slotCost_scale`), and the standard-form right-block
-                    bound (`RBlock_std_ge6`).  Establishes (by `decide`) that the
-                    decoupled per-block bound is insufficient (raw `Y4` offsets are
-                    non-standard) and the standard-form reduction (Lemma 27) is required to
-                    discharge the two wt-24 leaves — the remaining M1b work.
+                    (kernel `decide`).  The bridge to the actual wt-24 floor is `WtFloor24Bridge`.
+- `WtFloor24Bridge` — **(Tier 3, A4 §§10–11) the weight-24 floor close** (M1 — DONE).  The
+                    bridge connecting the closed coset weight `costFromComps` (the
+                    `floor_of_data_analytic` hypothesis) to the `slotCost` machinery, and the
+                    assembly `costFromComps_ge_12_of_blocks` that **discharges the two
+                    weight-24 floor leaves** `MImFloorY{11,12}` analytically (dropping their
+                    `floorOK` `2³⁰` `native_decide`).  Contents: radical-multiplier image
+                    membership (`rmul_{Bhat2,Ahat1,Ahat4}_mem`, `inIdeal_to_exists`), the
+                    slot-sum expansion (`sum_zmod2sq`), the `Fin 2 ↪ Fin 4` component-0 bridge
+                    (`slotCost(L)_le'`), component 0's `F₂`-valuedness (`V_psi0_lt2`,
+                    `comp0_lt2_{L,R}`), the block split (`costFromComps_ge_blockSlotCost`), and
+                    the cost-preserving moves (Lemma 25).  The wt-24 reps `Y11, Y12` decouple
+                    per-block to `6 + 6` (so no `ρ`-links / Lemma-27 reduction needed); the
+                    light orbits `Y0, Y1, Y4` (per-block `< 6`) remain on the engine (M2/M3).
 
 Both CRT-engine inputs — `LightStabilizerClassification` (`LightStabClassify`) and `MImBound`
 (`MImAssembly`) — are now discharged, so the distance of the gross `[[144,12,12]]` code is

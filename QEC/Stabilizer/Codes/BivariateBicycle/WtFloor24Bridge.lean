@@ -30,29 +30,26 @@ of `floor_of_data_analytic`) to the per-slot / per-block `slotCost` machinery.
   moves (Lemma 25): per-slot cost is invariant under entrywise Frobenius (both
   blocks) and under the rigidity-preserving scaling `s₂² = s₃s₄` (right block).
 * **`RBlock_std_ge6`** — the standard-form right block (`off₄ = ωθ`) is `≥ 6`
-  even with the spine direction freed: the verified endpoint the reduction
-  targets.
+  even with the spine direction freed (`Prop 29` realized through `slotCost`).
+* **`costFromComps_ge_12_of_blocks`** — the **wt-24 close**: per-block `slotCost`
+  slot sums both `≥ 6` ⟹ closed coset weight `≥ 12`, ready for
+  `floor_of_data_analytic`.
 
-## The reduction-required finding (why the leaves are NOT yet discharged)
+## Which reps this discharges (the orbit-type finding)
 
-The naive route — bound each block independently below by its `slotCost` slot
-sum (`costFromComps_ge_blockSlotCost`) and minimize over the radical-ideal image
-— is **insufficient**, established here by `decide`:
+The decisive empirical fact (per-block decoupled minima, by `#eval`): the two
+**weight-24** reps `Y11`, `Y12` have `(min_R, min_L) = (6, 6)`, so they
+**decouple** — each block independently reaches `6`, hence `costFromComps ≥ 12`
+with **no `ρ`-links and no Lemma-27 reduction** (`MImFloorY{11,12}` discharge
+their floor analytically via `costFromComps_ge_12_of_blocks`, dropping the `2³⁰`
+`floorOK` leaf).  The other three reps are the **light orbits**: `Y0` is `(4,4)`,
+`Y1`/`Y4` are `(3,3)` — per-block `< 6`, so they need the weight-10 kill and the
+`ρ`-links (M2/M3), *not* covered here.  (An earlier read mis-tagged `Y4` as
+wt-24; the `decide` characterisation corrected it.)
 
-* the right block of `Y4` with its *raw* seam offsets minimizes to `< 6`
-  (the raw `off₄ = (ω,ω,ω²,0)` is not the standard `ωθ`; the
-  no-three-collinear quadruple of Lemma 24 fails), whereas `RBlock_std_ge6`
-  shows the *standard* `off₄ = ωθ` block is `≥ 6`;
-* even the bound that couples components 3,4 through the shared datum `Vⱼ f`
-  (but frees `V₀, V₁, V₂` per block) stays `< 12` for `Y4` — the documented
-  link-free floor `≈ 9`.
-
-So the `12` comes from the cross-block coupling (the `ρ`-links pinning
-components `0,1,2`, A4 §10) **or**, equivalently, from first reducing each rep's
-raw offsets to the standard form via the cost-preserving moves (Lemma 27).  The
-move-invariances above are the building blocks of that reduction; composing them
-per rep (and, where a rep is a `y`-translate of a canonical weight-24 class,
-first transporting via `floor_transfer`) is the remaining M1b work.
+The cost-preserving moves (`slotCost(L)_frob`, `slotCost_scale`) and
+`RBlock_std_ge6` are retained as the standard-form-reduction building blocks for
+the light orbits / any non-decoupling rep.
 
 Everything here is **axiom-clean** except the three `rmul_*_mem` facts, which use
 `native_decide` over the 256-element ring (the same foundational-ring category as
@@ -183,6 +180,44 @@ theorem costFromComps_ge_blockSlotCost
   refine Nat.add_le_add (Finset.sum_le_sum ?_) (Finset.sum_le_sum ?_)
   · intro s _; exact slotCostL_le' (oL0 s) (oL1 s) (oL2 s) (oL3 s) (oL4 s) (hL0 s)
   · intro s _; exact slotCost_le' (oR0 s) (oR1 s) (oR2 s) (oR3 s) (oR4 s) (hR0 s)
+
+/-- **The wt-24 close (assembly).**  When both per-block `slotCost` slot sums of a
+coset's ten components are `≥ 6`, the closed coset weight is `≥ 12`.  This is the
+full bridge for a weight-24 orbit rep: the per-block `≥ 6` bounds (proved per rep
+from the radical-ideal image + the standard-form walk) feed straight into
+`floor_of_data_analytic`.  Component 0's `F₂`-valuedness is discharged internally
+by `comp0_lt2_{L,R}`. -/
+theorem costFromComps_ge_12_of_blocks (ζ f : BaseGroup → ZMod 2)
+    (hL : 6 ≤ ∑ s, slotCostL (shifted (seamOffL ζ psi1) Ahat1 (compF f psi1) s)
+                             (shifted (seamOffL ζ psi3) Ahat1 (compF f psi3) s)
+                             (shifted (seamOffL ζ psi4) Ahat4 (compF f psi4) s))
+    (hR : 6 ≤ ∑ s, slotCost (shifted (seamOffR ζ psi2) Bhat2 (compF f psi2) s)
+                            (shifted (seamOffR ζ psi3) Bhat2 (compF f psi3) s)
+                            (shifted (seamOffR ζ psi4) Bhat2 (compF f psi4) s)) :
+    12 ≤ costFromComps
+        (shifted (seamOffL ζ psi0) unitHat (compF f psi0))
+        (shifted (seamOffL ζ psi1) Ahat1 (compF f psi1))
+        (shifted (seamOffL ζ psi2) unitHat (compF f psi2))
+        (shifted (seamOffL ζ psi3) Ahat1 (compF f psi3))
+        (shifted (seamOffL ζ psi4) Ahat4 (compF f psi4))
+        (shifted (seamOffR ζ psi0) unitHat (compF f psi0))
+        (shifted (seamOffR ζ psi1) unitHat (compF f psi1))
+        (shifted (seamOffR ζ psi2) Bhat2 (compF f psi2))
+        (shifted (seamOffR ζ psi3) Bhat2 (compF f psi3))
+        (shifted (seamOffR ζ psi4) Bhat2 (compF f psi4)) := by
+  have hsplit := costFromComps_ge_blockSlotCost
+    (shifted (seamOffL ζ psi0) unitHat (compF f psi0))
+    (shifted (seamOffL ζ psi1) Ahat1 (compF f psi1))
+    (shifted (seamOffL ζ psi2) unitHat (compF f psi2))
+    (shifted (seamOffL ζ psi3) Ahat1 (compF f psi3))
+    (shifted (seamOffL ζ psi4) Ahat4 (compF f psi4))
+    (shifted (seamOffR ζ psi0) unitHat (compF f psi0))
+    (shifted (seamOffR ζ psi1) unitHat (compF f psi1))
+    (shifted (seamOffR ζ psi2) Bhat2 (compF f psi2))
+    (shifted (seamOffR ζ psi3) Bhat2 (compF f psi3))
+    (shifted (seamOffR ζ psi4) Bhat2 (compF f psi4))
+    (comp0_lt2_L ζ f) (comp0_lt2_R ζ f)
+  omega
 
 /-! ## §5 Cost-preserving moves (Lemma 25) — the reduction building blocks
 
