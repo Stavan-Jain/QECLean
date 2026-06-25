@@ -10,6 +10,7 @@ docs/*
 !docs/pipeline-usage.md
 !docs/lean-patterns.md
 !docs/mathlib-version-quirks.md
+!docs/gross-distance-extensibility.md
 
 # Cursor local state and continual-learning index
 .cursor/
