@@ -23,6 +23,7 @@ import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY12
 import QEC.Stabilizer.Codes.BivariateBicycle.MImAssembly
 import QEC.Stabilizer.Codes.BivariateBicycle.SlotFrame
 import QEC.Stabilizer.Codes.BivariateBicycle.WtFloor24
+import QEC.Stabilizer.Codes.BivariateBicycle.WtFloor24Bridge
 
 /-!
 # Bivariate bicycle codes
@@ -99,6 +100,19 @@ code and its `[[72, 12, 6]]` base, related by a 2:1 covering:
                     `Sab` (Def 26), and **Proposition 29** `Sab_ge_6` (`S(a,b) ≥ 6` ∀ 16 pairs,
                     so every wt-24 spine cell has linked block cost `≥ 12`).  Axiom-clean
                     (kernel `decide`).  The bridge to the actual wt-24 floor (M1b) is TODO.
+- `WtFloor24Bridge` — **(Tier 3, A4 §§10–11) the weight-24 floor bridge substrate** (M1b).
+                    The verified plumbing connecting the closed coset weight `costFromComps`
+                    (the `floor_of_data_analytic` hypothesis) to the `slotCost` machinery:
+                    radical-multiplier image membership (`rmul_{Bhat2,Ahat1,Ahat4}_mem`,
+                    `inIdeal_to_exists`), the slot-sum expansion (`sum_zmod2sq`), the
+                    `Fin 2 ↪ Fin 4` component-0 bridge (`slotCost(L)_le'`), component 0's
+                    `F₂`-valuedness (`V_psi0_lt2`, `comp0_lt2_{L,R}`), the block split
+                    (`costFromComps_ge_blockSlotCost`), the cost-preserving moves (Lemma 25:
+                    `slotCost(L)_frob`, `slotCost_scale`), and the standard-form right-block
+                    bound (`RBlock_std_ge6`).  Establishes (by `decide`) that the
+                    decoupled per-block bound is insufficient (raw `Y4` offsets are
+                    non-standard) and the standard-form reduction (Lemma 27) is required to
+                    discharge the two wt-24 leaves — the remaining M1b work.
 
 Both CRT-engine inputs — `LightStabilizerClassification` (`LightStabClassify`) and `MImBound`
 (`MImAssembly`) — are now discharged, so the distance of the gross `[[144,12,12]]` code is
