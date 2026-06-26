@@ -58,15 +58,27 @@ def test_frobenius_counterexample_passes_d1_d2_fails_d3():
     assert not h.floor_hypothesis              # so the 2w floor is NOT guaranteed
 
 
-def test_frobenius_gate_detects_translates_and_symmetry():
+def test_frobenius_gate_directional_asymmetry():
+    # The gate is an OR over both directions, so as a *gate* it is symmetric:
     B = _p("1 + x + y")
-    A = _p("1 + x^2 + y^2")
+    A = _p("1 + x^2 + y^2")                     # A = B^2
     assert is_frobenius_related(A, B)
-    # translate of B^2 is still flagged
-    A_shift = _p("y + x^2*y + y^3")            # y * (1 + x^2 + y^2)
-    assert is_frobenius_related(A_shift, B)
-    # symmetric direction: B related to A^2
     assert is_frobenius_related(B, A) == is_frobenius_related(A, B)
+
+    # ...but the UNDERLYING relation is directional. Here A = B^2 holds, yet B is
+    # NOT a translate of A^2 = 1 + x^4 + y^4. Assert each direction separately so
+    # the asymmetry is documented, not glossed by the symmetric OR:
+    assert frobenius_square(A) == _p("1 + x^4 + y^4")
+    assert is_translate(A, frobenius_square(B))         # A is a translate of B^2  -> True
+    assert not is_translate(B, frobenius_square(A))     # B is NOT a translate of A^2 -> False
+    # the gate fires precisely because the first direction holds.
+
+
+def test_frobenius_gate_flags_translates_of_the_square():
+    B = _p("1 + x + y")
+    A_shift = _p("y + x^2*y + y^3")            # y * (1 + x^2 + y^2) = y * B^2
+    assert is_translate(A_shift, frobenius_square(B))
+    assert is_frobenius_related(A_shift, B)
 
 
 # ---------------------------------------------------------- [[36,4,4]] anchor
