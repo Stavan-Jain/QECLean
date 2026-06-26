@@ -328,6 +328,60 @@ theorem blockCostRedR_parity (oR2 oR3 oR4 V0 : Ring) (a2 b2 a3 b3 a4 b4 : Fin 4)
   unfold blockCostRedR
   rw [Finset.sum_nat_mod, Finset.sum_congr rfl key]
 
+/-! ## Per-cell minima (the inputs to `ge10_of_no_bad_split`)
+
+For a spine cell `(a₃, a₄)` with comp-4 shift `b₄` and diagonal datum `V₀`, the
+per-block minima `minL`/`minR` minimize the reduced block cost over the block's own
+knobs (the confining `(a₁,b₁)`/`(a₂,b₂)` and the comp-3 shift `b₃`).  The floor
+`min_L + min_R ≥ 10` (Prop 30) closes the cell — and since `blockCostRedL ≥ minL`
+etc. (`minL_le`), the per-cell floor lifts to the full coset floor.  `minL_parity`
+gives the equal-parity input of the skeleton. -/
+
+/-- The A/left-block per-cell minimum: `blockCostRedL` minimized over the L-only
+knobs `(a₁, b₁, b₃)`. -/
+def minL (oL1 oL3 oL4 V0 : Ring) (a3 a4 b4 : Fin 4) : Nat :=
+  (Finset.univ : Finset (Fin 4 × Fin 4 × Fin 4)).inf' Finset.univ_nonempty
+    (fun p => blockCostRedL oL1 oL3 oL4 V0 p.1 p.2.1 a3 p.2.2 a4 b4)
+
+/-- The B/right-block per-cell minimum: minimized over `(a₂, b₂, b₃ᴿ)`. -/
+def minR (oR2 oR3 oR4 V0 : Ring) (a3 a4 b4 : Fin 4) : Nat :=
+  (Finset.univ : Finset (Fin 4 × Fin 4 × Fin 4)).inf' Finset.univ_nonempty
+    (fun p => blockCostRedR oR2 oR3 oR4 V0 p.1 p.2.1 a3 p.2.2 a4 b4)
+
+/-- `minL` lower-bounds every `blockCostRedL` at the cell. -/
+theorem minL_le (oL1 oL3 oL4 V0 : Ring) (a1 b1 a3 b3 a4 b4 : Fin 4) :
+    minL oL1 oL3 oL4 V0 a3 a4 b4 ≤ blockCostRedL oL1 oL3 oL4 V0 a1 b1 a3 b3 a4 b4 :=
+  Finset.inf'_le _ (Finset.mem_univ (a1, b1, b3))
+
+/-- `minR` lower-bounds every `blockCostRedR` at the cell. -/
+theorem minR_le (oR2 oR3 oR4 V0 : Ring) (a2 b2 a3 b3 a4 b4 : Fin 4) :
+    minR oR2 oR3 oR4 V0 a3 a4 b4 ≤ blockCostRedR oR2 oR3 oR4 V0 a2 b2 a3 b3 a4 b4 :=
+  Finset.inf'_le _ (Finset.mem_univ (a2, b2, b3))
+
+/-- `minL` has the parity of `|V₀|`: it is achieved at some knobs, where
+`blockCostRedL_parity` applies. -/
+theorem minL_parity (oL1 oL3 oL4 V0 : Ring) (a3 a4 b4 : Fin 4) (hV0 : ∀ s, (V0 s).val < 2) :
+    minL oL1 oL3 oL4 V0 a3 a4 b4 % 2 = (∑ s : ZMod 2 × ZMod 2, (V0 s).val) % 2 := by
+  obtain ⟨p, _, hp⟩ := Finset.exists_mem_eq_inf' (Finset.univ_nonempty)
+    (fun p : Fin 4 × Fin 4 × Fin 4 => blockCostRedL oL1 oL3 oL4 V0 p.1 p.2.1 a3 p.2.2 a4 b4)
+  rw [minL, hp]
+  exact blockCostRedL_parity oL1 oL3 oL4 V0 p.1 p.2.1 a3 p.2.2 a4 b4 hV0
+
+/-- `minR` has the parity of `|V₀|`. -/
+theorem minR_parity (oR2 oR3 oR4 V0 : Ring) (a3 a4 b4 : Fin 4) (hV0 : ∀ s, (V0 s).val < 2) :
+    minR oR2 oR3 oR4 V0 a3 a4 b4 % 2 = (∑ s : ZMod 2 × ZMod 2, (V0 s).val) % 2 := by
+  obtain ⟨p, _, hp⟩ := Finset.exists_mem_eq_inf' (Finset.univ_nonempty)
+    (fun p : Fin 4 × Fin 4 × Fin 4 => blockCostRedR oR2 oR3 oR4 V0 p.1 p.2.1 a3 p.2.2 a4 b4)
+  rw [minR, hp]
+  exact blockCostRedR_parity oR2 oR3 oR4 V0 p.1 p.2.1 a3 p.2.2 a4 b4 hV0
+
+/-- The per-cell minima have equal parity (both `≡ |V₀|`) — the `hpar` input to
+`ge10_of_no_bad_split`. -/
+theorem minL_parity_eq_minR (oL1 oL3 oL4 oR2 oR3 oR4 V0 : Ring) (a3 a4 b4 : Fin 4)
+    (hV0 : ∀ s, (V0 s).val < 2) :
+    minL oL1 oL3 oL4 V0 a3 a4 b4 % 2 = minR oR2 oR3 oR4 V0 a3 a4 b4 % 2 := by
+  rw [minL_parity _ _ _ _ _ _ _ hV0, minR_parity _ _ _ _ _ _ _ hV0]
+
 /-! ## Proposition 30 skeleton: the cost-8 kill (Remark 5)
 
 The per-cell floor `min_L + min_R ≥ 10` is reduced — by slot parity
