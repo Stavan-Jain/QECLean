@@ -28,14 +28,22 @@ counterexample is the characteristic-2 Frobenius square: in F2[G],
 pair ``(1, B)`` is a two-sided cycle of weight ``1 + w < 2w``, while A, B are
 both Sidon (D1) with ``dA = 2*dB`` disjoint from ``dB`` (D2). On e.g. Z7^2 this
 gives a genuine weight-4 *logical* in a [[98,12,4]] code. The Frobenius square
-violates D3 (it has ``0 in x(dA) ∩ x(dB)``), which is exactly why D3 is not
-dispensable. See ``scripts/twosided_floor_counterexample.py`` and
-``docs/gross-distance-extensibility.md``.
+violates D3 on Z6/Z7-type frames (there ``0 in x(dA) ∩ x(dB)``), which makes D3
+*look* like it dispatches Frobenius. But that is a small-modulus coincidence:
+on ``Z8^2``, ``Z13^2``, ``Z15^2`` there are Frobenius pairs ``A=B^2`` with D1, D2,
+AND D3 all true (a "spread" B whose doubled difference set stays coordinate-
+disjoint), so even ``D1 & D2 & D3 => floor >= 2w`` is FALSE on those frames.
+See ``scripts/twosided_floor_counterexample.py``,
+``scripts/d3_frobenius_frame_probe.py``, ``docs/gross-distance-extensibility.md``.
 
-Empirically (SAT-checked over 4144 general weight-3 codes on Z6^2 and Z7^2),
-``D1 & D2 & D3 => two-sided cycle floor >= 2w`` holds with zero violations.
-This is the corrected, frame-agnostic adaptation criterion (still a conjecture
-for general w; proven for the gross instance via the spike-spread argument).
+So ``D1 & D2 & D3`` is sufficient only on SPECIFIC frames (SAT: 0 violations over
+4144 weight-3 codes on Z6^2/Z7^2, and holds on Z9xZ6/Z12xZ6) and FAILS on
+Z8^2/Z13^2/Z15^2 -- it is NOT frame-agnostic. The robust exclusion of Frobenius is
+the explicit algebraic gate ``is_frobenius_related``, not a difference-set
+predicate. The conjectured criterion is ``D1 & D2 & D3 & not is_frobenius_related``
+(see ``robust_floor_hypothesis``): NECESSARY, and on a Z8^2 sample of 200
+non-Frobenius D1&D2&D3 pairs it had 0 violations, but SUFFICIENCY is OPEN (higher
+Frobenius powers A=B^4 and shared-factor obstructions are untested).
 """
 
 from __future__ import annotations
@@ -128,8 +136,10 @@ def is_frobenius_related(A: Poly, B: Poly) -> bool:
     True iff ``A`` is a translate of ``B^2`` or ``B`` is a translate of ``A^2``.
     When true, the code carries a two-sided cycle of weight ``1 + |supp|`` (the
     pair ``(monomial, B)`` since ``A = t B^2`` gives ``A.t' = B.B``-type), so the
-    two-sided floor argument fails regardless of D1/D2. Such pairs MUST be
-    excluded (D3 does this) before claiming a ``2w`` floor.
+    two-sided floor argument fails regardless of D1/D2/D3. Such pairs MUST be
+    excluded before claiming a ``2w`` floor, and D3 does NOT reliably exclude them:
+    it does on Z6/Z7-type frames but FAILS on Z8^2/Z13^2/Z15^2, so this explicit
+    algebraic gate (not D3) is the robust exclusion.
     """
     _same_group(A, B)
     return is_translate(A, frobenius_square(B)) or is_translate(B, frobenius_square(A))
@@ -151,13 +161,23 @@ class TwoSidedHypothesis:
 
     @property
     def floor_hypothesis(self) -> bool:
-        """The corrected, SAT-validated sufficient condition D1 & D2 & D3.
-
-        Implies (conjecturally for general w; proven for the gross instance)
-        a two-sided cycle floor of ``2w``. Note ``frobenius_related`` is always
-        False when this holds.
+        """D1 & D2 & D3. Implies a two-sided floor of ``2w`` on Z6^2/Z7^2-type
+        frames (SAT: 0 violations / 4144) but NOT in general: on Z8^2/Z13^2/Z15^2 a
+        Frobenius square ``A=B^2`` can satisfy D1 & D2 & D3 yet have floor
+        ``1+w < 2w``. So this property does NOT imply ``not frobenius_related`` --
+        use ``robust_floor_hypothesis``.
         """
         return self.d1 and self.d2_disjoint and self.d3_coord_separated
+
+    @property
+    def robust_floor_hypothesis(self) -> bool:
+        """D1 & D2 & D3 & not Frobenius -- the conjectured sufficient condition.
+
+        NECESSARY (Frobenius squares are genuine floor-``<2w`` obstructions that D3
+        misses on some frames); SUFFICIENCY is OPEN -- higher Frobenius powers
+        (``A=B^4``) and shared-factor obstructions are untested.
+        """
+        return self.floor_hypothesis and not self.frobenius_related
 
 
 def two_sided_hypothesis(A: Poly, B: Poly) -> TwoSidedHypothesis:

@@ -212,10 +212,22 @@ predicates on `(A,B)`: **D1** `ov≤1` (Sidon difference sets); **D2** `dA∩dB=
   code (`μ_Z` drops to 4 everywhere). The earlier "`D1∧D2` suffices, `D3`
   dispensable" reading was wrong: an artifact of testing only gross-shape
   polynomials, which exclude the square shape `A=B²`.
-- *Corrected criterion.* `D3` is exactly what excludes Frobenius (`A=B²` has
-  `0 ∈ x(dA)∩x(dB)`; gross does not). SAT-checked over **general** weight-3
-  polynomials: **`D1 ∧ D2 ∧ D3 ⟹ two-sided cycle floor ≥ 2w`, 0 violations / 4,144
-  codes** (4001 on `Z₇²`, 144 on `Z₆²`).
+- *Apparent corrected criterion (frame-limited).* On `Z₆²`/`Z₇²`, `D3` excludes
+  Frobenius (`A=B²` has `0 ∈ x(dA)∩x(dB)` there; gross does not), and
+  **`D1 ∧ D2 ∧ D3 ⟹ two-sided cycle floor ≥ 2w`** is SAT-verified with 0 violations
+  / 4,144 general weight-3 codes (4001 on `Z₇²`, 144 on `Z₆²`; also holds on `Z₉×Z₆`,
+  `Z₁₂×Z₆`).
+- ***…but `D1∧D2∧D3` itself fails on wider frames.*** `D3`'s exclusion of Frobenius
+  is a small-modulus coincidence. On **`Z₈²`, `Z₁₃²`, `Z₁₅²`** there exist Frobenius
+  squares `A=B²` with `D1∧D2∧D3` *all true* — a "spread" `B` whose doubled difference
+  set stays coordinate-disjoint (e.g. `Z₈²`: `B={(0,0),(1,1),(4,5)}`,
+  `A=B²={(0,0),(0,2),(2,2)}`, SAT two-sided floor `4 < 6`). So the corrected
+  conjecture is **also not frame-agnostic**. The robust exclusion is the *explicit
+  algebraic gate* `is_frobenius_related`, not `D3`: the conjectured criterion is
+  **`D1∧D2∧D3 ∧ ¬is_frobenius_related`** (`robust_floor_hypothesis`) — *necessary*
+  (Frobenius squares are genuine obstructions that `D3` misses), with 0 violations in
+  a 200-sample `¬Frobenius` `Z₈²` check, but **sufficiency is open** (higher Frobenius
+  powers `A=B⁴`, shared-factor obstructions untested).
 - *Proof status (the conjecture is NOT proven in general).* The gross proof is an
   **instance proof**, not a parametric theorem: only `(1,1)` is parametric (pure
   `D2`); the `(1,3)`/`(2,2)` cases hard-code per-polynomial facts (triangle
@@ -241,11 +253,16 @@ The predicates and the Frobenius gate are packaged in
 (`is_sidon`, `difference_sets_disjoint`, `coordinate_separated`,
 **`is_frobenius_related`**, `two_sided_hypothesis`).
 
-**Net for the program.** The two-sided half is the **frame-portable** foundation
-(it ports across `F₄/F₈/F₆₄`; the Frobenius obstruction is also frame-independent),
-with correct lemma `D1∧D2∧D3 ⟹ 2w`. The one-sided (engine) half stays frame-locked.
-A general base-floor theory should be built on the difference-set side, with the
-Frobenius square as a named, mandatory exclusion.
+**Net for the program.** The two-sided half is *more* frame-portable than the
+engine, but it is **not capturable by clean difference-set predicates alone**. The
+sequence `D1∧D2` → `D1∧D2∧D3` each looked sufficient on its test frames and each
+broke when the frame widened (gross-shape → all weight-3; then `Z₆²/Z₇²` → `Z₈²/Z₁₃²/Z₁₅²`).
+The stable object is the **explicit algebraic obstruction** (`is_frobenius_related`),
+not a Sidon-style condition. So a real base-floor theory must *enumerate and exclude
+algebraic obstructions explicitly* (Frobenius squares first; then higher powers /
+shared factors) and prove a floor on the complement — `D1∧D2∧D3` is a useful but
+frame-fragile filter, the one-sided (engine) half stays frame-locked, and sufficiency
+of `D1∧D2∧D3 ∧ ¬Frobenius` is itself open.
 
 ---
 

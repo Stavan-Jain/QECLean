@@ -40,6 +40,7 @@ def test_gross_satisfies_all_predicates():
     assert h.d3_coord_separated
     assert not h.frobenius_related
     assert h.floor_hypothesis
+    assert h.robust_floor_hypothesis
 
 
 # ----------------------------------------------------- Frobenius freshman dream
@@ -56,6 +57,25 @@ def test_frobenius_counterexample_passes_d1_d2_fails_d3():
     assert not h.d3_coord_separated            # 0 in x(dA) ∩ x(dB)  (D3 FAILS)
     assert h.frobenius_related                 # A = B^2
     assert not h.floor_hypothesis              # so the 2w floor is NOT guaranteed
+    assert not h.robust_floor_hypothesis
+
+
+def test_d3_does_not_exclude_frobenius_on_Z8():
+    # The Z8^2 hole: D3 excludes the Frobenius square only on Z6/Z7-type frames.
+    # Here a "spread" B whose doubled difference set stays coordinate-disjoint
+    # passes D1 & D2 & D3 yet is a Frobenius square A=B^2 (so the two-sided floor
+    # is 1+w < 2w). Hence floor_hypothesis (=D1&D2&D3) is NOT sufficient on Z8^2;
+    # only the explicit gate catches it.
+    G = AbelianGroup((8, 8))
+    B = Poly.from_support([(0, 0), (1, 1), (4, 5)], G)
+    A = frobenius_square(B)                     # = {(0,0),(0,2),(2,2)}
+    h = two_sided_hypothesis(A, B)
+    assert h.d1_A_sidon and h.d1_B_sidon
+    assert h.d2_disjoint
+    assert h.d3_coord_separated                 # D3 HOLDS here (unlike on Z6^2)
+    assert h.frobenius_related                  # ...yet A = B^2
+    assert h.floor_hypothesis                   # so D1&D2&D3 is NOT sufficient on Z8^2
+    assert not h.robust_floor_hypothesis        # the explicit Frobenius gate catches it
 
 
 def test_frobenius_gate_directional_asymmetry():
