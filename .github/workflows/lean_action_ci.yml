@@ -30,11 +30,13 @@ jobs:
       # 16 GB → the job is killed (exit 143). Add swap so the peak spills to disk
       # instead of OOM-ing. Remove once Tier-3 retires those leaves (cf. Y11/Y12).
       - name: Add swap space (BB floor_holds native_decide memory peaks)
+        # The runner already has an active /swapfile, so add an extra one on the
+        # large /mnt ephemeral disk rather than touching the existing swap.
         run: |
-          sudo fallocate -l 12G /swapfile
-          sudo chmod 600 /swapfile
-          sudo mkswap /swapfile
-          sudo swapon /swapfile
+          sudo fallocate -l 12G /mnt/swapfile
+          sudo chmod 600 /mnt/swapfile
+          sudo mkswap /mnt/swapfile
+          sudo swapon /mnt/swapfile
           free -h
       - uses: leanprover/lean-action@v1
       # docgen rebuilds API docs for the project + all of mathlib (~1-2h with
