@@ -20,8 +20,9 @@ steps (A4 §§12–13):
 * **Prop 32**: `≥ 10` (Prop 30) + **evenness** (below) + *no* weight-10
   (Prop 31) ⟹ `≥ 12`.
 
-This module currently provides the **parity layer** of the argument (the Prop 32
-glue and its slot-parity ingredients), all kernel-clean (std-3, no `native_decide`):
+This module provides two layers of the argument.
+
+**Parity layer** (the Prop 32 glue + slot-parity ingredients, all kernel-clean):
 
 * `costFromComps_even` / `chainWeight_coset_even` — **evenness**: every Smith-coset
   element has even weight, from the slot-parity remark (`SlotFrame.slot_parity`) and
@@ -35,12 +36,22 @@ glue and its slot-parity ingredients), all kernel-clean (std-3, no `native_decid
   the `≥ 10` floor (Prop 30) + the no-weight-`10` kill (Prop 31) ⟹ `≥ 12`, by one
   `omega`.  This fixes the proof shape and isolates the two remaining obligations.
 
-Prop 30 and Prop 31 (the per-cell spine-coupled walk and the 118 `ρ`-link kills)
-are the remaining M2/M3 work.  Empirically (repo frame): the spine has `64 × 16 =
-1024` cells (the joint radical images of `t ↦ (Â₁t, B̂₂t)` and `t ↦ (Â₄t, B̂₂t)`),
-so neither is a kernel-feasible enumeration — both need the structured locus
-argument (A4 §§11.2–11.4 tables + Lemmas 27–28).  Until then the three light orbits
-stay on the `MImFloor` engine (`floorOK`).
+**Reduction layer** (the standard-form coordinate change, the gateway to a finite
+floor): `spine3_reduce`/`spine4_reduce` (foundational `native_decide`) collapse the
+`64`/`16`-element joint spine images to a **shared** F₄ direction `(a₃, a₄)` (comp 4
+with the `ω`-linkage `b₄ᴿ = ω·b₄ᴸ`); the reduced-parameter block costs
+`blockCostRedL`/`blockCostRedR` express the per-block link-free cost over those F₄
+knobs; and `chainWeight_ge_blockCostRed` is the **soundness bridge** — every coset
+weight dominates `blockCostRedL + blockCostRedR` for parameters extracted from `f`,
+with `a₃, a₄, V₀` shared.  A rep-specific floor `∀ params, 10 ≤ blockCostRedL +
+blockCostRedR` (the finite F₄-knob walk over the `16` spine cells `(a₃, a₄)`) then
+gives `10 ≤ chainWeight`.  **Validated** this session: with this reduction the `Y1`
+coupled floor is exactly `10` at every one of the `16` cells (matching Prop 30).
+
+**Remaining M2/M3 work:** the rep-specific `≥ 10` floor decide (validated value, but
+a heavy kernel walk — `min_L + min_R` over the `16` cells × `V₀`), and Prop 31 (the
+`118` `ρ`-link kills).  Until both land, the three light orbits stay on the
+`MImFloor` engine (`floorOK`).
 -/
 import QEC.Stabilizer.Codes.BivariateBicycle.WtFloor24Bridge
 
@@ -112,6 +123,126 @@ theorem chainWeight_coset_even (ζ f : BaseGroup → ZMod 2)
   intro s
   have h := comp0_lt2_L ζ f s
   rwa [hoff0L] at h
+
+/-! ## The spine reduction (the standard-form coordinate change)
+
+The kernel-clean light-orbit floor rests on collapsing the raw radical images to
+the slot-frame standard form.  Empirically (this session, repo frame) the joint
+spine images have sizes `64` (comp 3) and `16` (comp 4); the two reduction lemmas
+below pin the exact coordinate change behind those numbers:
+
+* **comp 3** (`spine3_reduce`): `Â₁·t` and `B̂₂·t` of a single `t` share their F₄
+  *direction* `a`, with independent `XY`-shifts — so the `64`-element comp-3 cell
+  is exactly `(a₃ shared) × (b₃ᴸ, b₃ᴿ free)`.
+* **comp 4** (`spine4_reduce`): they share `a` *and* the `B̂₂`-shift is `ω` times
+  the `Â₄`-shift (`b₄ᴿ = ω·b₄ᴸ`) — so the `16`-element comp-4 cell is
+  `(a₄ shared) × (b₄ᴸ free)`.
+
+Both are foundational convolution facts over the 256-element `Ring` (`native_decide`,
+the same category as `rmul_*_mem` / `CRTFrame`'s ideal facts — *not* the `2³⁰` floor
+leaf).  They feed the reduced-parameter block costs `blockCostRed{L,R}` below, whose
+floor `min_L + min_R ≥ 10` (Prop 30) becomes a finite F₄-knob walk over the `16`
+spine cells `(a₃, a₄)`.  Validated this session: with this reduction the `Y1`
+coupled floor is exactly `10` at every one of the `16` spine cells (matching Prop
+30; the over-approximation that frees `b₄ᴿ` independently spuriously drops it to
+`8`, confirming the `ω`-linkage is load-bearing). -/
+
+/-- **comp-3 spine reduction.**  The L-side (`Â₁`) and R-side (`B̂₂`) radical images
+of any `t` share their slot-frame direction `a`; the `XY`-shifts `b, b'` are free.
+`native_decide` over the 256-element `Ring` (foundational, cf. `rmul_*_mem`). -/
+theorem spine3_reduce : ∀ t : Ring, ∃ a b b' : Fin 4,
+    rmul Ahat1 t = (fun s => fadd (fmul a (Ahat1 s)) (fmul b (uv s))) ∧
+    rmul Bhat2 t = (fun s => fadd (fmul a (Bhat2 s)) (fmul b' (uv s))) := by
+  native_decide
+
+/-- **comp-4 spine reduction.**  The L-side (`Â₄`) and R-side (`B̂₂`) radical images
+of any `t` share their direction `a`, and the `B̂₂`-shift is `ω·(Â₄-shift)`
+(`fmul 2`).  `native_decide` over the 256-element `Ring` (foundational). -/
+theorem spine4_reduce : ∀ t : Ring, ∃ a b : Fin 4,
+    rmul Ahat4 t = (fun s => fadd (fmul a (Ahat4 s)) (fmul b (uv s))) ∧
+    rmul Bhat2 t = (fun s => fadd (fmul a (Bhat2 s)) (fmul (fmul 2 b) (uv s))) := by
+  native_decide
+
+/-- The reduced A/left-block cost: the four-slot `mFree2` sum (component 0 = `V₀`
+fixed, the unit-side component 2 freed) with comp-1 confining `a₁·Â₁ + b₁·XY`,
+spine `a₃·Â₁ + b₃·XY` and `a₄·Â₄ + b₄·XY`, each shifted by the rep's seam offsets
+`oL₁, oL₃, oL₄`.  The F₄-knob standard form that `spine3_reduce`/`spine4_reduce`
+reduce the actual coset L-block to. -/
+def blockCostRedL (oL1 oL3 oL4 V0 : Ring) (a1 b1 a3 b3 a4 b4 : Fin 4) : Nat :=
+  ∑ s : ZMod 2 × ZMod 2, mFree2 (V0 s)
+    (fadd (oL1 s) (fadd (fmul a1 (Ahat1 s)) (fmul b1 (uv s))))
+    (fadd (oL3 s) (fadd (fmul a3 (Ahat1 s)) (fmul b3 (uv s))))
+    (fadd (oL4 s) (fadd (fmul a4 (Ahat4 s)) (fmul b4 (uv s))))
+
+/-- The reduced B/right-block cost: the four-slot `mFree1` sum (`V₀` fixed, the
+unit-side component 1 freed) with comp-2 confining `a₂·B̂₂ + b₂·XY`, spine
+`a₃·B̂₂ + b₃·XY` and `a₄·B̂₂ + b₄·XY`, shifted by `oR₂, oR₃, oR₄`.  In the coupled
+floor the spine direction `a₃` (and `a₄`) is **shared** with `blockCostRedL`, and
+`b₄ = ω·b₄ᴸ` (the `spine4_reduce` linkage). -/
+def blockCostRedR (oR2 oR3 oR4 V0 : Ring) (a2 b2 a3 b3 a4 b4 : Fin 4) : Nat :=
+  ∑ s : ZMod 2 × ZMod 2, mFree1 (V0 s)
+    (fadd (oR2 s) (fadd (fmul a2 (Bhat2 s)) (fmul b2 (uv s))))
+    (fadd (oR3 s) (fadd (fmul a3 (Bhat2 s)) (fmul b3 (uv s))))
+    (fadd (oR4 s) (fadd (fmul a4 (Bhat2 s)) (fmul b4 (uv s))))
+
+/-- **The reduction soundness bridge.**  For every base 1-chain `f`, the coset
+weight `chainWeight (seamC ζ + ∂₂ f)` dominates `blockCostRedL + blockCostRedR` for
+reduced parameters extracted from `f` — with the spine direction `a₃` (and `a₄`)
+**shared** between the two blocks and the comp-4 linkage `b₄ᴿ = ω·b₄ᴸ`, and a
+single `F₂`-valued `V₀` shared as component 0.  This is the link-free block bound
+(`costFromComps_ge_blockLB`) re-expressed through the spine reductions
+(`spine{3,4}_reduce`) and the radical-ideal witnesses (`inIdeal_to_exists`).  A
+rep-specific floor `∀ params, 10 ≤ blockCostRedL + blockCostRedR` (the finite
+F₄-knob walk over the 16 spine cells) then yields `10 ≤ chainWeight`. -/
+theorem chainWeight_ge_blockCostRed (ζ f : BaseGroup → ZMod 2)
+    (hz : bbBoundary2Fn baseA baseB ζ = 0) :
+    ∃ (V0 : Ring) (a1 b1 a2 b2 a3 b3L b3R a4 b4L : Fin 4),
+      (∀ s, (V0 s).val < 2) ∧
+      blockCostRedL (seamOffL ζ psi1) (seamOffL ζ psi3) (seamOffL ζ psi4) V0 a1 b1 a3 b3L a4 b4L
+    + blockCostRedR (seamOffR ζ psi2) (seamOffR ζ psi3) (seamOffR ζ psi4)
+        V0 a2 b2 a3 b3R a4 (fmul 2 b4L)
+      ≤ bb72Complex.chainWeight (seamC ζ + bbBoundary2Fn baseA baseB f) := by
+  obtain ⟨a1, b1, h1⟩ := inIdeal_to_exists Ahat1 _ (rmul_Ahat1_mem (compF f psi1))
+  obtain ⟨a2, b2, h2⟩ := inIdeal_to_exists Bhat2 _ (rmul_Bhat2_mem (compF f psi2))
+  obtain ⟨a3, b3L, b3R, h3L, h3R⟩ := spine3_reduce (compF f psi3)
+  obtain ⟨a4, b4L, h4L, h4R⟩ := spine4_reduce (compF f psi4)
+  refine ⟨shifted (seamOffL ζ psi0) unitHat (compF f psi0), a1, b1, a2, b2, a3, b3L, b3R, a4, b4L,
+    fun s => comp0_lt2_L ζ f s, ?_⟩
+  rw [chainWeight_coset_eq ζ f]
+  refine le_trans (le_of_eq ?_) (costFromComps_ge_blockLB
+    (shifted (seamOffL ζ psi0) unitHat (compF f psi0))
+    (shifted (seamOffL ζ psi1) Ahat1 (compF f psi1))
+    (shifted (seamOffL ζ psi2) unitHat (compF f psi2))
+    (shifted (seamOffL ζ psi3) Ahat1 (compF f psi3))
+    (shifted (seamOffL ζ psi4) Ahat4 (compF f psi4))
+    (shifted (seamOffR ζ psi0) unitHat (compF f psi0))
+    (shifted (seamOffR ζ psi1) unitHat (compF f psi1))
+    (shifted (seamOffR ζ psi2) Bhat2 (compF f psi2))
+    (shifted (seamOffR ζ psi3) Bhat2 (compF f psi3))
+    (shifted (seamOffR ζ psi4) Bhat2 (compF f psi4)))
+  have hoff0 : ∀ s, seamOffR ζ psi0 s = seamOffL ζ psi0 s := by
+    intro s
+    rw [show seamOffR ζ psi0 s = (0 : Fin 4) from (off_vanish ζ hz s).2.1,
+        show seamOffL ζ psi0 s = (0 : Fin 4) from (off_vanish ζ hz s).1]
+  have hL : blockCostRedL (seamOffL ζ psi1) (seamOffL ζ psi3) (seamOffL ζ psi4)
+              (shifted (seamOffL ζ psi0) unitHat (compF f psi0)) a1 b1 a3 b3L a4 b4L
+          = blockLBL (shifted (seamOffL ζ psi0) unitHat (compF f psi0))
+              (shifted (seamOffL ζ psi1) Ahat1 (compF f psi1))
+              (shifted (seamOffL ζ psi3) Ahat1 (compF f psi3))
+              (shifted (seamOffL ζ psi4) Ahat4 (compF f psi4)) := by
+    unfold blockCostRedL blockLBL
+    apply Finset.sum_congr rfl; intro s _
+    simp only [shifted, h1, h3L, h4L]
+  have hR : blockCostRedR (seamOffR ζ psi2) (seamOffR ζ psi3) (seamOffR ζ psi4)
+              (shifted (seamOffL ζ psi0) unitHat (compF f psi0)) a2 b2 a3 b3R a4 (fmul 2 b4L)
+          = blockLBR (shifted (seamOffR ζ psi0) unitHat (compF f psi0))
+              (shifted (seamOffR ζ psi2) Bhat2 (compF f psi2))
+              (shifted (seamOffR ζ psi3) Bhat2 (compF f psi3))
+              (shifted (seamOffR ζ psi4) Bhat2 (compF f psi4)) := by
+    unfold blockCostRedR blockLBR
+    apply Finset.sum_congr rfl; intro s _
+    simp only [shifted, hoff0 s, h2, h3R, h4R]
+  rw [hL, hR]
 
 /-! ## Proposition 32: the light-orbit floor assembly
 
