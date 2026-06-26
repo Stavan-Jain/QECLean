@@ -118,13 +118,17 @@ code and its `[[72, 12, 6]]` base, related by a 2:1 covering:
                     the cost-preserving moves (Lemma 25).  The wt-24 reps `Y11, Y12` decouple
                     per-block to `6 + 6` (so no `ρ`-links / Lemma-27 reduction needed); the
                     light orbits `Y0, Y1, Y4` (per-block `< 6`) remain on the engine (M2/M3).
-- `WtFloor1618`    — **(Tier 3, A4 §§12–13) the light-orbit floor** (M2/M3, in progress).  The light
-                    orbits `Y0, Y1, Y4` (wt-16/18) do NOT decouple, so `≥ 12` is coupled.  Currently
-                    provides the **evenness** ingredient of Proposition 32 (`chainWeight_coset_even`:
-                    every Smith-coset element has even weight, from `slot_parity` + the diagonal
-                    component-0 datum).  The remaining work is Prop 30 (`min_L + min_R ≥ 10`,
-                    per-cell spine-coupled) and Prop 31 (the 118 `ρ`-link kills); until then the
-                    three light orbits stay on the `MImFloor` engine.
+- `WtFloor1618`    — **(Tier 3, A4 §§12–13) the light-orbit floor** (M2/M3, in progress).
+                    The light orbits `Y0, Y1, Y4` (wt-16/18) do NOT decouple, so `≥ 12`
+                    is coupled.  Provides the **parity layer** (all kernel-clean, std-3):
+                    `chainWeight_coset_even` (every Smith-coset element has even weight),
+                    `blockCost_parity` (a block's cost `≡ |V₀| (mod 2)`, the Lemma-28
+                    ingredient), and `chainWeight_coset_ge12_of_floor10` (**Prop 32**:
+                    evenness + the `≥ 10` floor + the no-weight-`10` kill ⟹ `≥ 12`).  The
+                    remaining work is Prop 30 (`min_L + min_R ≥ 10`, per-cell spine-coupled
+                    over the `64 × 16 = 1024` spine cells) and Prop 31 (the 118 `ρ`-link
+                    kills) — neither a kernel-feasible enumeration; until then the three
+                    light orbits stay on the `MImFloor` engine.
 
 Both CRT-engine inputs — `LightStabilizerClassification` (`LightStabClassify`) and `MImBound`
 (`MImAssembly`) — are now discharged, so the distance of the gross `[[144,12,12]]` code is
