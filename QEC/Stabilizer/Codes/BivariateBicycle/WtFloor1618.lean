@@ -244,6 +244,27 @@ theorem chainWeight_ge_blockCostRed (ζ f : BaseGroup → ZMod 2)
     simp only [shifted, hoff0 s, h2, h3R, h4R]
   rw [hL, hR]
 
+/-! ## Proposition 30 skeleton: the cost-8 kill (Remark 5)
+
+The per-cell floor `min_L + min_R ≥ 10` is reduced — by slot parity
+(`blockCost_parity`: both block minima are `≡ |V₀| (mod 2)`, hence equal mod 2) and
+the per-block floors `min ≥ 3` — to **excluding the four "bad splits"** `(3,3)`,
+`(3,5)`, `(5,3)`, `(4,4)`.  Those exclusions are the locus-disjointness content of
+Prop 30 (the `L3=R3=∅` and `L4 ∩ R4 = ∅` facts of A4 §§11.2–11.4), proved cell by
+cell.  `ge10_of_no_bad_split` is the arithmetic skeleton that turns the exclusions
+into the floor; it is pure `omega`. -/
+
+/-- **Remark 5 (cost-8 kill skeleton).**  Per-block minima `mL, mR ≥ 3` of equal
+parity (`mL ≡ mR (mod 2)`, from slot parity) sum to `≥ 10` once the four bad splits
+`(3,3), (3,5), (5,3), (4,4)` are excluded: the equal parity rules out odd sums, the
+floor `≥ 3` and the exclusions rule out `6` and `8`.  Pure `omega`. -/
+theorem ge10_of_no_bad_split {mL mR : Nat} (hL : 3 ≤ mL) (hR : 3 ≤ mR)
+    (hpar : mL % 2 = mR % 2)
+    (h33 : ¬ (mL = 3 ∧ mR = 3)) (h35 : ¬ (mL = 3 ∧ mR = 5))
+    (h53 : ¬ (mL = 5 ∧ mR = 3)) (h44 : ¬ (mL = 4 ∧ mR = 4)) :
+    10 ≤ mL + mR := by
+  omega
+
 /-! ## Proposition 32: the light-orbit floor assembly
 
 The three analytic facts about a light Smith coset combine to the floor `≥ 12`:
