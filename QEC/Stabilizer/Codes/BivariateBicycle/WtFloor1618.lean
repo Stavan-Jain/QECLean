@@ -61,6 +61,8 @@ open Quantum.Stabilizer.Homological.BB.LightStab
 
 namespace Quantum.Stabilizer.Homological.BB.LightStab
 
+set_option maxRecDepth 4096
+
 /-! ## Evenness of the Smith-coset weight (the Prop 32 parity ingredient) -/
 
 /-- A single layer's two block weights, sharing the diagonal component-0 value
@@ -243,6 +245,88 @@ theorem chainWeight_ge_blockCostRed (ζ f : BaseGroup → ZMod 2)
     apply Finset.sum_congr rfl; intro s _
     simp only [shifted, hoff0 s, h2, h3R, h4R]
   rw [hL, hR]
+
+/-! ## Locus rules (the per-slot cost facts, A4 §"The locus rules")
+
+The `V₀`-fixed per-slot costs `mFree2` (A/left, frees comp 2) and `mFree1`
+(B/right, frees comp 1) obey the slot-cost rules of Lemma 20 — established here as
+small kernel `decide`s over the `2 · 4³ = 128` value tuples (`slot_parity` scale,
+axiom-clean).  Their empirical shape: with `v₀ = 0` the cost lies in `{0, 2, 4}`
+(`0` exactly on the all-zero datum, R1); with `v₀ = 1` it lies in `{1, 3}`.  These
+feed the per-cell floors `min ≥ 3` and the locus-disjointness exclusions that the
+`ge10_of_no_bad_split` skeleton consumes. -/
+
+/-- **R1 (zero slot), A/left.**  The `V₀`-fixed L cost vanishes iff every component
+of the slot datum is zero. -/
+theorem locus_zero_L : ∀ (v0 : Fin 2) (v1 v3 v4 : Fin 4),
+    mFree2 (v0.castLE (by norm_num)) v1 v3 v4 = 0 ↔ (v0 = 0 ∧ v1 = 0 ∧ v3 = 0 ∧ v4 = 0) := by
+  decide
+
+/-- **R1 (zero slot), B/right.** -/
+theorem locus_zero_R : ∀ (v0 : Fin 2) (v2 v3 v4 : Fin 4),
+    mFree1 (v0.castLE (by norm_num)) v2 v3 v4 = 0 ↔ (v0 = 0 ∧ v2 = 0 ∧ v3 = 0 ∧ v4 = 0) := by
+  decide
+
+/-- **Per-slot parity (Remark 3), A/left.**  The `V₀`-fixed L cost is `≡ v₀ (mod 2)`. -/
+theorem mFree2_parity : ∀ (v0 : Fin 2) (v1 v3 v4 : Fin 4),
+    mFree2 (v0.castLE (by norm_num)) v1 v3 v4 % 2 = v0.val := by decide
+
+/-- **Per-slot parity (Remark 3), B/right.** -/
+theorem mFree1_parity : ∀ (v0 : Fin 2) (v2 v3 v4 : Fin 4),
+    mFree1 (v0.castLE (by norm_num)) v2 v3 v4 % 2 = v0.val := by decide
+
+/-- **Per-slot cost bound.**  Every `V₀`-fixed L per-slot cost is `≤ 4`. -/
+theorem mFree2_le4 : ∀ (v0 : Fin 2) (v1 v3 v4 : Fin 4),
+    mFree2 (v0.castLE (by norm_num)) v1 v3 v4 ≤ 4 := by decide
+
+/-- **Per-slot cost bound.**  Every `V₀`-fixed R per-slot cost is `≤ 4`. -/
+theorem mFree1_le4 : ∀ (v0 : Fin 2) (v2 v3 v4 : Fin 4),
+    mFree1 (v0.castLE (by norm_num)) v2 v3 v4 ≤ 4 := by decide
+
+/-- **Reduced-block parity, A/left.**  `blockCostRedL` is `≡ |V₀| (mod 2)` (the F₂
+weight of the diagonal datum) whenever `V₀` is `F₂`-valued: each slot contributes
+`≡ V₀ (mod 2)` by `mFree2_parity`.  This is the `hpar` input to
+`ge10_of_no_bad_split` (applied to the per-cell minima). -/
+theorem blockCostRedL_parity (oL1 oL3 oL4 V0 : Ring) (a1 b1 a3 b3 a4 b4 : Fin 4)
+    (hV0 : ∀ s, (V0 s).val < 2) :
+    blockCostRedL oL1 oL3 oL4 V0 a1 b1 a3 b3 a4 b4 % 2
+      = (∑ s : ZMod 2 × ZMod 2, (V0 s).val) % 2 := by
+  have key : ∀ s ∈ (Finset.univ : Finset (ZMod 2 × ZMod 2)),
+      mFree2 (V0 s)
+        (fadd (oL1 s) (fadd (fmul a1 (Ahat1 s)) (fmul b1 (uv s))))
+        (fadd (oL3 s) (fadd (fmul a3 (Ahat1 s)) (fmul b3 (uv s))))
+        (fadd (oL4 s) (fadd (fmul a4 (Ahat4 s)) (fmul b4 (uv s)))) % 2 = (V0 s).val := by
+    intro s _
+    have hwc : V0 s = (⟨(V0 s).val, hV0 s⟩ : Fin 2).castLE (by norm_num) := by apply Fin.ext; rfl
+    have hp := mFree2_parity ⟨(V0 s).val, hV0 s⟩
+      (fadd (oL1 s) (fadd (fmul a1 (Ahat1 s)) (fmul b1 (uv s))))
+      (fadd (oL3 s) (fadd (fmul a3 (Ahat1 s)) (fmul b3 (uv s))))
+      (fadd (oL4 s) (fadd (fmul a4 (Ahat4 s)) (fmul b4 (uv s))))
+    rw [← hwc] at hp
+    exact hp
+  unfold blockCostRedL
+  rw [Finset.sum_nat_mod, Finset.sum_congr rfl key]
+
+/-- **Reduced-block parity, B/right.** -/
+theorem blockCostRedR_parity (oR2 oR3 oR4 V0 : Ring) (a2 b2 a3 b3 a4 b4 : Fin 4)
+    (hV0 : ∀ s, (V0 s).val < 2) :
+    blockCostRedR oR2 oR3 oR4 V0 a2 b2 a3 b3 a4 b4 % 2
+      = (∑ s : ZMod 2 × ZMod 2, (V0 s).val) % 2 := by
+  have key : ∀ s ∈ (Finset.univ : Finset (ZMod 2 × ZMod 2)),
+      mFree1 (V0 s)
+        (fadd (oR2 s) (fadd (fmul a2 (Bhat2 s)) (fmul b2 (uv s))))
+        (fadd (oR3 s) (fadd (fmul a3 (Bhat2 s)) (fmul b3 (uv s))))
+        (fadd (oR4 s) (fadd (fmul a4 (Bhat2 s)) (fmul b4 (uv s)))) % 2 = (V0 s).val := by
+    intro s _
+    have hwc : V0 s = (⟨(V0 s).val, hV0 s⟩ : Fin 2).castLE (by norm_num) := by apply Fin.ext; rfl
+    have hp := mFree1_parity ⟨(V0 s).val, hV0 s⟩
+      (fadd (oR2 s) (fadd (fmul a2 (Bhat2 s)) (fmul b2 (uv s))))
+      (fadd (oR3 s) (fadd (fmul a3 (Bhat2 s)) (fmul b3 (uv s))))
+      (fadd (oR4 s) (fadd (fmul a4 (Bhat2 s)) (fmul b4 (uv s))))
+    rw [← hwc] at hp
+    exact hp
+  unfold blockCostRedR
+  rw [Finset.sum_nat_mod, Finset.sum_congr rfl key]
 
 /-! ## Proposition 30 skeleton: the cost-8 kill (Remark 5)
 
