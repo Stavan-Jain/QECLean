@@ -24,6 +24,20 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      # The gross BB safe-sector floor still has three `native_decide` leaves
+      # (MImFloorY0/Y1/Y4, ~3.75 GB each). lake has no `-j`/parallelism flag, so
+      # it builds all three concurrently at the tail and exhausts the runner's
+      # 16 GB → the job is killed (exit 143). Add swap so the peak spills to disk
+      # instead of OOM-ing. Remove once Tier-3 retires those leaves (cf. Y11/Y12).
+      - name: Add swap space (BB floor_holds native_decide memory peaks)
+        # The runner already has an active /swapfile, so add an extra one on the
+        # large /mnt ephemeral disk rather than touching the existing swap.
+        run: |
+          sudo fallocate -l 12G /mnt/swapfile
+          sudo chmod 600 /mnt/swapfile
+          sudo mkswap /mnt/swapfile
+          sudo swapon /mnt/swapfile
+          free -h
       - uses: leanprover/lean-action@v1
       # docgen rebuilds API docs for the project + all of mathlib (~1-2h with
       # no cache). Skip it on every push/PR; only run on tag pushes or manual

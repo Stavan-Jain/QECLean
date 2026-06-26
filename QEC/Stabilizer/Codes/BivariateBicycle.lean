@@ -17,18 +17,14 @@ import QEC.Stabilizer.Codes.BivariateBicycle.MImMembership
 import QEC.Stabilizer.Codes.BivariateBicycle.MImTransport
 import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY0
 import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY1
-import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY2
-import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY3
 import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY4
-import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY5
-import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY6
-import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY7
-import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY8
-import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY9
-import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY10
 import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY11
 import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorY12
 import QEC.Stabilizer.Codes.BivariateBicycle.MImAssembly
+import QEC.Stabilizer.Codes.BivariateBicycle.SlotFrame
+import QEC.Stabilizer.Codes.BivariateBicycle.WtFloor24
+import QEC.Stabilizer.Codes.BivariateBicycle.WtFloor24Bridge
+import QEC.Stabilizer.Codes.BivariateBicycle.WtFloor1618
 
 /-!
 # Bivariate bicycle codes
@@ -76,16 +72,63 @@ code and its `[[72, 12, 6]]` base, related by a 2:1 covering:
 - `MImMembership` — the Γ-membership indices (`gammaIdx0`..`gammaIdx4`) and their correctness
                     (`mem0`..`mem4`, `native_decide`: each `rmul P̂ⱼ (Vⱼ f)` sits at the computed
                     index in Γⱼ), plus the general per-orbit floor `floor_of_data`
-- `MImTransport`  — the y-translation symmetry: `seamC` is y-covariant at the chain level
-                    (`seamC_shiftYk_combo`) and `chainWeight` is translation-invariant, giving
-                    the transport reduction `floor_shiftYk_combo` (a class's floor lifts to its
-                    `(0,k)`-translate)
-- `MImFloorY0..Y12` — the safe-sector floor proven for each of the 13 y-orbit representatives
-                    (per-orbit `native_decide` `floorOK = true` leaf + `floor_of_data`)
-- `MImAssembly`   — **discharges `MImBound`** (`mimBound_holds`): the 64-case y-orbit dispatch
-                    (`floor_kcombo`) reduces every `ker ∂₂` class to a y-orbit rep; then the
+- `MImTransport`  — the translation symmetry.  `seamC` is y-covariant at the chain level
+                    (`seamC_shiftYk_combo`); in x it is covariant only up to an explicit
+                    boundary defect (the §9.3 cut-shift).  Both are captured by the general
+                    `floor_transfer` (§17), which lifts a class's floor to any `(j,k)`-translate;
+                    `chainWeight` translation-invariance does the rest.
+- `MImFloorY{0,1,4,11,12}` — the safe-sector floor proven for the 5 full-translation-orbit
+                    representatives.  The **light orbits** `Y0, Y1, Y4` use the per-orbit
+                    `native_decide` `floorOK = true` engine leaf (`floor_of_data`); the
+                    **weight-24 orbits** `Y11, Y12` are discharged **analytically** (Tier 3,
+                    M1) via the slot-frame walk (`WtFloor24Bridge.costFromComps_ge_12_of_blocks`
+                    + per-block `slotCost` `decide`s), with **no `floorOK` leaf** (the `2³⁰`
+                    `native_decide` is gone for these two)
+- `MImAssembly`   — **discharges `MImBound`** (`mimBound_holds`): the 64-case 2-D-orbit dispatch
+                    (`floor_kcombo`) reduces every `ker ∂₂` class to one of the 5 reps; then the
                     **unconditional** `grossStabilizerCode_hasCodeDistance_12_uncond` and the
                     bundled `grossStabilizerCodeWithDistance : StabilizerCodeWithDistance 144 12 12`
+
+- `SlotFrame`     — **(Tier 3, A4 §10) analytic slot-frame infrastructure** that will replace
+                    the `native_decide` confined-floor engine (`MImFloor`/`floorOK`).  The
+                    integration bridge `floor_of_data_analytic` (mirrors `floor_of_data`'s
+                    signature, via `chainWeight_coset_eq`), the slot algebra (kill vector
+                    `kappa`, labelings `ellL`/`ellR`, `theta`), Lemma 19 (labeling facts),
+                    the per-slot cost lower bounds `mFree1`/`mFree2` + soundness (Lemma 20,
+                    by `omega` — axiom-clean), the link-free block bound
+                    `costFromComps_ge_blockLB`, and the affine-pencil / hyperbolic-quadruple
+                    facts (Lemmas 21, 24).  This is the §10 substrate; the per-orbit floor
+                    walks (§§11–13) that consume it are still TODO, so the floor remains
+                    discharged by `MImAssembly`'s engine for now.
+- `WtFloor24`     — **(Tier 3, A4 §11) the weight-24 standard-form walk** (M1a).  The per-slot
+                    cost `slotCost` (Lemma 20) + soundness `slotCost_le`, the standard form
+                    `Sab` (Def 26), and **Proposition 29** `Sab_ge_6` (`S(a,b) ≥ 6` ∀ 16 pairs,
+                    so every wt-24 spine cell has linked block cost `≥ 12`).  Axiom-clean
+                    (kernel `decide`).  The bridge to the actual wt-24 floor is `WtFloor24Bridge`.
+- `WtFloor24Bridge` — **(Tier 3, A4 §§10–11) the weight-24 floor close** (M1 — DONE).  The
+                    bridge connecting the closed coset weight `costFromComps` (the
+                    `floor_of_data_analytic` hypothesis) to the `slotCost` machinery, and the
+                    assembly `costFromComps_ge_12_of_blocks` that **discharges the two
+                    weight-24 floor leaves** `MImFloorY{11,12}` analytically (dropping their
+                    `floorOK` `2³⁰` `native_decide`).  Contents: radical-multiplier image
+                    membership (`rmul_{Bhat2,Ahat1,Ahat4}_mem`, `inIdeal_to_exists`), the
+                    slot-sum expansion (`sum_zmod2sq`), the `Fin 2 ↪ Fin 4` component-0 bridge
+                    (`slotCost(L)_le'`), component 0's `F₂`-valuedness (`V_psi0_lt2`,
+                    `comp0_lt2_{L,R}`), the block split (`costFromComps_ge_blockSlotCost`), and
+                    the cost-preserving moves (Lemma 25).  The wt-24 reps `Y11, Y12` decouple
+                    per-block to `6 + 6` (so no `ρ`-links / Lemma-27 reduction needed); the
+                    light orbits `Y0, Y1, Y4` (per-block `< 6`) remain on the engine (M2/M3).
+- `WtFloor1618`    — **(Tier 3, A4 §§12–13) the light-orbit floor** (M2/M3, in progress).
+                    The light orbits `Y0, Y1, Y4` (wt-16/18) do NOT decouple, so `≥ 12`
+                    is coupled.  Provides the **parity layer** (all kernel-clean, std-3):
+                    `chainWeight_coset_even` (every Smith-coset element has even weight),
+                    `blockCost_parity` (a block's cost `≡ |V₀| (mod 2)`, the Lemma-28
+                    ingredient), and `chainWeight_coset_ge12_of_floor10` (**Prop 32**:
+                    evenness + the `≥ 10` floor + the no-weight-`10` kill ⟹ `≥ 12`).  The
+                    remaining work is Prop 30 (`min_L + min_R ≥ 10`, per-cell spine-coupled
+                    over the `64 × 16 = 1024` spine cells) and Prop 31 (the 118 `ρ`-link
+                    kills) — neither a kernel-feasible enumeration; until then the three
+                    light orbits stay on the `MImFloor` engine.
 
 Both CRT-engine inputs — `LightStabilizerClassification` (`LightStabClassify`) and `MImBound`
 (`MImAssembly`) — are now discharged, so the distance of the gross `[[144,12,12]]` code is
