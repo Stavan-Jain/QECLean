@@ -179,7 +179,65 @@ Notes on rigor:
 
 ---
 
-## 6. Reusable core vs. per-code cost
+## 6. The base-floor halves, empirically: engine vs. difference-set
+
+Theorem A (the base floor `d(base) ≥ 6`) is **two independent arguments** with
+very different reach. Both were mapped against SAT ground truth (scripts:
+[`engine_frame_sweep.py`](../experiments/bb_lab/scripts/engine_frame_sweep.py),
+[`twosided_diffset_adapt.py`](../experiments/bb_lab/scripts/twosided_diffset_adapt.py),
+[`twosided_floor_counterexample.py`](../experiments/bb_lab/scripts/twosided_floor_counterexample.py),
+[`frobenius_obstruction_verify.py`](../experiments/bb_lab/scripts/frobenius_obstruction_verify.py)).
+
+**One-sided half (CRT/F₄ engine) — `Ann(A), Ann(B) ≥ 6`.** *Frame-locked.* The
+engine is *defined* only on `G ≅ Z₂²×Z₃²` (four `F₄` components + four `Z₂²`
+slots); among catalogued BB codes only the gross base lives there. Even on the
+frame: of weight-3 polynomials with a nonzero annihilator ~91% have `μ(Ann)≥6`
+but ~9% fall below, and the coarse component profile does **not** predict which
+(gross `A` and `1+y+y²` share a profile but have `μ=6` vs `4`). And the engine
+half *alone never determines a distance* — over gross-shape `k>0` codes a
+two-sided logical is strictly lighter than the one-sided floor ~47% of the time
+(engine blind), and in the other ~53% it locates but cannot *prove* the floor
+without the two-sided half.
+
+**Two-sided half (difference-set combinatorics) — no light `(u_L,u_R)` cycle.**
+*Frame-agnostic* (uses no `F₄`/CRT structure). It distills to checkable
+predicates on `(A,B)`: **D1** `ov≤1` (Sidon difference sets); **D2** `dA∩dB=∅`;
+**D3** coordinate separation.
+
+- *The natural conjecture `D1 ∧ D2 ⟹ floor ≥ 2w` is **false**.* The obstruction is
+  the characteristic-2 **Frobenius square**: `(1+x+y)² = 1+x²+y²`, so `A=B²` gives
+  a two-sided cycle `(1,B)` of weight `1+w < 2w` while `A,B` are Sidon (`D1`) with
+  `dA=2dB` disjoint from `dB` (`D2`). It is frame-independent and a *genuine
+  distance obstruction* — on `Z₇²` it is a weight-4 **logical** in a `[[98,12,4]]`
+  code (`μ_Z` drops to 4 everywhere). The earlier "`D1∧D2` suffices, `D3`
+  dispensable" reading was wrong: an artifact of testing only gross-shape
+  polynomials, which exclude the square shape `A=B²`.
+- *Corrected criterion.* `D3` is exactly what excludes Frobenius (`A=B²` has
+  `0 ∈ x(dA)∩x(dB)`; gross does not). SAT-checked over **general** weight-3
+  polynomials: **`D1 ∧ D2 ∧ D3 ⟹ two-sided cycle floor ≥ 2w`, 0 violations / 4,144
+  codes** (4001 on `Z₇²`, 144 on `Z₆²`).
+- *Proof status.* Unconditional under `D1∧D2`: parity; `(1,1)` impossible;
+  `(1,t) ⟹ t≥w` (each `B`-translate contributes ≤1 cell to an `A`-translate). The
+  gap is the minimal `(1,w)` cycle, where Frobenius lives. With the full
+  **spike–spread** structure (which implies `D3`) the gross argument generalizes
+  and *proves* the `2w` floor, modulo recomputing the projections' 1-variable
+  annihilator weights per polynomial. Whether `D3` *alone* suffices is open
+  (empirically yes for `w=3`).
+
+The predicates and the Frobenius gate are packaged in
+[`bb_lab.diffset_predicates`](../experiments/bb_lab/src/bb_lab/diffset_predicates.py)
+(`is_sidon`, `difference_sets_disjoint`, `coordinate_separated`,
+**`is_frobenius_related`**, `two_sided_hypothesis`).
+
+**Net for the program.** The two-sided half is the **frame-portable** foundation
+(it ports across `F₄/F₈/F₆₄`; the Frobenius obstruction is also frame-independent),
+with correct lemma `D1∧D2∧D3 ⟹ 2w`. The one-sided (engine) half stays frame-locked.
+A general base-floor theory should be built on the difference-set side, with the
+Frobenius square as a named, mandatory exclusion.
+
+---
+
+## 7. Reusable core vs. per-code cost
 
 **Genuinely reusable (prove once, instantiate freely):**
 - chain substrate + PAR + X–Z duality (**generic_BB**); already parametric in Lean;
@@ -206,11 +264,15 @@ Prop-10/Prop-32 analogue is known there — an open problem.
 
 ---
 
-## 7. Bottom line
+## 8. Bottom line
 
 - **Factor the cover machinery as a parametric Lean layer.** Substrate + duality +
   the free-Z₂ cover skeleton are reusable, low-risk infrastructure for the whole
   doubling program, taking `(d(base), μ_Z(base))` as inputs.
+- **Build the base-floor theory on the difference-set (two-sided) side** (§6): it
+  is frame-agnostic, distills to `D1 ∧ D2 ∧ D3`, and `is_frobenius_related` must be
+  a mandatory exclusion gate. The CRT/F₄ engine (one-sided) half is frame-locked and
+  is only one of two halves — never sufficient alone.
 - **State the doubling hypothesis as the four conditions of §3**, not the coarser
   floor condition. The cover supplies the factor-2; the base floor supplies the only
   number; conditions 2–4 are what upgrade `≥ d` to `= 2d`.
