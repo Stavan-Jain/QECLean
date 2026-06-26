@@ -216,13 +216,25 @@ predicates on `(A,B)`: **D1** `ov≤1` (Sidon difference sets); **D2** `dA∩dB=
   `0 ∈ x(dA)∩x(dB)`; gross does not). SAT-checked over **general** weight-3
   polynomials: **`D1 ∧ D2 ∧ D3 ⟹ two-sided cycle floor ≥ 2w`, 0 violations / 4,144
   codes** (4001 on `Z₇²`, 144 on `Z₆²`).
-- *Proof status.* Unconditional under `D1∧D2`: parity; `(1,1)` impossible;
+- *Proof status (the conjecture is NOT proven in general).* The gross proof is an
+  **instance proof**, not a parametric theorem: only `(1,1)` is parametric (pure
+  `D2`); the `(1,3)`/`(2,2)` cases hard-code per-polynomial facts (triangle
+  chiralities, the 1-variable fact "`Ann(1+x+x²)` has min weight 4", the multiset
+  `{3,1}≠{2,1,1}`). Unconditional under `D1∧D2`: parity; `(1,1)` impossible;
   `(1,t) ⟹ t≥w` (each `B`-translate contributes ≤1 cell to an `A`-translate). The
-  gap is the minimal `(1,w)` cycle, where Frobenius lives. With the full
-  **spike–spread** structure (which implies `D3`) the gross argument generalizes
-  and *proves* the `2w` floor, modulo recomputing the projections' 1-variable
-  annihilator weights per polynomial. Whether `D3` *alone* suffices is open
-  (empirically yes for `w=3`).
+  gap is the minimal `(1,w)` cycle, where Frobenius lives.
+- *The spike–spread "generalization" is a RECIPE, and it is incomplete.* Re-running
+  the gross case analysis on another spike–spread `(A,B)` requires discharging the
+  per-polynomial obligations, which **can fail**: the `(2,2)` step needs the spread's
+  1-variable annihilator min-weight `> 2`, and that fails for ≈8–10% of spike–spread
+  `D1∧D2` codes on larger frames (30/400 on `Z₉×Z₆`, 39/400 on `Z₆×Z₁₂`; 0/100 on
+  `Z₆²`) — *even though the floor still equals `2w` there* (SAT-confirmed). So the gross
+  technique is frame-fragile: a complete prover on `Z₆²`, a leaky recipe beyond it.
+- *Empirical robustness of the floor itself.* `D1∧D2∧spike-spread ⟹ floor = 2w` holds
+  with 0 violations over 900 codes (`Z₆²`, `Z₉×Z₆`, `Z₆×Z₁₂`), the floor being *exactly*
+  `2w` in every case. So the target is a robust conjecture; the gross proof supplies one
+  instance + a partial (automatable) recipe. Closing the ~10% the recipe drops — and
+  whether `D3` *alone* suffices (empirically yes, `w=3`) — is the open Layer-2 work.
 
 The predicates and the Frobenius gate are packaged in
 [`bb_lab.diffset_predicates`](../experiments/bb_lab/src/bb_lab/diffset_predicates.py)
