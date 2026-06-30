@@ -5,13 +5,18 @@ distinct parts of that proof and records, for each, how tightly the argument is
 welded to the specific code versus how far it transfers to other bivariate-bicycle
 (BB) codes. It also records the **doubling template** the proof instantiates, two
 corrections to an earlier (coarser) pass at this analysis, and an independently
-**verified second instance** of the template outside the gross lineage.
+**verified second doubling pair** outside the gross lineage (it confirms the cover
+scaffolding and the doubled *value* by SAT, but does not exercise the analytic floor
+engine — see §5).
 
 Scope note: the structural / proof-theoretic content here is grounded in the proof
 text and (for the new pair) in a 32/32-check computation. A handful of *quantitative
 corpus* claims (the 16,867-code cover sweep; the `Z₆×Z₁₄` weight-8 count; the
 two-gross self-test) come from the `bb_lab` cover-cascade tooling and the analysis
-agents and are flagged inline as **[reported, not re-verified here]**.
+agents and are flagged inline as **[reported, not re-verified here]**. An adversarial
+re-verification (2026-06-29) independently reproduced the §1/§3/§4/§5/§6 computations
+against `bb_lab` and corrected two corpus claims — the §6 engine-frame exclusivity and
+the §6 `D1∧D2∧D3` count (both below).
 
 ---
 
@@ -70,8 +75,14 @@ Four tiers, from most to least portable:
 
 ## 3. The doubling template
 
-The reusable abstraction the proof instantiates. When **all four** conditions hold,
-the template proves `d(cover) = 2·d(base)`:
+The reusable abstraction the proof instantiates. It is a **conditional reduction**,
+not a self-contained theorem: when conditions 1–4 hold they bring `d(cover) = 2·d(base)`
+down to the two floor inputs of condition 3 — which the template does **not** itself
+prove (those floors are discharged per-instance: by the analytic engine for gross, by a
+global SAT call in §5). The conditions are also **layered, not independent** — condition
+2 is the mechanism that establishes the safe half of condition 3, and condition 4
+supplies the matching tight upper bound. With those caveats, conditions 1–4 assemble to
+`d(cover) = 2·d(base)`:
 
 1. **Free Z₂ cover.** The cover is the free Z₂ cover of the base (automatic for
    `Z_{2ℓ} → Z_ℓ` with deck `σ = ·x^ℓ`), with the *same* polynomials (so
@@ -80,8 +91,10 @@ the template proves `d(cover) = 2·d(base)`:
    `im Δ` via the chain-level identity `τ∘p = 1 + σ` ⟹ (with R) `τ_*∘p_* = 0`, i.e.
    `im p_* ⊆ ker τ_* = im Δ`.
 3. **Both floors ≥ 2d.** The safe floor (the classes in `im p_*`, via the base's
-   heavy Smith classes) and the dangerous floor (the classes in `ker p_*`, via the
-   cover's diagonal lifts) both sit at `≥ 2·d(base)`.
+   heavy Smith classes / Prop 32) and the dangerous floor (the classes in `ker p_*`,
+   via the light-stabilizer classification Prop 10 + the slice identity
+   `|b|+2·m(b) ≥ 2d`) both sit at `≥ 2·d(base)`. (The diagonal lift `τ(u*)` is *not*
+   the dangerous-floor mechanism — it is the condition-4 tightness witness, below.)
 4. **Tight diagonal lift.** A minimum-weight base logical `u*` lies *outside*
    `im Δ`, so `τ(u*) = (u*, u*)` is a genuine cover logical of weight `2·d(base)`,
    attaining the floor.
@@ -123,10 +136,12 @@ hypothesis for `d(cover) = 2·d(base)` is the **four conditions of §3** (notabl
 
 ---
 
-## 5. Verified second instance — `[[36,4,4]] → [[72,4,8]]`
+## 5. Verified second doubling pair — `[[36,4,4]] → [[72,4,8]]`
 
 A doubling pair **outside the gross/tour-de-gross lineage**, with a *different base
-group*, on which the same safe/dangerous argument carries the distance.
+group*, on which the cover scaffolding reproduces and the doubled distance is confirmed
+by SAT — the analytic safe/dangerous *engine* (Prop 10 / Prop 32) is **not** re-run here
+(see the rigor notes below).
 
 - **Base** `[[36,4,4]]` on `G = Z₃×Z₆` (x order 3, y order 6):
   `A = x² + y + y³`, `B = 1 + x + y²`.
@@ -190,7 +205,11 @@ very different reach. Both were mapped against SAT ground truth (scripts:
 
 **One-sided half (CRT/F₄ engine) — `Ann(A), Ann(B) ≥ 6`.** *Frame-locked.* The
 engine is *defined* only on `G ≅ Z₂²×Z₃²` (four `F₄` components + four `Z₂²`
-slots); among catalogued BB codes only the gross base lives there. Even on the
+slots); among the **named/literature (Bravyi Table I)** BB codes only the gross base
+lives there — but the generated corpus has **812 `k>0` codes on this frame** (including
+non-gross `[[72,12,6]]`-shape codes), so the frame is *not* gross-exclusive **[corpus
+figure from private-side `bb_instances.duckdb`; not re-runnable in this worktree]**. Even
+on the
 frame: of weight-3 polynomials with a nonzero annihilator ~91% have `μ(Ann)≥6`
 but ~9% fall below, and the coarse component profile does **not** predict which
 (gross `A` and `1+y+y²` share a profile but have `μ=6` vs `4`). And the engine
@@ -215,8 +234,9 @@ predicates on `(A,B)`: **D1** `ov≤1` (Sidon difference sets); **D2** `dA∩dB=
 - *Apparent corrected criterion (frame-limited).* On `Z₆²`/`Z₇²`, `D3` excludes
   Frobenius (`A=B²` has `0 ∈ x(dA)∩x(dB)` there; gross does not), and
   **`D1 ∧ D2 ∧ D3 ⟹ two-sided cycle floor ≥ 2w`** is SAT-verified with 0 violations
-  / 4,144 general weight-3 codes (4001 on `Z₇²`, 144 on `Z₆²`; also holds on `Z₉×Z₆`,
-  `Z₁₂×Z₆`).
+  among **4,144 SAT-checked pairs** (`Z₇²`: 4000 of an 8496-pair population, the sweep
+  capping at 4000; `Z₆²`: all 144; also holds on `Z₉×Z₆`, `Z₁₂×Z₆`) — a clean but
+  partial sample (`Z₇²` under half), not an exhaustive check.
 - ***…but `D1∧D2∧D3` itself fails on wider frames.*** `D3`'s exclusion of Frobenius
   is a small-modulus coincidence. On **`Z₈²`, `Z₁₃²`, `Z₁₅²`** there exist Frobenius
   squares `A=B²` with `D1∧D2∧D3` *all true* — a "spread" `B` whose doubled difference
@@ -302,9 +322,12 @@ Prop-10/Prop-32 analogue is known there — an open problem.
   is frame-agnostic, distills to `D1 ∧ D2 ∧ D3`, and `is_frobenius_related` must be
   a mandatory exclusion gate. The CRT/F₄ engine (one-sided) half is frame-locked and
   is only one of two halves — never sufficient alone.
-- **State the doubling hypothesis as the four conditions of §3**, not the coarser
-  floor condition. The cover supplies the factor-2; the base floor supplies the only
-  number; conditions 2–4 are what upgrade `≥ d` to `= 2d`.
+- **State the doubling result as the conditional reduction of §3**, not a
+  self-contained theorem: the four conditions bring `= 2d` down to condition 3's two
+  floor inputs but do not prove them (still discharged per-instance — analytically for
+  gross, by SAT in §5). The cover supplies the factor-2; the base floor supplies the
+  only number; conditions 2–4 (layered, not independent) upgrade `≥ d` to `= 2d`
+  *given* the floors.
 - **The mechanism is multi-instance.** The `[[36,4,4]] → [[72,4,8]]` pair (§5) is a
   verified doubling outside the gross lineage, in the same `Z₃²`/elementary-2-part
   engine frame — a positive signal that the family route is broader than the single
