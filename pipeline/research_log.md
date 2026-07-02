@@ -24,6 +24,28 @@ what was tried and why it didn't work.
   `experiments/bb_lab/scripts/gen_pair72_packaging_data.py`.
   [plan](../experiments/bb_lab/notes/S39_pair72_packaging_plan.md)
 
+- 2026-07-02 — deck-homotopy-R-characterization (A12) — success —
+  **The doubling template's condition 2 (homotopy R) is solved:
+  (R) ⟺ `k(cover) = k(base)` ⟺ `1+x^ℓ ∈ (A,B)`** for every free ℤ₂ BB
+  cover (transfer-LES inequality `dim (1+σ)H₁ ≥ k̃−k`, plus the
+  constructive Koszul/Bezout converse). (R) is **not** automatic:
+  explicit weight-3 counterexamples exist (dead-character blocks), the
+  strict IBM monomial shape fails too, and among ~1.04M weight-3 cover
+  pairs swept 11,307 violate (R) — the majority (9,612) via *subtle*
+  non-dead-block mechanisms. Every historically checked cover (157/157:
+  gross both directions, pair72, Z₆×Z₁₄ both directions, all 152 A9
+  doubles) is k-preserving, where (R) is forced — the observed
+  universality dissolved. Resolved in passing: the F₂-additive
+  certificate form is complete (semantic (R) ⟺ certificate solvable),
+  and the `im p_* ⊆ im Δ` linchpin is an *iff*. Lean payoff:
+  `deckTrivial_of_bezout` in `BBDoubling.lean` (module-map homotopy from
+  any Bezout witness; both instance identities are its `P = 0` case);
+  pair72's (R) leg retrofitted to a kernel-`decide` 36-point identity.
+  Open remainder: the quantitative `dim (1+σ)H₁ = k̃−k` (⟺ vanishing of
+  the deck-Bockstein composite `δ₁∘δ₂`), exact on every instance and on
+  ~10⁶ exhaustively swept local blocks.
+  [details](../experiments/bb_lab/notes/A12_deck_homotopy_R.md)
+
 - 2026-07-02 — bb-doubling-layer-second-instance — success —
   **The free-ℤ₂ doubling template is a parametric Lean layer, and the
   `[[36,4,4]] → [[72,4,8]]` pair is proven through it** (chain+Pauli

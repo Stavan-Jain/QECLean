@@ -1,4 +1,4 @@
-"""A10 probe: is the homotopy (R) (sigma_* = id on H1(cover)) automatic?
+"""A12 probe: is the homotopy (R) (sigma_* = id on H1(cover)) automatic?
 
 For a BB pair (A, B) on the cover group Z_l x Z_m with deck sigma = x^(l/2)
 (free Z2 cover doubling x), this script computes, over F2:
@@ -9,7 +9,7 @@ For a BB pair (A, B) on the cover group Z_l x Z_m with deck sigma = x^(l/2)
   - membership: 1 + x^(l/2) in ideal (A, B) of F2[Z_l x Z_m]
                 (<=> vec(1+s) in im d1, since im d1 = {PA + QB})
 
-Predictions being tested (A10 plan):
+Predictions being tested (A12 plan):
   T1 (theorem):    membership  =>  (R)          (Koszul H1 killed by (A,B))
   C1 (counting):   membership <=>  k_cover = k_base
   R* (conjecture): (R)        <=>  membership   (the open (=>) direction)
@@ -17,7 +17,7 @@ Predictions being tested (A10 plan):
     of A and B  =>  (R) FAILS (headline: (R) not automatic).
 
 Pure stdlib; matrices as lists of int bitmasks (rows = F2 vectors).
-Run: uv run python scripts/a10_deck_r_probe.py   (from experiments/bb_lab)
+Run: uv run python scripts/a12_deck_r_probe.py   (from experiments/bb_lab)
 """
 
 
@@ -180,16 +180,23 @@ def case(name, l, m, A, B):
     return r_holds, mem, kc, kb
 
 
-print("== A10 deck-homotopy (R) probe — cover Z_l x Z_m, deck s = x^(l/2) ==")
-# controls (expected: (R) HOLDS, k preserved, membership yes)
-case("toric-ish Z6xZ3 (1+x, 1+y)", 6, 3, [(0, 0), (1, 0)], [(0, 0), (0, 1)])
-case("gross Z12xZ6 x-doubling", 12, 6,
-     [(3, 0), (0, 1), (0, 2)], [(0, 3), (1, 0), (2, 0)])
-case("pair72 Z6xZ6 x-doubling", 6, 6,
-     [(2, 0), (0, 1), (0, 3)], [(0, 0), (1, 0), (0, 2)])
-# dead-block counterexamples (expected: (R) FAILS, k jumps, no membership)
-case("CE1 Z6xZ3 A=1+y+y2 B=x2*A", 6, 3,
-     [(0, 0), (0, 1), (0, 2)], [(2, 0), (2, 1), (2, 2)])
-case("CE2 Z6xZ3 A=1+y+y2 B=1+x2+x4", 6, 3,
-     [(0, 0), (0, 1), (0, 2)], [(0, 0), (2, 0), (4, 0)])
-print("all T1/C1 consistency assertions passed")
+def main():
+    print("== A12 deck-homotopy (R) probe — cover Z_l x Z_m, "
+          "deck s = x^(l/2) ==")
+    # controls (expected: (R) HOLDS, k preserved, membership yes)
+    case("toric-ish Z6xZ3 (1+x, 1+y)", 6, 3,
+         [(0, 0), (1, 0)], [(0, 0), (0, 1)])
+    case("gross Z12xZ6 x-doubling", 12, 6,
+         [(3, 0), (0, 1), (0, 2)], [(0, 3), (1, 0), (2, 0)])
+    case("pair72 Z6xZ6 x-doubling", 6, 6,
+         [(2, 0), (0, 1), (0, 3)], [(0, 0), (1, 0), (0, 2)])
+    # dead-block counterexamples ((R) FAILS, k jumps, no membership)
+    case("CE1 Z6xZ3 A=1+y+y2 B=x2*A", 6, 3,
+         [(0, 0), (0, 1), (0, 2)], [(2, 0), (2, 1), (2, 2)])
+    case("CE2 Z6xZ3 A=1+y+y2 B=1+x2+x4", 6, 3,
+         [(0, 0), (0, 1), (0, 2)], [(0, 0), (2, 0), (4, 0)])
+    print("all T1/C1 consistency assertions passed")
+
+
+if __name__ == "__main__":
+    main()
