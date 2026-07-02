@@ -143,6 +143,21 @@ group*, on which the cover scaffolding reproduces and the doubled distance is co
 by SAT — the analytic safe/dangerous *engine* (Prop 10 / Prop 32) is **not** re-run here
 (see the rigor notes below).
 
+> **Lean status (2026-07-02).** This pair is now **proven in Lean at the chain and
+> Pauli levels**, end-to-end through the parametric doubling layer
+> (`QEC/Stabilizer/Framework/Homological/{BBCover,BBDoubling}.lean`):
+> `pair72_chain_distance_eq_8` / `pair72_pauli_distance_eq_8`
+> (`QEC/Stabilizer/Codes/BivariateBicycle/Z3Z6/`), axiom bar identical to gross
+> (standard three + `native_decide`).  All four template conditions of §3 are
+> discharged: the base floor by weight-≤3 kernel sweeps, (R) by the single
+> polynomial identity `p·B = 1+x³` (weight-8 `p`; simpler than gross's
+> `(1+x²)B² = 1+x⁶`) through the layer's chain-homotopy certificate, the dangerous
+> floor by the layer's generic single-shape rung over the 24-class light-boundary
+> census, and the safe floor by three per-Smith-class `2¹⁸` sweeps (`dim ker ∂₂ = 2`
+> here vs gross's 6, so no CRT engine is needed — the sweeps ARE the floor).  The
+> `StabilizerCodeWithDistance 72 4 8` packaging is the remaining (mechanical) step.
+> Data provenance: `experiments/bb_lab/scripts/gen_pair72_z6z6_data.py`.
+
 - **Base** `[[36,4,4]]` on `G = Z₃×Z₆` (x order 3, y order 6):
   `A = x² + y + y³`, `B = 1 + x + y²`.
 - **Cover** `[[72,4,8]]` on `Z₆×Z₆`, *same polynomials* — the free Z₂ double cover
@@ -208,7 +223,14 @@ engine is *defined* only on `G ≅ Z₂²×Z₃²` (four `F₄` components + fou
 slots); among the **named/literature (Bravyi Table I)** BB codes only the gross base
 lives there — but the generated corpus has **812 `k>0` codes on this frame** (including
 non-gross `[[72,12,6]]`-shape codes), so the frame is *not* gross-exclusive **[corpus
-figure from private-side `bb_instances.duckdb`; not re-runnable in this worktree]**. Even
+figure from private-side `bb_instances.duckdb`; not re-runnable in this worktree]**.
+**A9 correction (2026-07-02):** the frame is not even *anchorability*-exclusive — the
+presentation-orbit census over the corpus's `d ≥ 6` codes finds **six anchorable
+`[[72,12,6]]` codes: gross plus FIVE genuinely new ones** (inequivalent under the full
+captured equivalence; a raw check on stored canonical forms sees 0/812 because the
+mirrored-projection gate is not Aut-invariant), and **three of the five have exact
+`[[144,12,12]]` y-covers** — engine-frame gross twins.  See
+`experiments/bb_lab/notes/A9_lean_target_screen.md` §T2. Even
 on the
 frame: of weight-3 polynomials with a nonzero annihilator ~91% have `μ(Ann)≥6`
 but ~9% fall below, and the coarse component profile does **not** predict which
@@ -311,13 +333,31 @@ has odd part `Z₃×Z₇` → heterogeneous `F₈/F₆₄` layers where this rig
 confirms its covers double **[reported, not re-verified here]** but no analytic
 Prop-10/Prop-32 analogue is known there — an open problem.
 
+**A9 update (2026-07-02): an in-frame engine target now exists.** The obstacle above
+concerned leaving the frame; the A9 census (§6) shows the engine's own frame carries
+**three new `[[72,12,6]] → [[144,12,12]]` doubling pairs beyond gross** (hit3:
+`A = y³+x+x², B = y+xy²+x²`, and two siblings — all sharing gross's `A` up to
+normalization). Their bases have 36 cells, so the direct-sweep route used for the §5
+pair (`2¹⁸` cosets) is out of reach (`2³⁶`): a full `d = 12` proof for any of them
+requires re-instantiating the polynomial-specific engine tables (Prop-10
+classification, MIm dispatch and floor leaves) — i.e. these are the natural targets
+where the CRT/F₄ engine is *necessary*, not decorative, and where its parametrization
+would pay off.
+
 ---
 
 ## 8. Bottom line
 
-- **Factor the cover machinery as a parametric Lean layer.** Substrate + duality +
-  the free-Z₂ cover skeleton are reusable, low-risk infrastructure for the whole
-  doubling program, taking `(d(base), μ_Z(base))` as inputs.
+- **Factor the cover machinery as a parametric Lean layer.** ✅ **Done (2026-07-02)**:
+  `Framework/Homological/BBCover.lean` (the `XDoubleCoverData` bundle — five data
+  fields, four finite obligations — with the full transfer/sheet/seam apparatus
+  derived generically) and `BBDoubling.lean` (the template of §3 as theorems:
+  `chainWeight_ge_of_strongBaseFloor` for the Theorem-B floor,
+  `deckTrivial_of_homotopy_certificate` for (R), generic single-/pair-shape dangerous
+  rungs, `safeFloor_of_seamCosetFloor`, and the assemblies
+  `chain_distance_eq_double` / `pauli_distance_eq_double`).  The gross retrofit onto
+  the layer is deliberately deferred (its `native_decide` leaves embed the seam
+  definitions definitionally).
 - **Build the base-floor theory on the difference-set (two-sided) side** (§6): it
   is frame-agnostic, distills to `D1 ∧ D2 ∧ D3`, and `is_frobenius_related` must be
   a mandatory exclusion gate. The CRT/F₄ engine (one-sided) half is frame-locked and
@@ -325,13 +365,16 @@ Prop-10/Prop-32 analogue is known there — an open problem.
 - **State the doubling result as the conditional reduction of §3**, not a
   self-contained theorem: the four conditions bring `= 2d` down to condition 3's two
   floor inputs but do not prove them (still discharged per-instance — analytically for
-  gross, by SAT in §5). The cover supplies the factor-2; the base floor supplies the
-  only number; conditions 2–4 (layered, not independent) upgrade `≥ d` to `= 2d`
-  *given* the floors.
-- **The mechanism is multi-instance.** The `[[36,4,4]] → [[72,4,8]]` pair (§5) is a
-  verified doubling outside the gross lineage, in the same `Z₃²`/elementary-2-part
-  engine frame — a positive signal that the family route is broader than the single
-  tour-de-gross row.
+  gross, by kernel sweeps for the §5 pair in Lean, by SAT elsewhere). The cover
+  supplies the factor-2; the base floor supplies the only number; conditions 2–4
+  (layered, not independent) upgrade `≥ d` to `= 2d` *given* the floors.
+- **The mechanism is multi-instance — now in Lean, not just in SAT.** The
+  `[[36,4,4]] → [[72,4,8]]` pair (§5) is proven through the parametric layer at the
+  chain and Pauli levels with the gross axiom bar; and the A9 census (§6) shows the
+  engine frame itself carries three further `[[144,12,12]]` doubling pairs beyond
+  gross (§7) — the family route is broader than the single tour-de-gross row in both
+  directions.
 - **Claim the mechanism and the family route, not the solver-known values.** The
-  cover dichotomy is family-portable; `d = 2·d(base)` is carried by polynomial-specific
-  engines that currently live only over `Z₃²/F₄`.
+  cover dichotomy is family-portable (and now a reusable Lean layer);
+  `d = 2·d(base)` is carried by per-instance floors — polynomial-specific engines
+  over `Z₃²/F₄` at gross scale, direct kernel sweeps at `2¹⁸` scale.

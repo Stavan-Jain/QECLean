@@ -82,6 +82,10 @@ Two lessons from the hunt, recorded here because they are reusable traps:
    one** genuinely-new `[[168,12,6]]` code up to full BB-equivalence (Aut × A↔B swap ×
    independent monomial translation; the dedup is validated by `Z₆×Z₆`'s 36 hits
    collapsing to the single gross base). All sampled members are SAT-exact `d = 6`.
+   *(A9 correction, 2026-07-02: the `Z₆×Z₆` uniqueness holds only for THIS
+   origin-anchored enumeration — the presentation-orbit census over the full corpus
+   finds gross plus FIVE more anchorable `[[72,12,6]]` codes, three of whose y-covers
+   are exact `[[144,12,12]]`; see `A9_lean_target_screen.md` §T2.)*
 
 ---
 

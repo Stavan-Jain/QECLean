@@ -13,6 +13,16 @@ what was tried and why it didn't work.
 
 ## Entries
 
+- 2026-07-02 — bb-doubling-layer-second-instance — success —
+  **The free-ℤ₂ doubling template is a parametric Lean layer, and the
+  `[[36,4,4]] → [[72,4,8]]` pair is proven through it** (chain+Pauli
+  `d = 8 = 2·d(base)`, gross axiom bar; packaging pending).  The A9
+  target screen found 152 direct-sweep doubling pairs and corrected the
+  Z₆×Z₆ census: gross has **five anchorable siblings, three with exact
+  `[[144,12,12]]` y-covers** — in-frame engine-necessary follow-on
+  targets.
+  [details](../experiments/bb_lab/notes/A9_lean_target_screen.md)
+
 - 2026-06-12 — gross-bb-analytic-bound — partial —
   **d(gross [[144,12,12]]) ≥ 6 fully analytic** (3× the published
   Lin–Pryadko floor of 2; goal 3 of the Phase-A program), via the

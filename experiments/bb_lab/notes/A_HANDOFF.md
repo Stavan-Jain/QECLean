@@ -11,6 +11,17 @@ passed — the chain HOLDS, **write-up grade**; Entries 16–28: goal 1
 closed, reviewed, and written up — **d(gross) = 12 fully analytic**,
 A4 Theorem D).
 
+> **A9 update (2026-07-02, `A9_lean_target_screen.md`) — goal-2 milestone.**
+> The free-ℤ₂ doubling template is now a **parametric Lean layer**
+> (`Framework/Homological/{BBCover,BBDoubling}.lean`), and the `[[36,4,4]] →
+> [[72,4,8]]` pair (extensibility doc §5) is **proven through it at the chain
+> and Pauli levels, gross axiom bar** (`Codes/BivariateBicycle/Z3Z6/`;
+> `StabilizerCodeWithDistance 72 4 8` packaging pending).  Corpus screen: 152
+> direct-sweep doubling pairs; the presentation census corrects the Z₆×Z₆
+> uniqueness reading — **five new anchorable [[72,12,6]] codes, three with
+> exact [[144,12,12]] y-covers** (hit3/4/6): in-frame, engine-necessary
+> targets for the next engine re-instantiation.
+
 ---
 
 ## 0. RESUME HERE (the one-paragraph version)
