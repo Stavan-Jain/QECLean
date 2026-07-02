@@ -391,3 +391,88 @@ The headline question this experiment answers: **"is distance-doubling by
 free ℤ₂ covering an *intrinsic* capability of certified BB bases, or a
 special property of some (frame-correlated) subfamily?"** — with hit2/hit5
 as the decisive instances either way.
+
+---
+---
+
+# RESULTS (accreting below; plan above is frozen)
+
+## R0. Stage S0 — ground truth recovered (2026-07-02)
+
+`scripts/a10_s0_recover_hits.py` reproduces the A9 T2 pass exactly from
+the corpus duckdb: 326 Z₆×Z₆ k>0 d≥6 codes → **6 presentation-anchorable
+→ 6 canonical classes** (~25 s for the Aut×swap search).  Labels, pinned
+by the published polynomials (hit3/4/6, gross base) and by the ladder
+signature for the rest (hit5 = the one whose x-literal reaches 8):
+
+| label | instance_id | A | B | literal x/y cover d |
+|---|---|---|---|---|
+| gross_base | `5620b8e2c34acc75` | y³+x+x² | 1+x·y²+x²·y | (gross itself: 12) |
+| hit2 | `98ff6753f866aba0` | y³+x+x² | 1+x·y⁵+x²·y | **6 / 6** |
+| hit3 | `9b9581f986a0d0ac` | y³+x+x² | y+x·y²+x² | (y: 12, A9) |
+| hit4 | `8b3fe87db2da2b48` | y³+x+x² | y²+x·y³+x²·y | (y: 12, A9) |
+| hit5 | `9706a4ea60d7e978` | y³+x+x² | y⁵+x·y+x² | **8 / 6** |
+| hit6 | `702393fa5fd7449c` | y³+x+x² | x·y+x²·y²+x³ | (y: 12, A9) |
+
+New datum: **hit5-y = 6** (A9 recorded only hit5-x = 8).  Regenerated
+artifacts: `data/a9/t2_presentation_hits.json`,
+`data/a9/t2_cover_ladders.json`.  Ladder cost at n = 144 is far below
+the plan's estimate: **sub-second per non-doubling ladder**; the gross
+d = 12 control (UNSAT through 11) runs in **88 s** — the per-survivor
+cost calibration for S4.
+
+## R1. Stage S1 — harness green
+
+`scripts/a10_descent_covers.py` + `tests/test_a10_descent_covers.py`:
+43 fast tests + the slow gross control, all passing.  Notables:
+
+- The plan's §2.2 worry about literal-lift ≠ zero-twist was wrong in a
+  pleasant direction: under the iso `(s,a,b) ↦ (a+ℓs, b)` the zero
+  twist IS the literal lift, verified by exact matrix equality against
+  the a9 `cover_group`/`lift_poly` builder on both axis classes.
+- The inversion duality `d_X = d_Z` holds on twisted covers (§docstring
+  proof: `M_Pᵀ = M_{ι(P)}`, `ι` a ring automorphism — group- and
+  twist-agnostic); numerically spot-checked.  The screen computes `d_X`
+  only.
+- Lemma-L1 consequence test: the full-descent-space `(k, d)` multiset is
+  Aut(H)-presentation-invariant (toric L=3, two random automorphisms).
+- Controls: Z3Z6 doc-verified pair x-literal → d = 8 exact, k = 4;
+  toric L=3 x-literal → d = 3; gross-base x-literal → d = 12 exact.
+
+## R2. Stage S2 — toric warm-up: TWISTS RESCUE THE TORUS
+
+Full 256-cover screens (`data/a10/toric{3,4}_descent_screen.jsonl`),
+exact SAT throughout.
+
+**L = 3 ([[18,2,3]], odd×odd):** 16/64 non-split-degenerate covers
+rescue (d = 6 = 2L, k = 2), 4 per class — every class carries rescuers:
+
+| class | rescuing twists (εA; εB) |
+|---|---|
+| x | εA constant, εB non-constant |
+| y | εA non-constant, εB constant |
+| mixed | both constant |
+| split | both non-constant |
+
+The pattern is exactly a **holonomy rule**: with `A = 1+x`, `B = 1+y`,
+the cover doubles iff both fundamental directions of the torus have
+nontrivial ℤ₂ holonomy, where the x-holonomy = c₁ (class carry) +
+L·Δε_B-ish twist contribution (odd L ⟹ a non-constant twist on the
+transverse polynomial flips the holonomy).  These rescued covers are
+the **twisted-toric ℤ²/Λ codes** (Λ an index-2L² non-rectangular
+sublattice) — the classical d ~ optimal twisted torus, recovered by the
+descent screen with zero geometry-specific input.
+
+**L = 4 ([[32,2,4]], even×even):** the parity wall — on an even axis
+the twist holonomy `L·Δε = 0 (mod 2)` vanishes, so **x/y-class covers
+all fail (32/32) regardless of twist**; the **split class never
+doubles** (16/16 k-drop); but the **mixed class rescues with ALL 16
+twists** (d = 8 = 2L, k = 2): its holonomy is intrinsic (both carries),
+so twists cannot cancel it (they only shift by even amounts).
+
+**Toric verdict: always constructible — but on even×even frames ONLY
+via the mixed extension class.**  This is the first structural signal
+for hit2/hit5: they live on Z₆×Z₆ (even×even).  Unlike toric, weight-3
+BB polynomials generate odd-length relative cycles too, so axis twists
+are not automatically impotent there — but the toric result already
+justifies the plan's §2.1 insistence on the mixed class.

@@ -267,7 +267,12 @@ def exact_distance(
 
 
 def _row_key(row: dict) -> tuple:
-    return (tuple(row["cls"]), tuple(row["epsA"]), tuple(row["epsB"]))
+    return (
+        row["base_id"],
+        tuple(row["cls"]),
+        tuple(row["epsA"]),
+        tuple(row["epsB"]),
+    )
 
 
 def screen_base(
@@ -298,7 +303,7 @@ def screen_base(
             len(A.support), len(B.support), classes
         ):
             n_total += 1
-            key = (cls, epsA, epsB)
+            key = (base_id, cls, epsA, epsB)
             if key in done:
                 continue
             t0 = time.time()
@@ -355,7 +360,7 @@ def screen_base(
                 f"({row['secs']}s)",
                 flush=True,
             )
-    return rows
+    return [r for r in rows if r["base_id"] == base_id]
 
 
 def summarize(rows: list[dict], d_base: int) -> dict:
@@ -367,7 +372,10 @@ def summarize(rows: list[dict], d_base: int) -> dict:
         "fail": len(by("fail")),
         "k_drop": len(by("k_drop")),
         "k_zero": len(by("k_zero")),
-        "max_d_fail": max((r.get("d") or r.get("d_ub") or 0) for r in rows) if rows else None,
+        "max_d_fail": max(
+            (r.get("d") or r.get("d_ub") or 0 for r in rows if r["verdict"] == "fail"),
+            default=None,
+        ),
     }
     per_cls: dict[str, dict] = {}
     for r in rows:
@@ -397,12 +405,21 @@ def main() -> None:
     sc.add_argument("--k-base", type=int, required=True)
     sc.add_argument("--out", type=Path, required=True)
     sc.add_argument("--no-exact", action="store_true")
+    sc.add_argument(
+        "--classes",
+        default="x,y,mixed,split",
+        help="comma-separated subset of x,y,mixed,split",
+    )
 
     tc = sub.add_parser("toric", help="toric warm-up screen")
     tc.add_argument("--L", type=int, required=True)
 
     args = ap.parse_args()
     if args.cmd == "screen":
+        name_to_cls = {v: k for k, v in CLASS_NAMES.items()}
+        classes = tuple(
+            name_to_cls[s.strip()] for s in args.classes.split(",") if s.strip()
+        )
         H = AbelianGroup((args.ell, args.m))
         rows = screen_base(
             args.base_id,
@@ -411,6 +428,7 @@ def main() -> None:
             args.d_base,
             args.k_base,
             args.out,
+            classes=classes,
             exact=not args.no_exact,
         )
         print(json.dumps(summarize(rows, args.d_base), indent=2))
