@@ -22,6 +22,18 @@ A4 Theorem D).
 > exact [[144,12,12]] y-covers** (hit3/4/6): in-frame, engine-necessary
 > targets for the next engine re-instantiation.
 
+> **A10 planned (2026-07-02, `A10_descent_twist_screen.md`) — the descent
+> question.** Does every certified BB base admit a *descent* free-ℤ₂ cover
+> (any extension class, cover polynomials only required to satisfy
+> `fiberSum = base`, i.e. `~2^(w_A+w_B)` sheet twists per class) with
+> `d(cover) = 2d`?  Known false for literal-lift axis covers (hit2/hit5
+> fail both axes; toric by symmetry).  Decisive experiment: exhaustive
+> 256-cover twist screens on hit2/hit5 at n = 144 — rescue ⟹ evidence for
+> "always constructible"; no rescue ⟹ finitely-certifiable (Lean-kernel
+> witness table) counterexamples.  Key enabler: `XDoubleCoverData` is
+> already descent-general (`Ac/Bc` free fields + `push_A/push_B`), so no
+> new Lean framework either way.  Branch `claude/a10-descent-twist-screen`.
+
 ---
 
 ## 0. RESUME HERE (the one-paragraph version)

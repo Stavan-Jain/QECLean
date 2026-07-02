@@ -1,0 +1,393 @@
+# A10 — Descent-cover twist screen: does every certified BB base admit a distance-doubling free ℤ₂ cover?
+
+**Status: Stage 0 (plan).** Branch `claude/a10-descent-twist-screen`, cut from
+the PR #53 head (`292a830`, the parametric doubling layer + the Z3Z6
+instance + the A9 screen). This file is the running log for the experiment;
+results accrete below the plan, A9-style. Date: 2026-07-02.
+
+---
+
+## 0. TL;DR
+
+**Question.** Given a BB base `(H, A, B)` with certified distance `d`, does
+there always exist a *free ℤ₂ cover* — a choice of ℤ₂-extension
+`π : G → H` (deck direction) and cover polynomials `(Ã, B̃)` that merely
+**descend** (`fiberSumFn π Ã = A`, `fiberSumFn π B̃ = B`) rather than lift
+literally — with `d(cover) = 2d`?
+
+**Known.** False when restricted to *literal-lift axis covers*: hit2 and
+hit5 (two of gross's five anchorable `[[72,12,6]]` Z₆×Z₆ siblings, A9 §T2)
+fail on both axes (hit2 x/y stay at 6; hit5-x reaches only 8), and toric
+fails on both axes by symmetry (`d(toric ℤ_a×ℤ_b) = min(a,b)`, so doubling
+one axis of a square torus leaves `d = L ≠ 2L`).
+
+**Open.** The full descent space: `2^(w_A+w_B)` sheet-assignment twists per
+extension class, times the ℤ₂-extension classes of `H` (both axis classes,
+plus the mixed class when both axes are even, plus the split class with
+nontrivial voltage — see §2.3 for why the split class is genuinely
+in-family).
+
+**Decisive experiment.** Exhaustive twist screen on hit2/hit5 (≤ 256 covers
+each, exact SAT verdicts at n = 144). If twists rescue them → evidence for
+"always constructible" and a new engine-tier Lean target. If not → strong,
+*finitely certifiable* counterexamples: the negative is a per-cover
+weight-≤ 11 witness table, checkable by the Lean kernel.
+
+**Why now.** PR #53's `XDoubleCoverData` is *already descent-general*: the
+cover polynomials `Ac/Bc` are free fields constrained only by
+`push_A/push_B` (the fiberSum equations), and `proj` is any 2:1 hom
+(`BBCover.lean:59-85`) — mixed-class and twisted instances need **zero new
+Lean framework**. And the verified `[[36,4,4]] → [[72,4,8]]` instance is
+itself a split-class cover with nontrivial voltage (`ℤ₆ ≅ ℤ₂×ℤ₃` splits over
+the odd axis), so "non-literal" covers already have a fully-proven precedent.
+
+**Epistemic grade.** This is a *screen* (A9 grade): SAT is
+discovery/validation only, per the A_HANDOFF §1 constraint. Each fork has
+its own certification path (§6): witnesses → Lean kernel for the negative;
+template obligations → the parametric layer for the positive.
+
+---
+
+## 1. The question, precisely
+
+Fix a base presentation `(H, A, B)`: `H = ℤ_ℓ × ℤ_m`, `A, B ∈ F₂[H]` of
+weights `w_A, w_B` (weight-3 pairs throughout this corpus), with
+`d = d(BB(H, A, B))` known exactly (SAT-certified; for hit2/hit5 the base
+floor `d ≥ 6` is also analytic via anchorability, A8/A9).
+
+A **group-structured free ℤ₂ descent cover** of `(H, A, B)` is:
+
+- a surjection `π : G → H` of finite abelian groups with `|ker π| = 2`;
+  write `δ` for the nonzero kernel element (the deck translation);
+- cover polynomials `Ã, B̃ ∈ F₂[G]` with `fiberSumFn π Ã = A` and
+  `fiberSumFn π B̃ = B` (each base monomial receives an odd number of its
+  two lifts; we restrict to the *weight-preserving* case — exactly one lift
+  per monomial — see scoping note §2.4);
+- the cover code is `BB(G, Ã, B̃)`: `H̃_X = (M_Ã | M_B̃)`,
+  `H̃_Z = (M_B̃ᵀ | M_Ãᵀ)`, `ñ = 2|G| = 2n`.
+
+The **question**: for every certified base, does some such cover satisfy
+`k(cover) = k` and `d(cover) = 2d`?
+
+A **literal lift** is the special case: `G` doubles one axis and every
+monomial lifts with its exponents unchanged (`x^a y^b ↦ x̃^a ỹ^b`). Both
+prior positive instances (gross = x-literal of its base; the Z3Z6 pair) and
+all A9 ladder data are literal lifts. The descent space is what the
+question actually quantifies over; literal lifts are its zero-twist points.
+
+---
+
+## 2. The search space (per base presentation)
+
+### 2.1 Extension classes — uniform cocycle model
+
+`Ext(ℤ_ℓ×ℤ_m, ℤ₂) ≅ ℤ₂^{[2|ℓ]} × ℤ₂^{[2|m]}`. Implement ALL four classes
+`c = (c₁, c₂) ∈ ℤ₂²` uniformly as cocycle extensions on the set
+`ℤ₂ × ℤ_ℓ × ℤ_m`:
+
+```
+(s,a,b) + (s',a',b') = (s + s' + c₁·carry_ℓ(a,a') + c₂·carry_m(b,b'),
+                        a+a' mod ℓ,  b+b' mod m)
+```
+
+with `carry_ℓ(a,a') = 1` iff `a+a' ≥ ℓ`. Then `π(s,a,b) = (a,b)`,
+`δ = (1,0,0)`, `sec(a,b) = (0,a,b)`, and every fiber is
+`{(0,a,b), (1,a,b)}` — literally the `XDoubleCoverData` field list
+(`proj_fiber`, `proj_sec` hold by construction).
+
+- `c = (1,0)`: the x-axis cover (`G ≅ ℤ_{2ℓ}×ℤ_m` when 2∤ℓ this is
+  iso to the split group but presented as the x-double — same code space
+  as the classical "double the x period" cover);
+- `c = (0,1)`: the y-axis cover;
+- `c = (1,1)`: the **mixed class** — genuinely new when both `ℓ, m` even
+  (for Z₆×Z₆: `G ≅ ℤ₁₂×ℤ₆` abstractly but with the diagonal projection —
+  NOT equivalent-over-id_H to either axis cover);
+- `c = (0,0)`: the **split class**. With zero voltage this is two disjoint
+  base copies (`d(cover) = d`, auto-fail — kept as an enumeration sanity
+  row). With nontrivial voltage it is a genuine connected free cover.
+
+### 2.2 Twists (voltage / sheet assignment)
+
+For a fixed class, a twist is `ε = (ε_A, ε_B) ∈ F₂^{w_A} × F₂^{w_B}`: the
+i-th monomial `x^{a_i} y^{b_i}` of `A` lifts to `(ε_A[i], a_i, b_i)`, same
+for `B`. Weight preserved, `fiberSum` descent automatic (distinct base
+monomials have disjoint fibers). For weight-3 pairs: `2^6 = 64` twists per
+class, `4 × 64 = 256` covers per base. The literal lift of an axis cover is
+a specific twist point in this parametrization (the lift of `x^a y^b` into
+the cocycle model has `s = ` the carry-accumulated bit of `a` resp. `b`;
+compute it, don't assume `ε = 0` — validated by the S1 matrix-equality
+test against A9's `cover_group`/`lift_poly` construction).
+
+### 2.3 Why the split class belongs
+
+The verified `[[36,4,4]] → [[72,4,8]]` instance doubles the ODD axis of
+`ℤ₃×ℤ₆` (deck `(3,0)`): the extension `ℤ₆ → ℤ₃` is split as groups, so in
+the classification above the instance sits in the split-with-voltage
+sector. Free-ness and the whole `XDoubleCoverData` apparatus are
+class-agnostic; excluding `c = (0,0)` for even-even bases would make the
+even-even screen *less* general than the machinery we already trust. Cost:
+64 extra covers per base. (The user-posed space is the three nonzero
+classes; the split column is a completeness appendix and its rows are
+flagged separately in the census.)
+
+### 2.4 Scoping decisions (fixed for A10)
+
+1. **Weight-preserving lifts only.** `fiberSum` also allows inflating `Ã`
+   by canceling pairs `{g, g+δ}` — that changes the row weight (LDPC-ness)
+   and opens an infinite space. Out of scope; note in the writeup.
+2. **`k(cover) = k` required for "rescue".** The census records `k(cover)`
+   for every candidate regardless (rank drift under twists is possible and
+   interesting), but only `k`-preserving covers count toward the question.
+3. **Group-structured covers only.** General free ℤ₂ covers of the Tanner
+   graph (per-edge voltages up to gauge, `H¹(Tanner, ℤ₂)`) form a vastly
+   larger space that destroys the BB form. A negative here is a
+   counterexample for *BB-structured* descent covers — state the theorem
+   with that scope.
+4. **Presentation exhaustiveness (Lemma L1, to nail down in S1).** A9's
+   caveat — doubling is presentation-sensitive — is resolved at the
+   descent level: if `σ ∈ Aut(H)` carries `(A,B)` to an equivalent
+   presentation `(A^σ, B^σ)`, then `σ` lifts to an isomorphism of the
+   class-`c` extension onto the class-`c∘σ` extension carrying twist
+   spaces bijectively and inducing cover-code equivalences. Since the
+   screen ranges over ALL classes and ALL twists, the fixed-presentation
+   space already covers the code-level descent space up to equivalence.
+   Deliverable: short proof sketch in this file + machine validation
+   (random `σ`, compare `canonical_pair` forms of the matched covers —
+   `bb_lab/canonical.py:230`).
+5. **Gauge is reporting-only.** Known cover equivalences — joint
+   translation `(Ã,B̃) → (δÃ, δB̃)`, generator re-sectioning
+   (`x̃ → x̃+δ` shifts `ε` by the exponent-parity pattern) — quotient the
+   256 raw covers to fewer classes. The screen runs the RAW space
+   (exhaustiveness must not depend on a gauge lemma); orbits are computed
+   empirically for the census statistics.
+
+---
+
+## 3. Prior evidence (what the screen must reproduce before it says anything new)
+
+| base | cover | verdict | source |
+|---|---|---|---|
+| gross base `[[72,12,6]]` (A=x³+y+y², B=y³+x+x²) | x-literal | d = 12 ✓ doubles | gross itself; A3/A4 analytic |
+| Z3Z6 `[[36,4,4]]` (A=x²+y+y³, B=1+x+y²) | x-literal, deck (3,0) | d = 8 ✓ doubles | PR #53, Lean-proven |
+| hit3 (A=y³+x+x², B=y+x·y²+x²) | y-literal | d = 12 ✓ doubles | A9 T2 ladders |
+| hit4 (B=y²+x·y³+x²·y), hit6 (B=x·y+x²·y²+x³) | y-literal | d = 12 ✓ | A9 T2 addendum |
+| **hit2** | x- and y-literal | **d stays 6** ✗ | A9 T2 |
+| **hit5** | x-literal | **d = 8** ✗ (y: see regenerated JSON) | A9 T2 |
+| toric ℤ_L×ℤ_L (A=1+x, B=1+y) | either axis literal | d = L ✗ | symmetry (min-axis distance) |
+| 152 T1 pairs (n ≤ 96 frames) | axis literals | doubling ✓ | A9 T1 hunt |
+
+hit2/hit5's exact `B` polynomials live in `data/a9/t2_presentation_hits.json`,
+which was never committed — S0 regenerates it from the corpus duckdb
+(`a9_lean_target_screen.py t2` is the fast subcommand). All five hits share
+`A = y³+x+x²` up to equivalence-normalization.
+
+---
+
+## 4. Stages
+
+### S0 — recover ground truth (cheap, this session or next)
+
+- Copy/point at the corpus: `data/bb_instances.duckdb` exists in the main
+  repo checkout (read-only per lab rules); the worktree needs a symlink or
+  `--db` path.
+- `uv run python scripts/a9_lean_target_screen.py t2` → regenerate
+  `t2_presentation_hits.json`; pin hit2/hit5 `(A, B)` exactly, record them
+  in this file.
+- Re-run the hit2/hit5 literal ladders (4 covers, n = 144, SAT cap 12) to
+  reproduce the A9 verdicts (6/6/8/?) — this is the harness-independent
+  baseline the twist screen must match at its zero-twist points.
+
+### S1 — the descent-cover harness (`scripts/a10_descent_covers.py` + tests)
+
+New module functions (reuse `bb_lab.{poly,linalg,sat_distance,checks,canonical}`):
+
+- `CocycleGroup(ell, m, c1, c2)` — the §2.1 model: element indexing
+  `(s,a,b) ↦ s·ℓm + a·m + b`, addition, negation, and a generic
+  group-algebra matrix builder `M_P[g,h] = P[g − h]` matching the lab's
+  circulant convention (validated against `bb_check_matrices` on the
+  trivial group cases).
+- `twisted_lift(P, group, eps)` — §2.2.
+- `descent_cover_checks(base, c, eps) -> CheckMatrices` for the cover code.
+- `enumerate_covers(base)` — the 256 rows.
+
+**Tests (all must pass before any screen result is quoted):**
+
+1. Class `(1,0)`/`(0,1)` zero-twist covers reproduce A9's
+   `cover_group`+`lift_poly` matrices exactly (up to the documented index
+   map — make it equality, not just code-equivalence).
+2. Control distances: Z3Z6 doc-verified pair x-literal → `d = 8` exact
+   (k = 4); toric L=3 axis-literal → `d = 3`; gross-base x-literal →
+   `d = 12` (one n = 144 ladder — the expensive control, run once).
+3. `fiberSum` descent holds for random twists (numpy re-implementation,
+   independent of the builder).
+4. BB-form duality `d_X = d_Z` spot-checked on twisted covers (compute
+   both on 20 random small covers); if it holds — as the transpose
+   symmetry argument predicts for any `(G, Ã, B̃)` in BB form — the screen
+   computes one side only.
+5. Lemma-L1 validation: random `σ ∈ Aut(H)`, matched covers
+   `canonical_pair`-equivalent.
+
+### S2 — toric warm-up (cheap, decisive for the symmetry-failure family)
+
+Full 256-cover screens on toric L=3 (n_cover = 36) and L=4 (n_cover = 64,
+all four classes live). Exact distances throughout (SAT is instant here).
+Output: does ANY descent cover of a square torus reach `2L`? This is the
+cheapest direct test of "twists rescue symmetric failures" and an
+independent data point regardless of the hit2/hit5 outcome. (Note the
+mixed-class covers of toric are close cousins of the twisted-toric
+`ℤ²/Λ` codes — see `project_twisted_toric_scoping`; don't conflate the
+two uses of "twist".)
+
+### S3 — small-frame rescue-rate sweep (the statistics arm)
+
+From the A9 hunt corpus (T1_FRAMES, n_cover ≤ 96): select the bases whose
+axis-literal covers FAILED to double (the complement of the 152 pairs in
+the hunt stream — the hunt JSONL records `d(cover)` per candidate, and is
+regenerable). Budget-capped (~50 bases): run the full 256-cover descent
+screen per base, exact SAT (cheap at this size). Outputs:
+
+- **rescue rate**: fraction of literal-failures rescued by some twist;
+- twist-position statistics of rescuers (do rescuing twists concentrate
+  on particular classes / voltage patterns? — the raw material for any
+  future selection rule or obstruction conjecture);
+- per-base `max_d over descent space` distribution.
+
+This arm turns the binary hit2/hit5 answer into a trend line, and
+battle-tests the harness before the expensive runs.
+
+### S4 — the decisive runs: hit2 and hit5 exhaustive (n = 144)
+
+Per base, 256 covers, fail-fast pipeline per cover:
+
+1. `k` via `rank_f2` (instant). Record; skip to census if `k ≠ 12`.
+2. Witness ladder: `x_distance(..., weight_upper_bound = 11)` — SAT hit at
+   `w ≤ 11` kills the cover cheaply (most twists die here, low `w`);
+   record the witness vector (this IS the counterexample certificate).
+3. Survivors (`UNSAT through 11`): confirm `d = 12` exactly with a SAT
+   call at 12, then re-run the UNSAT ladder with `proof_dir` set (LRAT
+   emission) for the archival certificate.
+4. Optional per-survivor: A9 `profile_pair`-style template obligations
+   (R-homotopy, linchpin, safe-class minima, tight witness) — is a rescue
+   also *template-provable*?
+
+Artifacts: `data/a10/{hit2,hit5}_descent_screen.jsonl` (append-per-cover,
+resumable, A9-hunt style) + a census table in this file.
+
+Cost model: A9's hunt did ~640 SAT ladders at n ≤ 96 in 30–90 min; the
+n = 144 UNSAT-through-11 ladders were done for 10 covers in the T2 pass.
+Here most of the 512 covers die at low weight (cheap SATs); expect hours,
+one machine, no Lean, no workspace lock. Run the two bases sequentially,
+JSONL-resumable.
+
+### S5 — interpretation + certification (fork-dependent, see §5–§6)
+
+### S6 — writeup: A10 results section in this file, A_HANDOFF pointer
+update, extensibility-doc §8 delta, research_log entry. Promote any new
+generalizable pattern per the pipeline's Stage-6 reflection recipe.
+
+---
+
+## 5. Outcome forks
+
+**Fork R (rescued): some twist of hit2 and/or hit5 reaches exact d = 12.**
+Evidence for "always constructible". Follow-ups, in order:
+(a) S3's rescue statistics become the main exhibit — is the rescue rate
+100% across all literal-failures?; (b) hunt a *selection rule* (which
+class/voltage rescues, and why — the seam-flux and difference-set
+predicates from A5/A8 are candidate explanatory variables); (c) the
+rescued cover joins hit3-y as an engine-tier Lean target: Z₆×Z₆ bases have
+36 cells, out of direct-sweep reach, so full certification needs the
+CRT/F₄ engine re-instantiation (A9 §T2) — the near-term Lean-certified
+claim is the template-obligation profile, not `d = 12`; (d) pose the
+general conjecture with the correct quantifier ("for every certified BB
+base there is a descent cover with d(cover) = 2d") and look for the
+constructive mechanism.
+
+**Fork C (counterexample): every one of the 256 covers of hit2 (resp.
+hit5) has k ≠ 12 or a weight-≤ 11 logical.**
+Then hit2/hit5 are counterexamples over the FULL group-structured descent
+space — much stronger than the literal-lift failures. This is *finitely
+certifiable*: the negative is a table of ≤ 256 witnesses per base, each
+checkable by kernel `decide` (logical-operator membership + weight at
+n = 144 is a trivial check; no sweeps). Package as a Lean theorem
+("no free ℤ₂ BB-descent cover of hit2 doubles its distance", quantifying
+over the four cocycle classes × 64 twists), scope-qualified per §2.4(3)
+and backed by Lemma L1 for the code-level reading. Update the
+extensibility doc: the doubling mechanism is genuinely *conditional* — the
+frame-correlation story (in-frame ⟹ heavy safe ⟹ doubling) gains its
+first certified negative instances on the engine frame itself.
+
+**Fork M (mixed): one rescued, one not.** Both packages above, one per
+base; "always constructible" is falsified either way by the negative one,
+while the positive one still feeds Fork R's mechanism hunt.
+
+---
+
+## 6. Certification paths (why both forks are Lean-ready)
+
+- **Layer generality (verified on-branch):** `XDoubleCoverData` fields
+  `proj/deckS/sec/Ac/Bc` + `proj_fiber/proj_sec/push_A/push_B`
+  (`BBCover.lean:59-85`) are satisfied by every §2.1–2.2 cover — the
+  cocycle model IS the bundle. Twisted/mixed instances re-use
+  `BBDoubling.lean` theorems unchanged; only the four finite obligations
+  are per-instance.
+- **Negative fork:** witness table + `decide`-grade checks; no
+  `native_decide`, no sweeps, no engine. The cheapest certification in
+  the whole program.
+- **Positive fork:** template obligations via the layer; full `d = 12`
+  needs the engine re-instantiation (same status as hit3-y, which remains
+  the queued engine target — a rescued twist cover would join, not jump,
+  that queue).
+
+---
+
+## 7. Risks and traps (read A_HANDOFF §6 first)
+
+1. **Hand-rolled CNF is guilty until sanity-laddered.** The screen only
+   uses `bb_lab.sat_distance` (validated, reproduces d(gross) = 12), never
+   a fresh encoding. Any new helper must reproduce the S1 controls before
+   its output is quoted.
+2. **Literal-lift ≠ zero-twist in the cocycle model** (carry bits). The S1
+   matrix-equality test exists precisely to kill this off-by-one.
+3. **Presentation trap** (A9's caveat): resolved by Lemma L1 + screening
+   all classes; do not quote a code-level negative before L1 is written
+   down and machine-validated.
+4. **k drift**: a twisted cover with `k ≠ 12` is not a rescue even if its
+   distance is large; the pipeline computes `k` first.
+5. **Duality shortcut**: computing only `d_X` is valid only after the S1
+   test-4 spot-check; if any twisted cover breaks `d_X = d_Z`, compute
+   both sides for all candidates (double SAT cost, still feasible).
+6. **Solver asymmetry** (memory: UNSAT intractable at n ≥ 288): n = 144 is
+   inside the feasible envelope (A9 did UNSAT@11 there), but if a survivor
+   ladder stalls, fall back to recording `d ≥ w_stalled` and escalate only
+   the decisive bit (`≥ 12` vs `= 12`).
+7. **No Lean builds in the screen loop** — the whole experiment is
+   Python + SAT; the workspace lock is never touched. Lean work starts
+   only in S5, in its own session, sequentially with any Y-floor builds
+   (~8 GB each, per PR #53 notes).
+8. **data/ hygiene**: `data/*.duckdb` read-only; all A10 outputs under
+   `data/a10/` (JSONL, append-only, resumable); nothing under `data/` is
+   committed unless small and load-bearing (the witness tables are — they
+   are the certificates).
+
+---
+
+## 8. Definition of done
+
+- [ ] S0: hit2/hit5 polynomials pinned in this file; literal baselines
+      reproduced.
+- [ ] S1: harness + 5 test classes green (`uv run pytest` includes them).
+- [ ] S2: toric L∈{3,4} full screens; verdict recorded.
+- [ ] S3: ≥ 30 literal-failure bases screened; rescue rate + twist
+      statistics tabulated.
+- [ ] S4: hit2 and hit5 exhaustive screens complete with per-cover
+      verdicts; survivors (if any) LRAT-certified; witnesses archived.
+- [ ] S5: fork identified; certification artifact started (Lean witness
+      theorem for Fork C, or template profile + conjecture memo for
+      Fork R).
+- [ ] S6: writeup + handoff/extensibility/research-log updates.
+
+The headline question this experiment answers: **"is distance-doubling by
+free ℤ₂ covering an *intrinsic* capability of certified BB bases, or a
+special property of some (frame-correlated) subfamily?"** — with hit2/hit5
+as the decisive instances either way.
