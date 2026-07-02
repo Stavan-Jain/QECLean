@@ -724,6 +724,30 @@ question, both empirical (SAT = discovery-grade; A_HANDOFF §1):
   rows — including the entire Z₃×Z₄:y doubling family — double with
   broken safe floors; the reachable-coset repair is refuted (0/41).
 
+**Epistemic status of C-safe — NOT a theorem; the precise gap.**
+Decompose a cover logical by its projection. What C-safe *provably*
+delivers: the safe sector (`[p(v)] ≠ 0`) clears 2d (`|v| ≥ |p(v)| ≥`
+class coset min, over exactly the `im p_*` classes the probe measures);
+the `b = 0` dangerous rung is free (`p(v) = 0 ⟹ v = τ(w)`, `w` a
+nontrivial base logical, `|v| = 2|w| ≥ 2d`); and the tight witness
+caps `d(cover) ≤ 2d`. What it does NOT cover: the **nonzero-`b`
+dangerous sector** — `p(v) = b ∈ Stab_Z ∖ 0`, where
+`|v| = |b| + 2m(b)` and the rung `≥ 2d` is per-instance work (gross's
+Prop 10 + (M); the layer's `dangerous_zero_rung`/single-shape rungs).
+So "C-safe ⟹ doubling" is a CONJECTURE (0 violations on 465 + 492
+cells + engine frame, 4/4 prospective; SAT-grade labels throughout);
+the provable-today variant is C-safe ∧ the dangerous-rung obligations
+= the Lean layer's full obligation set. The theorem-shaped open
+question the data poses: every observed doubling failure, on every
+frame, breaks in the SAFE sector — the nonzero-`b` rung has never been
+seen to bind below 2d. Prove that under C-safe's hypotheses (or find
+the cheap extra conjunct, e.g. the S3.0 seam-compatibility census, that
+makes it provable) and C-safe becomes a theorem; gross's own `b ≠ 0`
+dangerous minimum of 14 (cleared by 2, not by structural slack) says
+this will not be free. And note the probe itself is SAT-assisted:
+per-instance PROOF of the safe conjunct is the sweep/engine discharge
+(S5), separate from the criterion's own conjectural status.
+
 **Next-session queue, in order:**
 
 1. **Z₆×Z₁₈ arm, probe-first redesign (S3).** Regenerate the anchorable
