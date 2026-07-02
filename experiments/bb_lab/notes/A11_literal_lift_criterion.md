@@ -776,11 +776,16 @@ question, both empirical (SAT = discovery-grade; A_HANDOFF §1):
    literally either (any such lift would appear in the screened 256 as
    a rescue row). Two merge items queued with A10: (a) is every rescue
    row in the L1-image of literal lifts of equivalent presentations?
-   (b) **C-safe consistency check on the 13**: sufficiency demands the
-   safe floor (or witness) be broken on EVERY presentation × axis of
-   those 13 codes — small frames, sweep-checkable, a direct
-   falsification target for C-safe. The safe-sector probe is the cheap
-   per-row oracle for A10's selection-rule hunt (pull back through L1).
+   (b) **C-safe consistency check on the 13 — RUN AND PASSED
+   (`a11_s4_thirteen.py`, 13 s)**: all **492** presentation × axis cells
+   of the 13 codes (full Aut × swap orbits) have C-safe FALSE, with a
+   conjunct-level breakdown of 62 k-drops + 108 missing tight witnesses
+   + 322 light safe floors — zero C-safe-true cells, so the criterion is
+   consistent with the hardest negative data in the program. (All three
+   conjuncts do real work; base list pulled from the A10 branch's
+   committed `s3_unrescued_bases.json`.) The safe-sector probe is the
+   cheap per-row oracle for A10's selection-rule hunt (pull back
+   through L1).
 5. **S6 propagation** (after 1–2): promote the surviving criterion into
    `a5_cover_cascade.py` as DOUBLE_CANDIDATE v2 (per-presentation,
    probe-backed), research-log + memory updates, and the A8-note status
