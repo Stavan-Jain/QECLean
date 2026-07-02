@@ -469,3 +469,141 @@ controlled perturbation data (same base, 256 covers, which feature flips
 track the verdict flips). Neither blocks the other; the one sequencing
 preference is A11-S1 before A10-S4 (cheap, and it may hand A10 a testable
 prediction).
+
+---
+---
+
+# Results log
+
+## Entry 1 — S0 + S1: the audit verdict is in, and A8 SURVIVES its
+## sharpest test by *flipping the hit2/hit5 negatives* (2026-07-02)
+
+Artifacts: `scripts/a11_s1_audit.py` (hits / audit / ladders / baseline),
+`scripts/a11_s2_matrix.py`, `scripts/a11_s3_diagnose.py`;
+data under `data/a11/` (presentation hits, 1164-cell audit, ladder JSONL,
+S2 matrix) — regenerable, only the scripts + this note are committed.
+
+### S0 — data recovery (all green)
+
+- Both spot baselines PASS (Z3Z6 doc pair 4→8; A9 T1 row 12 4→8).
+- **Presentation-anchorable census reproduced exactly**: 326 Z₆×Z₆
+  `k>0, d≥6` corpus codes → **6 anchorable codes in 6 classes** (Aut×swap
+  orbit search, ~3 s). hit3 = `9b9581f986a0d0ac` ✓ matches A9.
+  Labels pinned by stored-form identity:
+  hit1 = `5620b8e2c34acc75` (gross base), hit3 = `9b95…`,
+  hit4 = `8b3f…`, hit6 = `7023…`; the remaining two disambiguated by
+  their known x-ladder verdicts (below): **hit5 = `9706a4ea60d7e978`**
+  (stored B = `y^5+x*y+x^2`), **hit2 = `98ff6753f866aba0`**
+  (stored B = `1+x*y^5+x^2*y`).
+- **Documentation correction discovered in passing**: the pairs the A9
+  note quotes per hit (e.g. hit3 `B = y+x*y^2+x^2`) are the STORED
+  corpus forms, and those are **not anchorable presentations** — their
+  `B` is monomial in neither axis, so gate (iii) fails. The anchorable
+  presentations are different orbit points (96 per class). The A9 T2
+  ladders therefore measured the *stored* presentations' covers. This
+  distinction turned out to be the whole story (below).
+- T1 hunt stream regenerated: 638 candidate rows — 152 DOUBLES ✓ exact
+  match to A9 — plus **465 labeled failures and 21 k-drift rows** (the
+  failures were never profiled before; they are S2's necessity data).
+
+### S1 — the audit (1164 cells) + decisive ladders
+
+Feature battery per cell (certificate hierarchy + invariants), stored
+form + all 96 anchorable presentations × both axes per class. Solver
+controls: toric-x `R0_B` correctly False, toy membership False, gross
+classic pin `A8exact_B` True + anchorable True.
+
+**Uniform on the engine frame** (every one of the 1164 cells):
+`dim ker ∂₂ = 6`, `R0_A = R0_B = Y` (1+δ lies in EACH principal ideal),
+`sq2 = R1 = Y`, `R2 = Y` (σ_* = id), linchpin = Y, `k(cover) = 12`,
+tight witness = Y, μ(Ann A) = μ(Ann B) = 6. So on this frame **the
+entire certificate hierarchy (R0-sq through R2) is non-discriminating**
+— template conditions 1, 2, 4 hold for every presentation and both
+axes; only condition 3 (the floors) can separate doubling from not.
+Moreover every class carries anchorable presentations with the LITERAL
+gross identity `(1+t²)P² = 1+δ` on **both** axes — so the A8 hypothesis
+package is satisfiable on every (class, axis), including all the cells
+A9 recorded as non-doubling. Refutation or a spectacular flip were the
+only options.
+
+**Ladder verdicts (n = 144, exact SAT, pinned presentations):**
+
+| cell | presentation | d(cover) | note |
+|---|---|---|---|
+| hit3:stored:x | A=`y³+x+x²`, B=`y+xy²+x²` | **6** | reproduces A9 |
+| hit4:stored:x | stored | **6** | NEW cell |
+| hit6:stored:x | stored | **6** | NEW cell |
+| hit5:stored:x | stored | **8** | reproduces A9 (disambiguates hit5) |
+| hit5:stored:y | stored | **6** | NEW — fills A10 §3's open cell |
+| hit2:stored:x / :y | stored | **6 / 6** | reproduces A9 |
+| **hit3:anch36:x** | A=`x³+x⁴+x⁵y³`, B=`xy+xy²+x⁴` (A8-exact on A) | **12** | **FLIP** |
+| **hit5:anch36:x** | A=`x³+x⁴+x⁵y³`, B=`xy²+x⁴+x⁴y` (A8-exact) | **12** | **FLIP** |
+| **hit2:anch0:x** | A=`1+x+x²y³`, B=`y²+x³+x³y` (A8-exact) | **12** | **FLIP** |
+
+(hit4/hit6 x-side A8-cells + hit2/hit5 y-side A8-cells queued; every
+completed A8-cell so far doubles.)
+
+**Headline findings:**
+
+1. **Literal-lift doubling is presentation-sensitive within the same
+   (code, axis).** hit3's stored x-lift has d = 6; its equivalent
+   anchorable presentation's x-lift has d = 12. First concrete same-axis
+   witness (A9 §caveats had anticipated the possibility abstractly).
+2. **A8 survives and strengthens**: on every cell where its hypotheses
+   hold and a ladder has completed, the cover doubles — including three
+   cells where the stored-form verdict said "no doubling". The conjecture
+   now has gross + Z₆×Z₁₄ + (Z₆×Z₁₈ partial) + **hit2/hit3/hit5
+   anchorable x-cells** in support, zero counterexamples.
+3. **A9's T2 negatives dissolve**: "hit2 and hit5 do not double" was an
+   artifact of laddering the stored presentations. As *classes*, all six
+   anchorable Z₆×Z₆ codes are gross-twins (doubling literal covers
+   exist). A9's §T2, the extensibility doc §6/§7 ("hit2 and hit5 do not
+   double"), and A10's §0/§3 premise ("known false at literal lifts —
+   hit2/hit5 fail on both axes") all need corrections: A10's decisive
+   Fork-C candidates are gone (its existence question is answered
+   POSITIVELY for hit2/hit5 by literal lifts of equivalent
+   presentations — no twists needed).
+4. **Mechanism of the flip (diagnose tool)**: every non-doubling stored
+   cell breaks in the SAFE sector — the min-weight cover logical
+   projects to a nontrivial base logical whose safe-class coset min
+   equals d(cover) exactly (6 or 8); the dangerous |b|+2m(b) rung never
+   breaks on this frame. The flip is entirely a safe-floor phenomenon:
+   equivalent presentations re-route `im p_*` through different
+   base-logical classes.
+
+### S2 — first matrix cuts (638-row hunt stream; job completing)
+
+On the ~450 rows finished at first cut (94 DOUBLES / 348 shorts among
+usable rows):
+
+- `R1`, `R2`, linchpin: **true on 100% of BOTH classes** — certificates
+  are (nearly) free for weight-3 BB pairs on these frames too, hence not
+  the discriminator anywhere.
+- **`safe_floor_ok` is sufficient-shaped with 0/348 violations**,
+  covering 53/94 DOUBLES (the uncovered 41 = the overlap-rescue class,
+  matching the A9 rows-112–152 observation exactly).
+- **`tight_witness` is necessary** (94/94) but far from sufficient
+  (54% of shorts have it).
+- A8-exact/R0-sq: ~20% of doubles, ~9% of shorts — scope-limited to the
+  engine class, as the plan predicted.
+- D1/D2/D3/Frobenius: uncorrelated with doubling (they are base-floor
+  predicates, not doubling predicates).
+
+### Emerging synthesis (criterion shape after one day)
+
+- The discriminating content of literal-lift doubling sits in **template
+  condition 3's safe half** — checkable base-side (no cover SAT) as
+  per-class coset minima: T-c sweeps at ≤ 24 cells, SAT-assisted coset
+  ladders at 36 cells (`a11_s3_diagnose.py safefloor`), the (M-im)
+  engine at proof grade.
+- Candidate unified criterion (to harden in S3/S4):
+  **C-safe := tight witness ∧ all safe-class coset minima ≥ 2d**
+  (with R2/R1 riding along ~free). Sufficient with zero violations on
+  everything measured so far; NOT necessary (the 41 overlap-rescued
+  doubles) — the S4(b) overlap question stands.
+- **A8's role sharpens**: on the engine frame its
+  anchorable-presentation + squaring-identity package empirically
+  selects presentations whose safe floor clears 2d — i.e. A8 is a
+  checkable *proxy* for C-safe where C-safe's sweep is infeasible. Why
+  anchorability re-routes the safe classes away from light logicals is
+  now THE mechanism question (S4).
