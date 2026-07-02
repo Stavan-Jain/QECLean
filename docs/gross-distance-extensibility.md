@@ -99,6 +99,22 @@ supplies the matching tight upper bound. With those caveats, conditions 1–4 as
    `im Δ`, so `τ(u*) = (u*, u*)` is a genuine cover logical of weight `2·d(base)`,
    attaining the floor.
 
+> **Update (2026-07-02, A10).** Condition 2 is now understood precisely
+> (`experiments/bb_lab/notes/A10_deck_homotopy_R.md`): (R) is **not automatic**
+> for arbitrary free Z₂ BB covers — explicit weight-3 counterexamples exist on
+> `Z₆×Z₃` (e.g. `A = 1+y+y²`, `B = 1+x²+x⁴`, where `σ_* ≠ id` on a
+> 16-dimensional `H₁`). But `1+x^ℓ ∈ (A,B)` implies (R) with an explicit
+> module-map certificate (both instance identities — gross's `(1+x²)B² = 1+x⁶`
+> and the pair's `p·B = 1+x³` — are `P = 0` Bezout witnesses of this
+> membership), and the membership holds **iff `k(cover) = k(base)`**. So the
+> "`k` is preserved" feature below is not an independent observation: it is a
+> sufficient (conjecturally exact — see A10) criterion for (R), and every
+> historically checked instance sits in that regime. Also resolved in passing:
+> the F₂-additive certificate form of `deckTrivial_of_homotopy_certificate` is
+> *complete* — semantic (R) is equivalent to solvability of
+> `1+σ = ∂₂∘C + E∘∂₁` (split `C₁ = ker ∂₁ ⊕ W`; define `C` on cycles by (R),
+> absorb `W` into `E`) — so the certificate route loses nothing.
+
 Two structural features observed in **both** known instances (gross and the new
 pair, §5), likely additional template conditions worth proving in general:
 
