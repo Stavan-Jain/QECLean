@@ -728,6 +728,46 @@ Consequences:
     but not by axis-doubling any GL-transformed square-torus
     presentation.
 
+## R9. Q1 answered: failure is ALWAYS a safe-sector event (2026-07-02)
+
+The sharpened keystone question (does the doubling verdict live entirely
+in the safe sector?) is answered on all data to date, at zero new
+compute: every `fail` witness in every screen JSONL was projected to
+the base (`p(v)[h,blk] = Σ_fiber v`) and classified homologically.
+
+**Result: 14101/14101 k-preserving fail witnesses are SAFE-sector —
+`p(v)` is a nontrivial base logical in every single case.**  Zero
+dangerous witnesses (`p(v) = 0`), zero intermediate cases (`p(v)` a
+nonzero boundary).  Spans toric3/4 (complete), hit2/hit5 (partial),
+and the entire S3 sweep so far (~90 bases, 4 frames).  Alongside:
+zero `super` verdicts anywhere — `d(cover) ≤ 2d` without exception,
+consistent with the generic `τ(u)` upper bound (weight-`2d` dangerous
+logicals exist in every k-preserving cover; `τ = D.pull` is already
+generic in the layer).
+
+**Conjecture (C-A10), the operational reduction.**  For every
+k-preserving free-ℤ₂ descent cover of a BB base:
+(i) the dangerous-sector minimum equals `2·d_base` exactly — never
+below; (ii) hence `d(cover) = min(safe-min, 2d)` and
+**doubling ⟺ the safe-sector coset floor ≥ 2d** — a base-side
+computation (A11's diagnostic), no cover SAT.
+
+Program significance if (i) proves out: the HARD sector of the gross
+proof — the (M)/(M-im) machinery — is the *universal* sector (true for
+every cover, hence provable-in-principle once, parametrically), while
+all cross-cover variability sits in the safe sector, which is exactly
+the part the template checks cheaply per instance.  The selection rule
+(Q4) reduces to base-side safe-coset spectra.  Q2/Q3 (tower iteration,
+engine-frame universality) collapse from SAT campaigns to base-side
+probes plus survivor confirmation.
+
+Caveats: witness-grade (SAT returns ONE minimal witness; an equal-
+weight dangerous logical could coexist unseen — though 14k/0 across
+four frames leaves little room); the converse direction (safe floor
+≥ 2d ⟹ doubling) is exactly conjecture (i) and needs the generic
+dangerous-floor theorem — the natural target for the parametric layer,
+since `BBDoubling` already derives the dangerous apparatus generically.
+
 ## R7. Follow-ups (queued)
 
 1. **Lean instance of a rescued cover** — `XDoubleCoverData` verifies
