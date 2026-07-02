@@ -309,3 +309,93 @@ and failures. Three read-throughs against this note:
 - **Public/private split**: this note lives in `experiments/bb_lab/notes/`
   (slated private-side); the Lean lemma D1 and the doc §3 correction are
   public-side.
+
+## 8. Open problems, sharpened (2026-07-02)
+
+Ordered by program value. Two unconditional facts from the LES bookkeeping
+frame all of them: `k(base) ≤ k(cover) ≤ 2·k(base)` (the upper bound —
+`k̃ = 2k − dim im δ₁ − dim im δ₂` — was implicit in §3 and deserves its own
+line; CE1 sits exactly at the `2k` boundary), and for **odd**-order decks
+the whole question trivializes (`F₂[Z_p]` is semisimple for odd `p`, so
+Maschke gives (R) ⟺ `k̃ = k` for free) — `p = 2` is the modular case, and
+Theorem A12 says the modular answer *matches* the semisimple one.
+
+**OQ1 — Tower/deck generalization (highest program value).** For a free
+`Z_{2^r}` cover tower `G̃ → G̃/⟨σ^{2^{r-1}}⟩ → ⋯ → G` (iterated doubling —
+the tour-de-gross family route), does `σ_* = id` on `H₁(top)` force
+`k(top) = k(base)`?
+*Known:* ⟸ holds in full generality — for any finite abelian deck `Δ`,
+`k(top) = k(base)` ⟺ `I_Δ ⊆ (A,B)` (augmentation ideal; counting lemma
+verbatim) ⟹ deck acts trivially (Koszul annihilation, same two lines). And
+`σ_* = id` does give `k(top) = k(mid)` by A12 applied to the top `Z₂`-step
+(deck `σ^{2^{r-1}}`).
+*The gap:* does `σ_* = id` on `H₁(top)` force the induced `σ̄_* = id` on
+`H₁(mid)`? Not obvious — `p_* : H₁(top) → H₁(mid)` need not be surjective.
+*Route:* the ε-adic filtration is now length `2^r`, so the two-step LES
+becomes a Bockstein spectral sequence; the A12 inequality should be its
+first-page shadow. A clean statement here ("deck trivial ⟺ k constant
+along the tower") is the theorem the family paper wants.
+
+**OQ2 — The Bockstein equality (mathematical core).** Is
+`dim (1+σ)H₁ = k̃ − k` always? Equivalent forms: `δ₁∘δ₂ = 0`;
+`im δ₂ ⊆ im p_*`; element form — whenever `Az, Bz ∈ εR̃`, must
+`A·ε⁻¹(Bz) + B·ε⁻¹(Az) ∈ ε(A,B)` (well-defined mod `ε(A,B)`)?
+*If true:* `H₁(cover) ≅ D^{k̃−k} ⊕ F₂^{2k−k̃}` as a deck module — the
+complete representation type from two ranks (uses `k̃ ≤ 2k`).
+*Verified frontier:* every instance; exhaustive `F₂[P]` `|P| ≤ 8`, `F₄[P]`
+`|P| ≤ 4`; chain-ring blocks (`P` cyclic ⟸ `m` odd) reducible to a finite
+`(val A, val B, N)` case lemma — worth writing out, since it would make the
+equality a *theorem for every cover with odd undoubled coordinate*.
+*Cheapest falsification path:* the `g > 0` stratum of `Z₈×Z₂` / `Z₄×Z₄`
+blocks was only randomly sampled — a stratified exhaustive sweep there
+(enumerate ideals containing neither `ε` nor a unit) is an afternoon;
+`S = F₈` blocks are untouched.
+*Structural route:* the extend-by-ε Koszul LES
+`0 → H₁/εH₁ → H₁(A,B,ε) → ann_{H₀}(ε) → 0` plus Frobenius self-duality of
+the complex.
+
+**OQ3 — Arithmetic classification of the failure locus.** Conjecture: for
+weight-3 cover pairs, (R)-violations exist on `Z_L×Z_m` iff the char-2
+unit equation `x + y = 1` is solvable in the relevant roots of unity —
+i.e. iff the odd part admits a 3-term vanishing sum (available at order 3:
+`1+ω+ω²`; order 7: `1+η+η³`; generally governed by which pairs of odd
+orders `(ord x, ord (x+1))` occur in `F̄₂` — a finite-field table), with
+the sector/parity constraints layered on top.
+*Evidence:* the §6 table exactly — zero failures on every
+`{1,5}`-odd-part group, failures precisely where `μ₃` or the `F₈` relation
+is available; even the lone `Z₈×Z₃` (chain-block) failure needs the `μ₃`
+cancellation to reach socle depth.
+*Two halves:* dead blocks = elementary (pure unit-equation + sector
+parity); subtle blocks need the ideal-theoretic criterion (`ε ∉ (A_χ,B_χ)`
+with both nonzero) — characterize which weight-3 sector images can
+generate such an ideal.
+*Payoff:* a-priori (R)-safety certificates for whole group families, and
+with it lift-robustness statements (which base pairs are safe under
+*every* lift vs only the canonical one).
+
+**OQ4 — A safe-floor criterion (the next rung of the template).** With
+condition 2 now free given the k-check, the doubling separation lives
+provably in condition 3's safe floor (cross-session corroborated: same
+(R)/R1 rates on doubles and failures; separation visible only in
+safe-class coset minima). Open: any ideal/character-theoretic *necessary*
+condition for `safe floor ≥ 2d(base)` — e.g. a Smith-heavy-class
+reformulation of `im p_*` — that is cover-class-generic? Honest
+expectation: the floor is value-carrying (engine/SAT territory; the
+[[288,12,18]] anti-instance shows it genuinely fails off-frame), so aim
+for cheap necessary screens to sharpen A9-style hunts, not a full
+criterion.
+
+**OQ5 — R0 structure (cheap, tidy).** The literal-lift session observed
+`1+δ ∈ (A)` and `∈ (B)` *separately* (R0) across their whole frame. By the
+single-generator counting lemma, R0 ⟺ each circulant factor preserves its
+own `dim R̃/(A)` under descent. Questions: (a) construct/count
+R1-but-not-R0 covers among k-preserving weight-3 pairs (minutes of sweep);
+(b) R0 forces one-sided witnesses (`Q⋆B = 1+s`) — half-size Lean
+certificates, which is what both proven instances happened to use. Is R0
+generic on engine frames or an artifact of small ones?
+
+**Formalization scope note.** The natural Lean targets, in order:
+(i) `membership ⟺ k̃ = k` (finite linear algebra, no homotopy);
+(ii) the chain-ring case lemma of OQ2; (iii) the full (R) ⟺ k iff — only
+if the paper states it at theorem level (needs H₁ dimension counting +
+the LES, a genuine formalization project).
