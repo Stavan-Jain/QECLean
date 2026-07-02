@@ -476,3 +476,158 @@ for hit2/hit5: they live on Z₆×Z₆ (even×even).  Unlike toric, weight-3
 BB polynomials generate odd-length relative cycles too, so axis twists
 are not automatically impotent there — but the toric result already
 justifies the plan's §2.1 insistence on the mixed class.
+
+## R2.5 Lemma L1 — proven (stronger than planned)
+
+**Lemma L1.** Fix `H` and a base pair `(A, B)`; let `σ ∈ Aut(H)`.  The
+descent covers of `(A^σ, B^σ)` are the SAME cover codes as those of
+`(A, B)`, with extension classes permuted by `σ`: if `π : G → H` has
+class `c` and `fiberSumFn π Ã = A`, then `π' := σ∘π : G → H` has class
+`σ_*(c)` and `fiberSumFn π' Ã = A^σ` — the cover code `BB(G, Ã, B̃)`
+is *literally unchanged*; only which base presentation it covers (and
+along which projection) is re-indexed.
+
+*Proof.* `fiberSum_{π'}(Ã)(h) = Σ_{π(g)=σ⁻¹(h)} Ã(g) = A(σ⁻¹h) =
+A^σ(h)`; `ker π' = ker π = ⟨δ⟩`, and the Ext-class of `σ∘π` is the
+image of `c` under `Ext(σ⁻¹, id)`. □
+
+Two consequences.  (i) **Code-level exhaustiveness**: since the screen
+ranges over ALL four classes, the union of its cover codes is invariant
+across the whole `Aut(H)`-orbit of base presentations — the A9
+presentation-sensitivity caveat does not apply to descent screens.
+(A9's literal-lift hunts were the zero-twist SLICE of this space, and a
+slice is presentation-sensitive; the full space is not.)  Block swap
+and pair translation are absorbed the same way (`(Ã,B̃) ↦ (B̃,Ã)` /
+`(g̃Ã, g̃B̃)`).  My §2.1 cocycle models represent every class up to an
+iso over `id_H`, which carries descent pairs to descent pairs and
+induces code equivalences.  (ii) **Within a fixed presentation** the
+only twist-space gauge is the joint deck flip
+`(Ã,B̃) ↦ (δÃ, δB̃)` (all `w_A + w_B` bits flip), so the 64 twists per
+class fall into ≤ 32 equivalence pairs; the raw screen double-covers
+this, harmlessly.  Machine validation: the verdict-profile invariance
+test (`test_l1_presentation_invariance`) passes.
+
+## R3. Stage S3 (interim) — NOT always constructible: small-frame counterexamples
+
+Early census (first 33 complete bases, Z₃×Z₃ + Z₃×Z₄, all d_base = 4,
+k = 4): 9 double literally; **13 literal-failures are twist-rescued —
+all on Z₃×Z₄, all rescued exclusively by the y/mixed classes** (the
+even y-axis needs its holonomy from the class carry, exactly the toric
+parity lesson); and **11 literal-failures are NOT rescued by ANY of
+their 256 descent covers** (8 on Z₃×Z₄, 3 on Z₃×Z₃ — the latter on an
+all-odd frame where every twist direction is live).  Their whole
+descent space tops out at d = 6 < 8 = 2d.
+
+Each unrescued base is a complete, finitely-certified (SAT-witness
+grade) counterexample: **the A10 question's universal form is FALSE.**
+The refined question — which certified bases admit descent doubling —
+is now a selection-rule hunt, with the hit2 rescue (R4) showing the
+answer is not "literal-lift-equivalent" either.
+
+**Certificate verification:** every row of the unrescued bases'
+descent spaces re-verifies independently
+(`scripts/a10_verify_certificates.py`: rebuild each cover from
+`(base, class, twist)` alone, recompute `k` by rank, re-check each
+witness's kernel membership / logical pairing / rowspan exclusion /
+weight in pure numpy — no SAT): **3328/3328 rows PASS** (2992
+witnessed fails + 336 k-drops) at the first snapshot.  Committed as
+`data/a10/s3_unrescued_certificates.jsonl` +
+`s3_unrescued_bases.json` (the `data/` tree is gitignored; these are
+force-added — the A9 data-loss lesson).
+
+**Selection-rule leads (snapshot, hypotheses only):**
+
+- On the 41-base Z₃×Z₃/Z₃×Z₄ d=4 stratum, `is_sidon(B)` separated
+  perfectly: every unrescued base had Sidon (repeat-free difference
+  set) `B`, every rescued/literal base non-Sidon `B`.  The clean-
+  difference-structure codes — the ones the analytic floor machinery
+  likes — are the descent-resistant ones there.
+- The rule does NOT survive richer strata: two `d = 6` bases on
+  Z₃×Z₅ (`0558ff082fa2ec09`, `09d82cd19d904915`, A = y+x+x²) are
+  unrescued with **non-Sidon** B (max descent d = 8 < 12); and
+  hit2/hit5 have **Sidon** B yet are rescued on Z₆×Z₆ (R4).  Sidon-ness
+  is a minimal-frame obstruction pattern, not the mechanism.
+- On Z₃×Z₄ every rescue goes through the y/mixed classes (the even
+  axis needs its holonomy from the class carry — the toric parity
+  lesson); the x/split classes rescue nothing on that frame.
+
+## R4. Stage S4 — THE DECISIVE ANSWER: hit2 AND hit5 are both rescued
+
+Both gross siblings that fail every literal-lift axis cover admit
+exact-doubling descent covers, `k = 12` preserved, `d = 12 = 2·6`
+SAT-exact (UNSAT through 11 + weight-12 witness):
+
+- **hit2** (`98ff6753f866aba0`, B = 1+x·y⁵+x²·y): rescued in the
+  x-class by single-bit twists — first confirmed `(εA, εB) =
+  (000, 001)` (twist the x²y monomial of B onto the other sheet), and
+  by `(000,011), (000,100), (000,110), (001,000)` (a twist on A alone
+  also works), plus mixed-class rescuers `(000,010), (000,011)`, …
+- **hit5** (`9706a4ea60d7e978`, B = y⁵+x·y+x²): rescued by the **mixed
+  class at zero twist** — the pure mixed ℤ₂-extension, exactly the
+  toric even×even pattern — plus mixed `(000,{011,100,111})` and
+  x-class `(000,{001,011})`, …
+
+(The per-class 64-twist grids are still filling in as the four workers
+grind — each rescue confirmation is an UNSAT@11 at n = 144, ~2–7 min.
+Refresh with `uv run python scripts/a10_census.py`; the JSONLs under
+`data/a10/hit{2,5}_descent_screen*.jsonl` are append-resumable.)
+
+**Archival certificates** (`scripts/a10_s5_certify.py`, cadical CLI):
+one representative rescue per base re-run with per-weight DRAT proof
+emission and an independent numpy witness verification —
+
+- `data/a10/certs/hit2_c10_eA000_eB001/certificate.json`: n=144, k=12,
+  d=12, witness verified, UNSAT proofs w=1..11 (605 s).
+- `data/a10/certs/hit5_c11_eA000_eB000/certificate.json`: same shape.
+
+The DRAT files are ~1–2 GB per cover and stay local (regenerable);
+the certificate JSONs are committed.
+
+So on the engine frame the descent space **strictly enlarges** the
+doubling universe: the A9 verdict "hit2 and hit5 do not double" was a
+statement about the literal-lift slice, and it flips under a single
+sheet-assignment bit (or, for hit5, under the mixed extension class
+with no twist at all).  Notably, hit5's rescuer means **all five
+anchorable [[72,12,6]] siblings of the gross base now have exact
+[[144,12,12]] covers** — hit3/4/6 literally (A9), hit2/hit5 by descent
+(A10).
+
+## R5. Fork determination: Fork M, with a sharp two-level structure
+
+- **Globally: NOT always constructible.**  13 complete counterexample
+  bases so far (3 × Z₃×Z₃ d=4, 8 × Z₃×Z₄ d=4, 2 × Z₃×Z₅ d=6), each
+  with all 256 descent covers failing, witnessed, and independently
+  re-verified.  The two Z₃×Z₅ d=6 counterexamples are all-odd-frame
+  and non-Sidon — no known structural excuse.
+- **On the engine frame: constructible everywhere tested.**  All five
+  gross siblings double.  Whether Z₆×Z₆ certified bases are ALWAYS
+  descent-doublable is the sharpened open question the S3 trend line
+  (and a future Z₆×Z₆-targeted sweep) should answer.
+
+The refined research object is the **selection rule**: what property
+of `(H, A, B)` decides descent-doublability?  Live leads: the
+Sidon(B) pattern (minimal frames only), the even-axis class-carry
+requirement, and the frame-richness effect (Z₆ = ℤ₂×ℤ₃ gives twists
+odd-component leverage that ℤ₄ denies them).
+
+## R6. Follow-ups (queued)
+
+1. **Lean instance of a rescued cover** — `XDoubleCoverData` verifies
+   descent-generality by construction (R2.5 / plan §6); hit2's
+   `(x, 000, 001)` cover is statement-ready, but its `d = 12` proof is
+   engine-tier (36-cell base): joins hit3-y in the engine-target queue.
+   The four finite template obligations should first be profiled on the
+   rescued covers (adapt `a9.profile_pair` to cocycle covers).
+2. **Fork-C Lean packaging for a small counterexample** — e.g.
+   `b78e8b27ffa1fef2` (Z₃×Z₃, [[18,4,4]], descent space = 256 covers,
+   all witnessed ≤ 6): "no free ℤ₂ BB-descent cover doubles this code"
+   as a kernel-`decide` theorem over the witness table.  Cheapest
+   full-rigor artifact of the program; would make the FALSE side of
+   the A10 question axiom-clean.
+3. **Complete the S3 sweep** (Z₃×Z₅/Z₃×Z₆/Z₄×Z₆ strata) and re-run the
+   discriminator analysis on the full sample.
+4. **Z₆×Z₆ d≥6 targeted sweep** (the 326-code corpus): is the engine
+   frame universally descent-doublable?
+5. **Gauge-quotient reporting** and the holonomy invariant: formalize
+   the per-relative-cycle ℤ₂ holonomy that explains the toric grids and
+   test it as a rescue predictor on the BB data.

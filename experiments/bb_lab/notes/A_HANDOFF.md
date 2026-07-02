@@ -22,17 +22,28 @@ A4 Theorem D).
 > exact [[144,12,12]] y-covers** (hit3/4/6): in-frame, engine-necessary
 > targets for the next engine re-instantiation.
 
-> **A10 planned (2026-07-02, `A10_descent_twist_screen.md`) — the descent
-> question.** Does every certified BB base admit a *descent* free-ℤ₂ cover
-> (any extension class, cover polynomials only required to satisfy
-> `fiberSum = base`, i.e. `~2^(w_A+w_B)` sheet twists per class) with
-> `d(cover) = 2d`?  Known false for literal-lift axis covers (hit2/hit5
-> fail both axes; toric by symmetry).  Decisive experiment: exhaustive
-> 256-cover twist screens on hit2/hit5 at n = 144 — rescue ⟹ evidence for
-> "always constructible"; no rescue ⟹ finitely-certifiable (Lean-kernel
-> witness table) counterexamples.  Key enabler: `XDoubleCoverData` is
-> already descent-general (`Ac/Bc` free fields + `push_A/push_B`), so no
-> new Lean framework either way.  Branch `claude/a10-descent-twist-screen`.
+> **A10 RESULTS (2026-07-02, `A10_descent_twist_screen.md`) — the descent
+> question ANSWERED (Fork M).** Question: does every certified BB base
+> admit a *descent* free-ℤ₂ cover (any extension class, polynomials only
+> required to `fiberSum` down, ~2^(w_A+w_B) sheet twists per class) with
+> `d(cover) = 2d`?  **Both marquee bases are RESCUED**: hit2 by an
+> x-class single-bit twist (εB=001, DRAT-certified d = 12), hit5 by the
+> **mixed extension class at zero twist** — so ALL FIVE anchorable
+> [[72,12,6]] gross siblings now carry exact [[144,12,12]] covers
+> (hit3/4/6 literal + hit2/hit5 descent), and A9's "hit2/hit5 do not
+> double" was a literal-lift-slice artifact.  But **globally the
+> universal claim is FALSE**: 13 small-frame counterexample bases
+> (Z₃×Z₃/Z₃×Z₄ d=4, Z₃×Z₅ d=6) whose ENTIRE 256-cover descent space
+> fails — 3328 witness rows, all independently numpy-re-verified;
+> committed as certificates.  Toric: rescued at every L (twisted-toric
+> mechanism recovered); even×even frames only via the mixed class (the
+> parity wall).  Lemma L1 (proven): descent screens are presentation-
+> exhaustive — the cover codes are literally invariant under Aut(H)
+> re-presentation, classes permuted.  Selection-rule leads: Sidon(B)
+> separates on minimal frames only.  Lean side untouched this pass;
+> queued: engine-tier rescued-cover instance, kernel-`decide` Fork-C
+> counterexample packaging (cheapest full-rigor artifact), Z₆×Z₆
+> universal-doubling sweep.  Branch `claude/a10-descent-twist-screen`.
 
 ---
 
