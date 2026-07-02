@@ -802,6 +802,69 @@ sufficiency; empirical record 0 violations on ~1000 cells; the
 falsification target is now sharp — *construct* a light stabilizer with
 deep seam-half cancellation against a min-weight fiber logical.
 
+### Entry 2b — continuation: the shadow bound, the flux dichotomy, and
+### the twice-refined residue (2026-07-02)
+
+Three further propositions, each proven from the D1 collapse and
+machine-validated (V6: 20k-random-triple check of the D4 algebra; V7:
+end-to-end D7 mechanics on hit3-stored — see below).
+
+**Prop D4 (seam-shadow bound).** Fix a light `b`, any preimage `y_b`,
+`h = ∂₂ᶜy_b`, `h' = ∂₂ⁿᶜy_b`, and the seam shadow
+`Σ(b) := supp(h) ∪ supp(h')`. Splitting any `ρ` into its parts inside
+and outside `Σ` (and using that `h, h'` live inside `Σ`):
+
+    |ρ + h| + |ρ + h'| = 2|ρ ∖ Σ| + |ρ_Σ + h| + |ρ_Σ + h'|
+                       ≥ 2|ρ ∖ Σ| + |b|,
+
+hence  **slice-min(b) ≥ |b| + 2·min over fiber reps ρ of |ρ ∖ Σ(b)|**
+(and one may maximize the bound over preimages, and over cut positions
+— every cut gives a valid bound).
+
+**Prop D5 (concentration criterion).** The rung over `b` holds whenever
+every representative of every τ-fiber class keeps at least
+`d − |b|/2` weight outside `Σ(b)`. This is a **concentration bound for
+logicals on small shapes** — precisely the statement family gross's
+m-rungs instantiate: for a hexagon (`|b| = 6`, `2d = 12`) it demands
+punctured weight ≥ 3, cf. gross's `m(hexagon) ≥ 3` ("no non-imΔ cycle
+with ≤ 2 qubits off the hexagon"; gross punctures at `supp(b)`, we at
+`Σ(b)` — same shape, and gross's mod-b coset-averaging is a proof
+technique for exactly this kind of bound).
+
+**Prop D6 (cheap per-instance check).** `min_ρ |ρ ∖ Σ(b)|` over a class
+coset is the Σ-punctured coset minimum — the same dual-constraint SAT
+as `coset_min` with the cardinality restricted to the complement of
+`Σ`. So D5 is a *cheaper* sufficient sub-check for C-danger than the
+full slice optimization.
+
+**Prop D7 (trivial-flux rung).** Suppose some preimage's seam-half `h`
+is a base cycle (`∂₁h = 0`) with `[h] ∈ im Δ`. Choosing `ζ ∈ ker ∂₂`
+with `Δ[ζ] = [h]` and replacing `y_b ↦ y_b + ζ` makes the new `h` a
+STABILIZER; then `ρ + h` and `ρ + h' = ρ + h + b` are both
+representatives of the same nontrivial fiber class, so
+`slice(b) ≥ d + d = 2d`. **The rung is free whenever the flux
+`φ(b) := [∂₂ᶜ y_b] mod im Δ` is defined and vanishes** (the ζ-freedom
+shifts the flux by exactly `im Δ`, so `φ(b) ∈ H₁(base)/im Δ ≅ im τ_*`
+is canonical; it is the class of the one-sheet lift where that is a
+cycle).
+
+*Validation (V7, hit3-stored x):* of the 36 stabilizer generators, 24
+have cycle seam-halves, **all 24 with trivial flux**, and the
+ζ-replacement lands a stabilizer `h₂` in every case — D7 disposes of
+all 24 of those generator rungs outright; the remaining 12 have
+non-cycle seam-halves and fall to D4/D5 or per-instance work.
+
+**The twice-refined residue.** Combining D2, D4–D7, the unproven
+content of "C-safe ⟹ doubling" is now confined to stabilizers `b`
+with ALL of: `0 < |b| < 2d`; no seam-trivial preimage; no
+trivial-flux cycle seam-half (for any cut); and a τ-fiber logical
+concentrating more than `d − |b|/2` inside the (best) seam shadow
+`Σ(b)`. Everything else is theorem. A counterexample hunt targeting
+exactly this cell is running (subagent, `scripts/a11_cx_*`,
+`data/a11/cx/`); a proof of the concentration bound for the anchorable
+class via the A5 difference-set machinery is the complementary route
+(the "A8 proxy → theorem" path).
+
 ### Honesty ledger (tooling corrections found during validation)
 
 `x_distance` witnesses are X-type operators (`ker H_Z`), so sector
