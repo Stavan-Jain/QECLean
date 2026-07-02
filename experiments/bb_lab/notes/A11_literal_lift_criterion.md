@@ -607,3 +607,53 @@ usable rows):
   checkable *proxy* for C-safe where C-safe's sweep is infeasible. Why
   anchorability re-routes the safe classes away from light logicals is
   now THE mechanism question (S4).
+
+### Safe-floor probe scoreboard + REGISTERED PREDICTIONS
+
+Base-side probes (`a11_s3_diagnose.py safefloor`, coset-min ladders at
+n = 72, cap 11 — no cover SAT), against known cover verdicts:
+
+| cell | safe-floor histogram | floor ok | d(cover) |
+|---|---|---|---|
+| hit3:stored:x | {6:12, 8:45, ≥12:6} | ✗ | 6 ✓ |
+| hit3:anch36:x | {≥12: 63} | ✓ | 12 ✓ |
+| hit3:stored:y | {≥12: 63} | ✓ | 12 ✓ (A9) |
+| Z3Z6 doc pair (probe mode, cap 7) | {≥8: 3} | ✓ | 8 ✓ (Lean) |
+
+**Predictions registered 2026-07-02 BEFORE the SAT verdicts** (ladders
+still running at registration; probe result in
+`data/a11/safefloor_predictions.log`, commit `8a6a06d`):
+
+| cell | probe | prediction |
+|---|---|---|
+| hit5:anch40:y | {≥12: 63} | **d = 12** |
+| hit2:anch16:y | {≥12: 63} | **d = 12** |
+| hit4:anch48:x | {≥12: 63} | **d = 12** |
+| hit6:anch24:x | {≥12: 63} | **d = 12** |
+
+If confirmed, C-safe passes its first *prospective* test and the
+engine-frame scoreboard is doubling ⟺ safe-floor on every tested cell
+(the small-frame overlap-rescue rows keep the ⟸ direction one-way
+globally; the reachable-coset refinement is the S4 candidate fix).
+
+**First prediction CONFIRMED**: hit5:anch40:y ladder returned
+**d = 12** (1020s of UNSAT climbing) — hit5 doubles on BOTH axes via
+its anchorable presentations. Remaining three verdicts pending.
+
+### S4 first cut — the reachable-coset refinement FAILS (dead end, first-class)
+
+Hypothesis: the 41 overlap-rescue rows (DOUBLES with a safe-class base
+coset min < 2d; frames Z₃×Z₅:x ×17, Z₃×Z₄:y ×10, Z₃×Z₆:y ×9, Z₃×Z₅:y ×5)
+are explained by restricting each class coset to its *reachable* part
+`rep + (rowspace(H_Z^base) ∩ p(cycle space))` — maybe the light coset
+elements simply aren't projections. **Refuted**: `a11_s4_reachable.py`
+computes the reachable minima exactly (subspace-intersection dual +
+coset-min SAT) and gets **0/41 all-heavy** — e.g. reachable minima
+`[6,6,6]` on rows whose covers still double to 8. So light projections
+DO exist; every cover cycle over them just carries overlap
+`|v| = |p(v)| + 2|v₀ ∧ v₁| ≥ 2d`. The necessity gap is genuine
+slice-level mathematics — the safe-sector analogue of gross's m(b)
+machinery (A_HANDOFF §4 Entry-16 anticipated the shape) — not an
+accounting artifact. C-safe stays sufficient-only; the S4(b) question
+is now precisely: *bound `min_{p(v)=w} |w| + 2|v₀ ∧ v₁|` from base data
+on the light reachable classes.*
