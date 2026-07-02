@@ -578,7 +578,11 @@ usable rows):
 
 - `R1`, `R2`, linchpin: **true on 100% of BOTH classes** — certificates
   are (nearly) free for weight-3 BB pairs on these frames too, hence not
-  the discriminator anywhere.
+  the discriminator anywhere. *(Post-hoc explanation: the A12 session
+  proved `(R) ⟺ k preserved ⟺ 1+x^ℓ ∈ (A,B)` as a theorem the same day
+  — the hunt's DOUBLES/short rows are k-preserving by construction, so
+  100%-both-classes is exactly what the theorem predicts. The universal
+  R-columns here are a corollary, not a coincidence.)*
 - **`safe_floor_ok` is sufficient-shaped with 0/348 violations**,
   covering 53/94 DOUBLES (the uncovered 41 = the overlap-rescue class,
   matching the A9 rows-112–152 observation exactly).
@@ -737,10 +741,24 @@ question, both empirical (SAT = discovery-grade; A_HANDOFF §1):
    engine-frame flipped presentations (e.g. hit3:anch36 = up to units
    `A ~ 1+x+x²y³`, `B ~ y+y²+x³`) are the natural "second gross"
    engine targets — now with the RIGHT presentations pinned.
-4. **A10 coordination.** Its hit2/hit5 Fork-C framing is dissolved
-   (messages sent to the Q1/Q4 sessions); the descent screens remain
-   valuable as presentation-level perturbation data. Before A10 S4 runs,
-   its §0/§3/§5 need the Entry-1 correction.
+4. **A10 coordination — CORRECTED BY A10's L1 (2026-07-02, same day).**
+   My message to the A10/Q1 session claimed a Fork-C negative "can only
+   be a statement about the stored presentations' descent space" — that
+   was WRONG: A10's Lemma L1 (proven, strong form: Aut(H) lifts act on
+   the cocycle model, permuting classes × twists with literal matrix
+   equality) makes the 256-cover descent space presentation-closed, so
+   its screens are code-exhaustive. Concretely, A10 verified that my
+   flipped literal lifts ARE its stored-presentation mixed-class rows —
+   hit2 (εA=001, εB=010), hit5 (εA=001, εB=011), exact matrix equality —
+   i.e. "literal lift of an equivalent presentation" and "twisted
+   descent cover of the stored presentation" are two coordinatizations
+   of the same cover. A10's outcome is Fork M: hit2/hit5 rescued
+   (consistent with Entry 1), but **13 code-level counterexample bases**
+   (Z₃×Z₃/Z₃×Z₄/Z₃×Z₅) whose entire 256-cover descent spaces fail —
+   witness-certified. For A11 this is a gift: those 13 are the first
+   *code-level* hard negatives for any criterion at descent scope, and
+   the L1 correspondence means C-safe should be evaluated on descent
+   cells too (the probe generalizes — im p_* of the cocycle cover).
 5. **S6 propagation** (after 1–2): promote the surviving criterion into
    `a5_cover_cascade.py` as DOUBLE_CANDIDATE v2 (per-presentation,
    probe-backed), research-log + memory updates, and the A8-note status
