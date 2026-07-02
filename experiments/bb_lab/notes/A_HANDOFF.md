@@ -16,7 +16,9 @@ A4 Theorem D).
 > (`Framework/Homological/{BBCover,BBDoubling}.lean`), and the `[[36,4,4]] →
 > [[72,4,8]]` pair (extensibility doc §5) is **proven through it at the chain
 > and Pauli levels, gross axiom bar** (`Codes/BivariateBicycle/Z3Z6/`;
-> `StabilizerCodeWithDistance 72 4 8` packaging pending).  Corpus screen: 152
+> the `StabilizerCodeWithDistance 72 4 8` packaging is DONE — S3.9,
+> `Z3Z6/StabilizerCode.lean`, `pair72StabilizerCodeWithDistance`).
+> Corpus screen: 152
 > direct-sweep doubling pairs; the presentation census corrects the Z₆×Z₆
 > uniqueness reading — **five new anchorable [[72,12,6]] codes, three with
 > exact [[144,12,12]] y-covers** (hit3/4/6): in-frame, engine-necessary

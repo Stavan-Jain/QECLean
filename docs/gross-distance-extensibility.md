@@ -155,8 +155,11 @@ by SAT — the analytic safe/dangerous *engine* (Prop 10 / Prop 32) is **not** r
 > floor by the layer's generic single-shape rung over the 24-class light-boundary
 > census, and the safe floor by three per-Smith-class `2¹⁸` sweeps (`dim ker ∂₂ = 2`
 > here vs gross's 6, so no CRT engine is needed — the sweeps ARE the floor).  The
-> `StabilizerCodeWithDistance 72 4 8` packaging is the remaining (mechanical) step.
-> Data provenance: `experiments/bb_lab/scripts/gen_pair72_z6z6_data.py`.
+> `StabilizerCodeWithDistance 72 4 8` packaging is also done (S3.9):
+> `pair72StabilizerCodeWithDistance` in `Z3Z6/StabilizerCode.lean`, mirroring the
+> gross Phase-5 packaging.  Data provenance:
+> `experiments/bb_lab/scripts/gen_pair72_z6z6_data.py` (instance data) and
+> `gen_pair72_packaging_data.py` (packaging data, 15-check ALL-PASS gate).
 
 - **Base** `[[36,4,4]]` on `G = Z₃×Z₆` (x order 3, y order 6):
   `A = x² + y + y³`, `B = 1 + x + y²`.

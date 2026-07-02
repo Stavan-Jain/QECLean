@@ -1,5 +1,18 @@
 # S3.9 — `StabilizerCodeWithDistance 72 4 8` packaging plan
 
+> **✅ DONE (2026-07-02).** All three stages executed as planned:
+> `gen_pair72_packaging_data.py` (Stage A, 15-check ALL-PASS gate),
+> `Z3Z6/StabilizerCode.lean` (Stage B, §1–§6 + the bundle
+> `pair72StabilizerCodeWithDistance : StabilizerCodeWithDistance 72 4 8`),
+> umbrella + docs (Stage C).  Verified: LSP zero-error, `lake build` green,
+> axiom audit = standard three + `native_decide` oracles (no `sorry`).
+> Two deviations from the plan text: the face and vertex drop-sets
+> coincided (`[(0,0),(0,1)]`), so the single-`dropSet` gross template
+> applied verbatim; and §3–§6 were produced by scripted transformation
+> of the gross file (renames + 6→2/12→4 constant fixes) rather than
+> hand-adaptation — only the §6 tail (distance transport with the
+> ∃-restatement, the `WithDistance` bundle) is new text.
+
 The one remaining gap from the PR #53 stage-4 wrap (`A_HANDOFF.md` A9 update):
 the `[[36,4,4]] → [[72,4,8]]` doubling instance is proven at the chain and
 Pauli levels (`Z3Z6/Distance.lean`: `pair72_chain_distance_eq_8`,

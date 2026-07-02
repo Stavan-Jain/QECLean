@@ -13,14 +13,25 @@ what was tried and why it didn't work.
 
 ## Entries
 
+- 2026-07-02 — bb-pair72-packaging (S3.9) — success —
+  **`pair72StabilizerCodeWithDistance : StabilizerCodeWithDistance 72 4 8`**
+  (`Codes/BivariateBicycle/Z3Z6/StabilizerCode.lean`): the second doubling
+  instance packaged as a first-class code object, mirroring the gross
+  Phase-5 packaging at pair72 scale (trimmed 68-generator list,
+  decoder-certified independence, 4 logical qubits, distance transport).
+  Axiom-clean (standard three + `native_decide` oracles, no `sorry`).
+  Data generator with 15-check ALL-PASS gate:
+  `experiments/bb_lab/scripts/gen_pair72_packaging_data.py`.
+  [plan](../experiments/bb_lab/notes/S39_pair72_packaging_plan.md)
+
 - 2026-07-02 — bb-doubling-layer-second-instance — success —
   **The free-ℤ₂ doubling template is a parametric Lean layer, and the
   `[[36,4,4]] → [[72,4,8]]` pair is proven through it** (chain+Pauli
-  `d = 8 = 2·d(base)`, gross axiom bar; packaging pending).  The A9
-  target screen found 152 direct-sweep doubling pairs and corrected the
-  Z₆×Z₆ census: gross has **five anchorable siblings, three with exact
-  `[[144,12,12]]` y-covers** — in-frame engine-necessary follow-on
-  targets.
+  `d = 8 = 2·d(base)`, gross axiom bar; packaging: see the S3.9 entry
+  above).  The A9 target screen found 152 direct-sweep doubling pairs
+  and corrected the Z₆×Z₆ census: gross has **five anchorable siblings,
+  three with exact `[[144,12,12]]` y-covers** — in-frame
+  engine-necessary follow-on targets.
   [details](../experiments/bb_lab/notes/A9_lean_target_screen.md)
 
 - 2026-06-12 — gross-bb-analytic-bound — partial —
