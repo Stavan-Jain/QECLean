@@ -335,6 +335,13 @@ verbatim) ⟹ deck acts trivially (Koszul annihilation, same two lines). And
 becomes a Bockstein spectral sequence; the A12 inequality should be its
 first-page shadow. A clean statement here ("deck trivial ⟺ k constant
 along the tower") is the theorem the family paper wants.
+*Status (2026-07-02):* promoted to fork **A13** — plan in
+[`A13_deck_tower_plan.md`](A13_deck_tower_plan.md). Headlines there:
+"deck trivial at *every* level ⟺ k constant" is already a theorem
+(stepwise A12 + counting), the gross x-ladder is certified uniformly in
+`r` by the level-free witness `(1+x²)B² = 1+x⁶`, and Q(r) itself is
+compressed (planning-grade) to the vanishing of one divided class
+`ε̄φ ∈ H₁(S/ε^{t*})` at the critical level `t* = min{t : ε^t ∈ (A,B)}`.
 
 **OQ2 — The Bockstein equality (mathematical core).** Is
 `dim (1+σ)H₁ = k̃ − k` always? Equivalent forms: `δ₁∘δ₂ = 0`;
