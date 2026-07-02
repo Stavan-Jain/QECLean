@@ -44,6 +44,16 @@ A4 Theorem D).
 > queued: engine-tier rescued-cover instance, kernel-`decide` Fork-C
 > counterexample packaging (cheapest full-rigor artifact), Z₆×Z₆
 > universal-doubling sweep.  Branch `claude/a10-descent-twist-screen`.
+> **A11 synthesis (same day):** the A11 session showed hit2/hit5's
+> ANCHORABLE presentations double via literal x-lifts (verified here:
+> both d = 12) — and the constructive L1 correspondence
+> (`a10_l1_correspondence.py`) identifies those covers, with exact
+> matrix equality, as the stored presentation's mixed-class twist rows
+> (hit2: εA=001/εB=010; hit5: εA=001/εB=011).  Twist rescues ≡
+> presentation moves; the descent screen is the presentation-invariant
+> closure of literal lifting, so its negatives (the 13 counterexamples)
+> are CODE-level — A11's "Fork-C is presentation-only" caveat is
+> corrected in A10 note §R6.
 
 ---
 

@@ -583,14 +583,16 @@ emission and an independent numpy witness verification —
 The DRAT files are ~1–2 GB per cover and stay local (regenerable);
 the certificate JSONs are committed.
 
-So on the engine frame the descent space **strictly enlarges** the
-doubling universe: the A9 verdict "hit2 and hit5 do not double" was a
-statement about the literal-lift slice, and it flips under a single
-sheet-assignment bit (or, for hit5, under the mixed extension class
-with no twist at all).  Notably, hit5's rescuer means **all five
-anchorable [[72,12,6]] siblings of the gross base now have exact
-[[144,12,12]] covers** — hit3/4/6 literally (A9), hit2/hit5 by descent
-(A10).
+So the A9 verdict "hit2 and hit5 do not double" was a statement about
+the literal-lift slice *at the stored presentation*, and it flips under
+a single sheet-assignment bit (or, for hit5, under the mixed extension
+class with no twist at all).  **All five anchorable [[72,12,6]]
+siblings of the gross base now have exact [[144,12,12]] covers** —
+hit3/4/6 literally (A9), hit2/hit5 by descent (A10).  *(See R6 for the
+A11 cross-session synthesis: these rescues and the literal covers of
+equivalent presentations are the same codes in different coordinates —
+"strictly enlarges the literal slice at this presentation", not
+"strictly enlarges presentation-closed literal lifting".)*
 
 ## R5. Fork determination: Fork M, with a sharp two-level structure
 
@@ -610,7 +612,69 @@ Sidon(B) pattern (minimal frames only), the even-axis class-carry
 requirement, and the frame-richness effect (Z₆ = ℤ₂×ℤ₃ gives twists
 odd-component leverage that ℤ₄ denies them).
 
-## R6. Follow-ups (queued)
+## R6. A11 cross-session synthesis: twists ≡ presentation moves (2026-07-02)
+
+The A11 session (`claude/a8-literal-lift-criterion`, note
+`A11_literal_lift_criterion.md` Entry 1) reported: the A9 T2 ladders
+ran on the STORED corpus presentations, which fail the anchorability
+gate (iii); the ANCHORABLE presentations of hit2/hit5 (e.g. hit2:
+A = 1+x+x²y³, B = y²+x³+x³y) have **literal x-covers with d = 12
+exactly** — so literal-lift doubling is presentation-sensitive within
+one (code, axis), and all six anchorable Z₆×Z₆ classes are gross-twins.
+Their positive claim **verifies independently** here (fresh ladders,
+`blxtkaey7` run: both anchorable literal x-covers d = 12, k = 12).
+
+**Synthesis via Lemma L1 (constructive).**  A11's finding and this
+screen's rescues are the same phenomenon in different coordinates.
+`scripts/a10_l1_correspondence.py` computes the presentation move
+(σ, translation) carrying the stored pair to the anchorable pair,
+transports the anchorable literal x-cover back along σ, classifies the
+resulting extension, builds the explicit iso ψ onto the cocycle model,
+and reads off the twist bits:
+
+- hit2: anchorable-literal-x  ≡  stored-presentation **mixed-class
+  (εA=001, εB=010)** — *exact matrix equality* under ψ;
+- hit5: anchorable-literal-x  ≡  stored-presentation **mixed-class
+  (εA=001, εB=011)** — exact matrix equality.
+
+So the anchorable presentations' literal covers ARE rows of this
+screen (as L1 requires: the x-class of a moved presentation pulls back
+to a different class of the stored one — here mixed — with a computable
+twist).  The mixed-class zero-twist rescuer of hit5 found earlier is a
+*further* rescuer beyond that image.
+
+**Correction to the A11 message's consequence (1).**  A11 inferred "a
+Fork-C negative can only be a statement about the stored
+presentations' descent space, not about the codes."  L1 says the
+opposite, and the correspondence above demonstrates it on the exact
+contested instance: descent-cover codes are invariant under
+presentation moves (§R2.5 — the cover code is literally unchanged,
+only (class, twist) bookkeeping moves), so a fixed-presentation screen
+over ALL FOUR classes is code-level exhaustive.  Consequently the R3
+counterexamples are strengthened, not weakened, by A11's mechanism:
+for each of the 13 unrescued bases, **no equivalent presentation
+(Aut × swap × translation orbit) admits a doubling literal lift
+either** — any such lift would appear in the screened 256 as a rescue
+row.  What IS presentation-relative (A11 is right here) is any claim
+about the *literal-lift slice alone*, including A9's T2 ladder
+verdicts and this note's earlier "strictly enlarges" phrasing (fixed
+in R4).
+
+**Net effect on framing:** the descent screen is the
+presentation-invariant closure of literal-lift search — it subsumes
+presentation search (a 576-element orbit hunt) at the cost of a 256-row
+screen, and its negatives are code-level.  A11's safe-sector coset
+diagnostics (stored-x minima {6:12, 8:45, ≥12:6} vs anchorable-x
+{≥12:63}, base-side probe, no cover SAT) are exactly the cheap
+per-(class, twist) predictor the R5 selection-rule hunt wants — pulled
+back through the L1 correspondence they become a per-row screen
+oracle.  Open follow-up (now sharper): are ALL rescue rows in the
+L1-image of {literal lifts of equivalent presentations}, or does the
+descent space rescue codes that NO presentation rescues literally?
+The 576×2 move-image is directly computable per base; run it against
+the finished hit2/hit5 grids.
+
+## R7. Follow-ups (queued)
 
 1. **Lean instance of a rescued cover** — `XDoubleCoverData` verifies
    descent-generality by construction (R2.5 / plan §6); hit2's
