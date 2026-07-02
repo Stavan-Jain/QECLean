@@ -303,3 +303,23 @@ if fails:
     print(f"RESULT: {len(fails)} FAILURES: {fails}")
     sys.exit(1)
 print("RESULT: ALL CHECKS PASS")
+
+# ------------------------------------------------- 5b. seam tables (Lean literals)
+# The three class seams seamC (kcombo c0 c1) as literal supports, consumed by
+# QEC/.../Z3Z6/SeamTables.lean (tabulated so the SweepSafe* leaves do not
+# re-derive a 72-entry constant 2^18 times).
+print("== 5b. tabulated class seams ==")
+S1 = np.zeros((2 * nb, 2 * nc), dtype=np.uint8)
+for h in Gb:
+    hp = ((h[0] + 3) % (2 * ELL), h[1])
+    for blk in range(2):
+        S1[blk * nb + base_idx[h], blk * nc + cover_idx[hp]] = 1
+SEAM1 = (S1 @ LS) % 2
+for (c0, c1), name in [((1, 0), "seam10"), ((0, 1), "seam01"), ((1, 1), "seam11")]:
+    z = (c0 * kb[0] ^ c1 * kb[1]) % 2
+    s = (SEAM1 @ z) % 2
+    L = sorted(g for g in Gb if s[base_idx[g]])
+    R = sorted(g for g in Gb if s[nb + base_idx[g]])
+    print(f"  {name}: wt={int(s.sum())}  L={L}  R={R}")
+    out[name] = {"L": [list(g) for g in L], "R": [list(g) for g in R]}
+outp.write_text(json.dumps(out, indent=1))

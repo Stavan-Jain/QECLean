@@ -575,6 +575,21 @@ lemma seamC_add (ξ η : H → ZMod 2) :
   unfold seamC liftStab
   rw [D.liftC2_add, bbBoundary2Fn_add, D.sheet1_add]
 
+lemma liftC2_zero : D.liftC2 (0 : H → ZMod 2) = 0 := by
+  funext g
+  change (if g = D.sec (D.proj g) then (0 : H → ZMod 2) (D.proj g) else 0) = 0
+  split <;> rfl
+
+lemma seamC_zero : D.seamC (0 : H → ZMod 2) = 0 := by
+  unfold seamC liftStab
+  rw [D.liftC2_zero]
+  funext q
+  have h : bbBoundary2Fn D.Ac D.Bc (0 : G → ZMod 2) = 0 := by
+    have h0 : D.coverComplex.boundary2 0 = 0 := map_zero _
+    exact h0
+  rw [h]
+  rfl
+
 /-! ## Deck-shift bookkeeping -/
 
 lemma liftStab_deckShift (ξ : H → ZMod 2) :
