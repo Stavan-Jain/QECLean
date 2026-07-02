@@ -358,7 +358,14 @@ part that moves under re-presentation: the stored hit3-x presentation's 63 safe
 classes have coset minima {6:12, 8:45, ≥12:6} while its flipped anch-presentation's
 are all ≥ 12 — condition 2 (R), the linchpin, `k`-preservation and the tight witness
 hold for *every* presentation and axis on this frame (certificates are
-non-discriminating there; the A11 audit's uniform result).
+non-discriminating there; the A11 audit's uniform result — and forced, by the A12
+theorem `(R) ⟺ k(cover) = k(base) ⟺ 1+δ ∈ (A,B)`, within any k-preserving family).
+Presentation-relativity is a property of the *literal-lift slice* only: full
+descent-space (twist-screen) verdicts are code-level by A10's Lemma L1 — the flipped
+literal covers above are exactly mixed-class twist rows of the stored presentations,
+and A10's 13 unrescued small-frame bases are genuine code-level non-doubling
+instances (see `experiments/bb_lab/notes/A10_descent_twist_screen.md` §R6 for the
+scope statement).
 
 ---
 

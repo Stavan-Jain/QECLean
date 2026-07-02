@@ -45,6 +45,18 @@ A4 Theorem D).
 > necessary, certificates/difference-set predicates uncorrelated.
 > Emerging criterion: **C-safe = tight witness ∧ safe-class coset minima
 > ≥ 2d**, with A8's package as its checkable engine-frame proxy.
+> Cross-session synthesis (same day): A12 proved
+> `(R) ⟺ k(cover) = k(base) ⟺ 1+δ ∈ (A,B)` — so the universal
+> R-columns are forced on k-gated data, k-preservation is the right
+> primitive conjunct, and `deckTrivial_of_bezout` (BBDoubling.lean)
+> consumes the R1 witnesses kernel-grade.  A10's Lemma L1 makes descent
+> screens code-exhaustive (the A11 flips = its mixed-class twist rows,
+> matrix-equal): literal-lift claims are presentation-relative, descent
+> claims are not, and A10's 13 unrescued bases are code-level
+> non-doubling instances that no equivalent presentation lifts to a
+> doubling literal cover — the first hard negatives; C-safe consistency
+> on all their presentations is a queued falsification check (A11 note
+> § Session close item 4; Fork-C scope statement = A10 note §R6).
 
 ---
 

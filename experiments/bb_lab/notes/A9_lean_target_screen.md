@@ -264,4 +264,8 @@ double (hit5-x reaches d = 8).
 > hit2-y all d = 6.  ids: hit5 = `9706a4ea60d7e978`,
 > hit2 = `98ff6753f866aba0`.  Mechanism: every stored-form non-doubling
 > cell breaks in the SAFE sector (a safe class with coset min = d(cover));
-> see A11 Entry 1.
+> see A11 Entry 1.  Scope note: only claims about the *literal-lift
+> slice* are presentation-relative; descent-space (twist-screen)
+> verdicts are code-level by A10's Lemma L1 — the flipped literal
+> covers are exactly mixed-class twist rows of the stored forms.  For
+> the Fork-C scope fix see `A10_descent_twist_screen.md` §R6.

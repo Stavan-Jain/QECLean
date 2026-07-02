@@ -576,13 +576,19 @@ completed A8-cell so far doubles.)
 On the ~450 rows finished at first cut (94 DOUBLES / 348 shorts among
 usable rows):
 
-- `R1`, `R2`, linchpin: **true on 100% of BOTH classes** — certificates
-  are (nearly) free for weight-3 BB pairs on these frames too, hence not
-  the discriminator anywhere. *(Post-hoc explanation: the A12 session
-  proved `(R) ⟺ k preserved ⟺ 1+x^ℓ ∈ (A,B)` as a theorem the same day
-  — the hunt's DOUBLES/short rows are k-preserving by construction, so
-  100%-both-classes is exactly what the theorem predicts. The universal
-  R-columns here are a corollary, not a coincidence.)*
+- `R1`, `R2`, linchpin: **true on 100% of BOTH classes**. *(Explained by
+  a THEOREM the same day — A12 session, `A12_deck_homotopy_R.md` §3:
+  for every free-ℤ₂ BB cover, `(R) ⟺ k(cover) = k(base) ⟺ R1
+  [1+δ ∈ (A,B)]`; proof via Frobenius duality + the transfer-LES
+  inequality + the Koszul reading of my one-line R1 ⟹ (R) mechanism.
+  The hunt's DOUBLES/short rows are k-gated, so 100%-both-classes is
+  FORCED: (R) can never discriminate within a k-preserving family.
+  Scope caveat for any write-up: this is a k-gate fact, NOT a class
+  fact — A12's ~1.04M-pair sweep found 11,307 (R)-violations, all
+  k-jumping as the theorem forces, including strict-IBM-shape pairs on
+  Z₆×Z₆ itself; and (R) is lift-dependent. My R0 observation — 1+δ in
+  EACH principal ideal on the engine frame — is strictly stronger than
+  R1 and matches the P=0 shape of both proven instance witnesses.)*
 - **`safe_floor_ok` is sufficient-shaped with 0/348 violations**,
   covering 53/94 DOUBLES (the uncovered 41 = the overlap-rescue class,
   matching the A9 rows-112–152 observation exactly).
@@ -701,13 +707,14 @@ on the light reachable classes.*
 **Criterion status after one session.** Two-tier answer to the A11
 question, both empirical (SAT = discovery-grade; A_HANDOFF §1):
 
-- **C-safe (frame-agnostic, sufficient):** tight witness ∧ every safe
-  class coset min ≥ 2d (R2/linchpin/R1 ride along free). Zero
-  violations across 465 small-frame failures + every engine-frame cell;
-  covers 111/152 small-frame doubles and (scoreboard ⟺) all engine-frame
-  cells tested. Checkable with NO cover SAT: T-c span sweeps at ≤ 24
-  cells, base-side SAT coset ladders at 36+ cells (`a11_s3_diagnose.py`),
-  4/4 prospective predictions.
+- **C-safe (frame-agnostic, sufficient):** k(cover) = k(base) — one rank
+  computation, and by the A12 theorem EQUIVALENT to (R)/R1, so the
+  homotopy conjunct is subsumed — ∧ tight witness ∧ every safe class
+  coset min ≥ 2d. Zero violations across 465 small-frame failures +
+  every engine-frame cell; covers 111/152 small-frame doubles and
+  (scoreboard ⟺) all engine-frame cells tested. Checkable with NO cover
+  SAT: T-c span sweeps at ≤ 24 cells, base-side SAT coset ladders at
+  36+ cells (`a11_s3_diagnose.py`), 4/4 prospective predictions.
 - **A8 (engine-frame proxy, sufficient):** anchorable presentation +
   `dim ker ∂₂ = 6` + squaring identity. 7/7 on fresh ladders (flipping
   every A9 stored-form negative), plus gross, Z₆×Z₁₄ ×2, Z₆×Z₁₈ (d>7
@@ -738,27 +745,42 @@ question, both empirical (SAT = discovery-grade; A_HANDOFF §1):
    layer-provable ones (safe floor by per-class sweeps at ≤ 2¹⁸ ×
    dispatch 4); pick 1–2 fresh-frame instances (a Z₄×Z₆:y row for a new
    frame) and push through `BBCover`/`BBDoubling` end-to-end. The
-   engine-frame flipped presentations (e.g. hit3:anch36 = up to units
+   homotopy obligation is now cheapest via A12's new
+   `deckTrivial_of_bezout (P Q) (hPQ : conv P Ac + conv Q Bc = deckPoly)`
+   in `BBDoubling.lean` — the S2 matrix's R1 witnesses plug straight in
+   (one G-indexed `decide` per instance, kernel-grade, native-free;
+   pair72 already retrofitted on the A12 branch). The engine-frame
+   flipped presentations (e.g. hit3:anch36 = up to units
    `A ~ 1+x+x²y³`, `B ~ y+y²+x³`) are the natural "second gross"
    engine targets — now with the RIGHT presentations pinned.
-4. **A10 coordination — CORRECTED BY A10's L1 (2026-07-02, same day).**
-   My message to the A10/Q1 session claimed a Fork-C negative "can only
-   be a statement about the stored presentations' descent space" — that
-   was WRONG: A10's Lemma L1 (proven, strong form: Aut(H) lifts act on
-   the cocycle model, permuting classes × twists with literal matrix
-   equality) makes the 256-cover descent space presentation-closed, so
-   its screens are code-exhaustive. Concretely, A10 verified that my
-   flipped literal lifts ARE its stored-presentation mixed-class rows —
-   hit2 (εA=001, εB=010), hit5 (εA=001, εB=011), exact matrix equality —
-   i.e. "literal lift of an equivalent presentation" and "twisted
-   descent cover of the stored presentation" are two coordinatizations
-   of the same cover. A10's outcome is Fork M: hit2/hit5 rescued
-   (consistent with Entry 1), but **13 code-level counterexample bases**
-   (Z₃×Z₃/Z₃×Z₄/Z₃×Z₅) whose entire 256-cover descent spaces fail —
-   witness-certified. For A11 this is a gift: those 13 are the first
-   *code-level* hard negatives for any criterion at descent scope, and
-   the L1 correspondence means C-safe should be evaluated on descent
-   cells too (the probe generalizes — im p_* of the cocycle cover).
+4. **A10 coordination — CORRECTED BY A10's L1 (2026-07-02, same day;
+   scope fix at A10 note §R6 — cite THAT for Fork-C scope, not this
+   note's earlier message).** My message to the A10/Q1 session claimed a
+   Fork-C negative "can only be a statement about the stored
+   presentations' descent space" — WRONG: A10's Lemma L1 (proven strong
+   form, now *constructively demonstrated on hit2/hit5*: transport my
+   literal covers back along the Aut-move σ — hit2 σ(e₁,e₂) =
+   ((5,3),(5,2)) + translate (3,0), hit5 ((5,3),(5,4)) — and the
+   projection σ⁻¹∘π₁ is a MIXED-class (1,1) extension of the STORED
+   pair, with twist read off exactly: hit2 (εA=001, εB=010), hit5
+   (εA=001, εB=011), matrix equality) makes the 256-cover descent space
+   presentation-closed: fixed-presentation screens are code-exhaustive
+   over the full Aut × swap × translation orbit. "Literal lift of an
+   equivalent presentation" and "twisted descent cover of the stored
+   presentation" are two coordinatizations of one phenomenon. A10 also
+   independently re-verified both flips (fresh ladders, d = 12 exact).
+   Outcome Fork M: hit2/hit5 rescued, but **13 code-level counterexample
+   bases** (3× Z₃×Z₃ d=4, 8× Z₃×Z₄ d=4, 2× Z₃×Z₅ d=6; 3328 witness rows
+   re-verified, committed on the A10 branch) — and Entry 1's mechanism
+   STRENGTHENS them: no equivalent presentation of those 13 doubles
+   literally either (any such lift would appear in the screened 256 as
+   a rescue row). Two merge items queued with A10: (a) is every rescue
+   row in the L1-image of literal lifts of equivalent presentations?
+   (b) **C-safe consistency check on the 13**: sufficiency demands the
+   safe floor (or witness) be broken on EVERY presentation × axis of
+   those 13 codes — small frames, sweep-checkable, a direct
+   falsification target for C-safe. The safe-sector probe is the cheap
+   per-row oracle for A10's selection-rule hunt (pull back through L1).
 5. **S6 propagation** (after 1–2): promote the surviving criterion into
    `a5_cover_cascade.py` as DOUBLE_CANDIDATE v2 (per-presentation,
    probe-backed), research-log + memory updates, and the A8-note status
