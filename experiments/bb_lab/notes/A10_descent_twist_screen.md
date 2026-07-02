@@ -674,6 +674,60 @@ descent space rescue codes that NO presentation rescues literally?
 The 576×2 move-image is directly computable per base; run it against
 the finished hit2/hit5 grids.
 
+## R8. The L1-image analysis: DESCENT STRICTLY BEATS PRESENTATION-CLOSED LITERAL LIFTING (2026-07-02)
+
+R6's open question is answered.  `scripts/a10_l1_image.py` computes,
+purely group-theoretically (no SAT), the **presentation-literal
+L1-image** of a screen: the set of rows (class, epsA, epsB) that are
+L1-transports of literal axis covers of ANY moved presentation
+(Aut × swap × translation), including the full row-level gauge
+(deck-lift choice, and all consistent trivializing cochains η — note:
+η's generator values are pinned by the cocycle data, an early-version
+bug; and on frames with odd axes several cocycle models are
+equivalent-over-id_H, so image rows are emitted in every model whose
+η exists).
+
+Results against the grids:
+
+| base | image size | rescues in-image / descent-proper (screened so far) |
+|---|---|---|
+| toric3 (complete) | 32/64 (8 per model) | 8 / **8** |
+| toric4 (complete) | 24/64 (x,y,mixed only) | 8 / **8** (all mixed) |
+| hit2 (partial) | **192/256 — saturates all three nonsplit classes** | 11 / 0 (forced: only split-class rows can be outside) |
+| hit5 (partial) | **96/256 — half of each nonsplit class** | 6 / **7** |
+
+**Headline: hit5 has confirmed d = 12, k = 12 doubling covers that are
+literal lifts of NO equivalent presentation.**  The three x-class
+descent-proper rescues — (εA, εB) = (000,001), (000,011), (001,000) —
+were re-verified at a *stronger* grade by
+`scripts/a10_l1_image_verify.py`: mapped onto Z₁₂×Z₆, a pair is
+equivalent to a literal lift iff some Aut(Z₁₂×Z₆)-image fits in a
+width-6 x-window with windowed reduction among the 10368 moved
+presentations (set membership, no canonicalization).  The literal
+control row tests IN; all three descent-proper rows test OUT — i.e.
+outside the literal image **even under full Aut(Z₁₂×Z₆) × swap ×
+translation**, strictly broader than the group-structured gauge.
+(The four mixed-class descent-proper rows rest on the row-level
+gauge-complete image; their canonical-grade re-check via an abstract
+iso mixed → Z₁₂×Z₆ is queued.)
+
+Consequences:
+
+1.  The descent space is *strictly* larger than presentation-closed
+    literal lifting — sheet twists are a genuinely new construction
+    axis, not presentation search in disguise.  (A11's mechanism
+    explains SOME rescues — hit5's zero-twist mixed rescue and all of
+    hit2's nonsplit rescues are in-image — but not all.)
+2.  The image size is itself a sharp per-code invariant and new
+    selection-rule variable: hit2 saturates its nonsplit classes
+    (192/256) while hit5 fills only half (96/256) — the two siblings
+    differ structurally in how much of their descent space literal
+    lifting can reach.
+3.  Even toric already separates: half its rescuing covers (both L)
+    are descent-proper — the skew-torus covers reachable by twists
+    but not by axis-doubling any GL-transformed square-torus
+    presentation.
+
 ## R7. Follow-ups (queued)
 
 1. **Lean instance of a rescued cover** — `XDoubleCoverData` verifies
