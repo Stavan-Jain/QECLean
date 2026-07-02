@@ -636,9 +636,43 @@ engine-frame scoreboard is doubling ⟺ safe-floor on every tested cell
 (the small-frame overlap-rescue rows keep the ⟸ direction one-way
 globally; the reachable-coset refinement is the S4 candidate fix).
 
-**First prediction CONFIRMED**: hit5:anch40:y ladder returned
-**d = 12** (1020s of UNSAT climbing) — hit5 doubles on BOTH axes via
-its anchorable presentations. Remaining three verdicts pending.
+**ALL FOUR PREDICTIONS CONFIRMED (4/4)**: hit5:anch40:y → 12 (1021s),
+hit2:anch16:y → 12 (1496s), hit4:anch48:x → 12 (167s),
+hit6:anch24:x → 12 (298s). Full ladder scoreboard for the session —
+7 stored cells all non-doubling (6/6/6/8/6/6/6), **7 anchorable
+A8-package cells all d = 12 exactly**. Combined with A9's stored-y
+ladders and gross: **every one of the six engine-frame classes doubles
+on BOTH axes via its anchorable presentations**, and the base-side
+safe-floor probe called every verdict it was asked to predict. On the
+engine frame the tested scoreboard is exactly
+
+    doubling  ⟺  safe_floor_ok      (per presentation and axis),
+
+and A8's full package (anchorable + kerd2 6 + squaring identity) has
+gone 7-for-7 on fresh SAT ladders with zero counterexamples anywhere.
+
+### S2 final numbers (complete 638-row matrix; `a11_s2_analyze.py`)
+
+152 DOUBLES + 465 shorts + 21 k-drift, 0 errors. Necessity/sufficiency
+screen (P(f | DOUBLES) vs P(f | short)):
+
+- **`safe_floor_ok`: 0.730 vs 0.000 — SUFFICIENT with 0/465 violations,
+  covering 111/152** (C-safe adds nothing beyond it on this data — R2,
+  linchpin, R1 are true on 100% of BOTH classes; `tight_witness` is
+  implied wherever the floor holds).
+- **`tight_witness`: 1.000 vs 0.482 — NECESSARY**, far from sufficient.
+- **A8-exact / R0-sq: 0.507 vs 0.133 — enriched but NOT sufficient on
+  the small frames (62 violating shorts)**. This sharpens A8's reading:
+  the squaring identity alone provably does not buy doubling; the
+  anchorability + engine-frame (kerd2 = 6) hypotheses are load-bearing.
+  (On the engine frame, every A8-package cell laddered so far doubles.)
+- Difference-set predicates (D1/D2/D3/Frobenius): uncorrelated, as
+  expected — they govern the base floor, not the doubling.
+- Per-frame C-safe coverage of DOUBLES: Z₃×Z₆:x 20/20, Z₄×Z₆:y 58/58,
+  Z₃×Z₆:y 22/31, Z₃×Z₅:x 8/25, Z₃×Z₅:y 3/8, **Z₃×Z₄:y 0/10** — whole
+  frames double exclusively through the overlap mechanism, others
+  exclusively through heavy safe floors. The two mechanisms are both
+  real and frame-correlated.
 
 ### S4 first cut — the reachable-coset refinement FAILS (dead end, first-class)
 
@@ -657,3 +691,57 @@ machinery (A_HANDOFF §4 Entry-16 anticipated the shape) — not an
 accounting artifact. C-safe stays sufficient-only; the S4(b) question
 is now precisely: *bound `min_{p(v)=w} |w| + 2|v₀ ∧ v₁|` from base data
 on the light reachable classes.*
+
+### Session close — state and next queue (2026-07-02)
+
+**Criterion status after one session.** Two-tier answer to the A11
+question, both empirical (SAT = discovery-grade; A_HANDOFF §1):
+
+- **C-safe (frame-agnostic, sufficient):** tight witness ∧ every safe
+  class coset min ≥ 2d (R2/linchpin/R1 ride along free). Zero
+  violations across 465 small-frame failures + every engine-frame cell;
+  covers 111/152 small-frame doubles and (scoreboard ⟺) all engine-frame
+  cells tested. Checkable with NO cover SAT: T-c span sweeps at ≤ 24
+  cells, base-side SAT coset ladders at 36+ cells (`a11_s3_diagnose.py`),
+  4/4 prospective predictions.
+- **A8 (engine-frame proxy, sufficient):** anchorable presentation +
+  `dim ker ∂₂ = 6` + squaring identity. 7/7 on fresh ladders (flipping
+  every A9 stored-form negative), plus gross, Z₆×Z₁₄ ×2, Z₆×Z₁₈ (d>7
+  partial). The identity ALONE is refuted as sufficient (62 small-frame
+  shorts) — the frame/anchorability hypotheses are load-bearing.
+- **Not equivalent** (both are sufficient-only): the 41 overlap-rescue
+  rows — including the entire Z₃×Z₄:y doubling family — double with
+  broken safe floors; the reachable-coset repair is refuted (0/41).
+
+**Next-session queue, in order:**
+
+1. **Z₆×Z₁₈ arm, probe-first redesign (S3).** Regenerate the anchorable
+   candidates (`a5_cover_cascade.py --hunt-direct`, Z₆×Z₁₈ slice), dedup,
+   `d(base) = 6` validation; then `a11_s3_diagnose.py probe` per
+   candidate × axis (n = 216 base-side, cap 11) and REGISTER predictions;
+   only then spend the n = 432 cover ladders, cheapest-first. This both
+   settles A8's pending falsification probe and tests C-safe
+   out-of-frame prospectively.
+2. **S4 mechanism questions** (the real math): (a) WHY do anchorable +
+   squaring-identity presentations select all-heavy Smith subgroups
+   `im Δ` on the engine frame? (The A5/A8 machinery — mirrored
+   projections pinning the seam — is the natural suspect; a proof here
+   turns A8 from proxy into theorem-modulo-C-safe.) (b) the overlap
+   slice bound `min_{p(v)=w} |w| + 2|v₀∧v₁| ≥ 2d` on light reachable
+   classes — the missing necessity half; Z₃×Z₄:y (10 rows, 24-cell
+   frames, fully overlap-carried) is the model system.
+3. **S5 Lean packaging.** The 111 C-safe-covered pairs are exactly the
+   layer-provable ones (safe floor by per-class sweeps at ≤ 2¹⁸ ×
+   dispatch 4); pick 1–2 fresh-frame instances (a Z₄×Z₆:y row for a new
+   frame) and push through `BBCover`/`BBDoubling` end-to-end. The
+   engine-frame flipped presentations (e.g. hit3:anch36 = up to units
+   `A ~ 1+x+x²y³`, `B ~ y+y²+x³`) are the natural "second gross"
+   engine targets — now with the RIGHT presentations pinned.
+4. **A10 coordination.** Its hit2/hit5 Fork-C framing is dissolved
+   (messages sent to the Q1/Q4 sessions); the descent screens remain
+   valuable as presentation-level perturbation data. Before A10 S4 runs,
+   its §0/§3/§5 need the Entry-1 correction.
+5. **S6 propagation** (after 1–2): promote the surviving criterion into
+   `a5_cover_cascade.py` as DOUBLE_CANDIDATE v2 (per-presentation,
+   probe-backed), research-log + memory updates, and the A8-note status
+   flip from "3 supporting groups" to the new census.

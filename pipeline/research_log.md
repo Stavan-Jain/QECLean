@@ -13,6 +13,25 @@ what was tried and why it didn't work.
 
 ## Entries
 
+- 2026-07-02 — bb-literal-lift-criterion (A11, Entry 1) — success —
+  **A checkable doubling criterion emerges, and the A8 audit FLIPS the
+  hit2/hit5 negatives.** Literal-lift doubling is presentation-sensitive
+  within a (code, axis): the anchorable A8-presentations of ALL six
+  engine-frame classes have d = 12 covers on BOTH axes (7 fresh SAT
+  ladders, all 12), while their stored forms stay at 6/8 — A9's "hit2/
+  hit5 do not double" was a presentation artifact. The discriminator is
+  template condition 3's safe half: **doubling ⟺ safe-class coset minima
+  ≥ 2d on every engine-frame cell tested** (base-side SAT probe, no
+  cover SAT; 4/4 prospective predictions), and safe-floor ⟹ doubling
+  with 0/465 violations on the full A9 hunt stream. Certificates
+  (R0-sq…R2, linchpin) are universally satisfied — never discriminating
+  (one-line mechanism: 1+δ ∈ (A,B) forces σ_* = id). A8's squaring
+  identity alone is refuted as sufficient (62 small-frame shorts); its
+  full package stands at 7/7 + gross + Z₆×Z₁₄, zero counterexamples.
+  Dead end (first-class): the reachable-coset repair of the 41
+  overlap-rescue rows fails 0/41 — the necessity gap is genuine slice
+  mathematics. [details](../experiments/bb_lab/notes/A11_literal_lift_criterion.md)
+
 - 2026-07-02 — bb-doubling-layer-second-instance — success —
   **The free-ℤ₂ doubling template is a parametric Lean layer, and the
   `[[36,4,4]] → [[72,4,8]]` pair is proven through it** (chain+Pauli
