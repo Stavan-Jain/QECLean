@@ -344,6 +344,22 @@ classification, MIm dispatch and floor leaves) — i.e. these are the natural ta
 where the CRT/F₄ engine is *necessary*, not decorative, and where its parametrization
 would pay off.
 
+**A11 correction (2026-07-02, `experiments/bb_lab/notes/A11_literal_lift_criterion.md`
+Entry 1): the hit2/hit5 negatives were presentation artifacts, and doubling is
+presentation-sensitive within a (code, axis).** The A9 ladders ran on the stored
+corpus presentations. The *anchorable* presentations of hit2, hit3 and hit5 (different
+Aut×swap orbit points of the same codes, carrying the literal `(1+t²)P² = 1+δ`
+identity) have **x-covers with d = 12 exactly** — so "hit2 and hit5 do not double"
+is false at class level: **all six anchorable Z₆×Z₆ codes are gross-twins**. Two
+consequences for this doc: (i) the literal lift in template condition 1 is a
+*presentation-level* datum — equivalent bases can have inequivalent literal covers
+(one d = 6, one d = 12 on the same axis); (ii) the safe floor of condition 3 is the
+part that moves under re-presentation: the stored hit3-x presentation's 63 safe
+classes have coset minima {6:12, 8:45, ≥12:6} while its flipped anch-presentation's
+are all ≥ 12 — condition 2 (R), the linchpin, `k`-preservation and the tight witness
+hold for *every* presentation and axis on this frame (certificates are
+non-discriminating there; the A11 audit's uniform result).
+
 ---
 
 ## 8. Bottom line

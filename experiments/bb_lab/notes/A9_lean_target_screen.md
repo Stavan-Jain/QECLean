@@ -250,3 +250,18 @@ exact [[144,12,12]] doublings — the engine frame carries at least FOUR
 gross-class doubling pairs (gross, hit3, hit4, hit6), all sharing
 `A = y^3+x+x^2` up to equivalence-normalization.  hit2 and hit5 do not
 double (hit5-x reaches d = 8).
+
+> **A11 CORRECTION (2026-07-02, `A11_literal_lift_criterion.md` Entry 1).**
+> The pairs quoted per hit above are the STORED corpus forms, which are
+> *not anchorable presentations* (their `B` is monomial in neither axis,
+> so gate (iii) fails); these ladders measured the stored presentations'
+> covers only.  Literal-lift doubling is **presentation-sensitive within
+> the same (code, axis)**: the anchorable presentations of hit2, hit3 and
+> hit5 have **x-covers with d = 12 exactly** (e.g. hit3
+> `A = x³+x⁴+x⁵y³, B = xy+xy²+x⁴`), so "hit2 and hit5 do not double" is
+> a presentation artifact — **as classes, all six anchorable Z₆×Z₆ codes
+> are gross-twins**.  New stored-form cells: hit4-x, hit6-x, hit5-y and
+> hit2-y all d = 6.  ids: hit5 = `9706a4ea60d7e978`,
+> hit2 = `98ff6753f866aba0`.  Mechanism: every stored-form non-doubling
+> cell breaks in the SAFE sector (a safe class with coset min = d(cover));
+> see A11 Entry 1.

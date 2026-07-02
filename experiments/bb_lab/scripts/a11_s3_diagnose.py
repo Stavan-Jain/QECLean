@@ -106,13 +106,14 @@ def coset_min(rep: np.ndarray, dual: np.ndarray, cap: int) -> int | None:
     return None
 
 
-def safe_class_reps(A: Poly, B: Poly, axis: str):
+def safe_class_reps(A: Poly, B: Poly, axis: str, Gb: AbelianGroup = G6):
     """Independent reps of im p_* mod base Z-stabilizers, plus HZb."""
-    Gc = cover_group(6, 6, axis)
+    ell, m = Gb.orders
+    Gc = cover_group(ell, m, axis)
     chb = bb_check_matrices(A, B)
     chc = bb_check_matrices(lift_poly(A, Gc), lift_poly(B, Gc))
     HZb = chb.H_Z.astype(np.uint8)
-    p_blk, _tau, _sig, _deck = cover_maps(G6, Gc, axis)
+    p_blk, _tau, _sig, _deck = cover_maps(Gb, Gc, axis)
     P = blkdiag(p_blk)
     LZc = find_logical_z(chc)
     p_imgs = np.array([(P @ LZc[i]) % 2 for i in range(LZc.shape[0])], dtype=np.uint8)
@@ -148,38 +149,61 @@ def run_diagnose(cells: list[str]) -> None:
               f"sector: {sector}  ({time.time()-t0:.1f}s)", flush=True)
 
 
+def safefloor_verdict(A: Poly, B: Poly, axis: str, Gb: AbelianGroup,
+                      cap: int, tag: str) -> bool:
+    """Probe all nonzero im p_* classes; True iff every coset min > cap."""
+    import collections
+    t0 = time.time()
+    reps, HZb, chb, chc = safe_class_reps(A, B, axis, Gb)
+    dual = nullspace_f2(HZb)
+    r = reps.shape[0]
+    minima: list[int | None] = []
+    for mask in range(1, 1 << r):
+        combo = np.zeros(reps.shape[1], dtype=np.uint8)
+        for i in range(r):
+            if (mask >> i) & 1:
+                combo ^= reps[i]
+        minima.append(coset_min(combo, dual, cap))
+    vals = [f">={cap+1}" if m is None else str(m) for m in minima]
+    hist = collections.Counter(vals)
+    ok = all(m is None for m in minima)
+    print(f"{tag}: rank(im p_*) = {r}, {len(minima)} classes, "
+          f"minima histogram {dict(sorted(hist.items()))} -> "
+          f"safe_floor_ok = {ok}  ({time.time()-t0:.1f}s)", flush=True)
+    return ok
+
+
 def run_safefloor(cells: list[str]) -> None:
     for cell in cells:
         lab, pres, axis, A, B = load_cell(cell)
-        t0 = time.time()
-        reps, HZb, chb, chc = safe_class_reps(A, B, axis)
-        dual = nullspace_f2(HZb)
-        r = reps.shape[0]
-        minima: list[int | None] = []
-        for mask in range(1, 1 << r):
-            combo = np.zeros(reps.shape[1], dtype=np.uint8)
-            for i in range(r):
-                if (mask >> i) & 1:
-                    combo ^= reps[i]
-            minima.append(coset_min(combo, dual, 11))
-        vals = ["≥12" if m is None else str(m) for m in minima]
-        import collections
-        hist = collections.Counter(vals)
-        ok = all(m is None for m in minima)
-        print(f"{cell}: rank(im p_*) = {r}, {len(minima)} classes, "
-              f"minima histogram {dict(sorted(hist.items()))} -> "
-              f"safe_floor_ok = {ok}  ({time.time()-t0:.1f}s)", flush=True)
+        safefloor_verdict(A, B, axis, G6, 11, cell)
+
+
+def run_probe(group: str, a_s: str, b_s: str, axis: str, d_base: int) -> None:
+    """Frame-generic safe-floor probe: --group ell,m --A .. --B .. --axis .. --d .."""
+    ell, m = (int(t) for t in group.split(","))
+    Gb = AbelianGroup((ell, m))
+    A, B = Poly.from_string(a_s, Gb), Poly.from_string(b_s, Gb)
+    safefloor_verdict(A, B, axis, Gb, 2 * d_base - 1,
+                      f"Z{ell}xZ{m}:{axis} A=`{a_s}` B=`{b_s}`")
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["diagnose", "safefloor"])
-    ap.add_argument("cells", nargs="+")
+    ap.add_argument("cmd", choices=["diagnose", "safefloor", "probe"])
+    ap.add_argument("cells", nargs="*")
+    ap.add_argument("--group", type=str, help="ell,m (probe mode)")
+    ap.add_argument("--A", type=str)
+    ap.add_argument("--B", type=str)
+    ap.add_argument("--axis", type=str, default="x")
+    ap.add_argument("--d", type=int, default=6)
     args = ap.parse_args()
     if args.cmd == "diagnose":
         run_diagnose(args.cells)
-    else:
+    elif args.cmd == "safefloor":
         run_safefloor(args.cells)
+    else:
+        run_probe(args.group, args.A, args.B, args.axis, args.d)
 
 
 if __name__ == "__main__":
