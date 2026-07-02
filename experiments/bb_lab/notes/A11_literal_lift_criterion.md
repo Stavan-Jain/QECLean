@@ -702,6 +702,121 @@ accounting artifact. C-safe stays sufficient-only; the S4(b) question
 is now precisely: *bound `min_{p(v)=w} |w| + 2|v₀ ∧ v₁|` from base data
 on the light reachable classes.*
 
+## Entry 2 — proof attempt: does the nonzero-b dangerous rung follow
+## from C-safe's hypotheses? (2026-07-02)
+
+**Verdict up front: NOT proven in general — but the attempt yields a
+machine-validated structural collapse of the dangerous sector, three
+unconditional rung pieces, an exact characterization of the irreducible
+residue, and an upgraded criterion that IS provably sufficient with
+every conjunct base-side-checkable.** Validation:
+`scripts/a11_s4_dangerous_reduction.py` (V1–V5, 10/10 PASS on the Z3Z6
+pair and hit3-stored; A_HANDOFF §4 discipline).
+
+### Setup
+
+Fix one CSS complex per side (stated for the primal/Z side; everything
+dualizes). Base `C₂ →^{∂₂} C₁ →^{∂₁} C₀` over `F₂[H]`; cover over `G̃`
+(axis-doubled), deck `σ`. A fundamental domain splits every monomial
+action into cut-preserving and cut-crossing parts, giving `∂ = ∂ⁿᶜ + ∂ᶜ`
+on the base and the block form `∂^cov = [[∂ⁿᶜ, ∂ᶜ],[∂ᶜ, ∂ⁿᶜ]]` in sheet
+coordinates (V1). `τ(u) = (u,u)`, `p(v₀,v₁) = v₀+v₁`; SES of complexes;
+`|v| = |p(v)| + 2|v₀ ∧ v₁|`.
+
+**Lemma 1 (free, LES).** `ker p_* = im τ_*` and `ker τ_* = im Δ` on H₁,
+with the connecting map's chain formula `Δ[ζ] = [∂₂ᶜ ζ]` and
+`∂₂ᶜ ζ = ∂₂ⁿᶜ ζ` for `ζ ∈ ker ∂₂` (the lift `(ζ,0)` has diagonal
+boundary; V2).
+
+### Proposition D1 (dangerous collapse — the main structural find)
+
+Every dangerous cover cycle (`p(v) = b ∈ Stab`) with `[v] ≠ 0`
+decomposes as
+
+    v = τ(ρ) + ∂₂^cov(y, 0),    ∂₂ y = b,
+    sheets: v = (ρ + ∂₂ⁿᶜ y,  ρ + ∂₂ᶜ y),
+
+with `[v] = τ_*[ρ]`. *Proof:* `[v] ∈ im τ_*` (Lemma 1) gives
+`v = τ(x) + ∂₂^cov(Z₀, Z₁)`; since `∂₂^cov(Z₁,Z₁) = τ(∂₂ Z₁)`, absorb
+the diagonal part: `v = τ(x + ∂₂Z₁) + ∂₂^cov(Z₀+Z₁, 0)`. ∎ (V3
+validates forward on 50 random `(ρ,y)` per frame; V4 back-decomposes
+real SAT minima.)
+
+Moreover the residual freedom collapses: replacing `y ↦ y + ζ`
+(`ζ ∈ ker ∂₂`) shifts the sheet pair by exactly `τ(∂₂ᶜ ζ)` (V5), i.e.
+moves `[ρ]` through the **τ-fiber** `[u] + im Δ`. Hence for ONE fixed
+preimage `y_b` of `b`:
+
+    slice-min(b, τ_*[u]) = min over reps ρ of classes in [u]+im Δ of
+                           |ρ + ∂₂ⁿᶜ y_b| + |ρ + ∂₂ᶜ y_b|.
+
+**Corollary: the dangerous sector is a base-side quantity** — no cover
+enumeration; a base-dimension optimization (SAT-able) per light `b`.
+
+### Proposition D2 (unconditional rung pieces)
+
+1. **b = 0**: the slice equals `2·min` over the *whole fiber* of class
+   coset minima `≥ 2·d(base)` — free, since `0 ∉` fiber (else `[v] = 0`).
+2. **|b| ≥ 2d**: free, `|v| ≥ |p(v)| = |b|`.
+3. **Seam-trivial b** (some preimage with `∂₂ᶜ y_b = 0`): slice
+   `= min_ρ |ρ| + |ρ + b| ≥ d + d` (both are reps of one nontrivial
+   fiber class). Soft general bound: slice(b) `≥ 2d − |b| − 2|h ∧ h′|`
+   for `h = ∂₂ᶜ y_b`, `h′ = ∂₂ⁿᶜ y_b`.
+
+So the entire gap is: **stabilizers with `0 < |b| < 2d` whose every
+preimage carries overlapping seam-halves that cancel against a τ-fiber
+logical** — light, seam-flux-carrying stabilizers. (Under gross's
+no-double-wrap identities and `∂₁ᶜ b = 0` one can push further: the
+slice classes shift by the flux class `δ_b = [∂₂ᶜ y_b]` and the rung is
+again free unless `δ_b` lands in the fiber — the residue is precisely
+*flux-anomalous* light stabilizers.)
+
+### Theorem (upgraded provable criterion — all conjuncts base-side)
+
+    tight witness
+    ∧  every nonzero im p_* class has base coset min ≥ 2d       (C-safe)
+    ∧  every stabilizer b with 0 < |b| < 2d has slice-min ≥ 2d
+       (computed via Prop D1's base-side formula)               (C-danger)
+    ⟹  d(cover) = 2·d(base).
+
+*Proof:* sector exhaustion. Safe classes by C-safe (`|v| ≥ |p(v)| ≥`
+class min); dangerous `b = 0` by D2.1; `|b| ≥ 2d` by D2.2; light `b` by
+C-danger; `≤ 2d` by the witness. ∎  This replaces the Lean layer's
+cover-side safe/dangerous sweep obligations with base-side ones — the
+practical S5 payoff of the attempt.
+
+### Why C-safe alone resisted (the obstruction)
+
+C-safe's floor constrains the **im Δ classes**; the dangerous slices
+live on the **τ-fiber = the complement side** of H₁(base). The
+hypotheses act on complementary halves, and no soft argument transfers
+weight control across (`|ρ + h| ≥ |ρ| − |h|` is the best generic bound,
+and the cancellation `|ρ ∧ h|` is exactly the quantity gross's m(b)
+machinery exists to control). A principled reason to expect no soft
+proof: it would derive gross's Theorem C from (M-im) + Theorem A +
+duality — collapsing a major, twice-adversarially-reviewed component of
+A4 that the program never found collapsible; and gross's own `b ≠ 0`
+dangerous minimum is 14, not 12 — its truth is not forced by the floor
+value. Status of "C-safe ⟹ light-b rung": exactly equivalent to C-safe
+sufficiency; empirical record 0 violations on ~1000 cells; the
+falsification target is now sharp — *construct* a light stabilizer with
+deep seam-half cancellation against a min-weight fiber logical.
+
+### Honesty ledger (tooling corrections found during validation)
+
+`x_distance` witnesses are X-type operators (`ker H_Z`), so sector
+diagnosis must run on the dual complex; the diagnose tool previously
+tested `p(v)` against the Z-side stabilizer rowspace unconditionally.
+Fixed side-aware (`a11_s3_diagnose.py`), all seven non-doubling stored
+cells re-diagnosed: **every one still breaks in the SAFE sector, now
+verified on the correct complex** (and on both complexes where the
+witness lies in both kernels; X-coset min = Z-coset min = d(cover) on
+each). The safe-floor probe and its 4/4 predictions were unaffected
+(fully primal-side construction). The V4c failure that exposed the bug
+is exactly why the validation-first discipline exists.
+
+---
+
 ### Session close — state and next queue (2026-07-02)
 
 **Criterion status after one session.** Two-tier answer to the A11

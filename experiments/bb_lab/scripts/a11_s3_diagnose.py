@@ -126,10 +126,16 @@ def safe_class_reps(A: Poly, B: Poly, axis: str, Gb: AbelianGroup = G6):
 
 
 def run_diagnose(cells: list[str]) -> None:
+    """Side-aware sector diagnosis (corrected 2026-07-02: x_distance
+    witnesses are X-type operators in ker H_Z — the dangerous test is
+    membership in rowspace(H_X^base) on the DUAL complex; a witness may
+    also happen to lie in ker H_X, in which case the primal reading is
+    reported too)."""
     for cell in cells:
         lab, pres, axis, A, B = load_cell(cell)
         reps, HZb, chb, chc = safe_class_reps(A, B, axis)
-        dual = nullspace_f2(HZb)
+        HXb = chb.H_X.astype(np.uint8)
+        HXc, HZc = chc.H_X.astype(np.uint8), chc.H_Z.astype(np.uint8)
         t0 = time.time()
         res = x_distance(chc, weight_upper_bound=12)
         v = res.witness.astype(np.uint8)
@@ -137,16 +143,28 @@ def run_diagnose(cells: list[str]) -> None:
         p_blk, _t, _s, _d = cover_maps(G6, Gc, axis)
         pv = (blkdiag(p_blk) @ v) % 2
         w_pv = int(pv.sum())
-        if not pv.any():
-            sector = "dangerous (p(v) = 0: diagonal-type)"
-        elif in_rowspace(HZb, pv):
-            sector = f"dangerous (p(v) ∈ Stab_Z, |b| = {w_pv})"
-        else:
-            m = coset_min(pv, dual, 11)
-            sector = (f"SAFE (p(v) nontrivial logical, |p(v)| = {w_pv}, "
-                      f"class coset min = {m if m is not None else '>=12'})")
+
+        sides = []
+        if not ((HZc @ v) % 2).any():  # X-type operator: dual complex
+            if not pv.any():
+                sides.append("X-side: dangerous (p(v) = 0)")
+            elif in_rowspace(HXb, pv):
+                sides.append(f"X-side: dangerous (p(v) ∈ Stab_X, |b| = {w_pv})")
+            else:
+                m = coset_min(pv, nullspace_f2(HXb), 11)
+                sides.append(f"X-side: SAFE (|p(v)| = {w_pv}, X-coset min = "
+                             f"{m if m is not None else '>=12'})")
+        if not ((HXc @ v) % 2).any():  # also a Z-type cycle: primal complex
+            if not pv.any():
+                sides.append("Z-side: dangerous (p(v) = 0)")
+            elif in_rowspace(HZb, pv):
+                sides.append(f"Z-side: dangerous (p(v) ∈ Stab_Z, |b| = {w_pv})")
+            else:
+                m = coset_min(pv, nullspace_f2(HZb), 11)
+                sides.append(f"Z-side: SAFE (|p(v)| = {w_pv}, Z-coset min = "
+                             f"{m if m is not None else '>=12'})")
         print(f"{cell}: d_cover = {res.distance}, |v| = {int(v.sum())}, "
-              f"sector: {sector}  ({time.time()-t0:.1f}s)", flush=True)
+              f"{'; '.join(sides)}  ({time.time()-t0:.1f}s)", flush=True)
 
 
 def safefloor_verdict(A: Poly, B: Poly, axis: str, Gb: AbelianGroup,
