@@ -224,3 +224,29 @@ axes of the stored canonical presentation (doubling is presentation-
 sensitive, so equivalent presentations may double when the canonical one
 does not — adequate for target-picking, not exhaustive); Z3xZ6's twelve
 d=6 bases do NOT double (no [[72,k,12]] T1 pair exists in this pool).
+
+### Stage-3 gating addendum: T1 target switched to the doc-verified pair
+
+The S3.0 data-generation gate **overturned the q1=0 recommendation**: the
+single-shape dangerous rung needs, per light boundary `b`, a preimage
+`f0` whose lifted sheet-0 seam is supported inside `supp b`, and at
+`t = 1` (weight-6 boundaries, `2d = 8`) there is zero slack for seam
+excess.  A sweep over ALL q1=0 candidates found every one seam-hostile
+under the identity section (6–18 of 24 light classes fail across the
+whole ker-coset; the y-doubling of these polynomial families crosses the
+seam off-support systematically).  The doc-verified pair
+(`A = x^2+y+y^3`, `B = 1+x+y^2`, x-cover, deck `(3,0)`) has **0/24
+failures** — and its homotopy certificate collapses to a *single*
+polynomial identity `p * B = 1 + x^3` with
+`p = x^2(1+y^2+y^4) + x^3(1+y^4) + x^4(1+y^2) + x^5` (weight 8), i.e.
+the homotopy chain is `z = p * v_R` — strictly simpler than gross's
+`(1+x^2)*B^2 = 1+x^6` route.  Generator:
+`scripts/gen_pair72_z6z6_data.py` (ALL CHECKS PASS; data in
+`data/a9/pair72_z6z6_data.json`).
+
+**Also: T2 ladders completed** (`data/a9/t2_cover_ladders.json`): hit4-y
+(B = `y^2+x*y^3+x^2*y`) and hit6-y (B = `x*y+x^2*y^2+x^3`) are ALSO
+exact [[144,12,12]] doublings — the engine frame carries at least FOUR
+gross-class doubling pairs (gross, hit3, hit4, hit6), all sharing
+`A = y^3+x+x^2` up to equivalence-normalization.  hit2 and hit5 do not
+double (hit5-x reaches d = 8).
