@@ -768,6 +768,28 @@ four frames leaves little room); the converse direction (safe floor
 dangerous-floor theorem — the natural target for the parametric layer,
 since `BBDoubling` already derives the dangerous apparatus generically.
 
+## R10. Q7 answered: hit2 has NO descent-proper rescue — the siblings split (2026-07-02)
+
+The hit2 split class (the only place a hit2 descent-proper rescue could
+live, given R8's image saturation of its nonsplit classes) is fully
+screened: **all 64 split-class covers drop k** (48 → k = 16, 16 →
+k = 24; no k = 12 cover exists in the class at all; every row
+< 0.05 s — rank-only).  Therefore:
+
+- **hit2 is doublable but only presentation-doublable**: every one of
+  its doubling descent covers is equivalent to a literal axis-lift of
+  some equivalent presentation.
+- **hit5 is descent-properly doublable** (R8: seven rescues outside
+  the literal image, three canonical-grade verified).
+
+Two gross siblings on the same frame, same `A`, both rescued — but on
+opposite sides of the descent-vs-presentation divide.  This makes the
+literal-image size (R8: 192/256 vs 96/256) look **causal**: image
+saturation of the k-preserving classes ⟺ no room for descent-proper
+doubling.  The invariant is orbit-theoretic (a stabilizer computation
+on the pair) — a candidate closed-form selection-rule variable that
+needs no SAT and no screen.
+
 ## R7. Follow-ups (queued)
 
 1. **Lean instance of a rescued cover** — `XDoubleCoverData` verifies
