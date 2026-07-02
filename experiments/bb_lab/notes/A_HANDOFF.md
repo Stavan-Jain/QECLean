@@ -22,6 +22,17 @@ A4 Theorem D).
 > exact [[144,12,12]] y-covers** (hit3/4/6): in-frame, engine-necessary
 > targets for the next engine re-instantiation.
 
+> **A11 plan (2026-07-02, `A11_literal_lift_criterion.md`) — the
+> literal-lift doubling criterion.** Stage-0 plan for finding a checkable
+> criterion `P(H, A, B, axis)` sufficient (stretch: equivalent) for
+> literal-lift cover doubling. Standing candidate = the A8 conjecture
+> (anchorable + `dim ker ∂₂ = 6` + squaring identity ⟹ x-cover doubles;
+> 3 supporting groups, 0 counterexamples, Z₆×Z₁₈ ladders pending). Sharpest
+> cheap test queued first: the A8 hypothesis audit on the six anchorable
+> Z₆×Z₆ codes × both axes against the known hit2/3/4/5/6 verdicts — pure
+> polynomial arithmetic, refutes or strengthens A8 in an afternoon. Sibling
+> of A10 (existence/twists); shared S0 data recovery.
+
 ---
 
 ## 0. RESUME HERE (the one-paragraph version)
