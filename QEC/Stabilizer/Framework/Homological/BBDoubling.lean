@@ -9,9 +9,12 @@ specific `Z₁₂×Z₆ → Z₆×Z₆` cover in `DeckHomotopy.lean`, `Assembly.
 here once, parametrically; what remains per instance are the five *inputs*:
 
 * `StrongBaseFloor d` — the base small-cycle theorem (Theorem A);
-* `DeckTrivialOnH1` — the homotopy (R), from a finite matrix certificate
-  (`deckTrivial_of_homotopy_certificate`; the gross polynomial identity
-  `(1+x²)B² = 1+x⁶` is one way to produce such a certificate);
+* `DeckTrivialOnH1` — the homotopy (R), from a Bezout witness
+  `P⋆A + Q⋆B = 1 + x^{deckS}` (`deckTrivial_of_bezout`; by A12 such a
+  witness exists **iff** `k(cover) = k(base)`, and both instance
+  identities — gross's `(1+x²)B² = 1+x⁶`, pair72's `p⋆B = 1+x³` — are its
+  `P = 0` case), or from a raw finite matrix certificate
+  (`deckTrivial_of_homotopy_certificate`);
 * `DangerousFloorNZ (2d)` — assembled per instance from the generic rungs
   (`dangerous_bound_of_single_shape`, `dangerous_bound_of_pair_shape`)
   dispatched over that code's light-boundary classification;
@@ -236,6 +239,150 @@ theorem deckTrivial_of_homotopy_certificate
   have hkey := key v
   rw [hv0, hE0, add_zero] at hkey
   exact ⟨Cmap v, hkey.symm⟩
+
+/-! ## The homotopy (R) from a Bezout witness (A12)
+
+By A12 (`experiments/bb_lab/notes/A12_deck_homotopy_R.md`), (R) holds
+**iff** the deck polynomial `1 + x^{deckS}` lies in the ideal `(A, B)` of
+`𝔽₂[G]` — equivalently, iff `k(cover) = k(base)`.  The sufficiency
+direction is constructive and packaged here: a Bezout witness
+`P⋆A + Q⋆B = 1 + x^{deckS}` yields the chain homotopy of
+`deckTrivial_of_homotopy_certificate` with *module* maps
+`C v = P⋆v_L + Q⋆v_R` and `E h = (Q⋆h | P⋆h)` — the standard fact that
+Koszul homology is annihilated by its ideal, made explicit.  Both existing
+instance certificates are the special case `P = 0`: gross's
+`(1+x²)⋆B⋆B = 1+x⁶` and pair72's `p⋆B = 1+x³`.  Checking the witness is a
+single `G`-indexed kernel identity (vs the `G × Fin 2`-basis sweep needed
+by the raw certificate). -/
+
+/-- The deck polynomial `1 + x^{deckS}` as a 0-chain. -/
+def deckPoly : G → ZMod 2 :=
+  Pi.single (0 : G) 1 + Pi.single D.deckS 1
+
+/-- Convolution with `deckPoly` is `1 + σ` on `G`-chains. -/
+lemma conv_deckPoly_eq (w : G → ZMod 2) :
+    conv D.deckPoly w = w + D.deckShift0 w := by
+  funext g
+  simp only [deckPoly, conv_add_left, Pi.add_apply,
+    conv_single_left_apply, deckShift0_apply]
+  rw [sub_zero, sub_eq_add_neg, D.neg_deckS]
+
+/-- The Bezout homotopy 2-chain map `C v = P⋆v_L + Q⋆v_R`. -/
+def bezoutC (P Q : G → ZMod 2) (v : G × Fin 2 → ZMod 2) : G → ZMod 2 :=
+  conv P (leftHalf v) + conv Q (rightHalf v)
+
+/-- The Bezout `∂₁`-correction `E h = (Q⋆h | P⋆h)`. -/
+def bezoutE (P Q : G → ZMod 2) (h : G → ZMod 2) : G × Fin 2 → ZMod 2 :=
+  fun q => if q.2 = 0 then conv Q h q.1 else conv P h q.1
+
+omit [DecidableEq G] in
+lemma bezoutC_zero (P Q : G → ZMod 2) : bezoutC P Q 0 = 0 := by
+  funext g
+  simp only [bezoutC, Pi.add_apply, conv_apply, leftHalf, rightHalf,
+    Pi.zero_apply, mul_zero, Finset.sum_const_zero, add_zero]
+
+omit [DecidableEq G] in
+lemma bezoutC_add (P Q : G → ZMod 2) (a b : G × Fin 2 → ZMod 2) :
+    bezoutC P Q (a + b) = bezoutC P Q a + bezoutC P Q b := by
+  have hL : leftHalf (a + b) = leftHalf a + leftHalf b := rfl
+  have hR : rightHalf (a + b) = rightHalf a + rightHalf b := rfl
+  unfold bezoutC
+  rw [hL, hR, conv_add_right, conv_add_right]
+  abel
+
+omit [DecidableEq G] in
+lemma bezoutE_zero (P Q : G → ZMod 2) : bezoutE P Q 0 = 0 := by
+  funext q
+  simp only [bezoutE, conv_apply, Pi.zero_apply, mul_zero,
+    Finset.sum_const_zero]
+  split <;> rfl
+
+omit [DecidableEq G] in
+lemma bezoutE_add (P Q : G → ZMod 2) (a b : G → ZMod 2) :
+    bezoutE P Q (a + b) = bezoutE P Q a + bezoutE P Q b := by
+  funext q
+  simp only [bezoutE, Pi.add_apply]
+  by_cases hq : q.2 = 0
+  · rw [if_pos hq, if_pos hq, if_pos hq, conv_add_right]
+    rfl
+  · rw [if_neg hq, if_neg hq, if_neg hq, conv_add_right]
+    rfl
+
+/-- Left-block computation for the Bezout homotopy:
+`(1+σ)v_L + Q⋆(∂₁v) = A⋆(C v)` at the left block. -/
+lemma bezout_blockL (P Q : G → ZMod 2)
+    (hPQ : conv P D.Ac + conv Q D.Bc = D.deckPoly)
+    (wL wR : G → ZMod 2) :
+    wL + D.deckShift0 wL
+        + conv Q (conv D.Bc wL + conv D.Ac wR)
+      = conv D.Ac (conv P wL + conv Q wR) := by
+  have heps : wL + D.deckShift0 wL
+      = conv (conv P D.Ac) wL + conv (conv Q D.Bc) wL := by
+    rw [← conv_add_left, hPQ, D.conv_deckPoly_eq]
+  rw [conv_add_right, conv_add_right, heps,
+    ← conv_assoc Q D.Bc wL,
+    ← conv_assoc Q D.Ac wR, conv_comm Q D.Ac, conv_assoc D.Ac Q wR,
+    conv_comm P D.Ac, conv_assoc D.Ac P wL]
+  funext g
+  simp only [Pi.add_apply]
+  linear_combination
+    (CharTwo.add_self_eq_zero (conv (conv Q D.Bc) wL g))
+
+/-- Right-block computation for the Bezout homotopy:
+`(1+σ)v_R + P⋆(∂₁v) = B⋆(C v)` at the right block. -/
+lemma bezout_blockR (P Q : G → ZMod 2)
+    (hPQ : conv P D.Ac + conv Q D.Bc = D.deckPoly)
+    (wL wR : G → ZMod 2) :
+    wR + D.deckShift0 wR
+        + conv P (conv D.Bc wL + conv D.Ac wR)
+      = conv D.Bc (conv P wL + conv Q wR) := by
+  have heps : wR + D.deckShift0 wR
+      = conv (conv P D.Ac) wR + conv (conv Q D.Bc) wR := by
+    rw [← conv_add_left, hPQ, D.conv_deckPoly_eq]
+  rw [conv_add_right, conv_add_right, heps,
+    ← conv_assoc P D.Bc wL, conv_comm P D.Bc, conv_assoc D.Bc P wL,
+    ← conv_assoc P D.Ac wR,
+    conv_comm Q D.Bc, conv_assoc D.Bc Q wR]
+  funext g
+  simp only [Pi.add_apply]
+  linear_combination
+    (CharTwo.add_self_eq_zero (conv (conv P D.Ac) wR g))
+
+/-- The full chain-level Bezout homotopy identity
+`(1 + σ) + E∘∂₁ = ∂₂∘C` on every 1-chain. -/
+lemma bezout_chain_identity (P Q : G → ZMod 2)
+    (hPQ : conv P D.Ac + conv Q D.Bc = D.deckPoly)
+    (v : G × Fin 2 → ZMod 2) :
+    v + D.deckShift1 v + bezoutE P Q (bbBoundary1Fn D.Ac D.Bc v)
+      = bbBoundary2Fn D.Ac D.Bc (bezoutC P Q v) := by
+  have hb1 : bbBoundary1Fn D.Ac D.Bc v
+      = conv D.Bc (leftHalf v) + conv D.Ac (rightHalf v) := rfl
+  funext q
+  obtain ⟨g, j⟩ := q
+  fin_cases j
+  · have hL := congrFun
+      (D.bezout_blockL P Q hPQ (leftHalf v) (rightHalf v)) g
+    simp only [Pi.add_apply, deckShift0_apply, leftHalf] at hL
+    simp only [Pi.add_apply, deckShift1_apply, bezoutE, bezoutC, hb1,
+      bbBoundary2Fn]
+    exact hL
+  · have hR := congrFun
+      (D.bezout_blockR P Q hPQ (leftHalf v) (rightHalf v)) g
+    simp only [Pi.add_apply, deckShift0_apply, rightHalf] at hR
+    simp only [Pi.add_apply, deckShift1_apply, bezoutE, bezoutC, hb1,
+      bbBoundary2Fn]
+    exact hR
+
+/-- **The Bezout route to (R)** (A12): a polynomial witness
+`P⋆A + Q⋆B = 1 + x^{deckS}` certifies that the deck acts trivially on
+`H₁(cover)`.  By A12 such a witness exists iff `k(cover) = k(base)`. -/
+theorem deckTrivial_of_bezout (P Q : G → ZMod 2)
+    (hPQ : conv P D.Ac + conv Q D.Bc = D.deckPoly) :
+    D.DeckTrivialOnH1 :=
+  D.deckTrivial_of_homotopy_certificate (bezoutC P Q) (bezoutE P Q)
+    (bezoutC_zero P Q) (bezoutC_add P Q) (bezoutE_zero P Q)
+    (bezoutE_add P Q)
+    (fun q => D.bezout_chain_identity P Q hPQ (Pi.single q 1))
 
 /-! ## The Theorem-B floor: `d(cover) ≥ d(base)`, unconditionally -/
 
