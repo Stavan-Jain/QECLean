@@ -1,0 +1,85 @@
+{"base_id": "hit5", "cls": [1, 1], "cls_name": "mixed", "epsA": [0, 0, 0], "epsB": [0, 0, 0], "k": 12, "verdict": "rescue", "d": 12, "witness": [83, 89, 92, 95, 101, 104, 119, 125, 128, 131, 137, 140], "secs": 141.52}
+{"base_id": "hit5", "cls": [1, 1], "cls_name": "mixed", "epsA": [0, 0, 0], "epsB": [0, 0, 1], "k": 12, "verdict": "fail", "d": 8, "witness": [38, 63, 70, 87, 93, 96, 106, 140], "secs": 3.7}
+{"base_id": "hit5", "cls": [1, 1], "cls_name": "mixed", "epsA": [0, 0, 0], "epsB": [0, 1, 0], "k": 12, "verdict": "fail", "d": 6, "witness": [0, 14, 28, 77, 121, 135], "secs": 0.68}
+{"base_id": "hit5", "cls": [1, 1], "cls_name": "mixed", "epsA": [0, 0, 0], "epsB": [0, 1, 1], "k": 12, "verdict": "rescue", "d": 12, "witness": [83, 89, 92, 95, 101, 104, 119, 125, 128, 131, 137, 140], "secs": 177.46}
+{"base_id": "hit5", "cls": [1, 1], "cls_name": "mixed", "epsA": [0, 0, 0], "epsB": [1, 0, 0], "k": 12, "verdict": "rescue", "d": 12, "witness": [83, 89, 92, 95, 101, 104, 119, 125, 128, 131, 137, 140], "secs": 261.66}
+{"base_id": "hit5", "cls": [1, 1], "cls_name": "mixed", "epsA": [0, 0, 0], "epsB": [1, 0, 1], "k": 12, "verdict": "fail", "d": 6, "witness": [0, 14, 28, 85, 99, 113], "secs": 0.99}
+{"base_id": "hit5", "cls": [1, 1], "cls_name": "mixed", "epsA": [0, 0, 0], "epsB": [1, 1, 0], "k": 12, "verdict": "fail", "d": 8, "witness": [1, 20, 33, 71, 86, 133, 137, 139], "secs": 5.77}
+{"base_id": "hit5", "cls": [1, 1], "cls_name": "mixed", "epsA": [0, 0, 0], "epsB": [1, 1, 1], "k": 12, "verdict": "rescue", "d": 12, "witness": [83, 89, 92, 95, 101, 104, 119, 125, 128, 131, 137, 140], "secs": 160.11}
+{"base_id": "hit5", "cls": [1, 1], "cls_name": "mixed", "epsA": [0, 0, 1], "epsB": [0, 0, 0], "k": 12, "verdict": "rescue", "d": 12, "witness": [1, 6, 14, 17, 22, 24, 37, 42, 50, 53, 58, 60], "secs": 595.03}
+{"base_id": "hit5", "cls": [1, 1], "cls_name": "mixed", "epsA": [0, 0, 1], "epsB": [0, 0, 1], "k": 12, "verdict": "fail", "d": 6, "witness": [24, 38, 52, 109, 123, 137], "secs": 1.18}
+{"base_id": "hit5", "cls": [1, 1], "cls_name": "mixed", "epsA": [0, 0, 1], "epsB": [0, 1, 0], "k": 12, "verdict": "fail", "d": 8, "witness": [56, 63, 67, 80, 95, 99, 122, 133], "secs": 8.34}
+{"base_id": "hit5", "cls": [1, 1], "cls_name": "mixed", "epsA": [0, 0, 1], "epsB": [0, 1, 1], "k": 12, "verdict": "rescue", "d": 12, "witness": [1, 6, 14, 17, 22, 24, 37, 42, 50, 53, 58, 60], "secs": 534.13}
+{"base_id": "hit5", "cls": [1, 1], "cls_name": "mixed", "epsA": [0, 0, 1], "epsB": [1, 0, 0], "k": 12, "verdict": "rescue", "d": 12, "witness": [1, 6, 14, 17, 22, 24, 37, 42, 50, 53, 58, 60], "secs": 786.97}
+{"base_id": "hit5", "cls": [1, 1], "cls_name": "mixed", "epsA": [0, 0, 1], "epsB": [1, 0, 1], "k": 12, "verdict": "fail", "d": 8, "witness": [24, 59, 70, 89, 92, 96, 100, 119], "secs": 9.75}
+{"base_id": "hit5", "cls": [1, 1], "cls_name": "mixed", "epsA": [0, 0, 1], "epsB": [1, 1, 0], "k": 12, "verdict": "fail", "d": 6, "witness": [42, 56, 70, 91, 105, 119], "secs": 1.4}
+{"base_id": "hit5", "cls": [1, 1], "cls_name": "mixed", "epsA": [0, 0, 1], "epsB": [1, 1, 1], "k": 12, "verdict": "rescue", "d": 12, "witness": [1, 6, 14, 17, 22, 24, 37, 42, 50, 53, 58, 60], "secs": 813.73}
+{"base_id": "hit5", "cls": [1, 1], "cls_name": "mixed", "epsA": [0, 1, 0], "epsB": [0, 0, 0], "k": 12, "verdict": "fail", "d": 6, "witness": [4, 48, 62, 97, 111, 125], "secs": 1.47}
+{"base_id": "hit5", "cls": [1, 1], "cls_name": "mixed", "epsA": [0, 1, 0], "epsB": [0, 0, 1], "k": 12, "verdict": "rescue", "d": 12, "witness": [83, 89, 92, 95, 101, 104, 119, 125, 128, 131, 137, 140], "secs": 2275.2}
+{"base_id": "hit5", "cls": [1, 1], "cls_name": "mixed", "epsA": [0, 1, 0], "epsB": [0, 1, 0], "k": 12, "verdict": "rescue", "d": 12, "witness": [83, 89, 92, 95, 101, 104, 119, 125, 128, 131, 137, 140], "secs": 2005.7}
+{"base_id": "hit5", "cls": [1, 1], "cls_name": "mixed", "epsA": [0, 1, 0], "epsB": [0, 1, 1], "k": 12, "verdict": "fail", "d": 8, "witness": [25, 38, 46, 59, 91, 112, 121, 142], "secs": 4.59}
+{"base_id": "hit5", "cls": [1, 1], "cls_name": "mixed", "epsA": [0, 1, 0], "epsB": [1, 0, 0], "k": 12, "verdict": "fail", "d": 8, "witness": [40, 45, 53, 66, 70, 96, 113, 142], "secs": 4.26}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 0, 0], "epsB": [0, 0, 0], "k": 24, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 0, 0], "epsB": [0, 0, 1], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 0, 0], "epsB": [0, 1, 0], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 0, 0], "epsB": [0, 1, 1], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 0, 0], "epsB": [1, 0, 0], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.03}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 0, 0], "epsB": [1, 0, 1], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 0, 0], "epsB": [1, 1, 0], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 0, 0], "epsB": [1, 1, 1], "k": 24, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 0, 1], "epsB": [0, 0, 0], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 0, 1], "epsB": [0, 0, 1], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 0, 1], "epsB": [0, 1, 0], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 0, 1], "epsB": [0, 1, 1], "k": 24, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 0, 1], "epsB": [1, 0, 0], "k": 24, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 0, 1], "epsB": [1, 0, 1], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 0, 1], "epsB": [1, 1, 0], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 0, 1], "epsB": [1, 1, 1], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 1, 0], "epsB": [0, 0, 0], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 1, 0], "epsB": [0, 0, 1], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 1, 0], "epsB": [0, 1, 0], "k": 24, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 1, 0], "epsB": [0, 1, 1], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 1, 0], "epsB": [1, 0, 0], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 1, 0], "epsB": [1, 0, 1], "k": 24, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 1, 0], "epsB": [1, 1, 0], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 1, 0], "epsB": [1, 1, 1], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 1, 1], "epsB": [0, 0, 0], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 1, 1], "epsB": [0, 0, 1], "k": 24, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 1, 1], "epsB": [0, 1, 0], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 1, 1], "epsB": [0, 1, 1], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 1, 1], "epsB": [1, 0, 0], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 1, 1], "epsB": [1, 0, 1], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 1, 1], "epsB": [1, 1, 0], "k": 24, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [0, 1, 1], "epsB": [1, 1, 1], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 0, 0], "epsB": [0, 0, 0], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 0, 0], "epsB": [0, 0, 1], "k": 24, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 0, 0], "epsB": [0, 1, 0], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 0, 0], "epsB": [0, 1, 1], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 0, 0], "epsB": [1, 0, 0], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 0, 0], "epsB": [1, 0, 1], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 0, 0], "epsB": [1, 1, 0], "k": 24, "verdict": "k_drop", "d_ub": 6, "secs": 0.03}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 0, 0], "epsB": [1, 1, 1], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 0, 1], "epsB": [0, 0, 0], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 0, 1], "epsB": [0, 0, 1], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 0, 1], "epsB": [0, 1, 0], "k": 24, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 0, 1], "epsB": [0, 1, 1], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 0, 1], "epsB": [1, 0, 0], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 0, 1], "epsB": [1, 0, 1], "k": 24, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 0, 1], "epsB": [1, 1, 0], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 0, 1], "epsB": [1, 1, 1], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 1, 0], "epsB": [0, 0, 0], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 1, 0], "epsB": [0, 0, 1], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.03}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 1, 0], "epsB": [0, 1, 0], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 1, 0], "epsB": [0, 1, 1], "k": 24, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 1, 0], "epsB": [1, 0, 0], "k": 24, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 1, 0], "epsB": [1, 0, 1], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 1, 0], "epsB": [1, 1, 0], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 1, 0], "epsB": [1, 1, 1], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 1, 1], "epsB": [0, 0, 0], "k": 24, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 1, 1], "epsB": [0, 0, 1], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 1, 1], "epsB": [0, 1, 0], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 1, 1], "epsB": [0, 1, 1], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 1, 1], "epsB": [1, 0, 0], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 1, 1], "epsB": [1, 0, 1], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.03}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 1, 1], "epsB": [1, 1, 0], "k": 16, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}
+{"base_id": "hit5", "cls": [0, 0], "cls_name": "split", "epsA": [1, 1, 1], "epsB": [1, 1, 1], "k": 24, "verdict": "k_drop", "d_ub": 6, "secs": 0.02}

@@ -790,6 +790,30 @@ doubling.  The invariant is orbit-theoretic (a stabilizer computation
 on the pair) — a candidate closed-form selection-rule variable that
 needs no SAT and no screen.
 
+## R11. Session close: screens halted at the efficiency crossover (2026-07-02)
+
+Workers stopped deliberately (all JSONLs committed and resumable).
+Rationale: survivor confirmations degraded to 30–80 min under CPU
+contention, while R9's (C-A10) makes every remaining verdict
+predictable from the base-side safe-coset floor — brute confirmation
+became the most expensive way to learn them.  Final grid state:
+
+- **hit2, 95/256**: x 7 rescues / 8 fails (15 screened), mixed 8/8
+  (16 screened), **split 64/64 all k-drop**, y unscreened.
+- **hit5, 98/256**: x 6/7 (13), mixed 10/11 (21), **split 64/64 all
+  k-drop** (mirrors hit2 — no k-preserving split covers on this
+  frame), y unscreened.
+- S3 paused at ~90/319 bases (13 unrescued certified, trend
+  established).
+- Screened-cell rescue density ≈ 50% throughout x/mixed; every
+  confirmed rescue d = 12, k = 12; every fail witness safe-sector.
+
+Resume commands are the `--classes`-split invocations in this note's
+git history; the census regenerates via `scripts/a10_census.py`.  The
+efficient completion path is Q1's oracle: validate A11's base-side
+coset probe against the ~190 exact hit verdicts + 14k S3 verdicts,
+then predict the unscreened cells and spot-check a sample.
+
 ## R7. Follow-ups (queued)
 
 1. **Lean instance of a rescued cover** — `XDoubleCoverData` verifies
