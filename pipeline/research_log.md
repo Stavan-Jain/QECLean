@@ -40,6 +40,24 @@ what was tried and why it didn't work.
   (condition 3), untouched here.
   [plan+resolution](../experiments/bb_lab/notes/A13_deck_tower_plan.md)
 
+- 2026-07-02 — bockstein-equality (A13) — partial —
+  **A12's OQ2 (`dim (1+σ)H₁ = k̃−k`, ⟺ `δ₁∘δ₂ = 0`) has a candidate
+  half-page proof**: the transfer SES is the mod-`ε̂²` reduction of the
+  **4-fold cover** — the exact analogue of the integral lift behind the
+  classical `β² = 0` — and freeness over `F₂[ℤ/4]` kills the composite at
+  the element level (`W = 0` on the nose), for arbitrary order-2 decks
+  including twisted ones. A toy 3-term free-D *self-dual* complex with
+  `δ₁δ₂ ≠ 0` shows the originally scoped structural route (LES +
+  Frobenius self-duality) is provably insufficient — liftability is the
+  real content. Session-0 validation: 167,698 pairs all clean (first F₈
+  blocks, first twisted decks, 39,611 live-stratum pairs, 4,518
+  element-form direct checks, tower-lift rank pillar verified; A12 CE
+  regressions reproduce). Status partial until the W0 red-team passes
+  and the W1 stratified exhaustive sweep lands. If confirmed:
+  `H₁(cover) ≅ D^{k̃−k} ⊕ F₂^{2k−k̃}` — the complete deck-module
+  classification from two ranks, with Theorem A12 as its `a = 0` slice.
+  [plan](../experiments/bb_lab/notes/A13_bockstein_equality_plan.md)
+
 - 2026-07-02 — bb-pair72-packaging (S3.9) — success —
   **`pair72StabilizerCodeWithDistance : StabilizerCodeWithDistance 72 4 8`**
   (`Codes/BivariateBicycle/Z3Z6/StabilizerCode.lean`): the second doubling

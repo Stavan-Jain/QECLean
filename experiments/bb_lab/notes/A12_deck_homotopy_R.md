@@ -2,7 +2,9 @@
 
 **Status: theorem proven on paper + machine-verified on 157 covers and
 exhaustive block sweeps (2026-07-02). Remaining open: only the quantitative
-Bockstein refinement (§4).**
+Bockstein refinement (§4) — now attacked as A13
+(`A13_bockstein_equality_plan.md`, branch `claude/a13-bockstein-equality`:
+candidate tower-lift proof + 167k-pair clean sweep, red-team pending).**
 Branch: `claude/admiring-curran-3a5e2a` (off PR #53). Scripts:
 [`a12_deck_r_probe.py`](../scripts/a12_deck_r_probe.py) (first
 counterexamples), [`a12_deck_r_survey.py`](../scripts/a12_deck_r_survey.py)
@@ -366,6 +368,12 @@ blocks was only randomly sampled — a stratified exhaustive sweep there
 *Structural route:* the extend-by-ε Koszul LES
 `0 → H₁/εH₁ → H₁(A,B,ε) → ann_{H₀}(ε) → 0` plus Frobenius self-duality of
 the complex.
+*Follow-up (2026-07-02, A13):* session-0 found a candidate half-page proof
+via the ℤ/4 **Frattini lift** (the 4-fold cover is the "integral lift"
+behind the classical `β² = 0`), a toy showing the self-duality route as
+stated above is provably insufficient, and a 167k-pair clean sweep
+covering F₈ blocks and twisted decks — see
+`A13_bockstein_equality_plan.md` (red-team pending).
 
 **OQ3 — Arithmetic classification of the failure locus.** Conjecture: for
 weight-3 cover pairs, (R)-violations exist on `Z_L×Z_m` iff the char-2
