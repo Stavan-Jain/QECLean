@@ -66,7 +66,7 @@ Four tiers, from most to least portable:
 | Difference-set / overlap small-cycle obstructions (Thm A) | **polynomial_specific** | recipe re-runs; values do not. |
 | Theorem A + witness `z*` (`d(base)=6`) | **polynomial_specific** | value is monomial-pinned. |
 | Light-stabilizer classification (Prop 10) | **polynomial_specific** | hardest object; **false** off-monomials (see `Z₆×Z₁₄`). |
-| Safe-sector reduction (homotopy R witness) | **polynomial_specific** *(corrected — see §4)* | sector-split is cover-class; the homotopy witness is monomial-tuned. |
+| Safe-sector reduction (homotopy R witness) | **cover_class** *(upgraded by A12 — see §3 update)* | sector-split is cover-class; the homotopy witness is now generic: (R) ⟺ `k` preserved ⟺ Bezout membership, with `deckTrivial_of_bezout` producing the certificate from any witness pair. |
 | Smith-orbit + confined frame | **polynomial_specific** | numeric data bespoke; transport skeleton generic. |
 | Slot-frame toolkit + weight-orbit walks | **polynomial_specific** | the AG(2,F₄) sub-toolkit is group_CRT; the floor lands at 6 only for this `A,B`. |
 | ρ-link kill (Prop 31→32) | **polynomial_specific** | the 118-achiever list + ρ-links are this code's Smith-normal-form data. |
@@ -99,11 +99,36 @@ supplies the matching tight upper bound. With those caveats, conditions 1–4 as
    `im Δ`, so `τ(u*) = (u*, u*)` is a genuine cover logical of weight `2·d(base)`,
    attaining the floor.
 
-Two structural features observed in **both** known instances (gross and the new
-pair, §5), likely additional template conditions worth proving in general:
+> **Update (2026-07-02, A12 — condition 2 is solved).** Theorem
+> (`experiments/bb_lab/notes/A12_deck_homotopy_R.md` §3): for every free Z₂ BB
+> cover, the following are **equivalent**: (R); `k(cover) = k(base)`;
+> `1+x^ℓ ∈ (A,B)` (Bezout membership in `F₂[G̃]`). In particular (R) is **not
+> automatic** — explicit weight-3 counterexamples exist (e.g. `Z₆×Z₃` cover
+> with `A = 1+y+y²`, `B = 1+x²+x⁴`: `k` jumps 8→16 and `σ_* ≠ id` on a
+> 16-dimensional `H₁`; even the strict IBM monomial shape admits failures) —
+> but it is **free exactly on the k-preserving class**, which the A9 screen
+> already computes, and every historically checked cover (gross both
+> directions, the §5 pair, Z₆×Z₁₄ both directions, all 152 A9 doubles:
+> 157/157) is in that class. The membership direction is constructive: a
+> Bezout witness `P⋆A + Q⋆B = 1+x^ℓ` yields the homotopy certificate with
+> module maps (`deckTrivial_of_bezout` in `BBDoubling.lean`); both instance
+> identities — gross's `(1+x²)B² = 1+x⁶` and the pair's `p·B = 1+x³` — are
+> its `P = 0` case. Two further A12 facts: the `Δ`-linchpin `im p_* ⊆ im Δ`
+> is *equivalent* to (R) (Δ is the transfer-LES connecting map), and the
+> F₂-additive certificate form of `deckTrivial_of_homotopy_certificate` is
+> *complete* — semantic (R) is equivalent to solvability of
+> `1+σ = ∂₂∘C + E∘∂₁` (split `C₁ = ker ∂₁ ⊕ W`; define `C` on cycles by (R),
+> absorb `W` into `E`) — so the certificate route loses nothing. Still open
+> (A12 §4): the quantitative refinement `dim (1+σ)H₁ = k(cover) − k(base)`
+> (equivalently, vanishing of the deck-Bockstein composite `δ₁∘δ₂`), exact in
+> every instance and block swept so far.
 
-- **`k` is preserved** under the doubling (12→12 for gross; 4→4 for the new pair).
-  Not automatic — it constrains how `A,B` interact with the doubled direction.
+Two structural features observed in **both** known instances (gross and the new
+pair, §5):
+
+- **`k` is preserved** under the doubling (12→12 for gross; 4→4 for the new
+  pair). Not automatic — and by the A12 theorem above this is not an
+  independent condition: it is *equivalent* to condition 2 (R).
 - **`im Δ` and `ker p_*` are each exactly half of `k`**, and in fact
   `im τ_* = ker p_*` (dangerous sector = image of the transfer).
 
@@ -155,8 +180,11 @@ by SAT — the analytic safe/dangerous *engine* (Prop 10 / Prop 32) is **not** r
 > floor by the layer's generic single-shape rung over the 24-class light-boundary
 > census, and the safe floor by three per-Smith-class `2¹⁸` sweeps (`dim ker ∂₂ = 2`
 > here vs gross's 6, so no CRT engine is needed — the sweeps ARE the floor).  The
-> `StabilizerCodeWithDistance 72 4 8` packaging is the remaining (mechanical) step.
-> Data provenance: `experiments/bb_lab/scripts/gen_pair72_z6z6_data.py`.
+> `StabilizerCodeWithDistance 72 4 8` packaging is also done (S3.9):
+> `pair72StabilizerCodeWithDistance` in `Z3Z6/StabilizerCode.lean`, mirroring the
+> gross Phase-5 packaging.  Data provenance:
+> `experiments/bb_lab/scripts/gen_pair72_z6z6_data.py` (instance data) and
+> `gen_pair72_packaging_data.py` (packaging data, 15-check ALL-PASS gate).
 
 - **Base** `[[36,4,4]]` on `G = Z₃×Z₆` (x order 3, y order 6):
   `A = x² + y + y³`, `B = 1 + x + y²`.

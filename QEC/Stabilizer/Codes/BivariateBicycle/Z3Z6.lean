@@ -13,6 +13,7 @@ import QEC.Stabilizer.Codes.BivariateBicycle.Z3Z6.LightStab
 import QEC.Stabilizer.Codes.BivariateBicycle.Z3Z6.Dangerous
 import QEC.Stabilizer.Codes.BivariateBicycle.Z3Z6.SafeFloor
 import QEC.Stabilizer.Codes.BivariateBicycle.Z3Z6.Distance
+import QEC.Stabilizer.Codes.BivariateBicycle.Z3Z6.StabilizerCode
 
 /-!
 # The [[36,4,4]] → [[72,4,8]] doubling pair over `Z₃×Z₆ → Z₆×Z₆`
@@ -43,4 +44,8 @@ SAT, now proven through the parametric layer
                    (no CRT engine at this scale)
 - `Distance`     — `d = 8` at the chain and Pauli levels
                    (`pair72_chain_distance_eq_8`, `pair72_pauli_distance_eq_8`)
+- `StabilizerCode` — the S3.9 packaging: `pair72StabilizerCode : StabilizerCode _ 4`
+                   (trimmed 68-generator list, decoder-certified independence,
+                   4 logical qubits) and the bundled
+                   `pair72StabilizerCodeWithDistance : StabilizerCodeWithDistance 72 4 8`
 -/
