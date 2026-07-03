@@ -335,6 +335,19 @@ verbatim) ⟹ deck acts trivially (Koszul annihilation, same two lines). And
 becomes a Bockstein spectral sequence; the A12 inequality should be its
 first-page shadow. A clean statement here ("deck trivial ⟺ k constant
 along the tower") is the theorem the family paper wants.
+*Status (2026-07-02): **RESOLVED — YES**, fork **A13**
+([`A13_deck_tower_plan.md`](A13_deck_tower_plan.md) §0★).* `σ_* = id` on
+`H₁(top)` **does** force `k(top) = k(base)` for every free `ℤ_{2^r}` tower
+(`r ≥ 2`; `r = 1` is this note). Proof: A12 on the top `ℤ₂`-step gives the
+entry `ε^{N/2} ∈ (A,B)`, then a **descent** — apply (R) to the canonical
+cycle `ε^{N-t}(f,g)`; the boundary coefficient `z` satisfies `ε^t z = 0`,
+so ε-freeness divides it (`z = ε^{N-t}u`), yielding
+`ε ∈ (A,B) + ε^{N-t}S` — plus a ring-algebra iteration eliminating the
+tail. Simpler than the planned route: no spectral sequence, no `Ob`-class,
+no induction on `r`. The core descent is Lean-formalized axiom-clean
+(`BBDeckTower.lean`, `eps_mem_of_deckTrivial`); screens exhaustive to deck
+order 8. The compressed "divided class `ε̄φ`" picture (planning-grade
+below) was correct but unnecessary — the direct descent bypasses it.
 
 **OQ2 — The Bockstein equality (mathematical core).** Is
 `dim (1+σ)H₁ = k̃ − k` always? Equivalent forms: `δ₁∘δ₂ = 0`;
