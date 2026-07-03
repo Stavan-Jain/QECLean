@@ -1,11 +1,94 @@
-# A13 — Deck-trivial ⟺ k constant along ℤ_{2^r} doubling towers (OQ1) — PLAN
+# A13 — Deck-trivial ⟺ k constant along ℤ_{2^r} doubling towers (OQ1)
 
-**Status: OPENED — plan only (2026-07-02). No result is claimed in this
-note; §3's derivations are planning-grade and their adversarial
-verification is work item W1.**
+**Status: RESOLVED — YES (2026-07-02).** `σ_* = id` on `H₁(top)` forces
+`k(top) = k(base)` for every free `ℤ_{2^r}` doubling tower (`r ≥ 2`; `r = 1`
+is A12). The hard direction is a completed elementary proof (§0★), its core
+descent is **formalized in Lean, axiom-clean** (`eps_mem_of_deckTrivial` in
+`QEC/Stabilizer/Framework/Homological/BBDeckTower.lean`), and the statement
++ mechanism + every intermediate identity pass exhaustive/sampled screens
+(§0★). The clean family statement **deck-trivial ⟺ k constant along the
+tower** now holds.
 Branch: `claude/a13-deck-trivial-tower` (off PR #53 head).
 Predecessor: [`A12_deck_homotopy_R.md`](A12_deck_homotopy_R.md) — this is
-its §8 **OQ1**, promoted to its own fork.
+its §8 **OQ1**, promoted to its own fork. The plan below (§1–§8) is retained
+as written; §0★ records the resolution.
+
+## 0★. Resolution (2026-07-02)
+
+**Theorem A13 (Q(r), answered).** For a free `ℤ_{2^r}` BB cover
+(`ε = 1+σ`, deck order `N = 2^r`, `ε^N = 0`, `S = 𝔽₂[G]` free over
+`Λ = 𝔽₂[⟨σ⟩]`), the following are equivalent:
+`σ_* = id` on `H₁(top)`  ⟺  `ε ∈ (A,B)`  ⟺  `k(top) = k(base)`  ⟺  the
+whole deck acts trivially at every level of the tower.
+
+**The proof that closed it (the §3 gap, filled).** Running the S3/S7
+mechanism forced the missing step. Under (R_r): A12 on the top `ℤ₂`-step
+gives the entry `ε^{N/2} ∈ (A,B)` (`(σ^{N/2})_* = (σ_*)^{N/2} = id`). Then
+the **descent** — apply (R_r) to the *canonical cycle* `ε^{N-t}(f,g)` where
+`ε^t = fA+gB`:
+
+1. the returned boundary coefficient `z` satisfies `ε^t z = 0` (two-line
+   char-2 cancellation using the witness), **so `EpsFree` divides it:
+   `z = ε^{N-t}u`** — this is the step §3 was missing;
+2. back-substitution gives `εf = ε^t p + Bu`, `εg = ε^t q + Au`, hence
+   `ε^{t+1} = ε^t(pA+qB)`, so `ε^t(ε + pA + qB) = 0`;
+3. `EpsFree` again: `ε = pA + qB + ε^{N-t}v`, i.e. `ε ∈ (A,B) + ε^{N-t}S`.
+
+Entry `t = N/2` (needs `N ≥ 4`, `r ≥ 2`) feeds the **iteration**: `boost`
+grows the tail exponent (`ε ∈ (A,B) + ε^m S ⟹ ∈ (A,B) + ε^{2m-1}S`, pure
+ring algebra) until it passes `N` and `ε^m = 0`, leaving `ε ∈ (A,B)`. ∎
+
+This subsumes the planning-grade R2–R5 (§3) and is *stronger and simpler*:
+no spectral sequence, no `Ob`-class bookkeeping, no induction on `r` — one
+deck application on one cycle, then a ring-algebra iteration. R3/R6/(★) are
+now corollaries or unused; the Bockstein-SS frame (Attack A) and Frobenius
+pairing (Attack B) were not needed.
+
+**Lean (public-side, axiom-clean).**
+`QEC/Stabilizer/Framework/Homological/BBDeckTower.lean` (builds in 1.4 s,
+axioms = `propext, Classical.choice, Quot.sound` only). Contents:
+- `EpsFree ε N`, `DeckTrivial ε A B` — the two geometric inputs as abstract
+  char-2-ring predicates (see the file header for the `𝔽₂[G]` model);
+- `descent` — steps 1–3 above (axioms `propext, Quot.sound`);
+- `boost`, `iterate_aux`, `iterate` — the tail-elimination (char-independent);
+- `eps_mem_of_deckTrivial` — the headline ⟹, entry `ε^m ∈ (A,B)` (`2 ≤ m ≤
+  N-2`) taken as hypothesis (= A12 top-step).
+Pairs with the existing `BB.deckTrivial_of_bezout` (the ⟸) to give the full
+iff at the ring level.
+
+**Scope / what is NOT yet formalized (honest).** The Lean theorem is the
+*ring-theoretic core*. Two bridges remain paper-level: (i) `DeckTrivial` and
+`EpsFree` are the abstract predicates, not yet derived from the concrete
+`bbChainComplex` deck action and `𝔽₂[G]`-freeness (freeness over the
+subgroup algebra `𝔽₂[⟨σ⟩]`); (ii) the entry `ε^m ∈ (A,B)` is imported as
+A12's top-step result rather than re-proved. Both are the same
+`H₁`-dictionary work flagged as plan item L1 (a genuine formalization
+project); neither is a mathematical gap. `k(top)=k(base) ⟺ ε∈(A,B)` is the
+counting lemma (A12 Lemma 0/1), paper-level here.
+
+**Screens (refutation-first, all clean).**
+- [`a13_deck_tower_block_sweep.py`](../scripts/a13_deck_tower_block_sweep.py):
+  the endpoint `(R) ⟺ ε∈(A,B)` (S1), the canonical-violator mechanism (S3),
+  divided-class liveness (S7), A12 top-step regression (S4), and the R3/S6/S8
+  structural identities — **exhaustive** on `𝔽₂[Z₄]`, `𝔽₂[Z₈]` (`N=4,8`),
+  `𝔽₄[Z₄]`, `𝔽₂[Z₄×Z₂]` (both deck classes); **sampled** (uniform + a
+  targeted `ε²∈I` stratum) on `𝔽₂[Z₈×Z₂]`, `𝔽₂[Z₄×Z₄]`, `𝔽₄[Z₄×Z₂]`.
+  Zero S1 mismatches anywhere; S3/S7 fire on every `2≤t*≤N-2` pair.
+- [`a13_gross_ladder.py`](../scripts/a13_gross_ladder.py): the gross x-tower
+  `Z_{6·2^j}×Z₆`, `j=0..3` (up to `[[576,12,·]]`) — `k≡12` and full
+  deck-triviality at every level from the single level-free witness
+  `(1+x²)B² = 1+x⁶` (**T3/P0 confirmed**); plus the full battery on genuine
+  weight-3 `Z₁₂×Z₃` cover pairs (0 mismatches, S3/S7/S4 firing).
+  `𝔽₈` blocks remain out of scope (same residual as the A12 sweep).
+
+**Implications for the family paper.** Template condition 2 is now a clean
+equivalence at every tower level, not a per-instance certificate hunt: it
+*is* the k-check. The k-row of the tour-de-gross family is a theorem (T1–T3
++ A13). What A13 does **not** touch — and where growing distance must come
+from — is the value-carrying safe floor (condition 3); see the caveats in
+the parent conversation (BT cross-section cap on the pure x-tower;
+growing-`d` needs the 2D/twisted route, where each free-`ℤ₂` sub-step reuses
+this same equivalence).
 
 ## 0. The question, and what is already a theorem
 

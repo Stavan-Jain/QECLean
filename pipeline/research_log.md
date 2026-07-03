@@ -13,6 +13,33 @@ what was tried and why it didn't work.
 
 ## Entries
 
+- 2026-07-02 — deck-tower-descent (A13) — success —
+  **Deck-trivial ⟺ k constant along `ℤ_{2^r}` doubling towers (A12 OQ1),
+  answered YES.** For a free `ℤ_{2^r}` BB cover, `σ_* = id` on `H₁(top)`
+  forces `k(top) = k(base)` (`r ≥ 2`; `r = 1` is A12). The hard direction
+  is a completed elementary proof: A12 on the top `ℤ₂`-step gives the entry
+  `ε^{N/2} ∈ (A,B)`, then a **descent** — apply deck-triviality to the
+  canonical cycle `ε^{N-t}(f,g)`; the boundary coefficient satisfies
+  `ε^t z = 0`, so ε-freeness divides it (`z = ε^{N-t}u`), yielding
+  `ε ∈ (A,B) + ε^{N-t}S` — plus a ring-algebra tail-elimination. Simpler
+  than the planned Bockstein-SS / obstruction-class route (none needed).
+  **Lean payoff (public-side, axiom-clean):**
+  `QEC/Stabilizer/Framework/Homological/BBDeckTower.lean` —
+  `eps_mem_of_deckTrivial` (the ⟹), `descent`, `boost`/`iterate` over an
+  abstract char-2 ring with the `EpsFree`/`DeckTrivial` predicates; pairs
+  with the existing `BB.deckTrivial_of_bezout` (the ⟸) for the full ring
+  iff. Builds 1.4 s; axioms = standard three, no `sorry`/`native_decide`.
+  Screens (refutation-first, all clean):
+  `a13_deck_tower_block_sweep.py` (endpoint + mechanism + intermediate
+  identities, exhaustive to deck order 8) and `a13_gross_ladder.py` (gross
+  x-tower `k≡12` + full deck-triviality to `[[576,12,·]]` from the
+  level-free witness `(1+x²)B²=1+x⁶`; genuine `Z₁₂×Z₃` cover pairs).
+  Residual (paper-level, plan item L1): the `H₁ ↔ DeckTrivial` /
+  `𝔽₂[G]-free ↔ EpsFree` bridges. The family paper's k-row is now a
+  theorem (T1–T3 + A13); growing distance still lives in the safe floor
+  (condition 3), untouched here.
+  [plan+resolution](../experiments/bb_lab/notes/A13_deck_tower_plan.md)
+
 - 2026-07-02 — bb-pair72-packaging (S3.9) — success —
   **`pair72StabilizerCodeWithDistance : StabilizerCodeWithDistance 72 4 8`**
   (`Codes/BivariateBicycle/Z3Z6/StabilizerCode.lean`): the second doubling
