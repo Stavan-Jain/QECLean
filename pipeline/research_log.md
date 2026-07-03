@@ -60,13 +60,19 @@ what was tried and why it didn't work.
   (all decks; `≈` 2³² weighted pairs per |P|=16 block; hundreds of
   millions of live pairs) has `E = 2g`, `maxdef = 0` — closing OQ2's own
   "cheapest falsification path." W0 red-team agents were cut off by a
-  session limit (Lean kernel now the referee). Remaining (paper +
-  independently sweep-verified; future Lean L2): the LES repackaging
-  `δ₁δ₂ = 0` / rank corollary `E = k̃−k`, and the general-group
-  `Ann(ε̂)=(ε̂³)` from coset-basis freeness. Payoff:
-  `H₁(cover) ≅ D^{k̃−k} ⊕ F₂^{2k−k̃}`, with Theorem A12 as its `a = 0`
-  slice. [result](../experiments/bb_lab/notes/A13_result.md) ·
-  [plan](../experiments/bb_lab/notes/A13_bockstein_equality_plan.md)
+  session limit (Lean kernel now the referee). **L2 progress (commit
+  `b7ee838`, `BBEpsFree.lean`, axiom-clean):** the ring hypothesis shared
+  by OQ2 (`BocksteinLift`) and OQ1 (`BBDeckTower`'s `EpsFree`, on-branch
+  after rebasing onto merged PR #54) has its reusable core proven —
+  `epsFree_quotXpow` (chain ring `R[X]/(X^N)`) + `epsFree_of_free`
+  (transfer across a free module) + `hann_of_epsFree` (bridge). General
+  L2a now reduces to one wildcard: `Module.Free 𝔽₂[⟨σ⟩] 𝔽₂[G]` (coset
+  basis, no mathlib support). Remaining Lean L2: that freeness instance,
+  plus the LES rank corollary `E = k̃−k` (Phases 0–2/4 of the L2 plan).
+  Payoff: `H₁(cover) ≅ D^{k̃−k} ⊕ F₂^{2k−k̃}`, with Theorem A12 as its
+  `a = 0` slice. [result](../experiments/bb_lab/notes/A13_result.md) ·
+  [plan](../experiments/bb_lab/notes/A13_bockstein_equality_plan.md) ·
+  [L2 plan](../experiments/bb_lab/notes/A13_L2_formalization_plan.md)
 
 - 2026-07-02 — bb-pair72-packaging (S3.9) — success —
   **`pair72StabilizerCodeWithDistance : StabilizerCodeWithDistance 72 4 8`**

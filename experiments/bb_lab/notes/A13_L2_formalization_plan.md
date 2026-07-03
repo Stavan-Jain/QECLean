@@ -1,10 +1,39 @@
 # A13 L2 — formalizing the rank corollary `dim (1+σ)H₁ = k̃ − k`
 
-**Status: plan (2026-07-03), grounded in two reconnaissance sweeps of the
-repo homological framework and of mathlib's homology / finrank / group-
-algebra API. Not started.** Branch `claude/a13-bockstein-equality`
-(off PR #53). Prereq reading: [`A13_result.md`](A13_result.md) (§1 defect
-identity, §5 the L2 scope note), `BocksteinLift.lean` (L1, done).
+**Status: in progress (2026-07-03). L2a core landed; see Execution status
+below.** Branch `claude/a13-bockstein-equality` (off PR #53, rebased —
+`BBDeckTower.lean` from the merged OQ1 PR #54 is now on-branch). Prereq
+reading: [`A13_result.md`](A13_result.md) (§1 defect identity, §5 the L2
+scope note), `BocksteinLift.lean` (L1, done).
+
+## Execution status (2026-07-03)
+
+The rebase onto PR #53 pulled in `BBDeckTower.lean` (OQ1 tower work),
+which **defines `EpsFree ε N`** (`ε^t x = 0 → ∃ y, x = ε^{N-t} y`) — the
+same ring hypothesis L2a needs. This unified the two deck lines: L2a's
+`Ann(ε̂) = (ε̂³)` is `EpsFree ε̂ 4` at `t = 1`, the hypothesis BOTH
+`BBDeckTower.eps_mem_of_deckTrivial` (OQ1) and
+`BocksteinLift.bockstein_element_form` (OQ2) consume unproven.
+
+**Landed, axiom-clean (`QEC/…/Homological/BBEpsFree.lean`, commit `b7ee838`):**
+- `epsFree_quotXpow` — `EpsFree (mk X) N` in `R[X]/(X^N)` for any
+  `CommRing R` (chain-ring / local block; `X^t` monic ⟹ regular ⟹
+  cancels). Generalizes `BocksteinLift.deckRing_ann` (its `R=𝔽₂,N=4,t=1`
+  slice). This is the base ring `Λ`.
+- `epsFree_of_free` — `EpsFree` transfers from `Λ` to any free
+  `Λ`-algebra `S` (basis expansion + coordinatewise division). The
+  "annihilator across a free module" step.
+- `hann_of_epsFree` — `EpsFree ε 4 ⟹` `BocksteinLift`'s `hann`, making
+  the unification explicit.
+
+**Effect on the plan:** general L2a (`EpsFree` for `𝔽₂[G]`) is now reduced
+to a **single remaining lemma** — `Module.Free 𝔽₂[⟨σ⟩] 𝔽₂[G]` (coset
+basis) plus the ring iso `𝔽₂[⟨σ⟩] ≅ 𝔽₂[Y]/(Y^N)` — after which
+`epsFree_of_free ∘ epsFree_quotXpow` closes it. Confirmed no mathlib
+support for subgroup-algebra freeness (`MonoidAlgebra.instFree` is base-
+ring only), so this remains the from-scratch wildcard (Phase 3 below).
+Phases 0/1/2 (concrete equality, `E ≥ k̃−k` inequality, bridge) are
+untouched and remain the recommended next entry points.
 
 ## 0. What L2 is, and what L1 already gave
 
@@ -133,25 +162,24 @@ all lemmas exist. Medium–high.
 Risk: the `MonoidAlgebra ≃ conv` transport is standard but verbose; the
 `seamC`↔`δ` identification needs care. Medium.
 
-### Phase 3 — L2a: `Ann_{F₂[Ĝ]}(ε̂) = (ε̂³)`, general (L, wildcard)
-Closes Phase 1's inequality to the equality. Steps:
-- **First: attempt to port `BBDeckTower.lean`** from the OQ1 branch
-  (`claude/a13-deck-trivial-tower`) — it has ℤ/2^r lift + descent
-  (`ε^t z = 0 ⟹ ε-free divides`), which may already contain the ℤ/4
-  annihilator content. If portable, Phase 3 collapses to wiring.
-- **Else build it:** (a) the Frattini lift `Ĝ` (double the `deckS` axis)
-  for the concrete family `ZMod (2ℓ)×ZMod m ↦ ZMod (4ℓ)×ZMod m`, with
-  `σ̂` order 4 and `R̂/(ε̂²) ≅ R̃`; (b) `F₂[Ĝ]` free over `Λ = F₂[⟨σ̂⟩] ≅
-  F₂[Z₄]` via an explicit **coset basis** (no mathlib support — use
-  `Basis.mk` on a transversal, or an internal `Finsupp` coset direct-sum);
-  (c) annihilator transfer `Ann_{R̂}(ε̂) = (Ann_Λ ε̂)·R̂` (hand-built);
-  (d) combine with the existing `deckRing_ann` (`Λ ≅ F₂[X]/(X⁴)`) to get
-  `Ann(ε̂)=(ε̂³)`; (e) instantiate `bockstein_element_form`.
-Risk: (b)+(c) are the bespoke ring theory with zero mathlib support — the
-main cost/uncertainty of all L2. **Fallback**: prove L2a only for
-`m` odd (all blocks chain) using `bockstein_element_form_deck` + a CRT
-block split — but CRT for `F₂[G]` is *also* not in mathlib, so this trades
-one gap for another; prefer the coset-basis route.
+### Phase 3 — L2a: `EpsFree` (⟹ `Ann(ε̂) = (ε̂³)`), general (L, wildcard)
+Closes Phase 1's inequality to the equality. **Core DONE** (see Execution
+status): `epsFree_quotXpow` (base ring `Λ`) + `epsFree_of_free` (transfer)
++ `hann_of_epsFree` (bridge to OQ2), all axiom-clean in `BBEpsFree.lean`.
+`BBDeckTower.lean` did **not** need porting — it was merged in via the
+rebase, and it *defines* `EpsFree`, so `BBEpsFree` builds directly on it.
+
+**Remaining (the single wildcard):** the freeness instance
+`Module.Free (𝔽₂[⟨σ⟩]) (𝔽₂[G])` (coset basis) plus the ring iso
+`𝔽₂[⟨σ⟩] ≅ 𝔽₂[Y]/(Y^N)` (`N = 2^r`). Confirmed no mathlib support
+(`MonoidAlgebra.instFree` is base-ring only; no subgroup-algebra
+freeness). Build via `Basis.mk` on an ⟨σ⟩-transversal of `G`, or an
+internal `Finsupp` coset direct-sum; then `epsFree_of_free` applied to
+that instance + `epsFree_quotXpow` (through the iso) gives `EpsFree` for
+`𝔽₂[G]`, discharging the hypothesis of BOTH deck lines. **Fallback** for
+partial coverage: `m` odd (all blocks chain) via `epsFree_quotXpow`
+directly + a CRT split — but CRT for `𝔽₂[G]` is also not in mathlib, so
+prefer completing the coset-basis freeness.
 
 ### Phase 4 — equality + structure theorem + write-up (S–M)
 `deck_finrank_eq` (Phase 1 `≥` + Phase 2/3 `δ₁δ₂=0` ⟹ `=`), then
@@ -214,13 +242,13 @@ risk can't strand the rest.
 
 ## 7. Effort summary
 
-| Phase | Effort | Wildcard? |
-|---|---|---|
-| 0 — per-code `native_decide` equality | S–M | no |
-| 1 — unconditional inequality `E ≥ k̃−k` | M–L | no |
-| 2 — bridge + element-form wiring | M | no |
-| 3 — L2a general `Ann(ε̂)=(ε̂³)` | L | **yes** (no mathlib support) |
-| 4 — equality + structure thm + write-up | S–M | no |
+| Phase | Effort | Wildcard? | Status |
+|---|---|---|---|
+| 0 — per-code `native_decide` equality | S–M | no | not started |
+| 1 — unconditional inequality `E ≥ k̃−k` | M–L | no | not started |
+| 2 — bridge + element-form wiring | M | no | not started |
+| 3 — L2a general `EpsFree`/`Ann(ε̂)=(ε̂³)` | L | **yes** (no mathlib support) | **core done** (`BBEpsFree`); only coset-basis freeness left |
+| 4 — equality + structure thm + write-up | S–M | no | not started |
 
 Full abstract theorem: ≈ 1.5–2.5 weeks, dominated by Phase 3. Pragmatic
 milestone (flagship codes + homological inequality, Phases 0–1): ≈ 3–4
