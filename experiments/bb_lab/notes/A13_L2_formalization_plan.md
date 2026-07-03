@@ -32,8 +32,35 @@ basis) plus the ring iso `𝔽₂[⟨σ⟩] ≅ 𝔽₂[Y]/(Y^N)` — after whic
 `epsFree_of_free ∘ epsFree_quotXpow` closes it. Confirmed no mathlib
 support for subgroup-algebra freeness (`MonoidAlgebra.instFree` is base-
 ring only), so this remains the from-scratch wildcard (Phase 3 below).
-Phases 0/1/2 (concrete equality, `E ≥ k̃−k` inequality, bridge) are
-untouched and remain the recommended next entry points.
+
+**Phase 1 core landed (commit `67b947e`, `BBBocksteinRank.lean`,
+axiom-clean):** the transfer inequality's linear-algebra heart —
+- `finrank_ker_comp_le : dim ker(g∘f) ≤ dim ker f + dim ker g` (restrict
+  `f` to `ker(g∘f)`: range lands in `ker g`, kernel injects into `ker f`);
+- `finrank_sub_le_finrank_range_comp` : given exactness `ker p = range τ`
+  and `ε = τ∘p`, `dim Hc − dim Hb ≤ dim (range ε)`.
+Instantiated with `Hc = H₁(cover)`, `Hb = H₁(base)`, `p = p_*`,
+`τ = τ_*`, `ε_* = (1+σ)_*`, this is `E ≥ k̃−k`.
+
+**Remaining Phase-1 instantiation (turnkey; all repo lemmas confirmed to
+exist except `push0_surjective`):**
+1. Induce `p_* : H₁(cover) → H₁(base)` and `τ_* : H₁(base) → H₁(cover)`
+   via `LinearMap.restrict` (using `push1_mem_cycles`/`pull1_mem_cycles`)
+   + `Submodule.mapQ` (using `push1_mem_boundaries`/`pull1_mem_boundaries`).
+2. `ε_* = τ_* ∘ p_*` from `pull1_push1` (`pull1(push1 v) = v + σv`).
+3. Exactness `ker p_* = range τ_*` — diagram chase (the crux):
+   - `range τ_* ⊆ ker p_*`: from `push1_pull1_eq_zero`.
+   - `ker p_* ⊆ range τ_*`: `[v] ∈ ker p_*` ⟹ `push1 v = ∂₂ᵇ w`; lift
+     `w = push0 w'` (needs `push0_surjective`, analogue of the existing
+     `push1_surjective`); then `push1(v − ∂₂ᶜ w') = 0` by
+     `push_boundary2_comm`, so `v − ∂₂ᶜ w' = pull1 u` by
+     `push1_eq_zero_iff`; `u` is a base cycle (`pull_boundary1_comm` +
+     `pull0_injective`); hence `[v] = τ_*[u]`.
+4. Apply `finrank_sub_le_finrank_range_comp` + `finrank_H1_eq_*`.
+
+Phase 0 (per-code) only exercises the trivial `E=0` corner on the repo's
+actual codes (pair72 is a doubling, `k̃=k`), so it is deprioritized;
+Phase 2 (bridge) is unchanged.
 
 ## 0. What L2 is, and what L1 already gave
 
@@ -244,8 +271,8 @@ risk can't strand the rest.
 
 | Phase | Effort | Wildcard? | Status |
 |---|---|---|---|
-| 0 — per-code `native_decide` equality | S–M | no | not started |
-| 1 — unconditional inequality `E ≥ k̃−k` | M–L | no | not started |
+| 0 — per-code `native_decide` equality | S–M | no | deprioritized (only trivial `E=0` corner on real codes) |
+| 1 — unconditional inequality `E ≥ k̃−k` | M–L | no | **core done** (`BBBocksteinRank`); only the homology instantiation (induced maps + exactness chase) left |
 | 2 — bridge + element-form wiring | M | no | not started |
 | 3 — L2a general `EpsFree`/`Ann(ε̂)=(ε̂³)` | L | **yes** (no mathlib support) | **core done** (`BBEpsFree`); only coset-basis freeness left |
 | 4 — equality + structure thm + write-up | S–M | no | not started |

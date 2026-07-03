@@ -67,10 +67,16 @@ what was tried and why it didn't work.
   `epsFree_quotXpow` (chain ring `R[X]/(X^N)`) + `epsFree_of_free`
   (transfer across a free module) + `hann_of_epsFree` (bridge). General
   L2a now reduces to one wildcard: `Module.Free 𝔽₂[⟨σ⟩] 𝔽₂[G]` (coset
-  basis, no mathlib support). Remaining Lean L2: that freeness instance,
-  plus the LES rank corollary `E = k̃−k` (Phases 0–2/4 of the L2 plan).
-  Payoff: `H₁(cover) ≅ D^{k̃−k} ⊕ F₂^{2k−k̃}`, with Theorem A12 as its
-  `a = 0` slice. [result](../experiments/bb_lab/notes/A13_result.md) ·
+  basis, no mathlib support). **L2b core (commit `67b947e`,
+  `BBBocksteinRank.lean`, axiom-clean):** the transfer-inequality heart —
+  `finrank_ker_comp_le` + `finrank_sub_le_finrank_range_comp` (`ker p =
+  range τ`, `ε = τ∘p` ⟹ `dim Hc − dim Hb ≤ dim (range ε)`), i.e. `E ≥
+  k̃−k` once instantiated on homology. Remaining Lean L2: the L2a freeness
+  instance; the Phase-1 homology instantiation (induce `p_*`/`τ_*` via
+  `mapQ` + the exactness chase `ker p_* = im τ_*`, all repo lemmas present
+  bar `push0_surjective`); and the equality via the element form (Phase
+  2/4). Payoff: `H₁(cover) ≅ D^{k̃−k} ⊕ F₂^{2k−k̃}`, with Theorem A12 as
+  its `a = 0` slice. [result](../experiments/bb_lab/notes/A13_result.md) ·
   [plan](../experiments/bb_lab/notes/A13_bockstein_equality_plan.md) ·
   [L2 plan](../experiments/bb_lab/notes/A13_L2_formalization_plan.md)
 
