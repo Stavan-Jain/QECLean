@@ -40,22 +40,32 @@ what was tried and why it didn't work.
   (condition 3), untouched here.
   [plan+resolution](../experiments/bb_lab/notes/A13_deck_tower_plan.md)
 
-- 2026-07-02 — bockstein-equality (A13) — partial —
-  **A12's OQ2 (`dim (1+σ)H₁ = k̃−k`, ⟺ `δ₁∘δ₂ = 0`) has a candidate
-  half-page proof**: the transfer SES is the mod-`ε̂²` reduction of the
-  **4-fold cover** — the exact analogue of the integral lift behind the
-  classical `β² = 0` — and freeness over `F₂[ℤ/4]` kills the composite at
-  the element level (`W = 0` on the nose), for arbitrary order-2 decks
-  including twisted ones. A toy 3-term free-D *self-dual* complex with
-  `δ₁δ₂ ≠ 0` shows the originally scoped structural route (LES +
-  Frobenius self-duality) is provably insufficient — liftability is the
-  real content. Session-0 validation: 167,698 pairs all clean (first F₈
-  blocks, first twisted decks, 39,611 live-stratum pairs, 4,518
-  element-form direct checks, tower-lift rank pillar verified; A12 CE
-  regressions reproduce). Status partial until the W0 red-team passes
-  and the W1 stratified exhaustive sweep lands. If confirmed:
-  `H₁(cover) ≅ D^{k̃−k} ⊕ F₂^{2k−k̃}` — the complete deck-module
-  classification from two ranks, with Theorem A12 as its `a = 0` slice.
+- 2026-07-03 — bockstein-equality (A13) — success (core) —
+  **A12's OQ2 sharpest element-level form is now a machine-checked Lean
+  theorem, and the full failure-danger zone is swept exhaustively clean.**
+  Math: the transfer SES is the mod-`ε̂²` reduction of the **4-fold
+  cover** — the analogue of the integral lift behind classical `β² = 0`
+  — and freeness over `F₂[ℤ/4]` (`Ann(ε̂) = (ε̂³)`) kills the composite
+  at the element level (`W = A·ε⁻¹(Bz) + B·ε⁻¹(Az) = 0` on the nose),
+  for arbitrary order-2 decks incl. twisted. A toy 3-term free-D
+  *self-dual* complex with `δ₁δ₂ ≠ 0` shows the originally scoped
+  structural route (LES + Frobenius self-duality) is provably
+  insufficient — liftability is the content. **Lean (W3, axiom-clean):**
+  `Framework/Homological/BocksteinLift.lean` — `bockstein_element_form`
+  (abstract capstone: element form from `char 2` + `Ann(ε)=(ε³)`) and
+  `bockstein_element_form_deck` (unconditional on the ℤ/4 chain block);
+  only `propext`/`Classical.choice`/`Quot.sound`. **Sweeps (W1,
+  exhaustive):** every `(A,B)` pair over `F₂[Z₁₆]`, `F₂[Z₈×Z₂]`,
+  `F₂[Z₄×Z₄]`, `F₄[Z₈]`, `F₄[Z₄×Z₂]`, `F₈[Z₂]`, `F₈[Z₄]`, `F₈[Z₂²]`
+  (all decks; `≈` 2³² weighted pairs per |P|=16 block; hundreds of
+  millions of live pairs) has `E = 2g`, `maxdef = 0` — closing OQ2's own
+  "cheapest falsification path." W0 red-team agents were cut off by a
+  session limit (Lean kernel now the referee). Remaining (paper +
+  independently sweep-verified; future Lean L2): the LES repackaging
+  `δ₁δ₂ = 0` / rank corollary `E = k̃−k`, and the general-group
+  `Ann(ε̂)=(ε̂³)` from coset-basis freeness. Payoff:
+  `H₁(cover) ≅ D^{k̃−k} ⊕ F₂^{2k−k̃}`, with Theorem A12 as its `a = 0`
+  slice. [result](../experiments/bb_lab/notes/A13_result.md) ·
   [plan](../experiments/bb_lab/notes/A13_bockstein_equality_plan.md)
 
 - 2026-07-02 — bb-pair72-packaging (S3.9) — success —

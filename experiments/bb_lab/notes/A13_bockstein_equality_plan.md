@@ -1,9 +1,14 @@
 # A13 — The Bockstein equality (A12 OQ2): plan + candidate proof
 
-**Status: session-0 (2026-07-02) — plan, a candidate half-page proof of the
-full conjecture, and a 167k-pair validation sweep (all clean). Red-team of
-the proof (W0) and the stratified exhaustive sweep (W1) are the next
-actions; nothing below is "theorem" until W0 passes.**
+**Status: session-1 (2026-07-03) — EXECUTED. W1 exhaustive sweep done
+(entire OQ2 danger zone clean, every `(A,B)` pair; see `A13_result.md`
+§4) and W3 Lean formalization landed (the sharpest element-level form is
+an axiom-clean theorem, `BocksteinLift.lean`). W0's three red-team agents
+were cut off by a session limit; the Lean kernel now serves as referee
+for the formalized core. Results consolidated in
+[`A13_result.md`](A13_result.md); this file remains the design/plan
+record. Session-0 (2026-07-02): plan, the candidate half-page proof, and
+the first 167k-pair validation sweep.**
 Branch: `claude/a13-bockstein-equality` (off PR #53, includes A12).
 Prereq reading: `A12_deck_homotopy_R.md` §1 (notation), §3 (theorem), §4
 (the conjecture), §8 OQ2 (the question as posed).
