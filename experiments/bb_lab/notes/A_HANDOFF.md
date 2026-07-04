@@ -11,6 +11,19 @@ passed — the chain HOLDS, **write-up grade**; Entries 16–28: goal 1
 closed, reviewed, and written up — **d(gross) = 12 fully analytic**,
 A4 Theorem D).
 
+> **A9 update (2026-07-02, `A9_lean_target_screen.md`) — goal-2 milestone.**
+> The free-ℤ₂ doubling template is now a **parametric Lean layer**
+> (`Framework/Homological/{BBCover,BBDoubling}.lean`), and the `[[36,4,4]] →
+> [[72,4,8]]` pair (extensibility doc §5) is **proven through it at the chain
+> and Pauli levels, gross axiom bar** (`Codes/BivariateBicycle/Z3Z6/`;
+> the `StabilizerCodeWithDistance 72 4 8` packaging is DONE — S3.9,
+> `Z3Z6/StabilizerCode.lean`, `pair72StabilizerCodeWithDistance`).
+> Corpus screen: 152
+> direct-sweep doubling pairs; the presentation census corrects the Z₆×Z₆
+> uniqueness reading — **five new anchorable [[72,12,6]] codes, three with
+> exact [[144,12,12]] y-covers** (hit3/4/6): in-frame, engine-necessary
+> targets for the next engine re-instantiation.
+
 ---
 
 ## 0. RESUME HERE (the one-paragraph version)
@@ -69,6 +82,29 @@ the per-cell locus tables derived by rules R1–R5: 48 + 48 + 22 = 118,
 matching Entry 25, all killed by one-convolution ρ-link checks.
 `a3_a4ext_recheck.py` certifies every table (all PASS).
 d(gross) = 12 and d(gross) ≥ 6 are both fully analytic.***
+**Update (A5 Entries 1–5, 2026-06-12): goal 2 STARTED and producing —
+`notes/A5_goal2_log.md`. d(bb_108) ≥ 6 AND d(bb_90) ≥ 6, both fully
+analytic: the small-cycle grid now runs on all three occurring frame
+shapes (Z₂² base / Z₂ bb_108 / semisimple bb_90); Theorem-B transfers
+stated for the four n ∈ {216, 180} covers.**
+**Update (A5 Entries 6–7, 2026-06-13): the class theorem SHARPENED by a
+counterexample. A 26-agent workflow (corpus hunt + skeptic + proof
+panel) plus a human verification pass (Entry 7) established: the
+Entry-5 conjecture "(a) floor-bearing frame + (b) mult-free + disjoint
+⟹ d ≥ 6" is FALSE — the Z3×Z5 family (A = x+y²+y³, B = x²+y+y⁴ and
+5 siblings) has all of (a)+(b) yet d = 4 (independently SAT-verified;
+explicit weight-4 (3,1) cycle). The missing load-bearing hypothesis is
+(iii) the MIRRORED-projection pattern (A monomial in x, B monomial in
+y); all 58 corpus members carry it, all 6 violators lack it. Corrected
+live conjecture (C-iv′)/(C-v′) = (a)+(b)+(iii) ⟹ d ≥ 6, zero
+counterexamples across every sweep. The three template theorems
+(gross/bb_108/bb_90) SURVIVE independent re-derivation. Two technical
+finds: a bug in the uniform "weight lemma" (false on even-period axes;
+corrected form verified 0/29510), and the one remaining open step is the
+presentation-free multiplicity-profile residue lemma (or accept it as a
+per-instance surveyable check). The single gross dictionary row
+d₃((3,F)) feeds the two pullback floors but NOT the Z₂² base (layer
+engine); see Entry 7 §7.3.**
 
 ---
 
@@ -591,13 +627,41 @@ buggy-scout flag commit). Each `A3` entry is one commit.
    prose vs. the certified tables, with special attention to the §12
    locus-table presentation grade (rule-derived with worked
    representatives; a reviewer may demand more worked cells).
-5. **Goal 2 — template runs**: the small-cycle engine analysis on other
-   BB bases (Bravyi instances; bb_90/bb_108 odd-h covers with k′ = 8);
-   each run needs only the CRT components, the difference sets, and the
-   projections of that instance. The Entry-28 slot frame is
-   instance-generic (only m, the offsets, and the e/d_w dictionary
-   change).
-6. **Maintain `A3_track1p1_log.md`** as the running log; commit per entry.
+5. **Goal 2 — template runs**: STARTED — see `notes/A5_goal2_log.md`
+   (the goal-2 track log). Entry 1: the instance-hypothesis checker
+   (`scripts/a5_instance_hypotheses.py`) + corpus sweeps — the
+   empirical class {floor-bearing frame ∧ mult-free ∧ dA∩dB=∅} has
+   58 members across Z6xZ6/Z15xZ3 (Entry-5 corrigendum; was miscounted
+   54) with zero d < 6 exceptions — but see Entries 6–7: that class
+   def is INCOMPLETE (needs (iii)).
+   Entry 2: **bb_108 template run DONE — d(bb_108) ≥ 6 analytic**
+   (Z₂-frame engine, μ(Ann) = 12 via the gross d₃ dictionary pulled
+   back through Z₉×Z₃ → Z₃²; confirmation
+   `scripts/a5_bb108_smallcycles.py`, W1–W7 PASS), plus the Theorem-B
+   transfer to its two n = 216 free-Z₂ covers. Entry 3: gap analysis —
+   proposed class-theorem shape with hypotheses (a)–(d); the missing
+   deeper-2-part engine and the census-dependence of the (1,3)/(2,2)
+   kills are the open gaps. Entry 4: **bb_90 template run DONE —
+   d(bb_90) ≥ 6 analytic** (semisimple engine, μ(Ann) = 10 via 5-fold
+   pullback to d₃; every kill is projection arithmetic, census-free;
+   `scripts/a5_bb90_smallcycles.py` W1–W7 PASS) — the grid is 3-for-3
+   across frame shapes, all floors tracing to the single dictionary
+   row d₃((3,F)) = 2 (corrected in Entry 7: only the two PULLBACK
+   floors; the base uses the layer engine). Entry 5: the (iv)/(v)
+   census sweep — 58/58 class members pass, conjectured
+   (C-iv)/(C-v). **Entries 6–7 (2026-06-13): (C-iv)/(C-v) as stated
+   are FALSE** — a 26-agent workflow's corpus hunt + a human
+   verification pass found the **Z3×Z5 family (6 members, d = 4)**
+   with full (a)+(b) but a weight-4 (3,1) cycle. The fix is to add
+   **(iii) mirrored-projection** as load-bearing: corrected
+   conjecture (C-iv′)/(C-v′) = (a)+(b)+(iii) ⟹ d ≥ 6, zero
+   counterexamples. The 3 templates survive independent re-derivation.
+   Open: the presentation-free multiplicity-profile residue lemma
+   (with the Entry-7-corrected even-period weight lemma as ingredient),
+   or accept it as a per-instance surveyable check. Next: that lemma;
+   (M)-analogue on the bb_108/bb_90 covers (true d = 10).
+6. **Maintain `A3_track1p1_log.md`** as the running log for the gross
+   arc, and `A5_goal2_log.md` for goal 2; commit per entry.
 
 ---
 

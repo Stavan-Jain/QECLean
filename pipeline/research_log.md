@@ -13,6 +13,76 @@ what was tried and why it didn't work.
 
 ## Entries
 
+- 2026-07-02 — deck-tower-descent (A13) — success —
+  **Deck-trivial ⟺ k constant along `ℤ_{2^r}` doubling towers (A12 OQ1),
+  answered YES.** For a free `ℤ_{2^r}` BB cover, `σ_* = id` on `H₁(top)`
+  forces `k(top) = k(base)` (`r ≥ 2`; `r = 1` is A12). The hard direction
+  is a completed elementary proof: A12 on the top `ℤ₂`-step gives the entry
+  `ε^{N/2} ∈ (A,B)`, then a **descent** — apply deck-triviality to the
+  canonical cycle `ε^{N-t}(f,g)`; the boundary coefficient satisfies
+  `ε^t z = 0`, so ε-freeness divides it (`z = ε^{N-t}u`), yielding
+  `ε ∈ (A,B) + ε^{N-t}S` — plus a ring-algebra tail-elimination. Simpler
+  than the planned Bockstein-SS / obstruction-class route (none needed).
+  **Lean payoff (public-side, axiom-clean):**
+  `QEC/Stabilizer/Framework/Homological/BBDeckTower.lean` —
+  `eps_mem_of_deckTrivial` (the ⟹), `descent`, `boost`/`iterate` over an
+  abstract char-2 ring with the `EpsFree`/`DeckTrivial` predicates; pairs
+  with the existing `BB.deckTrivial_of_bezout` (the ⟸) for the full ring
+  iff. Builds 1.4 s; axioms = standard three, no `sorry`/`native_decide`.
+  Screens (refutation-first, all clean):
+  `a13_deck_tower_block_sweep.py` (endpoint + mechanism + intermediate
+  identities, exhaustive to deck order 8) and `a13_gross_ladder.py` (gross
+  x-tower `k≡12` + full deck-triviality to `[[576,12,·]]` from the
+  level-free witness `(1+x²)B²=1+x⁶`; genuine `Z₁₂×Z₃` cover pairs).
+  Residual (paper-level, plan item L1): the `H₁ ↔ DeckTrivial` /
+  `𝔽₂[G]-free ↔ EpsFree` bridges. The family paper's k-row is now a
+  theorem (T1–T3 + A13); growing distance still lives in the safe floor
+  (condition 3), untouched here.
+  [plan+resolution](../experiments/bb_lab/notes/A13_deck_tower_plan.md)
+
+- 2026-07-02 — bb-pair72-packaging (S3.9) — success —
+  **`pair72StabilizerCodeWithDistance : StabilizerCodeWithDistance 72 4 8`**
+  (`Codes/BivariateBicycle/Z3Z6/StabilizerCode.lean`): the second doubling
+  instance packaged as a first-class code object, mirroring the gross
+  Phase-5 packaging at pair72 scale (trimmed 68-generator list,
+  decoder-certified independence, 4 logical qubits, distance transport).
+  Axiom-clean (standard three + `native_decide` oracles, no `sorry`).
+  Data generator with 15-check ALL-PASS gate:
+  `experiments/bb_lab/scripts/gen_pair72_packaging_data.py`.
+  [plan](../experiments/bb_lab/notes/S39_pair72_packaging_plan.md)
+
+- 2026-07-02 — deck-homotopy-R-characterization (A12) — success —
+  **The doubling template's condition 2 (homotopy R) is solved:
+  (R) ⟺ `k(cover) = k(base)` ⟺ `1+x^ℓ ∈ (A,B)`** for every free ℤ₂ BB
+  cover (transfer-LES inequality `dim (1+σ)H₁ ≥ k̃−k`, plus the
+  constructive Koszul/Bezout converse). (R) is **not** automatic:
+  explicit weight-3 counterexamples exist (dead-character blocks), the
+  strict IBM monomial shape fails too, and among ~1.04M weight-3 cover
+  pairs swept 11,307 violate (R) — the majority (9,612) via *subtle*
+  non-dead-block mechanisms. Every historically checked cover (157/157:
+  gross both directions, pair72, Z₆×Z₁₄ both directions, all 152 A9
+  doubles) is k-preserving, where (R) is forced — the observed
+  universality dissolved. Resolved in passing: the F₂-additive
+  certificate form is complete (semantic (R) ⟺ certificate solvable),
+  and the `im p_* ⊆ im Δ` linchpin is an *iff*. Lean payoff:
+  `deckTrivial_of_bezout` in `BBDoubling.lean` (module-map homotopy from
+  any Bezout witness; both instance identities are its `P = 0` case);
+  pair72's (R) leg retrofitted to a kernel-`decide` 36-point identity.
+  Open remainder: the quantitative `dim (1+σ)H₁ = k̃−k` (⟺ vanishing of
+  the deck-Bockstein composite `δ₁∘δ₂`), exact on every instance and on
+  ~10⁶ exhaustively swept local blocks.
+  [details](../experiments/bb_lab/notes/A12_deck_homotopy_R.md)
+
+- 2026-07-02 — bb-doubling-layer-second-instance — success —
+  **The free-ℤ₂ doubling template is a parametric Lean layer, and the
+  `[[36,4,4]] → [[72,4,8]]` pair is proven through it** (chain+Pauli
+  `d = 8 = 2·d(base)`, gross axiom bar; packaging: see the S3.9 entry
+  above).  The A9 target screen found 152 direct-sweep doubling pairs
+  and corrected the Z₆×Z₆ census: gross has **five anchorable siblings,
+  three with exact `[[144,12,12]]` y-covers** — in-frame
+  engine-necessary follow-on targets.
+  [details](../experiments/bb_lab/notes/A9_lean_target_screen.md)
+
 - 2026-06-12 — gross-bb-analytic-bound — partial —
   **d(gross [[144,12,12]]) ≥ 6 fully analytic** (3× the published
   Lin–Pryadko floor of 2; goal 3 of the Phase-A program), via the
