@@ -1,7 +1,9 @@
 # A13 L2 — formalizing the rank corollary `dim (1+σ)H₁ = k̃ − k`
 
-**Status: in progress (2026-07-03). L2a core landed; see Execution status
-below.** Branch `claude/a13-bockstein-equality` (off PR #53, rebased —
+**Status: in progress (2026-07-04). L2a core + L2b core + Phase-1
+homology instantiation ALL landed; the inequality `E ≥ k̃ − k` is now a
+Lean theorem for every `XDoubleCoverData`. See Execution status below.**
+Branch `claude/a13-bockstein-equality` (off PR #53, rebased —
 `BBDeckTower.lean` from the merged OQ1 PR #54 is now on-branch). Prereq
 reading: [`A13_result.md`](A13_result.md) (§1 defect identity, §5 the L2
 scope note), `BocksteinLift.lean` (L1, done).
@@ -42,21 +44,34 @@ axiom-clean):** the transfer inequality's linear-algebra heart —
 Instantiated with `Hc = H₁(cover)`, `Hb = H₁(base)`, `p = p_*`,
 `τ = τ_*`, `ε_* = (1+σ)_*`, this is `E ≥ k̃−k`.
 
-**Remaining Phase-1 instantiation (turnkey; all repo lemmas confirmed to
-exist except `push0_surjective`):**
-1. Induce `p_* : H₁(cover) → H₁(base)` and `τ_* : H₁(base) → H₁(cover)`
-   via `LinearMap.restrict` (using `push1_mem_cycles`/`pull1_mem_cycles`)
-   + `Submodule.mapQ` (using `push1_mem_boundaries`/`pull1_mem_boundaries`).
-2. `ε_* = τ_* ∘ p_*` from `pull1_push1` (`pull1(push1 v) = v + σv`).
-3. Exactness `ker p_* = range τ_*` — diagram chase (the crux):
-   - `range τ_* ⊆ ker p_*`: from `push1_pull1_eq_zero`.
-   - `ker p_* ⊆ range τ_*`: `[v] ∈ ker p_*` ⟹ `push1 v = ∂₂ᵇ w`; lift
-     `w = push0 w'` (needs `push0_surjective`, analogue of the existing
-     `push1_surjective`); then `push1(v − ∂₂ᶜ w') = 0` by
-     `push_boundary2_comm`, so `v − ∂₂ᶜ w' = pull1 u` by
-     `push1_eq_zero_iff`; `u` is a base cycle (`pull_boundary1_comm` +
-     `pull0_injective`); hence `[v] = τ_*[u]`.
-4. Apply `finrank_sub_le_finrank_range_comp` + `finrank_H1_eq_*`.
+**Phase-1 instantiation LANDED (2026-07-04, `BBTransferH1.lean` +
+additions to `BBCover.lean`, axiom-clean):**
+- `BBCover.lean` gained `push0_surjective` (one-liner, mirror of
+  `push1_surjective`) and `exists_pull_eq_add_boundary` — the full
+  diagram chase **at chain level** (`p₁ v ∈ B ⟹ ∃ u ∈ Z₁(base), ∃ f,
+  τ₁ u = v + ∂₂ᶜ f`), exactly the chase sketched below.
+- `BBTransferH1.lean` (new, in the umbrella): `push1Cycles`/`pull1Cycles`
+  (`LinearMap.restrict`), `pushH1`/`pullH1` (`Submodule.mapQ`),
+  `ker_pushH1_eq_range_pullH1` (exactness at the cover), `epsH1 = τ_* ∘
+  p_*` with `pull1Cycles_push1Cycles_apply` (the `1+σ` identification,
+  pointwise), and the capstone
+  `finrank_H1_sub_le_finrank_range_epsH1 : dim H₁(cover) − dim H₁(base)
+  ≤ dim (range ε_*)` — i.e. **`E ≥ k̃ − k` for every `XDoubleCoverData`**
+  via `BBBocksteinRank.finrank_sub_le_finrank_range_comp`.
+
+**Lean traps hit (recorded for the next phase):** the quotient-level
+proof initially died on defeq-but-not-syntactic types
+(`D.coverComplex.C1` vs `G × Fin 2`): `rw [map_add]` fails on
+mixed-Pi-instance `+`, coercion ascriptions to the native type fail at
+reducible transparency, and `binop%` looks *through* type ascriptions, so
+one cannot fix a mixed-type `+`/`-` by ascribing operands. Fixes: (a) do
+the chase in `BBCover.lean` in native chain types, with `set v' := v +
+∂₂ᶜ w'` so every rewrite targets an fvar; (b) in the quotient file,
+ascribe coercions to the **ambient** type (`D.coverComplex.C1 → ZMod 2`),
+never the native one; (c) express the boundary-witness equality pointwise
+(`congrFun` + scalar `ZMod 2` arithmetic, `∀ a b c : ZMod 2, a = b + c →
+c = a - b := by decide`) so no Pi instance ever appears; (d) `change`,
+never `show`, when moving across the defeq (linter-enforced).
 
 Phase 0 (per-code) only exercises the trivial `E=0` corner on the repo's
 actual codes (pair72 is a doubling, `k̃=k`), so it is deprioritized;
@@ -164,18 +179,14 @@ immediately, independent of L2a/L2b, and *cross-validates* the abstract
 claim. Risk: representing `E` as a matrix rank (needs a computable handle
 on `ker∂₁`); low. **This is the cheapest real artifact.**
 
-### Phase 1 — the unconditional inequality `E ≥ k̃ − k` (M–L)
-The direct-`finrank` diagram chase on the existing chain-level transfer
-SES (`BBCover.lean:276–303`), mirroring `Code.lean`'s rank-nullity style.
-Deliverables:
-- `epsH1` : the endomorphism `H1 → H1` from `deckShift1` (prove it
-  descends: `deckShift1` maps `cycles→cycles`, `boundaries→boundaries` —
-  extract the `∂∘σ = σ∘∂` commutation).
-- `deck_finrank_ge` via incl-excl (`finrank_sup_add_finrank_inf_eq`) +
-  rank-nullity on the transfer maps. This *is* A12 part 2, re-proved
-  homologically in Lean — valuable on its own, and no L2a needed.
-Risk: the chase is intricate (tracking `ε(ker∂₁)`, `im∂₂`, base homology);
-all lemmas exist. Medium–high.
+### Phase 1 — the unconditional inequality `E ≥ k̃ − k` (M–L) — ✅ DONE
+Landed in two layers (see Execution status): the instance-agnostic core
+(`BBBocksteinRank.lean`, commit `67b947e`) and the homology instantiation
+(`BBTransferH1.lean` + `BBCover.lean` chase, 2026-07-04). `epsH1` was
+built as `pullH1 ∘ₗ pushH1` (equal to the descended `1+σ` by
+`pull1Cycles_push1Cycles_apply`) rather than by descending `deckShift1`
+directly — the transfer route hands you exactness for free. The
+incl-excl variant sketched below was not needed.
 
 ### Phase 2 — the bridge + wiring the element form (M)
 - `BBConvRing.lean` (new): `R_G := MonoidAlgebra (ZMod 2) (Multiplicative G)`,

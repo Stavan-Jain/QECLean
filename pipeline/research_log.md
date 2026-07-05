@@ -71,12 +71,21 @@ what was tried and why it didn't work.
   `BBBocksteinRank.lean`, axiom-clean):** the transfer-inequality heart —
   `finrank_ker_comp_le` + `finrank_sub_le_finrank_range_comp` (`ker p =
   range τ`, `ε = τ∘p` ⟹ `dim Hc − dim Hb ≤ dim (range ε)`), i.e. `E ≥
-  k̃−k` once instantiated on homology. Remaining Lean L2: the L2a freeness
-  instance; the Phase-1 homology instantiation (induce `p_*`/`τ_*` via
-  `mapQ` + the exactness chase `ker p_* = im τ_*`, all repo lemmas present
-  bar `push0_surjective`); and the equality via the element form (Phase
-  2/4). Payoff: `H₁(cover) ≅ D^{k̃−k} ⊕ F₂^{2k−k̃}`, with Theorem A12 as
-  its `a = 0` slice. [result](../experiments/bb_lab/notes/A13_result.md) ·
+  k̃−k` once instantiated on homology. **Phase-1 instantiation landed
+  (2026-07-04, axiom-clean): the inequality `E ≥ k̃ − k` is now a Lean
+  theorem for every `XDoubleCoverData`** — `BBCover.lean` gained
+  `push0_surjective` + `exists_pull_eq_add_boundary` (the chain-level
+  diagram chase), and the new `BBTransferH1.lean` induces
+  `pushH1`/`pullH1` on `H₁` via `Submodule.mapQ`, proves the exactness
+  `ker p_* = range τ_*`, identifies `epsH1 = τ_*∘p_*` with `(1+σ)_*`
+  pointwise, and concludes
+  `finrank_H1_sub_le_finrank_range_epsH1 : dim H₁(cover) − dim H₁(base)
+  ≤ dim (1+σ)H₁(cover)` — A12 part 2, previously paper-only, now
+  kernel-checked. Remaining Lean L2: the L2a freeness instance
+  (`Module.Free 𝔽₂[⟨σ⟩] 𝔽₂[G]`), and the equality via the element form
+  (Phase 2/4). Payoff: `H₁(cover) ≅ D^{k̃−k} ⊕ F₂^{2k−k̃}`, with Theorem
+  A12 as its `a = 0` slice.
+  [result](../experiments/bb_lab/notes/A13_result.md) ·
   [plan](../experiments/bb_lab/notes/A13_bockstein_equality_plan.md) ·
   [L2 plan](../experiments/bb_lab/notes/A13_L2_formalization_plan.md)
 

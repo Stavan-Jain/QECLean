@@ -294,6 +294,9 @@ theorem push1_surjective : Function.Surjective ⇑D.push1 := fun u =>
   ⟨lift0 (Prod.map ⇑D.proj id) D.sec1 u,
     fiberSumFn_lift0 D.proj_prodMap_sec1 u⟩
 
+theorem push0_surjective : Function.Surjective ⇑D.push0 := fun u =>
+  ⟨lift0 ⇑D.proj D.sec u, fiberSumFn_lift0 D.proj_sec u⟩
+
 /-- `ker p = range τ` on 1-chains. -/
 theorem push1_eq_zero_iff (v : G × Fin 2 → ZMod 2) :
     D.push1 v = 0 ↔ ∃ u : H × Fin 2 → ZMod 2, v = D.pull1 u :=
@@ -308,6 +311,57 @@ theorem pull1_push1 (v : G × Fin 2 → ZMod 2) :
     = v p + v (p.1 + D.deckS, p.2)
   rw [fiberSumFn_pair D.deckSigma1_ne D.proj_prodMap_fiber v p]
   rfl
+
+/-- **The transfer chase at the cover**: a cover 1-cycle whose pushforward is
+a base boundary differs from the pullback of a base 1-cycle by a cover
+boundary.  This is the hard (`ker ≤ range`) half of the exactness of the
+transfer sequence on `H₁`; the quotient-level packaging lives in
+`BBTransferH1.lean`.
+
+Chase: `p₁ v = ∂₂ᵇ w`; lift `w = p₀ w'` (`push0_surjective`); then
+`p₁ (v + ∂₂ᶜ w') = ∂₂ᵇ w + ∂₂ᵇ w = 0` (char 2), so `v + ∂₂ᶜ w' = τ₁ u`
+(`push1_eq_zero_iff`); finally `u` is a base cycle by `pull_boundary1_comm`
+and `pull0_injective`. -/
+theorem exists_pull_eq_add_boundary {v : G × Fin 2 → ZMod 2}
+    (hv : v ∈ D.coverComplex.cycles)
+    (hbd : D.push1 v ∈ D.baseComplex.boundaries) :
+    ∃ u : H × Fin 2 → ZMod 2, u ∈ D.baseComplex.cycles ∧
+      ∃ f : G → ZMod 2, D.pull1 u = v + bbBoundary2Fn D.Ac D.Bc f := by
+  have hkey : ∀ a : ZMod 2, a + a = 0 := by decide
+  obtain ⟨w, hw⟩ := hbd
+  -- lift the 2-chain witness through the surjective `p₀`
+  obtain ⟨w', rfl⟩ := D.push0_surjective w
+  set v' : G × Fin 2 → ZMod 2 := v + bbBoundary2Fn D.Ac D.Bc w' with hv'
+  -- the corrected chain pushes to zero (char 2)
+  have hzero : D.push1 v' = 0 := by
+    have h1 : D.push1 v'
+        = D.push1 v + D.push1 (bbBoundary2Fn D.Ac D.Bc w') := by
+      rw [hv']; exact map_add _ _ _
+    have h2 : D.push1 (bbBoundary2Fn D.Ac D.Bc w') = D.push1 v :=
+      (D.push_boundary2_comm w').trans hw
+    rw [h1, h2]
+    funext j
+    rw [Pi.add_apply, Pi.zero_apply]
+    exact hkey _
+  -- hence it is a pullback: `v + ∂₂ᶜ w' = τ₁ u`
+  obtain ⟨u, hu⟩ := (D.push1_eq_zero_iff _).mp hzero
+  -- the descended chain `u` is a base cycle
+  have hu_cyc : u ∈ D.baseComplex.cycles := by
+    have hb1 : D.coverComplex.boundary1 v' = 0 := by
+      have h1 : D.coverComplex.boundary1 v'
+          = D.coverComplex.boundary1 v
+            + D.coverComplex.boundary1 (bbBoundary2Fn D.Ac D.Bc w') := by
+        rw [hv']; exact map_add _ _ _
+      have h2 : D.coverComplex.boundary1 v = 0 := hv
+      have h3 : D.coverComplex.boundary1 (bbBoundary2Fn D.Ac D.Bc w') = 0 :=
+        D.coverComplex.boundary_comp_apply w'
+      rw [h1, h2, h3, add_zero]
+    have h4 : D.coverComplex.boundary1 (D.pull1 u) = 0 := by
+      rw [← hu]; exact hb1
+    rw [D.pull_boundary1_comm] at h4
+    exact (D.baseComplex.mem_cycles_iff u).mpr
+      (D.pull0_injective (h4.trans (map_zero D.pull0).symm))
+  exact ⟨u, hu_cyc, w', hu.symm.trans hv'⟩
 
 /-! ## Weight identities -/
 
