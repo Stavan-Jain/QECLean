@@ -81,8 +81,19 @@ what was tried and why it didn't work.
   pointwise, and concludes
   `finrank_H1_sub_le_finrank_range_epsH1 : dim H₁(cover) − dim H₁(base)
   ≤ dim (1+σ)H₁(cover)` — A12 part 2, previously paper-only, now
-  kernel-checked. Remaining Lean L2: the L2a freeness instance
-  (`Module.Free 𝔽₂[⟨σ⟩] 𝔽₂[G]`), and the equality via the element form
+  kernel-checked. **The L2a wildcard is also CLOSED (2026-07-04,
+  `BBEpsFreeGroupAlgebra.lean`, axiom-clean):** the group algebra
+  `k[G]` is free directly over the chain ring `k[X]/(X^N)` via
+  `X ↦ x^σ − 1` (coset-transversal basis: spanning by
+  `x^g = (X+1)^j·C c • x^{t i}`, independence by `modByMonic`
+  representatives + the invertible substitution `∘(X±1)` + orbit
+  coefficient extraction), giving
+  `epsFree_one_add_single_of_addOrderOf : EpsFree (1 + x^σ) (2^r)`
+  for ANY abelian `G` (finite or not) and any char-2 base — the shared
+  ring hypothesis of BOTH deck lines (OQ1 `eps_mem_of_deckTrivial`,
+  OQ2 `bockstein_element_form` via `hann_of_epsFree`) is now
+  unconditional for group algebras. Remaining Lean L2: the
+  conv↔MonoidAlgebra bridge and the equality via the element form
   (Phase 2/4). Payoff: `H₁(cover) ≅ D^{k̃−k} ⊕ F₂^{2k−k̃}`, with Theorem
   A12 as its `a = 0` slice.
   [result](../experiments/bb_lab/notes/A13_result.md) ·

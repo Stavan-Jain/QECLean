@@ -1,8 +1,12 @@
 # A13 L2 — formalizing the rank corollary `dim (1+σ)H₁ = k̃ − k`
 
 **Status: in progress (2026-07-04). L2a core + L2b core + Phase-1
-homology instantiation ALL landed; the inequality `E ≥ k̃ − k` is now a
-Lean theorem for every `XDoubleCoverData`. See Execution status below.**
+homology instantiation + THE L2a WILDCARD all landed. The inequality
+`E ≥ k̃ − k` is a Lean theorem for every `XDoubleCoverData`, and
+`EpsFree (1 + x^σ) (2^r)` is a Lean theorem for every deck of exact
+2-power order in every finite-or-not abelian `G` over every char-2 base —
+the shared ring hypothesis of BOTH deck lines is now discharged
+unconditionally for group algebras. See Execution status below.**
 Branch `claude/a13-bockstein-equality` (off PR #53, rebased —
 `BBDeckTower.lean` from the merged OQ1 PR #54 is now on-branch). Prereq
 reading: [`A13_result.md`](A13_result.md) (§1 defect identity, §5 the L2
@@ -200,24 +204,35 @@ incl-excl variant sketched below was not needed.
 Risk: the `MonoidAlgebra ≃ conv` transport is standard but verbose; the
 `seamC`↔`δ` identification needs care. Medium.
 
-### Phase 3 — L2a: `EpsFree` (⟹ `Ann(ε̂) = (ε̂³)`), general (L, wildcard)
-Closes Phase 1's inequality to the equality. **Core DONE** (see Execution
-status): `epsFree_quotXpow` (base ring `Λ`) + `epsFree_of_free` (transfer)
-+ `hann_of_epsFree` (bridge to OQ2), all axiom-clean in `BBEpsFree.lean`.
-`BBDeckTower.lean` did **not** need porting — it was merged in via the
-rebase, and it *defines* `EpsFree`, so `BBEpsFree` builds directly on it.
+### Phase 3 — L2a: `EpsFree` (⟹ `Ann(ε̂) = (ε̂³)`), general — ✅ DONE
+Core (`BBEpsFree.lean`): `epsFree_quotXpow` + `epsFree_of_free` +
+`hann_of_epsFree`, all axiom-clean.
 
-**Remaining (the single wildcard):** the freeness instance
-`Module.Free (𝔽₂[⟨σ⟩]) (𝔽₂[G])` (coset basis) plus the ring iso
-`𝔽₂[⟨σ⟩] ≅ 𝔽₂[Y]/(Y^N)` (`N = 2^r`). Confirmed no mathlib support
-(`MonoidAlgebra.instFree` is base-ring only; no subgroup-algebra
-freeness). Build via `Basis.mk` on an ⟨σ⟩-transversal of `G`, or an
-internal `Finsupp` coset direct-sum; then `epsFree_of_free` applied to
-that instance + `epsFree_quotXpow` (through the iso) gives `EpsFree` for
-`𝔽₂[G]`, discharging the hypothesis of BOTH deck lines. **Fallback** for
-partial coverage: `m` odd (all blocks chain) via `epsFree_quotXpow`
-directly + a CRT split — but CRT for `𝔽₂[G]` is also not in mathlib, so
-prefer completing the coset-basis freeness.
+**The wildcard is CLOSED (2026-07-04, `BBEpsFreeGroupAlgebra.lean`,
+axiom-clean):** instead of the two-step "iso `𝔽₂[⟨σ⟩] ≅ 𝔽₂[Y]/(Y^N)` +
+subgroup-algebra freeness", one step suffices — `AddMonoidAlgebra k G` is
+free **directly over the chain ring** `Λ = AdjoinRoot (X^N : k[X])`,
+acting via `AdjoinRoot.lift` with `X ↦ ε = x^σ − 1`:
+- `span_transversal_eq_top` — `x^g = mk (C c·(X+1)^j) • x^{t i}` for
+  `g = t i + j•σ` (uses `ε + 1 = x^σ` **char-free**, since `ε` is defined
+  as `x^σ − 1`, not `1 + x^σ`).
+- `linearIndependent_transversal` — canonical `AdjoinRoot.modByMonicHom`
+  representatives; the substitution `p ↦ p ∘ (X−1)` turns
+  `ε`-polynomials into `x^σ`-polynomials (invertible via `∘ (X+1)`,
+  again char-free); coefficient extraction along the orbit
+  `t i₀ + m•σ` (`Finsupp`-level, exact order ⟹ orbit points distinct).
+- `epsFree_single_sub_one_of_transversal` — the char-free core: any
+  `(T, t)` with `(i,j) ↦ t i + j•σ` bijective + `ε^N = 0` gives
+  `EpsFree ε N` via `Module.Basis.mk` → `Module.Free.of_basis` →
+  `epsFree_of_free ∘ epsFree_adjoinRoot_root`.
+- `transversal_out_bijective` — the canonical transversal
+  (`Quotient.out` on `G ⧸ zmultiples σ`) for `σ` of exact order `N`.
+- `epsFree_one_add_single_of_addOrderOf` — **the deck payoff**: char-2
+  base, `addOrderOf σ = 2^r` ⟹ `EpsFree (1 + x^σ) (2^r)` (Frobenius
+  `ε^{2^r} = 0` via the instance-free `add_pow_two_pow_of_two_eq_zero`;
+  `1 + x^σ = x^σ − 1` in char 2). Works for ANY abelian `G` (finiteness
+  not needed) and any char-2 commutative base (`𝔽₂, 𝔽₄, 𝔽₈` blocks
+  included). No CRT fallback needed.
 
 ### Phase 4 — equality + structure theorem + write-up (S–M)
 `deck_finrank_eq` (Phase 1 `≥` + Phase 2/3 `δ₁δ₂=0` ⟹ `=`), then
