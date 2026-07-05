@@ -177,6 +177,64 @@ theorem finrank_H1_sub_le_finrank_range_epsH1 :
   BBBocksteinRank.finrank_sub_le_finrank_range_comp D.pushH1 D.pullH1
     D.ker_pushH1_eq_range_pullH1
 
+/-! ## The Bockstein-vanishing criterion and the rank equality -/
+
+/-- **The Bockstein-vanishing criterion** for a cover: `ker τ_* ≤ range p_*`
+on `H₁`.  Equivalently `δ₁ ∘ δ₂ = 0` for the two connecting maps of the
+transfer LES (`im δ₂ = ker τ_*`, `ker δ₁ = range p_*`).  It is exactly the
+hypothesis under which the deck-image floor `E ≥ k̃ − k` is an equality
+(`BBBocksteinRank.finrank_range_comp_eq_of_ker_le`); the OQ2 element form
+(`BocksteinLift`) + L2a (`BBEpsFreeGroupAlgebra`) are what establish it for
+actual BB covers. -/
+def BocksteinVanishes : Prop :=
+  LinearMap.ker D.pullH1 ≤ LinearMap.range D.pushH1
+
+/-- **The rank corollary, additive form.** Under `BocksteinVanishes`,
+`dim (1+σ)·H₁(cover) + k = k̃` exactly (no truncated subtraction) — in
+particular `k̃ ≥ k`. -/
+theorem finrank_range_epsH1_add_eq (h : D.BocksteinVanishes) :
+    Module.finrank (ZMod 2) (LinearMap.range D.epsH1)
+        + Module.finrank (ZMod 2) D.baseComplex.H1
+      = Module.finrank (ZMod 2) D.coverComplex.H1 := by
+  have hid := BBBocksteinRank.finrank_range_comp_add_eq D.pushH1 D.pullH1
+    D.ker_pushH1_eq_range_pullH1
+  rw [inf_of_le_right h] at hid
+  change Module.finrank (ZMod 2) (LinearMap.range (D.pullH1 ∘ₗ D.pushH1))
+      + _ = _
+  omega
+
+/-- **The rank corollary, equality form.** Under `BocksteinVanishes`, the
+deck-image floor is tight: `dim (1+σ)·H₁(cover) = k̃ − k`. -/
+theorem finrank_range_epsH1_eq (h : D.BocksteinVanishes) :
+    Module.finrank (ZMod 2) (LinearMap.range D.epsH1)
+      = Module.finrank (ZMod 2) D.coverComplex.H1
+        - Module.finrank (ZMod 2) D.baseComplex.H1 := by
+  have h := D.finrank_range_epsH1_add_eq h
+  omega
+
+/-! ## The deck endomorphism squares to zero -/
+
+/-- `ε_*² = 0` on `H₁(cover)`: `(1+σ)² = 1 + σ² = 0` in char 2, here read
+off `push_*∘pull_* = 0` (`range τ_* ≤ ker p_*`). This makes `H₁(cover)` a
+module over `D = 𝔽₂[ε]/(ε²)`; with `finrank_range_epsH1_eq` giving
+`dim ε_*H₁ = k̃ − k`, the deck-module structure is
+`H₁ ≅ D^{k̃−k} ⊕ 𝔽₂^{2k−k̃}`. -/
+theorem epsH1_epsH1_apply (x : D.coverComplex.H1) :
+    D.epsH1 (D.epsH1 x) = 0 := by
+  have hmid : D.pushH1 (D.pullH1 (D.pushH1 x)) = 0 :=
+    D.range_pullH1_le_ker_pushH1 ⟨D.pushH1 x, rfl⟩
+  simp only [epsH1, LinearMap.comp_apply]
+  rw [hmid, map_zero]
+
+/-- Under `BocksteinVanishes`, `dim (ker ε_*) = k`: the complementary rank
+to `finrank_range_epsH1_eq`, via rank-nullity for `ε_*`. -/
+theorem finrank_ker_epsH1_eq (h : D.BocksteinVanishes) :
+    Module.finrank (ZMod 2) (LinearMap.ker D.epsH1)
+      = Module.finrank (ZMod 2) D.baseComplex.H1 := by
+  have hrn := LinearMap.finrank_range_add_finrank_ker D.epsH1
+  have hadd := D.finrank_range_epsH1_add_eq h
+  omega
+
 end XDoubleCoverData
 
 end BB

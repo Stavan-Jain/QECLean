@@ -92,10 +92,25 @@ what was tried and why it didn't work.
   for ANY abelian `G` (finite or not) and any char-2 base — the shared
   ring hypothesis of BOTH deck lines (OQ1 `eps_mem_of_deckTrivial`,
   OQ2 `bockstein_element_form` via `hann_of_epsFree`) is now
-  unconditional for group algebras. Remaining Lean L2: the
-  conv↔MonoidAlgebra bridge and the equality via the element form
-  (Phase 2/4). Payoff: `H₁(cover) ≅ D^{k̃−k} ⊕ F₂^{2k−k̃}`, with Theorem
-  A12 as its `a = 0` slice.
+  unconditional for group algebras. **The L2 linear-algebra wiring is
+  also COMPLETE (2026-07-04, axiom-clean):** `BBBocksteinRank` gained the
+  exact defect identity `E + dim Hb + dim(range p ⊓ ker τ) = dim Hc +
+  dim(ker τ)` and the tightness criterion `ker τ ≤ range p → E = dim Hc −
+  dim Hb`; `BBTransferH1` instantiates them as `BocksteinVanishes D`
+  (`ker τ_* ≤ range p_*` = `δ₁∘δ₂=0`), `finrank_range_epsH1_eq`
+  (`E = k̃−k` under `BocksteinVanishes` — the headline `deck_finrank_eq`),
+  `finrank_ker_epsH1_eq` (`dim ker ε_* = k`), and `epsH1_epsH1_apply`
+  (`ε_*²=0`, unconditional). On the ring side, `BBEpsFreeGroupAlgebra` §7
+  `bockstein_element_form_group_algebra` composes L2a into L1 to give the
+  element form `δ₁δ₂=0` unconditionally in every order-4 deck group
+  algebra `k[G]⧸(ε²)`. The SOLE remaining gap is the homological transport
+  identifying that element fact with `BocksteinVanishes` (the
+  `seamC`↔connecting-map δ₂ bridge + conv-ring reading of `∂ᵢ=mul`,
+  `1+σ=mul ε`) — the paper's main theorem, genuinely open (the toy
+  self-dual free-`D` complex has `δ₁δ₂≠0`, so it is not automatic).
+  Payoff once closed: `H₁(cover) ≅ D^{k̃−k} ⊕ F₂^{2k−k̃}` (rank data all
+  in hand; needs the `𝔽₂[ε]/(ε²)`-module classification for the iso),
+  with Theorem A12 as its `a = 0` slice.
   [result](../experiments/bb_lab/notes/A13_result.md) ·
   [plan](../experiments/bb_lab/notes/A13_bockstein_equality_plan.md) ·
   [L2 plan](../experiments/bb_lab/notes/A13_L2_formalization_plan.md)

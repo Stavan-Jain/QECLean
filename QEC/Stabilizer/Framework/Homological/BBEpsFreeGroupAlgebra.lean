@@ -24,6 +24,7 @@ packages the payoff:
 -/
 
 import QEC.Stabilizer.Framework.Homological.BBEpsFree
+import QEC.Stabilizer.Framework.Homological.BocksteinLift
 import Mathlib.Algebra.MonoidAlgebra.Basic
 import Mathlib.GroupTheory.QuotientGroup.Basic
 
@@ -439,6 +440,48 @@ theorem epsFree_one_add_single_of_addOrderOf
   rw [hswap]
   exact epsFree_single_sub_one_of_transversal hN hεN Quotient.out
     (transversal_out_bijective σ hord hN)
+
+/-! ## §7 Wiring L2a into L1: the element form for real deck group algebras -/
+
+/-- **Element form for order-4 deck group algebras (L1 ∘ L2a).**  The L2a
+freeness (`epsFree_one_add_single_of_addOrderOf` at `r = 2`, so
+`addOrderOf σ = 4`) supplies through `hann_of_epsFree` exactly the
+`Ann(ε) = (ε³)` hypothesis that L1's abstract capstone
+`BocksteinLift.bockstein_element_form` consumes.  Composing them: for a
+deck `σ` of exact order 4 over any char-2 base, with `ε = 1 + x^σ`, the
+Bockstein element form `δ₁ ∘ δ₂ = 0` holds **unconditionally** in the
+cover quotient `k[G] ⧸ (ε²)` — whenever `A z̄ = ε ā` and `B z̄ = ε b̄`, the
+representative `A b̄ + B ā` lies in `ε·(A, B)`.
+
+This discharges, for the Frattini-lift ring of every genuine BB double
+cover, the ring hypothesis L1 had to assume.  What remains to reach the
+homological equality `E = k̃ − k` (`BBTransferH1.BocksteinVanishes`) is the
+seam↔connecting-map identification transporting this element fact onto
+`H₁`. -/
+theorem bockstein_element_form_group_algebra
+    {k : Type*} [CommRing k] (h2 : (2 : k) = 0)
+    {G : Type*} [AddCommGroup G] (σ : G) (hord : addOrderOf σ = 4)
+    (A B : AddMonoidAlgebra k G)
+    (z a b : AddMonoidAlgebra k G ⧸
+      Ideal.span {(1 + AddMonoidAlgebra.single σ (1 : k)) ^ 2})
+    (hAz : Ideal.Quotient.mk _ A * z
+      = Ideal.Quotient.mk _ (1 + AddMonoidAlgebra.single σ (1 : k)) * a)
+    (hBz : Ideal.Quotient.mk _ B * z
+      = Ideal.Quotient.mk _ (1 + AddMonoidAlgebra.single σ (1 : k)) * b) :
+    Ideal.Quotient.mk _ A * b + Ideal.Quotient.mk _ B * a ∈
+      Ideal.span
+        {Ideal.Quotient.mk (Ideal.span {(1 + AddMonoidAlgebra.single σ (1 : k)) ^ 2})
+            (1 + AddMonoidAlgebra.single σ (1 : k)) * Ideal.Quotient.mk _ A,
+          Ideal.Quotient.mk (Ideal.span {(1 + AddMonoidAlgebra.single σ (1 : k)) ^ 2})
+            (1 + AddMonoidAlgebra.single σ (1 : k)) * Ideal.Quotient.mk _ B} := by
+  have hchar : (2 : AddMonoidAlgebra k G) = 0 := by
+    rw [← map_ofNat (algebraMap k (AddMonoidAlgebra k G)) 2, h2, map_zero]
+  have hEF : EpsFree (1 + AddMonoidAlgebra.single σ (1 : k)) 4 := by
+    have h := epsFree_one_add_single_of_addOrderOf h2 σ 2 (hord.trans (by norm_num))
+    norm_num at h
+    exact h
+  exact BocksteinLift.bockstein_element_form _ A B hchar
+    (hann_of_epsFree hEF) z a b hAz hBz
 
 end BBEpsFree
 end Homological

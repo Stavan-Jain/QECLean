@@ -1,12 +1,17 @@
 # A13 L2 — formalizing the rank corollary `dim (1+σ)H₁ = k̃ − k`
 
-**Status: in progress (2026-07-04). L2a core + L2b core + Phase-1
-homology instantiation + THE L2a WILDCARD all landed. The inequality
-`E ≥ k̃ − k` is a Lean theorem for every `XDoubleCoverData`, and
-`EpsFree (1 + x^σ) (2^r)` is a Lean theorem for every deck of exact
-2-power order in every finite-or-not abelian `G` over every char-2 base —
-the shared ring hypothesis of BOTH deck lines is now discharged
-unconditionally for group algebras. See Execution status below.**
+**Status: in progress (2026-07-04). ALL LINEAR-ALGEBRA WIRING DONE. The
+inequality `E ≥ k̃ − k` is a Lean theorem for every `XDoubleCoverData`;
+the *equality* `E = k̃ − k` (plus `dim ker ε_* = k` and `ε_*² = 0`, i.e.
+the full deck-module rank picture) is a Lean theorem conditional on the
+single clean criterion `BocksteinVanishes D` (`ker τ_* ≤ range p_*` on
+`H₁`, = `δ₁∘δ₂ = 0`). `EpsFree (1 + x^σ) (2^r)` is a Lean theorem for
+every 2-power-order deck (any abelian `G`, any char-2 base), and composing
+it with L1 gives the element form `δ₁δ₂ = 0` in every order-4 deck group
+algebra (`bockstein_element_form_group_algebra`). The SOLE remaining gap
+is the homological transport identifying that element fact with
+`BocksteinVanishes` (the seam↔connecting-map bridge) — which is the
+paper's main theorem, not wiring. See Execution status below.**
 Branch `claude/a13-bockstein-equality` (off PR #53, rebased —
 `BBDeckTower.lean` from the merged OQ1 PR #54 is now on-branch). Prereq
 reading: [`A13_result.md`](A13_result.md) (§1 defect identity, §5 the L2
@@ -192,17 +197,28 @@ built as `pullH1 ∘ₗ pushH1` (equal to the descended `1+σ` by
 directly — the transfer route hands you exactness for free. The
 incl-excl variant sketched below was not needed.
 
-### Phase 2 — the bridge + wiring the element form (M)
-- `BBConvRing.lean` (new): `R_G := MonoidAlgebra (ZMod 2) (Multiplicative G)`,
-  the ring iso to `(G→ZMod 2, conv)`, and lemmas `∂ᵢ = mul …`,
-  `(1+σ) = mul deckPoly`. Reformulate `cycles/boundaries/H1` as `R_G`-module
-  objects so `BocksteinLift` applies.
-- Connect `bockstein_element_form` to the chain-level connecting composite
-  (via `seamC`, `BBCover.lean:558`): show the composite `δ₁∘δ₂` on base
-  homology is the map the element form kills. Output: `δ₁δ₂ = 0` at the
-  concrete level (conditional on L2a's `Ann` for this cover).
-Risk: the `MonoidAlgebra ≃ conv` transport is standard but verbose; the
-`seamC`↔`δ` identification needs care. Medium.
+### Phase 2 — the bridge + wiring the element form (M) — ring-side ✅ DONE
+**Ring-side composition landed (2026-07-04, `BBEpsFreeGroupAlgebra.lean`
+§7, axiom-clean):** `bockstein_element_form_group_algebra` composes L2a
+(`epsFree_one_add_single_of_addOrderOf` at `r = 2`) through
+`hann_of_epsFree` into L1's `BocksteinLift.bockstein_element_form`, giving
+`δ₁δ₂ = 0` **unconditionally at the element level** in `k[G] ⧸ (ε²)` for
+every order-4 deck over any char-2 base — the element form now applies to
+real Frattini-lift cover rings, not just the single ℤ/4 block L1 hard-coded.
+No `MonoidAlgebra ≃ conv` transport was needed for this: the element form is
+ring-agnostic and `k[G]` is directly an `AddMonoidAlgebra`, so L2a's
+`EpsFree` on `AddMonoidAlgebra k G` feeds it straight in.
+
+**Remaining (the hard part, NOT wiring):** the homological transport
+identifying this element fact with `BBTransferH1.BocksteinVanishes`
+(`ker τ_* ≤ range p_*` on `H₁`). This needs the `seamC`↔connecting-map δ₂
+identification (`BBCover.lean:558`) and the conv-ring reading of `cycles /
+boundaries / H₁` as modules where `∂ᵢ = mul` and `1+σ = mul ε`, so that
+`[u] ∈ ker τ_*` unpacks to an `A z = ε a`, `B z = ε b` instance and the
+element form places `[u]` in `range p_*`. This is the paper's main theorem
+(the toy free-`D` self-dual counterexample shows it is *false* for generic
+3-term complexes — liftability, supplied by the order-4 lift behind the
+element form, is the content), so it is genuinely open, not plumbing.
 
 ### Phase 3 — L2a: `EpsFree` (⟹ `Ann(ε̂) = (ε̂³)`), general — ✅ DONE
 Core (`BBEpsFree.lean`): `epsFree_quotXpow` + `epsFree_of_free` +
@@ -234,12 +250,30 @@ acting via `AdjoinRoot.lift` with `X ↦ ε = x^σ − 1`:
   not needed) and any char-2 commutative base (`𝔽₂, 𝔽₄, 𝔽₈` blocks
   included). No CRT fallback needed.
 
-### Phase 4 — equality + structure theorem + write-up (S–M)
-`deck_finrank_eq` (Phase 1 `≥` + Phase 2/3 `δ₁δ₂=0` ⟹ `=`), then
-`coverH1_deckModule_iso` (`H₁ ≅ D^{k̃−k}⊕F₂^{2k−k̃}` from `E` and `k̃`,
-using `Module.finrank_directSum` and the `D = F₂[ε]/ε²`-module
-classification). Update `A13_result.md`, research log, memory; `lake build`
-+ `#print axioms` (target: standard three only).
+### Phase 4 — equality + structure theorem — linear-algebra spine ✅ DONE
+**Landed (2026-07-04, axiom-clean).** The equality and its companions are
+now Lean theorems, each reduced to the single criterion `BocksteinVanishes`:
+- `BBBocksteinRank.finrank_range_comp_add_eq` — the **exact defect
+  identity** `E + dim Hb + dim(range p ⊓ ker τ) = dim Hc + dim(ker τ)`,
+  purely from exactness `ker p = range τ` (rank-nullity of `τ∘p`, `τ`, and
+  `p|_{ker(τ∘p)}`; `map_comap_eq` + `comapSubtypeEquivOfLe`). The
+  `range p ⊓ ker τ` term is the entire obstruction.
+- `BBBocksteinRank.finrank_range_comp_eq_of_ker_le` — the **tightness
+  criterion**: `ker τ ≤ range p → E = dim Hc − dim Hb`.
+- `BBTransferH1.BocksteinVanishes D` := `ker pullH1 ≤ range pushH1` — the
+  named criterion (= `δ₁∘δ₂ = 0`).
+- `BBTransferH1.finrank_range_epsH1_add_eq` / `finrank_range_epsH1_eq` —
+  `E + k = k̃` (additive, so `k̃ ≥ k`) / `E = k̃ − k`, under
+  `BocksteinVanishes`. **This is `deck_finrank_eq`.**
+- `BBTransferH1.finrank_ker_epsH1_eq` — `dim ker ε_* = k` (companion rank).
+- `BBTransferH1.epsH1_epsH1_apply` — `ε_*² = 0` (unconditional; from
+  `push_*∘pull_* = 0`). Makes `H₁` a `D = 𝔽₂[ε]/(ε²)`-module.
+
+**Remaining for the structure *iso*** `H₁ ≅ D^{k̃−k} ⊕ 𝔽₂^{2k−k̃}`: the
+rank data (`E = k̃−k`, `dim ker ε_* = k`, `ε_*²=0`) is all in hand; turning
+it into the module iso needs the classification of finitely-generated
+modules over `D = 𝔽₂[ε]/(ε²)` (`D^a ⊕ 𝔽₂^b`, not in mathlib) — a separate
+algebra task, and it is downstream of `BocksteinVanishes` anyway.
 
 ## 4. Dependency graph & recommended sequencing
 

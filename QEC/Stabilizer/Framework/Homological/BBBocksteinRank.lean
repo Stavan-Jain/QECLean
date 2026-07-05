@@ -81,6 +81,53 @@ theorem finrank_sub_le_finrank_range_comp
   have hcomp := finrank_ker_comp_le p τ                   -- dim ker(τ∘p) ≤ dim ker p + dim ker τ
   omega
 
+/-- **Exact defect identity.** With exactness `ker p = range τ`, the deck
+composite `ε = τ ∘ p` satisfies
+`dim (im ε) + dim Hb + dim (range p ⊓ ker τ) = dim Hc + dim (ker τ)`.
+
+The `range p ⊓ ker τ` term is the entire obstruction to tightness of
+`finrank_sub_le_finrank_range_comp`: it is `≤ ker τ` always, and equals
+`ker τ` exactly when `ker τ ≤ range p`.  In the homology instance this
+`range p ⊓ ker τ = ker τ` condition is the Bockstein vanishing
+`δ₁ ∘ δ₂ = 0`. -/
+theorem finrank_range_comp_add_eq
+    (p : Hc →ₗ[F] Hb) (τ : Hb →ₗ[F] Hc)
+    (hexact : ker p = range τ) :
+    finrank F (range (τ ∘ₗ p)) + finrank F Hb
+        + finrank F (range p ⊓ ker τ : Submodule F Hb)
+      = finrank F Hc + finrank F (ker τ) := by
+  -- rank-nullity for `τ ∘ p`, `τ`, and `p` restricted to `K := ker (τ ∘ p)`
+  have hEc := LinearMap.finrank_range_add_finrank_ker (τ ∘ₗ p)
+  have hτ := LinearMap.finrank_range_add_finrank_ker τ
+  have hrn := LinearMap.finrank_range_add_finrank_ker
+    (p.domRestrict (ker (τ ∘ₗ p)))
+  -- `range (p|K) = range p ⊓ ker τ`  (`K = comap p (ker τ)`)
+  have hrange : finrank F (range (p.domRestrict (ker (τ ∘ₗ p))))
+      = finrank F (range p ⊓ ker τ : Submodule F Hb) := by
+    rw [LinearMap.range_domRestrict, LinearMap.ker_comp, Submodule.map_comap_eq]
+  -- `ker (p|K) ≅ ker p`  (since `ker p ≤ K`)
+  have hker : finrank F (ker (p.domRestrict (ker (τ ∘ₗ p))))
+      = finrank F (ker p) := by
+    rw [LinearMap.ker_domRestrict]
+    exact (Submodule.comapSubtypeEquivOfLe (LinearMap.ker_le_ker_comp p τ)).finrank_eq
+  rw [hrange, hker] at hrn
+  -- `ker p = range τ`
+  have hkerp : finrank F (ker p) = finrank F (range τ) := by rw [hexact]
+  omega
+
+/-- **The tightness criterion (sufficient direction).**
+`finrank_sub_le_finrank_range_comp` is an equality when `ker τ ≤ range p`.
+In the homology instance `ker τ ≤ range p` is the Bockstein vanishing
+`δ₁ ∘ δ₂ = 0`, so this is the step that turns `E ≥ k̃ − k` into
+`E = k̃ − k`. -/
+theorem finrank_range_comp_eq_of_ker_le
+    (p : Hc →ₗ[F] Hb) (τ : Hb →ₗ[F] Hc)
+    (hexact : ker p = range τ) (hle : ker τ ≤ range p) :
+    finrank F (range (τ ∘ₗ p)) = finrank F Hc - finrank F Hb := by
+  have hid := finrank_range_comp_add_eq p τ hexact
+  rw [inf_of_le_right hle] at hid
+  omega
+
 end BBBocksteinRank
 end Homological
 end Stabilizer
