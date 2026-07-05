@@ -44,7 +44,14 @@ what was tried and why it didn't work.
   `a14_{seam_formula_check,safe_floor_screens,phase2_screens,s4_ladder}.py`;
   columns wired into the A9 profiler (`a14_columns`). Residual
   (queued): the Phase-3 Lean package for A14.1(1)–(2), sharing the
-  A13-L2b exactness chase.
+  A13-L2b exactness chase. **Tower follow-up (§13):** every proven
+  rung-1 double, re-doubled on the *same* axis, freezes at its rung-1
+  distance — all five rung-2 safe floors refuted by S0 alone (raw seam
+  = `d(rung-1)` exactly), SAT confirms `d_X ≤ d(rung-1)` (pair72-x full
+  ladder `d_X = 8`; both `n = 288` towers SAT@12). This is the toric
+  same-axis bottleneck, certified on the gross lineage; distance
+  `> 12` must come from a larger-`d` base or a mixed (tour-de-gross)
+  lift, not from towers.
   [plan+results](../experiments/bb_lab/notes/A14_safe_floor_criterion_plan.md)
 
 - 2026-07-02 — deck-tower-descent (A13) — success —

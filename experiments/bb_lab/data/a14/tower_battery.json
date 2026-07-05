@@ -1,0 +1,72 @@
+[
+ {
+  "name": "gross-rung2  [[144,12,12]] -x-> [[288,12,24]]?",
+  "A": "x^3 + y + y^2",
+  "B": "y^3 + x + x^2",
+  "l": 12,
+  "m": 6,
+  "axis": "x",
+  "d_base": 12,
+  "floor": 24,
+  "a14_s0_raw_min": 12,
+  "a14_cheap_min": 12,
+  "a14_screen_reject": true,
+  "status": "SF-REFUTED (cheap tier: coset element of weight 12 < 24)"
+ },
+ {
+  "name": "pair72-rung2 [[72,4,8]]    -x-> [[144,4,16]]?",
+  "A": "x^2 + y + y^3",
+  "B": "1 + x + y^2",
+  "l": 6,
+  "m": 6,
+  "axis": "x",
+  "d_base": 8,
+  "floor": 16,
+  "a14_s0_raw_min": 12,
+  "a14_cheap_min": 8,
+  "a14_screen_reject": true,
+  "status": "SF-REFUTED (cheap tier: coset element of weight 8 < 16)"
+ },
+ {
+  "name": "hit3y-rung2  [[144,12,12]] -y-> [[288,12,24]]?",
+  "A": "y^3 + x + x^2",
+  "B": "y + x*y^2 + x^2",
+  "l": 6,
+  "m": 12,
+  "axis": "y",
+  "d_base": 12,
+  "floor": 24,
+  "a14_s0_raw_min": 12,
+  "a14_cheap_min": 12,
+  "a14_screen_reject": true,
+  "status": "SF-REFUTED (cheap tier: coset element of weight 12 < 24)"
+ },
+ {
+  "name": "hit4y-rung2  [[144,12,12]] -y-> [[288,12,24]]?",
+  "A": "y^3 + x + x^2",
+  "B": "y^2 + x*y^3 + x^2*y",
+  "l": 6,
+  "m": 12,
+  "axis": "y",
+  "d_base": 12,
+  "floor": 24,
+  "a14_s0_raw_min": 12,
+  "a14_cheap_min": 12,
+  "a14_screen_reject": true,
+  "status": "SF-REFUTED (cheap tier: coset element of weight 12 < 24)"
+ },
+ {
+  "name": "hit6y-rung2  [[144,12,12]] -y-> [[288,12,24]]?",
+  "A": "y^3 + x + x^2",
+  "B": "x*y + x^2*y^2 + x^3",
+  "l": 6,
+  "m": 12,
+  "axis": "y",
+  "d_base": 12,
+  "floor": 24,
+  "a14_s0_raw_min": 12,
+  "a14_cheap_min": 12,
+  "a14_screen_reject": true,
+  "status": "SF-REFUTED (cheap tier: coset element of weight 12 < 24)"
+ }
+]

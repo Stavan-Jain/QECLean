@@ -1,14 +1,17 @@
 # A14 — OQ4: a safe-floor criterion (necessary screens for condition 3)
 
-**Status: Phases 0–2 and 4 COMPLETE (§§9–12). Battery power 86%
-cheap-tier / 100% with S4 on decidable frames, zero false rejects
-throughout; hit3/4/6-y safe floors SAT-CERTIFIED (5 orbit reps each,
-~25 s); bb_288 SF-refuted on BOTH axes; gross safe floor independently
-SAT-cross-checked. Write-up shipped: extensibility doc §3/§7 updates,
-research_log entry, A9 profiler columns (`a14_columns`). Remaining
-(optional): Phase 3 — the Lean lemma package for Prop A14.1(1)–(2) in
-`BBDoubling.lean`, coordinated with A13-L2b's exactness chase
-(`push0_surjective`).**
+**Status: Phases 0–2 and 4 COMPLETE (§§9–12), plus the rung-2 tower
+battery (§13). Battery power 86% cheap-tier / 100% with S4 on decidable
+frames, zero false rejects throughout; hit3/4/6-y safe floors
+SAT-CERTIFIED (5 orbit reps each, ~25 s); bb_288 SF-refuted on BOTH
+axes; gross safe floor independently SAT-cross-checked. Tower result
+(§13): every proven rung-1 double, re-doubled on the same axis,
+**freezes at its rung-1 distance** (all five rung-2 safe floors refuted
+with weight-`d(rung-1)` light classes; SAT confirms `d_X ≤ d(rung-1)`
+on all) — the toric same-axis bottleneck, now certified. Write-up
+shipped. Remaining (optional): Phase 3 — the Lean lemma package for
+Prop A14.1(1)–(2) in `BBDoubling.lean`, coordinated with A13-L2b's
+exactness chase (`push0_surjective`).**
 Branch: `claude/a14-safe-floor-criterion` (off `claude/a13-bockstein-equality`,
 which carries PR #53's parametric cover layer and the A13 Lean modules).
 Scripts: [`a14_seam_formula_check.py`](../scripts/a14_seam_formula_check.py)
@@ -524,3 +527,60 @@ into `a9_lean_target_screen.py`'s row loop is a mechanical follow-up
   Lean lemmas in `BBDoubling.lean`, sharing the homology exactness
   chase (`push0_surjective`, `ker p_* = im τ_*`) with A13-L2b Phase 1
   so it lands once and is consumed twice.
+
+## 13. Tower battery (2026-07-05) — rung-2 safe floors all refuted; towers freeze
+
+The five proven rung-1 doubles are themselves BB codes; re-doubling the
+same axis is the next rung of each `Z_{2^r}` tower (the tour-de-gross
+shape). A13 already proved the k-row (deck-trivial towers keep k, so
+condition 2 survives every rung); the only open input at rung 2 is the
+value-carrying safe floor, `SeamCosetFloor (2·d(rung-1))`. The battery
+decides it. Scripts: `a14_tower_battery.py` (k-gate → cheap tiers → S4),
+`a14_tower_distance_probe.py` (exact SAT distance ladder). Outputs:
+`data/a14/{tower_battery,tower_distance_probe}.json`.
+
+| tower (re-double axis) | rung-2 | floor | safe floor | `d_X` (SAT) |
+|---|---|---|---|---|
+| gross-x  `[[144,12,12]] →x` | `Z₂₄×Z₆` | 24 | **REFUTED** (light class wt 12) | **≤ 12** (SAT@12) |
+| pair72-x `[[72,4,8]] →x`    | `Z₁₂×Z₆` | 16 | **REFUTED** (light class wt 8)  | **8** (UNSAT ≤7, SAT@8) |
+| hit3-y   `[[144,12,12]] →y` | `Z₆×Z₂₄` | 24 | **REFUTED** (light class wt 12) | **≤ 12** (SAT@12) |
+| hit4-y   `[[144,12,12]] →y` | `Z₆×Z₂₄` | 24 | **REFUTED** (light class wt 12) | — |
+| hit6-y   `[[144,12,12]] →y` | `Z₆×Z₂₄` | 24 | **REFUTED** (light class wt 12) | — |
+
+Every rung-2 safe floor is refuted **by the free tier S0 alone**: the
+raw seam minimum equals `d(rung-1)` exactly (12, resp. 8) — half the
+doubling target. The distance probe confirms the consequence at the
+logical level: pair72-x re-double is a clean full ladder to
+**`d_X = 8`** (UNSAT ≤ 7, SAT at 8), and both `n = 288` towers have a
+weight-12 logical (SAT at 12), so `d_X ≤ 12`. (The `n = 288` UNSAT
+tail ≤ 11 is the memory-documented CaDiCaL-intractable regime and was
+not run — irrelevant to the verdict: `12 < 24` already kills the
+double, and in fact the tower is *flat*, `d(rung-2) = d(rung-1)`.)
+
+**Mechanism — this is the toric caution, certified.** Re-doubling the
+axis you already doubled leaves the *other* axis as the bottleneck: the
+minimal rung-2 logical routes through the still-cheap undoubled
+direction, so `min(long doubled loop, short other loop) = short loop =
+d(rung-1)`. The extensibility-doc §3 caution ("doubling x leaves the
+y-loop as the bottleneck, `min(2L, L) = L`") was stated for the plain
+toric code; the battery shows the gross lineage obeys it identically,
+and the safe floor is exactly the instrument that *sees* it — the light
+safe class at weight `d(rung-1)` is the undoubled-direction logical,
+lifted. So:
+
+- **Naive same-axis re-doubling is a dead end for growing distance** —
+  it produces `[[2ⁿ⁺¹·…, k, d]]` with `d` pinned at the rung-1 value,
+  strictly worse rate at the same distance.
+- This is *consistent with*, not contradicted by, the IBM
+  tour-de-gross family reaching `[[288,12,18]]`: that member is a
+  **different** cover (`Z₁₂×Z₁₂`, a mixed/cleverer lift), not the
+  `Z₂₄×Z₆` same-axis re-double probed here. The family grows by
+  changing the lift, not by iterating one axis.
+- **Program consequence:** distance `> 12` does **not** come from
+  towers over the current instances. It must come from (a) a
+  larger-`d` *base* (the `d ≥ 7` hunt — bb_90/bb_108 at `d = 10` are
+  the first targets), or (b) a mixed / non-same-axis cover in the
+  tour-de-gross direction (screen the `Z₁₂×Z₁₂` [[288,12,18]]
+  presentation orbit — A14's battery makes that nearly free per
+  presentation). Both are cheap next hunts; the tower direction is now
+  closed with certificates.
