@@ -209,16 +209,33 @@ No `MonoidAlgebra ≃ conv` transport was needed for this: the element form is
 ring-agnostic and `k[G]` is directly an `AddMonoidAlgebra`, so L2a's
 `EpsFree` on `AddMonoidAlgebra k G` feeds it straight in.
 
+**Conv↔group-algebra bridge landed (2026-07-04, `BBConvRing.lean`,
+axiom-clean)** — the "standard but verbose" transport of §2.3 decision 2:
+- `convEquiv : AddMonoidAlgebra (ZMod 2) G ≃ₗ[ZMod 2] (G → ZMod 2)` —
+  the group algebra identified with the repo's function chains.
+- `convEquiv_mul` — `convEquiv (a * b) = conv (convEquiv a) (convEquiv b)`:
+  the group-algebra **product is the repo's `conv`** (via
+  `AddMonoidAlgebra.mul_apply_antidiagonal` over the `{(h, g−h)}`
+  antidiagonal).
+- `conv_convEquiv_single` — mult by a group generator is a translation
+  (`conv (x^s) v = translate (−s) v`); `conv_convEquiv_one_add_single`
+  — the deck `ε = 1 + x^σ` acts as `v ↦ v + translate (−σ) v` (the
+  repo's `v + σv` for order-2 `σ`).
+So L2a's `EpsFree (1 + x^σ)` and the element form now speak, through
+`convEquiv`, about the repo's actual chain-level convolution/deck action.
+
 **Remaining (the hard part, NOT wiring):** the homological transport
-identifying this element fact with `BBTransferH1.BocksteinVanishes`
-(`ker τ_* ≤ range p_*` on `H₁`). This needs the `seamC`↔connecting-map δ₂
-identification (`BBCover.lean:558`) and the conv-ring reading of `cycles /
-boundaries / H₁` as modules where `∂ᵢ = mul` and `1+σ = mul ε`, so that
-`[u] ∈ ker τ_*` unpacks to an `A z = ε a`, `B z = ε b` instance and the
-element form places `[u]` in `range p_*`. This is the paper's main theorem
-(the toy free-`D` self-dual counterexample shows it is *false* for generic
-3-term complexes — liftability, supplied by the order-4 lift behind the
-element form, is the content), so it is genuinely open, not plumbing.
+identifying `bockstein_element_form_group_algebra` with
+`BBTransferH1.BocksteinVanishes` (`ker τ_* ≤ range p_*` on `H₁`). With the
+ring bridge in hand this reduces to the `seamC`↔connecting-map δ₂
+identification (`BBCover.lean:558` `seamC_mem_cycles` is already δ₂ at
+chain level): read `cycles / boundaries / H₁` as `convEquiv`-modules
+where `∂ᵢ = mul`, so `[u] ∈ ker τ_*` unpacks to an `A z = ε a`,
+`B z = ε b` instance the element form kills, placing `[u]` in
+`range p_*`. This is the paper's main theorem (the toy free-`D` self-dual
+counterexample shows it is *false* for generic 3-term complexes —
+liftability, supplied by the order-4 lift behind the element form, is the
+content), so it is genuinely open, not plumbing.
 
 ### Phase 3 — L2a: `EpsFree` (⟹ `Ann(ε̂) = (ε̂³)`), general — ✅ DONE
 Core (`BBEpsFree.lean`): `epsFree_quotXpow` + `epsFree_of_free` +

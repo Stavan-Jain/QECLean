@@ -103,11 +103,16 @@ what was tried and why it didn't work.
   (`ε_*²=0`, unconditional). On the ring side, `BBEpsFreeGroupAlgebra` §7
   `bockstein_element_form_group_algebra` composes L2a into L1 to give the
   element form `δ₁δ₂=0` unconditionally in every order-4 deck group
-  algebra `k[G]⧸(ε²)`. The SOLE remaining gap is the homological transport
-  identifying that element fact with `BocksteinVanishes` (the
-  `seamC`↔connecting-map δ₂ bridge + conv-ring reading of `∂ᵢ=mul`,
-  `1+σ=mul ε`) — the paper's main theorem, genuinely open (the toy
-  self-dual free-`D` complex has `δ₁δ₂≠0`, so it is not automatic).
+  algebra `k[G]⧸(ε²)`. The conv↔group-algebra bridge is
+  also landed (`BBConvRing.lean`, axiom-clean): `convEquiv` +
+  `convEquiv_mul` (`conv` = the `𝔽₂[G]` product) + the deck-operator
+  identifications, so L2a/element-form now speak about the repo's actual
+  `conv`/deck action. The SOLE remaining gap is the homological transport
+  identifying the element fact with `BocksteinVanishes` — the
+  `seamC`↔connecting-map δ₂ step (`seamC_mem_cycles` is already δ₂ at
+  chain level) reading `cycles/boundaries/H₁` as `convEquiv`-modules —
+  the paper's main theorem, genuinely open (the toy self-dual free-`D`
+  complex has `δ₁δ₂≠0`, so it is not automatic).
   Payoff once closed: `H₁(cover) ≅ D^{k̃−k} ⊕ F₂^{2k−k̃}` (rank data all
   in hand; needs the `𝔽₂[ε]/(ε²)`-module classification for the iso),
   with Theorem A12 as its `a = 0` slice.
