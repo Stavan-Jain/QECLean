@@ -350,6 +350,18 @@ def profile_pair(rec: dict) -> dict:
         wit is not None and tight_witness_check(Gb, (wit & 1).astype(np.uint8), tau_blk, HZc, HXc)
     )
 
+    # A14 necessary-screen columns (cheap tiers: raw seams + S1+/S2 descent).
+    # Frame-size-independent — in particular available on 36-cell bases where
+    # the exact safe_class_minima above are out of reach.  Advisory: a screen
+    # failure must never break the profiler.
+    try:
+        from a14_phase2_screens import a14_columns
+        from a14_safe_floor_screens import parse_poly as a14_parse
+        out.update(a14_columns(a14_parse(rec["A"]), a14_parse(rec["B"]),
+                               ell, m, axis, d_base))
+    except Exception as exc:  # pragma: no cover
+        out["a14_screen_error"] = repr(exc)
+
     # Lean cost proxies
     out["leaf_sweep_bits"] = nb                     # per-leaf: 2^cells kernel sweep
     out["n_cover"] = 2 * chb.num_qubits // 1        # = 2 * n_base

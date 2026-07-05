@@ -270,6 +270,25 @@ def screen_row_phase2(A, B, l, m, axis, d_base, polish_top: int = 6):
             "reject": overall < floor}
 
 
+def a14_columns(A, B, l, m, axis, d_base) -> dict:
+    """Per-candidate screen columns for hunt integration (A9 §profile).
+
+    Cheap tiers only (S0 raw seams + S1+/S2 descent minima) — no exact
+    ground truth, so this is frame-size-independent and in particular
+    available on the 36-cell engine frame where per-class sweeps are not.
+    Rows where k jumps are out of SF scope and flagged instead.
+    """
+    from a14_safe_floor_screens import h1_dim
+    Ac, Bc, lc, mc = canonical_row(A, B, l, m, axis)
+    cov = XCover(Ac, Bc, lc, mc)
+    if h1_dim(cov.d2c, cov.d1c) != h1_dim(cov.d2b, cov.d1b):
+        return {"a14_skip": "k not preserved ((R) fails)"}
+    rec = screen_row_phase2(A, B, l, m, axis, d_base)
+    return {"a14_s0_raw_min": rec["best"]["raw"],
+            "a14_cheap_min": rec["min_reached"],
+            "a14_screen_reject": rec["reject"]}
+
+
 # ------------------------------------------------------------------ driver
 
 

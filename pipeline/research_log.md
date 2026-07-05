@@ -13,6 +13,40 @@ what was tried and why it didn't work.
 
 ## Entries
 
+- 2026-07-04 — safe-floor-screens (A14) — success —
+  **A12's OQ4 answered in its own terms: the safe sector is canonical
+  under (R), and a certified necessary-screen battery now decides
+  condition-3 targets.** Math (Prop A14.1): under (R) — equivalently
+  the Bezout membership `ε ∈ (A,B)` — `p₂ = 0`, the connecting map
+  `Δ = δ₂` is **injective**, `im p_* = im Δ = Δ(ann_R(A,B))` of dim
+  `k/2` (the extensibility doc's per-instance "half of k" observations
+  are theorems), with closed-form **seam-carry representatives**
+  (= `BBCover.seamC`, matched bit-for-bit against `SeamTables.lean`)
+  and coset minima **constant on G-translation orbits** (gross: 63
+  classes → 13 y-orbits = the MIm transport count → **5** full-G
+  orbits); at `k̃ = k` the deck-Bockstein composite vanishes
+  automatically (OQ2's remaining content lives off the doubling
+  regime). Screens (necessity-by-construction — every rejection
+  exhibits an explicit light coset element): S0 raw seams → S1/S1+
+  descent → S2 CRT-block kills → S4 per-orbit-rep coset SAT. On the
+  638-row T1 corpus with exact ground truth recomputed for every row
+  (A9-profile cross-validation 0/152 mismatches): the cheap tiers
+  reject **86%** of the 506 SF-failures at **zero false rejections**,
+  and **every k-preserving short is SF-false** — on the direct-sweep
+  frames the safe floor alone separates doubles from shorts (111/111).
+  S4 with the 5-orbit transport: **hit3/4/6-y `SeamCosetFloor 12` all
+  SAT-certified (~25 s each, floors exactly tight — all three engine
+  targets viable, none overlap-rescued)**; gross's Lean-proven floor
+  independently SAT-cross-checked (24 s); **bb_288 SF-refuted on both
+  axes** (x: raw seam weight 24, turning the previously SAT-derived
+  `d_safe ≤ 24` into a polynomial identity; y: witness weight 34,
+  provably beyond the cheap tiers). Scripts
+  `a14_{seam_formula_check,safe_floor_screens,phase2_screens,s4_ladder}.py`;
+  columns wired into the A9 profiler (`a14_columns`). Residual
+  (queued): the Phase-3 Lean package for A14.1(1)–(2), sharing the
+  A13-L2b exactness chase.
+  [plan+results](../experiments/bb_lab/notes/A14_safe_floor_criterion_plan.md)
+
 - 2026-07-02 — deck-tower-descent (A13) — success —
   **Deck-trivial ⟺ k constant along `ℤ_{2^r}` doubling towers (A12 OQ1),
   answered YES.** For a free `ℤ_{2^r}` BB cover, `σ_* = id` on `H₁(top)`

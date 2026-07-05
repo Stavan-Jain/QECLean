@@ -1,11 +1,14 @@
 # A14 — OQ4: a safe-floor criterion (necessary screens for condition 3)
 
-**Status: Phases 0–2 COMPLETE (§§9–11). Battery power 86% cheap-tier /
-100% with S4 on decidable frames, zero false rejects throughout;
-hit3/4/6-y safe floors SAT-CERTIFIED (5 orbit reps each, ~25 s);
-bb_288 SF-refuted on BOTH axes; gross safe floor independently
-SAT-cross-checked. Next: Phase 3 (Lean lemma package, shared with
-A13-L2b) + Phase 4 (write-up, A9 column wiring).**
+**Status: Phases 0–2 and 4 COMPLETE (§§9–12). Battery power 86%
+cheap-tier / 100% with S4 on decidable frames, zero false rejects
+throughout; hit3/4/6-y safe floors SAT-CERTIFIED (5 orbit reps each,
+~25 s); bb_288 SF-refuted on BOTH axes; gross safe floor independently
+SAT-cross-checked. Write-up shipped: extensibility doc §3/§7 updates,
+research_log entry, A9 profiler columns (`a14_columns`). Remaining
+(optional): Phase 3 — the Lean lemma package for Prop A14.1(1)–(2) in
+`BBDoubling.lean`, coordinated with A13-L2b's exactness chase
+(`push0_surjective`).**
 Branch: `claude/a14-safe-floor-criterion` (off `claude/a13-bockstein-equality`,
 which carries PR #53's parametric cover layer and the A13 Lean modules).
 Scripts: [`a14_seam_formula_check.py`](../scripts/a14_seam_formula_check.py)
@@ -494,3 +497,30 @@ A9-hunt wiring: `screen_row` / `screen_row_phase2` are importable
 per-candidate calls (`(A, B, ℓ, m, axis, d) → columns`); folding them
 into `a9_lean_target_screen.py`'s row loop is a mechanical follow-up
 (Phase 4).
+
+## 12. Phase 4 log (2026-07-04) — write-up shipped
+
+- **Extensibility doc** (`docs/gross-distance-extensibility.md`): §3
+  gains the A14 update block (the "observed in both instances"
+  structural features are theorems; safe sector canonical; seam-carry
+  representatives; 63 → 13 → 5 orbit transport; `δ₁∘δ₂ = 0` automatic
+  at `k̃ = k`); §7's engine-target paragraph gains the A14 update (the
+  battery, the hit3/4/6-y SAT certifications, bb_288 dead both axes,
+  and the scope caveat — the battery settles *which* codes deserve the
+  engine, not the engine work itself).
+- **`pipeline/research_log.md`**: A14 entry added (top of the list),
+  status *success* in OQ4's own terms — cheap necessary screens plus
+  target decisions, full criterion explicitly out of scope.
+- **A9 profiler wiring**: `a14_columns(A, B, ℓ, m, axis, d)` in
+  `a14_phase2_screens.py` (cheap tiers only, k-gate included), called
+  advisorily from `profile_pair` in `a9_lean_target_screen.py` — new
+  columns `a14_s0_raw_min`, `a14_cheap_min`, `a14_screen_reject`
+  (or `a14_skip`/`a14_screen_error`). Semantics: on small frames the
+  columns sit alongside A9's exact `safe_class_minima` (a cheap-tier
+  non-reject with `safe_floor_ok = false` marks an S4-deep row); on
+  36-cell+ frames they are the only safe-floor signal available.
+  Verified on a corpus doubler and on hit3-y.
+- **Remaining (the only open item):** Phase 3 — Prop A14.1(1)–(2) as
+  Lean lemmas in `BBDoubling.lean`, sharing the homology exactness
+  chase (`push0_surjective`, `ker p_* = im τ_*`) with A13-L2b Phase 1
+  so it lands once and is consumed twice.
