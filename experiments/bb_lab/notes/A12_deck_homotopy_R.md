@@ -415,7 +415,15 @@ representatives (= `BBCover.seamC`, matched bit-for-bit against
 (gross: 63 classes → 13 y-orbits = the MIm transport count → **5**
 full-G orbits), and `δ₁∘δ₂ = 0` automatic at `k̃ = k` (sharpening where
 OQ2's remaining content lives). Screen battery S0–S4 designed,
-necessity-by-construction. Gate: `a14_seam_formula_check.py` (30/30).*
+necessity-by-construction. Gate: `a14_seam_formula_check.py` (30/30).
+Phase 1 done (`a14_safe_floor_screens.py`, exact ground truth on all
+638 T1 rows, 0 false rejects, A9-profile cross-validation 0/152
+mismatches): **S0+S1 reject 75% of the 506 SF-false rows at zero cost;
+every k-preserving short is SF-false (so SF-true ⟹ doubles, 111/111,
+on the T1 frames); and the [[288,12,18]] x-double anti-instance is
+caught by S0 alone — raw seam weight 24 = the previously-SAT-derived
+`d_safe ≤ 24`.* 128 gap rows (light classes 2–4 below floor, needing
+multi-monomial cancellation) queue for the S2/S4 tier.*
 
 **OQ5 — R0 structure (cheap, tidy).** The literal-lift session observed
 `1+δ ∈ (A)` and `∈ (B)` *separately* (R0) across their whole frame. By the

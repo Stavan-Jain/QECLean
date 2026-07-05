@@ -1,7 +1,9 @@
 # A14 — OQ4: a safe-floor criterion (necessary screens for condition 3)
 
-**Status: Phase 0 COMPLETE (gate green, 30/30 — §9). Next: Phase 1
-(S0/S1/S3 harness over the §5 corpus).**
+**Status: Phase 0 COMPLETE (gate green, 30/30 — §9); Phase 1 COMPLETE
+(gate green — §10: S0+S1 = 75% power at zero false rejects; bb_288-x
+caught by S0 alone; all 465 shorts are SF-false). Next: Phase 2 (S2
+sector tier + S4 budgeted ladder over the 128 gap rows, §10 brief).**
 Branch: `claude/a14-safe-floor-criterion` (off `claude/a13-bockstein-equality`,
 which carries PR #53's parametric cover layer and the A13 Lean modules).
 Scripts: [`a14_seam_formula_check.py`](../scripts/a14_seam_formula_check.py)
@@ -356,3 +358,71 @@ load-bearing, not decorative.
 
 **Gate verdict:** seam formula and Prop A14.1 are safe to build Phase 1
 on; no convention drift between lab and repo.
+
+## 10. Phase 1 log (2026-07-04) — gate GREEN
+
+`uv run python scripts/a14_safe_floor_screens.py` (57 s). Outputs:
+`data/a14/t1_screens.jsonl` (all 638 rows: recomputed exact minima +
+screen verdicts), `data/a14/anchors_screens.jsonl`,
+`data/a14/phase2_gap_rows.jsonl`.
+
+**Ground truth recomputed for every row.** All T1 frames have ≤ 24 base
+cells, so the per-class coset minima are *exact* (direct enumeration of
+`im ∂₂`, float32-GEMM chunked). Cross-validation: **0/152 mismatches**
+against the A9 profiles' `safe_class_minima`/`safe_floor_ok` — two
+independent code paths agree on every doubler. 617 rows scoped
+(21 `k_changed` rows excluded — out of SF scope, as (R) fails).
+
+**Corpus census (recomputed):**
+
+| set | n | SF-true | SF-false |
+|---|---|---|---|
+| DOUBLES | 152 | 111 (= A11) | 41 overlap-rescued (= A11) |
+| shorts | 465 | **0** | **465** |
+
+Every single k-preserving short fails the safe floor. Combined with the
+doubler column: **on the T1 direct-sweep frames, SF-true ⟹ doubles with
+no exceptions (111/111)** — the safe floor alone, no tight-witness
+conjunct needed, is empirically sufficient here; it remains non-necessary
+(the 41 rescues). (A11's "322" figure was the light-floor count over the
+13 hard-negative bases' 492 orbit cells, not over the 465 shorts —
+denominator clarified, no conflict.)
+
+**Soundness: 0 false rejections** on the 111 SF-true rows, for both S0
+and S1 (theorem-guaranteed for S0; empirically confirms the
+implementation), and on the proof-grade anchors (pair72: S1 descends
+12 → 8 = the exact floor, does not dip below; gross: raw and descended
+minima sit at exactly 12 — greedy cannot cross the proven MIm floor).
+
+**Power on the 506 SF-false rows (465 shorts + 41 rescued):**
+
+| screen | rejects | rate |
+|---|---|---|
+| S0 (raw seam < 2d) | 288 | 57% |
+| S0 + S1 (greedy descent) | 378 | **75%** |
+
+Per frame:axis (SF-false, caught): Z3xZ3 6/6, Z3xZ4:x 21/30,
+Z3xZ4:y 24/41, Z3xZ5:x 50/62, Z3xZ5:y 50/67, **Z3xZ6:x 84/84**,
+Z3xZ6:y 60/92, Z4xZ6:x 63/91, Z4xZ6:y 20/33.
+
+**bb_288 anti-instance: S0 alone catches it.** The [[288,12,18]]
+x-double's raw seam minimum is **24** — below the floor 36, and exactly
+the known `d_safe ≤ 24` bound that previously took a SAT run. The
+headline off-frame failure needs no solver. The y-double passes S0/S1
+(raw min 48 ≥ 36): its SF status is genuinely open — first concrete S4
+target.
+
+**Residual gap: 128 rows** (105 shorts + 23 rescued doublers), by frame:
+Z3xZ6:y 32, Z4xZ6:x 28, Z3xZ4:y 17, Z3xZ5:y 17, Z4xZ6:y 13, Z3xZ5:x 12,
+Z3xZ4:x 9. Structure of the miss: S1 reaches the exact minimum on 65% of
+all classes (61% of light ones); on the gap rows the light classes sit
+only **2–4 below the floor** (deficit histogram {2: 201, 4: 231, 6: 3})
+while greedy stalls 2–8 above — the missing weight drops need
+*coordinated multi-monomial* cancellation, precisely the S2
+(sector-exact division) / S4 (budgeted ladder) design point. A cheap
+S1 upgrade to try first in Phase 2: pair-monomial moves (≤ |G|²
+candidates per round — still trivial at these sizes).
+
+**Phase-2 decision (per §6 gate):** 75% < the ~80% bar, so S2 is
+justified, prioritized on the gap frames above; S4 on whatever survives
+S2, plus the bb_288-y question.
