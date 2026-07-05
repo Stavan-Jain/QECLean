@@ -1,6 +1,7 @@
 # A14 — OQ4: a safe-floor criterion (necessary screens for condition 3)
 
-**Status: Phase 0 (structure + conventions) — see §9 log.**
+**Status: Phase 0 COMPLETE (gate green, 30/30 — §9). Next: Phase 1
+(S0/S1/S3 harness over the §5 corpus).**
 Branch: `claude/a14-safe-floor-criterion` (off `claude/a13-bockstein-equality`,
 which carries PR #53's parametric cover layer and the A13 Lean modules).
 Scripts: [`a14_seam_formula_check.py`](../scripts/a14_seam_formula_check.py)
@@ -314,6 +315,44 @@ A13's tower theorem supplies the k-row and SF must be screened per rung.
 - **Convention drift** between lab and repo (block order, section, sheet)
   is killed at the Phase-0 gate by the bit-for-bit SeamTables comparison.
 
-## 9. Phase 0 log
+## 9. Phase 0 log (2026-07-04) — gate GREEN, 30/30
 
-*(to be filled by `a14_seam_formula_check.py` results)*
+`uv run python scripts/a14_seam_formula_check.py` — all checks pass on
+first run (pure numpy, seconds). Conventions locked: repo block order
+(block 0 = A, block 1 = B), canonical section `x < ℓ`, sheet-1 read at
+`x + ℓ`, block-major C₁ layout, row-major cells.
+
+**pair72 (16 checks).** The carry formula reproduces all three
+`SeamTables.lean` literals **bit-for-bit** on the `MaskDefs` kernel basis
+(each weight 12); the three classes are non-boundary; the direct `2¹⁸`
+sweeps give coset minima **8/8/8** (144 minimizing chains each) — the
+Lean floors re-derived independently. Prop A14.1 numerics: `p₂ = 0`,
+`dim im δ₂ = 2` (injective), `im p₁ = im δ₂` (union rank 2), and the
+class-level G-transport `[seamC(g·ζ)] = g·[seamC(ζ)]` holds for **all**
+18 translations × 3 classes.
+
+**gross base (9 checks).** `k = k̃ = 12`; `dim ker ∂₂ = 6`; `p₂ = 0`;
+`δ₂` injective (dim 6); `im p₁ = im δ₂`. **S0 data: all 63 raw seam
+weights ≥ 12, histogram `{12: 18, 14: 12, 16: 15, 18: 12, 20: 6}`.**
+Two findings beyond the gate:
+
+- **S0 is tight on gross**: the 18 classes with raw seam weight 12 have
+  coset minimum *exactly* 12 (raw seam is a coset element; the proven MIm
+  floor gives ≥ 12). The MIm engine only ever needed `≥`; the raw-seam
+  table pins those 18 exactly, for free.
+- **Full-G transport beats the engine's y-transport**: the 63 classes
+  fall into **13 y-orbits** (exactly the MIm `T_y`-transport count —
+  independent corroboration) but only **5 full-G orbits**. A14.1(4)'s
+  class-level x-transport is thus worth a further 2.6× reduction: a
+  gross-shaped safe floor needs only **5** per-orbit-rep floors, not 13.
+  Directly relevant to the hit3/4/6 engine re-instantiation.
+
+**CE2 negative control (5 checks).** `k` jumps 8 → 16; `p₂ ≠ 0`;
+`δ₂ = 0` (against `dim H₂(base) = 4`); `im p₁` (dim 8) ⊄ `im δ₂` — every
+conclusion of Prop A14.1 fails without (R), and the `δ₂ = 0` value is the
+one forced by the A12 bookkeeping at the `k̃ = 2k` boundary
+(`k̃ − k = dim ker δ₁ − dim im δ₂` with `ker δ₁ ≤ k`). The hypothesis is
+load-bearing, not decorative.
+
+**Gate verdict:** seam formula and Prop A14.1 are safe to build Phase 1
+on; no convention drift between lab and repo.

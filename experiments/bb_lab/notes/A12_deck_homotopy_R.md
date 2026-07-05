@@ -405,6 +405,17 @@ expectation: the floor is value-carrying (engine/SAT territory; the
 [[288,12,18]] anti-instance shows it genuinely fails off-frame), so aim
 for cheap necessary screens to sharpen A9-style hunts, not a full
 criterion.
+*Status (2026-07-04): **ATTACKED as A14**
+([`A14_safe_floor_criterion_plan.md`](A14_safe_floor_criterion_plan.md),
+branch `claude/a14-safe-floor-criterion`). Phase 0 done: under (R) the
+safe sector is canonical — `p₂ = 0`, `Δ = δ₂` injective,
+`im p_* = im Δ = Δ(ann_R(A,B))` of dim `k/2`, explicit seam-carry
+representatives (= `BBCover.seamC`, matched bit-for-bit against
+`SeamTables.lean`), coset minima constant on G-translation orbits
+(gross: 63 classes → 13 y-orbits = the MIm transport count → **5**
+full-G orbits), and `δ₁∘δ₂ = 0` automatic at `k̃ = k` (sharpening where
+OQ2's remaining content lives). Screen battery S0–S4 designed,
+necessity-by-construction. Gate: `a14_seam_formula_check.py` (30/30).*
 
 **OQ5 — R0 structure (cheap, tidy).** The literal-lift session observed
 `1+δ ∈ (A)` and `∈ (B)` *separately* (R0) across their whole frame. By the
