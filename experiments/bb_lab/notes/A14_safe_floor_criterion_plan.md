@@ -1,9 +1,11 @@
 # A14 — OQ4: a safe-floor criterion (necessary screens for condition 3)
 
-**Status: Phase 0 COMPLETE (gate green, 30/30 — §9); Phase 1 COMPLETE
-(gate green — §10: S0+S1 = 75% power at zero false rejects; bb_288-x
-caught by S0 alone; all 465 shorts are SF-false). Next: Phase 2 (S2
-sector tier + S4 budgeted ladder over the 128 gap rows, §10 brief).**
+**Status: Phases 0–2 COMPLETE (§§9–11). Battery power 86% cheap-tier /
+100% with S4 on decidable frames, zero false rejects throughout;
+hit3/4/6-y safe floors SAT-CERTIFIED (5 orbit reps each, ~25 s);
+bb_288 SF-refuted on BOTH axes; gross safe floor independently
+SAT-cross-checked. Next: Phase 3 (Lean lemma package, shared with
+A13-L2b) + Phase 4 (write-up, A9 column wiring).**
 Branch: `claude/a14-safe-floor-criterion` (off `claude/a13-bockstein-equality`,
 which carries PR #53's parametric cover layer and the A13 Lean modules).
 Scripts: [`a14_seam_formula_check.py`](../scripts/a14_seam_formula_check.py)
@@ -426,3 +428,69 @@ candidates per round — still trivial at these sizes).
 **Phase-2 decision (per §6 gate):** 75% < the ~80% bar, so S2 is
 justified, prioritized on the gap frames above; S4 on whatever survives
 S2, plus the bb_288-y question.
+
+## 11. Phase 2 log (2026-07-04) — S1+/S2/S4, gate GREEN
+
+Scripts: `a14_phase2_screens.py` (S1+ pair descent + S2 CRT-block
+kills; 3 s over the 128 gap rows + 6 targets),
+`a14_s4_ladder.py` (budgeted per-class coset SAT; ~3 min total).
+Outputs: `data/a14/{phase2_screens,phase2_targets}.jsonl`,
+`data/a14/s4_results.json`.
+
+**S1+ / S2 on the 128 Phase-1 gap rows: 57 caught (45%), 0 soundness
+violations** → cumulative cheap-tier power **435/506 = 86%** (past the
+§6 80% bar). Marginal split: S1+ pair-moves alone catch 44; the S2
+kill-combos (+polish) add 13. S2's implementation: per-coordinate
+cyclic idempotents from the hardcoded `x^q − 1` factor table
+(q ∈ {1,3,5,7,9}, verified at import), tensored to an orthogonal block
+decomposition; per block, linear solves inside `e_χR` for f killing the
+A-side, B-side, or both components of the seam; ≤ 4^B combos
+enumerated, best few S1+-polished. Every element is explicitly
+`seam + ∂₂f` — necessity by construction, and the soundness invariant
+(screen value ≥ exact minimum) held on all 1000+ class evaluations.
+Residual 71 rows (Z4xZ6:x 20, Z3xZ6:y 18, Z3xZ5:y 12, Z3xZ4:y 10,
+Z3xZ5:x 8, Z3xZ4:x 3) — light classes needing genuinely deep
+cancellation; on hunt-scale frames S4 decides them trivially (see
+validation below), so the battery is complete in practice.
+
+**S4 (SAT per orbit rep, A14.1(4) transport).** Encoding: f-vars +
+XOR-chained output cells + `seqcounter` cardinality, CaDiCaL,
+conflict-budgeted; every SAT answer re-verified as a genuine coset
+element before acceptance. Validation on 12 gap rows (36 queries
+against exact ground truth): PASS.
+
+| target | orbit reps | result | cost |
+|---|---|---|---|
+| gross-x (floor 12) | 5 | **SF-CERTIFIED** (all UNSAT @ 11) | 24 s |
+| hit3-y (floor 12) | 5 | **SF-CERTIFIED** | 26 s |
+| hit4-y (floor 12) | 5 | **SF-CERTIFIED** | 32 s |
+| hit6-y (floor 12) | 5 | **SF-CERTIFIED** | 21 s |
+| bb288-y (floor 36) | 5 | **SF-REFUTED** (rep 1 SAT, weight 34) | 60 s |
+
+Readings:
+
+- **gross**: the entire safe floor, proven in Lean by the MIm engine
+  (Γ-membership + 13-rep y-transport + 64-case dispatch), is
+  independently reproduced by a 24-second solver run over the 5
+  full-G orbit reps — solver-grade vs kernel-grade, but as a
+  *targeting* instrument the A14.1(4)-transported S4 makes the engine
+  frame cheap.
+- **hit3/4/6 re-rank (the Phase-2 deliverable):** all three pass every
+  cheap tier with their floors *exactly tight* (min raw seam = 12 =
+  floor on every one, the gross pattern), and S4 certifies
+  `SeamCosetFloor 12` outright. None is overlap-rescued; the engine
+  re-instantiation can choose any of the three on safe-floor grounds.
+- **bb288 is now dead on both axes, with certificates**: x-axis raw
+  seam weight 24 (S0, no solver), y-axis SAT witness at weight 34
+  (raw 48, S1+ stalls at 40 — genuinely S4-deep). The "off-frame ⟹
+  light safe classes" picture is certificate-backed in both
+  directions of the doubling.
+
+**Battery, final shape (cost-ordered, all necessity-by-construction):**
+S0 raw seams (free, 57%) → S1/S1+ descent (≈free, 75%) → S2 sector
+kills (cheap linear algebra, 86%) → S4 budgeted SAT (seconds per orbit
+rep on hunt-scale frames; decides everything the cheap tiers leave).
+A9-hunt wiring: `screen_row` / `screen_row_phase2` are importable
+per-candidate calls (`(A, B, ℓ, m, axis, d) → columns`); folding them
+into `a9_lean_target_screen.py`'s row loop is a mechanical follow-up
+(Phase 4).

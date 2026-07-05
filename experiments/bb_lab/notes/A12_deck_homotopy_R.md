@@ -422,8 +422,13 @@ mismatches): **S0+S1 reject 75% of the 506 SF-false rows at zero cost;
 every k-preserving short is SF-false (so SF-true ⟹ doubles, 111/111,
 on the T1 frames); and the [[288,12,18]] x-double anti-instance is
 caught by S0 alone — raw seam weight 24 = the previously-SAT-derived
-`d_safe ≤ 24`.* 128 gap rows (light classes 2–4 below floor, needing
-multi-monomial cancellation) queue for the S2/S4 tier.*
+`d_safe ≤ 24`.* Phase 2 done (S1+ pairs, S2 CRT-block kills, S4
+orbit-rep SAT): cheap-tier power 86%; **hit3/4/6-y safe floors
+SAT-CERTIFIED (5 orbit reps each, ~25 s — all three engine targets
+viable, floors exactly tight at 12); bb_288 SF-refuted on BOTH axes
+(y-witness weight 34); gross's Lean-proven safe floor independently
+SAT-cross-checked in 24 s.* Remaining: Phase 3 Lean lemmas + Phase 4
+write-up/A9 wiring.*
 
 **OQ5 — R0 structure (cheap, tidy).** The literal-lift session observed
 `1+δ ∈ (A)` and `∈ (B)` *separately* (R0) across their whole frame. By the
