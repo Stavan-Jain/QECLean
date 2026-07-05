@@ -12,8 +12,11 @@ four bb_90/bb_108 literal-lift axes fail (three distinct modes:
 freeze-pattern light classes, a first in-the-wild condition-2 death,
 and bb108-y's deficit-2 near miss whose overlap rescue is refuted by a
 weight-18 cover logical) — **no d = 20 doubles from stored corpus
-presentations**; the d > 12 hunt moves to presentation orbits / mixed
-lifts / wider base enumeration. Remaining (optional): Phase 3 — the
+presentations**. Orbit sweep (§15): the 2808-cell v1 presentation
+orbit of bb_108 contains **no SF-passing cell** (orbit ceiling 18 <
+20; 192 descended-to-20 finalists all S4-refuted at 12–18); the
+d > 12 hunt moves to mixed lifts / re-decompositions / wider base
+enumeration. Remaining (optional): Phase 3 — the
 Lean lemma package for Prop A14.1(1)–(2) in `BBDoubling.lean`,
 coordinated with A13-L2b's exactness chase (`push0_surjective`).**
 Branch: `claude/a14-safe-floor-criterion` (off `claude/a13-bockstein-equality`,
@@ -638,3 +641,52 @@ re-route `im Δ`; a stored-form negative is not a code-level verdict);
 Z₁₂×Z₁₂ orbit); (c) **wider `d ≥ 7` base hunts** beyond the Bravyi
 corpus (A9-style enumeration with the a14 columns as the front
 filter). All three are battery-cheap per candidate.
+
+## 15. bb_108 presentation-orbit sweep (2026-07-05) — no rescue; orbit SF ceiling = 18
+
+Route (a) executed for bb_108 (`a14_bb108_orbit_sweep.py`; output
+`data/a14/bb108_orbit_sweep.json`). Equivalence set v1 =
+**doubled-axis translations of A and B independently** (undoubled-axis
+translations are exact cover symmetries — same order upstairs and
+downstairs, so they cannot move the seams) × **diagonal unit
+automorphisms** `(x,y) → (x^u, y^v)` × **A↔B swap**; both axes; 2808
+deduped cells. Staged battery: fast probe (k-gate + S0) everywhere →
+S1+/S2 on S0 survivors → S4 per orbit rep on cheap-tier passers.
+Whole sweep: 318 s.
+
+| stage | axis y (864 cells) | axis x (1944 cells) |
+|---|---|---|
+| k-gate fails | **0** | **816 (42%)** |
+| S0 histogram | {18: 576, 30: 288} | {16: 240, 20: 360, 24: 96, 28: 288, 32: 96, 36: 48} |
+| S0 survivors (≥ 20) | 288 | 888 |
+| survive S1+/S2 (min ≥ 20) | **0** | **192** (all at exactly 20) |
+| survive S4 | — | **0** (light classes: 10× wt 12, 6× 14, 63× 16, 113× 18) |
+
+**Verdict: no SF-passing presentation in the v1 orbit — the orbit-wide
+safe-floor ceiling is 18 < 20**, matching the stored-y deficit-2 miss
+(and the actual weight-18 cover logical of §14). The rescue that saved
+hit3 (A11) does not materialize for bb_108 at this equivalence depth.
+
+Structural readings:
+
+- **Condition 2 is strongly presentation-sensitive**: the stored
+  x-presentation's k-gate death is a 42%-of-orbit phenomenon, not a
+  code-level fact — 1128 x-cells revive condition 2. (The y-axis
+  passes everywhere.)
+- **The tier ladder worked exactly as designed, and each tier's
+  optimism was real but insufficient**: raw seams swing 18 → 36 across
+  the orbit; descent compresses every survivor to exactly 20; the
+  exact per-class SAT then finds 12–18 underneath. All 192 finalists
+  refuted in ≤ 2 s each (rep 1 SAT).
+- The clustering of exact minima at 16/18 across *many distinct
+  presentations* suggests a code-level weight-16/18 structure in the
+  safe sector that re-presentation cannot avoid — a concrete input for
+  the OQ4-residue question ("closed-form S0/lightness from (A,B)
+  arithmetic").
+
+**Not covered by v1 (documented, queued):** mixing automorphisms
+(`x → x·y^β` etc.) and — more interestingly — the **Z₁₈×Z₃
+re-decomposition** of the same abstract group (a different cyclic
+factorization = genuinely different doubling axes; the tour-de-gross
+family's own lifts are of this mixed kind). That, plus the
+[[288,12,18]] Z₁₂×Z₁₂ orbit, is where route (b) begins.
