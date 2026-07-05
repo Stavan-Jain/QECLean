@@ -1,17 +1,21 @@
 # A14 — OQ4: a safe-floor criterion (necessary screens for condition 3)
 
 **Status: Phases 0–2 and 4 COMPLETE (§§9–12), plus the rung-2 tower
-battery (§13). Battery power 86% cheap-tier / 100% with S4 on decidable
-frames, zero false rejects throughout; hit3/4/6-y safe floors
-SAT-CERTIFIED (5 orbit reps each, ~25 s); bb_288 SF-refuted on BOTH
-axes; gross safe floor independently SAT-cross-checked. Tower result
-(§13): every proven rung-1 double, re-doubled on the same axis,
-**freezes at its rung-1 distance** (all five rung-2 safe floors refuted
-with weight-`d(rung-1)` light classes; SAT confirms `d_X ≤ d(rung-1)`
-on all) — the toric same-axis bottleneck, now certified. Write-up
-shipped. Remaining (optional): Phase 3 — the Lean lemma package for
-Prop A14.1(1)–(2) in `BBDoubling.lean`, coordinated with A13-L2b's
-exactness chase (`push0_surjective`).**
+battery (§13) and the d=10-base battery (§14). Battery power 86%
+cheap-tier / 100% with S4 on decidable frames, zero false rejects
+throughout; hit3/4/6-y safe floors SAT-CERTIFIED (5 orbit reps each,
+~25 s); bb_288 SF-refuted on BOTH axes; gross safe floor independently
+SAT-cross-checked. Tower result (§13): every proven rung-1 double,
+re-doubled on the same axis, **freezes at its rung-1 distance** — the
+toric same-axis bottleneck, certified. d=10-base result (§14): all
+four bb_90/bb_108 literal-lift axes fail (three distinct modes:
+freeze-pattern light classes, a first in-the-wild condition-2 death,
+and bb108-y's deficit-2 near miss whose overlap rescue is refuted by a
+weight-18 cover logical) — **no d = 20 doubles from stored corpus
+presentations**; the d > 12 hunt moves to presentation orbits / mixed
+lifts / wider base enumeration. Remaining (optional): Phase 3 — the
+Lean lemma package for Prop A14.1(1)–(2) in `BBDoubling.lean`,
+coordinated with A13-L2b's exactness chase (`push0_surjective`).**
 Branch: `claude/a14-safe-floor-criterion` (off `claude/a13-bockstein-equality`,
 which carries PR #53's parametric cover layer and the A13 Lean modules).
 Scripts: [`a14_seam_formula_check.py`](../scripts/a14_seam_formula_check.py)
@@ -584,3 +588,53 @@ lifted. So:
   presentation orbit — A14's battery makes that nearly free per
   presentation). Both are cheap next hunts; the tower direction is now
   closed with certificates.
+
+## 14. d=10-base battery (2026-07-05) — bb_90/bb_108: no d=20 literal-lift doubles
+
+The first larger-`d` bases: both axes of the two `d = 10` corpus codes
+(`bb_90 [[90,8,10]]` on Z₁₅×Z₃, `bb_108 [[108,8,10]]` on Z₉×Z₆ — the
+gross-base polynomials on a taller frame). Both axes of each are fresh
+(trivial 2-part), so §13's same-axis bottleneck does not apply a
+priori. Script: `a14_d10_battery.py` (k-gate → cheap tiers → S4 →
+on-certify cover ladder; the S2 factor table gained the `x¹⁵−1` row).
+Output: `data/a14/d10_battery.json`. All four verdicts landed in the
+cheap tiers, in **three distinct failure modes**:
+
+| target | verdict | detail |
+|---|---|---|
+| bb90-x → [[180,8,20]]? | SF-REFUTED | raw seams **at** floor 20; S1+/S2 descend to **10** |
+| bb90-y → [[180,8,20]]? | SF-REFUTED | raw seam min **10** = d(base) |
+| bb108-x → [[216,8,20]]? | **K-GATE-FAIL** | condition 2 dies: `1+x⁹ ∉ (A,B)` on Z₁₈×Z₆ |
+| bb108-y → [[216,8,20]]? | SF-REFUTED | light class at **18** — deficit 2, the program's nearest miss |
+
+Notes per mode:
+
+- **bb90-x is the first S0-pass / S1+-reject case** in the whole
+  program — the raw seams sit exactly at the floor and only descent
+  exposes the weight-10 element underneath. Confirms the tier design:
+  raw seams alone are not a sufficient hunt filter.
+- **bb108-x is the first in-the-wild condition-2 failure** among all
+  batteried candidates: an A12-class (R)-violation on a real corpus
+  code's literal lift (all 157 historically *checked* covers were
+  k-preserving; this one was never checked because nobody tried to
+  double it).
+- **bb108-y was a live overlap-rescue candidate** (deficit 2 is
+  exactly the A11 rescue profile), so the battery alone could not
+  close it — SF is sufficient-not-necessary for doubling. The decisive
+  probe: one witness-side SAT query on the [[216,8,?]] cover at
+  `w ≤ 19` returned a **weight-18 logical in 3 s** → `d_X ≤ 18 < 20`.
+  No rescue: the weight-18 safe element lifts overlap-free, the
+  screen's certificate weight is achieved by an actual logical.
+  (Parenthetically: [[216,8,≤18]] would rival [[288,12,18]] on `n` if
+  `d = 18` were exact, but certifying that needs UNSAT@17 at `n = 216`
+  — the expensive direction, out of scope.)
+
+**Where the `d > 12` hunt now stands.** Stored-presentation literal
+lifts are exhausted for the corpus's `d = 10` bases. Remaining routes,
+in order of promise: (a) **presentation-orbit sweeps** — bb108-y's
+deficit-2 miss is the prime candidate (A11: presentation changes
+re-route `im Δ`; a stored-form negative is not a code-level verdict);
+(b) the **mixed-lift / tour-de-gross direction** ([[288,12,18]]'s
+Z₁₂×Z₁₂ orbit); (c) **wider `d ≥ 7` base hunts** beyond the Bravyi
+corpus (A9-style enumeration with the a14 columns as the front
+filter). All three are battery-cheap per candidate.

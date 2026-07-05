@@ -51,7 +51,15 @@ what was tried and why it didn't work.
   ladder `d_X = 8`; both `n = 288` towers SAT@12). This is the toric
   same-axis bottleneck, certified on the gross lineage; distance
   `> 12` must come from a larger-`d` base or a mixed (tour-de-gross)
-  lift, not from towers.
+  lift, not from towers. **d=10-base follow-up (§14):** all four
+  bb_90/bb_108 literal-lift axes fail in three distinct modes —
+  freeze-pattern light classes (bb90 both axes; bb90-x is the first
+  S0-pass/S1+-reject), a first in-the-wild condition-2 death (bb108-x:
+  `1+x⁹ ∉ (A,B)`), and bb108-y's deficit-2 near miss whose overlap
+  rescue is refuted by an explicit weight-18 cover logical (3 s SAT).
+  No `d = 20` doubles from stored corpus presentations; the hunt moves
+  to presentation orbits (bb108-y first), mixed lifts, and wider
+  `d ≥ 7` base enumeration.
   [plan+results](../experiments/bb_lab/notes/A14_safe_floor_criterion_plan.md)
 
 - 2026-07-02 — deck-tower-descent (A13) — success —

@@ -87,6 +87,8 @@ ODD_FACTORS = {
     5: [0b11, 0b11111],
     7: [0b11, 0b1011, 0b1101],
     9: [0b11, 0b111, 0b1001001],
+    # Phi_1 Phi_3 Phi_5 Phi_15, with Phi_15 = (x^4+x+1)(x^4+x^3+1)
+    15: [0b11, 0b111, 0b11111, 0b10011, 0b11001],
 }
 for q, fs in ODD_FACTORS.items():
     prod = 1
