@@ -969,13 +969,26 @@ vs x(dB) spread, gross-style). To be drafted as the Entry-9 lemma.
 
 ### 8.4 Frame completions
 
-Full Z₉×Z₆ (44,064 members) + Z₆×Z₁₀ (7,776) + Z₁₅×Z₆ + Z₆×Z₁₄
-(heterogeneous odd part) runs in flight at session close; counts to
-be appended here. Verdict so far across every checked member of
-every frame: **zero (iv)/(v) violations** — (C-iv′)/(C-v′) survives
-its first live even-axis frames, now with the orbit-pair branch
-exercised and with per-row invariant telemetry retained
+| frame | members checked | (iv) fails | (v) fails |
+|---|---|---|---|
+| Z₉×Z₆ (Z₂ frame, even y) | **44,064 / 44,064 (full)** | 0 | 0 |
+| Z₆×Z₁₀ (Z₂² frame, both even, odd part Z₃×Z₅) | **7,776 / 7,776 (full)** | 0 | 0 |
+| Z₁₅×Z₆ (Z₂ frame, even y) | 18,655 so far (cap 20,000; in flight) | 0 | 0 |
+| Z₆×Z₁₄ (Z₂² frame, odd part Z₃×Z₇) | queued in the same run | — | — |
+
+The full-Z₉×Z₆ classification pass (150 members, 6,148 residue rows,
+4,392 profile-resistant) raised **zero `DM-RESISTANT` alarms** — the
+difference multiset separated every profile-resistant row at full
+scale, consistent with §8.3's probe. Verdict across all 70,495
+members checked: **zero (iv)/(v) violations** — (C-iv′)/(C-v′)
+survives its first live even-axis frames (orbit-pair branch
+exercised), with per-row invariant telemetry retained
 (`data/a15/t11_*.jsonl` + logs) for the Entry-9 lemma drafting.
+[Batch run detached at session close; Z₁₅×Z₆ tail + Z₆×Z₁₄ land in
+`data/a15/t11_batch2.log` — append their counts here on pickup.
+Perf note for reruns: verdict_v is ~0.9 s/member at |G| = 90 (the
+right-image dictionary is |G|²); batch the big frames or vectorize
+before scaling past 20k-member caps.]
 
 ### Next
 

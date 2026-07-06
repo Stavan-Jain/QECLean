@@ -1,0 +1,118 @@
+self-test (bb_108 gates + iv/v): PASS
+
+========================================================================
+frame Z9×Z6  (|G|=54, frame shape Z2, even axes [1])
+weight-3 translation-classes: 1378; mult-free+mirrored: 618; +floor/Ann gates: 474 (mono-x 192, mono-y 282)
+members (b: disjoint diff sets): 44064
+  ... 500/44064 members (11s)
+  ... 1000/44064 members (19s)
+  ... 1500/44064 members (28s)
+  ... 2000/44064 members (36s)
+  ... 2500/44064 members (44s)
+  ... 3000/44064 members (53s)
+  ... 3500/44064 members (61s)
+  ... 4000/44064 members (70s)
+  ... 4500/44064 members (78s)
+  ... 5000/44064 members (86s)
+  ... 5500/44064 members (96s)
+  ... 6000/44064 members (103s)
+  ... 6500/44064 members (111s)
+  ... 7000/44064 members (119s)
+  ... 7500/44064 members (127s)
+  ... 8000/44064 members (136s)
+  ... 8500/44064 members (145s)
+  ... 9000/44064 members (153s)
+  ... 9500/44064 members (162s)
+  ... 10000/44064 members (170s)
+  ... 10500/44064 members (178s)
+  ... 11000/44064 members (185s)
+  ... 11500/44064 members (192s)
+  ... 12000/44064 members (199s)
+  ... 12500/44064 members (207s)
+  ... 13000/44064 members (214s)
+  ... 13500/44064 members (222s)
+  ... 14000/44064 members (230s)
+  ... 14500/44064 members (238s)
+  ... 15000/44064 members (247s)
+  ... 15500/44064 members (256s)
+  ... 16000/44064 members (265s)
+  ... 16500/44064 members (17474s)
+  ... 17000/44064 members (17486s)
+  ... 17500/44064 members (17494s)
+  ... 18000/44064 members (17500s)
+  ... 18500/44064 members (17507s)
+  ... 19000/44064 members (17513s)
+  ... 19500/44064 members (17518s)
+  ... 20000/44064 members (17524s)
+  ... 20500/44064 members (17530s)
+  ... 21000/44064 members (17534s)
+  ... 21500/44064 members (17539s)
+  ... 22000/44064 members (17543s)
+  ... 22500/44064 members (17547s)
+  ... 23000/44064 members (17550s)
+  ... 23500/44064 members (17554s)
+  ... 24000/44064 members (17558s)
+  ... 24500/44064 members (17562s)
+  ... 25000/44064 members (17566s)
+  ... 25500/44064 members (17570s)
+  ... 26000/44064 members (17573s)
+  ... 26500/44064 members (17577s)
+  ... 27000/44064 members (17581s)
+  ... 27500/44064 members (17585s)
+  ... 28000/44064 members (17589s)
+  ... 28500/44064 members (17592s)
+  ... 29000/44064 members (17596s)
+  ... 29500/44064 members (17600s)
+  ... 30000/44064 members (17604s)
+  ... 30500/44064 members (17608s)
+  ... 31000/44064 members (17612s)
+  ... 31500/44064 members (17616s)
+  ... 32000/44064 members (17620s)
+  ... 32500/44064 members (17624s)
+  ... 33000/44064 members (17628s)
+  ... 33500/44064 members (17632s)
+  ... 34000/44064 members (17636s)
+  ... 34500/44064 members (17640s)
+  ... 35000/44064 members (17644s)
+  ... 35500/44064 members (17648s)
+  ... 36000/44064 members (17651s)
+  ... 36500/44064 members (17655s)
+  ... 37000/44064 members (17659s)
+  ... 37500/44064 members (17663s)
+  ... 38000/44064 members (17666s)
+  ... 38500/44064 members (17670s)
+  ... 39000/44064 members (17674s)
+  ... 39500/44064 members (17677s)
+  ... 40000/44064 members (17681s)
+  ... 40500/44064 members (17685s)
+  ... 41000/44064 members (17689s)
+  ... 41500/44064 members (17693s)
+  ... 42000/44064 members (17696s)
+  ... 42500/44064 members (17700s)
+  ... 43000/44064 members (17703s)
+  ... 43500/44064 members (17707s)
+  ... 44000/44064 members (17710s)
+
+(iv) fails: 0   (v) fails: 0   [17711s]
+(2,2) pipeline tally over 150 classified members:
+    s1-y-weight              290250
+    s2-x-weight              120032
+    s3-size                  4920
+    s3-residue-neither       4392
+    s3-residue-y             908
+    s3-residue-x             680
+    s3-residue-both          168
+  stage-3 residue rows: 6148; profile-lemma-resistant ('neither'): 4392
+  'neither' examples (first few):
+    {'A': [(0, 0), (0, 1), (1, 2)], 'B': [(0, 0), (1, 0), (2, 3)], 'dl': (2, 1), 'dr': (1, 1), 'size': 6, 'branch_y': 'y-3AP', 'branch_x': 'x-3AP'}
+    {'A': [(0, 0), (0, 1), (1, 2)], 'B': [(0, 0), (1, 0), (2, 3)], 'dl': (2, 1), 'dr': (1, 2), 'size': 6, 'branch_y': 'y-3AP', 'branch_x': 'x-3AP'}
+    {'A': [(0, 0), (0, 1), (1, 2)], 'B': [(0, 0), (1, 0), (2, 3)], 'dl': (2, 1), 'dr': (1, 4), 'size': 6, 'branch_y': 'y-3AP', 'branch_x': 'x-3AP'}
+    {'A': [(0, 0), (0, 1), (1, 2)], 'B': [(0, 0), (1, 0), (2, 3)], 'dl': (2, 1), 'dr': (1, 5), 'size': 6, 'branch_y': 'y-3AP', 'branch_x': 'x-3AP'}
+    {'A': [(0, 0), (0, 1), (1, 2)], 'B': [(0, 0), (1, 0), (2, 3)], 'dl': (2, 1), 'dr': (8, 1), 'size': 6, 'branch_y': 'y-3AP', 'branch_x': 'x-3AP'}
+    {'A': [(0, 0), (0, 1), (1, 2)], 'B': [(0, 0), (1, 0), (2, 3)], 'dl': (2, 1), 'dr': (8, 2), 'size': 6, 'branch_y': 'y-3AP', 'branch_x': 'x-3AP'}
+  (iv) kill-profile tags: {('13', 'both'): 46008, ('31', 'both'): 43200, ('13', 'x'): 13176, ('31', 'x'): 23040, ('31', 'y'): 7704}
+
+========================================================================
+SUMMARY
+  Z9xZ6: members 44064, iv_fail 0, v_fail 0, neither-rows 4392/150 classified
+VERDICT: no violations — conjecture survives these frames
