@@ -1,7 +1,14 @@
 # A15 — base-floor generalization: mathematical landscape + plan (v2)
 
-> **Status: PLAN (not started). v2, 2026-07-06** — deep-dive revision of the
-> same-day v1. Successor to the goal-2 track (A4 §7, `A5_goal2_log.md`
+> **Execution log: `A5_goal2_log.md` Entry 8+** (session 1, 2026-07-06:
+> §1.3 verified + hand-proven — the engine support dichotomy is
+> field-generic, checker widened additively; T1.1 hunt clean on the
+> first live even-axis frames; the residue lemma re-shaped from
+> multiplicity profiles to DIFFERENCE-MULTISET incidence, which
+> separates 100% of profile-resistant rows).
+>
+> **Status: v2, 2026-07-06; T1.1 + §1.3 execution begun** — deep-dive
+> revision of the same-day v1. Successor to the goal-2 track (A4 §7, `A5_goal2_log.md`
 > Entries 1–7) and the base-floor half of
 > `docs/gross-distance-extensibility.md` §6. New in v2: the structural-algebra
 > anatomy (§1), the full landscape map including the Cv/T2/T3 falsification

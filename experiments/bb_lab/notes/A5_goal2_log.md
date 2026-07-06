@@ -803,3 +803,187 @@ None touches a d ≥ 6 conclusion. The analytic core is intact.
    d = 10 for bb_90/bb_108) — the gross Entries 16–28 playbook.
 3. Housekeeping: fold (iii) into the Entry-3.6 conjecture as a
    load-bearing hypothesis (Entry 6 did this; it is now the headline).
+
+---
+
+## Entry 8 (2026-07-06) — A15 execution session 1: field-genericity
+## PROVEN-SWEPT + the residue lemma re-shaped (difference multisets)
+
+First execution session of the A15 plan
+(`A15_base_floor_class_plan.md`): the §1.3 verification sweep and the
+T1.1 falsify-first hunt, both landed. All numbers
+discovery/validation (A_HANDOFF §1). Scripts:
+`a15_field_generic_engine_check.py`, `a15_t11_residue_hunt.py`.
+
+### 8.1 The Z₂²-engine support dichotomy is FIELD-GENERIC (verified)
+
+Sweep E1/E2/E2′ over K = F₄, F₈, F₁₆, F₆₄ (exhaustive at each field
+for E2/E2′; E1 exhaustive at F₄, sampled 400×400 above):
+
+* **E1.** For D = aU + bV + cUV ∈ K[Z₂²], (a,b) ≠ 0: D² = 0 and
+  x·D = 0 ⟺ x₀ = 0 ∧ x₁b + x₂a = 0, i.e. Ann(D) = span_K{aU+bV, UV}
+  = (D), dim 2 — at every field. PASS.
+* **E2.** Every nonzero α·D + β·UV has ≥ 3 nonzero slot coordinates
+  ⟺ **{0, a, b, a+b} pairwise distinct** (⟺ a ≠ 0, b ≠ 0, a ≠ b);
+  c is irrelevant (it absorbs into β). When distinctness fails the
+  minimum support is exactly 2 (floor degrades to ≥ 4-with-parity,
+  not 6). PASS, all fields.
+* **E2′.** The distinctness condition ⟺ **D's four slot values are
+  pairwise distinct** — the *widened engine predicate*. The checker's
+  `ENGINE_RADICAL` ("one zero + three distinct") is the special case
+  c ∈ {0, a, b, a+b}; the zero-count requirement is NOT load-bearing.
+  PASS, all fields (262,080 triples at F₆₄).
+
+**Instance consequence (E3).** Control bb_72: all radical components
+pass the widened predicate; exact w2/w4/w6 kernel exhaustion (+PAR)
+reproduces μ(Ann A) = μ(Ann B) = 6; 500-sample layer structure clean.
+**Target Z₆×Z₁₄ [[168,12,6]]** (A = 1+y+x³y³, B = 1+x+x²y⁷, the A8
+base; components F₂·F₄·F₈²·F₆₄²): **all radical components pass the
+widened predicate** — the engine's one-sided floor applies verbatim
+OFF the Z₃² odd part. Exact exhaustion: μ(Ann B) = 6 (w6 witness, no
+w2/w4), μ(Ann A) ≥ 8 (consistent with A8's reported 12); 0 layer-
+structure violations in 500 samples per side.
+
+**Corrections this licenses**: the §3.2 frame table's Z₂² row and the
+extensibility doc §4(a) framing "co-point dichotomy = |F₄ˣ| = 3"
+conflate SUPPORT rigidity (field-generic, floor-bearing) with VALUE
+rigidity (F₄-only, classification-bearing). Hypothesis (a)'s engine
+column widens to Z₂²-frames with ANY odd part, via the widened
+predicate.
+
+### 8.1b The hand proof (short; the sweep above is confirmation)
+
+**Lemma (field-generic engine).** Let K be any field of
+characteristic 2, R = K[Z₂²] = K[U,V]/(U², V²) with U = 1+s_x,
+V = 1+s_y, and D = aU + bV + cUV with (a,b) ≠ (0,0). Then:
+
+1. *(products)* For x = x₀ + x₁U + x₂V + x₃UV:
+   x·D = x₀·D + (x₁b + x₂a)·UV, using U² = V² = 0 and U·UV = V·UV
+   = 0. In particular D² = 0 (char-2 squaring kills cross terms; U²,
+   V², (UV)² all vanish) and D·UV = 0.
+2. *(annihilator)* D and UV are linearly independent ((a,b) ≠ 0
+   gives D a nonzero U- or V-coefficient; UV has none), so by (1)
+   x·D = 0 ⟺ x₀ = 0 and x₁b + x₂a = 0 ⟺ x ∈ K·(aU+bV) ⊕ K·UV
+   (parametrize (x₁, x₂) = t·(a, b): x₁b + x₂a = 2tab = 0, and
+   conversely if a ≠ 0 set t = x₁/a). Also by (1),
+   D·R = K·D + K·UV = K·(aU+bV) ⊕ K·UV, so **Ann(D) = (D)**,
+   K-dimension 2.
+3. *(support dichotomy)* In the slot (group-element) basis
+   (1, s_x, s_y, s_xs_y): U = (1,1,0,0), V = (1,0,1,0),
+   UV = (1,1,1,1). A nonzero ideal element z = α(aU+bV) + β′·UV has
+   slot vector (α(a+b)+β′, αa+β′, αb+β′, β′). If α = 0: all four
+   slots equal β′ ≠ 0 (full support). If α ≠ 0: the slots are
+   α·{a+b, a, b, 0} + β′, so a slot vanishes exactly when β′/α hits
+   the corresponding member of {a+b, a, b, 0}. Hence
+   * {0, a, b, a+b} pairwise distinct (⟺ a, b ≠ 0, a ≠ b) ⟹ at most
+     one zero slot: **every nonzero z ∈ (D) has ≥ 3 nonzero slots**;
+   * otherwise choosing β′/α = the repeated value gives exactly two
+     zero slots: the dichotomy fails at support 2.
+   The slot values of D itself are c + {a+b, a, b, 0}, so the
+   distinctness condition ⟺ **D's four slot values are pairwise
+   distinct** (E2′). ∎
+
+**Corollary (one-sided floor, widened hypothesis).** Let
+G = Z_ℓ × Z_m have 2-part Z₂², A ∈ F₂[G] with |A| odd, and suppose
+every CRT component Â_j is a unit or a radical D_j whose (a_j, b_j)
+satisfy the distinctness condition (no zero components). Then
+μ(Ann A) ≥ 6. *Proof.* For 0 ≠ z ∈ Ann(A): some ẑ_j ≠ 0 (CRT
+injectivity); j is not a unit component (units force ẑ_j = 0); at
+radical j, ẑ_j ∈ Ann(D_j) = (D_j) by (2), so it has ≥ 3 nonzero
+slots by (3), i.e. z has ≥ 3 nonzero layers (V_j(z)[s] ≠ 0 needs
+z_s ≠ 0). |A| odd makes Â₀ a unit (augmentation 1), so ẑ₀ = 0: every
+layer weight |z_s| is even, and nonzero layers weigh ≥ 2. Total
+≥ 3·2 = 6. ∎ (A4 §4.1 verbatim; only the hypothesis is widened — no
+|F₄ˣ| = 3 input anywhere.)
+
+### 8.2 T1.1 hunt, frame 1 (Z₉×Z₆ — first LIVE even-axis frame)
+
+Self-test: bb_108's stored presentation passes all gates + (iv)+(v)
+(Entry-2 consistency). Enumeration: 1431 weight-3 translation
+classes/side → mirrored+mult-free → floor/Ann gates (exact w2/w4
+kernel exhaustion + PAR — no engine reasoning load-bearing) → 192
+mono-x × 282 mono-y polys → **44,064 members** with disjoint diff
+sets. Run 1 (first 20,000 members): **0 (iv) violations, 0 (v)
+violations**. [Full-frame + Z₆×Z₁₀/Z₁₅×Z₆/Z₆×Z₁₄ runs: §8.4.]
+
+**Pipeline telemetry (the load-bearing discovery).** Classifying the
+(2,2) table of 120 members through the E6.4 pipeline:
+
+| stage | kill | rows |
+|---|---|---|
+| s1 | y-projection weight | 232,200 |
+| s2 | x-projection weight | 94,760 |
+| s3 | size mismatch | 4,368 |
+| s3 residue | profile x / y / both | 640 / 856 / 160 |
+| s3 residue | **profile "neither"** | **4,096** |
+
+The projections are far LEAKIER here than on the three template
+instances (~48 residue rows/member vs ~1), and **71% of the residue
+is profile-resistant**: σ_L ≠ t·σ_R for every t, yet the x- AND
+y-multiplicity profiles agree. ⟹ **the multiplicity-profile residue
+lemma (E6.4's sketch) is the WRONG SHAPE for the class** — it closes
+the three templates by luck of their tables, not by mechanism.
+(Contrast: the (iv) triangle kills are 100% profile-separable —
+63,030 records, zero "neither" — so (iv)'s uniform lemma CAN stay
+profile-based.)
+
+### 8.3 The residue lemma re-shaped: DIFFERENCE-MULTISET incidence
+
+For a size-6 (disjoint-union) row, translation-invariance gives the
+exact multiset identity
+
+    d(σ_L) = 2·dA ⊎ (dA ∪ {0} + δ_L) ⊎ (dA ∪ {0} − δ_L),
+
+so a match σ_L = t·σ_R forces d(σ_L) = d(σ_R) as multisets, and
+counting any d ∈ dA (multiplicity ≥ 2 on the left; dA ∩ dB = ∅ kills
+the 2·dB contribution on the right; the two shifted sets contribute
+≤ 1 each) forces the **incidence system**
+
+    d + δ_R ∈ dB ∪ {0}  AND  d − δ_R ∈ dB ∪ {0}   for EVERY d ∈ dA,
+    (mirror: e ± δ_L ∈ dA ∪ {0} for every e ∈ dB)
+
+— 12+12 Sidon-type incidences. **Probe (40 Z₉×Z₆ members + 25
+Z₆×Z₁₀ members, scratchpad `a15_diffmultiset_probe.py`, now baked
+into the hunt script): the difference multiset separates 1580/1580
+profile-resistant rows, and the incidence criterion alone kills
+1512/1512 size-6 rows.** Zero resistant rows.
+
+Re-shaped T1 target (replaces the profile lemma):
+
+> **(C-res) residue lemma, difference-multiset form.** Under
+> (b) D1 ∧ D2 [+ (iii), + floor]: no (δ_L, δ_R) satisfies the
+> incidence system; hence no size-6 (2,2) match. Size-4 rows
+> (δ_L ∈ dA: one internal overlap) need the corrected multiset
+> formula — 68/68 probed rows are also dm-separated.
+
+This is FRAME-AGNOSTIC (no coordinate projections at all — they
+survive only as cheap pre-filters) and lives in the same D1/D2
+difference-set language as the extensibility-doc §6 two-sided half —
+the two-sided theory and the (v)-kill now share one vocabulary. The
+proof obligation is a finite incidence analysis of (dA, dB, δ);
+plausible uniform route: |dA| = 6 elements each needing BOTH signs to
+land in the 7-element dB ∪ {0} forces |(dA + δ_R) ∩ (dB ∪ {0})| = 6
+— a near-translation of difference sets, which (iii)'s coordinate
+separation should refute outright (x(dA) concentrated on ≤ 2 values
+vs x(dB) spread, gross-style). To be drafted as the Entry-9 lemma.
+
+### 8.4 Frame completions
+
+Full Z₉×Z₆ (44,064 members) + Z₆×Z₁₀ (7,776) + Z₁₅×Z₆ + Z₆×Z₁₄
+(heterogeneous odd part) runs in flight at session close; counts to
+be appended here. Verdict so far across every checked member of
+every frame: **zero (iv)/(v) violations** — (C-iv′)/(C-v′) survives
+its first live even-axis frames, now with the orbit-pair branch
+exercised and with per-row invariant telemetry retained
+(`data/a15/t11_*.jsonl` + logs) for the Entry-9 lemma drafting.
+
+### Next
+
+1. Draft **(C-res)** (§8.3) as the uniform (v)-kill; prove the
+   size-4 variant's multiset formula; keep the profile lemma for
+   (iv) only.
+2. Finish the frame battery; add a DM-RESISTANT alarm key (done —
+   any future row the difference multiset fails to separate prints
+   `s3-residue-DM-RESISTANT`).
+3. T3a.1: write the hand proof of E1/E2/E2′ (short; the sweep is
+   confirmation) and re-scope the checker's `engine_radical`.
