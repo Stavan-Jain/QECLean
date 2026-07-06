@@ -1,0 +1,158 @@
+self-test (bb_108 gates + iv/v): PASS
+
+========================================================================
+frame Z6×Z10  (|G|=60, frame shape Z2xZ2, even axes [0, 1])
+weight-3 translation-classes: 1711; mult-free+mirrored: 654; +floor/Ann gates: 198 (mono-x 96, mono-y 102)
+members (b: disjoint diff sets): 7776
+  ... 500/7776 members (8s)
+  ... 1000/7776 members (16s)
+  ... 1500/7776 members (24s)
+  ... 2000/7776 members (32s)
+  ... 2500/7776 members (40s)
+  ... 3000/7776 members (48s)
+  ... 3500/7776 members (55s)
+  ... 4000/7776 members (64s)
+  ... 4500/7776 members (72s)
+  ... 5000/7776 members (81s)
+  ... 5500/7776 members (90s)
+  ... 6000/7776 members (99s)
+  ... 6500/7776 members (108s)
+  ... 7000/7776 members (119s)
+  ... 7500/7776 members (129s)
+
+(iv) fails: 0   (v) fails: 0   [135s]
+(2,2) pipeline tally over 80 classified members:
+    s1-y-weight              276480
+    s2-x-weight              1440
+    s3-size                  440
+    s3-residue-y             72
+    s3-residue-both          48
+  stage-3 residue rows: 120; profile-lemma-resistant ('neither'): 0
+  (iv) kill-profile tags: {('13', 'both'): 11520, ('31', 'both'): 7776}
+
+========================================================================
+frame Z15×Z6  (|G|=90, frame shape Z2, even axes [1])
+weight-3 translation-classes: 3916; mult-free+mirrored: 1752; +floor/Ann gates: 1260 (mono-x 288, mono-y 972)
+members (b: disjoint diff sets): 248904
+  !! member cap 20000 hit — checking the first 20000 (deterministic order)
+  ... 500/20000 members (27s)
+  ... 1000/20000 members (51s)
+  ... 1500/20000 members (75s)
+  ... 2000/20000 members (98s)
+  ... 2500/20000 members (122s)
+  ... 3000/20000 members (145s)
+  ... 3500/20000 members (166s)
+  ... 4000/20000 members (186s)
+  ... 4500/20000 members (209s)
+  ... 5000/20000 members (234s)
+  ... 5500/20000 members (17462s)
+  ... 6000/20000 members (17480s)
+  ... 6500/20000 members (17496s)
+  ... 7000/20000 members (17510s)
+  ... 7500/20000 members (17521s)
+  ... 8000/20000 members (17531s)
+  ... 8500/20000 members (17542s)
+  ... 9000/20000 members (17553s)
+  ... 9500/20000 members (17564s)
+  ... 10000/20000 members (17575s)
+  ... 10500/20000 members (17586s)
+  ... 11000/20000 members (17598s)
+  ... 11500/20000 members (17609s)
+  ... 12000/20000 members (17620s)
+  ... 12500/20000 members (17630s)
+  ... 13000/20000 members (17641s)
+  ... 13500/20000 members (17652s)
+  ... 14000/20000 members (17662s)
+  ... 14500/20000 members (17672s)
+  ... 15000/20000 members (17682s)
+  ... 15500/20000 members (17692s)
+  ... 16000/20000 members (17702s)
+  ... 16500/20000 members (17712s)
+  ... 17000/20000 members (17724s)
+  ... 17500/20000 members (17743s)
+  ... 18000/20000 members (17763s)
+  ... 18500/20000 members (17784s)
+  ... 19000/20000 members (17804s)
+  ... 19500/20000 members (17825s)
+  ... 20000/20000 members (17847s)
+
+(iv) fails: 0   (v) fails: 0   [17847s]
+(2,2) pipeline tally over 80 classified members:
+    s1-y-weight              438000
+    s2-x-weight              189644
+    s3-residue-neither       2796
+    s3-size                  2512
+    s3-residue-y             456
+    s3-residue-x             228
+    s3-residue-both          44
+  stage-3 residue rows: 3524; profile-lemma-resistant ('neither'): 2796
+  'neither' examples (first few):
+    {'A': [(0, 0), (0, 1), (1, 2)], 'B': [(0, 0), (1, 0), (2, 3)], 'dl': (2, 1), 'dr': (1, 1), 'size': 6, 'branch_y': 'y-3AP', 'branch_x': 'x-3AP'}
+    {'A': [(0, 0), (0, 1), (1, 2)], 'B': [(0, 0), (1, 0), (2, 3)], 'dl': (2, 1), 'dr': (1, 2), 'size': 6, 'branch_y': 'y-3AP', 'branch_x': 'x-3AP'}
+    {'A': [(0, 0), (0, 1), (1, 2)], 'B': [(0, 0), (1, 0), (2, 3)], 'dl': (2, 1), 'dr': (1, 4), 'size': 6, 'branch_y': 'y-3AP', 'branch_x': 'x-3AP'}
+    {'A': [(0, 0), (0, 1), (1, 2)], 'B': [(0, 0), (1, 0), (2, 3)], 'dl': (2, 1), 'dr': (1, 5), 'size': 6, 'branch_y': 'y-3AP', 'branch_x': 'x-3AP'}
+    {'A': [(0, 0), (0, 1), (1, 2)], 'B': [(0, 0), (1, 0), (2, 3)], 'dl': (2, 1), 'dr': (14, 1), 'size': 6, 'branch_y': 'y-3AP', 'branch_x': 'x-3AP'}
+    {'A': [(0, 0), (0, 1), (1, 2)], 'B': [(0, 0), (1, 0), (2, 3)], 'dl': (2, 1), 'dr': (14, 2), 'size': 6, 'branch_y': 'y-3AP', 'branch_x': 'x-3AP'}
+  (iv) kill-profile tags: {('13', 'both'): 23716, ('31', 'both'): 11444, ('13', 'x'): 2118, ('31', 'x'): 8556, ('31', 'y'): 3516}
+
+========================================================================
+frame Z6×Z14  (|G|=84, frame shape Z2xZ2, even axes [0, 1])
+weight-3 translation-classes: 3403; mult-free+mirrored: 1362; +floor/Ann gates: 528 (mono-x 378, mono-y 150)
+members (b: disjoint diff sets): 49788
+  !! member cap 20000 hit — checking the first 20000 (deterministic order)
+  ... 500/20000 members (20s)
+  ... 1000/20000 members (38s)
+  ... 1500/20000 members (56s)
+  ... 2000/20000 members (73s)
+  ... 2500/20000 members (91s)
+  ... 3000/20000 members (108s)
+  ... 3500/20000 members (126s)
+  ... 4000/20000 members (144s)
+  ... 4500/20000 members (162s)
+  ... 5000/20000 members (180s)
+  ... 5500/20000 members (199s)
+  ... 6000/20000 members (217s)
+  ... 6500/20000 members (235s)
+  ... 7000/20000 members (254s)
+  ... 7500/20000 members (273s)
+  ... 8000/20000 members (293s)
+  ... 8500/20000 members (313s)
+  ... 9000/20000 members (337s)
+  ... 9500/20000 members (358s)
+  ... 10000/20000 members (378s)
+  ... 10500/20000 members (400s)
+  ... 11000/20000 members (420s)
+  ... 11500/20000 members (441s)
+  ... 12000/20000 members (462s)
+  ... 12500/20000 members (483s)
+  ... 13000/20000 members (504s)
+  ... 13500/20000 members (526s)
+  ... 14000/20000 members (547s)
+  ... 14500/20000 members (569s)
+  ... 15000/20000 members (590s)
+  ... 15500/20000 members (611s)
+  ... 16000/20000 members (633s)
+  ... 16500/20000 members (654s)
+  ... 17000/20000 members (676s)
+  ... 17500/20000 members (697s)
+  ... 18000/20000 members (718s)
+  ... 18500/20000 members (739s)
+  ... 19000/20000 members (761s)
+  ... 19500/20000 members (790s)
+  ... 20000/20000 members (815s)
+
+(iv) fails: 0   (v) fails: 0   [815s]
+(2,2) pipeline tally over 80 classified members:
+    s1-y-weight              549120
+    s2-x-weight              1240
+    s3-size                  520
+    s3-residue-both          240
+  stage-3 residue rows: 240; profile-lemma-resistant ('neither'): 0
+  (iv) kill-profile tags: {('13', 'both'): 29552, ('31', 'both'): 24500, ('31', 'y'): 3528}
+
+========================================================================
+SUMMARY
+  Z6xZ10: members 7776, iv_fail 0, v_fail 0, neither-rows 0/80 classified
+  Z15xZ6: members 20000, iv_fail 0, v_fail 0, neither-rows 2796/80 classified
+  Z6xZ14: members 20000, iv_fail 0, v_fail 0, neither-rows 0/80 classified
+VERDICT: no violations — conjecture survives these frames

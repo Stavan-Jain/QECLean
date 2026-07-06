@@ -966,6 +966,12 @@ land in the 7-element dB ∪ {0} forces |(dA + δ_R) ∩ (dB ∪ {0})| = 6
 — a near-translation of difference sets, which (iii)'s coordinate
 separation should refute outright (x(dA) concentrated on ≤ 2 values
 vs x(dB) spread, gross-style). To be drafted as the Entry-9 lemma.
+**[Superseded by Entry 9: the ⊎(dA∪{0}±δ) shorthand under-counts —
+the ±δ atoms carry multiplicity 3 (6 at 2-torsion) — and the probe's
+incidence criterion was only approximately necessary. Entry 9 gives
+the exact accounting and the resulting three-branch kill; the 100%
+dm-separation figures above are unaffected (they compared true
+multisets).]**
 
 ### 8.4 Frame completions
 
@@ -973,22 +979,21 @@ vs x(dB) spread, gross-style). To be drafted as the Entry-9 lemma.
 |---|---|---|---|
 | Z₉×Z₆ (Z₂ frame, even y) | **44,064 / 44,064 (full)** | 0 | 0 |
 | Z₆×Z₁₀ (Z₂² frame, both even, odd part Z₃×Z₅) | **7,776 / 7,776 (full)** | 0 | 0 |
-| Z₁₅×Z₆ (Z₂ frame, even y) | 18,655 so far (cap 20,000; in flight) | 0 | 0 |
-| Z₆×Z₁₄ (Z₂² frame, odd part Z₃×Z₇) | queued in the same run | — | — |
+| Z₁₅×Z₆ (Z₂ frame, even y) | 20,000 / 248,904 (cap) | 0 | 0 |
+| Z₆×Z₁₄ (Z₂² frame, odd part Z₃×Z₇) | 20,000 / 49,788 (cap) | 0 | 0 |
 
-The full-Z₉×Z₆ classification pass (150 members, 6,148 residue rows,
-4,392 profile-resistant) raised **zero `DM-RESISTANT` alarms** — the
-difference multiset separated every profile-resistant row at full
-scale, consistent with §8.3's probe. Verdict across all 70,495
-members checked: **zero (iv)/(v) violations** — (C-iv′)/(C-v′)
-survives its first live even-axis frames (orbit-pair branch
-exercised), with per-row invariant telemetry retained
-(`data/a15/t11_*.jsonl` + logs) for the Entry-9 lemma drafting.
-[Batch run detached at session close; Z₁₅×Z₆ tail + Z₆×Z₁₄ land in
-`data/a15/t11_batch2.log` — append their counts here on pickup.
-Perf note for reruns: verdict_v is ~0.9 s/member at |G| = 90 (the
-right-image dictionary is |G|²); batch the big frames or vectorize
-before scaling past 20k-member caps.]
+**Grand total: 91,840 members, zero (iv)/(v) violations, zero
+`DM-RESISTANT` alarms** (grep-confirmed on both logs) —
+(C-iv′)/(C-v′) survives its first live even-axis frames with the
+orbit-pair branch exercised, and the difference multiset separated
+every profile-resistant row everywhere one arose (Z₉×Z₆: 4,392 rows
+over 150 classified members; Z₁₅×Z₆: 2,796 over 80; **Z₆×Z₁₀ and
+Z₆×Z₁₄: zero profile-resistant rows at all** — the projections are
+tight on those frames). Per-row invariant telemetry retained
+(`data/a15/t11_*.jsonl` + logs). Perf note for reruns: verdict_v is
+~0.9 s/member at |G| = 90 (the right-image dictionary is |G|²);
+vectorize before scaling past the 20k caps; the uncapped Z₁₅×Z₆
+tail (228,904 members) is queued for a vectorized pass.
 
 ### Next
 
@@ -1000,3 +1005,173 @@ before scaling past 20k-member caps.]
    `s3-residue-DM-RESISTANT`).
 3. T3a.1: write the hand proof of E1/E2/E2′ (short; the sweep is
    confirmation) and re-scope the checker's `engine_radical`.
+
+---
+
+## Entry 9 (2026-07-06) — (C-res) proven-in-structure: the exact
+## multiset accounting and the three-branch (v)-kill
+
+Continuation of Entry 8 (§8.3's re-shaping), same session. The (v)
+obligation — no (2,2) translate match A·{0,δ_L} = t + B·{0,δ_R} — is
+now killed by a three-branch argument whose first two branches are
+proven lemmas and whose third is reduced to a tiny pinned census,
+machine-cleared corpus-wide. Verification script (each check = one
+proof step): `a15_e9_residue_lemma_checks.py` (V1–V6). Standing
+hypotheses: |A| = |B| = 3, D1 (Sidon), D2 (dA ∩ dB = ∅), no-period
+(the w2 gate), (iii) mirrored shapes, floor-bearing frame — of which
+the (v)-kill consumes only D1, D2, no-period, (iii), and 4 ∤ ℓ ∧
+4 ∤ m; the μ ≥ 6 floor is NOT used here.
+
+### 9.0 Correction to §8.3's shorthand
+
+The formula "d(σ_L) = 2·dA ⊎ (dA∪{0} ± δ_L)" under-counts: the ±δ_L
+atoms carry multiplicity 3 each (they merge to one atom of
+multiplicity 6 when 2δ_L = 0), and the probe's incidence criterion
+was approximately-necessary only. Exact accounting below; the §8.3
+dm-separation figures compared true multisets and stand.
+
+### 9.1 The exact identities (V1: 2,500 formula checks, both frames)
+
+Size 6 (δ_L ∉ dA; σ_L = A ⊔ (A + δ_L)):
+
+    d(σ_L) = 2·dA ⊎ (dA + δ_L) ⊎ (dA − δ_L) ⊎ {δ_L}³ ⊎ {−δ_L}³.
+
+Size 4 (δ := δ_L ∈ dA; by D1 the ordered pair a_i − a_j = δ is
+unique; a_k the third element; e := a_j − a_k):
+σ_L = {a_j, a_k, a_j + 2δ, a_k + δ} and
+
+    d(σ_L) = ±{δ, 2δ, e, e − δ, e + δ, e + 2δ}.
+
+Size 2 is vacuous: it needs δ_L ∈ dA with 2δ_L = 0, but a 2-torsion
+difference has multiplicity 2 in the ordered-difference multiset,
+violating D1. (Mirror statements for σ_R with dB, δ_R, f.)
+
+### 9.2 Branch 1 — the atom dichotomy (proven)
+
+**Lemma A.** If σ_L = t + σ_R (sizes 6), then
+δ_L = ±δ_R, or (δ_L ∈ dB and δ_R ∈ dA).
+
+*Proof.* d(σ) is translation-invariant, so the multisets agree. By
+§9.1, mult_{d(σ_L)}(δ_L) = 3 + [2δ_L ∈ dA] + 3·[2δ_L = 0] ≥ 3, while
+mult_{d(σ_R)}(δ_L) = 2·[δ_L ∈ dB] + [δ_L−δ_R ∈ dB] + [δ_L+δ_R ∈ dB]
++ 3·[δ_L = δ_R] + 3·[δ_L = −δ_R]. If δ_L ≠ ±δ_R and δ_L ∉ dB this is
+≤ 2 < 3. The mirror count at δ_R forces δ_R ∈ dA likewise. ∎
+
+(V2: asserted on every size-6 row of both frames — 1.77M rows on
+Z₉×Z₆ [800-member slice], 21.8M on Z₆×Z₁₀ [all 7,776 members]; the
+atom step alone kills 94.7% / 95.5% of rows.)
+
+### 9.3 Branch 2a — δ_L = ±δ_R =: δ (proven under (iii), 4 ∤ ℓ)
+
+WLOG δ_L = δ_R = δ (σ_R(−δ) is a translate of σ_R(δ)); δ ∉ dA ∪ dB.
+
+**Lemma B (translate rigidity).** A size-6 match with δ_L = ±δ_R
+forces dB = dA + δ = dA − δ.
+
+*Proof.* Count d(·) over d ∈ dA: mult_L(d) = 2 + [d−δ ∈ dA] +
+[d+δ ∈ dA] ≥ 2 (atoms don't contribute: ±δ ∉ dA). On the right,
+mult_R(d) = [d−δ ∈ dB] + [d+δ ∈ dB] ≤ 2 (D2 kills 2·dB; d ≠ ±δ).
+Summing over the six d and comparing forces per-element equality
+at 2: d ± δ ∈ dB for every d ∈ dA, i.e. dA + δ ⊆ dB ⊇ dA − δ; sizes
+(6 = 6) give equality. ∎
+
+**Lemma C (shift lemma; V4, exhaustive ℓ ≤ 24).** For 4 ∤ ℓ, the
+x-coordinate difference multiset {±p, ±q, ±(p+q)} of a 3-subset of
+Z_ℓ (p, q, p+q ≠ 0 — the (iii) B-shapes guarantee this) is never a
+shift of an A-shape x-profile — {0², u², (−u)²} (u ≠ 0; = {0², u⁴}
+at 2u = 0) or {0⁶}. At 4 | ℓ the exceptions are exactly the APs with
+an order-4 common difference.
+
+*Proof sketch (hand, verified by V4).* Shifts preserve the
+multiplicity pattern. A symmetric multiset {±p, ±q, ±r} with r = p+q
+and all nonzero has pattern (3 values × mult 2) only if its value
+set is negation-closed, which forces either three distinct nonzero
+2-torsion values (impossible in a cyclic group) or a pair {w, −w}
+plus a 2-torsion value, which solves to an order-4 element (4 | ℓ);
+the patterns (2,4) and (6) solve only degenerately. The A-shapes
+have patterns (2,2,2), (2,4) (2-torsion u), or (6). ∎
+
+**Theorem D (2a kill).** Under D1, D2, (iii), no-period, and
+4 ∤ ℓ ∧ 4 ∤ m: no size-6 match has δ_L = ±δ_R. *Proof.* Lemma B
+gives dB = dA + δ, so x(dB) = x(dA) + δ_x as multisets; Lemma C
+forbids it (dA carries an A-shape x-profile by (iii); dB carries a
+3-subset difference multiset in x with nonzero entries). ∎
+
+Two notes. (1) The dm invariant ALONE cannot close 2a: if
+dB = dA + δ did hold, the two §9.1 multisets would coincide
+identically — Lemma C (hence (iii) + the frame) is load-bearing,
+and this branch is where DM-resistant rows would have lived. (2)
+Corpus-wide the rigidity premise never holds anyway: V3 finds
+0/44,064 (Z₉×Z₆) and 0/7,776 (Z₆×Z₁₀) members with dB in dA's
+translate class.
+
+### 9.4 Branch 2b (S2) — δ_L ∈ dB ∧ δ_R ∈ dA: pinned census (reduced)
+
+For S2 rows, the proven projection-weight machinery (the corrected
+even-period lemma, E7.3) pins hard:
+
+* B2-shape (axis-confined B) dies at once: δ_L ∈ dB gives δ_Ly = 0,
+  so |π_y σ_L| = 0, while δ_R ∈ dA has δ_Ry ≠ 0 ((iii) forbids the
+  spike sharing a y with the pair), so |π_y σ_R| = 2. ✗
+* B1-shape survivors must have: δ_Ly = ±h (dB's slant y-gap) with
+  |a(y)(1+y^{δ_Ly})| = 2 (a is a 3-AP of difference δ_Ly, or the
+  orbit-pair branch), and δ_Rx = ±u (dA's slant x-gap) with
+  |b(x)(1+x^{δ_Rx})| = 2 (mirror). In the 3-AP sub-branch, x(dB) =
+  {±u², ±2u} regardless of the spike's AP position, and the dA-slice
+  count of Lemma B's type then bounds the compatible x-fibers at
+  exactly 6, forcing y-alignments (δ_Ry ∈ {±w} ∩ {±s, ±s′}) that
+  make a(y) an AP for a second difference — i.e. a(y) a coset of an
+  order-3 subgroup — the residual census shape.
+
+Numbers: Z₉×Z₆ (800-member slice): 28,800 S2 rows → **160 S2-hard**
+(0.2/member; all in the 3AP/3AP sub-branch, e.g. A =
+{(0,0),(0,1),(1,2)}, B = {(0,0),(1,0),(2,5)}, δ_L = (1,5) ∈ dB,
+δ_R = (1,1) ∈ dA) → **0 DM-equal**. Z₆×Z₁₀ (all members): 279,936
+S2 rows → **0 S2-hard** — the pinning annihilates the branch there.
+Status: per-member surveyable census (≤ a few rows), machine-cleared
+everywhere; the uniform finish (the order-3-coset case analysis) is
+the remaining crumb.
+
+### 9.5 Size 4 — the coupled system (generic derivation + clearance)
+
+For a size-4 match (δ := δ_L ∈ dA, δ′ := δ_R ∈ dB), §9.1 gives
+d(σ_L) ⊇ dA = {±δ, ±e, ±(e+δ)} and six values outside dA (D2 keeps
+dB off them), so generically the match forces the **coupled system**
+
+    dA = {±2δ′, ±(f−δ′), ±(f+2δ′)}   and
+    dB = {±2δ, ±(e−δ), ±(e+2δ)},
+
+a doubling-incidence structure (2δ ∈ dB for δ ∈ dA — the
+`is_frobenius_related` gate's kin). V6, all size-4 rows: Z₉×Z₆
+108,000 rows (3,000 members) and Z₆×Z₁₀ 279,936 rows (all members):
+**0 rows satisfy even one leg of the system; 0 DM-equal**.
+Coincidence sub-branches (e.g. 2δ ∈ dA) are folded into the direct
+dm check. Uniform infeasibility proof of the system = second
+remaining crumb (torsion equations; expect (iii) + 4∤ℓ to close it
+by the Lemma-C method).
+
+### 9.6 Status of (C-v′) after this entry
+
+The (v)-kill = Lemma A (proven) + Theorem D (proven, hypotheses D1 ∧
+D2 ∧ (iii) ∧ no-period ∧ 4∤ℓ ∧ 4∤m) + S2 census (pinned by proven
+lemmas; empty or ≤O(1) rows/member, machine-cleared on 51,840+
+members) + size-4 system (necessary condition proven generically;
+machine-cleared). What remains of Entry 6's single amorphous
+"multiplicity-profile residue": two structured crumbs — the S2
+order-3-coset case analysis and the size-4 system's infeasibility.
+The (iv) obligation stays profile-based (Entry 8.2: 100%
+profile-separable). Certifier consequence (T1.2): the per-member (v)
+obligation is now [translate-class compare: one canonicalization] +
+[S2-hard census: ≤ few rows] + [size-4 dm rows: ≤ 36] — all
+surveyable, replacing the |G|³ table.
+
+### Next
+
+1. Entry 10: the two crumbs — S2's order-3-coset analysis; size-4
+   system infeasibility under (iii) + 4∤ℓ (Lemma-C-style torsion
+   arithmetic).
+2. Wire the three-branch kill into the recipe-certifier (T1.2) and
+   re-run the 58-member corpus + the hunt frames through it.
+3. Queued falsify-first: the off-(iii) rigidity hunt (∃δ:
+   dB = dA + δ with D1∧D2) on 4|ℓ frames — explicit (2,2)-match
+   codes would witness (iii)/frame-necessity for branch 2a.
