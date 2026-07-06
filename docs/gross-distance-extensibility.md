@@ -132,6 +132,23 @@ pair, §5):
 - **`im Δ` and `ker p_*` are each exactly half of `k`**, and in fact
   `im τ_* = ker p_*` (dangerous sector = image of the transfer).
 
+> **Update (2026-07-04, A14 — the "observed" features are theorems, and the
+> safe sector is canonical).** Under (R), Prop A14.1
+> (`experiments/bb_lab/notes/A14_safe_floor_criterion_plan.md` §2) proves:
+> `p₂ = 0` on H₂ and the connecting map `Δ = δ₂` is **injective** (via the
+> Bezout membership `ε ∈ (A,B)`); `im p_* = im Δ` **exactly**, of dimension
+> `k/2 = dim R/(A,B)` (so `rank p_* = 2` resp. `6` above are forced, and
+> `im τ_* = ker p_*` is LES exactness, hypothesis-free); the safe classes are
+> canonically `Δ(ann_R(A,B) \ 0)` with the explicit **seam-carry
+> representatives** `seamC(ζ)` = the x-wrap masks of `(Ãζ̃, B̃ζ̃)` (=
+> `BBCover.seamC`, matched bit-for-bit against `SeamTables.lean`); and coset
+> minima are **constant on G-translation orbits** — gross's 63 Smith classes
+> collapse to 13 y-orbits (the MIm transport count) and further to **5**
+> full-G orbits. Also automatic at `k̃ = k`: the deck-Bockstein composite
+> `δ₁∘δ₂ = 0` (the A12 §4 remainder has content only off the doubling
+> regime). Verified numerically on gross, pair72, and a CE2 negative control
+> (`a14_seam_formula_check.py`, 30/30).
+
 **Caution — doubling is not automatic.** The plain toric code is the cautionary
 example: doubling x leaves the y-loop as the bottleneck, so `min(2L, L) = L` and the
 distance does not move. The polynomials must mix the two directions enough that the
@@ -371,6 +388,25 @@ requires re-instantiating the polynomial-specific engine tables (Prop-10
 classification, MIm dispatch and floor leaves) — i.e. these are the natural targets
 where the CRT/F₄ engine is *necessary*, not decorative, and where its parametrization
 would pay off.
+
+**A14 update (2026-07-04): the three targets' safe floors are SAT-certified, and a
+necessary-screen battery now front-runs the hunts.** Fork A14 (OQ4;
+`experiments/bb_lab/notes/A14_safe_floor_criterion_plan.md`) built a cost-ordered
+battery of *necessary* screens for condition 3's safe half — S0 raw seam weights
+(free) → S1/S1+ boundary descent → S2 CRT-block kills → S4 per-orbit-rep coset SAT —
+each rejection carrying an explicit light-coset-element certificate. On the 638-row
+T1 corpus (exact ground truth recomputed for every row): 86% of SF-failures rejected
+by the cheap tiers at zero false rejections, and **every k-preserving short is
+SF-false** — on the direct-sweep frames the safe floor alone separates doubles from
+shorts. On the engine frame, Prop A14.1's full-G transport (63 classes → **5** orbit
+reps) makes S4 decisive in seconds: **hit3/4/6-y all have `SeamCosetFloor 12`
+SAT-certified (~25 s each, floors exactly tight at 12 — the gross pattern), none is
+overlap-rescued**, so all three are viable engine targets; gross's Lean-proven floor
+is independently SAT-cross-checked in 24 s; and the `[[288,12,18]]` anti-instance
+fails the safe floor on **both** axes with certificates (x: raw seam weight 24; y:
+SAT witness weight 34). The engine re-instantiation itself (Prop-10 + MIm tables for
+the new `(A,B)`) remains the open per-code work — the battery only settles *which*
+codes deserve it.
 
 ---
 

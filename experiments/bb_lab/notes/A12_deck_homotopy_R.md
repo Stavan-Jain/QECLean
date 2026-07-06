@@ -2,7 +2,9 @@
 
 **Status: theorem proven on paper + machine-verified on 157 covers and
 exhaustive block sweeps (2026-07-02). Remaining open: only the quantitative
-Bockstein refinement (§4).**
+Bockstein refinement (§4) — now attacked as A13
+(`A13_bockstein_equality_plan.md`, branch `claude/a13-bockstein-equality`:
+candidate tower-lift proof + 167k-pair clean sweep, red-team pending).**
 Branch: `claude/admiring-curran-3a5e2a` (off PR #53). Scripts:
 [`a12_deck_r_probe.py`](../scripts/a12_deck_r_probe.py) (first
 counterexamples), [`a12_deck_r_survey.py`](../scripts/a12_deck_r_survey.py)
@@ -366,6 +368,12 @@ blocks was only randomly sampled — a stratified exhaustive sweep there
 *Structural route:* the extend-by-ε Koszul LES
 `0 → H₁/εH₁ → H₁(A,B,ε) → ann_{H₀}(ε) → 0` plus Frobenius self-duality of
 the complex.
+*Follow-up (2026-07-02, A13):* session-0 found a candidate half-page proof
+via the ℤ/4 **Frattini lift** (the 4-fold cover is the "integral lift"
+behind the classical `β² = 0`), a toy showing the self-duality route as
+stated above is provably insufficient, and a 167k-pair clean sweep
+covering F₈ blocks and twisted decks — see
+`A13_bockstein_equality_plan.md` (red-team pending).
 
 **OQ3 — Arithmetic classification of the failure locus.** Conjecture: for
 weight-3 cover pairs, (R)-violations exist on `Z_L×Z_m` iff the char-2
@@ -397,6 +405,30 @@ expectation: the floor is value-carrying (engine/SAT territory; the
 [[288,12,18]] anti-instance shows it genuinely fails off-frame), so aim
 for cheap necessary screens to sharpen A9-style hunts, not a full
 criterion.
+*Status (2026-07-04): **ATTACKED as A14**
+([`A14_safe_floor_criterion_plan.md`](A14_safe_floor_criterion_plan.md),
+branch `claude/a14-safe-floor-criterion`). Phase 0 done: under (R) the
+safe sector is canonical — `p₂ = 0`, `Δ = δ₂` injective,
+`im p_* = im Δ = Δ(ann_R(A,B))` of dim `k/2`, explicit seam-carry
+representatives (= `BBCover.seamC`, matched bit-for-bit against
+`SeamTables.lean`), coset minima constant on G-translation orbits
+(gross: 63 classes → 13 y-orbits = the MIm transport count → **5**
+full-G orbits), and `δ₁∘δ₂ = 0` automatic at `k̃ = k` (sharpening where
+OQ2's remaining content lives). Screen battery S0–S4 designed,
+necessity-by-construction. Gate: `a14_seam_formula_check.py` (30/30).
+Phase 1 done (`a14_safe_floor_screens.py`, exact ground truth on all
+638 T1 rows, 0 false rejects, A9-profile cross-validation 0/152
+mismatches): **S0+S1 reject 75% of the 506 SF-false rows at zero cost;
+every k-preserving short is SF-false (so SF-true ⟹ doubles, 111/111,
+on the T1 frames); and the [[288,12,18]] x-double anti-instance is
+caught by S0 alone — raw seam weight 24 = the previously-SAT-derived
+`d_safe ≤ 24`.* Phase 2 done (S1+ pairs, S2 CRT-block kills, S4
+orbit-rep SAT): cheap-tier power 86%; **hit3/4/6-y safe floors
+SAT-CERTIFIED (5 orbit reps each, ~25 s — all three engine targets
+viable, floors exactly tight at 12); bb_288 SF-refuted on BOTH axes
+(y-witness weight 34); gross's Lean-proven safe floor independently
+SAT-cross-checked in 24 s.* Remaining: Phase 3 Lean lemmas + Phase 4
+write-up/A9 wiring.*
 
 **OQ5 — R0 structure (cheap, tidy).** The literal-lift session observed
 `1+δ ∈ (A)` and `∈ (B)` *separately* (R0) across their whole frame. By the

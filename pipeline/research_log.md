@@ -13,6 +13,55 @@ what was tried and why it didn't work.
 
 ## Entries
 
+- 2026-07-04 — safe-floor-screens (A14) — success —
+  **A12's OQ4 answered in its own terms: the safe sector is canonical
+  under (R), and a certified necessary-screen battery now decides
+  condition-3 targets.** Math (Prop A14.1): under (R) — equivalently
+  the Bezout membership `ε ∈ (A,B)` — `p₂ = 0`, the connecting map
+  `Δ = δ₂` is **injective**, `im p_* = im Δ = Δ(ann_R(A,B))` of dim
+  `k/2` (the extensibility doc's per-instance "half of k" observations
+  are theorems), with closed-form **seam-carry representatives**
+  (= `BBCover.seamC`, matched bit-for-bit against `SeamTables.lean`)
+  and coset minima **constant on G-translation orbits** (gross: 63
+  classes → 13 y-orbits = the MIm transport count → **5** full-G
+  orbits); at `k̃ = k` the deck-Bockstein composite vanishes
+  automatically (OQ2's remaining content lives off the doubling
+  regime). Screens (necessity-by-construction — every rejection
+  exhibits an explicit light coset element): S0 raw seams → S1/S1+
+  descent → S2 CRT-block kills → S4 per-orbit-rep coset SAT. On the
+  638-row T1 corpus with exact ground truth recomputed for every row
+  (A9-profile cross-validation 0/152 mismatches): the cheap tiers
+  reject **86%** of the 506 SF-failures at **zero false rejections**,
+  and **every k-preserving short is SF-false** — on the direct-sweep
+  frames the safe floor alone separates doubles from shorts (111/111).
+  S4 with the 5-orbit transport: **hit3/4/6-y `SeamCosetFloor 12` all
+  SAT-certified (~25 s each, floors exactly tight — all three engine
+  targets viable, none overlap-rescued)**; gross's Lean-proven floor
+  independently SAT-cross-checked (24 s); **bb_288 SF-refuted on both
+  axes** (x: raw seam weight 24, turning the previously SAT-derived
+  `d_safe ≤ 24` into a polynomial identity; y: witness weight 34,
+  provably beyond the cheap tiers). Scripts
+  `a14_{seam_formula_check,safe_floor_screens,phase2_screens,s4_ladder}.py`;
+  columns wired into the A9 profiler (`a14_columns`). Residual
+  (queued): the Phase-3 Lean package for A14.1(1)–(2), sharing the
+  A13-L2b exactness chase. **Tower follow-up (§13):** every proven
+  rung-1 double, re-doubled on the *same* axis, freezes at its rung-1
+  distance — all five rung-2 safe floors refuted by S0 alone (raw seam
+  = `d(rung-1)` exactly), SAT confirms `d_X ≤ d(rung-1)` (pair72-x full
+  ladder `d_X = 8`; both `n = 288` towers SAT@12). This is the toric
+  same-axis bottleneck, certified on the gross lineage; distance
+  `> 12` must come from a larger-`d` base or a mixed (tour-de-gross)
+  lift, not from towers. **d=10-base follow-up (§14):** all four
+  bb_90/bb_108 literal-lift axes fail in three distinct modes —
+  freeze-pattern light classes (bb90 both axes; bb90-x is the first
+  S0-pass/S1+-reject), a first in-the-wild condition-2 death (bb108-x:
+  `1+x⁹ ∉ (A,B)`), and bb108-y's deficit-2 near miss whose overlap
+  rescue is refuted by an explicit weight-18 cover logical (3 s SAT).
+  No `d = 20` doubles from stored corpus presentations; the hunt moves
+  to presentation orbits (bb108-y first), mixed lifts, and wider
+  `d ≥ 7` base enumeration.
+  [plan+results](../experiments/bb_lab/notes/A14_safe_floor_criterion_plan.md)
+
 - 2026-07-02 — deck-tower-descent (A13) — success —
   **Deck-trivial ⟺ k constant along `ℤ_{2^r}` doubling towers (A12 OQ1),
   answered YES.** For a free `ℤ_{2^r}` BB cover, `σ_* = id` on `H₁(top)`
@@ -39,6 +88,86 @@ what was tried and why it didn't work.
   theorem (T1–T3 + A13); growing distance still lives in the safe floor
   (condition 3), untouched here.
   [plan+resolution](../experiments/bb_lab/notes/A13_deck_tower_plan.md)
+
+- 2026-07-03 — bockstein-equality (A13) — success (core) —
+  **A12's OQ2 sharpest element-level form is now a machine-checked Lean
+  theorem, and the full failure-danger zone is swept exhaustively clean.**
+  Math: the transfer SES is the mod-`ε̂²` reduction of the **4-fold
+  cover** — the analogue of the integral lift behind classical `β² = 0`
+  — and freeness over `F₂[ℤ/4]` (`Ann(ε̂) = (ε̂³)`) kills the composite
+  at the element level (`W = A·ε⁻¹(Bz) + B·ε⁻¹(Az) = 0` on the nose),
+  for arbitrary order-2 decks incl. twisted. A toy 3-term free-D
+  *self-dual* complex with `δ₁δ₂ ≠ 0` shows the originally scoped
+  structural route (LES + Frobenius self-duality) is provably
+  insufficient — liftability is the content. **Lean (W3, axiom-clean):**
+  `Framework/Homological/BocksteinLift.lean` — `bockstein_element_form`
+  (abstract capstone: element form from `char 2` + `Ann(ε)=(ε³)`) and
+  `bockstein_element_form_deck` (unconditional on the ℤ/4 chain block);
+  only `propext`/`Classical.choice`/`Quot.sound`. **Sweeps (W1,
+  exhaustive):** every `(A,B)` pair over `F₂[Z₁₆]`, `F₂[Z₈×Z₂]`,
+  `F₂[Z₄×Z₄]`, `F₄[Z₈]`, `F₄[Z₄×Z₂]`, `F₈[Z₂]`, `F₈[Z₄]`, `F₈[Z₂²]`
+  (all decks; `≈` 2³² weighted pairs per |P|=16 block; hundreds of
+  millions of live pairs) has `E = 2g`, `maxdef = 0` — closing OQ2's own
+  "cheapest falsification path." W0 red-team agents were cut off by a
+  session limit (Lean kernel now the referee). **L2 progress (commit
+  `b7ee838`, `BBEpsFree.lean`, axiom-clean):** the ring hypothesis shared
+  by OQ2 (`BocksteinLift`) and OQ1 (`BBDeckTower`'s `EpsFree`, on-branch
+  after rebasing onto merged PR #54) has its reusable core proven —
+  `epsFree_quotXpow` (chain ring `R[X]/(X^N)`) + `epsFree_of_free`
+  (transfer across a free module) + `hann_of_epsFree` (bridge). General
+  L2a now reduces to one wildcard: `Module.Free 𝔽₂[⟨σ⟩] 𝔽₂[G]` (coset
+  basis, no mathlib support). **L2b core (commit `67b947e`,
+  `BBBocksteinRank.lean`, axiom-clean):** the transfer-inequality heart —
+  `finrank_ker_comp_le` + `finrank_sub_le_finrank_range_comp` (`ker p =
+  range τ`, `ε = τ∘p` ⟹ `dim Hc − dim Hb ≤ dim (range ε)`), i.e. `E ≥
+  k̃−k` once instantiated on homology. **Phase-1 instantiation landed
+  (2026-07-04, axiom-clean): the inequality `E ≥ k̃ − k` is now a Lean
+  theorem for every `XDoubleCoverData`** — `BBCover.lean` gained
+  `push0_surjective` + `exists_pull_eq_add_boundary` (the chain-level
+  diagram chase), and the new `BBTransferH1.lean` induces
+  `pushH1`/`pullH1` on `H₁` via `Submodule.mapQ`, proves the exactness
+  `ker p_* = range τ_*`, identifies `epsH1 = τ_*∘p_*` with `(1+σ)_*`
+  pointwise, and concludes
+  `finrank_H1_sub_le_finrank_range_epsH1 : dim H₁(cover) − dim H₁(base)
+  ≤ dim (1+σ)H₁(cover)` — A12 part 2, previously paper-only, now
+  kernel-checked. **The L2a wildcard is also CLOSED (2026-07-04,
+  `BBEpsFreeGroupAlgebra.lean`, axiom-clean):** the group algebra
+  `k[G]` is free directly over the chain ring `k[X]/(X^N)` via
+  `X ↦ x^σ − 1` (coset-transversal basis: spanning by
+  `x^g = (X+1)^j·C c • x^{t i}`, independence by `modByMonic`
+  representatives + the invertible substitution `∘(X±1)` + orbit
+  coefficient extraction), giving
+  `epsFree_one_add_single_of_addOrderOf : EpsFree (1 + x^σ) (2^r)`
+  for ANY abelian `G` (finite or not) and any char-2 base — the shared
+  ring hypothesis of BOTH deck lines (OQ1 `eps_mem_of_deckTrivial`,
+  OQ2 `bockstein_element_form` via `hann_of_epsFree`) is now
+  unconditional for group algebras. **The L2 linear-algebra wiring is
+  also COMPLETE (2026-07-04, axiom-clean):** `BBBocksteinRank` gained the
+  exact defect identity `E + dim Hb + dim(range p ⊓ ker τ) = dim Hc +
+  dim(ker τ)` and the tightness criterion `ker τ ≤ range p → E = dim Hc −
+  dim Hb`; `BBTransferH1` instantiates them as `BocksteinVanishes D`
+  (`ker τ_* ≤ range p_*` = `δ₁∘δ₂=0`), `finrank_range_epsH1_eq`
+  (`E = k̃−k` under `BocksteinVanishes` — the headline `deck_finrank_eq`),
+  `finrank_ker_epsH1_eq` (`dim ker ε_* = k`), and `epsH1_epsH1_apply`
+  (`ε_*²=0`, unconditional). On the ring side, `BBEpsFreeGroupAlgebra` §7
+  `bockstein_element_form_group_algebra` composes L2a into L1 to give the
+  element form `δ₁δ₂=0` unconditionally in every order-4 deck group
+  algebra `k[G]⧸(ε²)`. The conv↔group-algebra bridge is
+  also landed (`BBConvRing.lean`, axiom-clean): `convEquiv` +
+  `convEquiv_mul` (`conv` = the `𝔽₂[G]` product) + the deck-operator
+  identifications, so L2a/element-form now speak about the repo's actual
+  `conv`/deck action. The SOLE remaining gap is the homological transport
+  identifying the element fact with `BocksteinVanishes` — the
+  `seamC`↔connecting-map δ₂ step (`seamC_mem_cycles` is already δ₂ at
+  chain level) reading `cycles/boundaries/H₁` as `convEquiv`-modules —
+  the paper's main theorem, genuinely open (the toy self-dual free-`D`
+  complex has `δ₁δ₂≠0`, so it is not automatic).
+  Payoff once closed: `H₁(cover) ≅ D^{k̃−k} ⊕ F₂^{2k−k̃}` (rank data all
+  in hand; needs the `𝔽₂[ε]/(ε²)`-module classification for the iso),
+  with Theorem A12 as its `a = 0` slice.
+  [result](../experiments/bb_lab/notes/A13_result.md) ·
+  [plan](../experiments/bb_lab/notes/A13_bockstein_equality_plan.md) ·
+  [L2 plan](../experiments/bb_lab/notes/A13_L2_formalization_plan.md)
 
 - 2026-07-02 — bb-pair72-packaging (S3.9) — success —
   **`pair72StabilizerCodeWithDistance : StabilizerCodeWithDistance 72 4 8`**
