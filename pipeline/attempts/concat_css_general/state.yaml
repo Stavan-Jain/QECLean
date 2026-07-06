@@ -38,5 +38,3 @@ notes: |
   needed for the long-pole M4 already exists (SymplecticSpan.lean), so M4 is reuse
   not author-from-scratch; (2) phase/Y-agnostic operator-part lemmas already exist
   (LogicalOperators.lean, NQubitElement.lean), fixing the distance-critic's R4.
-</content>
-</invoke>

@@ -114,4 +114,3 @@ See `gap_audit.md` for detail. Summary:
   the existing `SymplecticSpan` bridge).
 - **`restrictBlock` + `inducedOuter` correspondence** (M5) — concatenation-specific.
 - **`concatenate` constructor** and **`concat_hasCodeDistance`** (M3, M6).
-</content>
