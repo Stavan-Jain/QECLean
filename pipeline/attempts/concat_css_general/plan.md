@@ -304,4 +304,3 @@ are the deeper, higher-risk deliverable and can be a follow-on.
 | — | M7 Steane⊗Steane | ~80 | |
 
 Total **~1560–1740 LOC**. Realistic schedule risk concentrated in M4.
-</content>

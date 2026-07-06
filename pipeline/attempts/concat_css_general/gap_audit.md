@@ -106,4 +106,3 @@ discharged per-instance (`native_decide` at n=49 via `rowsLinearIndependent_iff_
    and its phase bookkeeping.
 4. **A general `weight_ge_of_blocks_ge` / block-superadditivity** lemma (M1) may
    be promotable to `Foundations` if a second block-structured code appears.
-</content>

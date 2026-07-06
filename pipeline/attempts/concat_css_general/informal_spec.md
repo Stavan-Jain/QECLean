@@ -180,4 +180,3 @@ structural proof above is mandatory, not a convenience.
 | `Framework/Core/Logical/LogicalOperators.lean` | phase/Y-agnostic operator-part lemmas; `LogicalQubitOps` target |
 | `Framework/Core/CSS/CSSPredicates.lean` | `IsXTypeElement`/`IsZTypeElement` for typed promotion |
 | `Codes/_TEMPLATE.lean` | canonical §1–§14 structure for the constructor file |
-</content>
