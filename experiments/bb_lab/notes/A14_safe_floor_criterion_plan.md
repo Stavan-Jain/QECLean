@@ -14,9 +14,15 @@ and bb108-y's deficit-2 near miss whose overlap rescue is refuted by a
 weight-18 cover logical) — **no d = 20 doubles from stored corpus
 presentations**. Orbit sweep (§15): the 2808-cell v1 presentation
 orbit of bb_108 contains **no SF-passing cell** (orbit ceiling 18 <
-20; 192 descended-to-20 finalists all S4-refuted at 12–18); the
-d > 12 hunt moves to mixed lifts / re-decompositions / wider base
-enumeration. Remaining (optional): Phase 3 — the
+20; 192 descended-to-20 finalists all S4-refuted at 12–18). v2 hunts
+(§16): the Z₁₈×Z₃ re-decomposition of bb_108 is equally dead (weight
+16/18 again — the obstruction is code-level); the bb_288 Z₁₂×Z₁₂
+orbit's strongest cells (descended minima to 48, raw seams to 104)
+are all refuted by solver-deep weight-28–34 witnesses —
+**sampled-refuted, and a recurring "deficit wall" just below 2d
+emerges as a candidate new OQ**. The literal-lift d > 12 hunt over
+corpus codes closes negative-with-certificates; residue = fresh-base
+enumeration + the deficit-wall question + the consolidation track. Remaining (optional): Phase 3 — the
 Lean lemma package for Prop A14.1(1)–(2) in `BBDoubling.lean`,
 coordinated with A13-L2b's exactness chase (`push0_surjective`).**
 Branch: `claude/a14-safe-floor-criterion` (off `claude/a13-bockstein-equality`,
@@ -690,3 +696,66 @@ re-decomposition** of the same abstract group (a different cyclic
 factorization = genuinely different doubling axes; the tour-de-gross
 family's own lifts are of this mixed kind). That, plus the
 [[288,12,18]] Z₁₂×Z₁₂ orbit, is where route (b) begins.
+
+## 16. v2 hunts (2026-07-05) — re-decomposition + bb_288 orbit: the deficit wall
+
+Scripts: `a14_v2_redecomp_sweep.py` (staged, with the lazy k-gate:
+S0-with-early-exit first, k-check only on survivors — sound because an
+S0 reject is a genuine coset element regardless of (R), and k-jumping
+cells are dead anyway), `a14_bb288_s4_finalists.py`. Data:
+`data/a14/{v2_sweep_log_summary.txt,bb288_s4_finalists.json}`. The
+exhaustive stage-2 pass was **interrupted for cost** midway through
+Hunt B (per-survivor descent at 63 classes ≈ 1–2 min × 1200+
+survivors); the endgame switched to *sampling the strongest strata* —
+the right protocol at this scale, recorded as such.
+
+**Hunt A — bb_108 re-coordinatized on Z₁₈×Z₃** (φ(a,b) =
+((10a+9b) mod 18, b mod 3); A′ = u¹² + u⁹v + v², B′ = u² + u⁹ + u¹⁰;
+genuinely different doubling axes). COMPLETE, dead:
+
+- axis u (7776 cells): **zero k-gate failures**, raw seams spread
+  18–42, 1212 cells descend to exactly 20 — and the S4 sample refutes
+  every one at weight 16/18, instantly (≤ 2 s), exactly the v1
+  pattern.
+- axis v (216 cells): uniformly S0-dead at 12.
+
+**bb_108's weight-16/18 safe-sector structure survives
+re-decomposition.** Both cyclic factorizations of the abstract group,
+their translation/unit/swap orbits, and both axes are now exhausted:
+bb_108 is closed as a d = 20 base.
+
+**Hunt B — bb_288 [[288,12,18]] on Z₁₂×Z₁₂ (floor 36).** Stage 1
+complete on axis x (4608 cells): zero k-gate failures among S0
+survivors, raw seams reaching **104**; stage 2 (interrupted) had
+already produced 717 passes at descended min 36, 455 at 40, **90 at
+48**. S4 on the six strongest sampled cells (3× min-48, 2× 40, 1× 36):
+**all six SF-REFUTED — but by solver-deep witnesses at weight 28–34,
+taking 8–68 s each** (vs bb_108's ≤ 2 s). The light classes here are
+invisible to raw seams (up to 104!) *and* to descent (stuck ≥ 36), and
+sit 2–8 below the floor. Status: **sampled-refuted**; the residual
+~1200 unsampled passing cells and the y-axis remain formally open, but
+six-for-six deep refutations in the strongest strata price the rescue
+odds low. (Also not covered: mixing autos, as in v1.)
+
+**The recurring shape — a "deficit wall" just below 2d.** In every
+probed direction, the orbit-maximum safe floor stalls a hair under the
+target: bb_108 at 18 vs 20 (both decompositions, hundreds of
+presentations), bb_288 at 32–34 vs 36 (strongest sampled cells). The
+walls are invisible to the cheap tiers and found only by exact search
+— value-carrying lightness of precisely the kind OQ4's framing
+predicted, but its *recurrence at 2d − 2 across unrelated codes and
+presentations* looks structural. Candidate new OQ: is there a
+parity/duality mechanism pinning `max over presentations of the
+safe-floor minimum` to `2d − 2` for non-doubling BB codes? (Note
+`2d − 2 = 2(d − 1)` — suggestive of a weight-(d−1)-ish base object
+whose double-cover shadow lands in the safe sector; connects to the
+overlap-rescue math and the closed-form-S0 residue.)
+
+**Hunt verdict for d > 12 by literal-lift doubling of corpus codes:
+negative in every probed direction** — stored forms (§14), same-axis
+towers (§13), presentation orbits (§15), re-decompositions and the
+bb_288 orbit sampled (§16). Each negative carries certificates. The
+constructive residue: fresh-base enumeration (d ≥ 7, k > 0, outside
+the Bravyi corpus) with the battery as front filter, the deficit-wall
+theory question, and the consolidation track (Phase 3 Lean, hit3-y
+engine re-instantiation, the LRAT bridge spike).
