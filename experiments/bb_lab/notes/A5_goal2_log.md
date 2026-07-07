@@ -1175,3 +1175,135 @@ surveyable, replacing the |G|³ table.
 3. Queued falsify-first: the off-(iii) rigidity hunt (∃δ:
    dB = dA + δ with D1∧D2) on 4|ℓ frames — explicit (2,2)-match
    codes would witness (iii)/frame-necessity for branch 2a.
+
+---
+
+## Entry 10 (2026-07-06) — the two crumbs closed: S2's D2-funnel and
+## the size-4 family collapse
+
+Same-day continuation of Entry 9. Both residual crumbs of the
+(v)-kill are now resolved — S2 by a fully-proven funnel into a D2
+contradiction, size-4 by an exact rigidity lemma + a matching
+dichotomy that collapses every branch into finite torsion families,
+each dead against D2 / D1 / a counting bound / hypothesis (a) — with
+one honestly-flagged polish item. Verification:
+`a15_e10_size4_s2_kills.py` (W1–W5b). Machine numbers below are
+from Z₉×Z₆ (1,200-member slice) + Z₆×Z₁₀ (full) + the fixed ambient
+censuses.
+
+### 10.1 Theorem G — the S2 kill (branch 2b closed)
+
+Under D1 ∧ D2 ∧ (iii) ∧ no-period ∧ 4∤ℓ ∧ 4∤m, no size-6 match has
+δ_L ∈ dB ∧ δ_R ∈ dA. With Entry 9's Lemma A and Theorem D this
+closes size 6: **no size-6 (2,2) match exists at all.**
+
+*Proof sketch (funnel).* The Σ-count over dA (Entry 9's method, with
+the S2 atom terms: Σ_R picks up +6 from δ_R ∈ dA) forces
+|dA ∩ (dB+δ_R)| + |dA ∩ (dB−δ_R)| ≥ 6. The pinning (Entry 9 §9.4)
+gives b(x) = AP(δ_Rx) with δ_Rx = ±u, so x(dB) = {±u², ±2u}
+(any spike position), and the x-fiber caps bound the two
+intersections by 3+3 (generic u) — equality forces every
+x-compatible element to land in dA, pinning the y-data:
+{δ_Ry, δ_Ry ∓ h} = {±w}, hence h = ±2w and {s, s′} = {w, 2w} (up to
+mirror), i.e. a(y) = AP(w). The pinning also says a(y) = AP(±h) =
+AP(2w); a 3-set that is an AP for both w and 2w forces 3w = 0
+(difference-multiset comparison; the 5w = 0 option fails
+multiplicities). With 3w = 0, dA's slant set becomes all four
+(±u, ±w) — and dB always carries a slant with x-part ±u and y-part
+±h = ∓w, which therefore lies in dA: **dA ∩ dB ≠ ∅, contradicting
+D2**. Sub-branches: 3u = 0 (x(dB) = {±u³}) reruns the count with
+per-fiber caps 2 and lands in the same clash via h ∈ {±w, ±2w};
+b-side orbit-pair dies by the fiber count (≤ 4 < 6); a-side
+orbit-pair forces 4w = 0 ⟹ 2w = 0, excluded because D1 forbids
+2-torsion differences ((0,w) would be one). ∎
+
+Machine (W3): all pinned S2-hard rows are AP/AP (160 on Z₉×Z₆, 0 on
+Z₆×Z₁₀; 0 orbit-pair rows either side), and **0 rows satisfy the
+forced-condition set** [a = AP(w) ∧ (h = ±2w ∨ (3u = 0 ∧ h = ±w))] —
+the funnel's terminal configuration never coexists with the D2 gate,
+as the proof demands.
+
+### 10.2 Size 4 — exact rigidity, the dichotomy, the family collapse
+
+**Lemma E (exact rigidity; upgrades E9.5's "generic").** A size-4
+match forces dA = {±2δ′, ±(f−δ′), ±(f+2δ′)} and
+dB = {±2δ, ±(e−δ), ±(e+2δ)}, all six values distinct on each side.
+*Proof:* Σ-count over dA: the ±{δ, e, e+δ} multiset hits each dA
+element exactly once (D1), the right side reaches 6 only if every
+one of its six non-dB values lands in dA, and per-element equality
+at 1 makes the cover exact; symmetrically over dB. ∎ (W1: the
+Σ-formula asserted on all 86,400 sampled size-4 rows; joint
+rigidity holds 0 times on gate-passing members.)
+
+**Lemma F (matching dichotomy).** σ_L = t + σ_R makes σ_L's pair
+decomposition (gaps {δ, 2δ}) and σ_R's ({δ′, 2δ′}) two matchings of
+ONE 4-set, so one of:
+- *aligned* (same matching, gap-aligned): δ = ±δ′ — **D2-dead**;
+- *crossed* (same matching, gaps swapped): δ = ±2δ′ ∧ 2δ = ∓δ′ ⟹
+  3δ′ = 0 (then 2δ′ = −δ′ gives δ = ±δ′ — **D2-dead**) or 5δ′ = 0 —
+  the **pentagonal family**;
+- *M₂* ({±e, ±(e+δ)} = {±δ′, ±2δ′}): e or e+δ ∈ ±dB — **D2-dead**;
+- *M₃* ({±(δ−e), ±(e+2δ)} = {±δ′, ±2δ′}): the **triangular
+  families**, resolved by the closure constraint (dB must itself be
+  a 3-set difference set): every sign-assignment forces one of
+  3δ = 0-with-3τ = 0 (T₃-confined: |dA ⊎ dB| = 12 > 8 = |Z₃² ∖ 0| —
+  **counting-dead**), τ = 3δ with 9δ = 0 (dB acquires 2δ twice —
+  **D1-dead**), or 5δ = 0 / 15-torsion **cyclic-confined families**.
+
+**Lemma H (the pentagonal kill).** The crossed-5-torsion analysis
+confines all data to the (5,5)-torsion subgroup T₅ ≅ Z₅² (both
+coordinates of δ′, e, f are 5-torsion by the (iii)-profile order
+argument), so dA ⊂ T₅ and A lies in a single T₅-coset. In char 2
+there are **no vanishing weight-3 sums of 5th roots of unity**
+((1+ζ)⁵ = ζ + ζ⁴ ≠ 1 for ζ ∈ μ₅ ∖ {1}), so every CRT component of Â
+is a unit and Ann(A) = 0 — **hypothesis (a) is violated**. ∎
+(W4: the branch is genuinely live at the difference-set level — 960
+D1∧D2 σ-shape matches on Z₅², all realizable; W4b: all 276 weight-3
+polys on Z₅² have all-unit components — the kill is real and
+needed, not vacuous.)
+
+**The confined families vs the gates (machine-exhaustive).** The
+15-torsion/cyclic-confined families are also live at the
+difference-set level: W5 finds 4,560 D1∧D2 σ-shape matches across
+the family ambients — all at 5 | n, i.e. every live confined family
+is 5-torsion-flavored, and these are exactly Entry 6's non-mirror
+exclusion zone seen structurally (the diagnosed hits are
+axis-confined, same-orientation pairs with Ann = 0). **W5b realizes
+every hit on the 2-D ambient list (Z_n×Z₃ n ≤ 30, Z_n×Z₅ n ≤ 20,
+Z₅²) — 19,120 realized matches — and 0 satisfy
+(iii)-mirrored ∧ Ann ≠ 0 ∧ no-w2/w4.** Polish item (flagged): the
+by-hand (iii)∧(a)-incompatibility for arbitrary embeddings of the
+confined families (diagonal cyclic subgroups of large frames) — the
+coordinate-split analysis per family; all axis-aligned and
+small-mixed embeddings are covered by the census, and the 91,840-
+member frame battery plus W2's zero-precondition-rows corroborate.
+
+### 10.3 Status: the (v)-obligation is now a theorem-with-one-polish-item
+
+    (v) size 6 = Lemma A + Theorem D + Theorem G      [proven]
+    (v) size 4 = Lemmas E, F, H + family collapse     [proven; general-
+                 embedding polish item, census-exhausted]
+    (v) size 2 = vacuous under D1                     [proven]
+
+Hypotheses consumed: D1, D2, (iii), no-period, Ann ≠ 0, 4∤ℓ ∧ 4∤m —
+**still no use of the full μ ≥ 6 floor.** Remaining for the class
+theorem (C-iv′)/(C-v′): the (iv) uniform lemma (Entry 8.2: 100%
+profile-separable — expected to yield to the same multiset toolkit),
+the size-4 polish item, and the certifier wiring (T1.2).
+
+### 10.4 Frame battery addendum
+
+Z₅×Z₅ has **zero class members** (144 mirrored candidates, all fail
+the floor/Ann gate — Entry 6 §6.1's "Z₅² matches are all k = 0"
+reappearing as the pentagonal kill). Z₅×Z₁₀ + Z₁₅×Z₅ hunt in flight
+at entry time (`data/a15/t11_pent.log`) — append counts on pickup.
+
+### Next
+
+1. Entry 11: the (iv) uniform lemma via the same difference-multiset
+   toolkit (triangle-image d(σ) identities); then (C-iv′)/(C-v′) is
+   a THEOREM modulo the size-4 polish item.
+2. T1.2 certifier: per-member (v) is now zero-cost (all uniform);
+   per-member (iv) = the small census until Entry 11 lands.
+3. Polish: the general-embedding (iii)∧(a) argument; fold Theorem
+   G/Lemmas E–H into a consolidated A16 class-theorem write-up.
