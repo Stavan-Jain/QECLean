@@ -351,6 +351,32 @@ shared factors) and prove a floor on the complement — `D1∧D2∧D3` is a usef
 frame-fragile filter, the one-sided (engine) half stays frame-locked, and sufficiency
 of `D1∧D2∧D3 ∧ ¬Frobenius` is itself open.
 
+> **Update (2026-07-07, A15 Entries 8–11 — the class small-cycle theorem
+> closes this arc for the mirrored class).** The base-floor theory this
+> section called for now exists as a theorem on the (iii)-mirrored class
+> (`A5_goal2_log.md` Entry 11.4; certifier
+> `experiments/bb_lab/scripts/a15_class_certify.py`): for weight-3
+> instances with D1 ∧ D2 ∧ (iii) ∧ Ann ≠ 0 on a floor-bearing frame,
+> **no nonzero 1-cycle of weight ≤ 5 exists** — modulo three bounded
+> polish items, none realized on 111,840 battery members. Three findings
+> revise this section's conclusions *for class members*:
+> (1) the one-sided engine half is **not** frame-locked to `Z₃²` — the
+> support dichotomy is field-generic (only value-rigidity is F₄-bound),
+> so the `Z₂²`-frame floor runs over any odd part (first new instance:
+> `Z₆×Z₁₄ [[168,12,6]]`, certified, odd part `Z₃×Z₇`);
+> (2) the Frobenius obstruction is subsumed: the weight-3 triangle image
+> is *identically* `B² + c` (char-2 identity), and `(iii) ∧ D1` exclude
+> `dA = 2·dB` outright — including the `Z₈²`-spread variants that broke
+> `D3` — so on the class no explicit `is_frobenius_related` gate is
+> needed;
+> (3) the `(2,2)` obligation's stable invariant is the **difference
+> multiset**, not coordinate profiles: the kill is exact multiset
+> accounting (atoms → translate-rigidity → a D2 funnel), and its only
+> live exceptional families are 5-torsion-confined, dying against
+> `Ann ≠ 0` (no vanishing weight-3 sums of 5th roots in char 2).
+> Off-class (non-mirrored pairs), this section's caution stands
+> unchanged — the falsifier families live exactly there.
+
 ---
 
 ## 7. Reusable core vs. per-code cost

@@ -1,13 +1,21 @@
 # A15 — base-floor generalization: mathematical landscape + plan (v2)
 
-> **Execution log: `A5_goal2_log.md` Entry 8+** (session 1, 2026-07-06:
-> §1.3 verified + hand-proven — the engine support dichotomy is
-> field-generic, checker widened additively; T1.1 hunt clean on the
-> first live even-axis frames; the residue lemma re-shaped from
-> multiplicity profiles to DIFFERENCE-MULTISET incidence, which
-> separates 100% of profile-resistant rows).
+> **Execution log: `A5_goal2_log.md` Entries 8–11** (2026-07-06/07).
+> **T1 IS CLOSED (modulo three bounded polish items)**: the class
+> small-cycle theorem v1 is assembled (Entry 11.4) — D1 ∧ D2 ∧ (iii) ∧
+> no-period ∧ Ann ≠ 0 ∧ floor-bearing frame ⟹ no cycle of weight ≤ 5,
+> d ≥ 6, covers inherit. Proof pieces: field-generic engine (E8.1b,
+> §1.3 CONFIRMED), difference-multiset (v)-kill (E9: Lemma A/Thm D;
+> E10: Thm G + Lemmas E/F/H + family collapse), Frobenius-square (iv)-
+> kill (E11: Lemma I/Thm J/Lemma K — `is_frobenius_related` subsumed
+> by (iii) on class members). Battery: 111,840 members / 8 frames / 0
+> violations. Certifier: `a15_class_certify.py` (T1.2) — every
+> obligation uniform, no per-member censuses; **Z₆×Z₁₄ [[168,12,6]]
+> CERTIFIED = 4th analytic instance, 1st off-Z₃² odd part (T3a.3
+> subsumed)**. Residue: polish items P1–P3 (→ A16 consolidation),
+> then T2 (Lean layer), T4 (w = 5), T3c (Z₄ pilot).
 >
-> **Status: v2, 2026-07-06; T1.1 + §1.3 execution begun** — deep-dive
+> **Status: v2, 2026-07-06; T1 closed-mod-polish 2026-07-07** — deep-dive
 > revision of the same-day v1. Successor to the goal-2 track (A4 §7, `A5_goal2_log.md`
 > Entries 1–7) and the base-floor half of
 > `docs/gross-distance-extensibility.md` §6. New in v2: the structural-algebra

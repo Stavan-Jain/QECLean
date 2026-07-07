@@ -1422,3 +1422,41 @@ surveyable per instance).
 3. Then T2 (the Lean base-floor layer) — the theorem's obligations
    are now all decidable-by-construction, which is exactly what the
    `BBSmallCycleData` bundle wants.
+
+---
+
+## Entry 12 (2026-07-07) — T1.2: the certifier lands; Z₆×Z₁₄ becomes
+## the fourth analytic instance
+
+`scripts/a15_class_certify.py` wires Entry 11.4 into a per-instance
+certificate: gates W3/D1/D2/(iii)/FRM/ANN + the frame-appropriate
+analytic floor route (widened engine / Z₂ pullback / semisimple d_H)
++ the exact w2/w4 kernel exhaustion, emitting CERTIFIED (theorem
+citation + cover transfer) or REJECTED (first failed gate, no
+verdict implied). Every obligation is uniform — the Entry-5-era
+per-member censuses are gone. `--verify` runs the direct (iv)/(v)
+checks as machine confirmation (A_HANDOFF §1 grade).
+
+Self-test battery (8/8 as predicted): bb_72, bb_108, bb_90 CERTIFIED
+(three frame shapes, three floor routes); **Z₆×Z₁₄ [[168,12,6]]
+(A = 1+y+x³y³, B = 1+x+x²y⁷) CERTIFIED with the widened-engine
+route — the fourth analytic instance and the FIRST off the Z₃² odd
+part (components F₂·F₄·F₈²·F₆₄²), subsuming T3a.3's planned
+per-instance grid**; its two n = 336 free-Z₂ covers inherit d ≥ 6
+(and are SAT-known d = 12 doubles — the natural next engine
+targets). gross-as-base and bb_288-base REJECTED at FRM (the Z₄
+wall, as designed); the Entry-6 Z₃×Z₅ falsifier and the Z₇²
+Frobenius square REJECTED at (iii).
+
+Doc updates: extensibility §6 update block (the class theorem closes
+the obstruction arc for mirrored members; engine not frame-locked;
+Frobenius subsumed; difference multiset = the stable invariant);
+A15 plan header (T1 closed-mod-polish).
+
+### Next (unchanged from Entry 11 + re-ranked)
+
+1. A16 consolidation (discharge P1–P3, one document for Entries
+   8–12).
+2. T2: the Lean `BBSmallCycleData` layer — all obligations now
+   decidable-by-construction; pilot bb_108/bb_90/z6z14.
+3. T4 (w = 5 sweep) / T3c (Z₄ pilot) per the plan ranking.
