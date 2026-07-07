@@ -673,6 +673,15 @@ safe-floor ceiling is 18 < 20**, matching the stored-y deficit-2 miss
 (and the actual weight-18 cover logical of §14). The rescue that saved
 hit3 (A11) does not materialize for bb_108 at this equivalence depth.
 
+> **A15 correction (2026-07-06).** The *rejection verdict* of every cell
+> stands (each certificate is a genuine coset element below the floor),
+> but the recorded refutation *weights* here and in §16 are first-found
+> SAT witness weights at the query bound — upper bounds, not minima —
+> and the "orbit ceiling 18" reading overstates the orbit: exact
+> descending ladders put the stored-y cell and every sampled finalist
+> strictly below 18. See `A15_deficit_wall.md` §8 for the corrected
+> exact values and the theorem that pins what the true ceiling can be.
+
 Structural readings:
 
 - **Condition 2 is strongly presentation-sensitive**: the stored
@@ -750,6 +759,25 @@ safe-floor minimum` to `2d − 2` for non-doubling BB codes? (Note
 `2d − 2 = 2(d − 1)` — suggestive of a weight-(d−1)-ish base object
 whose double-cover shadow lands in the safe sector; connects to the
 overlap-rescue math and the closed-form-S0 residue.)
+
+> **A15 resolution + correction (2026-07-06,
+> `A15_deficit_wall.md`).** Answered in corrected form. The *value* is
+> a theorem: with weight-3 polynomials every 1-cycle is even
+> (augmentation), and `d_safe = 2d ⟺ SF`, so `2d − 2` is the unique
+> maximal SF-failing value — parity is the whole "parity/duality
+> mechanism". The *mechanism* is a pushforward, not a base object:
+> under (R), `im p₁ = im δ₂` makes the projection of any
+> surviving-class cover logical a safe base logical
+> (`d_safe ≤ d̃_safe`), so a safe-sector failure upstairs is inherited
+> downstairs at no weight cost; the hypothesized `2(d−1)` base object
+> (two overlapping translates of a min-weight logical) is provably
+> *absent* on bb_108 — all 54 minimum-weight logicals have collision
+> group `K_z = Stab₀`. And the "stalls at *exactly* 2d − 2" premise
+> was a measurement artifact: these paragraphs' 18s and 34s are
+> first-found witness weights, not minima (exact ladders: stored-y
+> and all sampled finalists sit strictly lower). The honest residue
+> is the code invariant `maxSF ∈ {2d} ∪ {even ≤ 2d − 2}` and the
+> (M)-robustness conjecture. See A15 §§6–9.
 
 **Hunt verdict for d > 12 by literal-lift doubling of corpus codes:
 negative in every probed direction** — stored forms (§14), same-axis
