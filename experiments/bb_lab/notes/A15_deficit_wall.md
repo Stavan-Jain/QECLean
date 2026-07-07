@@ -373,14 +373,36 @@ Corrected empirical picture:
   should never be read as floors; `a14_s4_ladder.coset_query` callers
   that log `weight` now have a documented descending-ladder recipe for
   exact values.
-- **Lean package (queued; small).** `BBTransferH1.lean` already proves
-  the sibling LES slot `ker_pushH1_eq_range_pullH1`
-  (`ker p₁ = im τ₁`, both inclusions by the same mapQ/exactness-chase
-  idiom); L0 is the connecting-map slot `ker τ₁ = im δ₂` with `δ₂`
-  induced by the existing `BBCover.seamC`, and T2's input
-  `im p₁ = im δ₂` (A14.1(2), already the queued A14 Phase-3 target)
-  composes the two. L1 is the augmentation homomorphism plus two
-  rewrites. L2/T1 are finite group/module algebra over the existing
-  `H₁` quotient. The sheet inequality `|p(v)| ≤ |v|` is already the
-  `chainWeight`-level step inside `safeFloor_of_seamCosetFloor`
-  (`BBDoubling.lean`). None of it needs new native_decide content.
+- **Lean package: LANDED (same session), axiom-clean.**
+  `QEC/Stabilizer/Framework/Homological/BBDeficitWall.lean` (new module,
+  wired into the `Homological` umbrella; builds green with zero
+  warnings; flagship theorems check to the standard three axioms — no
+  `sorry`, no `native_decide`):
+  - **L1**: `sum_conv` (the augmentation is multiplicative on
+    convolutions), `cycle_support_even` (generic: odd-weight `A, B` ⟹
+    every 1-cycle has even support), instantiated as
+    `base_cycle_weight_even` / `cover_cycle_weight_even` (the cover
+    hypotheses *descend* through `push_A`/`push_B` — only the base
+    sums are assumed).
+  - **L0**: `pull1_seamC` (`τ(seamC ζ) = liftStab ζ`) and
+    `pull1_mem_boundaries_iff_seamCoset` — a base 1-chain pulls back
+    to a cover boundary **iff** it lies in a seam coset; the forward
+    chase descends the boundary witness through `liftC2_decomp` and
+    takes `sheet1`.  This is the connecting-map slot `im δ₂ = ker τ₁`
+    at chain level, sibling to `BBTransferH1.ker_pushH1_eq_range_pullH1`.
+  - **T2**: `push1_mem_seamCoset_of_deckTrivial` (under
+    `DeckTrivialOnH1`, i.e. from any `deckTrivial_of_bezout` witness,
+    every cover cycle's pushforward lies in a seam coset — proof:
+    `τ(p v) = v + σv` is a boundary) and
+    `not_seamCosetFloor_of_light_cover_cycle` (a cover cycle of weight
+    `< m` with non-boundary pushforward refutes `SeamCosetFloor m`) —
+    `d_safe ≤ d̃_safe` in the repo's own predicates, the converse
+    direction to `safeFloor_of_seamCosetFloor`.
+  - **The wall**: `seamCosetFloor_of_even_of_pred` and
+    `safeFloor_of_even_of_pred` — for even `m`, the floors at `m − 1`
+    upgrade to `m` for free, so **the unique maximal failing value of
+    an even target is `m − 2`**.
+  Not formalized (follow-up if ever needed): L2/T1 collision
+  subgroups (the mechanism is measurably silent on the codes that
+  matter), and A14.1(2)'s dimension count (T2 deliberately routes
+  around it via deck-triviality).

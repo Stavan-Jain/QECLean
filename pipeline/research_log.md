@@ -54,10 +54,19 @@ what was tried and why it didn't work.
   correction blocks added to A14 §§15–16. Residue: the code invariant
   `maxSF ∈ {2d} ∪ {even ≤ 2d − 2}` (true value per code now measurable
   by ladders; A15-P1's corpus battery must report S4 weights as "≤"),
-  the (M)-robustness conjecture, the T1/T2-both-silent corner of the
-  `≤ 2d` ceiling, and the small Lean package (L0/T2 slot into
-  `BBTransferH1`'s exactness chase next to
-  `ker_pushH1_eq_range_pullH1`; L1 is augmentation-trivial).
+  the (M)-robustness conjecture, and the T1/T2-both-silent corner of
+  the `≤ 2d` ceiling. **Lean layer LANDED (same session, axiom-clean,
+  zero warnings): `Framework/Homological/BBDeficitWall.lean`** — L1
+  parity (`sum_conv`, `cycle_support_even`, base+cover instantiations
+  with descending hypotheses), L0 as the chain-level iff
+  `pull1_mem_boundaries_iff_seamCoset` (sibling to
+  `ker_pushH1_eq_range_pullH1`), T2 as
+  `push1_mem_seamCoset_of_deckTrivial` +
+  `not_seamCosetFloor_of_light_cover_cycle` (`d_safe ≤ d̃_safe`
+  against the repo's own `SeamCosetFloor`/`DeckTrivialOnH1`,
+  deliberately routing around A14.1(2)'s dimension count via
+  deck-triviality), and the wall as the even-step upgrades
+  `seamCosetFloor_of_even_of_pred` / `safeFloor_of_even_of_pred`.
   [theorem+battery](../experiments/bb_lab/notes/A15_deficit_wall.md)
 
 - 2026-07-04 — safe-floor-screens (A14) — success —
