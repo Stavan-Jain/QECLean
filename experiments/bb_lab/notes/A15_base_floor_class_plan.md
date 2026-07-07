@@ -1,6 +1,11 @@
 # A15 — base-floor generalization: mathematical landscape + plan (v2)
 
-> **Execution log: `A5_goal2_log.md` Entries 8–13** (2026-07-06/07).
+> **Execution log: `A5_goal2_log.md` Entries 8–14** (2026-07-06/07).
+> **T2 SHIPPED (Entry 14)** — parametric Lean bundle `SmallCycleData`
+> (`Framework/Homological/BBSmallCycle.lean`) + generator
+> (`gen_base_floor_lean.py`) + three kernel-checked pilots (bb_108 /
+> bb_90 / Z₆×Z₁₄, all d ≥ 6 at chain, dual, and Pauli levels;
+> `strongBaseFloor_of_smallCycle` feeds BBDoubling).
 > **T1 IS CLOSED — the class small-cycle theorem is UNCONDITIONAL**
 > (Entry 11.4 assembled it; Entry 13 discharged the P1–P3 polish
 > items; write-up of record: `A16_class_theorem_writeup.md`) —

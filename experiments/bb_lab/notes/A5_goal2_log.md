@@ -1512,3 +1512,90 @@ updated; research_log entry added.
    §"class results" companion to the gross mechanism paper
    ([[bb-paper1-positioning]]); Lin–Pryadko baseline comparison per
    member.
+
+---
+
+## Entry 14 (2026-07-07) — T2 SHIPPED: the parametric Lean base-floor
+## layer (`SmallCycleData`) + three kernel-checked pilots
+
+**The class theorem's Lean packaging exists.** New Framework module
+`QEC/Stabilizer/Framework/Homological/BBSmallCycle.lean` defines
+
+> `SmallCycleData G` (namespace `Quantum.Stabilizer.Homological.BB`):
+> fields `A B : G → ZMod 2`, `epsA/epsB` (ε = 1), `check_two/check_four`
+> (no normalized weight-2/4 cycle, tuple form),
+
+and derives **generically** (parametrizing the gross
+`BaseDistance.lean` argument: translation normalization + PAR +
+sparse-syndrome bridge to the finite checks):
+
+* `D.cycle_weight_ge_6` — the strong small-cycle floor (every nonzero
+  1-cycle weighs ≥ 6, boundaries included);
+* `D.chain_floor` / `D.dual_chain_floor` (via
+  `bb_cycle_bound_iff_dual_bound`) / `D.logical_weight_ge_6` (Pauli
+  level, via `chainWeight_lower_bound_transfers`) /
+  `D.stab_weight_ge_6` (the μ ≥ 6 half);
+* `XDoubleCoverData.strongBaseFloor_of_smallCycle` — any free-ℤ₂ cover
+  of a bundled base gets `StrongBaseFloor 6`, feeding the
+  Theorem-B/BBDoubling machinery directly (T6 routing hook).
+
+**Two-grade design as planned**: the four obligations are plain `Prop`s.
+The pilots discharge them by `native_decide` (engineering grade); the
+analytic grade replaces exactly those four leaves with the class
+theorem's per-split kills — invisible downstream.
+
+**Generator + pilots.** `experiments/bb_lab/scripts/gen_base_floor_lean.py`
+validates the four obligations offline (bitmask syndromes; ~2.1M
+subset checks across the pilots; k cross-checked: 8/8/12) and emits
+`QEC/Stabilizer/Codes/BivariateBicycle/BaseFloors/{BB108,BB90,Z6Z14}.lean`.
+All three build (kernel-accepted):
+
+| pilot | group | params | floor | build |
+|---|---|---|---|---|
+| bb_108 | Z₉×Z₆ | [[108,8,10]] | d ≥ 6 (true d = 10) | 228 s |
+| bb_90 | Z₁₅×Z₃ | [[90,8,10]] | d ≥ 6 (true d = 10) | 123 s |
+| z6z14 | Z₆×Z₁₄ | [[168,12,6]] | d ≥ 6 — **tight** | 640 s |
+
+Each exports `strong_floor`, `chain_floor`, `dual_chain_floor`,
+`logical_weight_ge_6`, `stab_weight_ge_6`. These are the first Lean
+floors for codes with no prior per-code formalization (the gross/bb72
+/pair72 files were bespoke); marginal cost of the next member ≈ one
+generator entry + one build.
+
+**Engineering findings** (now baked into the generator template):
+
+* **One declaration per `native_decide`.** Bundling all four checks
+  inside the `def floorData` structure literal blows the single-
+  declaration 200k-heartbeat budget at `whnf` once |G| ≳ 54 (BB90 at
+  45 squeaked through; BB108/Z6Z14 died with a cascade of misleading
+  `Unknown identifier` errors downstream). Hoisting each obligation to
+  its own lemma (fresh budget each — exactly how the gross file is
+  shaped) fixes it with no heartbeat bumps.
+* **`decide` on the ε sums is not cheap-per-case** (~90 s kernel
+  reduction per 45-term `ZMod 2` `Finset.sum`); `native_decide`
+  matches the gross precedent.
+* Debug hygiene relearned: read the FIRST error of the raw log —
+  two rounds of tail-filtered build output hid the heartbeat root
+  cause behind its own cascade; and don't leave the MCP `lake serve`
+  alive across a `lake build`.
+
+**Verification scope** (cold worktree): `lake build` of
+`Framework.Homological` umbrella (3367 jobs ✓ — includes the new
+module + the edited umbrella), `BaseFloors` + all three instances
+(3363 jobs ✓). The `Codes.BivariateBicycle` umbrella edit adds one
+import of a target built above; the full gross Y-floor stack was not
+rebuilt on this worktree (hours; unchanged by this diff).
+
+### Next
+
+1. **T6 routing**: when a cover's `XDoubleCoverData` lands (hit3-y /
+   Z₆×Z₁₄→[[336,12,12]] engine targets),
+   `strongBaseFloor_of_smallCycle` is the one-liner base-floor input.
+2. **IsLeast for d = 6 members** (z6z14 + the other 23): needs one new
+   generic lemma — odd pairing with a dual cycle certifies
+   `∉ boundaries` — then a weight-6 witness per member (one
+   convolution decides). Queued.
+3. **Analytic-grade leaves**: discharge `check_two/check_four` from
+   the class theorem inside Lean (tier-2; the statement shape is
+   already final).
+4. T4 (w = 5 sweep) / T3c (Z₄ pilot) — unchanged plan ranking.
