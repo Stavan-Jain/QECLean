@@ -256,6 +256,57 @@ regime where CaDiCaL stalls both ways). Next actions, in order:
    wall's cross-family recurrence prices rescue odds low; the docket
    dominates on expected value per CPU-hour.
 
+### 6.1 Docket decision pass (2026-07-06/07) — FOURTEEN SF-CERTIFICATIONS
+
+Driver: `scripts/a15_docket_decide.py`. The decisive query per cell is
+`exists coset element of weight <= floor - 2` per G-orbit rep (parity
+makes floor-1 vacuous): SAT refutes SF; UNSAT on all reps certifies
+`SeamCosetFloor floor`. Backends: **cryptominisat5 with the XOR rows
+passed natively as DIMACS x-lines** (no Tseitin), kissat/cadical
+binaries on the Tseitin CNF as second opinions. Every SAT model is
+re-verified in numpy before being believed; smoke gates (known-refuted
+cell -> SAT; pair72-base @6 -> UNSAT) passed on both cms and kissat.
+
+**The XOR-native encoding cracked what pysat-CaDiCaL could not**: the
+Z21xZ3 queries that stalled for hours at 10M conflicts decided in
+3-20 min each under CMS. Run shape: 6-way shards, 1200 s/query
+timeout, ~2 h wall. Results (data/a15/docket_decision.jsonl):
+
+- **SF-CERTIFIED: 14 of 21** — every safe-class coset minimum >= 2d,
+  solver-grade, witnessed UNSAT on every G-orbit rep + the parity step:
+  - **all 12 Z21xZ3 [[126,8,8]] x-cells** (the complete A-family
+    x-slice, A = y + y^2 + x^3) — doubling target [[252,8,16]];
+  - **e21c6389f1a88067 on BOTH axes** (y-reps ~15 min each);
+  - **f2a6f17e1c41ff96:y [[150,8,8]] (Z5xZ15) — WITH TIGHTNESS**: the
+    SS6 probe's weight-16 witness + UNSAT@14 pin its safe minimum at
+    exactly 16 = 2d. First certification outside the Z21xZ3 family.
+- **UNKNOWN: 7** (timeout at 1200 s; retry pass at 7200 s running):
+  16884e06:y (reps 2/3 already UNSAT — one rep short of certifying),
+  ac46bbea:y, 38d3c884:x/y (Z5xZ15, floor 16), 37a70e02:x,
+  5e50a9:x/y (Z15xZ6 [[180,4,10]], floor 20 — d = 20-target cells).
+
+**These are the program's first safe-floor certifications past d = 6**
+— SeamCosetFloor 16 on thirteen d = 8 bases (twelve of them one
+G-frame family). What certification does and does not give: SF is the
+template's provability bottleneck (A11: SF-true doublers 111/111;
+0/465 sufficiency violations; T2: SF + (M)-half => doubles), but the
+unconditional doubling claim per cell still owes the cover-side
+confirmation — next: witness-side cover ladders at 16 on the
+[[252,8,16]] targets (cheap), cover UNSAT@14 / Lean packaging after.
+
+**Trust status, stated honestly:** CMS UNSATs ride its Gauss-Jordan
+XOR reasoning — sound but proof-less (DRAT is disabled under Gauss).
+SAT-side answers are numpy-re-verified; UNSAT-side rests on solver
+correctness, same trust tier as the corpus's CaDiCaL d_exact values.
+Proof-grade upgrade in flight: kissat DRAT spike on the tightness
+cell's Tseitin CNF (first LRAT-bridge artifact if it lands); full
+kissat confirmation sweep + cake_lpr checking = the Phase-4 residue.
+
+**Cross-fork ops note:** CMS-with-x-lines re-prices every "CaDiCaL
+can't" in the program — A15-P3's "bb_288 exact minima priced out"
+(<= 34, unmeasured) and the 5 h bb108-y cover-side UNSAT are worth
+re-running under this backend.
+
 ## 7. Success criteria
 
 - **Primary:** one (code, axis) with S4-certified SF ≥ 2·d(base) ≥ 14,
