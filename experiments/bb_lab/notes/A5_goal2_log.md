@@ -1307,3 +1307,113 @@ at entry time (`data/a15/t11_pent.log`) — append counts on pickup.
    per-member (iv) = the small census until Entry 11 lands.
 3. Polish: the general-embedding (iii)∧(a) argument; fold Theorem
    G/Lemmas E–H into a consolidated A16 class-theorem write-up.
+
+---
+
+## Entry 11 (2026-07-06) — the (iv) kill: triangle images are
+## Frobenius squares; the class small-cycle theorem assembles
+
+Same-day continuation. The (iv) obligation ((1,3)/(3,1) censuses)
+turns out to be governed by two char-2 polynomial identities, making
+its uniform kill THREE LINES — and with it, (C-iv′)/(C-v′) assembles
+into a theorem modulo explicitly-bounded polish items. Verification:
+`a15_e11_iv_kill.py` (X1–X3) + the coincidence classifier.
+
+### 11.1 Lemma I (chirality structure of the triangle census)
+
+In char 2: **B·B = B²** (the Frobenius square — squared supports,
+3 distinct cells since D1 forbids 2-torsion differences) and
+**B·(−B) = {0} ∪ dB** (weight 7 under D1). Consequently the
+dB-triangles {0, a, b} (a, b, b−a ∈ dB) generically form exactly two
+translate classes, and their weight-3 images are pinned:
+
+* reflection class T ~ B_i − B: image ({0} ∪ dB) + c, weight 7 —
+  never produces a (1,3) candidate;
+* same-chirality class T ~ B − B_i: image **B² + c**, weight 3.
+
+(X1: 24,000/24,000 image identities verified on the Z₉×Z₆ and
+Z₆×Z₁₀ batteries; A4 §4.3's T₊/T₋ = exactly these two classes, and
+its "constant-y image y³(1+x²+x⁴)" = 2B + (0,3) verbatim.)
+
+### 11.2 Theorem J (the generic (iv) kill = Frobenius exclusion)
+
+**Under D1 ∧ (iii) alone** (no frame condition): no weight-3
+same-chirality image is a translate of A, in either direction.
+
+*Proof.* A match forces dA = d(B²) = 2·dB. dB (B1-shape) contains
+(p, 0) with 2p ≠ 0 (D1), so 2·dB contains the nonzero y = 0 element
+(2p, 0); but dA under (iii) has y-parts {±w, ±s, ±s′}, all nonzero.
+Mirror: dB = 2·dA would need the x = 0 element (0, 2w) ∈ dB —
+impossible for B1 (all x-parts nonzero) and for B2 (forces 2w = 0,
+D1-dead). ∎
+
+This resolves the extensibility-§6 obstruction arc FOR THE CLASS:
+the Frobenius square A ~ B² (including the Z₈²-spread variants that
+defeated D3) is exactly the generic (iv) failure mode, and
+(iii) + D1 exclude it outright — the `is_frobenius_related` gate is
+subsumed by the mirrored-projection hypothesis on class members.
+
+### 11.3 Lemma K (coincidence classes)
+
+Extra triangle classes require extra additive relations in dB, and
+the battery classification is exact: **every occurring coincidence
+class (4,082/4,082 across both frames) is an order-3-coset triangle**
+T = ⟨v⟩ + c for v ∈ dB of order 3 (2v = −v ∈ dB is free by
+symmetry — bb_108's third (3,1) class, (6,4) = 2·(3,2) with
+3·(3,2) = 0, is this). Its image is the odd-multiplicity coset
+s + ⟨v⟩ (the dB-pair's cosets cancel) — an order-3 AP-line; A ~ an
+AP-line would put multiplicity 2 in dA at the common difference:
+**D1 kills in one line.** The non-occurring genuine-doubling family
+(v, 2v ∈ dB with 3v ≠ 0 ⟹ dB = ±{p, 2p, 3p}, image an AP-line with
+dA-confinement ±{p, 4p, 5p}) dies by the (iii)-clash: the confined
+dA needs an x = 0 representative pattern that forces p's x-part to
+0, contradicting B's own (iii)-shape (with a 2-torsion-u sub-case in
+the Entry-10 torsion apparatus). Polish item: complete the
+relation-type table (q = −3p, 3p + 2q = 0, … patterns) — none occur
+in the battery, and all inhabit the same bounded apparatus.
+
+### 11.4 The class small-cycle theorem (v1)
+
+Assembling Entries 8–11:
+
+> **Theorem (class small cycles, v1).** Let (Z_ℓ × Z_m, A, B) with
+> |A| = |B| = 3 satisfy: D1 (Sidon difference sets), D2
+> (dA ∩ dB = ∅), (iii) (mirrored projections), no-period,
+> Ann(A), Ann(B) ≠ 0, and a floor-bearing frame (2-part ∈ {1, Z₂,
+> Z₂²} with one-sided floor ≥ 6; 4 ∤ ℓ, 4 ∤ m). Then the code has no
+> nonzero 1-cycle of weight ≤ 5; in particular d ≥ 6, μ_Z, μ_X ≥ 6,
+> and every free-Z₂ cover has d ≥ 6 (Theorem-B transfer).
+>
+> *Proof map.* PAR kills mixed-parity splits (|A|, |B| odd). One-
+> sided splits: the widened engine floor (Entry 8.1b — field-generic;
+> Z₂/semisimple frames by the A5 E2/E4 mechanisms). (1,1): D2.
+> (1,3)/(3,1): Lemma I + Theorem J + Lemma K (Entry 11). (2,2):
+> Lemma A + Theorem D + Theorem G (size 6; Entries 9–10) and Lemmas
+> E/F/H + the family collapse (size 4; Entry 10); size 2 vacuous.
+>
+> *Modulo* three explicitly-bounded polish items, none of which
+> occurs on any of the 91,840+ battery members or the 58-member
+> corpus: (P1) the size-4 general-embedding (iii)∧(a) argument
+> (census-exhausted on all 2-D family ambients); (P2) Lemma K's
+> 2-torsion-u sub-case; (P3) the coincidence relation-type table.
+
+Notable hypothesis accounting: the full μ ≥ 6 floor is consumed
+ONLY by the one-sided splits; the entire two-sided analysis needs
+just D1 ∧ D2 ∧ (iii) ∧ no-period ∧ Ann ≠ 0 ∧ 4∤ℓ∧4∤m. And the
+certifier consequence (T1.2) is now maximal: **every per-member
+obligation is uniform** — no censuses, no residue tables; the
+certificate is the gate-check itself (O(|G|²) decidable, all
+surveyable per instance).
+
+### Next
+
+1. A16: consolidated class-theorem write-up (the Entry 8–11 lemmas
+   as one document, with the three polish items discharged — P2/P3
+   are small torsion tables, P1 is the coordinate-split analysis).
+2. T1.2: wire the theorem into `a5_recipe_certify.py`; re-run the
+   58-member corpus + battery as certificates; update the
+   extensibility doc §6 (Frobenius arc: closed for the class) and
+   the A15 plan (T1 = effectively closed).
+3. Then T2 (the Lean base-floor layer) — the theorem's obligations
+   are now all decidable-by-construction, which is exactly what the
+   `BBSmallCycleData` bundle wants.
