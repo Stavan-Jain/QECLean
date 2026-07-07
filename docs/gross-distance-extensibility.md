@@ -353,12 +353,12 @@ of `D1∧D2∧D3 ∧ ¬Frobenius` is itself open.
 
 > **Update (2026-07-07, A15 Entries 8–11 — the class small-cycle theorem
 > closes this arc for the mirrored class).** The base-floor theory this
-> section called for now exists as a theorem on the (iii)-mirrored class
-> (`A5_goal2_log.md` Entry 11.4; certifier
+> section called for now exists as an **unconditional theorem** on the
+> (iii)-mirrored class (write-up of record:
+> `experiments/bb_lab/notes/A16_class_theorem_writeup.md`; certifier
 > `experiments/bb_lab/scripts/a15_class_certify.py`): for weight-3
 > instances with D1 ∧ D2 ∧ (iii) ∧ Ann ≠ 0 on a floor-bearing frame,
-> **no nonzero 1-cycle of weight ≤ 5 exists** — modulo three bounded
-> polish items, none realized on 111,840 battery members. Three findings
+> **no nonzero 1-cycle of weight ≤ 5 exists**. Three findings
 > revise this section's conclusions *for class members*:
 > (1) the one-sided engine half is **not** frame-locked to `Z₃²` — the
 > support dichotomy is field-generic (only value-rigidity is F₄-bound),

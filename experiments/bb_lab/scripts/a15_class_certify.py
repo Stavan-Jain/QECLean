@@ -20,11 +20,10 @@ and emits a certificate:
     ⟹  no nonzero 1-cycle of weight ≤ 5: d ≥ 6, μ_Z = μ_X ≥ 6, and
         every free-Z₂ cover (same polynomials) has d ≥ 6.
 
-Caveat carried by every certificate: the theorem stands modulo the
-three bounded polish items P1–P3 (Entry 11.4), none of which occurs
-on any of the 111,840 battery members; `--verify` additionally runs
-the direct (iv)/(v) checks for the instance (machine confirmation,
-A_HANDOFF §1 grade).
+The theorem is UNCONDITIONAL (Entry 13: the P1–P3 polish items are
+discharged; write-up of record `A16_class_theorem_writeup.md`).
+`--verify` additionally runs the direct (iv)/(v) checks for the
+instance (machine confirmation, A_HANDOFF §1 grade).
 
 Usage:
     uv run python scripts/a15_class_certify.py --self-test
@@ -57,8 +56,9 @@ sys.modules["a15_t11_residue_hunt"] = hunt
 _spec.loader.exec_module(hunt)
 a5 = sys.modules["a5_instance_hypotheses"]
 
-THEOREM = ("class small-cycle theorem v1 (A5 goal-2 log Entry 11.4; "
-           "proof: Entries 8-11; modulo polish items P1-P3)")
+THEOREM = ("class small-cycle theorem (UNCONDITIONAL; write-up of "
+           "record: A16_class_theorem_writeup.md; proof: A5 goal-2 "
+           "log Entries 8-13)")
 
 
 def _widened_kind(comp) -> str:

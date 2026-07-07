@@ -1,10 +1,11 @@
 # A15 — base-floor generalization: mathematical landscape + plan (v2)
 
-> **Execution log: `A5_goal2_log.md` Entries 8–11** (2026-07-06/07).
-> **T1 IS CLOSED (modulo three bounded polish items)**: the class
-> small-cycle theorem v1 is assembled (Entry 11.4) — D1 ∧ D2 ∧ (iii) ∧
-> no-period ∧ Ann ≠ 0 ∧ floor-bearing frame ⟹ no cycle of weight ≤ 5,
-> d ≥ 6, covers inherit. Proof pieces: field-generic engine (E8.1b,
+> **Execution log: `A5_goal2_log.md` Entries 8–13** (2026-07-06/07).
+> **T1 IS CLOSED — the class small-cycle theorem is UNCONDITIONAL**
+> (Entry 11.4 assembled it; Entry 13 discharged the P1–P3 polish
+> items; write-up of record: `A16_class_theorem_writeup.md`) —
+> D1 ∧ D2 ∧ (iii) ∧ Ann ≠ 0 ∧ floor-bearing frame ⟹ no cycle of
+> weight ≤ 5, d ≥ 6, covers inherit. Proof pieces: field-generic engine (E8.1b,
 > §1.3 CONFIRMED), difference-multiset (v)-kill (E9: Lemma A/Thm D;
 > E10: Thm G + Lemmas E/F/H + family collapse), Frobenius-square (iv)-
 > kill (E11: Lemma I/Thm J/Lemma K — `is_frobenius_related` subsumed

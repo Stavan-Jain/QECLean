@@ -13,6 +13,32 @@ what was tried and why it didn't work.
 
 ## Entries
 
+- 2026-07-07 — class-small-cycle-theorem (A15/A16, goal 2) — success —
+  **The A5 goal-2 target statement is an unconditional theorem: every
+  weight-3 BB instance with Sidon disjoint difference sets (D1 ∧ D2),
+  mirrored projections (iii), Ann ≠ 0, and a floor-bearing frame
+  (4∤ℓ, 4∤m) has no nonzero 1-cycle of weight ≤ 5 — d ≥ 6, with every
+  free-Z₂ cover inheriting the floor.** Mechanism: a field-generic
+  widened engine for the one-sided floor (the F₄ co-point dichotomy
+  is support-generic; only value-rigidity is F₄-locked); the (1,3)
+  kill via char-2 chirality identities (the weight-3 triangle image
+  IS the Frobenius square B² + c, and (iii) ∧ D1 exclude dA = 2·dB —
+  subsuming the is_frobenius_related gate on the class); the (2,2)
+  kill via exact difference-multiset accounting (atoms →
+  translate-rigidity → a D2 funnel; size-4 via a matching dichotomy
+  whose exceptional torsion families die against D1/D2/counting/
+  Ann — the pentagonal family by "no vanishing weight-3 sums of 5th
+  roots of unity in char 2"). Two instance-independent fixed censuses
+  (Z₅², Z₁₅²; embedding-complete by torsion factoring) carry the
+  exceptional-family kills. Consequences: the 58-member corpus class
+  + 111,840 battery members certified analytically; bb_72/bb_108/
+  bb_90 subsumed; **Z₆×Z₁₄ [[168,12,6]] certified — first instance
+  off the Z₃² odd part**; per-instance certificates are uniform
+  O(|G|²) gate-checks (`a15_class_certify.py`). Write-up of record:
+  `experiments/bb_lab/notes/A16_class_theorem_writeup.md`; track log
+  `A5_goal2_log.md` Entries 8–13. Lives in `experiments/bb_lab/`
+  (not `attempts/`).
+
 - 2026-07-04 — safe-floor-screens (A14) — success —
   **A12's OQ4 answered in its own terms: the safe sector is canonical
   under (R), and a certified necessary-screen battery now decides

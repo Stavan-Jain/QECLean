@@ -1460,3 +1460,55 @@ A15 plan header (T1 closed-mod-polish).
 2. T2: the Lean `BBSmallCycleData` layer — all obligations now
    decidable-by-construction; pilot bb_108/bb_90/z6z14.
 3. T4 (w = 5 sweep) / T3c (Z₄ pilot) per the plan ranking.
+
+---
+
+## Entry 13 (2026-07-07) — P1/P2/P3 discharged: the class theorem is
+## UNCONDITIONAL; A16 write-up of record lands
+
+All three Entry-11.4 polish items are discharged
+(`a16_polish_checks.py` Y1–Y3; write-up `A16_class_theorem_writeup.md`):
+
+* **P3 (relation-type table) — COMPLETE.** Every non-generic triangle
+  relation among dB's positive reps (2s ∈ dB, q−p ∈ dB, 2p+q ∈ dB,
+  p+2q ∈ dB) resolves, after discarding D1-dead options, to exactly
+  two families: **O3** (an order-3 element of dB; coset triangle) and
+  **PROG** (dB = ±{c, 2c, 3c} — every linear relation q = 2p,
+  q = −3p, 3p+2q = 0, … lands here). Y1: 7,674 extra classes over
+  23,028 D1-sets across ~40 ambients — all O3 or PROG, zero others.
+* **P2 (the doubling family's kill) — a ONE-LINER, subsuming the old
+  coordinate route.** The PROG-AP image is {0, 4c, 5c} + t, whose
+  difference set contains c ∈ dB: a match puts c ∈ dA ∩ dB,
+  violating **D2** directly. No coordinates, no frame condition, no
+  2-torsion sub-case. (O3 images are AP-lines — D1, as before.)
+  Y2: 3,138/3,138 PROG images carry c ∈ d(σ) ∩ ±dB.
+* **P1 (general embeddings) — discharged by torsion factoring + one
+  new case analysis.** The pentagonal family was already
+  embedding-general (Lemma H's confinement is coordinate-shape-based;
+  5-torsion factors through Z₅², so W4b's census is complete). The
+  last triangular family **F-tri-5** (ord δ = 5, ord τ = 3;
+  dA = {±δ, ±τ, ±(τ+δ)}, dB = {±2δ, ±(τ−δ), ±(τ+2δ)}) is genuinely
+  live at the difference-set level (192/192 Z₁₅² data pass D1 ∧ D2!)
+  and dies by the (iii)-slot case analysis: x=0-slot = δ ⟹ dB ∋
+  (0, 2δ_y) vs B-shapes; = τ ⟹ dB's y-parts can't produce B1's
+  zero-pair nor B2 (coprime 3·5-torsion); = τ+δ ⟹ 3u = 5u = 0 ⟹
+  u = 0. Any embedding factors through the 15-torsion ⊆ Z₁₅×Z₁₅, so
+  Y3's sweep of all 192 data (0 admit an (iii)-mirrored shape pair)
+  is **embedding-complete**.
+
+Net: **the class small-cycle theorem carries no caveats.** The two
+load-bearing fixed censuses (Z₅² all-unit components; Z₁₅² F-tri-5
+shape-incompatibility) are instance-independent, hand-provable
+(§6.3/App. B of A16), and of d₃-dictionary epistemic grade.
+Doc/tooling updates: A16 write-up of record; certifier citation
+updated (unconditional); extensibility §6 block and A15 plan header
+updated; research_log entry added.
+
+### Next
+
+1. T2: the Lean `BBSmallCycleData` layer (pilot bb_108/bb_90/z6z14).
+2. T4 (w = 5 sweep) / T3c (Z₄ pilot) per the plan ranking.
+3. Paper positioning: the class theorem + certifier is the natural
+   §"class results" companion to the gross mechanism paper
+   ([[bb-paper1-positioning]]); Lin–Pryadko baseline comparison per
+   member.
