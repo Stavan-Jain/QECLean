@@ -1295,8 +1295,13 @@ the size-4 polish item, and the certifier wiring (T1.2).
 
 Z₅×Z₅ has **zero class members** (144 mirrored candidates, all fail
 the floor/Ann gate — Entry 6 §6.1's "Z₅² matches are all k = 0"
-reappearing as the pentagonal kill). Z₅×Z₁₀ + Z₁₅×Z₅ hunt in flight
-at entry time (`data/a15/t11_pent.log`) — append counts on pickup.
+reappearing as the pentagonal kill). Pickup (run complete): Z₅×Z₁₀
+also has **zero class members**, and Z₁₅×Z₅ — the 25 | |G| frame
+where the pentagonal branch is torsion-permitted — is clean at
+**20,000 members, 0 (iv)/(v) violations** (916 profile-resistant
+rows over 60 classified members, all dm-separated, zero
+DM-RESISTANT), exactly as Lemma H predicts. Battery grand total:
+**111,840 members across 8 frames, zero violations.**
 
 ### Next
 
