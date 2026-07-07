@@ -280,19 +280,40 @@ timeout, ~2 h wall. Results (data/a15/docket_decision.jsonl):
   - **f2a6f17e1c41ff96:y [[150,8,8]] (Z5xZ15) — WITH TIGHTNESS**: the
     SS6 probe's weight-16 witness + UNSAT@14 pin its safe minimum at
     exactly 16 = 2d. First certification outside the Z21xZ3 family.
-- **UNKNOWN: 7** (timeout at 1200 s; retry pass at 7200 s running):
-  16884e06:y (reps 2/3 already UNSAT — one rep short of certifying),
-  ac46bbea:y, 38d3c884:x/y (Z5xZ15, floor 16), 37a70e02:x,
-  5e50a9:x/y (Z15xZ6 [[180,4,10]], floor 20 — d = 20-target cells).
+- **Retry pass (7200 s/query, 3 workers) certified 4 more**:
+  16884e06:y (both axes now), 38d3c884:x AND :y (third both-axes
+  code; its x-side UNSAT took 7489 s — the hardest landed query),
+  ac46bbea:y. **Final: 18/21 SF-CERTIFIED, 0 refuted** — every
+  floor-16 docket cell certified.
+- **UNKNOWN: 3** — the Z15xZ6 [[180,4,10]] floor-20 cells (37a70e02:x,
+  5e50a9:x/y) resisted 2h+ per query (n = 180 at bound 18 is a harder
+  class). Honest open; candidates for longer budgets, a totalizer
+  cardinality encoding, or a bigger machine.
+
+**Both-axes codes (each = two independent certified doubling axes):**
+e21c6389 (Z21xZ3), 16884e06 (Z21xZ3), 38d3c884 (Z5xZ15).
+
+**kissat/DRAT spike (proof-grade leg): LANDED.** The tightness cell
+f2a6f17e:y re-proved UNSAT@14 by kissat on the Tseitin CNF (2429
+vars / 5430 clauses) in 9506 s, emitting a **6.85 GB DRAT proof**
+(gzipped to 3.3 GB, `data/a15/kissat_f2a6f17e_y_w14.drat.gz`,
+regenerable deterministically). Two fully independent solver routes
+now agree on the first certification. Cost ratio kissat:CMS ~ 10:1 —
+a full 18-cell DRAT sweep is machine-days; batch it deliberately.
+drat-trim verification + LRAT emission NOT yet run: the build was
+declined by the session sandbox (external-code rule) and, more
+practically, the disk was at 99% (LRAT > DRAT; ~3-7 GiB free). The
+proof-check leg needs: user-approved drat-trim (or cake_lpr) install
++ disk headroom.
 
 **These are the program's first safe-floor certifications past d = 6**
-— SeamCosetFloor 16 on thirteen d = 8 bases (twelve of them one
-G-frame family). What certification does and does not give: SF is the
-template's provability bottleneck (A11: SF-true doublers 111/111;
+— SeamCosetFloor 16 on eighteen (code, axis) cells over fifteen
+distinct d = 8 bases. What certification does and does not give: SF is
+the template's provability bottleneck (A11: SF-true doublers 111/111;
 0/465 sufficiency violations; T2: SF + (M)-half => doubles), but the
 unconditional doubling claim per cell still owes the cover-side
-confirmation — next: witness-side cover ladders at 16 on the
-[[252,8,16]] targets (cheap), cover UNSAT@14 / Lean packaging after.
+confirmation — next: witness-side cover ladders at 16 on the n = 252 /
+n = 300 cover targets (cheap), cover UNSAT@14 / Lean packaging after.
 
 **Trust status, stated honestly:** CMS UNSATs ride its Gauss-Jordan
 XOR reasoning — sound but proof-less (DRAT is disabled under Gauss).
