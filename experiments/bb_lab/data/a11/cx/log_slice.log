@@ -1,0 +1,21 @@
+slice probe over 399 C-safe-true cells
+  [20/399] 8s dips=0
+  [40/399] 8s dips=0
+  [60/399] 8s dips=0
+  [80/399] 8s dips=0
+  [100/399] 8s dips=0
+  [120/399] 8s dips=0
+  [140/399] 8s dips=0
+  [160/399] 8s dips=0
+  [180/399] 8s dips=0
+  [200/399] 8s dips=0
+  [220/399] 8s dips=0
+  [240/399] 8s dips=0
+  [260/399] 8s dips=0
+  [280/399] 8s dips=0
+  [300/399] 8s dips=0
+  [320/399] 8s dips=0
+  [340/399] 8s dips=0
+  [360/399] 8s dips=0
+  [380/399] 9s dips=0
+done: 0 cells with relaxed rung dips

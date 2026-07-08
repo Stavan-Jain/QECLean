@@ -1,0 +1,10 @@
+== control 1: Z3Z6 doc pair (A=x^2+y+y^3, B=1+x+y^2, axis x) ==
+  k(base) = 4 (expect 4), d(base) = 4 (expect 4)
+  eval_pair: d=4, x-axis verdict = CSAFE_DOUBLES d_cover = 8 (expect CSAFE_DOUBLES, 8)
+  safe minima (cap 7, lo=1): {'>=8': 3} over 3 classes (expect all >=8, 3 classes)
+== control 2: hit3 stored Z6xZ6 (A=y^3+x+x^2, B=y+x*y^2+x^2, axis x) ==
+  hit3:stored:x safe minima: {'6': 12, '8': 45, '>=12': 6} (22.4s) (expect {6:12, 8:45, >=12:6})
+== control 3: mixed-parity coset ladder (step-1 path) ==
+  synthetic minima: 1 (expect 1), 3 (expect 3)
+
+CONTROLS: ALL PASS (ok1=True ok2=True ok3=True ok4=True ok5=True)

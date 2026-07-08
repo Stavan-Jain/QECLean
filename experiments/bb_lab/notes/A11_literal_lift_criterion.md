@@ -992,3 +992,98 @@ per-instance PROOF of the safe conjunct is the sweep/engine discharge
    `a5_cover_cascade.py` as DOUBLE_CANDIDATE v2 (per-presentation,
    probe-backed), research-log + memory updates, and the A8-note status
    flip from "3 supporting groups" to the new census.
+
+---
+
+## Entry 3 — the Entry-2b hunt FOUND one, and it VERIFIES: first
+## observed dangerous-sector bind (2026-07-07)
+
+**Headline.** The 2026-07-02 counterexample-hunt subagent (brief:
+`data/a11/cx/BRIEF.md`; scope: weight-4/5 pairs on nine small frames,
+the weight-3 world having been screened clean) flagged exactly **one**
+counterexample among **2,059 C-safe-true cells** and its session ended
+before the brief's mandated from-scratch re-verification. That
+re-verification (this session, `scripts/a11_cx_verify_m.py`,
+`data/a11/cx/verify_m.json`, 1.7 s) **confirms it on every leg**:
+
+> **(A, B) = (x²y + x³ + x³y³ + x³y⁴, x⁴(1 + y + y² + y⁴))** on
+> **Z₅×Z₅** — a [[50,2,5]] code, weights **4×4** — y-axis literal lift
+> to Z₅×Z₁₀ = [[100,2,8]]: **C-safe holds (two-sidedly, at enumeration
+> grade) yet d(cover) = 8 < 10 = 2·d(base)**, and the failing weight-8
+> X-logical pushes to a **weight-6 nonzero stabilizer** — the b ≠ 0
+> dangerous rung, binding below 2d for the first time anywhere in the
+> program.
+
+**Verification ledger** (independent methods wherever the hunt used the
+SAT stack; grades per A_HANDOFF §1):
+
+| leg | result | method / grade |
+|---|---|---|
+| k(base) = k(cover) = 2 | ✓ | numpy rank (kernel-grade) |
+| (R) | ✓ | Bezout `1 + y⁵ ∈ (Ã, B̃)` by colspace rank (A12 theorem; kernel-grade) |
+| d(base) ≥ 5, both sides | ✓ | **exhaustive**: all C(50,1..4) = 251,175 supports, zero kernel vectors at all (packed-popcount, no solver) |
+| d(base) ≤ 5 | ✓ | SAT witnesses at 5 (X and Z), each re-verified in numpy |
+| tight witness | ✓ | translate (0,0) of the weight-5 Z-logical lifts diagonally to a nontrivial weight-10 cover Z-logical (numpy) |
+| safe floor, Z side | min = **11** ≥ 10 | **exhaustive** 2²⁴-element stabilizer-coset popcount sweep (replaces the hunt's SAT ladder) |
+| safe floor, X side | min = **11** ≥ 10 | same, **new** — closes the honesty-ledger side-gap (the hunt floored only the Z side while its witness is X-type) |
+| rank(im p_*) = 1 = k/2, both sides | ✓ | matches Prop A14.1's dim count under (R) |
+| weight-8 cover X-logical | ✓ | stored witness: ∈ ker H_Z(cover), ∉ rowspace H_X(cover), weight 8 (pure numpy); fresh from-scratch `x_distance` re-run returns d_X(cover) = 8 (SAT-grade exactness; the counterexample needs only ≤ 8) |
+| **sector diagnosis** (never run by the hunt) | **DANGEROUS** | b := p(v) has weight 6, lies in rowspace(H_X base); constructive certificate: **b = the product of exactly two y-adjacent X-checks, cells (1,2) and (1,3)** (Gaussian solve, numpy-reproduced) |
+| sheet split | 4 + 4, overlap 1 | \|v\| = \|b\| + 2·overlap = 6 + 2 ✓; v not deck-invariant |
+
+**What this settles.**
+
+1. **"C-safe ⟹ doubling" is FALSE as a weight-agnostic statement.**
+   The criterion's three conjuncts — plus (R), plus the X-side floor the
+   original criterion never even asked for — all hold at enumeration
+   grade, and the cover still under-runs 2d. Sufficiency was never a
+   near-theorem lacking only diligence; it genuinely needs a hypothesis
+   the even-weight world lacks.
+2. **The Entry-2b residue cell is instantiated, exactly.** The bind is a
+   light stabilizer b (0 < \|b\| = 6 < 2d) with a fiber logical
+   concentrating in its seam shadow: by the D4 accounting, the punctured
+   weight is ≤ overlap = 1 < d − \|b\|/2 = 2, i.e. the **D5
+   concentration criterion is violated** — the "flux-anomalous light b
+   with shadow-concentrating fiber logical" cell, no longer
+   hypothetical. The twice-refined residue was the right residue.
+3. **Parity is the load-bearing hypothesis, not decoration.** The
+   specimen wears the even-weight world's fingerprints: d(base) = 5 is
+   ODD and both safe minima are ODD (11) — both impossible under the
+   A15-P3 parity lemma L1 (\|A\|, \|B\| odd ⟹ all cycle weights even).
+   Also d_safe = 11 > 2d breaks the odd-weight corpus regularity
+   "viable cells sit at exactly 2d". The heavy cancellation feeding the
+   light b (two adjacent checks collapsing to weight 6) runs through
+   B's dense univariate y-support {0,1,2,4} — a shape PAR forbids
+   nothing about at even weight.
+4. **Consequence for the (M)-robustness conjecture** (deficit-wall §9,
+   scoped to corpus-class odd-weight pairs): **not refuted — but now
+   non-vacuous and provably scope-critical.** (R) + tight witness +
+   two-sided safe floors do NOT imply the dangerous rung; any proof
+   must consume \|A\|, \|B\| odd (or what parity buys) in an essential
+   way. Within the hunt itself the odd-weight record stays perfect: the
+   sole violation is the even×even cell; all-odd and mixed-parity
+   C-safe cells doubled without exception (2,058/2,058).
+5. **Near-miss context.** The S2 concentration probes (`a11_cx_nearmiss`,
+   `a11_cx_exhaustb`) logged 8 relaxed-margin rung dips (Z₃×Z₄, Z₄×Z₆,
+   Z₃×Z₅, Z₃×Z₆ — sharpest −4) — relaxation artifacts, none an actual
+   bind; the slice probe found 0. The true bind came from S1 random
+   sampling. Discovery-vs-guarantee, in miniature.
+
+**Follow-ups queued (cross-session propagation).**
+
+- Fold a scoping footnote into the deficit-wall note §9 (branch
+  `claude/charming-euler-ef6879`) at merge: the conjecture's
+  corpus-class restriction is *necessary*, witnessed here.
+- A15 T4 doctrine ("even w kills PAR — separate study, likely weaker
+  floors") now has a doubling-side counterexample, not just a
+  floors-side expectation; w = 4 stays deprioritized with sharper
+  justification, and the w = 5 lane (all-odd) is unaffected.
+- Scope sweep worth one background session: (a) push the 5×5 blocks to
+  real sample sizes (all-odd; the conjecture predicts zero binds);
+  (b) the mixed-parity 3+4/4+3 C-safe population — one polynomial odd,
+  one even — is the sharp boundary of L1's hypothesis and currently
+  clean; a bind there would pin exactly *which* parity the proof needs.
+- The specimen is the natural model system for proving the odd-weight
+  rung: why does oddness forbid a two-check domino with a
+  shadow-concentrated fiber logical? (D4/D5 give the quantitative
+  target: force punctured weight ≥ d − \|b\|/2.)

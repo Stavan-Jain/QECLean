@@ -1,0 +1,81 @@
+{
+ "frame": "Z5xZ5",
+ "A": "x^2*y + x^3 + x^3*y^3 + x^3*y^4",
+ "B": "x^4 + x^4*y + x^4*y^2 + x^4*y^4",
+ "axis": "y",
+ "V1_k_base": 2,
+ "V1_exhaustive_le4": {
+  "X_side": {
+   "trivial": 0,
+   "nontrivial": 0,
+   "min_wt": null
+  },
+  "Z_side": {
+   "trivial": 0,
+   "nontrivial": 0,
+   "min_wt": null
+  }
+ },
+ "V1_dX_base_sat": 5,
+ "V1_x_witness_check": {
+  "weight": 5,
+  "in_ker_HZ": true,
+  "notin_rowspace_HX": true
+ },
+ "V1_z_witness_check": {
+  "weight": 5,
+  "in_ker_HX": true,
+  "notin_rowspace_HZ": true
+ },
+ "V1_d_base_exact": 5,
+ "V2_k_cover": 2,
+ "V2_bezout_eps_in_ideal": true,
+ "V3_stored_witness_check": {
+  "weight": 8,
+  "in_ker_HZ": true,
+  "notin_rowspace_HX": true
+ },
+ "V3_dX_cover_sat": 8,
+ "V3_fresh_witness_check": {
+  "weight": 8,
+  "in_ker_HZ": true,
+  "notin_rowspace_HX": true
+ },
+ "V4_sector_stored": {
+  "push_weight": 6,
+  "push_in_ker_HZb": true,
+  "sector": "DANGEROUS (b != 0 stabilizer)",
+  "sheet_weights": [
+   4,
+   4
+  ],
+  "sheet_overlap": 1,
+  "deck_invariant": false
+ },
+ "V5_safe_floors_X": {
+  "rank_p_star": 1,
+  "stab_rank": 24,
+  "coset_minima": [
+   11
+  ],
+  "floor_ok_ge_10": true
+ },
+ "V6_safe_floors_Z": {
+  "rank_p_star": 1,
+  "stab_rank": 24,
+  "coset_minima": [
+   11
+  ],
+  "floor_ok_ge_10": true
+ },
+ "V7_tight_witness": {
+  "weight": 10,
+  "translate": [
+   0,
+   0
+  ]
+ },
+ "csafe_two_sided": true,
+ "verdict_confirmed_counterexample": true,
+ "elapsed_s": 1.7
+}
