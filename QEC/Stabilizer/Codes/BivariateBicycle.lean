@@ -26,6 +26,7 @@ import QEC.Stabilizer.Codes.BivariateBicycle.WtFloor24
 import QEC.Stabilizer.Codes.BivariateBicycle.WtFloor24Bridge
 import QEC.Stabilizer.Codes.BivariateBicycle.WtFloor1618
 import QEC.Stabilizer.Codes.BivariateBicycle.Z3Z6
+import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6
 
 /-!
 # Bivariate bicycle codes

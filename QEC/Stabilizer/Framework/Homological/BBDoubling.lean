@@ -8,7 +8,12 @@ specific `Z₁₂×Z₆ → Z₆×Z₆` cover in `DeckHomotopy.lean`, `Assembly.
 `DangerousSector.lean` (rungs) and `SafeSector.lean` (reduction) is proved
 here once, parametrically; what remains per instance are the five *inputs*:
 
-* `StrongBaseFloor d` — the base small-cycle theorem (Theorem A);
+* `StrongBaseFloor d` — the base small-cycle theorem (Theorem A).  For
+  `d ≥ 7` bases the strong form is outright false (every generator
+  column `∂₂ δ_g` is a weight-6 cycle), so the assembly also ships in a
+  `LogicalFloor d` variant (`..._of_logicalFloor`) consuming the plain
+  base distance floor — the shape SAT certifies (witness + UNSAT at
+  `d − 1`);
 * `DeckTrivialOnH1` — the homotopy (R), from a Bezout witness
   `P⋆A + Q⋆B = 1 + x^{deckS}` (`deckTrivial_of_bezout`; by A12 such a
   witness exists **iff** `k(cover) = k(base)`, and both instance
@@ -136,6 +141,16 @@ def StrongBaseFloor (d : ℕ) : Prop :=
     bbBoundary1Fn D.Ab D.Bb u = 0 → u ≠ 0 →
     d ≤ D.baseComplex.chainWeight u
 
+/-- **The logical base floor** (plain code-distance shape): every base
+1-cycle that is *not a boundary* has weight ≥ `d`.  Strictly weaker than
+`StrongBaseFloor d`, and the right input for `d ≥ 7` bases of
+weight-(3,3) BB codes, where `StrongBaseFloor d` is outright false:
+every generator column `∂₂ δ_g` is a nonzero cycle of weight 6 < `d`. -/
+def LogicalFloor (d : ℕ) : Prop :=
+  ∀ u : H × Fin 2 → ZMod 2,
+    bbBoundary1Fn D.Ab D.Bb u = 0 → u ∉ D.baseComplex.boundaries →
+    d ≤ D.baseComplex.chainWeight u
+
 /-- **The deck homotopy (R)**: the deck translation acts trivially on
 `H₁(cover)`. -/
 def DeckTrivialOnH1 : Prop :=
@@ -167,6 +182,15 @@ def SeamCosetFloor (m : ℕ) : Prop :=
       D.seamC ζ + bbBoundary2Fn D.Ab D.Bb f ∉ D.baseComplex.boundaries →
       m ≤ D.baseComplex.chainWeight
         (D.seamC ζ + bbBoundary2Fn D.Ab D.Bb f)
+
+/-- The strong floor implies the logical floor (`0` is a boundary, so a
+non-boundary chain is nonzero). -/
+lemma logicalFloor_of_strongBaseFloor {d : ℕ}
+    (hbase : D.StrongBaseFloor d) : D.LogicalFloor d := by
+  intro u hu hnb
+  refine hbase u hu ?_
+  rintro rfl
+  exact hnb (zero_mem _)
 
 /-! ## The homotopy (R) from a finite matrix certificate
 
@@ -425,6 +449,25 @@ theorem dangerous_zero_rung {d : ℕ} (hbase : D.StrongBaseFloor d)
     rintro rfl
     exact hnb (by rw [map_zero]; exact zero_mem _)
   have hd := hbase u hu_cyc hu_ne
+  rw [D.chainWeight_pull1]
+  omega
+
+/-- **The `b = 0` rung from the logical floor alone**: the descended chain
+of a nontrivial diagonal cycle is automatically a non-boundary (pullbacks
+of boundaries are boundaries), so the plain base distance floor suffices —
+`StrongBaseFloor` is not needed.  This is the rung for `d ≥ 7` bases,
+where light stabilizer generators make the strong floor false. -/
+theorem dangerous_zero_rung_of_logicalFloor {d : ℕ}
+    (hbase : D.LogicalFloor d)
+    {v : G × Fin 2 → ZMod 2}
+    (hv : v ∈ D.coverComplex.cycles) (hnb : v ∉ D.coverComplex.boundaries)
+    (h0 : D.push1 v = 0) :
+    2 * d ≤ D.coverComplex.chainWeight v := by
+  obtain ⟨u, rfl⟩ := (D.push1_eq_zero_iff v).mp h0
+  have hu_cyc : bbBoundary1Fn D.Ab D.Bb u = 0 := D.descend_cycle hv
+  have hu_nb : u ∉ D.baseComplex.boundaries := fun hu_bd =>
+    hnb (D.pull1_mem_boundaries hu_bd)
+  have hd := hbase u hu_cyc hu_nb
   rw [D.chainWeight_pull1]
   omega
 
@@ -900,6 +943,48 @@ theorem chain_distance_eq_double {d : ℕ}
   · rintro w ⟨v, hv, hnb, rfl⟩
     exact D.chainWeight_ge_double_of_sectors hbase hM hS v hv hnb
 
+/-! ## The assembly from the logical floor (`d ≥ 7` bases)
+
+The same sector dichotomy with `dangerous_zero_rung_of_logicalFloor` in
+place of the strong rung.  The three floors are exactly the
+certificate-checked inputs of an A15-track instance: the base distance
+(SAT: witness + UNSAT at `d − 1`), the dangerous floor, and the
+seam-coset floor (S4: XOR-native UNSAT at `2d − 2` per orbit rep +
+parity). -/
+
+/-- **Sector-dichotomy assembly from the logical floor**: given the plain
+base distance floor and the two sector floors, every nontrivial cover
+cycle has weight ≥ `2d`. -/
+theorem chainWeight_ge_double_of_logicalFloor {d : ℕ}
+    (hbase : D.LogicalFloor d)
+    (hM : D.DangerousFloorNZ (2 * d)) (hS : D.SafeFloor (2 * d)) :
+    ∀ v : G × Fin 2 → ZMod 2,
+      v ∈ D.coverComplex.cycles → v ∉ D.coverComplex.boundaries →
+      2 * d ≤ D.coverComplex.chainWeight v := by
+  intro v hv hnb
+  by_cases hb : D.push1 v ∈ D.baseComplex.boundaries
+  · by_cases h0 : D.push1 v = 0
+    · exact D.dangerous_zero_rung_of_logicalFloor hbase hv hnb h0
+    · exact hM v hv hnb hb h0
+  · exact hS v hv hb
+
+/-- **Chain-level `d(cover) = 2·d(base)` from the logical floor.** -/
+theorem chain_distance_eq_double_of_logicalFloor {d : ℕ}
+    (hbase : D.LogicalFloor d)
+    (hM : D.DangerousFloorNZ (2 * d)) (hS : D.SafeFloor (2 * d))
+    (uStar : H × Fin 2 → ZMod 2)
+    (hu_cyc : uStar ∈ D.baseComplex.cycles)
+    (hu_w : D.baseComplex.chainWeight uStar = d)
+    (hτnb : D.pull1 uStar ∉ D.coverComplex.boundaries) :
+    IsLeast {w : ℕ | ∃ v : G × Fin 2 → ZMod 2,
+      v ∈ D.coverComplex.cycles ∧ v ∉ D.coverComplex.boundaries ∧
+      D.coverComplex.chainWeight v = w} (2 * d) := by
+  constructor
+  · refine ⟨D.pull1 uStar, D.pull1_mem_cycles hu_cyc, hτnb, ?_⟩
+    rw [D.chainWeight_pull1, hu_w]
+  · rintro w ⟨v, hv, hnb, rfl⟩
+    exact D.chainWeight_ge_double_of_logicalFloor hbase hM hS v hv hnb
+
 /-! ## The dual side and the Pauli level -/
 
 /-- Dual-side mirror of the sector bound, via the chain-level `d_X = d_Z`
@@ -950,6 +1035,55 @@ theorem pauli_distance_eq_double {d : ℕ}
     · rw [HomologicalCode.weight_chainXOperator, D.chainWeight_pull1, hu_w]
   · rintro w ⟨g, hg, rfl⟩
     exact D.logical_weight_ge_double_of_sectors hbase hM hS g hg
+
+/-- Dual-side mirror of the logical-floor sector bound. -/
+theorem dual_chainWeight_ge_double_of_logicalFloor {d : ℕ}
+    (hbase : D.LogicalFloor d)
+    (hM : D.DangerousFloorNZ (2 * d)) (hS : D.SafeFloor (2 * d)) :
+    ∀ c ∈ D.coverComplex.dualCycles, c ∉ D.coverComplex.dualBoundaries →
+      2 * d ≤ D.coverComplex.chainWeight c := by
+  have hX : ∀ c ∈ (bbChainComplex D.Ac D.Bc).cycles,
+      c ∉ (bbChainComplex D.Ac D.Bc).boundaries →
+      2 * d ≤ (bbChainComplex D.Ac D.Bc).chainWeight c := fun c hc hnb =>
+    D.chainWeight_ge_double_of_logicalFloor hbase hM hS c hc hnb
+  exact (bb_cycle_bound_iff_dual_bound D.Ac D.Bc (2 * d)).mp hX
+
+/-- Pauli-level lower bound from the logical floor: every nontrivial
+logical operator of the cover's homological stabilizer group has weight
+≥ `2d`. -/
+theorem logical_weight_ge_double_of_logicalFloor {d : ℕ}
+    (hbase : D.LogicalFloor d)
+    (hM : D.DangerousFloorNZ (2 * d)) (hS : D.SafeFloor (2 * d))
+    (g : NQubitPauliGroupElement D.coverComplex.numQubits)
+    (hg : Quantum.StabilizerGroup.IsNontrivialLogicalOperator g
+      D.coverComplex.homologicalStabilizerGroup) :
+    2 * d ≤ NQubitPauliGroupElement.weight g :=
+  HomologicalCode.chainWeight_lower_bound_transfers D.coverComplex (2 * d)
+    (fun c hc hnb => D.chainWeight_ge_double_of_logicalFloor hbase hM hS c hc hnb)
+    (D.dual_chainWeight_ge_double_of_logicalFloor hbase hM hS) g hg
+
+/-- **Pauli-level `d(cover) = 2·d(base)` from the logical floor**: the
+assembly for `d ≥ 7` bases, whose light stabilizer generators rule out
+`StrongBaseFloor d`. -/
+theorem pauli_distance_eq_double_of_logicalFloor {d : ℕ}
+    (hbase : D.LogicalFloor d)
+    (hM : D.DangerousFloorNZ (2 * d)) (hS : D.SafeFloor (2 * d))
+    (uStar : H × Fin 2 → ZMod 2)
+    (hu_cyc : uStar ∈ D.baseComplex.cycles)
+    (hu_w : D.baseComplex.chainWeight uStar = d)
+    (hτnb : D.pull1 uStar ∉ D.coverComplex.boundaries) :
+    IsLeast {w : ℕ | ∃ g : NQubitPauliGroupElement D.coverComplex.numQubits,
+      Quantum.StabilizerGroup.IsNontrivialLogicalOperator g
+        D.coverComplex.homologicalStabilizerGroup ∧
+      NQubitPauliGroupElement.weight g = w} (2 * d) := by
+  constructor
+  · refine ⟨D.coverComplex.chainXOperator (D.pull1 uStar), ?_, ?_⟩
+    · exact (HomologicalCode.chainXOperator_isNontrivialLogical_iff
+        (X := D.coverComplex) (D.pull1 uStar)).mpr
+        ⟨D.pull1_mem_cycles hu_cyc, hτnb⟩
+    · rw [HomologicalCode.weight_chainXOperator, D.chainWeight_pull1, hu_w]
+  · rintro w ⟨g, hg, rfl⟩
+    exact D.logical_weight_ge_double_of_logicalFloor hbase hM hS g hg
 
 end XDoubleCoverData
 

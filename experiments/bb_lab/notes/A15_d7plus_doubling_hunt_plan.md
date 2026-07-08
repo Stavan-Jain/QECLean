@@ -328,6 +328,58 @@ can't" in the program — A15-P3's "bb_288 exact minima priced out"
 (<= 34, unmeasured) and the 5 h bb108-y cover-side UNSAT are worth
 re-running under this backend.
 
+### 6.2 Lean packaging of the tightness cell (2026-07-07)
+
+**The f2a6f17e1c41ff96:y pair is Lean-packaged** — the Phase-4 item 2
+deliverable, [[72,4,8]] chain as template, Paper-1 two-tier shape.
+New: `QEC/Stabilizer/Codes/BivariateBicycle/Z5Z15F2A6/` (Defs,
+DeckHomotopy, Witness, Distance) + a parametric extension of
+`Framework/Homological/BBDoubling.lean`. Generator:
+`scripts/gen_f2a6_z5z30_data.py` (all checks green; data:
+`data/a15/f2a6_z5z30_lean_data.json`).
+
+**A template correction forced by d = 8 (the parametric extension).**
+The shipped assembly consumed `StrongBaseFloor d` (every nonzero base
+cycle ≥ d) — TRUE for gross (d=6) and pair72 (d=4) but **false for
+every d ≥ 7 weight-(3,3) base**: generator columns ∂₂δ_g are weight-6
+cycles. Fix: the zero rung's descended diagonal chain is automatically
+a non-boundary (pullbacks of boundaries are boundaries), so the plain
+distance floor suffices. New `LogicalFloor d` Prop + `_of_logicalFloor`
+variants (zero rung, sector assembly, chain/Pauli `IsLeast`) — these,
+not the strong forms, are what every future A15 instance consumes.
+(The single/pair-shape rungs still take the strong floor; generalize
+when a d ≥ 7 dangerous sector is first discharged.)
+
+**Two-tier split for this instance:**
+
+- *Kernel-checked (native_decide, unconditional):* the cover bundle
+  (proj/deck/section, push_A/push_B for the literal lift); homotopy (R)
+  via a genuinely two-sided Bezout witness `P⋆A + Q⋆B = 1 + y^15`
+  (|P| = 25, |Q| = 3 — first non-`P = 0` instance; solved + greedy-
+  sparsified offline); the tight witness u* (weight-8 base logical) and
+  its lift τ(u*) (weight-16 cover logical, dual-flux-witness certified,
+  wt-18 witness) — i.e. the witness halves d(base) ≤ 8, d(cover) ≤ 16
+  are now kernel facts, upgrading the SS6/ladder SAT witnesses.
+- *Certificate-checked hypotheses (named Props on the theorems):*
+  `LogicalFloor 8` (corpus CaDiCaL UNSAT@7), `SeamCosetFloor 16` (the
+  §6.1 S4 certificate: CMS UNSAT@14 + parity + transport; kissat DRAT),
+  `DangerousFloorNZ 16` (**assumption** — the (M)-half; A11 0/465, per-
+  instance rung discharge = future work).
+
+Headlines: `cover300_chain_distance_eq_16`,
+`cover300_pauli_distance_eq_16` — d(cover) = 16 = 2d conditional on the
+three floors; `cover300_exists_weight16_nontrivial_cycle` +
+`base150_exists_weight8_nontrivial_cycle` unconditional.
+
+**A pleasing decode:** the ladder's weight-16 cover witness is
+deck-invariant on the nose — its 16 cells pair under y ↦ y+15 — so it
+IS τ(u*) for a weight-8 base logical u* (extracted by fiber descent +
+the lab→repo reflection). The tight-witness leg needed no new search.
+
+**Naming note:** dir is `Z5Z15F2A6` (not `Z5Z15`) because 38d3c884 is a
+second certified Z5xZ15 code (both axes) that would collide on a later
+packaging.
+
 ## 7. Success criteria
 
 - **Primary:** one (code, axis) with S4-certified SF ≥ 2·d(base) ≥ 14,
