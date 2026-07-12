@@ -12,6 +12,7 @@ dependencies = [
   "pyarrow>=15,<22",
   "python-sat[pblib,aiger]>=1.8.dev17",
   "click>=8.1,<9",
+  "pycryptosat>=5.14,<6",
 ]
 
 [project.optional-dependencies]

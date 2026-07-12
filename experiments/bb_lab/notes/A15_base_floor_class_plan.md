@@ -1,6 +1,13 @@
 # A15 — base-floor generalization: mathematical landscape + plan (v2)
 
-> **Execution log: `A5_goal2_log.md` Entries 8–14** (2026-07-06/07).
+> **Execution log: `A5_goal2_log.md` Entries 8–15** (2026-07-06/12).
+> **T4.2 SWEPT (Entry 15)** — w = 5 class: ZERO falsifiers over 2144
+> members (tier-1 exact SAT + orbit-boosted MC to weight 9); 450
+> Z₅×Z₁₅ members land EXACTLY at d = 2w = 10; inhabitation is
+> component-field-theoretic (Lemma E small-axis kill + zd-fraction
+> gradient); discovery-sieve candidates [[126,12,12–14]] /
+> [[150,8,14–18]] pending exact validation. Analytic w = 5 kills
+> GREENLIT (GF(16) components first).
 > **T2 SHIPPED (Entry 14)** — parametric Lean bundle `SmallCycleData`
 > (`Framework/Homological/BBSmallCycle.lean`) + generator
 > (`gen_base_floor_lean.py`) + three kernel-checked pilots (bb_108 /

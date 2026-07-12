@@ -55,6 +55,14 @@ from .linalg import nullspace_f2, quotient_complement_basis
 
 CADICAL_BINARY = shutil.which("cadical")  # None if not installed
 
+try:  # CryptoMiniSat with native XOR clauses — the A15 lesson: CaDiCaL
+    # on Tseitin-encoded XOR chains is intractable on the UNSAT rounds
+    # of BB distance instances; CMS handles the parity rows natively.
+    import pycryptosat
+    _HAVE_CMS = True
+except ImportError:
+    _HAVE_CMS = False
+
 
 @dataclass(frozen=True, slots=True)
 class DistanceResult:
@@ -165,6 +173,60 @@ def _parse_cadical_witness(stdout: str, qubit_vars: list[int]) -> np.ndarray:
     )
 
 
+def _solve_at_weight_cms(
+    H_check: np.ndarray,
+    L_logical: np.ndarray,
+    weight: int,
+) -> tuple[np.ndarray | None, None]:
+    """CryptoMiniSat backend: same instance as `_build_cnf_at_weight`
+    but with the parity constraints as native XOR clauses.
+
+    Each check row becomes `add_xor_clause(row_vars, rhs=False)`; each
+    logical rep gets an indicator `a` via `XOR(row_vars ∪ {a}) = 0`
+    (i.e. a ≡ XOR(row_vars)), and one clause ⋁ a_i asks that some
+    logical anticommutes. Cardinality stays a seqcounter CNF over the
+    shared IDPool, so variable spaces cannot collide."""
+    n = H_check.shape[1]
+    pool = IDPool()
+    qubit_vars = [pool.id() for _ in range(n)]
+    solver = pycryptosat.Solver()
+
+    for row in H_check:
+        idx = np.flatnonzero(row)
+        if idx.size:
+            solver.add_xor_clause([qubit_vars[i] for i in idx], False)
+
+    a_outs: list[int] = []
+    for L in L_logical:
+        idx = np.flatnonzero(L)
+        if idx.size == 0:
+            continue
+        a = pool.id()
+        solver.add_xor_clause([qubit_vars[i] for i in idx] + [a], False)
+        a_outs.append(a)
+    if not a_outs:
+        raise AssertionError("no non-trivial logicals to witness against")
+    solver.add_clause(a_outs)
+
+    if weight < n:
+        card = CardEnc.atmost(
+            lits=qubit_vars,
+            bound=weight,
+            vpool=pool,
+            encoding=EncType.seqcounter,
+        )
+        for cl in card.clauses:
+            solver.add_clause(cl)
+
+    sat, model = solver.solve()
+    if not sat:
+        return None, None
+    v = np.array(
+        [1 if model[qv] else 0 for qv in qubit_vars], dtype=np.uint8
+    )
+    return v, None
+
+
 def _solve_via_cadical_cli(
     cnf: CNF,
     qubit_vars: list[int],
@@ -240,10 +302,15 @@ def _solve_at_weight(
     the instance was UNSAT, else `None`.
 
     Backend choice:
-      - `proof_dir is None`: pysat in-process CaDiCaL (fast, no proof).
+      - `proof_dir is None`, pycryptosat importable: in-process
+        CryptoMiniSat with native XOR rows (fastest, no proof).
+      - `proof_dir is None`, no pycryptosat: pysat in-process CaDiCaL.
       - `proof_dir is not None`: `cadical` CLI subprocess (slower, reliable
         LRAT emission).
     """
+    if proof_dir is None and _HAVE_CMS:
+        return _solve_at_weight_cms(H_check, L_logical, weight)
+
     cnf, qubit_vars = _build_cnf_at_weight(H_check, L_logical, weight)
 
     if proof_dir is not None:

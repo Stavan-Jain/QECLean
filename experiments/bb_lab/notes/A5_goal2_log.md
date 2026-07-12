@@ -1599,3 +1599,189 @@ rebuilt on this worktree (hours; unchanged by this diff).
    the class theorem inside Lean (tier-2; the statement shape is
    already final).
 4. T4 (w = 5 sweep) / T3c (Z₄ pilot) — unchanged plan ranking.
+
+## Entry 15 (2026-07-12) — T4.2: the w = 5 sweep — zero falsifiers at
+## population scale; 450 members land exactly at d = 2w = 10; the class
+## sieve surfaces gross-rivalling code candidates
+
+**Question** (plan §T4): do the class hypotheses at w = 5 — W5, D1
+(both Sidon), D2 (disjoint difference sets), (iii) (A parity-mono in
+exactly x, B in exactly y), k > 0, Ann(A) ≠ 0 ≠ Ann(B), on
+floor-bearing frames (4∤ℓ, 4∤m, |G| ≥ 41 by the D1∧D2 counting
+bound 2·2·C(5,2) = 40 ≤ |G|−1) — come with d = 2w = 10?
+Falsify-first; Frobenius flags recorded as columns, not gates.
+
+**Method** (`scripts/a15_t42_w5_sweep.py`). Per frame:
+translation-normalized mono-x/mono-y Sidon pools, deduped to
+translation classes (Sidon supports have trivial translation
+stabilizer ⟹ exactly w zero-normalized reps per class), per-side
+zd-filter (Ann ≠ 0 — translation/unit-invariant, so a POOL gate),
+D2 pairing by difference-set bitmask, per-pair k > 0
+(k = 2·dim(Ann A ∩ Ann B): rank[cA|cB] = dim (A,B) and F₂[G] is
+Frobenius, so dim Ann((A,B)) = |G| − dim (A,B)), THEN canonical
+dedupe of k-positive pairs only (unit scalings × per-side
+retranslation, + transpose-swap on square frames). Both
+mono-orientations are covered by one enumeration: the opposite
+assignment is the standard pair (B, A) after the block-column qubit
+permutation CSS(A,B) ≅ CSS(B,A). Selftest: the gross base passes
+every gate and SATs to d = 6 = 2w; the gather-circulant and direct-k
+fast paths are asserted against the reference implementations.
+
+**Engineering (two walls, both moved).**
+1. *Structural*: pairing-then-canonicalizing stalls at |G| ≥ 54
+   (canon on 10⁵–10⁶ D2 pairs). Fix = the gate reorder above (units
+   dominate the pools, so the zd-filter collapses the quadratic loop)
+   + a per-frame difference-index table making each class circulant a
+   single numpy gather instead of `checks.circulant`'s O(n²) Python
+   loop.
+2. *SAT*: pysat CaDiCaL on Tseitin XOR chains — the first Z₆×Z₉
+   member burned 20+ CPU-min without resolving (the A15 CMS lesson
+   resurfacing). Fix = native-XOR CryptoMiniSat backend in
+   `sat_distance.py` (pycryptosat; parity rows and logical indicator
+   variables as XOR clauses, seqcounter cardinality unchanged, shared
+   IDPool; the LRAT/CaDiCaL CLI proof path untouched) + member-level
+   multiprocessing (`--sat-jobs`). Cost calibration on a Z₆×Z₁₀
+   member (n = 120): 0.06 / 0.50 / 3.25 / 29.8 / 141 / 590 / 1910 s
+   for the w = 2..8 UNSAT rounds — ~7× per weight increment, so
+   exact ub = 10 distances are unaffordable at population scale.
+   Verdict protocol therefore tiered: exact SAT screen at ub = 6;
+   MC witness hunt at wmax = 9 (below); deep UNSAT confirms reserved
+   for chosen representatives (A14 coset-query + orbit-transport
+   port, queued).
+
+**Lemma E (small-axis kill at w = 5).** On Z_ℓ × Z_m a 5-point Sidon
+set parity-mono in the m-axis and NOT parity-mono in the ℓ-axis
+exists only if ℓ ≥ 5; hence the w = 5 class is EMPTY on every frame
+with an axis of order ≤ 3. *Proof.* ℓ = 2: c₀ + c₁ = 5 forces
+exactly one odd count — every 5-set is parity-mono on a Z₂ axis, so
+non-mono is unsatisfiable. ℓ = 3: mono-m means the y-count multiset
+has exactly one odd part, i.e. {5}, {4,1}, {3,2}, or {2,2,1}; the
+first two need ≥ 4 distinct x in one row (impossible in Z₃); {3,2}'s
+same-y triple uses all of Z₃ and its six ordered x-differences cover
+{1,2} three times each; {2,2,1}'s two same-y pairs each contribute
+±(dx,0) with ±1 = {1,2} = ±2 mod 3 — repeats either way. ∎
+(ℓ = 4 excluded by FRM; ℓ = 5 realized.) Corroborated: all eight
+Z2/Z3 frames in [41,60] report an empty mono-small-axis pool
+(v1 log). Small-axis frames are skipped downstream.
+
+**The k-gate mechanism (what selects members).**
+(i) w = 5 odd ⟹ A(triv) = 1: no factor vanishing at the trivial
+character (no 1+g factor — (1+g)·C has even weight); the common
+annihilator k > 0 demands must be a nontrivial χ vanishing on BOTH
+sides (odd part) or a radical kill (2-part).
+(ii) A mono-axis side cannot vanish at a character trivial on the
+other axis: collapsing there leaves the parity-mono count pattern,
+whose mod-2 reduction is a single root of unity ≠ 0.
+(iii) Inhabitation is FIELD-theoretic, not parity-theoretic (an
+even/odd-frame guess died within minutes — Z₇×Z₉ is all-odd and
+inhabited): zero-divisorhood at w = 5 needs a vanishing 5-term
+root-of-unity sum in some CRT component field F_{2^ord₂}. Axes
+carrying 11 (ord₂ = 10) or 13 (ord₂ = 12) push components to fields
+where the Sidon-mono sums never vanish — Z₅×Z₁₁, Z₆×Z₁₁, Z₇×Z₁₁
+have EMPTY zd pools; Z₅×Z₁₃/Z₆×Z₁₃ nearly so. Small-ord₂ axes
+(9 → GF(64), 10, 15 → GF(16)) carry the members, with zd FRACTIONS
+tracking the fields: Z₅×Z₁₃ 0.3% → Z₅×Z₁₄ 25% → Z₅×Z₁₅ 72%. This is
+the A5 orbit-fields/component-table view resurfacing as the class's
+EXISTENCE theory; the analytic w = 5 kills will run per component
+field exactly as A16's did.
+(iv) Common annihilators are RARE among D2 pairs off the good
+frames: Z₅×Z₁₄ / Z₇×Z₁₀ have 7–10k D2 pairs among zero divisors and
+kpos = 0. The k-gate, not D2, binds at w = 5.
+
+**Census** (structural, `--sat-cap 0`; live frames = both axes ≥ 5,
+4∤; |G| ≤ 78 complete, tail in flight):
+
+| frame | G | poolA | poolB | zdA | zdB | d2 | kpos | members |
+|---|---|---|---|---|---|---|---|---|
+| Z6xZ7 | 42 | 792 | 408 | 192 | 168 | 0 | 0 | 0 |
+| Z5xZ9 | 45 | 2388 | 618 | 1092 | 138 | 0 | 0 | 0 |
+| Z7xZ7 | 49 | 2052 | 2052 | 1512 | 1512 | 144 | 0 | 0 |
+| Z5xZ10 | 50 | 3424 | 544 | 416 | 96 | 0 | 0 | 0 |
+| Z6xZ9 | 54 | 3996 | 1080 | 2832 | 708 | 1440 | 216 | **18** |
+| Z5xZ11 | 55 | 8060 | 1030 | 0 | 0 | 0 | 0 | 0 |
+| Z6xZ10 | 60 | 4298 | 848 | 626 | 352 | 336 | 64 | **8** |
+| Z7xZ9 | 63 | 8838 | 5004 | 3852 | 1962 | 34956 | 540 | **15** |
+| Z5xZ13 | 65 | 20140 | 1644 | 64 | 108 | 0 | 0 | 0 |
+| Z6xZ11 | 66 | 12800 | 1800 | 0 | 0 | 0 | 0 | 0 |
+| Z5xZ14 | 70 | 23872 | 1632 | 5968 | 96 | 7008 | 0 | 0 |
+| Z7xZ10 | 70 | 11760 | 4920 | 528 | 1344 | 9984 | 0 | 0 |
+| Z5xZ15 | 75 | 42300 | 2460 | 30540 | 1500 | 691008 | 67296 | **2103** |
+| Z7xZ11 | 77 | 25650 | 8340 | 0 | 0 | 0 | 0 | 0 |
+| Z6xZ13 | 78 | 31252 | 2832 | 24 | 816 | 960 | 0 | 0 |
+| Z9xZ9 | 81 | *(in flight)* | | | | | | |
+| Z6xZ14 | 84 | *(in flight)* | | | | | | |
+| Z5xZ17 | 85 | *(in flight)* | | | | | | |
+| Z6xZ15 | 90 | *(in flight)* | | | | | | |
+| Z9xZ10 | 90 | *(in flight)* | | | | | | |
+| Z5xZ18 | 90 | *(in flight)* | | | | | | |
+
+**Verdict: ZERO falsifiers anywhere.**
+* Tier-1 SAT screen (exact, CMS, ub = 6): **41/41** members of
+  Z₆×Z₉ / Z₆×Z₁₀ / Z₇×Z₉ at d > 6; every Frobenius flag false.
+* MC witness hunt (`scripts/a15_t42_mc_falsifier.py`,
+  QDistRnd-style random information sets, 800 iters/member,
+  witnesses self-certified against H_Z and L_Z; selftest: finds the
+  gross base's weight-6, nothing below): **2144 members
+  (2126 census + 18 Z₆×Z₉), 0 witnesses of weight ≤ 9.** The
+  translation orbit (~|G| copies of any min-weight logical) makes
+  800 iterations essentially exhaustive for true d ≤ 14 at these
+  sizes, so the absence is strong. The 2w − 2 = 8 wall mode — the
+  w = 3 story's Frobenius failure shape — is ABSENT from the entire
+  population.
+* One Z₆×Z₁₀ member carried by exact UNSAT rounds to **d ≥ 9**
+  (w = 9 in flight at entry time; an UNSAT there is the first full
+  floor confirmation, with MC bounding d ≤ 12–14 from above).
+
+**mc_min spectrum (upper bounds).**
+Z₅×Z₁₅ (2103): **450 @ 10** — witness-certified d ≤ 10, so with the
+floor these land EXACTLY at d = 2w = 10 (436 k=8, 14 k=16) — plus
+11 @ 12, 52 @ 14, 680 @ 16, 906 @ 18, 4 @ 20 (the high buckets
+almost entirely k = 8). Z₆×Z₉ (18): 14 @ 12, 4 @ 14 (k = 4).
+Z₆×Z₁₀ (8): 2 @ 12, 5 @ 14, 1 @ 16 (k = 8). Z₇×Z₉ (15): 1 @ 12,
+14 @ 14 (k = 12). Tightness at 10 is so far EXCLUSIVELY a Z₅×Z₁₅
+phenomenon — the small frames all overshoot the floor.
+Frame-dependence of tightness is a new structural datum.
+
+**The discovery-sieve surprise.** Taking the orbit-boosted MC bounds
+at face value, the class hypotheses surface candidate codes the
+standard BB tables don't list: Z₇×Z₉ k = 12 members at mc_min = 14
+(candidate [[126,12,12–14]] — gross-equal or gross-beating at 87.5%
+of the qubits); Z₅×Z₁₅ k = 8 members at mc_min = 16–18 (candidate
+[[150,8,14–18]]); Z₅×Z₁₅ k = 16 members at mc_min = 10
+([[150,16,10]]). CAVEATS: mc_min is an upper bound; exact values
+need the deep-UNSAT lane or analytic floors; check the BB literature
+tables before any novelty claim. But the sieve read stands: D1 ∧ D2
+(flat difference structure) selects for GOOD codes, not just
+floor-tight ones — exactly the intuition behind the difference-set
+side of the base-floor theory.
+
+**Read for T4.** The w = 5 class is (a) nonempty — massively so on
+GF(16)-component frames; (b) falsifier-free at population scale
+under two independent methods; (c) tight at 2w on a 450-member
+subpopulation. The naive-generalization risk (a w = 5 analog of the
+w = 3 Frobenius failure) did not materialize — and no D3-analog was
+even imposed. GREENLIGHT for the analytic work: port the A16
+per-component-field kills to w = 5, then extend the T2
+`SmallCycleData` packaging to floor 10 with the 450 tight members as
+the instance pool, and route survivors into the doubling layer
+(target: first analytic d = 20 covers).
+
+**Files.** `scripts/a15_t42_w5_sweep.py`,
+`scripts/a15_t42_mc_falsifier.py`, `scripts/a15_t42_verbose_probe.py`;
+CMS backend in `src/bb_lab/sat_distance.py` (+ pycryptosat dep in
+pyproject/uv.lock); data in `data/a15/`: `t42_w5_census.jsonl`
+(+ .log), `t42_w5_screen_ub6.jsonl` (+ .log), `t42_w5_mc.jsonl`
+(+ .log), `t42_w5_mc_6x9.jsonl`, `t42_verbose_probe.log`,
+`t42_w5_sweep_v1_stalled.log` (pre-reorder record; the empty
+`t42_w5_sat_pass_ub10_abandoned.jsonl` marks the retired ub = 10
+campaign).
+
+**Next.** (1) Census tail (9×9 / 6×14 / 5×17 / 6×15 / 9×10 / 5×18)
++ MC over any new members — addendum when it lands. (2) The probe
+member's w = 9 round → first full floor confirmation. (3) A14
+coset-query + orbit-transport port for affordable deep UNSAT
+confirms (the 7×-per-weight wall makes the full-space encoding a
+dead end past w ≈ 8). (4) BB-table novelty check + exact validation
+for the sieve candidates ([[126,12,·]] first). (5) The analytic
+w = 5 kills per component field (GF(16) first — it carries the
+tight members).
