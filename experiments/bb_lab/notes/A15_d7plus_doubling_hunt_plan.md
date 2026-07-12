@@ -380,6 +380,67 @@ the lab→repo reflection). The tight-witness leg needed no new search.
 second certified Z5xZ15 code (both axes) that would collide on a later
 packaging.
 
+### 6.3 Dangerous-sector discharge for f2a6f17e:y (2026-07-12) — partial;
+### a new stratum found
+
+Goal: turn `DangerousFloorNZ 16` (the (M)-half, so far a bare assumption)
+into a proof. Scripts `a15_f2a6_dangerous_{census,rungs,windows,cutoff}.py`,
+`a15_f2a6_nearkernel_recon.py`; data `data/a15/f2a6_dangerous_*.json`.
+
+**Small-preimage classification + rung coverage: COMPLETE.** All light
+boundaries (0 < |b| ≤ 14) with a support-≤4 preimage: 94 translation
+classes, weights {6:1, 10:6, 12:33, 14:54} (no |b| = 8 — which dodges
+the pair-rung bound's failure zone). Unlike pair72 (chosen for zero
+seam-hostile classes), 60/94 classes have seam-hostile translates,
+concentrated at y ∈ {13, 14} (the section-wrap zone). Full dispatch over
+all 94 × 75 = 7,050 cells:
+- **5,765 single-shape** (some ker-coset preimage seam-good);
+- **1,170 pair-shape** (both parts seam-good; |U| bound holds — at
+  |b| = 10 it is tight, 15 ≤ 15);
+- **115 window cells** (|b| = 14, t = 1, all shape rungs fail): a NEW
+  rung closes them — at t = 1 either an off-cell exists (≥ 16 directly)
+  or the normalized descent lies in W = supp b ∪ seam(f₀), and "every
+  cycle in W is a boundary" is a per-cell finite check. All 115 windows
+  (|W| ∈ {14, 16}) PASS, verified two ways (rank identity + 2^|W|
+  enumeration, 0 mismatches).
+
+**Lean: the parametric rungs are SHIPPED** (`BBDoubling.lean`):
+`dangerous_bound_of_{single,pair}_shape_of_logicalFloor` (the weak-floor
+forms every d ≥ 7 instance needs — light residual cycle concluded to be
+a *boundary*, not zero) and `dangerous_bound_of_window` (floor-free).
+Build green; axiom-clean (standard three).
+
+**The cutoff conjecture is FALSE — a near-kernel stratum exists.** The
+completeness certificate ("every light b has a small preimage") came back
+SAT in 0 s: there are |b| = 10 boundaries whose minimal preimage weighs
+31–33. Structure: balanced simultaneous near-annihilation
+(|A⋆f| = |B⋆f| ∈ {5, 6, 7}), far from BOTH single kernels (dist ≥ 31)
+— not kernel-plus-perturbation. Sharpened by SAT: μ_Z = 6 globally
+(UNSAT at |b| ≤ 4 over ALL preimages, 2 s), and the no-small-preimage
+stratum STARTS at |b| = 10 (UNSAT at caps 4/6/8 with min-rep ≥ 5:
+2 s / 25 s / 159 s — CaDiCaL scaling is ugly; caps 10–14 and the
+min-rep gap [5, 30] are OPEN, CMS-native-XOR re-run recommended).
+Consequence: no support-bounded census can complete the classification;
+the light-boundary set of a d ≥ 7 base is genuinely two-strata. The
+near-kernel stratum is a new research object (connects to the A16
+radical-weight machinery and the deficit-wall's cancellation
+phenomenology).
+
+**Certificate leg (in flight):** the subsuming cover-side UNSAT@14 for
+f2a6f17e:y relaunched solo (`a15_f2a6_cover_unsat_only.py`, CMS, 6 h
+budget, log `run_f2a6_cover_unsat_only.log`) — the prior round-2 launch
+died with its session, unnoticed (the CPU load mistaken for it was a
+parallel fork's T4 w=5 sweep). On UNSAT: d_X(cover) = 16 exact and
+`DangerousFloorNZ 16` becomes certificate-checked (still not
+kernel-checked — the in-kernel route needs the near-kernel stratum
+classified, plus a Lean sweep dispatching the three rungs over the
+small-preimage stratum).
+
+**Honest status of (M) for this instance:** assumption → certificate
+(pending the CMS run) → kernel (open: near-kernel stratum + the [5, 30]
+rep-gap + the ≤4-support Lean sweep, ~75³-scale with translation
+reduction).
+
 ## 7. Success criteria
 
 - **Primary:** one (code, axis) with S4-certified SF ≥ 2·d(base) ≥ 14,
