@@ -441,6 +441,79 @@ small-preimage stratum).
 rep-gap + the ≤4-support Lean sweep, ~75³-scale with translation
 reduction).
 
+### 6.4 The near-kernel stratum CLASSIFIED — light boundaries of
+### f2a6f17e are 113 classes, rung coverage 100% (2026-07-13)
+
+Scripts `a15_f2a6_{spectral_recon,sigma_structure,athin_lines,light_enum,
+full_dispatch,t3_exact}.py`; data `f2a6_light_classes.jsonl` (complete),
+`f2a6_full_dispatch.json`.
+
+**The algebraic identity of the stratum (all asserted exactly).** The
+pair is secretly σ-correlated: **B = xy⁶·σ(A)** with σ:(x,y)↦(xy⁶,y⁴)
+an ORDER-2 group automorphism, and σ(B) = x·A back. Consequences:
+(i) light boundaries are pairs of A-images — |b| = |A⋆f| + |A⋆(σf)|
+up to monomials — so the classification is about the σ-correlation of
+the A-thin sets of the single trinomial 1+x+y; (ii) there is a
+weight-preserving block-swapping involution Φ on translation classes of
+im ∂₂ (verified), which explains the balanced near-kernel weights and
+pairs the unbalanced small classes ((3,9)↔(9,3), (4,6)↔(6,4),
+(5,9)↔(9,5)); (iii) Â and B̂ vanish on the SAME GF(16) component
+(2-orbit of (1,14)), so ker MA = ker MB = ker ∂₂ and the transfer
+T = B̂/Â is total off that component, with small orders {1,3,5,15};
+(iv) the 5:1 quotient to Z₅×Z₃ kills σ and degenerates the pair
+(B̄ = x̄Ā, a [[30,0]] code) — the stratum's step-3 y-progressions are
+its fiber fingerprints. The A-thin layer alone is HUGE (4,375 weight-3
+"A-lines" in 59 classes, 228,600 weight-4, ~1.0M weight-5 — matching
+the random 4-check-code model): the σ-correlation is the entire filter,
+and no support-side description can exist (the §6.3 refutation, now
+explained).
+
+**Exhaustive enumeration (solver-grade complete).** All weight-≤14
+codewords of the [150,71,6] code im ∂₂, up to translation: SAT with
+translation-orbit blocking, final UNSAT (the completeness certificate,
+DRAT-able on the blocked CNF) took 9.6 h. **113 classes**: the 94
+small-preimage classes of §6.3 reproduced EXACTLY (weights
+{6:1, 10:6, 12:33, 14:54}) + **19 near-kernel classes** (1× |b|=10
+(5|5), 3× |b|=12 (6|6), 15× |b|=14 (7|7); preimage-coset minima 31–33).
+The coset-min spectrum over all 113 is strictly bimodal
+{1,2,3} ∪ {31,32,33} — **the [5,30] rep gap is EMPTY, closed as a
+byproduct**. Cross-checks: Φ-closure holds (29 Φ-fixed + 42 Φ-pairs,
+0 missing partners) — an independent exhaustiveness check.
+
+**Unified rung dispatch: 8,475/8,475 light cells covered, 0 uncovered.**
+Priorities S → P (pool-based pieces) → W/W+:
+
+| route | cells | Lean status |
+|---|---|---|
+| single-shape S | 5,765 | shipped (`_of_logicalFloor`) |
+| pair-shape P | 1,170 | shipped (`_of_logicalFloor`) |
+| window W (t=1) | 1,205 | shipped (`dangerous_bound_of_window`) |
+| gen. window W+ (t=2, exact) | 260 | rung generalization pending |
+| gen. window W+ (t=3, exact) | 75 | rung generalization pending |
+
+The near-kernel classes are exactly the shape-rung-hostile ones (heavy
+preimages ⟹ no seam-good coset element): |b|=14 ones fall to the
+shipped t=1 window; |b|=12 (t=2) need the generalized window (off ≤ 1
+⟹ descent in W ∪ {one extra cell}; verified for ALL single-cell
+extensions — the exact t=2 condition); the single |b|=10 class (t=3)
+verified for ALL ≤2-cell extensions (`a15_f2a6_t3_exact.py`, 447 s —
+the exact t=3 condition; every window condition in the dispatch is now
+exact, none probe-grade). CORRECTION to §6.3: of its "115 window
+cells", 80 were t=1 and 35 were actually |b|=12/t=2 — the old window
+check verified those only in the (insufficient) t=1 sense; the new
+dispatch verifies the exact t=2 condition and they pass.
+
+**(M) certificate restructured — the cover-side query is no longer
+needed.** The 6h CMS cover-UNSAT@14 TIMED OUT (UNKNOWN, honest); but
+the discharge now decomposes base-side: [113-class enumeration
+completeness, n=75-frame UNSAT, DRAT-able] + [per-cell rung checks,
+numerically verified today, kernel-upgradeable] + [Lean rung theorems,
+axiom-clean, shipped] ⟹ DangerousFloorNZ 16. Remaining for the full
+kernel route: the generalized-window rung in Lean (t ≥ 2 — mechanical
+extension of the t=1 proof), the per-class Lean check tables, and the
+dispatch sweep; the completeness certificate stays solver-grade (2⁷⁵
+statement).
+
 ## 7. Success criteria
 
 - **Primary:** one (code, axis) with S4-certified SF ≥ 2·d(base) ≥ 14,
