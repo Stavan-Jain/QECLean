@@ -5,6 +5,37 @@ the PR #53 head (`292a830`, the parametric doubling layer + the Z3Z6
 instance + the A9 screen). This file is the running log for the experiment;
 results accrete below the plan, A9-style. Date: 2026-07-02.
 
+> **Merge-record annotation (2026-07-18).** Merged to main as the
+> historical record of the A10 line (session closed 2026-07-02; grids
+> deliberately paused per R11 and never resumed — hit2 95/256, hit5
+> 98/256, S3 ~90/319). The headline results stand unrevised: the
+> universal doubling-existence claim is FALSE (R3/R5; the 13 certified
+> counterexample bases became A14's must-catch validation corpus,
+> `A14_safe_floor_criterion_plan.md` §5); hit2/hit5 are RESCUED with
+> DRAT certificates (R4); Lemma L1 and the presentation-invariant
+> closure reading stand (R2.5/R6); the descent-proper vs
+> presentation-doublable split of the siblings stands (R8/R10). Three
+> later developments correct or supersede specific passages — see the
+> dated blocks at R9 and R12 below: (1) conjecture C-A10(ii)'s
+> biconditional is REFUTED in the necessity direction (41
+> overlap-rescued doublers, A14 §§0/10); C-A10(i) survives as A17's
+> (M)-robustness conjecture. (2) R9's safe-sector mechanism is now a
+> THEOREM (`A17_deficit_wall.md` L0/T2; Lean `BBDeficitWall.lean`).
+> (3) The A12 §8 ledger cited in R12 has moved: OQ1 RESOLVED (A13),
+> OQ2 PROVEN (A13), OQ4 answered in corrected form (A14 + A17).
+> Measurement discipline (A17 §8) applies to this note's JSONLs:
+> recorded fail-witness weights are first-found SAT weights — upper
+> bounds on d(cover), not minima; no rescue/fail *verdict* is affected
+> (rescues are UNSAT@11-exact; fails need only some witness < 12).
+> The Q1–Q7 docket referenced by R9–R11 was session-internal and never
+> committed; from usage: Q1 = safe-sector keystone, Q2 = tower
+> iteration, Q3 = engine-frame universality, Q4 = selection rule,
+> Q7 = hit2 descent-proper existence. R7's queue items 1–5 all remain
+> open: the engine-tier rescued-cover instance is now subordinate to
+> the d ≥ 7 line (`A17_d7plus_doubling_hunt_plan.md` §4), and the
+> Fork-C kernel-`decide` counterexample package remains the program's
+> cheapest full-rigor artifact, still unclaimed.
+
 ---
 
 ## 0. TL;DR
@@ -768,6 +799,28 @@ four frames leaves little room); the converse direction (safe floor
 dangerous-floor theorem — the natural target for the parametric layer,
 since `BBDoubling` already derives the dangerous apparatus generically.
 
+> **A14/A17 correction + upgrade (2026-07-18).** The keystone datum
+> stands (14101/14101 fail witnesses safe-sector) and its mechanism is
+> now proved: under (R) the safe sector is the transfer kernel
+> (`A17_deficit_wall.md` L0, `im δ₂ = ker τ₁`) and the pushforward of
+> any surviving-class cover logical is a safe base logical of no
+> greater weight (T2, `d_safe ≤ d̃_safe`) — Lean in
+> `BBDeficitWall.lean`, axiom-clean, stated against the parametric
+> `XDoubleCoverData` layer (`push_A`/`push_B`, `DeckTrivialOnH1`),
+> i.e. descent-general in this note's §6 sense. Of conjecture (C-A10):
+> part (i) — dangerous floor = 2d, never below — remains OPEN; it is
+> A17 §9's (M)-robustness conjecture (0/465 violations on the T1
+> corpus; every k-preserving short is SF-false). Part (ii) is
+> CORRECTED: "doubling ⟺ base-side safe-coset floor ≥ 2d" fails in the
+> necessity direction — 41 of the 152 T1 doublers are overlap-rescued
+> (`|v| = |p(v)| + 2·overlap` clears 2d while the base-side coset
+> floor dips below; A14 §0 scope discipline, exact recomputation A14
+> §10). What survives, provably: SF forces the cover's entire safe
+> sector to ≥ 2d (A17 Cor. W(2)), so SF + the (M)-half ⟹ doubling;
+> empirically SF-true ⟹ doubles, 111/111. R11's base-side completion
+> oracle is therefore one-sided: floor-passes certify rescues, but
+> floor-failures do not exclude overlap-rescued doubling.
+
 ## R10. Q7 answered: hit2 has NO descent-proper rescue — the siblings split (2026-07-02)
 
 The hit2 split class (the only place a hit2 descent-proper rescue could
@@ -841,6 +894,33 @@ safe-class coset minima").  Cross-references: their OQ1 (tower) = my
 Q2; their OQ4 = my Q1/C-A10; my descent-generality data feeds their
 OQ2 quantitative sweep (the split-class k-jumps +4/+12 are test
 points for `dim (1+σ)H₁ = k̃ − k`).
+
+> **A13/A14/A17 status update (2026-07-18).** The A12 §8 ledger
+> cross-referenced here has moved (this branch's copy of
+> `A12_deck_homotopy_R.md` is the 2026-07-02 version; main's carries
+> the statuses). **OQ1 ("my Q2"): RESOLVED — YES** (A13,
+> `A13_deck_tower_plan.md` §0★; Lean `BBDeckTower.lean`,
+> `eps_mem_of_deckTrivial`): deck-trivial `ℤ_{2^r}` towers keep k. The
+> concrete tower-iteration question was then answered NEGATIVELY for
+> doubling: every same-axis rung-2 re-double of the five proven
+> doubles freezes at its rung-1 distance (A14 §13, certificates), and
+> the cross-axis rung-2 cells die too
+> (`A17_d7plus_doubling_hunt_plan.md` §6, Headline 2). **OQ2:
+> PROVEN** unconditionally (Theorem A13, `A13_result.md`:
+> `dim (1+σ)H₁ = k̃ − k` for arbitrary finite abelian `G̃`, order-2
+> deck, arbitrary `(A,B)` — twisted decks and hence this screen's
+> descent covers included; kernel-checked core `BocksteinLift.lean`;
+> exhaustive `|P| = 16` sweeps). The 3819-cover zero-mismatch test
+> above and the split-class k-jump "test points" are subsumed by the
+> theorem. **OQ4 ("my Q1/C-A10"): answered in corrected form** (A14
+> screens S0–S4 + the deficit-wall theorem, `A17_deficit_wall.md`;
+> first SF certifications past d = 6 at A17 §6.1, incl. the
+> [[300,8,16]]-target two-tier Lean package). The "template collapse"
+> paragraph above overshoots by the same margin as C-A10(ii): the
+> doubling question reduces to the safe floor only one-sidedly — SF is
+> sufficient-not-necessary (41 overlap rescues, A14 §§0/10), and the
+> dangerous rung's universality at 2d remains the (M)-robustness
+> conjecture, not a theorem.
 
 ## R7. Follow-ups (queued)
 

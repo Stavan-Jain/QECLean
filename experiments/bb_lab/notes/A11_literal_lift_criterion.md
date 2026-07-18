@@ -1,5 +1,55 @@
 # A11 — A checkable criterion for literal-lift doubling
 
+> **Status at merge (2026-07-18).** Line PAUSED 2026-07-07 after Entry 3;
+> merged as historical record. Read Entries 1–2 through Entry 3 and the
+> later forks:
+>
+> 1. **"C-safe ⟹ doubling" is REFUTED as a weight-agnostic conjecture by
+>    this note's own Entry 3**: a weight-4×4 pair on Z₅×Z₅ ([[50,2,5]] →
+>    [[100,2,8]]) satisfies every conjunct — plus (R), plus the X-side
+>    floor — at enumeration grade, yet d(cover) = 8 < 10, failing through
+>    a weight-6 nonzero stabilizer (the first observed dangerous-sector
+>    bind). Entry 1's engine-frame scoreboard "doubling ⟺ safe_floor_ok",
+>    Entry 2's "the nonzero-b rung has never been seen to bind below 2d",
+>    and every 0-violation census below are **odd-weight/corpus-scope
+>    facts, not weight-agnostic ones**. The surviving odd-weight form is
+>    the **(M)-robustness conjecture** (`A17_deficit_wall.md` §9: for
+>    corpus-class pairs the dangerous sector never under-runs
+>    min(2d, d̃_safe)); Entry 3 proves that scope restriction *necessary*.
+>    Its queued scoping footnote to A17 §9 is still unapplied on main.
+> 2. **The safe-floor findings were reconfirmed, then extended.** A14
+>    (`A14_safe_floor_criterion_plan.md` §10) recomputed exact ground
+>    truth on all 638 T1 rows: 111/152 SF-true doubles, 0/465 SF-true
+>    shorts, 0/152 profile mismatches — and showed the tight-witness
+>    conjunct adds nothing there (the safe floor alone separates).
+>    A17-P3's Theorem T2 (`A17_deficit_wall.md` §5) re-derives Entry 2's
+>    equivalence structurally: under (R), SF forces the cover's whole
+>    safe sector to ≥ 2d, so "SF-true ⟹ doubles" ⟺ the dangerous sector
+>    never binds alone. The A17 d ≥ 7 hunt then made the criterion's
+>    screen form produce the program's first floors past d = 6: 18
+>    SF-certifications on d = 8 bases, three certified [[252,8,16]]
+>    doubles, and the [[150,8,8]] → [[300,8,16]] two-tier Lean instance
+>    (`A17_d7plus_doubling_hunt_plan.md` §§6.1–6.2).
+> 3. **The Entry-2/2b dangerous-sector reduction is vindicated both
+>    ways**: the twice-refined residue is exactly the cell Entry 3's
+>    counterexample occupies (D5 concentration violated), and the
+>    per-instance base-side discharge it anticipated now exists — A17
+>    §§6.3–6.4 discharge f2a6f17e:y's dangerous sector (8,475/8,475
+>    light cells; parametric rungs shipped in `BBDoubling.lean`). Caveat
+>    discovered there: light-boundary sets of d ≥ 7 bases are two-strata
+>    (the near-kernel stratum, preimage-coset minima 31–33), so §1's
+>    T-c census cost model under-prices C-danger off small frames.
+> 4. **Still open, unchanged since the pause**: the overlap-term
+>    necessity half (the 41 rescue rows; the S4 reachable-coset dead end
+>    stands; queued out-of-scope in A14 §6, connected to wall theory in
+>    `A17_d7plus_doubling_hunt_plan.md` §3); the Z₆×Z₁₈ ladder arm (A8
+>    §6.2's falsification probe — never run); OQ5/R0 structure (A12 §8);
+>    the A8-proxy mechanism question (why anchorability selects
+>    all-heavy im Δ); and the hit3-y engine re-instantiation (queued,
+>    subordinate — A17 §4). Scope note: the gross-twin flips of Entry 1
+>    are rung-1 facts — same-axis re-doubles freeze at d(rung-1)
+>    (A14 §13).
+
 **Status: Stage 0 (plan).** Branch `claude/a8-literal-lift-criterion`, cut from
 the PR #53 head (`292a830`: parametric doubling layer + Z3Z6 instance + A9
 screen). This file is the running log for the effort; results accrete below
@@ -1049,7 +1099,7 @@ SAT stack; grades per A_HANDOFF §1):
 3. **Parity is the load-bearing hypothesis, not decoration.** The
    specimen wears the even-weight world's fingerprints: d(base) = 5 is
    ODD and both safe minima are ODD (11) — both impossible under the
-   A15-P3 parity lemma L1 (\|A\|, \|B\| odd ⟹ all cycle weights even).
+   A17-P3 parity lemma L1 (\|A\|, \|B\| odd ⟹ all cycle weights even).
    Also d_safe = 11 > 2d breaks the odd-weight corpus regularity
    "viable cells sit at exactly 2d". The heavy cancellation feeding the
    light b (two adjacent checks collapsing to weight 6) runs through

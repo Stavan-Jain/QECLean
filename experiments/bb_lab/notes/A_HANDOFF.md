@@ -60,6 +60,19 @@ A4 Theorem D).
 > on all their presentations is a queued falsification check (A11 note
 > § Session close item 4; Fork-C scope statement = A10 note §R6).
 
+> **A11 close-out (2026-07-18, at merge).** The block above is Entry-1
+> state. Two updates: the "queued" C-safe falsification check on the 13
+> hard negatives RAN AND PASSED (0/492 C-safe-true cells,
+> `a11_s4_thirteen.py`; A11 note § Session close item 4) — and the
+> criterion's weight-agnostic sufficiency was then REFUTED by A11
+> Entry 3 (2026-07-07): a weight-4×4 Z₅×Z₅ pair, [[50,2,5]] →
+> [[100,2,8]], C-safe true at enumeration grade, d(cover) = 8 < 10 —
+> the first observed dangerous-sector bind. The odd-weight form
+> survives as the (M)-robustness conjecture (`A17_deficit_wall.md` §9);
+> the safe-floor line continued as A14 → A17 (first certified d ≥ 7
+> doubles). Line paused; see the annotation atop
+> `A11_literal_lift_criterion.md`.
+
 > **A10 RESULTS (2026-07-02, `A10_descent_twist_screen.md`) — the descent
 > question ANSWERED (Fork M).** Question: does every certified BB base
 > admit a *descent* free-ℤ₂ cover (any extension class, polynomials only
@@ -92,6 +105,14 @@ A4 Theorem D).
 > closure of literal lifting, so its negatives (the 13 counterexamples)
 > are CODE-level — A11's "Fork-C is presentation-only" caveat is
 > corrected in A10 note §R6.
+
+> **Sequel (2026-07-18, merge).** The safe-floor program this block
+> queues became A14 (screens S0–S4; OQ4) and A17 (deficit-wall
+> theorem; d ≥ 7 hunt — first SF certifications past d = 6). C-A10(ii)
+> was corrected: the safe floor is sufficient, not necessary (41
+> overlap rescues, A14 §§0/10). The queued Z₆×Z₆ universal-doubling
+> sweep and the Fork-C kernel-`decide` counterexample package remain
+> unclaimed; see A10 note top annotation.
 
 ---
 
