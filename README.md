@@ -58,10 +58,6 @@ Every step of the homological distance argument is mechanized — no `sorry`s an
 
 The accompanying expository proof is available as an [interactive write-up](https://stavan-jain.github.io/DistanceBlog/) with diagrams (or the [in-repo version in qec-lab](https://github.com/Stavan-Jain/qec-lab/blob/main/docs/distance_proof.md)).
 
-## Research companion repo
-
-[**qec-lab**](https://github.com/Stavan-Jain/qec-lab) is the workbench behind this library: the BB-code distance research program (`experiments/bb_lab/`), the catalog-driven formalization pipeline covering all 267 codes in the [Error Correction Zoo](https://errorcorrectionzoo.org/), the human-readable proof documents, and the [live dashboard](https://stavan-jain.github.io/qec-lab/) tracking which codes are done, in-flight, queued, or deferred. Some Lean files here (marked `GENERATED FILE — DO NOT HAND-EDIT`) are emitted by generators in qec-lab — change the generator there and regenerate rather than editing the Lean.
-
 ## Project Structure
 
 Import the whole development via `QEC` (or `QEC.Foundations.Foundations`, `QEC.RepetitionCode.RepetitionCode`, `QEC.Stabilizer.Stabilizer`). The code is organized as:
