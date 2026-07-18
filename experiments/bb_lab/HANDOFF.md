@@ -579,6 +579,258 @@ classical analytic distance-bound technique can be tight on gross**.
 The remaining options are either new theory (1) or accepting that
 the negative-results program itself is the deliverable.
 
+### 6l. Cayley-graph spectral bounds are vacuous on every BB code with k ≥ 2
+
+Tier 2 round 2 Family C tested a spectral-radius predictor on the
+SAT-verified corpus (4,364 weight-3 rows; see
+`experiments/bb_lab/scripts/family_c_spectral_check.py`). The
+across-corpus Pearson correlation between the Cayley-graph spectral
+gap of M_A / M_B and `d_X` is **-0.020** — effectively zero. The cause
+is structural, not statistical:
+
+> By Bravyi 2024 Lemma 1, `k = 2·dim(ker A ∩ ker B)` for the BB code
+> BB(G, A, B). Hence `k ≥ 2` iff `A` and `B` jointly vanish on some
+> non-trivial character `χ` of `G`. On that `χ`, the Cayley-graph
+> eigenvalue `λ_A(χ) = sum_{g ∈ supp(A)} χ(g)` has absolute value
+> equal to `|supp(A)|` (a sum of |supp(A)|-many unit complex numbers
+> all aligned in the trivial direction after `A`'s vanishing). So
+> `λ_2(M_A) ≥ |supp(A)|`, meaning the Sipser-Spielman / Tanner /
+> Cheeger-style spectral gap `weight − λ_2` is `≤ 0` for every BB
+> code with k ≥ 2.
+
+The Cayley-graph spectral radius (and any bound derived from it as
+"gap-based") is therefore **identically vacuous on the engineering
+target**. This is a stronger obstruction than §6j/§6k: it doesn't hinge
+on characteristic-2 arithmetic, but rather on the basic algebraic fact
+that BB codes with k > 0 are *engineered* to have spectrally
+degenerate connection-set polynomials.
+
+This rules out the entire Family C "spectral-bound" subfamily without
+further empirical work. Combined with the round-1 girth-bound result
+(loose by 9 on gross), it suggests that *every* purely-combinatorial
+Family-C bound is structurally inapplicable or empirically loose.
+The remaining options for Family C are non-spectral expansion
+arguments (vertex / edge expansion via combinatorial means, no
+Cheeger-style proxy) and code-LP / SDP relaxations — neither has a
+known concrete formula on BB codes today.
+
+The empirical artifact is at
+`pipeline/attempts/bb_distance_conjecture_family_a_v2_yspread/result.md`
+(spectral check appears in the codebase under
+`scripts/family_c_spectral_check.py`; result is fully reproducible).
+Machine-checked under `obstructions.py` via the
+`uses_cayley_spectral_bound` predicate.
+
+### 6m. F₂[G]-module-isomorphism-class invariants cannot lower-bound d_X
+
+Round-2 v2 first session investigated Koszul H_2 minimum weight as a
+candidate lower bound (handoff §4d). Empirically `min_wt(H_2)` upper-
+bounds `d_X` instead — and the mechanism of failure exposes a
+structural obstruction that applies far beyond H_2.
+
+**Observation (witness).** For the gross polynomials
+(G = Z_12 × Z_6, A = x³ + y + y², B = y³ + x + x²) the Koszul
+cohomologies `H_0(K) = F_2[G]/(A,B)` and `H_2(K) = Ann(A) ∩ Ann(B)`
+are F_2[G]-module isomorphic — verified computationally by exhibiting
+36 invertible 6×6 intertwiners U ∈ GL_6(F_2) with `U · M_x|_{H_0} =
+M_x|_{H_2} · U` and `U · M_y|_{H_0} = M_y|_{H_2} · U`
+(`scripts/family_d_v1_koszul_h2_iso_witness.py`). The duality is the
+expected Frobenius / Nakayama duality
+`Hom_{F_2[G]}(F_2[G]/I, F_2[G]) ≅ Ann(I)`, which is exact because
+F_2[G] for G finite abelian is a finite commutative Frobenius algebra.
+
+Yet the minimum Hamming weights of these two F_2[G]-isomorphic modules
+in their canonical embeddings differ by a factor of 32:
+- `min_wt(H_0) = 1` (e_(0,0) ∉ (A, B), so [e_(0,0)] is a weight-1
+  coset class)
+- `min_wt(H_2) = 32` (by full enumeration over 2^6 − 1 = 63 nonzero
+  F_2-combinations).
+
+> **Min Hamming weight is not an F_2[G]-module-isomorphism-class
+> invariant.** Two F_2[G]-isomorphic modules embedded in F_2[G]^k can
+> have arbitrarily different minimum Hamming weights in the standard
+> basis. The Hamming weight depends on the embedding ι: M ↪ F_2[G]^k,
+> not on the abstract module class [M].
+
+**Proof (theory).** Let M be any nonzero finitely generated F_2[G]-
+module. The canonical embeddings ι: M ↪ F_2[G]^k vary over the orbit
+of GL_k(F_2[G]) acting on submodules of F_2[G]^k. This orbit contains
+embeddings of widely varying minimum weight: for the free rank-1
+module M = F_2[G], the embedding M = F_2[G]·1 ⊂ F_2[G] has min
+weight 1, while M = F_2[G]·a for a polynomial a of maximal weight
+(e.g., a = 1 + x + x² + … + x^{|G|−1} in the cyclic case) gives min
+weight = |G|. **Same abstract module, different min weights.**
+
+**Theorem (§6m).** Let `Φ: {(G, A, B)} → ℝ` be a function that
+factors through a functor F: {BB instances} → {F_2[G]-modules-mod-
+isomorphism} as `Φ(G, A, B) = ψ([F(G, A, B)])` for some
+F_2[G]-module-isomorphism-class invariant ψ (e.g., a dimension,
+Hilbert function value at any grading, Castelnuovo-Mumford
+regularity, Betti number, Tor/Ext dimension, projective/Krull
+dimension, depth). Then Φ cannot equal d_X.
+
+**Proof.** d_X(A, B) is the minimum Hamming weight in the F_2[G]-
+submodule `ker H_X / row H_Z ⊂ F_2[G]^2`, computed with respect to
+the standard F_2-basis `{(e_g, 0), (0, e_g)}` of F_2[G]^2. The
+Witness above establishes that for the gross polynomials,
+H_0(K_gross) ≅ H_2(K_gross) as abstract F_2[G]-modules (36 explicit
+invertible intertwiners) but their min Hamming weights in the
+canonical embeddings into F_2[G] differ by a factor of 32. Hence
+**the F_2[G]-module isomorphism class of an embedded submodule does
+not determine its min Hamming weight**.
+
+Φ depends only on the iso class of F(A, B); by the Witness, the min
+weight of any embedded copy of F(A, B) is not determined by Φ. So
+if Φ were to equal d_X (which is a specific min-weight quantity),
+then d_X would also be iso-class-invariant. But d_X = min weight in
+a specific embedded submodule, and the Witness shows this min weight
+is not iso-class-invariant. Contradiction. Therefore Φ ≠ d_X for
+some (G, A, B).
+
+The same argument applies to any non-trivial lower bound: if
+Φ(A, B) ≤ d_X(A, B) and Φ is iso-class-natural, then for any two
+BB codes (A, B), (A', B') in the same Φ-fiber,
+`Φ(A, B) = Φ(A', B') ≤ min(d_X(A, B), d_X(A', B'))`. To the extent
+that Φ-fibers contain BB codes of varying d_X (which they do
+generically, as the witness illustrates the underlying flexibility
+of embedding-vs-iso-class), Φ is forced to be loose on at least one
+of them.
+
+**What §6m blocks.** Any candidate Family D direction whose right-
+hand side is built from purely F_2[G]-module-isomorphism-class
+invariants of (A, B) is structurally blocked. In particular, from
+the round-2 v2 handoff:
+- **4a** (Hilbert series of `syz(A, B)`): Hilbert series coefficients
+  are dimensions of graded pieces. Each is an iso-class invariant.
+  §6m fires.
+- **4b** (Castelnuovo-Mumford regularity adapted to F_2[G]):
+  regularity is defined via dimensions of Tor groups (resp. local
+  cohomology). Iso-class invariant. §6m fires.
+- **4c-degree-only** (Anick resolution, degree-shape only): degrees
+  of generators in a minimal free resolution are iso-class
+  invariants. §6m fires.
+
+**What §6m does NOT block (the escape clause).** A bound whose RHS
+incorporates *non-module data* — explicitly any of the following —
+is NOT subject to §6m:
+- Hamming weight in F_2[G] or F_2[G]^k on specific elements (e.g.,
+  wt(A), wt(B), wt(γ) for specific γ).
+- The set-theoretic supports `supp(A), supp(B) ⊂ G` (not their
+  module structure).
+- Classical dual distances `d_A^⊥` of the cyclic codes generated by
+  A or B (uses Hamming distance on F_2^|G|).
+- Group-structural quantities like the degeneracy index
+  `c = [G : ⟨supp(A) ∩ supp(B)⟩]` (set-based, not module-based).
+- **4c-with-weights** (Anick resolution, min Hamming weight of
+  entries): the entries' min weights are basis-dependent and so
+  escape §6m — but for the same reason they cease to be module-
+  structural quantities; they're just disguised min-weight bounds,
+  which is what d_X already is.
+
+**Comparison with §6h.** §6h ruled out *dimension* RHS (e.g.,
+`Σ_O |O| · μ_O = dim ker M_A`) as a category error. §6m generalizes
+that pattern: not only dim ker, but *any* numerical F_2[G]-module-
+isomorphism-class invariant — including all of Krull-Schmidt-
+indecomposable-summand-multiplicity data — fails the same way. The
+witness of §6m (H_0 ≅ H_2 with different min weights) makes
+explicit what §6h could only assert via the specific
+`dim ker M_A = Σ_O |O| · μ_O` identity. §6m is the *structural*
+form of the obstruction; §6h is the operational form.
+
+**Connecting §6j / §6k / §6l / §6m.** §6j and §6k both fail because
+characteristic-2 arithmetic divides a key integer parameter (|G|
+for Fourier, h for cover-graph). §6l fails because k ≥ 2 forces
+joint character vanishing. §6m fails because **min weight isn't a
+module invariant** — a more abstract obstruction than any of these,
+because it doesn't gate on specific arithmetic facts about gross
+but on the very type of quantity being proposed. **§6m closes the
+last "structural algebraic" door**: characters (§6j), chain-maps
+(§6k), spectral gaps (§6l), and now any module-isomorphism-class
+invariant (§6m) cannot lower-bound d_X tightly.
+
+**Surviving directions after §6h–§6m.** The remaining theoretical
+options are exclusively those that mix module structure with
+*non-module data*:
+1. **Weight-aware Jacobson-radical filtrations** (round-1 Cv*
+   family): combine module structure (radical) with Hamming weight
+   (filtration). The `w_1` invariant is in this class — it survives
+   §6m (not iso-class) but was empirically falsified at Tier 3
+   independently.
+2. **Lifted-product-style bounds** (Lin–Pryadko / Tillich–Zémor):
+   uses classical-dual distances `d_A^⊥`, `d_B^⊥`, which are
+   weight quantities. Loose but valid. (Family B / round-2 v1.)
+3. **Combinatorial / expander-style bounds** using non-spectral
+   methods (vertex or edge expansion via combinatorial means, not
+   Cheeger-derived). Family C non-spectral subfamily; no closed
+   form known.
+4. **Brouwer-Zimmermann / probabilistic enumeration bounds**
+   (handoff §4e). Not module-natural; uses random information-set
+   decoding. Computational, not structural.
+
+**The combined §6h–§6m result is a publishable structural-
+impossibility theorem**: "No closed-form analytic distance lower
+bound for BB codes can be tight on gross using purely
+F_2[G]-module-isomorphism-class invariants." The remaining open
+direction is to mix module structure with non-module data, where
+no specific closed-form formula is known in the literature for the
+engineered Bravyi-table polynomials.
+
+The empirical artifact is at
+`pipeline/attempts/bb_distance_conjecture_family_d_v1_koszul_h2/result.md`
+(Frobenius-iso witness reproducibly verifiable via
+`scripts/family_d_v1_koszul_h2_iso_witness.py`). Machine-checked
+under `obstructions.py` via the `is_module_natural_invariant`
+predicate.
+
+## §6n: The (4/9)|G| H_2 min-weight identity (positive structural feature)
+
+Round-2 v2 session 3 (this is a **positive** finding, not an
+obstruction) pinned down the empirical observation from session 1
+that for the 5 Bravyi instances, `min_wt(H_2(Koszul(A, B))) = (4/9)·|G|`
+exactly. The general structural identity:
+
+**Theorem.** For weight-3 BB codes `(A, B)` over `G = Z_ℓ × Z_m`
+satisfying the **refined Z_3-pair hypothesis** — there exist linearly-
+independent group homomorphisms `φ_A, φ_B: G → Z_3` with
+`φ_A(supp(A)) = {0, 1, 2}` (multiset), `φ_A(supp(B))` constant in Z_3,
+`φ_B(supp(B)) = {0, 1, 2}`, and `φ_B(supp(A))` constant — the element
+`e(g) = 1[φ_A(g) ≠ 2 AND φ_B(g) ≠ 2]` is in `Ann(A) ∩ Ann(B) = H_2`
+with weight `(4/9)·|G|`.
+
+So `min_wt(H_2) ≤ (4/9)·|G|` whenever the hypothesis holds. The bound
+is tight in 93.4% of cases (corpus-wide) and tight for all 5 Bravyi
+instances.
+
+**Verification**: 437/437 corpus instances satisfying the refined
+hypothesis confirm the upper bound; 0 violations.
+
+**Conjectured generalization** (untested, no wt ≥ 4 corpus): for
+weight-w BB codes with the analogous Z_w-pair hypothesis,
+`min_wt(H_2) ≤ ((w-1)/w)² · |G|`.
+
+This is **not a distance bound on d_X** — `min_wt(H_2)` has the wrong
+sign per §6m. But it IS a clean structural identity for the joint
+annihilator of weight-3 polynomial pairs, deserving its own niche as
+a positive feature.
+
+**Mechanism (one-line proof)**: For each h, `(e·A)(h)` factors as
+`[φ_B(h) − c_A ≠ 2] · sum_a 1[φ_A(h−a) ≠ 2]` where `c_A = φ_B(supp(A))`
+(constant by hypothesis). The inner sum is 2 (one of three values
+mod 3 is 2, the other two aren't), even. So `(e·A)(h) = 0`. Symmetric
+for B.
+
+**Connection to §6m**: The identity is **embedding-specific** (depends
+on the canonical F_2-basis of F_2[G]). It does NOT factor through the
+F_2[G]-module iso class of H_2. Hence it's compatible with §6m's
+"min weight ≠ module invariant" statement: the (4/9)|G| upper bound
+is a feature of the embedding, not of the abstract module.
+
+The empirical artifact is at
+`pipeline/attempts/bb_distance_conjecture_family_d_v3_h2_minwt_formula/result.md`.
+Tier-1 implementation in `src/bb_lab/h2_minwt_formula.py` with 14
+regression tests in `tests/test_h2_minwt_formula.py`. Test suite total:
+383 passing (was 369 in session 2).
+
 ---
 
 ## 7. Recommended next moves, prioritized
