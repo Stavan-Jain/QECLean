@@ -1,7 +1,7 @@
 /-
 GENERATED FILE — DO NOT HAND-EDIT (edits WILL be clobbered by regen).
 Generator : qec-lab:experiments/bb_lab/scripts/gen_floor_lean.py
-Regen     : cd qec-lab:experiments/bb_lab && uv run python scripts/gen_floor_lean.py
+Regen     : cd experiments/bb_lab && uv run python scripts/gen_floor_lean.py
 To change this file, change the generator and regenerate — in the same PR.
 -/
 /-

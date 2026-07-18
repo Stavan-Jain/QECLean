@@ -3,7 +3,7 @@ GENERATED FILE — DO NOT HAND-EDIT (edits WILL be clobbered by regen).
 Generator : qec-lab:experiments/bb_lab/phase5/gen_file.py
 Data      : qec-lab:experiments/bb_lab/phase5/data.json (offline-validated 𝔽₂ linear algebra)
 Regen     : from a sibling qec-lab checkout (QECLEAN_ROOT points here):
-            uv run --project qec-lab:experiments/bb_lab python qec-lab:experiments/bb_lab/phase5/gen_file.py --force
+            uv run --project experiments/bb_lab python experiments/bb_lab/phase5/gen_file.py --force
 To change this file, change the generator/data in qec-lab and regenerate — land both repos' changes together.
 -/
 /-

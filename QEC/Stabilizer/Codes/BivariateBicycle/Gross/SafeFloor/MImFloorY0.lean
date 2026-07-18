@@ -2,7 +2,7 @@
 GENERATED FILE — DO NOT HAND-EDIT (edits WILL be clobbered by regen).
 Generator : qec-lab:experiments/bb_lab/scripts/gen_yrep_module.py (arg: 0)
 Regen     : from a sibling qec-lab checkout (QECLEAN_ROOT points here):
-            cd qec-lab:experiments/bb_lab && uv run python scripts/gen_yrep_module.py 0
+            cd experiments/bb_lab && uv run python scripts/gen_yrep_module.py 0
 To change this file, change the generator in qec-lab and regenerate — land both repos' changes together.
 -/
 /-
