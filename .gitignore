@@ -9,8 +9,11 @@ docs/*
 !docs/pipeline.md
 !docs/pipeline-usage.md
 !docs/lean-patterns.md
+!docs/lean-conversion-recipes.md
 !docs/mathlib-version-quirks.md
 !docs/gross-distance-extensibility.md
+!docs/gross-distance-proof.md
+!docs/gross-distance-proof.tex
 
 # Cursor local state and continual-learning index
 .cursor/

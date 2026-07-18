@@ -22,11 +22,21 @@ Modules are written in Lean 4 and rely on [mathlib](https://github.com/leanprove
 - **Binary Symplectic Representation**: Check matrices, symplectic inner product, symplectic span, and equivalence with independent generators
 - **Concrete Codes**: surface codes, 3-qubit repetition code, n-qubit repetition code, Steane 7-qubit code, Shor 9-qubit code, and quantum Hamming code
 - **Toric Code, end-to-end**: For every `L ≥ 2`, the `L × L` toric code is verified as a `StabilizerCode (2L²) 2` with **distance exactly `L`**. The chain complex, `H₁ ≅ 𝔽₂²` isomorphism, `(h, v)` wrapping invariants, and CSS distance bridge are all mechanized — see the [interactive write-up](https://stavan-jain.github.io/DistanceBlog/) (or [`docs/distance_proof.md`](docs/distance_proof.md) for the in-repo version) for the math, and `QEC/Stabilizer/Codes/Toric/` (code, lattice geometry, chain complex, distance) for the Lean.
+- **Bivariate-bicycle codes, incl. the gross code**: IBM's `[[144,12,12]]` gross code is verified with **distance exactly 12** (see Headline results), alongside its `[[72,12,6]]` base, the `[[72,4,8]]` pair, a `[[150,8,8]] → [[300,8,16]]` two-tier instance, and a parametric free-ℤ₂ **doubling framework** (`Framework/Homological/BB*`) with cover-transfer, deck-homotopy, deck-tower, Bockstein-rank, and class base-floor (`SmallCycleData`) layers. The accompanying analytic proof and research program live in [`docs/gross-distance-proof.md`](docs/gross-distance-proof.md), [`docs/gross-distance-extensibility.md`](docs/gross-distance-extensibility.md), and `experiments/bb_lab/`.
+- **CSS concatenation**: parametric `[[n₁n₂, k₂, ≥ d₁d₂]]` concatenation with unconditional `[[49,1,9]]` (Steane ⊗ Steane) and `[[28,2,6]]` (Steane ⊗ [[4,2,2]]) instances.
 - **Verified Properties**: Mechanized proofs of key properties, including the obligations used to instantiate `StabilizerCode` instances (generator count/independence/commutation, exclusion of `-I`, and logical-operator centralizer + anticommutation conditions), along with distance theorems.
 
-## Headline result
+## Headline results
 
-For every `L ≥ 2`, the `L × L` toric code is a verified `[[2L², 2, L]]` stabilizer code:
+**The gross code.** IBM's `[[144,12,12]]` bivariate-bicycle code — the flagship qLDPC code of Bravyi et al. (Nature 2024) — is a verified `StabilizerCodeWithDistance 144 12 12`:
+
+```lean
+grossStabilizerCodeWithDistance : StabilizerCodeWithDistance 144 12 12
+```
+
+The distance proof is unconditional and axiom-clean (the standard three axioms plus Lean's `native_decide` compiler axiom; no `sorry`), mechanizing the free-ℤ₂-cover argument of the in-repo analytic write-up: safe/dangerous sector dichotomy over the `[[72,12,6]]` base, the small-cycle theorem, the light-stabilizer classification, and the Smith-coset confined floor (`QEC/Stabilizer/Codes/BivariateBicycle/`). A fully analytic paper proof (no computer search in the argument) is at [`docs/gross-distance-proof.md`](docs/gross-distance-proof.md).
+
+**The toric family.** For every `L ≥ 2`, the `L × L` toric code is a verified `[[2L², 2, L]]` stabilizer code:
 
 ```lean
 theorem toricCodeN_distance_eq_L (L : ℕ) [Fact (2 ≤ L)] :
@@ -55,7 +65,7 @@ Import the whole development via `QEC` (or `QEC.Foundations.Foundations`, `QEC.R
 
 - **`QEC/Foundations/`** — Qubits, quantum states, gates (including CNOT), and tensor products.
 - **`QEC/RepetitionCode/`** — 3-qubit bit-flip code: encode/decode, logical X, and recovery with proofs.
-- **`QEC/Stabilizer/`** — Pauli groups (single- and n-qubit), binary symplectic representation (check matrices, symplectic span), stabilizer core (groups, CSS, centralizer, codespace/distance/logical-operator tools), lattice and toric-homology infrastructure, and concrete codes: repetition (3- and n-qubit), rotated surface code, toric code families, quantum Hamming, Steane 7, and Shor 9.
+- **`QEC/Stabilizer/`** — Pauli groups (single- and n-qubit), binary symplectic representation (check matrices, symplectic span), stabilizer core (groups, CSS, centralizer, codespace/distance/logical-operator tools), homological/chain-complex framework incl. the BB doubling layer, lattice and toric-homology infrastructure, and concrete codes: repetition (3- and n-qubit), rotated surface code, toric code families, bivariate-bicycle instances (gross and siblings), CSS concatenation instances, quantum Hamming, Steane 7, Shor 9, `[[5,1,3]]`, `[[4,2,2]]`, `[[6,2,2]]`, and the iceberg family.
 
 ## Getting Started
 
@@ -111,13 +121,13 @@ Contributions are welcome! If you add new modules or definitions, please:
 
 ### Near-Term Goals
 
-- Continue strengthening reusable stabilizer and binary-symplectic APIs needed by larger code families
-- Formalize the planar / rotated surface code distance (different boundary conditions, `H₁ ≅ 𝔽₂`)
-- Generalize the homological distance argument to arbitrary CW-complex cellulations
+- Extend the class small-cycle theorem (analytic `d ≥ 6` for a characterized family of weight-3 BB codes) toward weight-5 / `d ≥ 10` classes
+- Certify a BB code with distance `> 12` end-to-end through the doubling framework (the `[[300,8,16]]` two-tier instance's remaining dangerous-sector work)
+- Retire the remaining `native_decide` leaves of the gross proof via the Tier-3 analytic replacement track
 
 ### Long-Term Goals
 
-- Build a generic QLDPC formalization framework first, then instantiate it with concrete code families and prove distance
+- A generic QLDPC formalization framework instantiated across code families with proven distance
 - Extend logical-operator and logical-gate formalizations for topological and LDPC-style codes
 - Expand formalization across broader classes of quantum codes
 
