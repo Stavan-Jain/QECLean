@@ -814,6 +814,34 @@ efficient completion path is Q1's oracle: validate A11's base-side
 coset probe against the ~190 exact hit verdicts + 14k S3 verdicts,
 then predict the unscreened cells and spot-check a sample.
 
+## R12. A12 merged + the theorem generalizes to descent covers (2026-07-02)
+
+PR #53's head gained the A12 session's work (merged here): the S3.9
+packaging (`pair72StabilizerCodeWithDistance`), `deckTrivial_of_bezout`
+in the layer, and the **A12 theorem**: for literal free-ℤ₂ BB covers,
+(R) ⟺ `k(cover) = k(base)` ⟺ `1+x^ℓ ∈ (A,B)` — with the Δ-linchpin
+also equivalent to (R), and the certificate form complete.
+
+**Descent generalization, tested here:** the Koszul argument never uses
+literality (σ = multiplication by the deck element is central for any
+cover polynomials), so the membership⟺k direction should hold on the
+whole descent space.  Verified: over **3819 screened descent covers**
+(all four classes, all twists, toric3/4 + hit2/hit5 + an S3 stratified
+sample), `k` preserved ⟺ `1+δ ∈ (Ã, B̃)` with **zero mismatches**
+(3332 member/preserved, 487 non-member/dropped — including both split
+classes' 64/64 k-drops, all non-members).
+
+**The template collapse (A10 × A12 × C-A10).**  For a k-preserving
+descent cover — one rank check — conditions 2 (R) and the linchpin are
+now FREE (A12), and the dangerous rung is empirically universal at
+`2d` (R9, 14101/14101).  The entire doubling question per cover
+therefore reduces to the safe floor — exactly A12's OQ4, which their
+note independently corroborates ("separation visible only in
+safe-class coset minima").  Cross-references: their OQ1 (tower) = my
+Q2; their OQ4 = my Q1/C-A10; my descent-generality data feeds their
+OQ2 quantitative sweep (the split-class k-jumps +4/+12 are test
+points for `dim (1+σ)H₁ = k̃ − k`).
+
 ## R7. Follow-ups (queued)
 
 1. **Lean instance of a rescued cover** — `XDoubleCoverData` verifies
