@@ -13,6 +13,62 @@ what was tried and why it didn't work.
 
 ## Entries
 
+- 2026-07-06 — deficit-wall (A15-P3) — success (theorem + a correction) —
+  **A14 §16's deficit-wall OQ answered: the wall *value* is a theorem,
+  the *mechanism* is a pushforward, and the "stalls at exactly 2d − 2"
+  premise is retracted as a measurement artifact.** Math
+  (`notes/A15_deficit_wall.md`, machine-validated by
+  `a15_deficit_wall_checks.py`): **(L0)** the safe sector is the
+  transfer kernel — `im δ₂ = ker τ₁` (LES; span-verified on 9 covers
+  incl. both bb_288 presentations and the Z₁₈×Z₃ re-decomposition), so
+  `d_safe` = min weight of a base logical whose class *dies in the
+  double cover*; **(L1, parity)** with |A|, |B| odd every base and
+  cover 1-cycle has even weight (augmentation ring hom), so `d`, `d̃`,
+  `d_safe` are all even and — since `d_safe ≥ 2d ⟺ SF` — **`2d − 2`
+  is the unique maximal SF-failing value**: that is the whole
+  "parity/duality mechanism" §16 asked for; **(L2/T1)** the collision
+  sets `K_z = {g : (1+g)[z] safe} ⊇ Stab₀(z)` are subgroups with
+  `[G : K_z] ≤ 2^{k/2}`, and where the containment is proper the
+  difference classes give `d_safe ≤ 2d − 2·overlap` — fires on bb90-y
+  (bound 10, tight at the freeze), **provably silent on bb108-y** (all
+  54 min-weight logicals have `K_z = Stab₀`, exhausted by SAT — the
+  hypothesized "2(d−1) base object" does not exist there); **(T2, the
+  load-bearing mechanism)** under (R) `im p₁ = im δ₂` makes the
+  pushforward of any surviving-class cover logical a safe base logical:
+  `d_safe ≤ d̃_safe`, so a cover failing through its safe sector hands
+  the safe floor its witness at no weight cost, and conversely SF
+  forces the cover's whole safe sector to `≥ 2d` (the template
+  re-derived; "SF-true ⟹ doubles", A11's 111/111, reduces to the new
+  **(M)-robustness conjecture**: the dangerous sector never binds
+  alone). Coupling observed tight everywhere: doublers at `2d = 2d`
+  with overlap-free lifts; bb108-y at `14 = 14`. **The correction:**
+  §15/§16's "orbit ceiling 18" and bb_288's "32–34" were *first-found
+  SAT witness weights at the query bound, not minima* — exact
+  descending ladders put stored bb108-y at **`d_safe = 14 = 2d − 6`
+  exactly, certified both sides** (base UNSAT@12 on all orbit reps;
+  cover `d̃_safe = 14` exactly, its UNSAT@12 ≈5 h of CaDiCaL at
+  n = 216 — T2's coupling tight at 14 = 14), every ladder-sampled
+  v1 finalist at `≤ 12` (first witnesses 16), while bb90-y's freeze value
+  **= 10 = d exactly** (UNSAT@9, certified) — no measured instance
+  attains the wall;
+  correction blocks added to A14 §§15–16. Residue: the code invariant
+  `maxSF ∈ {2d} ∪ {even ≤ 2d − 2}` (true value per code now measurable
+  by ladders; A15-P1's corpus battery must report S4 weights as "≤"),
+  the (M)-robustness conjecture, and the T1/T2-both-silent corner of
+  the `≤ 2d` ceiling. **Lean layer LANDED (same session, axiom-clean,
+  zero warnings): `Framework/Homological/BBDeficitWall.lean`** — L1
+  parity (`sum_conv`, `cycle_support_even`, base+cover instantiations
+  with descending hypotheses), L0 as the chain-level iff
+  `pull1_mem_boundaries_iff_seamCoset` (sibling to
+  `ker_pushH1_eq_range_pullH1`), T2 as
+  `push1_mem_seamCoset_of_deckTrivial` +
+  `not_seamCosetFloor_of_light_cover_cycle` (`d_safe ≤ d̃_safe`
+  against the repo's own `SeamCosetFloor`/`DeckTrivialOnH1`,
+  deliberately routing around A14.1(2)'s dimension count via
+  deck-triviality), and the wall as the even-step upgrades
+  `seamCosetFloor_of_even_of_pred` / `safeFloor_of_even_of_pred`.
+  [theorem+battery](../experiments/bb_lab/notes/A15_deficit_wall.md)
+
 - 2026-07-04 — safe-floor-screens (A14) — success —
   **A12's OQ4 answered in its own terms: the safe sector is canonical
   under (R), and a certified necessary-screen battery now decides
