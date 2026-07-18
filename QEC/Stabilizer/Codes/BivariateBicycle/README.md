@@ -67,7 +67,8 @@ already flipped. Status changes belong HERE, not in module names.
 |---|---|---|
 | `Gross/StabilizerCodeData.lean` | `phase5/gen_file.py` (`--force` guard; emits data only) | `phase5/data.json` |
 | `Gross/SafeFloor/MImFloorData.lean` | `scripts/gen_floor_lean.py` | in-script |
-| `Gross/SafeFloor/MImFloorY{0,1,4,11,12}.lean` | `scripts/gen_yrep_module.py <i>` | in-script |
+| `Gross/SafeFloor/MImFloorY{0,1,4}.lean` | `scripts/gen_yrep_module.py <i>` | in-script |
+| `Gross/SafeFloor/MImFloorY{11,12}.lean` | **hand-maintained since PR #58** (analytic Tier-3 form; formerly `gen_yrep_module.py`, which now refuses args 11/12) | — |
 | `Z3Z6/StabilizerCodeData.lean` | `scripts/gen_pair72_packaging_data.py` (retarget to data-only queued — do not run without reading GENERATORS.md) | validation-gated |
 | `BaseFloors/*.lean` | `scripts/gen_base_floor_lean.py` | per-instance |
 

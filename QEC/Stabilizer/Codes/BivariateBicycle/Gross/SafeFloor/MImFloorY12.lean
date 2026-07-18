@@ -1,9 +1,9 @@
 /-
-GENERATED FILE — DO NOT HAND-EDIT (edits WILL be clobbered by regen).
-Generator : qec-lab:experiments/bb_lab/scripts/gen_yrep_module.py (arg: 12)
-Regen     : from a sibling qec-lab checkout (QECLEAN_ROOT points here):
-            cd experiments/bb_lab && uv run python scripts/gen_yrep_module.py 12
-To change this file, change the generator in qec-lab and regenerate — land both repos' changes together.
+FORMERLY GENERATED — now HAND-MAINTAINED. Do NOT regenerate.
+Originally emitted by qec-lab:experiments/bb_lab/scripts/gen_yrep_module.py (arg: 12),
+then hand-evolved to the analytic Tier-3 form (PR #58: kernel-decide tables, no
+floorOK `native_decide`). Rerunning the generator for arg 12 would revert that
+work; the generator refuses args 11/12 without --force.
 -/
 /-
 # Phase 6: the safe-sector floor for y-orbit representative 12 — ANALYTIC (Tier 3, M1)
