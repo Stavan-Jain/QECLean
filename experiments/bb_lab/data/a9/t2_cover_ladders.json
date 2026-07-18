@@ -1,0 +1,16 @@
+[
+  {
+    "instance_id": "9706a4ea60d7e978",
+    "A": "y^3 + x + x^2",
+    "B": "y^5 + x*y + x^2",
+    "x_cover_d": 8,
+    "y_cover_d": 6
+  },
+  {
+    "instance_id": "98ff6753f866aba0",
+    "A": "y^3 + x + x^2",
+    "B": "1 + x*y^5 + x^2*y",
+    "x_cover_d": 6,
+    "y_cover_d": 6
+  }
+]

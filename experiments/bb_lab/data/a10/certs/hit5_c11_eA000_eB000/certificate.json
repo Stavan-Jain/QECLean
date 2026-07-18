@@ -1,0 +1,96 @@
+{
+  "cert_id": "hit5_c11_eA000_eB000",
+  "base_id": "hit5",
+  "group": [
+    6,
+    6
+  ],
+  "A": "y^3 + x + x^2",
+  "B": "y^5 + x*y + x^2",
+  "cls": [
+    1,
+    1
+  ],
+  "epsA": [
+    0,
+    0,
+    0
+  ],
+  "epsB": [
+    0,
+    0,
+    0
+  ],
+  "cover_A_support": [
+    [
+      0,
+      0,
+      3
+    ],
+    [
+      0,
+      1,
+      0
+    ],
+    [
+      0,
+      2,
+      0
+    ]
+  ],
+  "cover_B_support": [
+    [
+      0,
+      0,
+      5
+    ],
+    [
+      0,
+      1,
+      1
+    ],
+    [
+      0,
+      2,
+      0
+    ]
+  ],
+  "n": 144,
+  "k": 12,
+  "distance": 12,
+  "witness_qubits": [
+    83,
+    89,
+    92,
+    95,
+    101,
+    104,
+    119,
+    125,
+    128,
+    131,
+    137,
+    140
+  ],
+  "witness_verification": {
+    "weight": 12,
+    "in_ker_HZ": true,
+    "anticommutes_with_a_logical": true,
+    "in_rowspan_HX": false,
+    "is_nontrivial_logical": true
+  },
+  "unsat_proofs": [
+    "data/a10/certs/hit5_c11_eA000_eB000/hit5_c11_eA000_eB000_w1.drat",
+    "data/a10/certs/hit5_c11_eA000_eB000/hit5_c11_eA000_eB000_w2.drat",
+    "data/a10/certs/hit5_c11_eA000_eB000/hit5_c11_eA000_eB000_w3.drat",
+    "data/a10/certs/hit5_c11_eA000_eB000/hit5_c11_eA000_eB000_w4.drat",
+    "data/a10/certs/hit5_c11_eA000_eB000/hit5_c11_eA000_eB000_w5.drat",
+    "data/a10/certs/hit5_c11_eA000_eB000/hit5_c11_eA000_eB000_w6.drat",
+    "data/a10/certs/hit5_c11_eA000_eB000/hit5_c11_eA000_eB000_w7.drat",
+    "data/a10/certs/hit5_c11_eA000_eB000/hit5_c11_eA000_eB000_w8.drat",
+    "data/a10/certs/hit5_c11_eA000_eB000/hit5_c11_eA000_eB000_w9.drat",
+    "data/a10/certs/hit5_c11_eA000_eB000/hit5_c11_eA000_eB000_w10.drat",
+    "data/a10/certs/hit5_c11_eA000_eB000/hit5_c11_eA000_eB000_w11.drat"
+  ],
+  "secs": 304.9
+}

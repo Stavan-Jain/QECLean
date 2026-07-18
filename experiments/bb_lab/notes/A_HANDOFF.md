@@ -24,6 +24,39 @@ A4 Theorem D).
 > exact [[144,12,12]] y-covers** (hit3/4/6): in-frame, engine-necessary
 > targets for the next engine re-instantiation.
 
+> **A10 RESULTS (2026-07-02, `A10_descent_twist_screen.md`) — the descent
+> question ANSWERED (Fork M).** Question: does every certified BB base
+> admit a *descent* free-ℤ₂ cover (any extension class, polynomials only
+> required to `fiberSum` down, ~2^(w_A+w_B) sheet twists per class) with
+> `d(cover) = 2d`?  **Both marquee bases are RESCUED**: hit2 by an
+> x-class single-bit twist (εB=001, DRAT-certified d = 12), hit5 by the
+> **mixed extension class at zero twist** — so ALL FIVE anchorable
+> [[72,12,6]] gross siblings now carry exact [[144,12,12]] covers
+> (hit3/4/6 literal + hit2/hit5 descent), and A9's "hit2/hit5 do not
+> double" was a literal-lift-slice artifact.  But **globally the
+> universal claim is FALSE**: 13 small-frame counterexample bases
+> (Z₃×Z₃/Z₃×Z₄ d=4, Z₃×Z₅ d=6) whose ENTIRE 256-cover descent space
+> fails — 3328 witness rows, all independently numpy-re-verified;
+> committed as certificates.  Toric: rescued at every L (twisted-toric
+> mechanism recovered); even×even frames only via the mixed class (the
+> parity wall).  Lemma L1 (proven): descent screens are presentation-
+> exhaustive — the cover codes are literally invariant under Aut(H)
+> re-presentation, classes permuted.  Selection-rule leads: Sidon(B)
+> separates on minimal frames only.  Lean side untouched this pass;
+> queued: engine-tier rescued-cover instance, kernel-`decide` Fork-C
+> counterexample packaging (cheapest full-rigor artifact), Z₆×Z₆
+> universal-doubling sweep.  Branch `claude/a10-descent-twist-screen`.
+> **A11 synthesis (same day):** the A11 session showed hit2/hit5's
+> ANCHORABLE presentations double via literal x-lifts (verified here:
+> both d = 12) — and the constructive L1 correspondence
+> (`a10_l1_correspondence.py`) identifies those covers, with exact
+> matrix equality, as the stored presentation's mixed-class twist rows
+> (hit2: εA=001/εB=010; hit5: εA=001/εB=011).  Twist rescues ≡
+> presentation moves; the descent screen is the presentation-invariant
+> closure of literal lifting, so its negatives (the 13 counterexamples)
+> are CODE-level — A11's "Fork-C is presentation-only" caveat is
+> corrected in A10 note §R6.
+
 ---
 
 ## 0. RESUME HERE (the one-paragraph version)
