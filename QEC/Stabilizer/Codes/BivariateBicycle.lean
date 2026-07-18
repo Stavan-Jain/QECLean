@@ -28,6 +28,7 @@ import QEC.Stabilizer.Codes.BivariateBicycle.WtFloor1618
 import QEC.Stabilizer.Codes.BivariateBicycle.Z3Z6
 import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6
 import QEC.Stabilizer.Codes.BivariateBicycle.BaseFloors
+import QEC.Stabilizer.Codes.BivariateBicycle.LayerInstance
 
 /-!
 # Bivariate bicycle codes
@@ -132,6 +133,11 @@ code and its `[[72, 12, 6]]` base, related by a 2:1 covering:
                     over the `64 × 16 = 1024` spine cells) and Prop 31 (the 118 `ρ`-link
                     kills) — neither a kernel-feasible enumeration; until then the three
                     light orbits stay on the `MImFloor` engine.
+- `LayerInstance`  — the gross ↔ bb72 cover packaged as `grossCoverData :
+                    XDoubleCoverData`, and the unconditional `d(gross) = 12` re-derived
+                    through the parametric doubling layer (`gross_chain_distance_eq_12`,
+                    `gross_pauli_distance_eq_12`) with every layer input discharged by the
+                    existing gross theorems — no `native_decide` leaf re-run
 
 Both CRT-engine inputs — `LightStabilizerClassification` (`LightStabClassify`) and `MImBound`
 (`MImAssembly`) — are now discharged, so the distance of the gross `[[144,12,12]]` code is
