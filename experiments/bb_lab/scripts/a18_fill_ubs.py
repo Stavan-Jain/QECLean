@@ -1,11 +1,11 @@
-"""A16 — parallel L1-sampling distance upper bounds for corpus rows.
+"""A18 — parallel L1-sampling distance upper bounds for corpus rows.
 
 Parallel version of `bb-lab fill-distance-ubs`: worker processes run
 `l1_distance_ub`, the driver serialises the DuckDB writes. Selection
 defaults to rows with no d_ub and no d_exact.
 
 Usage:
-  uv run python a16_fill_ubs.py --db data/bb_instances.duckdb \
+  uv run python a18_fill_ubs.py --db data/bb_instances.duckdb \
       [--min-n 0] [--max-n 10000] [--n-samples 30000] [--workers 8] \
       [--like 'bb_%']
 """

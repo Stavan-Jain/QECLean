@@ -1,4 +1,4 @@
-"""A16 — sampled canonical enumeration for groups too large to exhaust.
+"""A18 — sampled canonical enumeration for groups too large to exhaust.
 
 For each requested group Z_ell x Z_m, draw uniform random weight-3
 (A, B) support pairs, keep those with k >= --k-min, canonicalize the
@@ -12,7 +12,7 @@ which for breadth purposes is indistinguishable from uniform: almost
 all orbits under Aut(G) x translation x swap have full size.
 
 Usage:
-  uv run python a16_sample_enum.py --db data/bb_instances.duckdb \
+  uv run python a18_sample_enum.py --db data/bb_instances.duckdb \
       --group 7,8,1500 --group 6,10,1500 [--seed 20260707]
 """
 

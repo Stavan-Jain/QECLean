@@ -1,4 +1,4 @@
-"""A16 — flexible SAT exact-distance filler for the corpus DB.
+"""A18 — flexible SAT exact-distance filler for the corpus DB.
 
 Generalizes `bb-lab fill-distances`: arbitrary SQL row selection and
 ordering, per-instance hard timeout (subprocess kill), N concurrent
@@ -7,12 +7,12 @@ time-budgeted. All DB writes stay on the driver (DuckDB single writer).
 
 Typical passes:
   # breadth-first over new small groups
-  uv run python a16_sat_fill.py --db data/bb_instances.duckdb \
+  uv run python a18_sat_fill.py --db data/bb_instances.duckdb \
       --where "d_exact IS NULL AND n <= 100 AND k >= 2" \
       --breadth-first --timeout 60 --workers 8 --max-seconds 4200
 
   # d>=10 hunt in the 104..200 window, cheapest promising rows first
-  uv run python a16_sat_fill.py --db data/bb_instances.duckdb \
+  uv run python a18_sat_fill.py --db data/bb_instances.duckdb \
       --where "d_exact IS NULL AND n BETWEEN 104 AND 200 AND d_ub >= 10" \
       --order "n ASC, d_ub ASC, k DESC" --timeout 300 --workers 8
 """

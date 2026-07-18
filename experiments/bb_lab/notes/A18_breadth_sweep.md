@@ -1,4 +1,4 @@
-# A16 — corpus breadth sweep (2026-07-07)
+# A18 — corpus breadth sweep (2026-07-07)
 
 Goal: widen the `bb_instances.duckdb` corpus across **group-shape
 variety** and **slightly-higher-distance codes** while staying
@@ -54,7 +54,7 @@ Z4xZ12 (Z4²×Z3). Confirmed-barren probes: Z4xZ4, Z4xZ5, Z5xZ5 (0 rows).
 
 ## Tier S — sampled enumeration (hunt zone, n = 112…200)
 
-New script `scripts/a16_sample_enum.py`: uniform random weight-3
+New script `scripts/a18_sample_enum.py`: uniform random weight-3
 pairs, k≥2 filter first, then the same `canonical_bits` walk and
 `instance_id` scheme as `bb-lab enumerate`; `code_id` prefix
 **`bb_samp_`** marks non-exhaustive provenance. Groups (all new iso
@@ -66,9 +66,9 @@ Z7xZ7 (98), Z9xZ9 (162).
 
 ## Distance filling
 
-- `scripts/a16_fill_ubs.py` — parallel L1-sampling `d_ub`
+- `scripts/a18_fill_ubs.py` — parallel L1-sampling `d_ub`
   (hunt zone first, 60k samples).
-- `scripts/a16_sat_fill.py` — SAT exact `d` with per-row watchdog
+- `scripts/a18_sat_fill.py` — SAT exact `d` with per-row watchdog
   timeout + global time box; pass 1 breadth-first over new n≤100 rows,
   pass 2 = hunt (n∈[104,200], `d_ub ≥ 10`, cheapest-first).
 
@@ -118,7 +118,7 @@ breadth value.
   (2) a side DB + driver scripts staged in `/private/tmp` were lost
   to the 3-day tmp purge / reboot before their merge ran. Rule:
   long-running pipeline state (side DBs, driver scripts, logs)
-  goes on durable storage (`data/a16_run/`, gitignored), never
+  goes on durable storage (`data/a18_run/`, gitignored), never
   `/tmp`; and any deferred merge step should be part of the same
   driver script, not a separate manually-triggered action.
 - SAT throughput at n ≤ 100 (8 workers, M-series, uncontended):
