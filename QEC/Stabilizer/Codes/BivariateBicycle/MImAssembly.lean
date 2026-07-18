@@ -38,6 +38,214 @@ theorem kcombo_zero : kcombo 0 0 0 0 0 0 = 0 := by funext h; simp [kcombo]
 /-- The two values of `ZMod 2` (case-split with literal substitution). -/
 theorem zmod2_cases (c : ZMod 2) : c = 0 ∨ c = 1 := by revert c; decide
 
+set_option synthInstance.maxSize 4000 in
+-- The `Decidable` instance for the 63-way `∧` (63 function-equality leaves) is a
+-- term far larger than the default `synthInstance.maxSize` of 128; the search
+-- itself is cheap.
+/-- The 63 class-level covariance certificates `seamC z' = T_c (seamC zrep) + ∂₂ δ`
+consumed by `floor_kcombo`, bundled into a single `native_decide` so the file costs
+one native compilation unit instead of 63. -/
+private theorem transfer_covs :
+    (seamC (kcombo 0 0 0 0 0 1)
+          = translate1 ((1, 5) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(5,1),(5,5)])) ∧
+    (seamC (kcombo 0 0 0 0 1 0)
+          = translate1 ((1, 0) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(5,0),(5,4)])) ∧
+    (seamC (kcombo 0 0 0 0 1 1)
+          = translate1 ((4, 1) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(0,0),(0,1),(0,2),(0,5),(1,1),(1,5)])) ∧
+    (seamC (kcombo 0 0 0 1 0 0)
+          = translate1 ((2, 4) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(4,0),(4,2),(5,1),(5,3)])) ∧
+    (seamC (kcombo 0 0 0 1 0 1)
+          = translate1 ((0, 3) : BaseGroup) (seamC Y4.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [])) ∧
+    (seamC (kcombo 0 0 0 1 1 0)
+          = translate1 ((1, 0) : BaseGroup) (seamC Y0.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(5,0),(5,1),(5,3),(5,4)])) ∧
+    (seamC (kcombo 0 0 0 1 1 1)
+          = translate1 ((3, 4) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB
+                (mkZeta [(3,0),(3,2),(4,1),(4,3),(5,0),(5,3),(5,4),(5,5)])) ∧
+    (seamC (kcombo 0 0 1 0 0 0)
+          = translate1 ((0, 0) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [])) ∧
+    (seamC (kcombo 0 0 1 0 0 1)
+          = translate1 ((1, 0) : BaseGroup) (seamC Y4.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(5,0),(5,1),(5,2),(5,5)])) ∧
+    (seamC (kcombo 0 0 1 0 1 0)
+          = translate1 ((2, 3) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(4,1),(4,3),(5,2),(5,4)])) ∧
+    (seamC (kcombo 0 0 1 0 1 1)
+          = translate1 ((1, 2) : BaseGroup) (seamC Y0.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(5,1),(5,2),(5,4),(5,5)])) ∧
+    (seamC (kcombo 0 0 1 1 0 0)
+          = translate1 ((1, 5) : BaseGroup) (seamC Y4.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(5,0),(5,1),(5,2),(5,3)])) ∧
+    (seamC (kcombo 0 0 1 1 0 1)
+          = translate1 ((1, 1) : BaseGroup) (seamC Y0.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(5,0),(5,2),(5,3),(5,5)])) ∧
+    (seamC (kcombo 0 0 1 1 1 0)
+          = translate1 ((5, 5) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(0,1),(0,3)])) ∧
+    (seamC (kcombo 0 0 1 1 1 1)
+          = translate1 ((3, 5) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB
+                (mkZeta [(3,1),(3,5),(4,0),(4,2),(5,2),(5,3),(5,4),(5,5)])) ∧
+    (seamC (kcombo 0 1 0 0 0 0)
+          = translate1 ((0, 1) : BaseGroup) (seamC Y0.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [])) ∧
+    (seamC (kcombo 0 1 0 0 0 1)
+          = translate1 ((0, 1) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [])) ∧
+    (seamC (kcombo 0 1 0 0 1 0)
+          = translate1 ((2, 1) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(4,3),(4,5),(5,0),(5,4)])) ∧
+    (seamC (kcombo 0 1 0 0 1 1)
+          = translate1 ((1, 1) : BaseGroup) (seamC Y4.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(5,0),(5,1),(5,4),(5,5)])) ∧
+    (seamC (kcombo 0 1 0 1 0 0)
+          = translate1 ((1, 3) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(5,1),(5,3)])) ∧
+    (seamC (kcombo 0 1 0 1 0 1)
+          = translate1 ((1, 1) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(5,3),(5,5)])) ∧
+    (seamC (kcombo 0 1 0 1 1 0)
+          = translate1 ((0, 0) : BaseGroup) (seamC Y11.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [])) ∧
+    (seamC (kcombo 0 1 0 1 1 1)
+          = translate1 ((4, 2) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(0,0),(0,1),(0,4),(0,5),(1,0),(1,4)])) ∧
+    (seamC (kcombo 0 1 1 0 0 0)
+          = translate1 ((2, 5) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(4,1),(4,5),(5,0),(5,2)])) ∧
+    (seamC (kcombo 0 1 1 0 0 1)
+          = translate1 ((3, 2) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB
+                (mkZeta [(3,2),(3,4),(4,3),(4,5),(5,0),(5,1),(5,2),(5,5)])) ∧
+    (seamC (kcombo 0 1 1 0 1 0)
+          = translate1 ((0, 4) : BaseGroup) (seamC Y4.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [])) ∧
+    (seamC (kcombo 0 1 1 0 1 1)
+          = translate1 ((0, 2) : BaseGroup) (seamC Y12.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [])) ∧
+    (seamC (kcombo 0 1 1 1 0 0)
+          = translate1 ((5, 0) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(0,0),(0,2)])) ∧
+    (seamC (kcombo 0 1 1 1 0 1)
+          = translate1 ((2, 1) : BaseGroup) (seamC Y0.zrep)
+            + bbBoundary2Fn baseA baseB
+                (mkZeta [(1,0),(1,2),(1,3),(1,5),(2,0),(2,2),(2,3),(2,5)])) ∧
+    (seamC (kcombo 0 1 1 1 1 0)
+          = translate1 ((3, 0) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB
+                (mkZeta [(3,0),(3,4),(4,1),(4,5),(5,1),(5,2),(5,3),(5,4)])) ∧
+    (seamC (kcombo 0 1 1 1 1 1)
+          = translate1 ((1, 3) : BaseGroup) (seamC Y4.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(5,2),(5,3),(5,4),(5,5)])) ∧
+    (seamC (kcombo 1 0 0 0 0 0)
+          = translate1 ((0, 0) : BaseGroup) (seamC Y0.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [])) ∧
+    (seamC (kcombo 1 0 0 0 0 1)
+          = translate1 ((2, 0) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(4,0),(4,4),(5,1),(5,5)])) ∧
+    (seamC (kcombo 1 0 0 0 1 0)
+          = translate1 ((0, 2) : BaseGroup) (seamC Y4.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [])) ∧
+    (seamC (kcombo 1 0 0 0 1 1)
+          = translate1 ((3, 3) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB
+                (mkZeta [(3,1),(3,3),(4,2),(4,4),(5,0),(5,1),(5,4),(5,5)])) ∧
+    (seamC (kcombo 1 0 0 1 0 0)
+          = translate1 ((0, 5) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [])) ∧
+    (seamC (kcombo 1 0 0 1 0 1)
+          = translate1 ((2, 2) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(4,2),(4,4),(5,3),(5,5)])) ∧
+    (seamC (kcombo 1 0 0 1 1 0)
+          = translate1 ((2, 0) : BaseGroup) (seamC Y0.zrep)
+            + bbBoundary2Fn baseA baseB
+                (mkZeta [(1,0),(1,1),(1,3),(1,4),(2,0),(2,1),(2,3),(2,4)])) ∧
+    (seamC (kcombo 1 0 0 1 1 1)
+          = translate1 ((1, 2) : BaseGroup) (seamC Y4.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(5,0),(5,3),(5,4),(5,5)])) ∧
+    (seamC (kcombo 1 0 1 0 0 0)
+          = translate1 ((1, 4) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(5,0),(5,2)])) ∧
+    (seamC (kcombo 1 0 1 0 0 1)
+          = translate1 ((4, 0) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(0,0),(0,1),(0,2),(0,3),(1,0),(1,2)])) ∧
+    (seamC (kcombo 1 0 1 0 1 0)
+          = translate1 ((1, 2) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(5,2),(5,4)])) ∧
+    (seamC (kcombo 1 0 1 0 1 1)
+          = translate1 ((0, 2) : BaseGroup) (seamC Y11.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [])) ∧
+    (seamC (kcombo 1 0 1 1 0 0)
+          = translate1 ((3, 1) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB
+                (mkZeta [(3,3),(3,5),(4,0),(4,4),(5,0),(5,1),(5,2),(5,3)])) ∧
+    (seamC (kcombo 1 0 1 1 0 1)
+          = translate1 ((0, 1) : BaseGroup) (seamC Y12.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [])) ∧
+    (seamC (kcombo 1 0 1 1 1 0)
+          = translate1 ((1, 4) : BaseGroup) (seamC Y4.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(5,1),(5,2),(5,3),(5,4)])) ∧
+    (seamC (kcombo 1 0 1 1 1 1)
+          = translate1 ((5, 4) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(0,2),(0,4)])) ∧
+    (seamC (kcombo 1 1 0 0 0 0)
+          = translate1 ((0, 2) : BaseGroup) (seamC Y0.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [])) ∧
+    (seamC (kcombo 1 1 0 0 0 1)
+          = translate1 ((0, 1) : BaseGroup) (seamC Y4.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [])) ∧
+    (seamC (kcombo 1 1 0 0 1 0)
+          = translate1 ((0, 2) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [])) ∧
+    (seamC (kcombo 1 1 0 0 1 1)
+          = translate1 ((5, 2) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(0,0),(0,4)])) ∧
+    (seamC (kcombo 1 1 0 1 0 0)
+          = translate1 ((0, 5) : BaseGroup) (seamC Y4.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [])) ∧
+    (seamC (kcombo 1 1 0 1 0 1)
+          = translate1 ((0, 3) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [])) ∧
+    (seamC (kcombo 1 1 0 1 1 0)
+          = translate1 ((0, 0) : BaseGroup) (seamC Y12.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [])) ∧
+    (seamC (kcombo 1 1 0 1 1 1)
+          = translate1 ((5, 3) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(0,3),(0,5)])) ∧
+    (seamC (kcombo 1 1 1 0 0 0)
+          = translate1 ((0, 0) : BaseGroup) (seamC Y4.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [])) ∧
+    (seamC (kcombo 1 1 1 0 0 1)
+          = translate1 ((5, 1) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(0,1),(0,5)])) ∧
+    (seamC (kcombo 1 1 1 0 1 0)
+          = translate1 ((0, 4) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [])) ∧
+    (seamC (kcombo 1 1 1 0 1 1)
+          = translate1 ((2, 2) : BaseGroup) (seamC Y0.zrep)
+            + bbBoundary2Fn baseA baseB
+                (mkZeta [(1,1),(1,2),(1,4),(1,5),(2,1),(2,2),(2,4),(2,5)])) ∧
+    (seamC (kcombo 1 1 1 1 0 0)
+          = translate1 ((4, 5) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(0,1),(0,2),(0,3),(0,4),(1,1),(1,3)])) ∧
+    (seamC (kcombo 1 1 1 1 0 1)
+          = translate1 ((0, 1) : BaseGroup) (seamC Y11.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [])) ∧
+    (seamC (kcombo 1 1 1 1 1 0)
+          = translate1 ((4, 4) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(0,2),(0,3),(0,4),(0,5),(1,2),(1,4)])) ∧
+    (seamC (kcombo 1 1 1 1 1 1)
+          = translate1 ((4, 3) : BaseGroup) (seamC Y1.zrep)
+            + bbBoundary2Fn baseA baseB (mkZeta [(0,0),(0,3),(0,4),(0,5),(1,3),(1,5)])) := by
+  native_decide
+
 /-- **The 2-D-orbit dispatch**: every `ker ∂₂` class, addressed by its six free-cell values, has
 safe-sector floor `≥ 12` (the zero class is vacuous; the rest transport to one of the 5
 full-orbit reps via `floor_transfer`). -/
@@ -46,199 +254,204 @@ theorem floor_kcombo (c0 c1 c2 c3 c4 c5 : ZMod 2) (f : BaseGroup → ZMod 2)
       ∉ bb72Complex.boundaries) :
     12 ≤ bb72Complex.chainWeight (seamC (kcombo c0 c1 c2 c3 c4 c5)
       + bbBoundary2Fn baseA baseB f) := by
+  obtain ⟨h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13,
+    h14, h15, h16, h17, h18, h19, h20, h21, h22, h23, h24, h25, h26,
+    h27, h28, h29, h30, h31, h32, h33, h34, h35, h36, h37, h38, h39,
+    h40, h41, h42, h43, h44, h45, h46, h47, h48, h49, h50, h51, h52,
+    h53, h54, h55, h56, h57, h58, h59, h60, h61, h62, h63⟩ := transfer_covs
   rcases zmod2_cases c0 with rfl | rfl <;> rcases zmod2_cases c1 with rfl | rfl <;>
     rcases zmod2_cases c2 with rfl | rfl <;> rcases zmod2_cases c3 with rfl | rfl <;>
     rcases zmod2_cases c4 with rfl | rfl <;> rcases zmod2_cases c5 with rfl | rfl
   · rw [kcombo_zero, seamC_zero, zero_add] at hb; exact absurd ⟨f, rfl⟩ hb
   · exact floor_transfer Y1.zrep (kcombo 0 0 0 0 0 1) ((1, 5) : BaseGroup)
       (mkZeta [(5,1),(5,5)])
-      (by native_decide) Y1.floor f
+      h1 Y1.floor f
   · exact floor_transfer Y1.zrep (kcombo 0 0 0 0 1 0) ((1, 0) : BaseGroup)
       (mkZeta [(5,0),(5,4)])
-      (by native_decide) Y1.floor f
+      h2 Y1.floor f
   · exact floor_transfer Y1.zrep (kcombo 0 0 0 0 1 1) ((4, 1) : BaseGroup)
       (mkZeta [(0,0),(0,1),(0,2),(0,5),(1,1),(1,5)])
-      (by native_decide) Y1.floor f
+      h3 Y1.floor f
   · exact floor_transfer Y1.zrep (kcombo 0 0 0 1 0 0) ((2, 4) : BaseGroup)
       (mkZeta [(4,0),(4,2),(5,1),(5,3)])
-      (by native_decide) Y1.floor f
+      h4 Y1.floor f
   · exact floor_transfer Y4.zrep (kcombo 0 0 0 1 0 1) ((0, 3) : BaseGroup)
       (mkZeta [])
-      (by native_decide) Y4.floor f
+      h5 Y4.floor f
   · exact floor_transfer Y0.zrep (kcombo 0 0 0 1 1 0) ((1, 0) : BaseGroup)
       (mkZeta [(5,0),(5,1),(5,3),(5,4)])
-      (by native_decide) Y0.floor f
+      h6 Y0.floor f
   · exact floor_transfer Y1.zrep (kcombo 0 0 0 1 1 1) ((3, 4) : BaseGroup)
       (mkZeta [(3,0),(3,2),(4,1),(4,3),(5,0),(5,3),(5,4),(5,5)])
-      (by native_decide) Y1.floor f
+      h7 Y1.floor f
   · exact floor_transfer Y1.zrep (kcombo 0 0 1 0 0 0) ((0, 0) : BaseGroup)
       (mkZeta [])
-      (by native_decide) Y1.floor f
+      h8 Y1.floor f
   · exact floor_transfer Y4.zrep (kcombo 0 0 1 0 0 1) ((1, 0) : BaseGroup)
       (mkZeta [(5,0),(5,1),(5,2),(5,5)])
-      (by native_decide) Y4.floor f
+      h9 Y4.floor f
   · exact floor_transfer Y1.zrep (kcombo 0 0 1 0 1 0) ((2, 3) : BaseGroup)
       (mkZeta [(4,1),(4,3),(5,2),(5,4)])
-      (by native_decide) Y1.floor f
+      h10 Y1.floor f
   · exact floor_transfer Y0.zrep (kcombo 0 0 1 0 1 1) ((1, 2) : BaseGroup)
       (mkZeta [(5,1),(5,2),(5,4),(5,5)])
-      (by native_decide) Y0.floor f
+      h11 Y0.floor f
   · exact floor_transfer Y4.zrep (kcombo 0 0 1 1 0 0) ((1, 5) : BaseGroup)
       (mkZeta [(5,0),(5,1),(5,2),(5,3)])
-      (by native_decide) Y4.floor f
+      h12 Y4.floor f
   · exact floor_transfer Y0.zrep (kcombo 0 0 1 1 0 1) ((1, 1) : BaseGroup)
       (mkZeta [(5,0),(5,2),(5,3),(5,5)])
-      (by native_decide) Y0.floor f
+      h13 Y0.floor f
   · exact floor_transfer Y1.zrep (kcombo 0 0 1 1 1 0) ((5, 5) : BaseGroup)
       (mkZeta [(0,1),(0,3)])
-      (by native_decide) Y1.floor f
+      h14 Y1.floor f
   · exact floor_transfer Y1.zrep (kcombo 0 0 1 1 1 1) ((3, 5) : BaseGroup)
       (mkZeta [(3,1),(3,5),(4,0),(4,2),(5,2),(5,3),(5,4),(5,5)])
-      (by native_decide) Y1.floor f
+      h15 Y1.floor f
   · exact floor_transfer Y0.zrep (kcombo 0 1 0 0 0 0) ((0, 1) : BaseGroup)
       (mkZeta [])
-      (by native_decide) Y0.floor f
+      h16 Y0.floor f
   · exact floor_transfer Y1.zrep (kcombo 0 1 0 0 0 1) ((0, 1) : BaseGroup)
       (mkZeta [])
-      (by native_decide) Y1.floor f
+      h17 Y1.floor f
   · exact floor_transfer Y1.zrep (kcombo 0 1 0 0 1 0) ((2, 1) : BaseGroup)
       (mkZeta [(4,3),(4,5),(5,0),(5,4)])
-      (by native_decide) Y1.floor f
+      h18 Y1.floor f
   · exact floor_transfer Y4.zrep (kcombo 0 1 0 0 1 1) ((1, 1) : BaseGroup)
       (mkZeta [(5,0),(5,1),(5,4),(5,5)])
-      (by native_decide) Y4.floor f
+      h19 Y4.floor f
   · exact floor_transfer Y1.zrep (kcombo 0 1 0 1 0 0) ((1, 3) : BaseGroup)
       (mkZeta [(5,1),(5,3)])
-      (by native_decide) Y1.floor f
+      h20 Y1.floor f
   · exact floor_transfer Y1.zrep (kcombo 0 1 0 1 0 1) ((1, 1) : BaseGroup)
       (mkZeta [(5,3),(5,5)])
-      (by native_decide) Y1.floor f
+      h21 Y1.floor f
   · exact floor_transfer Y11.zrep (kcombo 0 1 0 1 1 0) ((0, 0) : BaseGroup)
       (mkZeta [])
-      (by native_decide) Y11.floor f
+      h22 Y11.floor f
   · exact floor_transfer Y1.zrep (kcombo 0 1 0 1 1 1) ((4, 2) : BaseGroup)
       (mkZeta [(0,0),(0,1),(0,4),(0,5),(1,0),(1,4)])
-      (by native_decide) Y1.floor f
+      h23 Y1.floor f
   · exact floor_transfer Y1.zrep (kcombo 0 1 1 0 0 0) ((2, 5) : BaseGroup)
       (mkZeta [(4,1),(4,5),(5,0),(5,2)])
-      (by native_decide) Y1.floor f
+      h24 Y1.floor f
   · exact floor_transfer Y1.zrep (kcombo 0 1 1 0 0 1) ((3, 2) : BaseGroup)
       (mkZeta [(3,2),(3,4),(4,3),(4,5),(5,0),(5,1),(5,2),(5,5)])
-      (by native_decide) Y1.floor f
+      h25 Y1.floor f
   · exact floor_transfer Y4.zrep (kcombo 0 1 1 0 1 0) ((0, 4) : BaseGroup)
       (mkZeta [])
-      (by native_decide) Y4.floor f
+      h26 Y4.floor f
   · exact floor_transfer Y12.zrep (kcombo 0 1 1 0 1 1) ((0, 2) : BaseGroup)
       (mkZeta [])
-      (by native_decide) Y12.floor f
+      h27 Y12.floor f
   · exact floor_transfer Y1.zrep (kcombo 0 1 1 1 0 0) ((5, 0) : BaseGroup)
       (mkZeta [(0,0),(0,2)])
-      (by native_decide) Y1.floor f
+      h28 Y1.floor f
   · exact floor_transfer Y0.zrep (kcombo 0 1 1 1 0 1) ((2, 1) : BaseGroup)
       (mkZeta [(1,0),(1,2),(1,3),(1,5),(2,0),(2,2),(2,3),(2,5)])
-      (by native_decide) Y0.floor f
+      h29 Y0.floor f
   · exact floor_transfer Y1.zrep (kcombo 0 1 1 1 1 0) ((3, 0) : BaseGroup)
       (mkZeta [(3,0),(3,4),(4,1),(4,5),(5,1),(5,2),(5,3),(5,4)])
-      (by native_decide) Y1.floor f
+      h30 Y1.floor f
   · exact floor_transfer Y4.zrep (kcombo 0 1 1 1 1 1) ((1, 3) : BaseGroup)
       (mkZeta [(5,2),(5,3),(5,4),(5,5)])
-      (by native_decide) Y4.floor f
+      h31 Y4.floor f
   · exact floor_transfer Y0.zrep (kcombo 1 0 0 0 0 0) ((0, 0) : BaseGroup)
       (mkZeta [])
-      (by native_decide) Y0.floor f
+      h32 Y0.floor f
   · exact floor_transfer Y1.zrep (kcombo 1 0 0 0 0 1) ((2, 0) : BaseGroup)
       (mkZeta [(4,0),(4,4),(5,1),(5,5)])
-      (by native_decide) Y1.floor f
+      h33 Y1.floor f
   · exact floor_transfer Y4.zrep (kcombo 1 0 0 0 1 0) ((0, 2) : BaseGroup)
       (mkZeta [])
-      (by native_decide) Y4.floor f
+      h34 Y4.floor f
   · exact floor_transfer Y1.zrep (kcombo 1 0 0 0 1 1) ((3, 3) : BaseGroup)
       (mkZeta [(3,1),(3,3),(4,2),(4,4),(5,0),(5,1),(5,4),(5,5)])
-      (by native_decide) Y1.floor f
+      h35 Y1.floor f
   · exact floor_transfer Y1.zrep (kcombo 1 0 0 1 0 0) ((0, 5) : BaseGroup)
       (mkZeta [])
-      (by native_decide) Y1.floor f
+      h36 Y1.floor f
   · exact floor_transfer Y1.zrep (kcombo 1 0 0 1 0 1) ((2, 2) : BaseGroup)
       (mkZeta [(4,2),(4,4),(5,3),(5,5)])
-      (by native_decide) Y1.floor f
+      h37 Y1.floor f
   · exact floor_transfer Y0.zrep (kcombo 1 0 0 1 1 0) ((2, 0) : BaseGroup)
       (mkZeta [(1,0),(1,1),(1,3),(1,4),(2,0),(2,1),(2,3),(2,4)])
-      (by native_decide) Y0.floor f
+      h38 Y0.floor f
   · exact floor_transfer Y4.zrep (kcombo 1 0 0 1 1 1) ((1, 2) : BaseGroup)
       (mkZeta [(5,0),(5,3),(5,4),(5,5)])
-      (by native_decide) Y4.floor f
+      h39 Y4.floor f
   · exact floor_transfer Y1.zrep (kcombo 1 0 1 0 0 0) ((1, 4) : BaseGroup)
       (mkZeta [(5,0),(5,2)])
-      (by native_decide) Y1.floor f
+      h40 Y1.floor f
   · exact floor_transfer Y1.zrep (kcombo 1 0 1 0 0 1) ((4, 0) : BaseGroup)
       (mkZeta [(0,0),(0,1),(0,2),(0,3),(1,0),(1,2)])
-      (by native_decide) Y1.floor f
+      h41 Y1.floor f
   · exact floor_transfer Y1.zrep (kcombo 1 0 1 0 1 0) ((1, 2) : BaseGroup)
       (mkZeta [(5,2),(5,4)])
-      (by native_decide) Y1.floor f
+      h42 Y1.floor f
   · exact floor_transfer Y11.zrep (kcombo 1 0 1 0 1 1) ((0, 2) : BaseGroup)
       (mkZeta [])
-      (by native_decide) Y11.floor f
+      h43 Y11.floor f
   · exact floor_transfer Y1.zrep (kcombo 1 0 1 1 0 0) ((3, 1) : BaseGroup)
       (mkZeta [(3,3),(3,5),(4,0),(4,4),(5,0),(5,1),(5,2),(5,3)])
-      (by native_decide) Y1.floor f
+      h44 Y1.floor f
   · exact floor_transfer Y12.zrep (kcombo 1 0 1 1 0 1) ((0, 1) : BaseGroup)
       (mkZeta [])
-      (by native_decide) Y12.floor f
+      h45 Y12.floor f
   · exact floor_transfer Y4.zrep (kcombo 1 0 1 1 1 0) ((1, 4) : BaseGroup)
       (mkZeta [(5,1),(5,2),(5,3),(5,4)])
-      (by native_decide) Y4.floor f
+      h46 Y4.floor f
   · exact floor_transfer Y1.zrep (kcombo 1 0 1 1 1 1) ((5, 4) : BaseGroup)
       (mkZeta [(0,2),(0,4)])
-      (by native_decide) Y1.floor f
+      h47 Y1.floor f
   · exact floor_transfer Y0.zrep (kcombo 1 1 0 0 0 0) ((0, 2) : BaseGroup)
       (mkZeta [])
-      (by native_decide) Y0.floor f
+      h48 Y0.floor f
   · exact floor_transfer Y4.zrep (kcombo 1 1 0 0 0 1) ((0, 1) : BaseGroup)
       (mkZeta [])
-      (by native_decide) Y4.floor f
+      h49 Y4.floor f
   · exact floor_transfer Y1.zrep (kcombo 1 1 0 0 1 0) ((0, 2) : BaseGroup)
       (mkZeta [])
-      (by native_decide) Y1.floor f
+      h50 Y1.floor f
   · exact floor_transfer Y1.zrep (kcombo 1 1 0 0 1 1) ((5, 2) : BaseGroup)
       (mkZeta [(0,0),(0,4)])
-      (by native_decide) Y1.floor f
+      h51 Y1.floor f
   · exact floor_transfer Y4.zrep (kcombo 1 1 0 1 0 0) ((0, 5) : BaseGroup)
       (mkZeta [])
-      (by native_decide) Y4.floor f
+      h52 Y4.floor f
   · exact floor_transfer Y1.zrep (kcombo 1 1 0 1 0 1) ((0, 3) : BaseGroup)
       (mkZeta [])
-      (by native_decide) Y1.floor f
+      h53 Y1.floor f
   · exact floor_transfer Y12.zrep (kcombo 1 1 0 1 1 0) ((0, 0) : BaseGroup)
       (mkZeta [])
-      (by native_decide) Y12.floor f
+      h54 Y12.floor f
   · exact floor_transfer Y1.zrep (kcombo 1 1 0 1 1 1) ((5, 3) : BaseGroup)
       (mkZeta [(0,3),(0,5)])
-      (by native_decide) Y1.floor f
+      h55 Y1.floor f
   · exact floor_transfer Y4.zrep (kcombo 1 1 1 0 0 0) ((0, 0) : BaseGroup)
       (mkZeta [])
-      (by native_decide) Y4.floor f
+      h56 Y4.floor f
   · exact floor_transfer Y1.zrep (kcombo 1 1 1 0 0 1) ((5, 1) : BaseGroup)
       (mkZeta [(0,1),(0,5)])
-      (by native_decide) Y1.floor f
+      h57 Y1.floor f
   · exact floor_transfer Y1.zrep (kcombo 1 1 1 0 1 0) ((0, 4) : BaseGroup)
       (mkZeta [])
-      (by native_decide) Y1.floor f
+      h58 Y1.floor f
   · exact floor_transfer Y0.zrep (kcombo 1 1 1 0 1 1) ((2, 2) : BaseGroup)
       (mkZeta [(1,1),(1,2),(1,4),(1,5),(2,1),(2,2),(2,4),(2,5)])
-      (by native_decide) Y0.floor f
+      h59 Y0.floor f
   · exact floor_transfer Y1.zrep (kcombo 1 1 1 1 0 0) ((4, 5) : BaseGroup)
       (mkZeta [(0,1),(0,2),(0,3),(0,4),(1,1),(1,3)])
-      (by native_decide) Y1.floor f
+      h60 Y1.floor f
   · exact floor_transfer Y11.zrep (kcombo 1 1 1 1 0 1) ((0, 1) : BaseGroup)
       (mkZeta [])
-      (by native_decide) Y11.floor f
+      h61 Y11.floor f
   · exact floor_transfer Y1.zrep (kcombo 1 1 1 1 1 0) ((4, 4) : BaseGroup)
       (mkZeta [(0,2),(0,3),(0,4),(0,5),(1,2),(1,4)])
-      (by native_decide) Y1.floor f
+      h62 Y1.floor f
   · exact floor_transfer Y1.zrep (kcombo 1 1 1 1 1 1) ((4, 3) : BaseGroup)
       (mkZeta [(0,0),(0,3),(0,4),(0,5),(1,3),(1,5)])
-      (by native_decide) Y1.floor f
+      h63 Y1.floor f
 
 /-- **`MImBound` holds** — the last assumed `Prop` for unconditional `d(gross) = 12`. -/
 theorem mimBound_holds : MImBound := by

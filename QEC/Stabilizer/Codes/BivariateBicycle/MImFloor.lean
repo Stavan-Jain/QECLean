@@ -453,9 +453,12 @@ def natslot (s : ZMod 2 × ZMod 2) : Nat := s.1.val + 2 * s.2.val
 /-- `gadd` (Nat xor) on `.val`s agrees with `fadd` (F₄ add). -/
 theorem gadd_eq_fadd : ∀ a b : Fin 4, gadd a.val b.val = (fadd a b).val := by decide
 
-/-- `wt5OfComps` (Fin 4) `=` `wt5N` on the underlying `.val`s. -/
+/-- `wt5OfComps` (Fin 4) `=` `wt5N` on the underlying `.val`s — this is also the
+certificate that the packed literal `WT5_N` agrees with `WT5_TABLE.getD` on the
+whole `Fin 4⁵` domain (including the two `99`-default slots `512, 513`). -/
 theorem wt5OfComps_eq_wt5N (v0 v1 v2 v3 v4 : Fin 4) :
-    wt5OfComps v0 v1 v2 v3 v4 = wt5N v0.val v1.val v2.val v3.val v4.val := rfl
+    wt5OfComps v0 v1 v2 v3 v4 = wt5N v0.val v1.val v2.val v3.val v4.val := by
+  revert v0 v1 v2 v3 v4; native_decide
 
 /-- Sum over the four `Z₂²` layers as an explicit four-term sum (`allS` order). -/
 theorem sum_zmod2sq (g : ZMod 2 × ZMod 2 → Nat) :

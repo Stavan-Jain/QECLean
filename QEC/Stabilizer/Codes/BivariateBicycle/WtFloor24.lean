@@ -18,7 +18,8 @@ no `native_decide`/`ofReduceBool`):
   line `⟨ℓ⟩`, component-3 direction `a·ℓ + c₃`, component-4 direction
   `b·ℓ + ωθ + c₄`, minimized over the free constants `p, c₂, c₃, c₄ ∈ F₄`.
 * `Sab_ge_6` — **Proposition 29**: `S(a,b) ≥ 6` for all 16 pairs (kernel `decide`,
-  the 256-knob × 4-slot × 16-pair walk; needs a `maxHeartbeats` bump, ~3 min).
+  the 256-knob × 4-slot × 16-pair walk; cheap because the tables are packed `Nat`
+  literals with kernel-accelerated lookups).
 
 The slot order is `allS = (e,x,y,xy) = (0,0),(1,0),(0,1),(1,1)`; over it the
 labeling `ℓ = ellL = Bhat2 = (ω²,ω,1,0) = (3,2,1,0)` (a bijection, `ellL_inj`) and
@@ -53,9 +54,20 @@ def SLOTCOST : Array Nat :=
   #[0,3,3,3,3,2,2,2,3,2,2,2,3,2,2,2,3,2,2,2,2,1,3,3,2,3,3,1,2,3,1,3,
     3,2,2,2,2,3,3,1,2,3,1,3,2,1,3,3,3,2,2,2,2,3,1,3,2,1,3,3,2,3,3,1]
 
+/-- `SLOTCOST` packed into one `Nat` literal at 2 bits per entry (all values are
+`≤ 3`), so lookups are kernel-accelerated `Nat` ops; `slotCost_eq_table` certifies
+agreement with the array. -/
+def SLOTCOST_N : Nat := 0x7ef6deabf6de7eabde7ef6ababababfc
+
 /-- The per-slot cost (Lemma 20): the minimum layer weight for a slot datum
 `(v₂, v₃, v₄)`, with the free `v₀`/`v₁` minimized out. -/
-def slotCost (v2 v3 v4 : Fin 4) : Nat := SLOTCOST.getD (v2.val * 16 + v3.val * 4 + v4.val) 99
+def slotCost (v2 v3 v4 : Fin 4) : Nat :=
+  (SLOTCOST_N >>> (2 * (v2.val * 16 + v3.val * 4 + v4.val))) &&& 3
+
+/-- The packed table agrees with the readable `SLOTCOST` array (kernel `decide`,
+64 entries). -/
+theorem slotCost_eq_table : ∀ v2 v3 v4 : Fin 4,
+    slotCost v2 v3 v4 = SLOTCOST.getD (v2.val * 16 + v3.val * 4 + v4.val) 99 := by decide
 
 /-- **Slot-cost soundness (Lemma 20).** `slotCost` lower-bounds the exact per-slot
 layer weight `wt5OfComps` for every free `v₀ ∈ F₂` and `v₁ ∈ F₄`.  Kernel `decide`
@@ -85,9 +97,19 @@ def SLOTCOSTL : Array Nat :=
   #[0,3,3,3,3,2,2,2,3,2,2,2,3,2,2,2,3,2,2,2,2,1,3,3,2,3,1,3,2,3,3,1,
     3,2,2,2,2,3,1,3,2,3,3,1,2,1,3,3,3,2,2,2,2,3,3,1,2,1,3,3,2,3,1,3]
 
+/-- `SLOTCOSTL` packed into one `Nat` literal at 2 bits per entry (cf. `SLOTCOST_N`);
+`slotCostL_eq_table` certifies agreement with the array. -/
+def SLOTCOSTL_N : Nat := 0xdef67eabf67edeab7edef6ababababfc
+
 /-- The A/left-block per-slot cost: the minimum layer weight for the constrained
 slot datum `(v₁, v₃, v₄)`, with the free `v₀ ∈ F₂` and `v₂ ∈ F₄` minimized out. -/
-def slotCostL (v1 v3 v4 : Fin 4) : Nat := SLOTCOSTL.getD (v1.val * 16 + v3.val * 4 + v4.val) 99
+def slotCostL (v1 v3 v4 : Fin 4) : Nat :=
+  (SLOTCOSTL_N >>> (2 * (v1.val * 16 + v3.val * 4 + v4.val))) &&& 3
+
+/-- The packed table agrees with the readable `SLOTCOSTL` array (kernel `decide`,
+64 entries). -/
+theorem slotCostL_eq_table : ∀ v1 v3 v4 : Fin 4,
+    slotCostL v1 v3 v4 = SLOTCOSTL.getD (v1.val * 16 + v3.val * 4 + v4.val) 99 := by decide
 
 /-- **L-block slot-cost soundness.** `slotCostL` lower-bounds the exact per-slot
 layer weight for every free `v₀ ∈ F₂`, `v₂ ∈ F₄` (kernel `decide`, axiom-clean). -/
@@ -127,12 +149,10 @@ def Sab (a b : Fin 4) : Nat :=
                      (fadd (fadd (fmul b pr.1) pr.2) c4)) 0
   ).foldr min 999
 
-set_option maxHeartbeats 4000000 in
--- The 16-pair × 256-knob × 4-slot standard-form walk is a large kernel `decide`
--- (~3 min); the bump keeps it kernel-checked (axiom-clean) rather than native_decide.
 /-- **Proposition 29** (the standard-form walk): `S(a,b) ≥ 6` for all `(a,b) ∈ F₄²`.
 Hence every weight-24 spine cell has linked block cost `≥ 6 + 6 = 12`.  Kernel
-`decide` over the 16 pairs — **axiom-clean** (`propext` only). -/
-theorem Sab_ge_6 : ∀ a b : Fin 4, 6 ≤ Sab a b := by decide
+`decide` over the 16 pairs — **axiom-clean** (`propext` only).  `+kernel` skips the
+elaborator evaluation; the packed-`Nat` tables keep the walk cheap. -/
+theorem Sab_ge_6 : ∀ a b : Fin 4, 6 ≤ Sab a b := by decide +kernel
 
 end Quantum.Stabilizer.Homological.BB.LightStab

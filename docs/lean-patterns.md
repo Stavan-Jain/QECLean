@@ -19,6 +19,7 @@ sections below.
 - [CSS distance proofs](#css-distance-proofs)
 - [Non-CSS distance proofs](#non-css-distance-proofs)
 - [Parametric code families](#parametric-code-families)
+- [Fast kernel `decide` for big finite walks](#fast-kernel-decide-for-big-finite-walks)
 - [Mechanical fixes for common gotchas](#mechanical-fixes-for-common-gotchas)
 
 ---
@@ -274,6 +275,45 @@ and (with `@[inline]`) reduces identically. Canonical hit:
 not `simp [logIdx]`.
 
 ---
+
+## Fast kernel `decide` for big finite walks
+
+Trigger: an axiom-clean enumeration (`by decide` over `4⁶`-ish cases) takes
+minutes-to-tens-of-minutes and/or needs a `maxHeartbeats` bump. Seen on the BB
+slot-frame walks (`WtFloor24Bridge.RBlock_std_ge6` was ~24 min of the Jul 2026
+BB build; ~0.5 s after this treatment).
+
+Three independent levers, in order of leverage:
+
+1. **Pack lookup tables into `Nat` literals.** `Array Nat` literals reduce in
+   the kernel as *linked-list walks* — `Array.getD` on a 512-entry table costs
+   ~hundreds of recursor steps per lookup. Pack the table into one `Nat`
+   (k bits per entry) and index with `(TBL >>> (k*i)) &&& mask`:
+   `Nat.shiftRight`/`Nat.land`/`Nat.mod` are GMP-accelerated in the kernel, so
+   a lookup is ~2 ops. Keep the readable `Array` next to it and certify
+   agreement with a 1-line kernel `decide` (see `WtFloor24.slotCost_eq_table`).
+   **Watch the `getD` default**: if the index range exceeds the array length,
+   the packed literal must reproduce the default at the out-of-range slots
+   (`MImClassify.WT5_N` pads indices 512–513 with `99`, 8 bits per entry).
+2. **Replace `Matrix.of ![![…]]` op tables with `Nat` ops.** `![…] a b`
+   reduces through `Fin.cases` chains. If the op has closed form, use it
+   (`CRTFrame.fadd` is XOR: `⟨(a.val ^^^ b.val) % 4, by omega⟩`); otherwise
+   pack the table as in (1) (`CRTFrame.fmul`, 2 bits/entry). The `% 4` keeps
+   the `Fin.mk` bound `omega`-provable (omega can't see `^^^`/`&&&`).
+3. **`decide +kernel`.** Plain `decide` evaluates the instance *twice* — once
+   in the elaborator (slow, allocation-heavy; the multi-GB RSS spikes) and
+   once in the kernel. `+kernel` skips the elaborator pass entirely, which
+   also frees the declaration from `maxHeartbeats` (kernel checking is not
+   heartbeat-metered) — the bump and its mandatory comment can be dropped.
+
+Measured on `RBlock_std_ge6` (4096 cases × 12 table lookups + 36 F₄ ops):
+plain `decide` ≈ 15–20 min / ~6 GB; `decide +kernel` alone ≈ 232 s / 6 GB;
+levers 1+2+3 together ≈ 0.4 s / negligible.
+
+Related native-side batching: N separate `native_decide` calls in one file pay
+N C-compile round-trips (~2–4 s each). Bundle them into a single `∧`-chain
+theorem proved by one `native_decide` and destructure (`MImAssembly.transfer_covs`,
+63→1; `MImFloorY11.offs_eq`, 24→1).
 
 ## Mechanical fixes for common gotchas
 
