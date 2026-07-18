@@ -12,7 +12,7 @@ constrained component is rewritten as a radical-ideal element
 discharged by a `4⁶`-knob kernel `decide` (`Rdec`/`Ldec`).
 
 The only `native_decide` here is the small per-slot seam-offset read-off
-(`off*_eq`, four layers each); the heavy `floorOK` leaf is gone.
+(`offs_eq`, one bundled compilation unit); the heavy `floorOK` leaf is gone.
 -/
 import QEC.Stabilizer.Codes.BivariateBicycle.WtFloor24Bridge
 
@@ -27,33 +27,38 @@ set_option maxRecDepth 8192
 /-- Y-orbit-11 representative `ker ∂₂` element. -/
 def zrep : BaseGroup → ZMod 2 := kcombo 0 1 0 1 1 0
 
-/-! ### Seam offsets, read off concretely (the only `native_decide`s; 4 layers each).
+/-! ### Seam offsets, read off concretely (the only `native_decide`, one bundled
+compilation unit).
 A-block (`seamOffL`): comp1 `(2,2,2,2)`, comp3 `(3,3,3,3)`, comp4 `(0,1,0,1)`;
 B-block (`seamOffR`): comp2 `(0,0,0,0)`, comp3 `(1,1,1,1)`, comp4 `(1,3,1,3)`.
 Components 0,2 vanish (Lemma 17). -/
 
-theorem offR2_eq : seamOffR zrep psi2 = fun _ => 0 := by
-  funext s; fin_cases s <;> native_decide
-theorem offR3_eq : seamOffR zrep psi3 = fun _ => 1 := by
-  funext s; fin_cases s <;> native_decide
+private theorem offs_eq :
+    (∀ s, seamOffR zrep psi2 s = 0) ∧ (∀ s, seamOffR zrep psi3 s = 1) ∧
+    (∀ s, seamOffR zrep psi4 s
+      = if s = (0,0) then 1 else if s = (1,0) then 3 else if s = (0,1) then 1 else 3) ∧
+    (∀ s, seamOffL zrep psi1 s = 2) ∧ (∀ s, seamOffL zrep psi3 s = 3) ∧
+    (∀ s, seamOffL zrep psi4 s
+      = if s = (0,0) then 0 else if s = (1,0) then 1 else if s = (0,1) then 0 else 1) := by
+  native_decide
+
+theorem offR2_eq : seamOffR zrep psi2 = fun _ => 0 := funext offs_eq.1
+theorem offR3_eq : seamOffR zrep psi3 = fun _ => 1 := funext offs_eq.2.1
 theorem offR4_eq : seamOffR zrep psi4
-    = fun s => if s = (0,0) then 1 else if s = (1,0) then 3 else if s = (0,1) then 1 else 3 := by
-  funext s; fin_cases s <;> native_decide
-theorem offL1_eq : seamOffL zrep psi1 = fun _ => 2 := by
-  funext s; fin_cases s <;> native_decide
-theorem offL3_eq : seamOffL zrep psi3 = fun _ => 3 := by
-  funext s; fin_cases s <;> native_decide
+    = fun s => if s = (0,0) then 1 else if s = (1,0) then 3 else if s = (0,1) then 1 else 3 :=
+  funext offs_eq.2.2.1
+theorem offL1_eq : seamOffL zrep psi1 = fun _ => 2 := funext offs_eq.2.2.2.1
+theorem offL3_eq : seamOffL zrep psi3 = fun _ => 3 := funext offs_eq.2.2.2.2.1
 theorem offL4_eq : seamOffL zrep psi4
-    = fun s => if s = (0,0) then 0 else if s = (1,0) then 1 else if s = (0,1) then 0 else 1 := by
-  funext s; fin_cases s <;> native_decide
+    = fun s => if s = (0,0) then 0 else if s = (1,0) then 1 else if s = (0,1) then 0 else 1 :=
+  funext offs_eq.2.2.2.2.2
 
 /-! ### Per-block standard-form walks (kernel `decide`, `4⁶` knobs; axiom-clean).
 Confined/spine components range over the radical ideal `{αD + β·uv}`; `slotCost`
 (resp. `slotCostL`) frees the unit-side and `v₀`. -/
 
-set_option maxHeartbeats 4000000 in
--- The 4⁶-knob standard-form walk over the radical ideal is a large kernel `decide`
--- (~minutes); the bump keeps it kernel-checked (axiom-clean) rather than native.
+-- The 4⁶-knob walks stay kernel-checked (axiom-clean); `+kernel` and the
+-- packed-`Nat` tables keep them cheap.
 /-- B/right block `≥ 6`: comp2 `(0,0,0,0)`, comp3 `(1,1,1,1)`, comp4 `(1,3,1,3)`. -/
 theorem Rdec : ∀ a2 b2 a3 b3 a4 b4 : Fin 4,
     6 ≤ slotCost (fadd 0 (fadd (fmul a2 3) (fmul b2 1)))
@@ -67,9 +72,8 @@ theorem Rdec : ∀ a2 b2 a3 b3 a4 b4 : Fin 4,
                  (fadd 1 (fadd (fmul a4 1) (fmul b4 1)))
       + slotCost (fadd 0 (fadd (fmul a2 0) (fmul b2 1)))
                  (fadd 1 (fadd (fmul a3 0) (fmul b3 1)))
-                 (fadd 3 (fadd (fmul a4 0) (fmul b4 1))) := by decide
+                 (fadd 3 (fadd (fmul a4 0) (fmul b4 1))) := by decide +kernel
 
-set_option maxHeartbeats 4000000 in
 -- Kernel `decide` (axiom-clean); see `Rdec`.
 /-- A/left block `≥ 6`: comp1 `(2,2,2,2)`, comp3 `(3,3,3,3)`, comp4 `(0,1,0,1)`. -/
 theorem Ldec : ∀ a1 b1 a3 b3 a4 b4 : Fin 4,
@@ -84,7 +88,7 @@ theorem Ldec : ∀ a1 b1 a3 b3 a4 b4 : Fin 4,
                   (fadd 0 (fadd (fmul a4 3) (fmul b4 1)))
       + slotCostL (fadd 2 (fadd (fmul a1 0) (fmul b1 1)))
                   (fadd 3 (fadd (fmul a3 0) (fmul b3 1)))
-                  (fadd 1 (fadd (fmul a4 0) (fmul b4 1))) := by decide
+                  (fadd 1 (fadd (fmul a4 0) (fmul b4 1))) := by decide +kernel
 
 /-- B/right-block per-slot sum `≥ 6` for every coset (radical-ideal image ▸ `Rdec`). -/
 theorem Rblock (f : BaseGroup → ZMod 2) :

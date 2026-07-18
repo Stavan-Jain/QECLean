@@ -33,13 +33,17 @@ namespace CRTFrame
 
 Characteristic-2 addition table and the F₄ multiplication table. -/
 
-/-- F₄ addition (characteristic 2). -/
+/-- F₄ addition (characteristic 2): bitwise XOR on the `Fin 4` encoding (the table
+`![![0,1,2,3], ![1,0,3,2], ![2,3,0,1], ![3,2,1,0]]`).  `Nat.xor` is
+kernel-accelerated, which keeps the big `decide` walks downstream cheap. -/
 def fadd : Fin 4 → Fin 4 → Fin 4 :=
-  fun a b => (![![0, 1, 2, 3], ![1, 0, 3, 2], ![2, 3, 0, 1], ![3, 2, 1, 0]] a) b
+  fun a b => ⟨(a.val ^^^ b.val) % 4, by omega⟩
 
-/-- F₄ multiplication. -/
+/-- F₄ multiplication: the table `![![0,0,0,0], ![0,1,2,3], ![0,2,3,1], ![0,3,1,2]]`
+packed row-major (`a*4 + b`) at 2 bits per entry into the literal `0x9c78e400`.
+`Nat.shiftRight`/`Nat.mod` are kernel-accelerated (cf. `fadd`). -/
 def fmul : Fin 4 → Fin 4 → Fin 4 :=
-  fun a b => (![![0, 0, 0, 0], ![0, 1, 2, 3], ![0, 2, 3, 1], ![0, 3, 1, 2]] a) b
+  fun a b => ⟨(0x9c78e400 >>> (2 * (a.val * 4 + b.val))) % 4, by omega⟩
 
 /-- `ω^k` for `k ∈ Z₃`: `1, ω, ω²` ↦ `1, 2, 3`. -/
 def omegaPow (k : ZMod 3) : Fin 4 := if k = 0 then 1 else if k = 1 then 2 else 3
@@ -299,7 +303,7 @@ theorem rmul_zero_right (P : ZMod 2 × ZMod 2 → Fin 4) :
   simp only [hmul]
   induction allS with
   | nil => rfl
-  | cons a t ih => simpa [fadd] using ih
+  | cons a t ih => simpa [fadd_zero] using ih
 
 /-- Indicator of a finset as a `ZMod 2` chain. -/
 def ind (S : Finset BaseGroup) : BaseGroup → ZMod 2 := fun g => if g ∈ S then 1 else 0

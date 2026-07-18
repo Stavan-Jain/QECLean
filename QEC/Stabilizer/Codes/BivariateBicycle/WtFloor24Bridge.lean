@@ -243,7 +243,7 @@ theorem slotCostL_frob : ∀ v1 v3 v4 : Fin 4,
 rigidity-preserving scaling `s₂² = s₃s₄` (`s₂ ≠ 0`). -/
 theorem slotCost_scale : ∀ s2 s3 s4 v2 v3 v4 : Fin 4,
     fmul s2 s2 = fmul s3 s4 → s2 ≠ 0 →
-    slotCost (fmul s2 v2) (fmul s3 v3) (fmul s4 v4) = slotCost v2 v3 v4 := by decide
+    slotCost (fmul s2 v2) (fmul s3 v3) (fmul s4 v4) = slotCost v2 v3 v4 := by decide +kernel
 
 /-! ## §6 The standard-form right block reaches `≥ 6` (the reduction endpoint)
 
@@ -253,12 +253,10 @@ block sums to `≥ 6` over the four slots even after freeing the spine direction
 exactly `Prop 29` realized through `slotCost`.  (The raw `Y4` offsets do *not*
 satisfy this; they must first be reduced via §5, the remaining M1b work.) -/
 
-set_option maxHeartbeats 4000000 in
--- The 4⁶-knob standard-form right-block walk is a large kernel `decide` (~minutes);
--- the bump keeps it kernel-checked (axiom-clean) rather than `native_decide`.
 /-- **Standard right block `≥ 6`.**  With `off₂ = off₃ = 0` and `off₄ = ωθ`, the
 B/right block's `slotCost` slot sum is `≥ 6` for every confined/spine ideal
-datum (`B̂₂` slot values `(ω²,ω,1,0)`, `uv ≡ 1`). -/
+datum (`B̂₂` slot values `(ω²,ω,1,0)`, `uv ≡ 1`).  The 4⁶-knob walk stays
+kernel-checked (axiom-clean); `+kernel` and the packed-`Nat` tables keep it cheap. -/
 theorem RBlock_std_ge6 : ∀ a2 b2 a3 b3 a4 b4 : Fin 4,
     6 ≤ slotCost (fadd 0 (fadd (fmul a2 3) (fmul b2 1)))
                  (fadd 0 (fadd (fmul a3 3) (fmul b3 1)))
@@ -271,6 +269,6 @@ theorem RBlock_std_ge6 : ∀ a2 b2 a3 b3 a4 b4 : Fin 4,
                  (fadd 2 (fadd (fmul a4 1) (fmul b4 1)))
       + slotCost (fadd 0 (fadd (fmul a2 0) (fmul b2 1)))
                  (fadd 0 (fadd (fmul a3 0) (fmul b3 1)))
-                 (fadd 0 (fadd (fmul a4 0) (fmul b4 1))) := by decide
+                 (fadd 0 (fadd (fmul a4 0) (fmul b4 1))) := by decide +kernel
 
 end Quantum.Stabilizer.Homological.BB.LightStab
