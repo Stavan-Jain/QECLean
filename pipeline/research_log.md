@@ -13,12 +13,12 @@ what was tried and why it didn't work.
 
 ## Entries
 
-- 2026-07-06 — deficit-wall (A15-P3) — success (theorem + a correction) —
+- 2026-07-06 — deficit-wall (A17-P3) — success (theorem + a correction) —
   **A14 §16's deficit-wall OQ answered: the wall *value* is a theorem,
   the *mechanism* is a pushforward, and the "stalls at exactly 2d − 2"
   premise is retracted as a measurement artifact.** Math
-  (`notes/A15_deficit_wall.md`, machine-validated by
-  `a15_deficit_wall_checks.py`): **(L0)** the safe sector is the
+  (`notes/A17_deficit_wall.md`, machine-validated by
+  `a17_deficit_wall_checks.py`): **(L0)** the safe sector is the
   transfer kernel — `im δ₂ = ker τ₁` (LES; span-verified on 9 covers
   incl. both bb_288 presentations and the Z₁₈×Z₃ re-decomposition), so
   `d_safe` = min weight of a base logical whose class *dies in the
@@ -53,7 +53,7 @@ what was tried and why it didn't work.
   attains the wall;
   correction blocks added to A14 §§15–16. Residue: the code invariant
   `maxSF ∈ {2d} ∪ {even ≤ 2d − 2}` (true value per code now measurable
-  by ladders; A15-P1's corpus battery must report S4 weights as "≤"),
+  by ladders; A17-P1's corpus battery must report S4 weights as "≤"),
   the (M)-robustness conjecture, and the T1/T2-both-silent corner of
   the `≤ 2d` ceiling. **Lean layer LANDED (same session, axiom-clean,
   zero warnings): `Framework/Homological/BBDeficitWall.lean`** — L1
@@ -67,7 +67,7 @@ what was tried and why it didn't work.
   deliberately routing around A14.1(2)'s dimension count via
   deck-triviality), and the wall as the even-step upgrades
   `seamCosetFloor_of_even_of_pred` / `safeFloor_of_even_of_pred`.
-  [theorem+battery](../experiments/bb_lab/notes/A15_deficit_wall.md)
+  [theorem+battery](../experiments/bb_lab/notes/A17_deficit_wall.md)
 
 - 2026-07-04 — safe-floor-screens (A14) — success —
   **A12's OQ4 answered in its own terms: the safe sector is canonical

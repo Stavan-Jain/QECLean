@@ -7,8 +7,8 @@ of the weight-8 base cycle
 
   `u* = (x²y + x²y⁵ + x²y⁹ + x³y⁷ | block 0) + (x³y⁴ + x³y⁵ + x³y⁶ + x⁴y⁴ | block 1)`.
 
-`u*` is the descent of the A15 cover ladder's weight-16 SAT witness
-(`data/a15/cover_witness.jsonl`, re-verified deck-invariant, translated
+`u*` is the descent of the A17 cover ladder's weight-16 SAT witness
+(`data/a17/cover_witness.jsonl`, re-verified deck-invariant, translated
 to repo convention by the global reflection) and is re-certified here by
 kernel computation.  Non-boundaryness is certified by an explicit dual
 witness `w` (weight 18) with `dualBoundary w = 0` and `⟨w, τ(u*)⟩ = 1`,

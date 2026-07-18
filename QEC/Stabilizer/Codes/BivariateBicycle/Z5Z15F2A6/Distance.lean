@@ -18,12 +18,12 @@ solver certificates.  Hypothesis status:
   Honest status: **assumption**, not yet certificate-backed; A11 found
   0/465 violations corpus-wide, and the per-instance discharge route is
   the light-boundary classification + the generic rungs (future work).
-* `hMim : coverData.SeamCosetFloor 16` — the S4 certificate of the A15
-  docket decision pass (`data/a15/docket_decision.jsonl`): CryptoMiniSat
+* `hMim : coverData.SeamCosetFloor 16` — the S4 certificate of the A17
+  docket decision pass (`data/a17/docket_decision.jsonl`): CryptoMiniSat
   XOR-native `UNSAT@14` on the seam-coset G-orbit rep (975.8 s) + the
   weight-parity lemma (odd weights vacuous) + orbit transport; kissat
   re-proof on the Tseitin CNF with a 6.85 GB DRAT certificate
-  (`data/a15/kissat_f2a6f17e_y_w14.drat.gz`).
+  (`data/a17/kissat_f2a6f17e_y_w14.drat.gz`).
 
 Given those, `cover300_chain_distance_eq_16` / `cover300_pauli_distance_eq_16`
 deliver `d(cover) = 16 = 2·d(base)` — the first `d > 12` distance statement

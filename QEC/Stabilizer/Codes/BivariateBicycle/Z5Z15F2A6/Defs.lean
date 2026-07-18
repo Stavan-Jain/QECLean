@@ -2,8 +2,8 @@
 # The [[150,8,8]] → [[300,8,16]] doubling pair over `Z₅×Z₁₅ → Z₅×Z₃₀` — definitions
 
 The first `d ≥ 7` instance of the free-ℤ₂ doubling template
-(`Framework/Homological/BBDoubling.lean`), from the A15 hunt
-(`experiments/bb_lab/notes/A15_d7plus_doubling_hunt_plan.md` §6.1):
+(`Framework/Homological/BBDoubling.lean`), from the A17 hunt
+(`experiments/bb_lab/notes/A17_d7plus_doubling_hunt_plan.md` §6.1):
 
 * **base** `[[150,8,8]]` on `G150 = Z₅ × Z₁₅`, `A = 1 + y + x`,
   `B = xy⁶ + xy¹⁰ + x²y¹²` (corpus instance `f2a6f17e1c41ff96`,
@@ -12,7 +12,7 @@ The first `d ≥ 7` instance of the free-ℤ₂ doubling template
   polynomials (same exponent supports), free ℤ₂ cover doubling `y`
   (deck `σ = ·y¹⁵`).
 
-This is the tightness cell of the A15 docket: its safe floor is
+This is the tightness cell of the A17 docket: its safe floor is
 S4-certified at `16 = 2d` (CryptoMiniSat XOR-native `UNSAT@14` on the
 seam-coset orbit rep + the parity lemma; kissat cross-proof with a DRAT
 certificate), and the cover ladder's weight-16 witness pins the safe
@@ -21,7 +21,7 @@ and the parametric cover bundle `coverData : XDoubleCoverData G300 G150`;
 all finite obligations are discharged by kernel computation.  The offline
 provenance (SAT distances, certificates, witness search) is
 `experiments/bb_lab/scripts/gen_f2a6_z5z30_data.py`
-(data: `experiments/bb_lab/data/a15/f2a6_z5z30_lean_data.json`).
+(data: `experiments/bb_lab/data/a17/f2a6_z5z30_lean_data.json`).
 
 ## Convention bridge (lab → repo)
 

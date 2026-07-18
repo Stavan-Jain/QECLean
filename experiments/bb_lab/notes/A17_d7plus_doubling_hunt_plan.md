@@ -1,4 +1,4 @@
-# A15 — the d ≥ 7 doubling hunt (plan)
+# A17 — the d ≥ 7 doubling hunt (plan)
 
 **Status: PLAN (2026-07-06).** Continuation of A14's constructive residue
 (§16): "fresh-base enumeration (d ≥ 7, k > 0, outside the Bravyi corpus)
@@ -42,7 +42,7 @@ new enumeration.
 
 ## 1. Phase 1 — in-corpus d ≥ 7 battery (1–2 sessions, start here)
 
-New driver `scripts/a15_corpus_battery.py`, generalizing
+New driver `scripts/a17_corpus_battery.py`, generalizing
 `a14_d10_battery.py`:
 
 1. Pull all d ≥ 7, k > 0 rows via `bb_lab.corpus.Corpus` (read-only);
@@ -136,7 +136,7 @@ shadow lands in the safe sector" hypothesis.
 
 ## 6. Phase 1 log (2026-07-06) — sweep complete; a 21-cell live docket
 
-Driver: `scripts/a15_corpus_battery.py` (tier semantics identical to
+Driver: `scripts/a17_corpus_battery.py` (tier semantics identical to
 `a14_d10_battery.py`; adds corpus-DB targeting, witness persistence,
 per-class cheap-weight persistence, x^21-1 idempotent support for the
 Z21xZ3 frames, glob-resume + `--shard K/N` parallelism). **Validation
@@ -145,8 +145,8 @@ gate GREEN on first run**: all four SS14 verdicts reproduced bit-for-bit
 18), and both SF-true anchors (pair72-base-x, gross-base-x) came back
 **SF-CERTIFIED** by S4 rather than merely unrejected — an independent
 re-run of the SAT-vs-Lean cross-check. Data:
-`data/a15/corpus_battery*.jsonl` (per-cell records incl. witnesses),
-`data/a15/docket_probe.json`, logs `data/a15/run_*.log`.
+`data/a17/corpus_battery*.jsonl` (per-cell records incl. witnesses),
+`data/a17/docket_probe.json`, logs `data/a17/run_*.log`.
 
 **Coverage: 2,722/2,722 cells** (16 d=12 + 406 d=10 + 2,300 d=8; the
 completeness identity checked after the sharded runs). Ops note: at
@@ -163,8 +163,8 @@ to a dedicated docket pass. Verdicts:
 
 **Headline 1 — the deficit-2 bucket dominates, and (per the parallel
 P3 result) that is the parity-maximal failing value, not a mystery.**
-IMPORTANT measurement discipline, from A15-P3 (branch
-`claude/charming-euler-ef6879`, `notes/A15_deficit_wall.md`, same
+IMPORTANT measurement discipline, from A17-P3 (branch
+`claude/charming-euler-ef6879`, `notes/A17_deficit_wall.md`, same
 day): recorded reject weights are **first-found witness / descent
 weights = upper bounds on d_safe, NOT minima** — the SS15/SS16
 "orbit ceiling 18 / 32-34" readings were retracted on exact ladders
@@ -208,7 +208,7 @@ possibly a clean ideal-theoretic reason at (l, m) = (5, 6).)
 - **5x Z5xZ15 [[150,8,8]]** (floor 16), cheap minima 18-32.
 - **3x Z15xZ6 [[180,4,10]]** (floor 20), cheap minima 28, 48, 50 (!).
 
-**Ladder-from-above probe** (`scripts/a15_docket_probe.py`, 300k
+**Ladder-from-above probe** (`scripts/a17_docket_probe.py`, 300k
 budgets, 17 s total): every above-floor cell has SAT witnesses far
 below its cheap minimum — descent tiers are nowhere near truth on
 these frames (cmin 50 -> wt-34 witness instantly; cmin 48 -> 32;
@@ -223,7 +223,7 @@ seam weights are even. Hence: **refutation requires a witness at
 impossible odd weight), and **certification = UNSAT at floor - 2 plus
 the parity lemma** — the same kernel-clean step the gross Lean proof
 already uses (`chainWeight_coset_even`). (This is the docket-level
-instance of A15-P3's L1, re-derived here independently — convergent.)
+instance of A17-P3's L1, re-derived here independently — convergent.)
 The f2a6f17e1c41ff96:y cell (witness AT floor 16) is one UNSAT-at-14
 from SF-CERTIFIED-with-tightness; likewise 38d3c884:x (witness 18)
 and the whole Z21xZ3 family. P3's cost calibration tempers
@@ -244,9 +244,9 @@ regime where CaDiCaL stalls both ways). Next actions, in order:
    as fallback. Any UNSAT = **first SF-certification at d >= 7** (a
    [[252,8,16]]-target or [[360,4,20]]-target double), which would be
    the program's first analytic floor > 12.
-2. **Wall theory: SS3 is EXECUTED** by the parallel A15-P3 fork
+2. **Wall theory: SS3 is EXECUTED** by the parallel A17-P3 fork
    (parity value theorem + pushforward mechanism + the witness-weight
-   retraction; see `notes/A15_deficit_wall.md` on
+   retraction; see `notes/A17_deficit_wall.md` on
    `claude/charming-euler-ef6879`). What this sweep adds to it: the
    2,700-cell upper-bound dataset for calibrating the corrected
    residue (max-SF invariant), and the Z21xZ3 docket A-family
@@ -258,7 +258,7 @@ regime where CaDiCaL stalls both ways). Next actions, in order:
 
 ### 6.1 Docket decision pass (2026-07-06/07) — FOURTEEN SF-CERTIFICATIONS
 
-Driver: `scripts/a15_docket_decide.py`. The decisive query per cell is
+Driver: `scripts/a17_docket_decide.py`. The decisive query per cell is
 `exists coset element of weight <= floor - 2` per G-orbit rep (parity
 makes floor-1 vacuous): SAT refutes SF; UNSAT on all reps certifies
 `SeamCosetFloor floor`. Backends: **cryptominisat5 with the XOR rows
@@ -270,7 +270,7 @@ cell -> SAT; pair72-base @6 -> UNSAT) passed on both cms and kissat.
 **The XOR-native encoding cracked what pysat-CaDiCaL could not**: the
 Z21xZ3 queries that stalled for hours at 10M conflicts decided in
 3-20 min each under CMS. Run shape: 6-way shards, 1200 s/query
-timeout, ~2 h wall. Results (data/a15/docket_decision.jsonl):
+timeout, ~2 h wall. Results (data/a17/docket_decision.jsonl):
 
 - **SF-CERTIFIED: 14 of 21** — every safe-class coset minimum >= 2d,
   solver-grade, witnessed UNSAT on every G-orbit rep + the parity step:
@@ -296,7 +296,7 @@ e21c6389 (Z21xZ3), 16884e06 (Z21xZ3), 38d3c884 (Z5xZ15).
 **kissat/DRAT spike (proof-grade leg): LANDED.** The tightness cell
 f2a6f17e:y re-proved UNSAT@14 by kissat on the Tseitin CNF (2429
 vars / 5430 clauses) in 9506 s, emitting a **6.85 GB DRAT proof**
-(gzipped to 3.3 GB, `data/a15/kissat_f2a6f17e_y_w14.drat.gz`,
+(gzipped to 3.3 GB, `data/a17/kissat_f2a6f17e_y_w14.drat.gz`,
 regenerable deterministically). Two fully independent solver routes
 now agree on the first certification. Cost ratio kissat:CMS ~ 10:1 —
 a full 18-cell DRAT sweep is machine-days; batch it deliberately.
@@ -324,7 +324,7 @@ cell's Tseitin CNF (first LRAT-bridge artifact if it lands); full
 kissat confirmation sweep + cake_lpr checking = the Phase-4 residue.
 
 **Cross-fork ops note:** CMS-with-x-lines re-prices every "CaDiCaL
-can't" in the program — A15-P3's "bb_288 exact minima priced out"
+can't" in the program — A17-P3's "bb_288 exact minima priced out"
 (<= 34, unmeasured) and the 5 h bb108-y cover-side UNSAT are worth
 re-running under this backend.
 
@@ -336,7 +336,7 @@ New: `QEC/Stabilizer/Codes/BivariateBicycle/Z5Z15F2A6/` (Defs,
 DeckHomotopy, Witness, Distance) + a parametric extension of
 `Framework/Homological/BBDoubling.lean`. Generator:
 `scripts/gen_f2a6_z5z30_data.py` (all checks green; data:
-`data/a15/f2a6_z5z30_lean_data.json`).
+`data/a17/f2a6_z5z30_lean_data.json`).
 
 **A template correction forced by d = 8 (the parametric extension).**
 The shipped assembly consumed `StrongBaseFloor d` (every nonzero base
@@ -346,7 +346,7 @@ cycles. Fix: the zero rung's descended diagonal chain is automatically
 a non-boundary (pullbacks of boundaries are boundaries), so the plain
 distance floor suffices. New `LogicalFloor d` Prop + `_of_logicalFloor`
 variants (zero rung, sector assembly, chain/Pauli `IsLeast`) — these,
-not the strong forms, are what every future A15 instance consumes.
+not the strong forms, are what every future A17 instance consumes.
 (The single/pair-shape rungs still take the strong floor; generalize
 when a d ≥ 7 dangerous sector is first discharged.)
 
@@ -384,8 +384,8 @@ packaging.
 ### a new stratum found
 
 Goal: turn `DangerousFloorNZ 16` (the (M)-half, so far a bare assumption)
-into a proof. Scripts `a15_f2a6_dangerous_{census,rungs,windows,cutoff}.py`,
-`a15_f2a6_nearkernel_recon.py`; data `data/a15/f2a6_dangerous_*.json`.
+into a proof. Scripts `a17_f2a6_dangerous_{census,rungs,windows,cutoff}.py`,
+`a17_f2a6_nearkernel_recon.py`; data `data/a17/f2a6_dangerous_*.json`.
 
 **Small-preimage classification + rung coverage: COMPLETE.** All light
 boundaries (0 < |b| ≤ 14) with a support-≤4 preimage: 94 translation
@@ -427,7 +427,7 @@ radical-weight machinery and the deficit-wall's cancellation
 phenomenology).
 
 **Certificate leg (in flight):** the subsuming cover-side UNSAT@14 for
-f2a6f17e:y relaunched solo (`a15_f2a6_cover_unsat_only.py`, CMS, 6 h
+f2a6f17e:y relaunched solo (`a17_f2a6_cover_unsat_only.py`, CMS, 6 h
 budget, log `run_f2a6_cover_unsat_only.log`) — the prior round-2 launch
 died with its session, unnoticed (the CPU load mistaken for it was a
 parallel fork's T4 w=5 sweep). On UNSAT: d_X(cover) = 16 exact and
@@ -444,7 +444,7 @@ reduction).
 ### 6.4 The near-kernel stratum CLASSIFIED — light boundaries of
 ### f2a6f17e are 113 classes, rung coverage 100% (2026-07-13)
 
-Scripts `a15_f2a6_{spectral_recon,sigma_structure,athin_lines,light_enum,
+Scripts `a17_f2a6_{spectral_recon,sigma_structure,athin_lines,light_enum,
 full_dispatch,t3_exact}.py`; data `f2a6_light_classes.jsonl` (complete),
 `f2a6_full_dispatch.json`.
 
@@ -496,7 +496,7 @@ preimages ⟹ no seam-good coset element): |b|=14 ones fall to the
 shipped t=1 window; |b|=12 (t=2) need the generalized window (off ≤ 1
 ⟹ descent in W ∪ {one extra cell}; verified for ALL single-cell
 extensions — the exact t=2 condition); the single |b|=10 class (t=3)
-verified for ALL ≤2-cell extensions (`a15_f2a6_t3_exact.py`, 447 s —
+verified for ALL ≤2-cell extensions (`a17_f2a6_t3_exact.py`, 447 s —
 the exact t=3 condition; every window condition in the dispatch is now
 exact, none probe-grade). CORRECTION to §6.3: of its "115 window
 cells", 80 were t=1 and 35 were actually |b|=12/t=2 — the old window

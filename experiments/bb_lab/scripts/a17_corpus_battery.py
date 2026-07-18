@@ -1,9 +1,9 @@
-"""A15 Phase 1: the in-corpus d>=7 doubling battery.
+"""A17 Phase 1: the in-corpus d>=7 doubling battery.
 
 A14 SS16 closed the literal-lift d > 12 hunt over *stored corpus
 presentations of the Bravyi-table codes* and left "fresh-base
 enumeration (d >= 7, k > 0)" as the constructive residue. The 2026-07-06
-census (notes/A15_d7plus_doubling_hunt_plan.md SS0) found that pool
+census (notes/A17_d7plus_doubling_hunt_plan.md SS0) found that pool
 already sitting in `data/bb_instances.duckdb`, unscreened: 1,361
 SAT-certified d >= 7, k > 0 rows the A14 battery never saw (the T1
 screen corpus caps at d_base = 6; SS14 covered only bb_90/bb_108).
@@ -19,7 +19,7 @@ same tier semantics, same S4 orbit-rep protocol):
 
   * targets come from the corpus DuckDB (read-only), stratified
     d = 12 -> 10 -> 8, both axes per row;
-  * S4 SAT witnesses are PERSISTED (support + weight), per the A15 plan
+  * S4 SAT witnesses are PERSISTED (support + weight), per the A17 plan
     — refutation witnesses are the Phase-3 deficit-wall dataset;
   * per-class cheap-tier weights are persisted (raw/s1p/s2/s2p), not
     just the row minimum, for the same reason;
@@ -36,10 +36,10 @@ genuine coset element below the floor for THIS presentation; per-code
 ceilings need an orbit sweep (SS15 protocol) and are out of scope here.
 
 Run from `experiments/bb_lab/` (see --help):
-    uv run python scripts/a15_corpus_battery.py --validate
-    uv run python scripts/a15_corpus_battery.py --strata 12
-    uv run python scripts/a15_corpus_battery.py --strata 8,10 --out data/a15/corpus_battery.jsonl
-    uv run python scripts/a15_corpus_battery.py --summarize
+    uv run python scripts/a17_corpus_battery.py --validate
+    uv run python scripts/a17_corpus_battery.py --strata 12
+    uv run python scripts/a17_corpus_battery.py --strata 8,10 --out data/a17/corpus_battery.jsonl
+    uv run python scripts/a17_corpus_battery.py --summarize
 """
 
 from __future__ import annotations
@@ -64,7 +64,7 @@ from bb_lab.corpus import Corpus  # noqa: E402
 from bb_lab.linalg import nullspace_f2  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_OUT = ROOT / "data/a15/corpus_battery.jsonl"
+DEFAULT_OUT = ROOT / "data/a17/corpus_battery.jsonl"
 
 # ------------------------------------------------- x^21 - 1 over F2 (for S2)
 # x^21+1 = (x+1)(x^2+x+1)(x^3+x+1)(x^3+x^2+1)
@@ -141,7 +141,7 @@ def coset_query_w(cov: XCover, seam: np.ndarray, w: int,
 
 
 def s4_run(A, B, l, m, axis, d_base, conf_budget):
-    """Orbit-rep S4 at floor 2*d_base; persists witnesses (A15 addition)."""
+    """Orbit-rep S4 at floor 2*d_base; persists witnesses (A17 addition)."""
     Ac, Bc, lc, mc = canonical_row(A, B, l, m, axis)
     cov = XCover(Ac, Bc, lc, mc)
     ker = nullspace_f2(cov.d2b)

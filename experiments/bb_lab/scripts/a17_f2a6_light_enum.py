@@ -1,4 +1,4 @@
-"""A15 near-kernel classification, step 2: EXHAUSTIVE enumeration of the
+"""A17 near-kernel classification, step 2: EXHAUSTIVE enumeration of the
 light boundaries of the f2a6f17e base — all weight-<=14 codewords of the
 [150, 71, 6] code im d2, up to translation.
 
@@ -21,7 +21,7 @@ Resumable: reloads the checkpoint and re-adds blockings on restart.
 Cap: --max-rounds (default 3000) as a runaway stop; hitting it is itself
 a finding (the stratum is large), recorded in the tail record.
 
-Usage: uv run python scripts/a15_f2a6_light_enum.py [--max-rounds N]
+Usage: uv run python scripts/a17_f2a6_light_enum.py [--max-rounds N]
 """
 
 from __future__ import annotations

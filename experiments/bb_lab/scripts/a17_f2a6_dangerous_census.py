@@ -1,4 +1,4 @@
-"""A15 dangerous-sector discharge, step 1: light-boundary census for
+"""A17 dangerous-sector discharge, step 1: light-boundary census for
 f2a6f17e1c41ff96 ([[150,8,8]] on Z5 x Z15, A = 1 + y + x,
 B = x*y^6 + x*y^10 + x^2*y^12), y-cover to Z5 x Z30.
 
@@ -20,9 +20,9 @@ b = d2 f with |b| <= 2d - 2 = 14 ("light").  This script:
      listed as HOSTILE-UNCOVERED (the honest residue).
 
 Everything is exact numpy over F2; no SAT.  Provenance feed for the Lean
-sweep (a15_f2a6 dangerous discharge) and the docket note.
+sweep (a17_f2a6 dangerous discharge) and the docket note.
 
-Usage: uv run python scripts/a15_f2a6_dangerous_census.py
+Usage: uv run python scripts/a17_f2a6_dangerous_census.py
 """
 
 from __future__ import annotations

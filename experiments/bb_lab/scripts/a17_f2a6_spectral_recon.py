@@ -1,4 +1,4 @@
-"""A15 near-kernel classification, step 1: spectral structure of the
+"""A17 near-kernel classification, step 1: spectral structure of the
 f2a6f17e base algebra F2[Z5 x Z15] and of the near-kernel specimens.
 
 Facts to establish (numerically, exact GF(16) arithmetic):
@@ -18,7 +18,7 @@ Facts to establish (numerically, exact GF(16) arithmetic):
 GF(16) = F2[t]/(t^4 + t + 1), omega15 = t (order 15), omega5 = t^3.
 Character (a, b) at group element (i, j): t^((3 a i + b j) mod 15).
 
-Usage: uv run python scripts/a15_f2a6_spectral_recon.py
+Usage: uv run python scripts/a17_f2a6_spectral_recon.py
 """
 
 from __future__ import annotations

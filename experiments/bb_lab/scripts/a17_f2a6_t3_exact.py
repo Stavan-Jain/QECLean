@@ -1,4 +1,4 @@
-"""A15 near-kernel classification, step 7: EXACT t = 3 generalized-window
+"""A17 near-kernel classification, step 7: EXACT t = 3 generalized-window
 verification for the |b| = 10 near-kernel class (the full-dispatch W+(t=3)
 verdict used a single-extension probe, necessary but not sufficient).
 
@@ -9,7 +9,7 @@ singles, and all ~C(140,2) pairs of non-W cells; rank identity per
 window).  This is exactly the hypothesis of the prospective
 `dangerous_bound_of_window_general` rung at t = 3.
 
-Usage: uv run python scripts/a15_f2a6_t3_exact.py
+Usage: uv run python scripts/a17_f2a6_t3_exact.py
 """
 
 import json
@@ -73,8 +73,8 @@ def window_ok(Wm):
     dim_pre = nb - rank_f2(D2b[cidx,:].T)
     return dim_cyc == dim_pre - 4
 
-d = json.load(open(LAB/"data/a15/f2a6_full_dispatch.json"))
-recs = [json.loads(l) for l in open(LAB/"data/a15/f2a6_light_classes.jsonl") if "b_support" in l]
+d = json.load(open(LAB/"data/a17/f2a6_full_dispatch.json"))
+recs = [json.loads(l) for l in open(LAB/"data/a17/f2a6_light_classes.jsonl") if "b_support" in l]
 t3 = [c for c in d["classes"] if "W+(t=3)" in c["verdicts"]]
 print(f"t=3 classes: {len(t3)}")
 TRANS = []

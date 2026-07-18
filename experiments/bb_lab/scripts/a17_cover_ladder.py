@@ -1,4 +1,4 @@
-"""A15: cover-side ladders for the 18 SF-certified cells.
+"""A17: cover-side ladders for the 18 SF-certified cells.
 
 SF-certification (SS6.1) bounds the SAFE sector of the double cover;
 the doubling verdict still owes the cover's actual X-distance — which
@@ -30,10 +30,10 @@ Smoke (both phases, known truth): pair72-base [[36,4,4]] x-cover =
 [[72,4,8]]: witness@8 -> SAT wt 8, UNSAT@6.
 
 Run from `experiments/bb_lab/`:
-    uv run python scripts/a15_cover_ladder.py --smoke
-    uv run python scripts/a15_cover_ladder.py --phase witness
-    uv run python scripts/a15_cover_ladder.py --phase unsat --shard 0/4
-    uv run python scripts/a15_cover_ladder.py --summarize
+    uv run python scripts/a17_cover_ladder.py --smoke
+    uv run python scripts/a17_cover_ladder.py --phase witness
+    uv run python scripts/a17_cover_ladder.py --phase unsat --shard 0/4
+    uv run python scripts/a17_cover_ladder.py --summarize
 """
 
 from __future__ import annotations
@@ -62,8 +62,8 @@ from bb_lab.poly import Poly  # noqa: E402
 from bb_lab.sat_distance import find_logical_z  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT_WITNESS = ROOT / "data/a15/cover_witness.jsonl"
-OUT_UNSAT = ROOT / "data/a15/cover_unsat14.jsonl"
+OUT_WITNESS = ROOT / "data/a17/cover_witness.jsonl"
+OUT_UNSAT = ROOT / "data/a17/cover_unsat14.jsonl"
 
 SOLVERS = {
     "cms": ["cryptominisat5", "--verb", "0"],
@@ -207,11 +207,11 @@ def unsat_query(checks: CheckMatrices, w: int, backend: str,
 
 def certified_cells() -> list[dict]:
     battery = {}
-    for p in sorted(glob.glob(str(ROOT / "data/a15/corpus_battery*.jsonl"))):
+    for p in sorted(glob.glob(str(ROOT / "data/a17/corpus_battery*.jsonl"))):
         for r in map(json.loads, open(p)):
             battery.setdefault((r["instance_id"], r["axis"]), r)
     best: dict[tuple, dict] = {}
-    for line in open(ROOT / "data/a15/docket_decision.jsonl"):
+    for line in open(ROOT / "data/a17/docket_decision.jsonl"):
         r = json.loads(line)
         key = (r["instance_id"], r["axis"])
         best[key] = {**battery[key], **r}  # battery carries ell/m

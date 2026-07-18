@@ -1,4 +1,4 @@
-"""A15 dangerous-sector discharge, step 4: the rep-weight cutoff certificate.
+"""A17 dangerous-sector discharge, step 4: the rep-weight cutoff certificate.
 
 Claim to certify: every nonzero light boundary (|d2 f| <= 14) of the
 f2a6f17e base has a preimage of support <= 3 (the census found light
@@ -15,7 +15,7 @@ classification of the light-boundary dispatch.  Backends: pysat-CaDiCaL
 Any SAT model is re-verified in numpy and dumped (it would mean a census
 bug — the census enumerated all |f| <= 4 supports exhaustively).
 
-Usage: uv run python scripts/a15_f2a6_dangerous_cutoff.py [--kissat]
+Usage: uv run python scripts/a17_f2a6_dangerous_cutoff.py [--kissat]
 """
 
 from __future__ import annotations

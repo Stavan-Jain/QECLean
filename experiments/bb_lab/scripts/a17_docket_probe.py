@@ -1,4 +1,4 @@
-"""A15: ladder-from-above probe of the INCONCLUSIVE docket.
+"""A17: ladder-from-above probe of the INCONCLUSIVE docket.
 
 For each above-floor docket cell (cheap_min > floor, S4 UNKNOWN at every
 orbit rep), run budgeted witness-side SAT queries at weights BETWEEN the
@@ -14,9 +14,9 @@ UNKNOWN everywhere = the cell is genuinely solver-resistant both ways,
 i.e. certification-flavored: queue for the dedicated high-budget /
 XOR-aware pass.
 
-Reads the docket straight from data/a15/corpus_battery*.jsonl.
+Reads the docket straight from data/a17/corpus_battery*.jsonl.
 Run from `experiments/bb_lab/`:
-    uv run python scripts/a15_docket_probe.py [--conf-budget 300000]
+    uv run python scripts/a17_docket_probe.py [--conf-budget 300000]
 """
 
 from __future__ import annotations
@@ -31,7 +31,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from a15_corpus_battery import coset_query_w  # noqa: E402
+from a17_corpus_battery import coset_query_w  # noqa: E402
 from a14_s4_ladder import orbit_reps  # noqa: E402
 from a14_safe_floor_screens import XCover, canonical_row, parse_poly  # noqa: E402
 from bb_lab.linalg import nullspace_f2  # noqa: E402
@@ -41,7 +41,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def docket() -> list[dict]:
     seen: dict[tuple, dict] = {}
-    for p in sorted(glob.glob(str(ROOT / "data/a15/corpus_battery*.jsonl"))):
+    for p in sorted(glob.glob(str(ROOT / "data/a17/corpus_battery*.jsonl"))):
         for line in open(p):
             r = json.loads(line)
             seen.setdefault((r["instance_id"], r["axis"]), r)
@@ -90,7 +90,7 @@ def main() -> None:
                       + f" [{time.time() - t0:.0f}s]", flush=True)
             rec["reps"].append(rrec)
         out.append(rec)
-        with open(ROOT / "data/a15/docket_probe.json", "w") as fh:
+        with open(ROOT / "data/a17/docket_probe.json", "w") as fh:
             json.dump(out, fh, indent=1)
     print(f"done ({time.time() - t0:.0f}s)", flush=True)
 

@@ -1,4 +1,4 @@
-"""Lean-packaging data generator for the A15 pick f2a6f17e1c41ff96:y.
+"""Lean-packaging data generator for the A17 pick f2a6f17e1c41ff96:y.
 
 Pair: base [[150,8,8]] on Z5 x Z15, A = 1 + y + x, B = x*y^6 + x*y^10 + x^2*y^12
 (corpus instance f2a6f17e1c41ff96, d_exact = 8 by SAT, CaDiCaL);
@@ -15,13 +15,13 @@ Emits (hard asserts; nonzero exit on failure):
      + push_A/push_B descent checks for the literal lift;
   2. the Bezout witness (P, Q) with P*Ac + Q*Bc = 1 + y^15 over
      F2[Z5xZ30] (greedy-sparsified), certifying the deck homotopy (R);
-  3. the tight witness u*: the A15 cover ladder's weight-16 witness
-     (data/a15/cover_witness.jsonl) is deck-invariant, hence = tau(u*)
+  3. the tight witness u*: the A17 cover ladder's weight-16 witness
+     (data/a17/cover_witness.jsonl) is deck-invariant, hence = tau(u*)
      for a weight-8 base logical u*; re-verified here in repo convention
      (base cycle, weight 8, non-boundary; tau(u*) cover non-boundary);
   4. a dual flux witness w on the cover (dual cycle, odd pairing with
      tau(u*)) certifying non-boundaryness for the Lean kernel;
-  5. JSON (data/a15/f2a6_z5z30_lean_data.json) + Lean-ready supports.
+  5. JSON (data/a17/f2a6_z5z30_lean_data.json) + Lean-ready supports.
 
 Usage:  uv run python scripts/gen_f2a6_z5z30_data.py
 """
@@ -161,7 +161,7 @@ if pq is not None:
     print(f"  |P| = {len(p_supp)}, |Q| = {len(q_supp)}")
 
 # ------------------------------------------------- 3. tight witness u*
-print("== 3. tight witness u* from the A15 cover-ladder witness ==")
+print("== 3. tight witness u* from the A17 cover-ladder witness ==")
 ladder = None
 with open(LAB_ROOT / "data" / "a15" / "cover_witness.jsonl") as fh:
     for line in fh:

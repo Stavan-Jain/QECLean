@@ -1,4 +1,4 @@
-"""A15 dangerous-sector discharge, step 2: rung coverage for every light
+"""A17 dangerous-sector discharge, step 2: rung coverage for every light
 (class, translate) of f2a6f17e1c41ff96.
 
 For each light boundary b = d2 f (|f| <= 4 canonical classes x all 75
@@ -17,7 +17,7 @@ cycles over b, in priority order:
 Output: per-(class, translate) rung table + summary; the dispatch data
 for the Lean sweep.
 
-Usage: uv run python scripts/a15_f2a6_dangerous_rungs.py
+Usage: uv run python scripts/a17_f2a6_dangerous_rungs.py
 """
 
 from __future__ import annotations

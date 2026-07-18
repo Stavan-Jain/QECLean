@@ -1,10 +1,10 @@
-"""A15: the docket decision pass — UNSAT@(floor-2) decides SF.
+"""A17: the docket decision pass — UNSAT@(floor-2) decides SF.
 
-Phase 1 (SS6 of the A15 note) left 21 INCONCLUSIVE (cell = presentation
+Phase 1 (SS6 of the A17 note) left 21 INCONCLUSIVE (cell = presentation
 x axis) rows: CaDiCaL-in-pysat stalled both ways at 10M conflicts on the
 floor-1 coset queries. Two sharpenings make a decision pass viable:
 
-1. **Parity** (verified on all 21 cells; A15-P3 L1): every safe-coset
+1. **Parity** (verified on all 21 cells; A17-P3 L1): every safe-coset
    weight is even, so the floor-1 query chased an impossible odd value.
    The decisive query is `exists coset element of weight <= floor-2`:
    SAT refutes SF outright (witness persisted); UNSAT on every G-orbit
@@ -22,9 +22,9 @@ never trusted bare. Per-query wall-clock timeout; timeouts are honest
 UNKNOWNs.
 
 Run from `experiments/bb_lab/`:
-    uv run python scripts/a15_docket_decide.py --smoke
-    uv run python scripts/a15_docket_decide.py --backend cms --timeout 900
-    uv run python scripts/a15_docket_decide.py --summarize
+    uv run python scripts/a17_docket_decide.py --smoke
+    uv run python scripts/a17_docket_decide.py --backend cms --timeout 900
+    uv run python scripts/a17_docket_decide.py --summarize
 """
 
 from __future__ import annotations
@@ -52,7 +52,7 @@ from a14_safe_floor_screens import (  # noqa: E402
 from bb_lab.linalg import nullspace_f2  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "data/a15/docket_decision.jsonl"
+OUT = ROOT / "data/a17/docket_decision.jsonl"
 
 SOLVERS = {
     "cms": ["cryptominisat5", "--verb", "0"],
@@ -168,7 +168,7 @@ def run_query(cov: XCover, seam: np.ndarray, w: int, backend: str,
 
 def load_cells() -> list[dict]:
     seen: dict[tuple, dict] = {}
-    for p in sorted(glob.glob(str(ROOT / "data/a15/corpus_battery*.jsonl"))):
+    for p in sorted(glob.glob(str(ROOT / "data/a17/corpus_battery*.jsonl"))):
         for line in open(p):
             r = json.loads(line)
             seen.setdefault((r["instance_id"], r["axis"]), r)
@@ -210,7 +210,7 @@ def smoke(backend: str, timeout: float) -> bool:
     """SAT sanity on a known-refuted cell; UNSAT sanity on pair72-base."""
     ok = True
     cells = {(r["instance_id"], r["axis"]): r for p in
-             glob.glob(str(ROOT / "data/a15/corpus_battery*.jsonl"))
+             glob.glob(str(ROOT / "data/a17/corpus_battery*.jsonl"))
              for r in map(json.loads, open(p))}
     refuted = next(r for r in cells.values()
                    if r["status"] == "SF-REFUTED" and r["d_base"] == 8

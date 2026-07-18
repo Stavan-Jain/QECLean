@@ -1,6 +1,6 @@
-"""A15 deficit wall: validation battery for the theorem package.
+"""A17 deficit wall: validation battery for the theorem package.
 
-Companion to `notes/A15_deficit_wall.md` (the deficit-wall theorem: why the
+Companion to `notes/A17_deficit_wall.md` (the deficit-wall theorem: why the
 orbit-maximum safe floor of a non-doubling BB code stalls at exactly
 2d(base) - 2).  Check IDs below mirror the note's statement numbers.
 
@@ -21,7 +21,7 @@ orbit-maximum safe floor of a non-doubling BB code stalls at exactly
       bb90-y = 10 = d exactly (freeze); stored bb108-y: witness descent to
       14 with a bounded UNSAT attempt at 12 (the historical §14/§15
       readings of "18" were first-found witness weights, not minima — see
-      A15 note §8); orbit-finalist sample: all exact values even and
+      A17 note §8); orbit-finalist sample: all exact values even and
       <= 2d - 2, strictly below the previously reported ceiling.
 
 The one *expensive* certificate — the bb108-y COVER's safe-sector minimum
@@ -31,8 +31,8 @@ reproduce it. Its result is recorded in the note and consumed here only
 as documentation.
 
 Run from `experiments/bb_lab/`:
-    uv run python scripts/a15_deficit_wall_checks.py [--expensive]
-Output: `data/a15/deficit_wall_checks.json`; ~1 h default
+    uv run python scripts/a17_deficit_wall_checks.py [--expensive]
+Output: `data/a17/deficit_wall_checks.json`; ~1 h default
 (SAT-witness ladders; UNSAT attempts are bounded at 2M conflicts and may
 report "upper" — the load-bearing exact certificates, with their real
 costs, are recorded in the note's §8 table).
@@ -561,13 +561,13 @@ def main() -> None:
     with open(OUT / "deficit_wall_checks.json", "w") as fh:
         json.dump(RESULTS, fh, indent=1, default=str)
     print(f"\n{len(CHECKS) - len(fails)}/{len(CHECKS)} checks passed "
-          f"({time.time() - t_start:.0f}s). Output: data/a15/deficit_wall_checks.json")
+          f"({time.time() - t_start:.0f}s). Output: data/a17/deficit_wall_checks.json")
     if fails:
         print("FAILED:")
         for n in fails:
             print(f"  - {n}")
         sys.exit(1)
-    print("ALL CHECKS PASS — A15 deficit-wall battery green.")
+    print("ALL CHECKS PASS — A17 deficit-wall battery green.")
 
 
 if __name__ == "__main__":

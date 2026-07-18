@@ -1,4 +1,4 @@
-"""A15 dangerous-sector discharge, step 3: window rung for the 115 cells
+"""A17 dangerous-sector discharge, step 3: window rung for the 115 cells
 single/pair rungs miss (all |b| = 14, t = 1, seam-wrapping translates).
 
 Window rung (to be added to BBDoubling as `dangerous_bound_of_window`):
@@ -16,7 +16,7 @@ This script: per uncovered cell, pick f0 in the ker-coset minimizing
 |seam \ supp b| (poke count), report |W|, and check the window condition
 two ways (rank identity + direct enumeration when |W| <= 24).
 
-Usage: uv run python scripts/a15_f2a6_dangerous_windows.py
+Usage: uv run python scripts/a17_f2a6_dangerous_windows.py
 """
 
 from __future__ import annotations

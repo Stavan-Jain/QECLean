@@ -1,4 +1,4 @@
-"""A15 near-kernel classification, step 4: the sigma-involution structure
+"""A17 near-kernel classification, step 4: the sigma-involution structure
 of the f2a6f17e pair.
 
 Claims (all asserted exactly):
@@ -21,7 +21,7 @@ Claims (all asserted exactly):
 Also emits: u|v balance histogram and Phi-orbit pairing of the enumerated
 classes (fixed classes vs swapped pairs).
 
-Usage: uv run python scripts/a15_f2a6_sigma_structure.py
+Usage: uv run python scripts/a17_f2a6_sigma_structure.py
 """
 
 from __future__ import annotations

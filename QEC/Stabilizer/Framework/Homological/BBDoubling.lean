@@ -1381,7 +1381,7 @@ theorem chain_distance_eq_double {d : ℕ}
 
 The same sector dichotomy with `dangerous_zero_rung_of_logicalFloor` in
 place of the strong rung.  The three floors are exactly the
-certificate-checked inputs of an A15-track instance: the base distance
+certificate-checked inputs of an A17-track instance: the base distance
 (SAT: witness + UNSAT at `d − 1`), the dangerous floor, and the
 seam-coset floor (S4: XOR-native UNSAT at `2d − 2` per orbit rep +
 parity). -/

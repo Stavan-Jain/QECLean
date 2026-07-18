@@ -1,4 +1,4 @@
-"""A15 near-kernel classification, step 3: structure-mine the enumerated
+"""A17 near-kernel classification, step 3: structure-mine the enumerated
 light-boundary classes (reads f2a6_light_classes.jsonl, works on whatever
 is there — rerun as the enumeration progresses).
 
@@ -16,7 +16,7 @@ Structural probes, motivated by the specimens' step-3 y-progressions:
   3. strata census: coset_min spectrum by |b| — closes the [5,30] gap
      question on the enumerated portion.
 
-Usage: uv run python scripts/a15_f2a6_nearkernel_structure.py
+Usage: uv run python scripts/a17_f2a6_nearkernel_structure.py
 """
 
 from __future__ import annotations

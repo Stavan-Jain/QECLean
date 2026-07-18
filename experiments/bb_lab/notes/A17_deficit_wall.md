@@ -1,4 +1,4 @@
-# A15 — The deficit wall: theorem, mechanism, and a measurement correction
+# A17 — The deficit wall: theorem, mechanism, and a measurement correction
 
 **Status: theorem package PROVED and machine-validated (final battery
 25/25 green; the first run's two "failures" were the §8 discoveries);
@@ -18,14 +18,14 @@ witness weights, not certified minima; exact ladders (this session) put
 the stored bb108-y cell at `d_safe = 14 = 2d − 6` — certified on both
 sides of the cover, with the T2 coupling tight at `14 = 14` — and every
 ladder-sampled orbit finalist at `≤ 12`; the corrected table is in §8.
-This note is **phase P3 of the A15 d≥7 doubling-hunt plan**
-(`A15_d7plus_doubling_hunt_plan.md`, drafted in a sibling worktree; the
+This note is **phase P3 of the A17 d≥7 doubling-hunt plan**
+(`A17_d7plus_doubling_hunt_plan.md`, drafted in a sibling worktree; the
 plan's "2(d−1) shadow hypothesis" is settled here — refuted as stated,
 replaced by the pushforward mechanism — and its P1 corpus battery
 should report S4 weights as "≤" bounds per §8).
 Branch: `claude/charming-euler-ef6879` (off `main` after PR #55).
-Script: [`a15_deficit_wall_checks.py`](../scripts/a15_deficit_wall_checks.py);
-data: `data/a15/deficit_wall_checks.json`.
+Script: [`a17_deficit_wall_checks.py`](../scripts/a17_deficit_wall_checks.py);
+data: `data/a17/deficit_wall_checks.json`.
 
 ## 0. The question (A14 §16, verbatim)
 
@@ -268,7 +268,7 @@ All parts are proved above (1: L1+definition; 2: L1; 3: T2/W; 4: T1;
 
 ## 7. Validation battery
 
-`uv run python scripts/a15_deficit_wall_checks.py` (~minutes;
+`uv run python scripts/a17_deficit_wall_checks.py` (~minutes;
 SAT-witness ladders plus bounded UNSAT attempts; `--expensive`
 reproduces the 5-h cover certificate). The battery ran twice in this
 fork: the *first* run scored 23/25 with its two "failures" being the
@@ -299,7 +299,7 @@ The §15/§16 sweep protocol recorded, per refuted cell, the weight of the
 *first extracted SAT certificate* at the query bound (`floor − 1` or
 similar). Those are upper bounds on `d_safe`, not minima — CaDiCaL
 returns any model under the cardinality bound, and nothing in the
-pipeline pressed below it. The A15 exactness pins exposed this
+pipeline pressed below it. The A17 exactness pins exposed this
 (`SAT@17` on the stored bb108-y cell returned a weight-**16** witness
 where "18" had been recorded, and likewise on all eight scanned orbit
 finalists — one of them at **12**). Descending ladders (SAT at `w` ⟹
@@ -362,7 +362,7 @@ Corrected empirical picture:
   invariant `maxSF(code) := max over orbit cells of d_safe` satisfies
   `maxSF ∈ {2d} ∪ {even ≤ 2d − 2}`; bb_108's measured value is ≤ 16 on
   every sampled cell (both decompositions' stored cells and 20/192 v1
-  finalists), i.e. the wall is not attained there and the pre-A15
+  finalists), i.e. the wall is not attained there and the pre-A17
   "orbit ceiling 18" overstated the orbit by 2. What structural feature
   sets `maxSF` (16-vs-18 for bb_108; the true value for bb_288) is the
   honest residue of the deficit-wall OQ — now with the right definition

@@ -1,4 +1,4 @@
-"""A15 near-kernel classification, step 5: the A-thin layer.
+"""A17 near-kernel classification, step 5: the A-thin layer.
 
 By the sigma-reduction (B = xy^6 sigma(A)), every light boundary is a pair
 of A-images: b = (A*f | monomial * sigma(A*sigma(f))), so |b| =
@@ -17,7 +17,7 @@ The S0-syndrome of a cell g is the GF(16) value chi(g) at the orbit-19
 rep character (1,14); u in V iff its cells' syndromes XOR to 0 (the other
 three orbit characters are Frobenius conjugates — one GF(16) equation).
 
-Usage: uv run python scripts/a15_f2a6_athin_lines.py
+Usage: uv run python scripts/a17_f2a6_athin_lines.py
 """
 
 from __future__ import annotations

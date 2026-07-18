@@ -1,4 +1,4 @@
-"""A15 dangerous discharge, step 5: recon of the near-kernel light-boundary
+"""A17 dangerous discharge, step 5: recon of the near-kernel light-boundary
 family that the cutoff query exposed (min-rep weight 33, |b| = 10).
 
 Questions:
@@ -11,7 +11,7 @@ Questions:
   4. count blocking-clause samples of the family at |b| = 10 to see orbit
      structure (translates? A-line unions?).
 
-Usage: uv run python scripts/a15_f2a6_nearkernel_recon.py
+Usage: uv run python scripts/a17_f2a6_nearkernel_recon.py
 """
 
 from __future__ import annotations

@@ -1,4 +1,4 @@
-"""A15 near-kernel classification, step 6: the UNIFIED rung dispatch over
+"""A17 near-kernel classification, step 6: the UNIFIED rung dispatch over
 the complete light-boundary class list (small-preimage + near-kernel).
 
 For every enumerated class x 75 translates, find a discharge route for
@@ -20,10 +20,10 @@ For every enumerated class x 75 translates, find a discharge route for
       side would need the rung generalization.
   U   uncovered — honest residue.
 
-Outputs data/a15/f2a6_full_dispatch.json with per-class verdicts and the
+Outputs data/a17/f2a6_full_dispatch.json with per-class verdicts and the
 poke statistics of near-kernel preimages (seam-crossing cancellations).
 
-Usage: uv run python scripts/a15_f2a6_full_dispatch.py [--skip-wplus]
+Usage: uv run python scripts/a17_f2a6_full_dispatch.py [--skip-wplus]
 """
 
 from __future__ import annotations
@@ -268,7 +268,7 @@ def main():
            "classes": per_class}
     (LAB_ROOT / "data" / "a15" / "f2a6_full_dispatch.json").write_text(
         json.dumps(out, indent=1))
-    print("wrote data/a15/f2a6_full_dispatch.json", flush=True)
+    print("wrote data/a17/f2a6_full_dispatch.json", flush=True)
 
 
 if __name__ == "__main__":
