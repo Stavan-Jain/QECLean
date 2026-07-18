@@ -60,6 +60,16 @@ theorem seamC_eq_seam01 : coverData.seamC (kcombo 0 1) = seam01 := by
 theorem seamC_eq_seam11 : coverData.seamC (kcombo 1 1) = seam11 := by
   native_decide
 
+/-! ## Seam mask literals (for the bitmask sweeps) -/
+
+def seam01Mask : Nat := 11799387
+def seam10Mask : Nat := 7079670
+def seam11Mask : Nat := 14159277
+
+theorem seam01Mask_eq : c1MaskOf seam01 = seam01Mask := by native_decide
+theorem seam10Mask_eq : c1MaskOf seam10 = seam10Mask := by native_decide
+theorem seam11Mask_eq : c1MaskOf seam11 = seam11Mask := by native_decide
+
 end Z3Z6
 end BB
 end Homological

@@ -315,6 +315,24 @@ N C-compile round-trips (~2–4 s each). Bundle them into a single `∧`-chain
 theorem proved by one `native_decide` and destructure (`MImAssembly.transfer_covs`,
 63→1; `MImFloorY11.offs_eq`, 24→1).
 
+**`native_decide` is interpreted, not compiled.** At elaboration time
+`native_decide` evaluates through Lean's IR interpreter (only stdlib calls in
+`libleanshared` run truly native), so every boxed apply costs ~µs. For big
+enumerations (`∀ m : Fin (2^18)`) the levers are different from the kernel
+case: (a) never touch `Finset`/`Fintype` in the per-item body —
+`Finset.univ.filter …|>.card` rebuilds the universe multiset *per item*
+(~2 ms); restate counts as `Nat` popcounts and prove
+`card_support_eq_natWt`-style bridges once (`Z3Z6/MaskDefs.lean`); (b)
+tabulate everything the body reads as *numeric literals* certified by one
+`native_decide`/`decide` (`bndRowsLit_correct`) — a computed `def` can be
+re-evaluated per reference; (c) derive the human-readable statement from the
+mask-form sweep through the bridges, keeping the public theorem byte-identical
+(`Z3Z6/Sweep*.lean`, ~59 min → ~7 min CPU each). `decide +kernel` is NOT an
+upgrade at this scale: per-item kernel reduction through `List` folds costs
+about the same and the 2^18-deep `decidableBallLT` recursion risks the C
+stack. Floor: ~100+ interpreted applies per item is the practical minimum for
+proof-carrying structures.
+
 ## Mechanical fixes for common gotchas
 
 These are quick-lookup items for failures that have a definite fix once
