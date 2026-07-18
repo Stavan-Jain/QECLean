@@ -24,6 +24,42 @@ A4 Theorem D).
 > exact [[144,12,12]] y-covers** (hit3/4/6): in-frame, engine-necessary
 > targets for the next engine re-instantiation.
 
+> **A11 plan + Entry 1 (2026-07-02, `A11_literal_lift_criterion.md`) — the
+> literal-lift doubling criterion; the A8 audit FLIPPED the hit2/hit5
+> negatives.** Stage-0 plan: find a checkable criterion `P(H, A, B, axis)`
+> sufficient (stretch: equivalent) for literal-lift cover doubling;
+> standing candidate = the A8 conjecture. Entry-1 results: (1) the A9 T2
+> ladders ran on STORED corpus forms, which are not anchorable
+> presentations; (2) **literal-lift doubling is presentation-sensitive
+> within the same (code, axis)** — the anchorable A8-presentations of
+> hit2, hit3, hit5 have x-covers with **d = 12 exactly** while the stored
+> forms stay at 6/8, so "hit2/hit5 don't double" was an artifact and
+> **all six anchorable Z₆×Z₆ classes are gross-twins** (A8 survives,
+> strengthened; A10's Fork-C candidates dissolve — update A10 before
+> running it); (3) the certificate hierarchy (R0-sq…R2, linchpin, k, tight
+> witness) is uniformly satisfied on the engine frame and 100%-both-classes
+> on the small frames — never the discriminator; (4) the discriminator is
+> template condition 3's SAFE half: every non-doubling cell breaks in the
+> safe sector, and the base-side coset-min probe (`a11_s3_diagnose.py`,
+> no cover SAT) separates flipped vs stored exactly ({≥12:63} vs
+> {6:12, 8:45, ≥12:6}); (5) S2 over the full 638-row hunt stream:
+> `safe_floor_ok` sufficient-shaped (0 violations), `tight_witness`
+> necessary, certificates/difference-set predicates uncorrelated.
+> Emerging criterion: **C-safe = tight witness ∧ safe-class coset minima
+> ≥ 2d**, with A8's package as its checkable engine-frame proxy.
+> Cross-session synthesis (same day): A12 proved
+> `(R) ⟺ k(cover) = k(base) ⟺ 1+δ ∈ (A,B)` — so the universal
+> R-columns are forced on k-gated data, k-preservation is the right
+> primitive conjunct, and `deckTrivial_of_bezout` (BBDoubling.lean)
+> consumes the R1 witnesses kernel-grade.  A10's Lemma L1 makes descent
+> screens code-exhaustive (the A11 flips = its mixed-class twist rows,
+> matrix-equal): literal-lift claims are presentation-relative, descent
+> claims are not, and A10's 13 unrescued bases are code-level
+> non-doubling instances that no equivalent presentation lifts to a
+> doubling literal cover — the first hard negatives; C-safe consistency
+> on all their presentations is a queued falsification check (A11 note
+> § Session close item 4; Fork-C scope statement = A10 note §R6).
+
 > **A10 RESULTS (2026-07-02, `A10_descent_twist_screen.md`) — the descent
 > question ANSWERED (Fork M).** Question: does every certified BB base
 > admit a *descent* free-ℤ₂ cover (any extension class, polynomials only

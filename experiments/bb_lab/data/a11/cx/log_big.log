@@ -1,0 +1,17 @@
+[big] hunt: frames=[(4, 6), (3, 7), (5, 5)] weights=[(4, 4), (5, 5), (3, 3)] modes=['rand', 'heavyx'] per-block=200 budget=4200s resume-skip=0
+
+!!! COUNTEREXAMPLE CANDIDATE !!!
+{"frame": "Z5xZ5", "A": "x^2*y + x^3 + x^3*y^3 + x^3*y^4", "B": "x^4 + x^4*y + x^4*y^2 + x^4*y^4", "wA": 4, "wB": 4, "mode": "heavyx", "k": 2, "d_base": 5, "stage": "axes", "axes": [{"axis": "x", "k_cover": 2, "tight_witness": false, "verdict": "no_tight_witness", "t": 0.006}, {"axis": "y", "k_cover": 2, "tight_witness": true, "rank_p_star": 1, "csafe": true, "d_cover": 8, "verdict": "COUNTEREXAMPLE", "witness": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "t": 2.256}], "t": 2.283}
+
+[big]    766s pass=1 wrote=380 csafe=25 {'axes': 153, 'no_tight_witness': 97, 'safe_floor_fail': 138, 'k_drift': 46, 'CSAFE_DOUBLES': 24, 'k0': 227, 'COUNTEREXAMPLE': 1}
+[big]    782s pass=1 wrote=400 csafe=29 {'axes': 173, 'no_tight_witness': 113, 'safe_floor_fail': 152, 'k_drift': 52, 'CSAFE_DOUBLES': 28, 'k0': 227, 'COUNTEREXAMPLE': 1}
+[big]    786s pass=1 wrote=420 csafe=30 {'axes': 174, 'no_tight_witness': 114, 'safe_floor_fail': 152, 'k_drift': 52, 'CSAFE_DOUBLES': 29, 'k0': 246, 'COUNTEREXAMPLE': 1}
+[big]    790s pass=1 wrote=440 csafe=30 {'axes': 175, 'no_tight_witness': 114, 'safe_floor_fail': 154, 'k_drift': 52, 'CSAFE_DOUBLES': 29, 'k0': 265, 'COUNTEREXAMPLE': 1}
+[big]    791s pass=1 wrote=460 csafe=30 {'axes': 176, 'no_tight_witness': 114, 'safe_floor_fail': 156, 'k_drift': 52, 'CSAFE_DOUBLES': 29, 'k0': 284, 'COUNTEREXAMPLE': 1}
+[big]    792s pass=1 wrote=480 csafe=30 {'axes': 178, 'no_tight_witness': 114, 'safe_floor_fail': 160, 'k_drift': 52, 'CSAFE_DOUBLES': 29, 'k0': 302, 'COUNTEREXAMPLE': 1}
+[big]    865s pass=1 wrote=500 csafe=31 {'axes': 198, 'no_tight_witness': 129, 'safe_floor_fail': 176, 'k_drift': 60, 'CSAFE_DOUBLES': 30, 'k0': 302, 'COUNTEREXAMPLE': 1}
+[big]    874s pass=1 wrote=520 csafe=32 {'axes': 218, 'no_tight_witness': 141, 'safe_floor_fail': 193, 'k_drift': 70, 'CSAFE_DOUBLES': 31, 'k0': 302, 'COUNTEREXAMPLE': 1}
+[big]    874s pass=1 wrote=540 csafe=32 {'axes': 218, 'no_tight_witness': 141, 'safe_floor_fail': 193, 'k_drift': 70, 'CSAFE_DOUBLES': 31, 'k0': 322, 'COUNTEREXAMPLE': 1}
+[big]    875s pass=1 wrote=560 csafe=32 {'axes': 219, 'no_tight_witness': 141, 'safe_floor_fail': 195, 'k_drift': 70, 'CSAFE_DOUBLES': 31, 'k0': 341, 'COUNTEREXAMPLE': 1}
+[big]    880s pass=1 wrote=580 csafe=35 {'axes': 224, 'no_tight_witness': 143, 'safe_floor_fail': 200, 'k_drift': 70, 'CSAFE_DOUBLES': 34, 'k0': 356, 'COUNTEREXAMPLE': 1}
+[big]    884s pass=1 wrote=600 csafe=38 {'axes': 226, 'no_tight_witness': 144, 'safe_floor_fail': 200, 'k_drift': 70, 'CSAFE_DOUBLES': 37, 'k0': 374, 'COUNTEREXAMPLE': 1}

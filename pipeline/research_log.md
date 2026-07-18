@@ -39,6 +39,22 @@ what was tried and why it didn't work.
   `A5_goal2_log.md` Entries 8–13. Lives in `experiments/bb_lab/`
   (not `attempts/`).
 
+- 2026-07-07 — bb-literal-lift-criterion (A11, Entry 3) — partial
+  (criterion refuted weight-agnostic; line paused) —
+  **The Entry-2b counterexample hunt found its target, and it
+  VERIFIES: first observed dangerous-sector bind.** A weight-4×4 pair
+  on Z₅×Z₅ ([[50,2,5]]), y-lift [[100,2,8]]: C-safe holds two-sidedly
+  at enumeration grade (k, tight witness, safe minima 11 ≥ 10 both
+  sides, (R)) yet d(cover) = 8 < 10 = 2d — the weight-8 X-logical
+  pushes to a weight-6 nonzero stabilizer. "C-safe ⟹ doubling" is
+  FALSE weight-agnostic; parity is the load-bearing hypothesis
+  (d(base) = 5 and the safe minima are odd — impossible with |A|, |B|
+  odd), the Entry-2b twice-refined residue is exactly the cell hit
+  (D5 concentration violated), and A17's (M)-robustness conjecture
+  (deficit-wall §9, corpus-class-scoped) becomes non-vacuous and
+  provably scope-critical — not refuted: the odd-weight record stays
+  2,058/2,058. [details](../experiments/bb_lab/notes/A11_literal_lift_criterion.md)
+
 - 2026-07-06 — deficit-wall (A17-P3) — success (theorem + a correction) —
   **A14 §16's deficit-wall OQ answered: the wall *value* is a theorem,
   the *mechanism* is a pushforward, and the "stalls at exactly 2d − 2"
@@ -143,6 +159,43 @@ what was tried and why it didn't work.
   to presentation orbits (bb108-y first), mixed lifts, and wider
   `d ≥ 7` base enumeration.
   [plan+results](../experiments/bb_lab/notes/A14_safe_floor_criterion_plan.md)
+
+- 2026-07-02 — bb-literal-lift-criterion (A11, Entry 1) — success —
+  **A checkable doubling criterion emerges, and the A8 audit FLIPS the
+  hit2/hit5 negatives.** Literal-lift doubling is presentation-sensitive
+  within a (code, axis): the anchorable A8-presentations of ALL six
+  engine-frame classes have d = 12 covers on BOTH axes (7 fresh SAT
+  ladders, all 12), while their stored forms stay at 6/8 — A9's "hit2/
+  hit5 do not double" was a presentation artifact. The discriminator is
+  template condition 3's safe half: **doubling ⟺ safe-class coset minima
+  ≥ 2d on every engine-frame cell tested** (base-side SAT probe, no
+  cover SAT; 4/4 prospective predictions), and safe-floor ⟹ doubling
+  with 0/465 violations on the full A9 hunt stream. Certificates
+  (R0-sq…R2, linchpin) are universally satisfied — never discriminating
+  (one-line mechanism: 1+δ ∈ (A,B) forces σ_* = id). A8's squaring
+  identity alone is refuted as sufficient (62 small-frame shorts); its
+  full package stands at 7/7 + gross + Z₆×Z₁₄, zero counterexamples.
+  Dead end (first-class): the reachable-coset repair of the 41
+  overlap-rescue rows fails 0/41 — the necessity gap is genuine slice
+  mathematics. [details](../experiments/bb_lab/notes/A11_literal_lift_criterion.md)
+
+- 2026-07-02 — descent-twist-screen (A10) — success (screens halted by design) —
+  **The doubling-existence question ANSWERED: universal claim FALSE,
+  marquee bases RESCUED.** Full descent-space (256-cover) twist screens
+  over the anchorable Z₆×Z₆ frame: hit2 rescued by an x-class
+  single-bit twist and hit5 by the mixed extension class at zero twist
+  (both DRAT-certified d = 12 = 2d), so all five gross siblings carry
+  exact [[144,12,12]] covers — while 13 small-frame bases
+  (Z₃×Z₃/Z₃×Z₄/Z₃×Z₅) have their ENTIRE descent space fail (3328
+  witness rows, numpy-re-verified, certificates committed — A14's
+  must-catch corpus). Lemma L1: descent covers are
+  presentation-invariant (screens are code-level exhaustive);
+  constructive corollary — twist rescues ≡ presentation moves. R9
+  keystone: 14101/14101 k-preserving fail witnesses break in the SAFE
+  sector (mechanism later proven as A17-P3's
+  transfer-kernel/pushforward theorems). Grids deliberately halted at
+  the efficiency crossover (R11).
+  [details](../experiments/bb_lab/notes/A10_descent_twist_screen.md)
 
 - 2026-07-02 — deck-tower-descent (A13) — success —
   **Deck-trivial ⟺ k constant along `ℤ_{2^r}` doubling towers (A12 OQ1),

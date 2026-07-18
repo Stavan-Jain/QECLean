@@ -1,0 +1,2 @@
+neighbors of (y^5 + x*y + x*y^6 | y^3 + x*y^2 + x^2*y^5) on Z3xZ7: 108 mutations
+neighbors done: {'k0': 84, 'axes': 24, 'no_tight_witness': 7, 'CSAFE_DOUBLES': 11, 'safe_floor_fail': 30}

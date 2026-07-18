@@ -415,6 +415,29 @@ classification, MIm dispatch and floor leaves) — i.e. these are the natural ta
 where the CRT/F₄ engine is *necessary*, not decorative, and where its parametrization
 would pay off.
 
+**A11 correction (2026-07-02, `experiments/bb_lab/notes/A11_literal_lift_criterion.md`
+Entry 1): the hit2/hit5 negatives were presentation artifacts, and doubling is
+presentation-sensitive within a (code, axis).** The A9 ladders ran on the stored
+corpus presentations. The *anchorable* presentations of hit2, hit3 and hit5 (different
+Aut×swap orbit points of the same codes, carrying the literal `(1+t²)P² = 1+δ`
+identity) have **x-covers with d = 12 exactly** — so "hit2 and hit5 do not double"
+is false at class level: **all six anchorable Z₆×Z₆ codes are gross-twins**. Two
+consequences for this doc: (i) the literal lift in template condition 1 is a
+*presentation-level* datum — equivalent bases can have inequivalent literal covers
+(one d = 6, one d = 12 on the same axis); (ii) the safe floor of condition 3 is the
+part that moves under re-presentation: the stored hit3-x presentation's 63 safe
+classes have coset minima {6:12, 8:45, ≥12:6} while its flipped anch-presentation's
+are all ≥ 12 — condition 2 (R), the linchpin, `k`-preservation and the tight witness
+hold for *every* presentation and axis on this frame (certificates are
+non-discriminating there; the A11 audit's uniform result — and forced, by the A12
+theorem `(R) ⟺ k(cover) = k(base) ⟺ 1+δ ∈ (A,B)`, within any k-preserving family).
+Presentation-relativity is a property of the *literal-lift slice* only: full
+descent-space (twist-screen) verdicts are code-level by A10's Lemma L1 — the flipped
+literal covers above are exactly mixed-class twist rows of the stored presentations,
+and A10's 13 unrescued small-frame bases are genuine code-level non-doubling
+instances (see `experiments/bb_lab/notes/A10_descent_twist_screen.md` §R6 for the
+scope statement).
+
 **A14 update (2026-07-04): the three targets' safe floors are SAT-certified, and a
 necessary-screen battery now front-runs the hunts.** Fork A14 (OQ4;
 `experiments/bb_lab/notes/A14_safe_floor_criterion_plan.md`) built a cost-ordered

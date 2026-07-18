@@ -1,0 +1,169 @@
+[small4] hunt: frames=[(3, 3), (3, 4), (4, 4)] weights=[(4, 4), (4, 3), (3, 4), (3, 3)] modes=['rand', 'heavyx', 'heavyy'] per-block=400 budget=4100s resume-skip=0
+[small4]    122s pass=1 wrote=1471 csafe=181 {'axes': 529, 'safe_floor_fail': 342, 'no_tight_witness': 351, 'k_drift': 184, 'CSAFE_DOUBLES': 181, 'k0': 942}
+[small4]    122s pass=1 wrote=1510 csafe=186 {'axes': 568, 'safe_floor_fail': 367, 'no_tight_witness': 380, 'k_drift': 203, 'CSAFE_DOUBLES': 186, 'k0': 942}
+[small4]    123s pass=1 wrote=1548 csafe=191 {'axes': 606, 'safe_floor_fail': 386, 'no_tight_witness': 405, 'k_drift': 230, 'CSAFE_DOUBLES': 191, 'k0': 942}
+[small4]    123s pass=1 wrote=1588 csafe=191 {'axes': 613, 'safe_floor_fail': 395, 'no_tight_witness': 410, 'k_drift': 230, 'CSAFE_DOUBLES': 191, 'k0': 975}
+[small4]    123s pass=1 wrote=1624 csafe=192 {'axes': 620, 'safe_floor_fail': 403, 'no_tight_witness': 415, 'k_drift': 230, 'CSAFE_DOUBLES': 192, 'k0': 1004}
+[small4]    123s pass=1 wrote=1663 csafe=193 {'axes': 631, 'safe_floor_fail': 419, 'no_tight_witness': 420, 'k_drift': 230, 'CSAFE_DOUBLES': 193, 'k0': 1032}
+[small4]    123s pass=1 wrote=1703 csafe=193 {'axes': 643, 'safe_floor_fail': 434, 'no_tight_witness': 429, 'k_drift': 230, 'CSAFE_DOUBLES': 193, 'k0': 1060}
+[small4]    123s pass=1 wrote=1741 csafe=193 {'axes': 650, 'safe_floor_fail': 442, 'no_tight_witness': 435, 'k_drift': 230, 'CSAFE_DOUBLES': 193, 'k0': 1091}
+[small4]    123s pass=1 wrote=1779 csafe=196 {'axes': 660, 'safe_floor_fail': 451, 'no_tight_witness': 443, 'k_drift': 230, 'CSAFE_DOUBLES': 196, 'k0': 1119}
+[small4]    124s pass=1 wrote=1819 csafe=210 {'axes': 673, 'safe_floor_fail': 455, 'no_tight_witness': 447, 'k_drift': 234, 'CSAFE_DOUBLES': 210, 'k0': 1146}
+[small4]    124s pass=1 wrote=1857 csafe=219 {'axes': 683, 'safe_floor_fail': 458, 'no_tight_witness': 454, 'k_drift': 235, 'CSAFE_DOUBLES': 219, 'k0': 1174}
+[small4]    124s pass=1 wrote=1890 csafe=227 {'axes': 693, 'safe_floor_fail': 466, 'no_tight_witness': 457, 'k_drift': 236, 'CSAFE_DOUBLES': 227, 'k0': 1197}
+[small4]    126s pass=1 wrote=1930 csafe=233 {'axes': 733, 'safe_floor_fail': 503, 'no_tight_witness': 472, 'k_drift': 258, 'CSAFE_DOUBLES': 233, 'k0': 1197}
+[small4]    127s pass=1 wrote=1970 csafe=239 {'axes': 773, 'safe_floor_fail': 534, 'no_tight_witness': 492, 'k_drift': 281, 'CSAFE_DOUBLES': 239, 'k0': 1197}
+[small4]    129s pass=1 wrote=2010 csafe=246 {'axes': 813, 'safe_floor_fail': 555, 'no_tight_witness': 521, 'k_drift': 304, 'CSAFE_DOUBLES': 246, 'k0': 1197}
+[small4]    129s pass=1 wrote=2050 csafe=246 {'axes': 817, 'safe_floor_fail': 560, 'no_tight_witness': 524, 'k_drift': 304, 'CSAFE_DOUBLES': 246, 'k0': 1233}
+[small4]    129s pass=1 wrote=2090 csafe=246 {'axes': 819, 'safe_floor_fail': 562, 'no_tight_witness': 526, 'k_drift': 304, 'CSAFE_DOUBLES': 246, 'k0': 1271}
+[small4]    129s pass=1 wrote=2130 csafe=246 {'axes': 819, 'safe_floor_fail': 562, 'no_tight_witness': 526, 'k_drift': 304, 'CSAFE_DOUBLES': 246, 'k0': 1311}
+[small4]    129s pass=1 wrote=2170 csafe=246 {'axes': 820, 'safe_floor_fail': 563, 'no_tight_witness': 527, 'k_drift': 304, 'CSAFE_DOUBLES': 246, 'k0': 1350}
+[small4]    129s pass=1 wrote=2210 csafe=246 {'axes': 822, 'safe_floor_fail': 565, 'no_tight_witness': 529, 'k_drift': 304, 'CSAFE_DOUBLES': 246, 'k0': 1388}
+[small4]    129s pass=1 wrote=2250 csafe=247 {'axes': 827, 'safe_floor_fail': 569, 'no_tight_witness': 534, 'k_drift': 304, 'CSAFE_DOUBLES': 247, 'k0': 1423}
+[small4]    129s pass=1 wrote=2290 csafe=247 {'axes': 830, 'safe_floor_fail': 572, 'no_tight_witness': 536, 'k_drift': 305, 'CSAFE_DOUBLES': 247, 'k0': 1460}
+[small4]    129s pass=1 wrote=2330 csafe=247 {'axes': 831, 'safe_floor_fail': 574, 'no_tight_witness': 536, 'k_drift': 305, 'CSAFE_DOUBLES': 247, 'k0': 1499}
+[small4]    129s pass=1 wrote=2369 csafe=249 {'axes': 837, 'safe_floor_fail': 578, 'no_tight_witness': 541, 'k_drift': 306, 'CSAFE_DOUBLES': 249, 'k0': 1532}
+[small4]    149s pass=1 wrote=2409 csafe=262 {'axes': 877, 'safe_floor_fail': 612, 'no_tight_witness': 570, 'k_drift': 310, 'CSAFE_DOUBLES': 262, 'k0': 1532}
+[small4]    172s pass=1 wrote=2449 csafe=282 {'axes': 917, 'safe_floor_fail': 638, 'no_tight_witness': 596, 'k_drift': 318, 'CSAFE_DOUBLES': 282, 'k0': 1532}
+[small4]    199s pass=1 wrote=2489 csafe=300 {'axes': 957, 'safe_floor_fail': 668, 'no_tight_witness': 621, 'k_drift': 325, 'CSAFE_DOUBLES': 300, 'k0': 1532}
+[small4]    199s pass=1 wrote=2529 csafe=300 {'axes': 957, 'safe_floor_fail': 668, 'no_tight_witness': 621, 'k_drift': 325, 'CSAFE_DOUBLES': 300, 'k0': 1572}
+[small4]    199s pass=1 wrote=2569 csafe=300 {'axes': 957, 'safe_floor_fail': 668, 'no_tight_witness': 621, 'k_drift': 325, 'CSAFE_DOUBLES': 300, 'k0': 1612}
+[small4]    199s pass=1 wrote=2609 csafe=300 {'axes': 957, 'safe_floor_fail': 668, 'no_tight_witness': 621, 'k_drift': 325, 'CSAFE_DOUBLES': 300, 'k0': 1652}
+[small4]    199s pass=1 wrote=2649 csafe=300 {'axes': 957, 'safe_floor_fail': 668, 'no_tight_witness': 621, 'k_drift': 325, 'CSAFE_DOUBLES': 300, 'k0': 1692}
+[small4]    199s pass=1 wrote=2689 csafe=300 {'axes': 957, 'safe_floor_fail': 668, 'no_tight_witness': 621, 'k_drift': 325, 'CSAFE_DOUBLES': 300, 'k0': 1732}
+[small4]    199s pass=1 wrote=2729 csafe=300 {'axes': 957, 'safe_floor_fail': 668, 'no_tight_witness': 621, 'k_drift': 325, 'CSAFE_DOUBLES': 300, 'k0': 1772}
+[small4]    199s pass=1 wrote=2769 csafe=300 {'axes': 957, 'safe_floor_fail': 668, 'no_tight_witness': 621, 'k_drift': 325, 'CSAFE_DOUBLES': 300, 'k0': 1812}
+[small4]    199s pass=1 wrote=2809 csafe=300 {'axes': 957, 'safe_floor_fail': 668, 'no_tight_witness': 621, 'k_drift': 325, 'CSAFE_DOUBLES': 300, 'k0': 1852}
+[small4]    199s pass=1 wrote=2849 csafe=300 {'axes': 957, 'safe_floor_fail': 668, 'no_tight_witness': 621, 'k_drift': 325, 'CSAFE_DOUBLES': 300, 'k0': 1892}
+[small4]    316s pass=3 wrote=4281 csafe=481 {'axes': 1474, 'safe_floor_fail': 1015, 'no_tight_witness': 976, 'k_drift': 476, 'CSAFE_DOUBLES': 481, 'k0': 2807}
+[small4]    317s pass=3 wrote=4314 csafe=490 {'axes': 1507, 'safe_floor_fail': 1028, 'no_tight_witness': 1004, 'k_drift': 492, 'CSAFE_DOUBLES': 490, 'k0': 2807}
+[small4]    318s pass=3 wrote=4351 csafe=501 {'axes': 1544, 'safe_floor_fail': 1041, 'no_tight_witness': 1031, 'k_drift': 515, 'CSAFE_DOUBLES': 501, 'k0': 2807}
+[small4]    318s pass=3 wrote=4391 csafe=502 {'axes': 1551, 'safe_floor_fail': 1050, 'no_tight_witness': 1034, 'k_drift': 516, 'CSAFE_DOUBLES': 502, 'k0': 2840}
+[small4]    318s pass=3 wrote=4426 csafe=503 {'axes': 1555, 'safe_floor_fail': 1054, 'no_tight_witness': 1037, 'k_drift': 516, 'CSAFE_DOUBLES': 503, 'k0': 2871}
+[small4]    319s pass=3 wrote=4462 csafe=505 {'axes': 1562, 'safe_floor_fail': 1060, 'no_tight_witness': 1043, 'k_drift': 516, 'CSAFE_DOUBLES': 505, 'k0': 2900}
+[small4]    319s pass=3 wrote=4499 csafe=506 {'axes': 1570, 'safe_floor_fail': 1070, 'no_tight_witness': 1046, 'k_drift': 518, 'CSAFE_DOUBLES': 506, 'k0': 2929}
+[small4]    319s pass=3 wrote=4533 csafe=507 {'axes': 1580, 'safe_floor_fail': 1079, 'no_tight_witness': 1056, 'k_drift': 518, 'CSAFE_DOUBLES': 507, 'k0': 2953}
+[small4]    319s pass=3 wrote=4568 csafe=508 {'axes': 1586, 'safe_floor_fail': 1083, 'no_tight_witness': 1063, 'k_drift': 518, 'CSAFE_DOUBLES': 508, 'k0': 2982}
+[small4]    320s pass=3 wrote=4607 csafe=520 {'axes': 1600, 'safe_floor_fail': 1091, 'no_tight_witness': 1067, 'k_drift': 522, 'CSAFE_DOUBLES': 520, 'k0': 3007}
+[small4]    320s pass=3 wrote=4644 csafe=535 {'axes': 1615, 'safe_floor_fail': 1092, 'no_tight_witness': 1078, 'k_drift': 525, 'CSAFE_DOUBLES': 535, 'k0': 3029}
+[small4]    320s pass=3 wrote=4680 csafe=553 {'axes': 1636, 'safe_floor_fail': 1103, 'no_tight_witness': 1088, 'k_drift': 528, 'CSAFE_DOUBLES': 553, 'k0': 3044}
+[small4]    325s pass=3 wrote=4720 csafe=558 {'axes': 1676, 'safe_floor_fail': 1134, 'no_tight_witness': 1110, 'k_drift': 550, 'CSAFE_DOUBLES': 558, 'k0': 3044}
+[small4]    326s pass=3 wrote=4760 csafe=562 {'axes': 1716, 'safe_floor_fail': 1167, 'no_tight_witness': 1133, 'k_drift': 570, 'CSAFE_DOUBLES': 562, 'k0': 3044}
+[small4]    331s pass=3 wrote=4799 csafe=568 {'axes': 1755, 'safe_floor_fail': 1193, 'no_tight_witness': 1156, 'k_drift': 593, 'CSAFE_DOUBLES': 568, 'k0': 3044}
+[small4]    331s pass=3 wrote=4839 csafe=569 {'axes': 1756, 'safe_floor_fail': 1193, 'no_tight_witness': 1156, 'k_drift': 594, 'CSAFE_DOUBLES': 569, 'k0': 3083}
+[small4]    331s pass=3 wrote=4878 csafe=569 {'axes': 1757, 'safe_floor_fail': 1194, 'no_tight_witness': 1157, 'k_drift': 594, 'CSAFE_DOUBLES': 569, 'k0': 3121}
+[small4]    331s pass=3 wrote=4915 csafe=569 {'axes': 1758, 'safe_floor_fail': 1195, 'no_tight_witness': 1158, 'k_drift': 594, 'CSAFE_DOUBLES': 569, 'k0': 3157}
+[small4]    331s pass=3 wrote=4955 csafe=569 {'axes': 1761, 'safe_floor_fail': 1200, 'no_tight_witness': 1159, 'k_drift': 594, 'CSAFE_DOUBLES': 569, 'k0': 3194}
+[small4]    331s pass=3 wrote=4995 csafe=569 {'axes': 1763, 'safe_floor_fail': 1202, 'no_tight_witness': 1161, 'k_drift': 594, 'CSAFE_DOUBLES': 569, 'k0': 3232}
+[small4]    331s pass=3 wrote=5033 csafe=569 {'axes': 1763, 'safe_floor_fail': 1202, 'no_tight_witness': 1161, 'k_drift': 594, 'CSAFE_DOUBLES': 569, 'k0': 3270}
+[small4]    331s pass=3 wrote=5073 csafe=570 {'axes': 1765, 'safe_floor_fail': 1203, 'no_tight_witness': 1162, 'k_drift': 595, 'CSAFE_DOUBLES': 570, 'k0': 3308}
+[small4]    331s pass=3 wrote=5113 csafe=570 {'axes': 1765, 'safe_floor_fail': 1203, 'no_tight_witness': 1162, 'k_drift': 595, 'CSAFE_DOUBLES': 570, 'k0': 3348}
+[small4]    331s pass=3 wrote=5149 csafe=570 {'axes': 1766, 'safe_floor_fail': 1204, 'no_tight_witness': 1162, 'k_drift': 596, 'CSAFE_DOUBLES': 570, 'k0': 3383}
+[small4]    378s pass=3 wrote=5189 csafe=590 {'axes': 1806, 'safe_floor_fail': 1242, 'no_tight_witness': 1182, 'k_drift': 598, 'CSAFE_DOUBLES': 590, 'k0': 3383}
+[small4]    402s pass=3 wrote=5229 csafe=606 {'axes': 1846, 'safe_floor_fail': 1273, 'no_tight_witness': 1213, 'k_drift': 599, 'CSAFE_DOUBLES': 606, 'k0': 3383, 'safe_r_too_big': 1}
+[small4]    436s pass=3 wrote=5269 csafe=627 {'axes': 1886, 'safe_floor_fail': 1299, 'no_tight_witness': 1242, 'k_drift': 602, 'CSAFE_DOUBLES': 627, 'k0': 3383, 'safe_r_too_big': 2}
+[small4]    436s pass=3 wrote=5309 csafe=627 {'axes': 1886, 'safe_floor_fail': 1299, 'no_tight_witness': 1242, 'k_drift': 602, 'CSAFE_DOUBLES': 627, 'k0': 3423, 'safe_r_too_big': 2}
+[small4]    436s pass=3 wrote=5349 csafe=627 {'axes': 1886, 'safe_floor_fail': 1299, 'no_tight_witness': 1242, 'k_drift': 602, 'CSAFE_DOUBLES': 627, 'k0': 3463, 'safe_r_too_big': 2}
+[small4]    436s pass=3 wrote=5389 csafe=627 {'axes': 1886, 'safe_floor_fail': 1299, 'no_tight_witness': 1242, 'k_drift': 602, 'CSAFE_DOUBLES': 627, 'k0': 3503, 'safe_r_too_big': 2}
+[small4]    436s pass=3 wrote=5429 csafe=627 {'axes': 1886, 'safe_floor_fail': 1299, 'no_tight_witness': 1242, 'k_drift': 602, 'CSAFE_DOUBLES': 627, 'k0': 3543, 'safe_r_too_big': 2}
+[small4]    436s pass=3 wrote=5469 csafe=627 {'axes': 1886, 'safe_floor_fail': 1299, 'no_tight_witness': 1242, 'k_drift': 602, 'CSAFE_DOUBLES': 627, 'k0': 3583, 'safe_r_too_big': 2}
+[small4]    436s pass=3 wrote=5509 csafe=627 {'axes': 1886, 'safe_floor_fail': 1299, 'no_tight_witness': 1242, 'k_drift': 602, 'CSAFE_DOUBLES': 627, 'k0': 3623, 'safe_r_too_big': 2}
+[small4]    436s pass=3 wrote=5549 csafe=627 {'axes': 1886, 'safe_floor_fail': 1299, 'no_tight_witness': 1242, 'k_drift': 602, 'CSAFE_DOUBLES': 627, 'k0': 3663, 'safe_r_too_big': 2}
+[small4]    436s pass=3 wrote=5589 csafe=627 {'axes': 1886, 'safe_floor_fail': 1299, 'no_tight_witness': 1242, 'k_drift': 602, 'CSAFE_DOUBLES': 627, 'k0': 3703, 'safe_r_too_big': 2}
+[small4]    436s pass=3 wrote=5629 csafe=627 {'axes': 1886, 'safe_floor_fail': 1299, 'no_tight_witness': 1242, 'k_drift': 602, 'CSAFE_DOUBLES': 627, 'k0': 3743, 'safe_r_too_big': 2}
+[small4]    564s pass=5 wrote=7043 csafe=774 {'axes': 2382, 'safe_floor_fail': 1646, 'no_tight_witness': 1574, 'k_drift': 768, 'CSAFE_DOUBLES': 774, 'k0': 4661, 'safe_r_too_big': 2}
+[small4]    565s pass=5 wrote=7078 csafe=783 {'axes': 2417, 'safe_floor_fail': 1662, 'no_tight_witness': 1603, 'k_drift': 784, 'CSAFE_DOUBLES': 783, 'k0': 4661, 'safe_r_too_big': 2}
+[small4]    567s pass=5 wrote=7115 csafe=792 {'axes': 2454, 'safe_floor_fail': 1677, 'no_tight_witness': 1636, 'k_drift': 801, 'CSAFE_DOUBLES': 792, 'k0': 4661, 'safe_r_too_big': 2}
+[small4]    567s pass=5 wrote=7153 csafe=792 {'axes': 2458, 'safe_floor_fail': 1683, 'no_tight_witness': 1638, 'k_drift': 801, 'CSAFE_DOUBLES': 792, 'k0': 4695, 'safe_r_too_big': 2}
+[small4]    567s pass=5 wrote=7186 csafe=793 {'axes': 2465, 'safe_floor_fail': 1692, 'no_tight_witness': 1642, 'k_drift': 801, 'CSAFE_DOUBLES': 793, 'k0': 4721, 'safe_r_too_big': 2}
+[small4]    567s pass=5 wrote=7221 csafe=793 {'axes': 2474, 'safe_floor_fail': 1703, 'no_tight_witness': 1648, 'k_drift': 802, 'CSAFE_DOUBLES': 793, 'k0': 4747, 'safe_r_too_big': 2}
+[small4]    567s pass=5 wrote=7256 csafe=793 {'axes': 2480, 'safe_floor_fail': 1708, 'no_tight_witness': 1655, 'k_drift': 802, 'CSAFE_DOUBLES': 793, 'k0': 4776, 'safe_r_too_big': 2}
+[small4]    568s pass=5 wrote=7290 csafe=794 {'axes': 2488, 'safe_floor_fail': 1715, 'no_tight_witness': 1663, 'k_drift': 802, 'CSAFE_DOUBLES': 794, 'k0': 4802, 'safe_r_too_big': 2}
+[small4]    568s pass=5 wrote=7323 csafe=795 {'axes': 2497, 'safe_floor_fail': 1728, 'no_tight_witness': 1667, 'k_drift': 802, 'CSAFE_DOUBLES': 795, 'k0': 4826, 'safe_r_too_big': 2}
+[small4]    568s pass=5 wrote=7356 csafe=808 {'axes': 2511, 'safe_floor_fail': 1730, 'no_tight_witness': 1677, 'k_drift': 805, 'CSAFE_DOUBLES': 808, 'k0': 4845, 'safe_r_too_big': 2}
+[small4]    568s pass=5 wrote=7388 csafe=824 {'axes': 2525, 'safe_floor_fail': 1733, 'no_tight_witness': 1686, 'k_drift': 805, 'CSAFE_DOUBLES': 824, 'k0': 4863, 'safe_r_too_big': 2}
+[small4]    569s pass=5 wrote=7424 csafe=833 {'axes': 2538, 'safe_floor_fail': 1738, 'no_tight_witness': 1694, 'k_drift': 809, 'CSAFE_DOUBLES': 833, 'k0': 4886, 'safe_r_too_big': 2}
+[small4]    570s pass=5 wrote=7464 csafe=838 {'axes': 2578, 'safe_floor_fail': 1771, 'no_tight_witness': 1716, 'k_drift': 829, 'CSAFE_DOUBLES': 838, 'k0': 4886, 'safe_r_too_big': 2}
+[small4]    572s pass=5 wrote=7504 csafe=843 {'axes': 2618, 'safe_floor_fail': 1799, 'no_tight_witness': 1738, 'k_drift': 854, 'CSAFE_DOUBLES': 843, 'k0': 4886, 'safe_r_too_big': 2}
+[small4]    574s pass=5 wrote=7541 csafe=849 {'axes': 2655, 'safe_floor_fail': 1817, 'no_tight_witness': 1766, 'k_drift': 876, 'CSAFE_DOUBLES': 849, 'k0': 4886, 'safe_r_too_big': 2}
+[small4]    574s pass=5 wrote=7581 csafe=849 {'axes': 2656, 'safe_floor_fail': 1818, 'no_tight_witness': 1767, 'k_drift': 876, 'CSAFE_DOUBLES': 849, 'k0': 4925, 'safe_r_too_big': 2}
+[small4]    574s pass=5 wrote=7620 csafe=851 {'axes': 2658, 'safe_floor_fail': 1818, 'no_tight_witness': 1768, 'k_drift': 877, 'CSAFE_DOUBLES': 851, 'k0': 4962, 'safe_r_too_big': 2}
+[small4]    575s pass=5 wrote=7659 csafe=852 {'axes': 2662, 'safe_floor_fail': 1821, 'no_tight_witness': 1771, 'k_drift': 878, 'CSAFE_DOUBLES': 852, 'k0': 4997, 'safe_r_too_big': 2}
+[small4]    575s pass=5 wrote=7698 csafe=852 {'axes': 2665, 'safe_floor_fail': 1824, 'no_tight_witness': 1774, 'k_drift': 878, 'CSAFE_DOUBLES': 852, 'k0': 5033, 'safe_r_too_big': 2}
+[small4]    575s pass=5 wrote=7737 csafe=852 {'axes': 2668, 'safe_floor_fail': 1827, 'no_tight_witness': 1777, 'k_drift': 878, 'CSAFE_DOUBLES': 852, 'k0': 5069, 'safe_r_too_big': 2}
+[small4]    575s pass=5 wrote=7772 csafe=852 {'axes': 2669, 'safe_floor_fail': 1828, 'no_tight_witness': 1778, 'k_drift': 878, 'CSAFE_DOUBLES': 852, 'k0': 5103, 'safe_r_too_big': 2}
+[small4]    575s pass=5 wrote=7810 csafe=853 {'axes': 2674, 'safe_floor_fail': 1832, 'no_tight_witness': 1783, 'k_drift': 878, 'CSAFE_DOUBLES': 853, 'k0': 5136, 'safe_r_too_big': 2}
+[small4]    575s pass=5 wrote=7850 csafe=853 {'axes': 2676, 'safe_floor_fail': 1834, 'no_tight_witness': 1785, 'k_drift': 878, 'CSAFE_DOUBLES': 853, 'k0': 5174, 'safe_r_too_big': 2}
+[small4]    575s pass=5 wrote=7883 csafe=855 {'axes': 2682, 'safe_floor_fail': 1838, 'no_tight_witness': 1789, 'k_drift': 880, 'CSAFE_DOUBLES': 855, 'k0': 5201, 'safe_r_too_big': 2}
+[small4]    612s pass=5 wrote=7923 csafe=872 {'axes': 2722, 'safe_floor_fail': 1876, 'no_tight_witness': 1811, 'k_drift': 883, 'CSAFE_DOUBLES': 872, 'k0': 5201, 'safe_r_too_big': 2}
+[small4]    636s pass=5 wrote=7963 csafe=887 {'axes': 2762, 'safe_floor_fail': 1906, 'no_tight_witness': 1842, 'k_drift': 887, 'CSAFE_DOUBLES': 887, 'k0': 5201, 'safe_r_too_big': 2}
+[small4]    669s pass=5 wrote=8003 csafe=904 {'axes': 2802, 'safe_floor_fail': 1933, 'no_tight_witness': 1873, 'k_drift': 892, 'CSAFE_DOUBLES': 904, 'k0': 5201, 'safe_r_too_big': 2}
+[small4]    669s pass=5 wrote=8043 csafe=904 {'axes': 2802, 'safe_floor_fail': 1933, 'no_tight_witness': 1873, 'k_drift': 892, 'CSAFE_DOUBLES': 904, 'k0': 5241, 'safe_r_too_big': 2}
+[small4]    669s pass=5 wrote=8083 csafe=904 {'axes': 2802, 'safe_floor_fail': 1933, 'no_tight_witness': 1873, 'k_drift': 892, 'CSAFE_DOUBLES': 904, 'k0': 5281, 'safe_r_too_big': 2}
+[small4]    669s pass=5 wrote=8123 csafe=904 {'axes': 2802, 'safe_floor_fail': 1933, 'no_tight_witness': 1873, 'k_drift': 892, 'CSAFE_DOUBLES': 904, 'k0': 5321, 'safe_r_too_big': 2}
+[small4]    669s pass=5 wrote=8163 csafe=904 {'axes': 2802, 'safe_floor_fail': 1933, 'no_tight_witness': 1873, 'k_drift': 892, 'CSAFE_DOUBLES': 904, 'k0': 5361, 'safe_r_too_big': 2}
+[small4]    669s pass=5 wrote=8203 csafe=904 {'axes': 2802, 'safe_floor_fail': 1933, 'no_tight_witness': 1873, 'k_drift': 892, 'CSAFE_DOUBLES': 904, 'k0': 5401, 'safe_r_too_big': 2}
+[small4]    669s pass=5 wrote=8243 csafe=904 {'axes': 2802, 'safe_floor_fail': 1933, 'no_tight_witness': 1873, 'k_drift': 892, 'CSAFE_DOUBLES': 904, 'k0': 5441, 'safe_r_too_big': 2}
+[small4]    669s pass=5 wrote=8283 csafe=904 {'axes': 2802, 'safe_floor_fail': 1933, 'no_tight_witness': 1873, 'k_drift': 892, 'CSAFE_DOUBLES': 904, 'k0': 5481, 'safe_r_too_big': 2}
+[small4]    669s pass=5 wrote=8322 csafe=904 {'axes': 2802, 'safe_floor_fail': 1933, 'no_tight_witness': 1873, 'k_drift': 892, 'CSAFE_DOUBLES': 904, 'k0': 5520, 'safe_r_too_big': 2}
+[small4]    669s pass=5 wrote=8361 csafe=904 {'axes': 2802, 'safe_floor_fail': 1933, 'no_tight_witness': 1873, 'k_drift': 892, 'CSAFE_DOUBLES': 904, 'k0': 5559, 'safe_r_too_big': 2}
+[small4]    766s pass=7 wrote=9740 csafe=1053 {'axes': 3281, 'safe_floor_fail': 2277, 'no_tight_witness': 2173, 'k_drift': 1057, 'CSAFE_DOUBLES': 1053, 'k0': 6459, 'safe_r_too_big': 2}
+[small4]    767s pass=7 wrote=9770 csafe=1060 {'axes': 3311, 'safe_floor_fail': 2294, 'no_tight_witness': 2199, 'k_drift': 1067, 'CSAFE_DOUBLES': 1060, 'k0': 6459, 'safe_r_too_big': 2}
+[small4]    768s pass=7 wrote=9803 csafe=1064 {'axes': 3344, 'safe_floor_fail': 2311, 'no_tight_witness': 2227, 'k_drift': 1084, 'CSAFE_DOUBLES': 1064, 'k0': 6459, 'safe_r_too_big': 2}
+[small4]    768s pass=7 wrote=9838 csafe=1064 {'axes': 3346, 'safe_floor_fail': 2315, 'no_tight_witness': 2227, 'k_drift': 1084, 'CSAFE_DOUBLES': 1064, 'k0': 6492, 'safe_r_too_big': 2}
+[small4]    768s pass=7 wrote=9870 csafe=1065 {'axes': 3353, 'safe_floor_fail': 2323, 'no_tight_witness': 2232, 'k_drift': 1084, 'CSAFE_DOUBLES': 1065, 'k0': 6517, 'safe_r_too_big': 2}
+[small4]    768s pass=7 wrote=9905 csafe=1067 {'axes': 3360, 'safe_floor_fail': 2330, 'no_tight_witness': 2237, 'k_drift': 1084, 'CSAFE_DOUBLES': 1067, 'k0': 6545, 'safe_r_too_big': 2}
+[small4]    768s pass=7 wrote=9944 csafe=1069 {'axes': 3370, 'safe_floor_fail': 2341, 'no_tight_witness': 2244, 'k_drift': 1084, 'CSAFE_DOUBLES': 1069, 'k0': 6574, 'safe_r_too_big': 2}
+[small4]    769s pass=7 wrote=9973 csafe=1072 {'axes': 3378, 'safe_floor_fail': 2348, 'no_tight_witness': 2250, 'k_drift': 1084, 'CSAFE_DOUBLES': 1072, 'k0': 6595, 'safe_r_too_big': 2}
+[small4]    769s pass=7 wrote=10004 csafe=1073 {'axes': 3384, 'safe_floor_fail': 2352, 'no_tight_witness': 2256, 'k_drift': 1085, 'CSAFE_DOUBLES': 1073, 'k0': 6620, 'safe_r_too_big': 2}
+[small4]    769s pass=7 wrote=10040 csafe=1088 {'axes': 3395, 'safe_floor_fail': 2353, 'no_tight_witness': 2261, 'k_drift': 1086, 'CSAFE_DOUBLES': 1088, 'k0': 6645, 'safe_r_too_big': 2}
+[small4]    769s pass=7 wrote=10069 csafe=1093 {'axes': 3403, 'safe_floor_fail': 2354, 'no_tight_witness': 2270, 'k_drift': 1087, 'CSAFE_DOUBLES': 1093, 'k0': 6666, 'safe_r_too_big': 2}
+[small4]    769s pass=7 wrote=10095 csafe=1100 {'axes': 3414, 'safe_floor_fail': 2361, 'no_tight_witness': 2277, 'k_drift': 1088, 'CSAFE_DOUBLES': 1100, 'k0': 6681, 'safe_r_too_big': 2}
+[small4]    771s pass=7 wrote=10135 csafe=1107 {'axes': 3454, 'safe_floor_fail': 2395, 'no_tight_witness': 2298, 'k_drift': 1106, 'CSAFE_DOUBLES': 1107, 'k0': 6681, 'safe_r_too_big': 2}
+[small4]    773s pass=7 wrote=10174 csafe=1112 {'axes': 3493, 'safe_floor_fail': 2421, 'no_tight_witness': 2320, 'k_drift': 1131, 'CSAFE_DOUBLES': 1112, 'k0': 6681, 'safe_r_too_big': 2}
+[small4]    777s pass=7 wrote=10214 csafe=1118 {'axes': 3533, 'safe_floor_fail': 2436, 'no_tight_witness': 2348, 'k_drift': 1162, 'CSAFE_DOUBLES': 1118, 'k0': 6681, 'safe_r_too_big': 2}
+[small4]    777s pass=7 wrote=10254 csafe=1119 {'axes': 3537, 'safe_floor_fail': 2439, 'no_tight_witness': 2351, 'k_drift': 1163, 'CSAFE_DOUBLES': 1119, 'k0': 6717, 'safe_r_too_big': 2}
+[small4]    777s pass=7 wrote=10294 csafe=1119 {'axes': 3539, 'safe_floor_fail': 2441, 'no_tight_witness': 2353, 'k_drift': 1163, 'CSAFE_DOUBLES': 1119, 'k0': 6755, 'safe_r_too_big': 2}
+[small4]    777s pass=7 wrote=10328 csafe=1119 {'axes': 3539, 'safe_floor_fail': 2441, 'no_tight_witness': 2353, 'k_drift': 1163, 'CSAFE_DOUBLES': 1119, 'k0': 6789, 'safe_r_too_big': 2}
+[small4]    777s pass=7 wrote=10368 csafe=1120 {'axes': 3542, 'safe_floor_fail': 2443, 'no_tight_witness': 2355, 'k_drift': 1164, 'CSAFE_DOUBLES': 1120, 'k0': 6826, 'safe_r_too_big': 2}
+[small4]    777s pass=7 wrote=10405 csafe=1122 {'axes': 3546, 'safe_floor_fail': 2445, 'no_tight_witness': 2359, 'k_drift': 1164, 'CSAFE_DOUBLES': 1122, 'k0': 6859, 'safe_r_too_big': 2}
+[small4]    777s pass=7 wrote=10439 csafe=1123 {'axes': 3550, 'safe_floor_fail': 2448, 'no_tight_witness': 2363, 'k_drift': 1164, 'CSAFE_DOUBLES': 1123, 'k0': 6889, 'safe_r_too_big': 2}
+[small4]    777s pass=7 wrote=10477 csafe=1123 {'axes': 3552, 'safe_floor_fail': 2450, 'no_tight_witness': 2363, 'k_drift': 1166, 'CSAFE_DOUBLES': 1123, 'k0': 6925, 'safe_r_too_big': 2}
+[small4]    777s pass=7 wrote=10514 csafe=1123 {'axes': 3553, 'safe_floor_fail': 2451, 'no_tight_witness': 2364, 'k_drift': 1166, 'CSAFE_DOUBLES': 1123, 'k0': 6961, 'safe_r_too_big': 2}
+[small4]    777s pass=7 wrote=10551 csafe=1124 {'axes': 3556, 'safe_floor_fail': 2453, 'no_tight_witness': 2365, 'k_drift': 1168, 'CSAFE_DOUBLES': 1124, 'k0': 6995, 'safe_r_too_big': 2}
+[small4]    814s pass=7 wrote=10591 csafe=1142 {'axes': 3596, 'safe_floor_fail': 2487, 'no_tight_witness': 2390, 'k_drift': 1171, 'CSAFE_DOUBLES': 1142, 'k0': 6995, 'safe_r_too_big': 2}
+[small4]    836s pass=7 wrote=10631 csafe=1157 {'axes': 3636, 'safe_floor_fail': 2517, 'no_tight_witness': 2418, 'k_drift': 1178, 'CSAFE_DOUBLES': 1157, 'k0': 6995, 'safe_r_too_big': 2}
+[small4]    869s pass=7 wrote=10671 csafe=1178 {'axes': 3676, 'safe_floor_fail': 2542, 'no_tight_witness': 2451, 'k_drift': 1179, 'CSAFE_DOUBLES': 1178, 'k0': 6995, 'safe_r_too_big': 2}
+[small4]    869s pass=7 wrote=10711 csafe=1178 {'axes': 3676, 'safe_floor_fail': 2542, 'no_tight_witness': 2451, 'k_drift': 1179, 'CSAFE_DOUBLES': 1178, 'k0': 7035, 'safe_r_too_big': 2}
+[small4]    869s pass=7 wrote=10751 csafe=1178 {'axes': 3676, 'safe_floor_fail': 2542, 'no_tight_witness': 2451, 'k_drift': 1179, 'CSAFE_DOUBLES': 1178, 'k0': 7075, 'safe_r_too_big': 2}
+[small4]    869s pass=7 wrote=10790 csafe=1178 {'axes': 3676, 'safe_floor_fail': 2542, 'no_tight_witness': 2451, 'k_drift': 1179, 'CSAFE_DOUBLES': 1178, 'k0': 7114, 'safe_r_too_big': 2}
+[small4]    869s pass=7 wrote=10830 csafe=1178 {'axes': 3676, 'safe_floor_fail': 2542, 'no_tight_witness': 2451, 'k_drift': 1179, 'CSAFE_DOUBLES': 1178, 'k0': 7154, 'safe_r_too_big': 2}
+[small4]    869s pass=7 wrote=10870 csafe=1178 {'axes': 3676, 'safe_floor_fail': 2542, 'no_tight_witness': 2451, 'k_drift': 1179, 'CSAFE_DOUBLES': 1178, 'k0': 7194, 'safe_r_too_big': 2}
+[small4]    869s pass=7 wrote=10908 csafe=1178 {'axes': 3676, 'safe_floor_fail': 2542, 'no_tight_witness': 2451, 'k_drift': 1179, 'CSAFE_DOUBLES': 1178, 'k0': 7232, 'safe_r_too_big': 2}
+[small4]    869s pass=7 wrote=10948 csafe=1178 {'axes': 3676, 'safe_floor_fail': 2542, 'no_tight_witness': 2451, 'k_drift': 1179, 'CSAFE_DOUBLES': 1178, 'k0': 7272, 'safe_r_too_big': 2}
+[small4]    869s pass=7 wrote=10987 csafe=1178 {'axes': 3676, 'safe_floor_fail': 2542, 'no_tight_witness': 2451, 'k_drift': 1179, 'CSAFE_DOUBLES': 1178, 'k0': 7311, 'safe_r_too_big': 2}
+[small4]    869s pass=7 wrote=11027 csafe=1178 {'axes': 3676, 'safe_floor_fail': 2542, 'no_tight_witness': 2451, 'k_drift': 1179, 'CSAFE_DOUBLES': 1178, 'k0': 7351, 'safe_r_too_big': 2}
+[small4]    961s pass=9 wrote=12393 csafe=1338 {'axes': 4171, 'safe_floor_fail': 2886, 'no_tight_witness': 2753, 'k_drift': 1362, 'CSAFE_DOUBLES': 1338, 'k0': 8222, 'safe_r_too_big': 3}
+[small4]    962s pass=9 wrote=12426 csafe=1347 {'axes': 4204, 'safe_floor_fail': 2894, 'no_tight_witness': 2781, 'k_drift': 1383, 'CSAFE_DOUBLES': 1347, 'k0': 8222, 'safe_r_too_big': 3}
+[small4]    962s pass=9 wrote=12453 csafe=1352 {'axes': 4231, 'safe_floor_fail': 2906, 'no_tight_witness': 2800, 'k_drift': 1401, 'CSAFE_DOUBLES': 1352, 'k0': 8222, 'safe_r_too_big': 3}
+[small4]    963s pass=9 wrote=12485 csafe=1353 {'axes': 4238, 'safe_floor_fail': 2915, 'no_tight_witness': 2803, 'k_drift': 1402, 'CSAFE_DOUBLES': 1353, 'k0': 8247, 'safe_r_too_big': 3}
+[small4]    963s pass=9 wrote=12514 csafe=1353 {'axes': 4248, 'safe_floor_fail': 2930, 'no_tight_witness': 2808, 'k_drift': 1402, 'CSAFE_DOUBLES': 1353, 'k0': 8266, 'safe_r_too_big': 3}
+[small4]    963s pass=9 wrote=12540 csafe=1354 {'axes': 4258, 'safe_floor_fail': 2944, 'no_tight_witness': 2813, 'k_drift': 1402, 'CSAFE_DOUBLES': 1354, 'k0': 8282, 'safe_r_too_big': 3}
+[small4]    963s pass=9 wrote=12577 csafe=1355 {'axes': 4267, 'safe_floor_fail': 2957, 'no_tight_witness': 2816, 'k_drift': 1403, 'CSAFE_DOUBLES': 1355, 'k0': 8310, 'safe_r_too_big': 3}
+[small4]    963s pass=9 wrote=12606 csafe=1357 {'axes': 4272, 'safe_floor_fail': 2961, 'no_tight_witness': 2820, 'k_drift': 1403, 'CSAFE_DOUBLES': 1357, 'k0': 8334, 'safe_r_too_big': 3}
+[small4]    963s pass=9 wrote=12634 csafe=1358 {'axes': 4280, 'safe_floor_fail': 2968, 'no_tight_witness': 2828, 'k_drift': 1403, 'CSAFE_DOUBLES': 1358, 'k0': 8354, 'safe_r_too_big': 3}
+[small4]    963s pass=9 wrote=12669 csafe=1363 {'axes': 4291, 'safe_floor_fail': 2975, 'no_tight_witness': 2836, 'k_drift': 1405, 'CSAFE_DOUBLES': 1363, 'k0': 8378, 'safe_r_too_big': 3}
+[small4]    963s pass=9 wrote=12696 csafe=1373 {'axes': 4303, 'safe_floor_fail': 2982, 'no_tight_witness': 2842, 'k_drift': 1406, 'CSAFE_DOUBLES': 1373, 'k0': 8393, 'safe_r_too_big': 3}
+[small4]    964s pass=9 wrote=12723 csafe=1384 {'axes': 4315, 'safe_floor_fail': 2988, 'no_tight_witness': 2849, 'k_drift': 1406, 'CSAFE_DOUBLES': 1384, 'k0': 8408, 'safe_r_too_big': 3}
+[small4]    964s pass=9 wrote=12763 csafe=1385 {'axes': 4355, 'safe_floor_fail': 3018, 'no_tight_witness': 2876, 'k_drift': 1428, 'CSAFE_DOUBLES': 1385, 'k0': 8408, 'safe_r_too_big': 3}
+[small4]    967s pass=9 wrote=12802 csafe=1389 {'axes': 4394, 'safe_floor_fail': 3052, 'no_tight_witness': 2894, 'k_drift': 1450, 'CSAFE_DOUBLES': 1389, 'k0': 8408, 'safe_r_too_big': 3}
+[small4]    973s pass=9 wrote=12839 csafe=1395 {'axes': 4431, 'safe_floor_fail': 3067, 'no_tight_witness': 2921, 'k_drift': 1476, 'CSAFE_DOUBLES': 1395, 'k0': 8408, 'safe_r_too_big': 3}
+[small4]    973s pass=9 wrote=12878 csafe=1396 {'axes': 4434, 'safe_floor_fail': 3069, 'no_tight_witness': 2923, 'k_drift': 1477, 'CSAFE_DOUBLES': 1396, 'k0': 8444, 'safe_r_too_big': 3}
+[small4]    973s pass=9 wrote=12916 csafe=1396 {'axes': 4434, 'safe_floor_fail': 3069, 'no_tight_witness': 2923, 'k_drift': 1477, 'CSAFE_DOUBLES': 1396, 'k0': 8482, 'safe_r_too_big': 3}
+[small4]    973s pass=9 wrote=12952 csafe=1396 {'axes': 4435, 'safe_floor_fail': 3070, 'no_tight_witness': 2924, 'k_drift': 1477, 'CSAFE_DOUBLES': 1396, 'k0': 8517, 'safe_r_too_big': 3}
+[small4]    973s pass=9 wrote=12992 csafe=1398 {'axes': 4437, 'safe_floor_fail': 3071, 'no_tight_witness': 2925, 'k_drift': 1477, 'CSAFE_DOUBLES': 1398, 'k0': 8555, 'safe_r_too_big': 3}
+[small4]    973s pass=9 wrote=13031 csafe=1398 {'axes': 4438, 'safe_floor_fail': 3072, 'no_tight_witness': 2926, 'k_drift': 1477, 'CSAFE_DOUBLES': 1398, 'k0': 8593, 'safe_r_too_big': 3}
+[small4]    974s pass=9 wrote=13067 csafe=1399 {'axes': 4442, 'safe_floor_fail': 3075, 'no_tight_witness': 2930, 'k_drift': 1477, 'CSAFE_DOUBLES': 1399, 'k0': 8625, 'safe_r_too_big': 3}
+[small4]    974s pass=9 wrote=13107 csafe=1400 {'axes': 4444, 'safe_floor_fail': 3076, 'no_tight_witness': 2932, 'k_drift': 1477, 'CSAFE_DOUBLES': 1400, 'k0': 8663, 'safe_r_too_big': 3}
+[small4]    974s pass=9 wrote=13146 csafe=1400 {'axes': 4444, 'safe_floor_fail': 3076, 'no_tight_witness': 2932, 'k_drift': 1477, 'CSAFE_DOUBLES': 1400, 'k0': 8702, 'safe_r_too_big': 3}
+[small4]    974s pass=9 wrote=13182 csafe=1402 {'axes': 4448, 'safe_floor_fail': 3078, 'no_tight_witness': 2935, 'k_drift': 1478, 'CSAFE_DOUBLES': 1402, 'k0': 8734, 'safe_r_too_big': 3}
