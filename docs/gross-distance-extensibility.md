@@ -71,6 +71,14 @@ Four tiers, from most to least portable:
 | Slot-frame toolkit + weight-orbit walks | **polynomial_specific** | the AG(2,F₄) sub-toolkit is group_CRT; the floor lands at 6 only for this `A,B`. |
 | ρ-link kill (Prop 31→32) | **polynomial_specific** | the 118-achiever list + ρ-links are this code's Smith-normal-form data. |
 
+> *(2026-07-18 note on the tier column: A16 has since moved the
+> "difference-set / overlap small-cycle obstructions" row up a tier on the
+> mirrored class — the Thm-A recipe is now a **class theorem**
+> (D1 ∧ D2 ∧ (iii) ∧ Ann ≠ 0, floor-bearing frames; values uniform at
+> ≥ 6 = 2w), and the engine's support-dichotomy half is field-generic
+> rather than `Z₃²`-locked. See the §6 update blocks and
+> `experiments/bb_lab/notes/A16_class_theorem_writeup.md`.)*
+
 ---
 
 ## 3. The doubling template
@@ -123,6 +131,21 @@ supplies the matching tight upper bound. With those caveats, conditions 1–4 as
 > (equivalently, vanishing of the deck-Bockstein composite `δ₁∘δ₂`), exact in
 > every instance and block swept so far.
 
+> **Update (2026-07-18, at the A13 merge) — the "still open" remainder
+> above is nearly closed.** A13 proved the element-level Bockstein
+> equality unconditionally for group-algebra chain rings
+> (`bockstein_element_form` + `bockstein_element_form_group_algebra`;
+> `Framework/Homological/{BocksteinLift,BBEpsFreeGroupAlgebra}.lean`)
+> and the rank identity `E = k̃ − k` under `BocksteinVanishes`,
+> instantiated on `H₁` for every `XDoubleCoverData`
+> (`{BBBocksteinRank,BBTransferH1}.lean`); exhaustive block sweeps found
+> zero defects, and at `k̃ = k` the composite vanishes automatically
+> (the A14 block below). The sole surviving gap is the homological
+> transport identifying the chain-level `seamC` with the connecting map
+> `δ₂` on the repo's `cycles`/`boundaries` — see
+> `experiments/bb_lab/notes/A13_L2_formalization_plan.md` and
+> `A13_result.md`.
+
 Two structural features observed in **both** known instances (gross and the new
 pair, §5):
 
@@ -131,6 +154,13 @@ pair, §5):
   independent condition: it is *equivalent* to condition 2 (R).
 - **`im Δ` and `ker p_*` are each exactly half of `k`**, and in fact
   `im τ_* = ker p_*` (dangerous sector = image of the transfer).
+
+> *(2026-07-18 note: "observed in both known instances" above is
+> historical phrasing from before A12/A14. Both features are
+> **theorems for every free-Z₂ BB cover satisfying (R)** — Prop A14.1,
+> next block — so they no longer rest on two instances: they hold
+> across the 157-cover k-preserving audit (A12) and automatically for
+> every later instance, e.g. A17's `[[150,8,8]] → [[300,8,16]]` pair.)*
 
 > **Update (2026-07-04, A14 — the "observed" features are theorems, and the
 > safe sector is canonical).** Under (R), Prop A14.1
@@ -256,6 +286,22 @@ Notes on rigor:
 
 ## 6. The base-floor halves, empirically: engine vs. difference-set
 
+> **Update (2026-07-18) — "empirically" is now historical for the
+> mirrored class.** The base-floor theory this section maps out
+> empirically has since become an **unconditional theorem** on the
+> (iii)-mirrored class: the class small-cycle theorem (A16, 2026-07-07
+> — see the update block at the end of this section for the three
+> specific revisions), `experiments/bb_lab/notes/A16_class_theorem_writeup.md`,
+> proves the `w = 3` floor `d ≥ 6` from D1 ∧ D2 ∧ (iii) ∧ Ann ≠ 0 over
+> floor-bearing frames, covers inheriting — four analytic instances, a
+> uniform certifier (`a15_class_certify.py`), and a parametric Lean
+> layer (`SmallCycleData`,
+> `QEC/Stabilizer/Framework/Homological/BBSmallCycle.lean`, with
+> kernel-checked instances under `Codes/BivariateBicycle/BaseFloors/`).
+> The empirical mapping below is retained as the record of how the
+> theorem was found; off-class (non-mirrored pairs) this section's
+> cautions remain the live state.
+
 Theorem A (the base floor `d(base) ≥ 6`) is **two independent arguments** with
 very different reach. Both were mapped against SAT ground truth (scripts:
 [`engine_frame_sweep.py`](../experiments/bb_lab/scripts/engine_frame_sweep.py),
@@ -335,6 +381,18 @@ predicates on `(A,B)`: **D1** `ov≤1` (Sidon difference sets); **D2** `dA∩dB=
   instance + a partial (automatable) recipe. Closing the ~10% the recipe drops — and
   whether `D3` *alone* suffices (empirically yes, `w=3`) — is the open Layer-2 work.
 
+> *(2026-07-18 note: the "open Layer-2 work" above is CLOSED for the
+> mirrored class — the class small-cycle theorem (A16) proves the
+> `w = 3` floor `2w = 6` unconditionally, with no ~10% recipe leak and
+> no per-instance censuses, and covers inherit. The "`D3` alone" question
+> is answered on the class by subsumption: `(iii) ∧ D1` exclude the
+> Frobenius square outright (the triangle image is identically
+> `B² + c`), so no `D3`-style gate is load-bearing there. Off-class both
+> questions remain open. The `w = 5` analogue — floor `2w = 10` — is the
+> live A15 §6.T4 lane: 2,144-member sweep with zero falsifiers, analytic
+> kills greenlit; see `A15_base_floor_class_plan.md` and `A5_goal2_log.md`
+> Entry 15.)*
+
 The predicates and the Frobenius gate are packaged in
 [`bb_lab.diffset_predicates`](../experiments/bb_lab/src/bb_lab/diffset_predicates.py)
 (`is_sidon`, `difference_sets_disjoint`, `coordinate_separated`,
@@ -404,6 +462,16 @@ has odd part `Z₃×Z₇` → heterogeneous `F₈/F₆₄` layers where this rig
 confirms its covers double **[reported, not re-verified here]** but no analytic
 Prop-10/Prop-32 analogue is known there — an open problem.
 
+> *(2026-07-18 note: half of this obstacle has since fallen. A16's
+> field-generic widening of the engine's support dichotomy makes
+> `Z₆×Z₁₄ [[168,12,6]]` a certified **analytic instance of the class
+> base floor** — d ≥ 6, the first odd part off `Z₃²` — with a
+> kernel-checked Lean bundle
+> (`QEC/Stabilizer/Codes/BivariateBicycle/BaseFloors/Z6Z14.lean`). What
+> remains open there is exactly what this paragraph names: the
+> cover-side Prop-10/Prop-32 analogue, i.e. the 2d-grade
+> dangerous/safe-sector engine.)*
+
 **A9 update (2026-07-02): an in-frame engine target now exists.** The obstacle above
 concerned leaving the frame; the A9 census (§6) shows the engine's own frame carries
 **three new `[[72,12,6]] → [[144,12,12]]` doubling pairs beyond gross** (hit3:
@@ -471,10 +539,20 @@ codes deserve it.
   `chain_distance_eq_double` / `pauli_distance_eq_double`).  The gross retrofit onto
   the layer is deliberately deferred (its `native_decide` leaves embed the seam
   definitions definitionally).
+  > *(2026-07-18 note: the deferral ends today — the gross LayerInstance
+  > retrofit is landing (branch `claude/gross-layer-instance`),
+  > re-deriving the gross d = 12 endpoints through the parametric
+  > `BBCover`/`BBDoubling` layer.)*
 - **Build the base-floor theory on the difference-set (two-sided) side** (§6): it
   is frame-agnostic, distills to `D1 ∧ D2 ∧ D3`, and `is_frobenius_related` must be
   a mandatory exclusion gate. The CRT/F₄ engine (one-sided) half is frame-locked and
   is only one of two halves — never sufficient alone.
+  > *(2026-07-18 note: built — this theory now exists as the A16 class
+  > small-cycle theorem on the mirrored class (see the §6 update
+  > blocks): there the Frobenius gate is subsumed by `(iii) ∧ D1`, the
+  > engine half is field-generic rather than frame-locked, and the
+  > floor is unconditional. Off-class, this bullet's prescriptions
+  > stand.)*
 - **State the doubling result as the conditional reduction of §3**, not a
   self-contained theorem: the four conditions bring `= 2d` down to condition 3's two
   floor inputs but do not prove them (still discharged per-instance — analytically for

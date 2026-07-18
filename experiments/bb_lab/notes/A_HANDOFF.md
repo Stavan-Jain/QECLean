@@ -118,6 +118,85 @@ A4 Theorem D).
 
 ## 0. RESUME HERE (the one-paragraph version)
 
+> **PROGRAM STATE (2026-07-18, at the July merges) — read this block
+> first.** Everything below it in this section is the mid-June state it
+> summarizes; the July lines (A9–A18) are indexed in the approach-number
+> registry `notes/README.md`, and the cross-line running index is
+> `pipeline/research_log.md` — those two are the live source of truth
+> (A10/A11 merged today as annotated historical records; see the blocks
+> above this section and the annotations atop their notes). Where the
+> program stands now:
+>
+> - **Goal 1 (gross d = 12): DONE, analytic + Lean.** Fully analytic
+>   (A4 Part II, Theorem D; Entries 16–28). In Lean, unconditional at
+>   the gross axiom bar: both named Props are kernel-discharged
+>   (`LightStab.lightStabilizerClassification_holds`,
+>   `LightStab.mimBound_holds`), headline
+>   `grossStabilizerCode_hasCodeDistance_12_uncond`
+>   (`QEC/Stabilizer/Codes/BivariateBicycle/MImAssembly.lean`). The
+>   LayerInstance retrofit landing today (branch
+>   `claude/gross-layer-instance`) re-derives the gross endpoints
+>   through the parametric doubling layer
+>   (`Framework/Homological/{BBCover,BBDoubling}.lean`), retiring the
+>   "gross retrofit deferred" caveat of
+>   `docs/gross-distance-extensibility.md` §8.
+> - **Goal 2 (a class bound): the first UNCONDITIONAL class theorem.**
+>   A16 (`A16_class_theorem_writeup.md`; proof log `A5_goal2_log.md`
+>   Entries 8–13): every weight-3 BB instance with D1 (Sidon) ∧ D2
+>   (disjoint difference sets) ∧ (iii) mirrored projections ∧ Ann ≠ 0
+>   on a floor-bearing frame (4∤ℓ, 4∤m) has no nonzero 1-cycle of
+>   weight ≤ 5 — d ≥ 6, μ_Z = μ_X ≥ 6, and every free-Z₂ cover
+>   inherits the floor. Four analytic instances (bb_72 = the gross
+>   base, bb_108, bb_90, Z₆×Z₁₄ [[168,12,6]] — the first off the Z₃²
+>   odd part); the 58-member corpus class + the 111,840-member battery
+>   certified with no per-instance census; uniform certifier
+>   `scripts/a15_class_certify.py`. Lean: the parametric
+>   `SmallCycleData` bundle
+>   (`Framework/Homological/BBSmallCycle.lean`) with kernel-checked
+>   instances under `Codes/BivariateBicycle/BaseFloors/` (bb_108,
+>   bb_90, Z₆×Z₁₄).
+> - **Beyond 12 (A17, the d ≥ 7 doubling hunt): the first certified
+>   safe floors past d = 6.** Eighteen (code, axis) S4 certifications
+>   (`SeamCosetFloor 16`) over fifteen distinct d = 8 bases (A17 plan
+>   §6.1) — including the complete Z₂₁×Z₃ [[126,8,8]] x-family, whose
+>   doubling targets are [[252,8,16]] — and the tightness cell
+>   f2a6f17e:y, [[150,8,8]] → [[300,8,16]], is Lean-packaged in
+>   Paper-1 two-tier shape (`Codes/BivariateBicycle/Z5Z15F2A6/`:
+>   `cover300_{chain,pauli}_distance_eq_16`, kernel-checked witness
+>   halves + certificate-checked floor Props; A17 §6.2). Per-cell
+>   unconditional doubling still owes the cover-side leg (A17 §6.1).
+> - **Structural negatives that steer the hunt:** the same-axis tower
+>   bottleneck (A14 §13 — every proven rung-1 double, re-doubled on
+>   the SAME axis, freezes at its rung-1 distance; distance > 12 must
+>   come from a larger-d base or a mixed lift, not towers) and the
+>   deficit-wall theorem (A17-P3, `A17_deficit_wall.md` — with
+>   |A|, |B| odd all three distances are even and 2d − 2 is the unique
+>   maximal SF-failing value; exact ladders show no measured instance
+>   attains the wall — bb108-y sits at d_safe = 14 = 2d − 6 exactly,
+>   bb90-y freezes at d). A18's breadth sweep (`A18_breadth_sweep.md`:
+>   the μ_e barrenness criterion, 41 group shapes) prices where k > 0
+>   instances can exist at all.
+> - **Genuinely open now (the frontier list):** (i) the analytic
+>   w = 5 class kills — the d ≥ 10 lane (A15 §6.T4 / A5 Entry 15:
+>   2,144-member sweep with zero falsifiers, 450 Z₅×Z₁₅ members
+>   exactly at d = 2w = 10; analytic kills greenlit); (ii) A17's
+>   dangerous-sector completion for f2a6f17e:y (near-kernel stratum
+>   classified — 113 light-boundary classes, rung dispatch
+>   8,475/8,475, the [5,30] rep gap closed — owed: the t ≥ 2
+>   generalized-window rung in Lean + the per-class dispatch sweep;
+>   plus the three Z₁₅×Z₆ floor-20 UNKNOWN docket cells; A17
+>   §§6.3–6.4); (iii) the (M)-robustness conjecture
+>   (`A17_deficit_wall.md` §9: the dangerous sector never binds alone
+>   on the corpus class — non-vacuous and provably scope-critical
+>   since A11 Entry 3's weight-4×4 counterexample); (iv) A13's
+>   remaining seamC ↔ δ₂ homological transport
+>   (`A13_L2_formalization_plan.md` — the sole gap to
+>   `H₁(cover) ≅ D^{k̃−k} ⊕ F₂^{2k−k̃}`); (v) A7 Props 30–31 — the
+>   Tier-3 analytic-grade replacement of the d = 12 machine leaves
+>   (the Lean theorem is already unconditional; this is epistemic
+>   upgrade — registry line A7, `docs/gross-distance-proof.md`
+>   Props 30–31).
+
 **The program has its first headline theorem (Entry 14): d(gross) ≥ 6,
 fully analytic — triple the published Lin–Pryadko floor of 2. Goal 3 is
 achieved, and the owed adversarial re-review passed (Entry 15): every link
@@ -311,6 +390,23 @@ reproduce `d=12`) — the validation the buggy scout script lacked (see §5).
 ---
 
 ## 4. The precise open problem (where to push)
+
+> **Superseded (2026-07-18).** This section is a historical record — its
+> title no longer describes the frontier. The "open problem for goal 1"
+> it poses (the safe-sector (M)-analogue) was CLOSED inside this
+> section's own update chain: Entries 16–28 proved (R), the flux
+> characterization, and (M-im) via the confined-floor program — **d(gross)
+> = 12 fully analytic** (A4 Part II, Theorem D; §8 items 2–3 record the
+> same DONE status this heading contradicts). The safe-sector question in
+> its general per-cover form then became A12's OQ4 and was closed by A14
+> (Prop A14.1: under (R) the safe sector is canonical — `im p_* = im Δ`
+> of dim k/2, seam-carry representatives, orbit-constant coset minima —
+> plus the necessity-screen battery S0–S4;
+> `A14_safe_floor_criterion_plan.md`), with the merged Lean transfer
+> layer alongside
+> (`Framework/Homological/{BBTransferH1,BBDeficitWall}.lean`). The
+> current frontier list lives in §0's 2026-07-18 block; the running
+> index is `pipeline/research_log.md` + the registry `notes/README.md`.
 
 *(Superseded forms: Entries 0–4 posed this as the s≠0 "fibre-disjointness"
 case; Entry 5 replaced it with (M); Entries 10–13 PROVED (M) in full. The
@@ -717,6 +813,14 @@ buggy-scout flag commit). Each `A3` entry is one commit.
    prose vs. the certified tables, with special attention to the §12
    locus-table presentation grade (rule-derived with worked
    representatives; a reviewer may demand more worked cells).
+   *[2026-07-18: still un-run as a dedicated prose pass — but largely
+   mooted in substance: the A6/A7 Lean line has since kernel-discharged
+   both named Props (`LightStab.lightStabilizerClassification_holds`,
+   `LightStab.mimBound_holds`), so
+   `grossStabilizerCode_hasCodeDistance_12_uncond` is unconditional at
+   the gross axiom bar; the surviving epistemic residue is the Tier-3
+   analytic-grade replacement of the machine leaves (Props 30–31 of
+   `docs/gross-distance-proof.md`) — registry line A7.]*
 5. **Goal 2 — template runs**: STARTED — see `notes/A5_goal2_log.md`
    (the goal-2 track log). Entry 1: the instance-hypothesis checker
    (`scripts/a5_instance_hypotheses.py`) + corpus sweeps — the
@@ -750,8 +854,22 @@ buggy-scout flag commit). Each `A3` entry is one commit.
    (with the Entry-7-corrected even-period weight lemma as ingredient),
    or accept it as a per-instance surveyable check. Next: that lemma;
    (M)-analogue on the bb_108/bb_90 covers (true d = 10).
+   *[2026-07-18: goal 2 has since landed its unconditional class
+   theorem — A16 (`A16_class_theorem_writeup.md`, via A5 Entries 8–13):
+   the corrected conjecture (C-iv′)/(C-v′) named here is now a THEOREM
+   (D1 ∧ D2 ∧ (iii) ∧ Ann ≠ 0 on a floor-bearing frame ⟹ d ≥ 6, covers
+   inherit), with no per-instance census — the residue-lemma question
+   dissolved into the A16 proof, and `a15_class_certify.py`'s gates are
+   uniform. Four analytic instances incl. Z₆×Z₁₄ [[168,12,6]]; Lean
+   layer `BBSmallCycle.lean` + `Codes/BivariateBicycle/BaseFloors/`.
+   The line continues as A15 (w = 5 kills → the d ≥ 10 lane). See §0's
+   2026-07-18 block.]*
 6. **Maintain `A3_track1p1_log.md`** as the running log for the gross
    arc, and `A5_goal2_log.md` for goal 2; commit per entry.
+   *[2026-07-18: `A5_goal2_log.md` Entries 8–15 became the A15
+   execution line; approach numbers are now claimed in the registry
+   (`notes/README.md`, same-commit rule), and the cross-line running
+   index is `pipeline/research_log.md`.]*
 
 ---
 
