@@ -1,0 +1,4 @@
+{"instance_id": "63603d9bee6e52c9", "axis": "x", "group": "Z21xZ3", "d_base": 8, "cover_n": 252, "w_query": 14, "backend": "cms", "verdict": "UNSAT", "secs": 13168.5, "status": "DX-CONFIRMED-2d"}
+{"instance_id": "3935e2cba2059f32", "axis": "x", "group": "Z21xZ3", "d_base": 8, "cover_n": 252, "w_query": 14, "backend": "cms", "verdict": "UNSAT", "secs": 14086.9, "status": "DX-CONFIRMED-2d"}
+{"instance_id": "71220ff9f12bb22d", "axis": "x", "group": "Z21xZ3", "d_base": 8, "cover_n": 252, "w_query": 14, "backend": "cms", "verdict": "UNSAT", "secs": 14630.5, "status": "DX-CONFIRMED-2d"}
+{"instance_id": "f2a6f17e1c41ff96", "axis": "y", "group": "Z5xZ15", "d_base": 8, "cover_n": 300, "w_query": 14, "backend": "cms", "verdict": "UNKNOWN", "secs": 23728.7, "status": "UNKNOWN (timeout)"}

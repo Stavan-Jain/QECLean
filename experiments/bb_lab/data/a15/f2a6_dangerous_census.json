@@ -1,0 +1,3821 @@
+{
+ "instance": "f2a6f17e1c41ff96:y",
+ "census_by_b_weight": {
+  "6": 1,
+  "10": 6,
+  "12": 33,
+  "14": 54
+ },
+ "n_light_classes": 94,
+ "n_hostile_classes": 60,
+ "classes": [
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ]
+   ],
+   "b_weight": 6,
+   "f_weight": 1,
+   "coset_min_weight": 1,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ]
+   ],
+   "b_weight": 10,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 70,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     14
+    ],
+    [
+     1,
+     14
+    ],
+    [
+     2,
+     14
+    ],
+    [
+     3,
+     14
+    ],
+    [
+     4,
+     14
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     2
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     3
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     4
+    ]
+   ],
+   "b_weight": 10,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 55,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     11
+    ],
+    [
+     1,
+     11
+    ],
+    [
+     2,
+     11
+    ],
+    [
+     3,
+     11
+    ],
+    [
+     4,
+     11
+    ],
+    [
+     0,
+     12
+    ],
+    [
+     1,
+     12
+    ],
+    [
+     2,
+     12
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     5
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     6
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     7
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ]
+   ],
+   "b_weight": 10,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     1
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     2
+    ]
+   ],
+   "b_weight": 10,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 65,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     13
+    ],
+    [
+     1,
+     13
+    ],
+    [
+     2,
+     13
+    ],
+    [
+     3,
+     13
+    ],
+    [
+     4,
+     13
+    ],
+    [
+     0,
+     14
+    ],
+    [
+     1,
+     14
+    ],
+    [
+     2,
+     14
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     3
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     4
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     5
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     6
+    ]
+   ],
+   "b_weight": 10,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 45,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     9
+    ],
+    [
+     1,
+     9
+    ],
+    [
+     2,
+     9
+    ],
+    [
+     3,
+     9
+    ],
+    [
+     4,
+     9
+    ],
+    [
+     0,
+     10
+    ],
+    [
+     1,
+     10
+    ],
+    [
+     2,
+     10
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     7
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     8
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     9
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     10
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     11
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     12
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     13
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     14
+    ]
+   ],
+   "b_weight": 10,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 70,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     3,
+     0
+    ],
+    [
+     4,
+     0
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     2,
+     0
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     2,
+     2
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     2,
+     3
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     2,
+     4
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     2,
+     5
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     2,
+     6
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     2,
+     7
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     2,
+     8
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     2,
+     9
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     2,
+     10
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     2,
+     11
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     2,
+     12
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     2,
+     13
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     2,
+     14
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 2,
+   "coset_min_weight": 2,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     2
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 65,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     13
+    ],
+    [
+     1,
+     13
+    ],
+    [
+     2,
+     13
+    ],
+    [
+     3,
+     13
+    ],
+    [
+     4,
+     13
+    ],
+    [
+     0,
+     14
+    ],
+    [
+     1,
+     14
+    ],
+    [
+     2,
+     14
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     4
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 55,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     11
+    ],
+    [
+     1,
+     11
+    ],
+    [
+     2,
+     11
+    ],
+    [
+     3,
+     11
+    ],
+    [
+     4,
+     11
+    ],
+    [
+     0,
+     12
+    ],
+    [
+     1,
+     12
+    ],
+    [
+     2,
+     12
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     5
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 50,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     10
+    ],
+    [
+     1,
+     10
+    ],
+    [
+     2,
+     10
+    ],
+    [
+     3,
+     10
+    ],
+    [
+     4,
+     10
+    ],
+    [
+     0,
+     11
+    ],
+    [
+     1,
+     11
+    ],
+    [
+     2,
+     11
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     11
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 50,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     3,
+     0
+    ],
+    [
+     4,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     12
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 55,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     3,
+     0
+    ],
+    [
+     4,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     0
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 70,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     14
+    ],
+    [
+     1,
+     14
+    ],
+    [
+     2,
+     14
+    ],
+    [
+     3,
+     14
+    ],
+    [
+     4,
+     14
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 70,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     14
+    ],
+    [
+     1,
+     14
+    ],
+    [
+     2,
+     14
+    ],
+    [
+     3,
+     14
+    ],
+    [
+     4,
+     14
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     2
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 65,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     13
+    ],
+    [
+     1,
+     13
+    ],
+    [
+     2,
+     13
+    ],
+    [
+     3,
+     13
+    ],
+    [
+     4,
+     13
+    ],
+    [
+     0,
+     14
+    ],
+    [
+     1,
+     14
+    ],
+    [
+     2,
+     14
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     3
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 60,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     12
+    ],
+    [
+     1,
+     12
+    ],
+    [
+     2,
+     12
+    ],
+    [
+     3,
+     12
+    ],
+    [
+     4,
+     12
+    ],
+    [
+     0,
+     13
+    ],
+    [
+     1,
+     13
+    ],
+    [
+     2,
+     13
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     6
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 45,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     9
+    ],
+    [
+     1,
+     9
+    ],
+    [
+     2,
+     9
+    ],
+    [
+     3,
+     9
+    ],
+    [
+     4,
+     9
+    ],
+    [
+     0,
+     10
+    ],
+    [
+     1,
+     10
+    ],
+    [
+     2,
+     10
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     7
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 40,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     8
+    ],
+    [
+     1,
+     8
+    ],
+    [
+     2,
+     8
+    ],
+    [
+     3,
+     8
+    ],
+    [
+     4,
+     8
+    ],
+    [
+     0,
+     9
+    ],
+    [
+     1,
+     9
+    ],
+    [
+     2,
+     9
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     14
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 65,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     3,
+     0
+    ],
+    [
+     4,
+     0
+    ],
+    [
+     0,
+     14
+    ],
+    [
+     1,
+     14
+    ],
+    [
+     2,
+     14
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     4,
+     0
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 70,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     14
+    ],
+    [
+     1,
+     14
+    ],
+    [
+     2,
+     14
+    ],
+    [
+     3,
+     14
+    ],
+    [
+     4,
+     14
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     4,
+     2
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 65,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     13
+    ],
+    [
+     1,
+     13
+    ],
+    [
+     2,
+     13
+    ],
+    [
+     3,
+     13
+    ],
+    [
+     4,
+     13
+    ],
+    [
+     0,
+     14
+    ],
+    [
+     1,
+     14
+    ],
+    [
+     2,
+     14
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     4,
+     9
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 40,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     3,
+     0
+    ],
+    [
+     4,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     4,
+     10
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 45,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     3,
+     0
+    ],
+    [
+     4,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     4,
+     13
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 60,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     3,
+     0
+    ],
+    [
+     4,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     4,
+     14
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 65,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     3,
+     0
+    ],
+    [
+     4,
+     0
+    ],
+    [
+     0,
+     14
+    ],
+    [
+     1,
+     14
+    ],
+    [
+     2,
+     14
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     2
+    ],
+    [
+     1,
+     2
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 65,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     13
+    ],
+    [
+     1,
+     13
+    ],
+    [
+     2,
+     13
+    ],
+    [
+     3,
+     13
+    ],
+    [
+     4,
+     13
+    ],
+    [
+     0,
+     14
+    ],
+    [
+     1,
+     14
+    ],
+    [
+     2,
+     14
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     2
+    ],
+    [
+     4,
+     0
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 65,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     13
+    ],
+    [
+     1,
+     13
+    ],
+    [
+     2,
+     13
+    ],
+    [
+     3,
+     13
+    ],
+    [
+     4,
+     13
+    ],
+    [
+     0,
+     14
+    ],
+    [
+     1,
+     14
+    ],
+    [
+     2,
+     14
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     3
+    ],
+    [
+     1,
+     2
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 60,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     12
+    ],
+    [
+     1,
+     12
+    ],
+    [
+     2,
+     12
+    ],
+    [
+     3,
+     12
+    ],
+    [
+     4,
+     12
+    ],
+    [
+     0,
+     13
+    ],
+    [
+     1,
+     13
+    ],
+    [
+     2,
+     13
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     3
+    ],
+    [
+     4,
+     1
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 60,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     12
+    ],
+    [
+     1,
+     12
+    ],
+    [
+     2,
+     12
+    ],
+    [
+     3,
+     12
+    ],
+    [
+     4,
+     12
+    ],
+    [
+     0,
+     13
+    ],
+    [
+     1,
+     13
+    ],
+    [
+     2,
+     13
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     4
+    ],
+    [
+     0,
+     8
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 35,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     7
+    ],
+    [
+     1,
+     7
+    ],
+    [
+     2,
+     7
+    ],
+    [
+     3,
+     7
+    ],
+    [
+     4,
+     7
+    ],
+    [
+     0,
+     8
+    ],
+    [
+     1,
+     8
+    ],
+    [
+     2,
+     8
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     4
+    ],
+    [
+     1,
+     0
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 55,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     11
+    ],
+    [
+     1,
+     11
+    ],
+    [
+     2,
+     11
+    ],
+    [
+     3,
+     11
+    ],
+    [
+     4,
+     11
+    ],
+    [
+     0,
+     12
+    ],
+    [
+     1,
+     12
+    ],
+    [
+     2,
+     12
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     4
+    ],
+    [
+     1,
+     2
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 55,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     11
+    ],
+    [
+     1,
+     11
+    ],
+    [
+     2,
+     11
+    ],
+    [
+     3,
+     11
+    ],
+    [
+     4,
+     11
+    ],
+    [
+     0,
+     12
+    ],
+    [
+     1,
+     12
+    ],
+    [
+     2,
+     12
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     4
+    ],
+    [
+     1,
+     3
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 55,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     11
+    ],
+    [
+     1,
+     11
+    ],
+    [
+     2,
+     11
+    ],
+    [
+     3,
+     11
+    ],
+    [
+     4,
+     11
+    ],
+    [
+     0,
+     12
+    ],
+    [
+     1,
+     12
+    ],
+    [
+     2,
+     12
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     4
+    ],
+    [
+     1,
+     4
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 55,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     11
+    ],
+    [
+     1,
+     11
+    ],
+    [
+     2,
+     11
+    ],
+    [
+     3,
+     11
+    ],
+    [
+     4,
+     11
+    ],
+    [
+     0,
+     12
+    ],
+    [
+     1,
+     12
+    ],
+    [
+     2,
+     12
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     4
+    ],
+    [
+     1,
+     6
+    ]
+   ],
+   "b_weight": 12,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 45,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     9
+    ],
+    [
+     1,
+     9
+    ],
+    [
+     2,
+     9
+    ],
+    [
+     3,
+     9
+    ],
+    [
+     4,
+     9
+    ],
+    [
+     0,
+     10
+    ],
+    [
+     1,
+     10
+    ],
+    [
+     2,
+     10
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     4
+    ],
+    [
+     1,
+     10
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 25,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     5
+    ],
+    [
+     1,
+     5
+    ],
+    [
+     2,
+     5
+    ],
+    [
+     3,
+     5
+    ],
+    [
+     4,
+     5
+    ],
+    [
+     0,
+     6
+    ],
+    [
+     1,
+     6
+    ],
+    [
+     2,
+     6
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     4
+    ],
+    [
+     1,
+     14
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 50,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     3,
+     0
+    ],
+    [
+     4,
+     0
+    ],
+    [
+     0,
+     11
+    ],
+    [
+     1,
+     11
+    ],
+    [
+     2,
+     11
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     4
+    ],
+    [
+     4,
+     0
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 55,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     11
+    ],
+    [
+     1,
+     11
+    ],
+    [
+     2,
+     11
+    ],
+    [
+     3,
+     11
+    ],
+    [
+     4,
+     11
+    ],
+    [
+     0,
+     12
+    ],
+    [
+     1,
+     12
+    ],
+    [
+     2,
+     12
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     4
+    ],
+    [
+     4,
+     1
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 55,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     11
+    ],
+    [
+     1,
+     11
+    ],
+    [
+     2,
+     11
+    ],
+    [
+     3,
+     11
+    ],
+    [
+     4,
+     11
+    ],
+    [
+     0,
+     12
+    ],
+    [
+     1,
+     12
+    ],
+    [
+     2,
+     12
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     4
+    ],
+    [
+     4,
+     2
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 55,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     11
+    ],
+    [
+     1,
+     11
+    ],
+    [
+     2,
+     11
+    ],
+    [
+     3,
+     11
+    ],
+    [
+     4,
+     11
+    ],
+    [
+     0,
+     12
+    ],
+    [
+     1,
+     12
+    ],
+    [
+     2,
+     12
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     4
+    ],
+    [
+     4,
+     4
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 55,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     11
+    ],
+    [
+     1,
+     11
+    ],
+    [
+     2,
+     11
+    ],
+    [
+     3,
+     11
+    ],
+    [
+     4,
+     11
+    ],
+    [
+     0,
+     12
+    ],
+    [
+     1,
+     12
+    ],
+    [
+     2,
+     12
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     4
+    ],
+    [
+     4,
+     5
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 50,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     10
+    ],
+    [
+     1,
+     10
+    ],
+    [
+     2,
+     10
+    ],
+    [
+     3,
+     10
+    ],
+    [
+     4,
+     10
+    ],
+    [
+     0,
+     11
+    ],
+    [
+     1,
+     11
+    ],
+    [
+     2,
+     11
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     4
+    ],
+    [
+     4,
+     9
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 25,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     3,
+     0
+    ],
+    [
+     4,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     6
+    ],
+    [
+     1,
+     6
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 45,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     9
+    ],
+    [
+     1,
+     9
+    ],
+    [
+     2,
+     9
+    ],
+    [
+     3,
+     9
+    ],
+    [
+     4,
+     9
+    ],
+    [
+     0,
+     10
+    ],
+    [
+     1,
+     10
+    ],
+    [
+     2,
+     10
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     6
+    ],
+    [
+     4,
+     0
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 45,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     9
+    ],
+    [
+     1,
+     9
+    ],
+    [
+     2,
+     9
+    ],
+    [
+     3,
+     9
+    ],
+    [
+     4,
+     9
+    ],
+    [
+     0,
+     10
+    ],
+    [
+     1,
+     10
+    ],
+    [
+     2,
+     10
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     7
+    ],
+    [
+     1,
+     6
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 40,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     8
+    ],
+    [
+     1,
+     8
+    ],
+    [
+     2,
+     8
+    ],
+    [
+     3,
+     8
+    ],
+    [
+     4,
+     8
+    ],
+    [
+     0,
+     9
+    ],
+    [
+     1,
+     9
+    ],
+    [
+     2,
+     9
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     7
+    ],
+    [
+     4,
+     1
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 40,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     8
+    ],
+    [
+     1,
+     8
+    ],
+    [
+     2,
+     8
+    ],
+    [
+     3,
+     8
+    ],
+    [
+     4,
+     8
+    ],
+    [
+     0,
+     9
+    ],
+    [
+     1,
+     9
+    ],
+    [
+     2,
+     9
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 75,
+   "translates_total": 75,
+   "hostile_translates": []
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     2
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 65,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     13
+    ],
+    [
+     1,
+     13
+    ],
+    [
+     2,
+     13
+    ],
+    [
+     3,
+     13
+    ],
+    [
+     4,
+     13
+    ],
+    [
+     0,
+     14
+    ],
+    [
+     1,
+     14
+    ],
+    [
+     2,
+     14
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     6
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 45,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     9
+    ],
+    [
+     1,
+     9
+    ],
+    [
+     2,
+     9
+    ],
+    [
+     3,
+     9
+    ],
+    [
+     4,
+     9
+    ],
+    [
+     0,
+     10
+    ],
+    [
+     1,
+     10
+    ],
+    [
+     2,
+     10
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     14
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 70,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     3,
+     0
+    ],
+    [
+     4,
+     0
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     4,
+     1
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 70,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     14
+    ],
+    [
+     1,
+     14
+    ],
+    [
+     2,
+     14
+    ],
+    [
+     3,
+     14
+    ],
+    [
+     4,
+     14
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     4,
+     9
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 45,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     3,
+     0
+    ],
+    [
+     4,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     4,
+     13
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 65,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     3,
+     0
+    ],
+    [
+     4,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     2
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 65,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     13
+    ],
+    [
+     1,
+     13
+    ],
+    [
+     2,
+     13
+    ],
+    [
+     3,
+     13
+    ],
+    [
+     4,
+     13
+    ],
+    [
+     0,
+     14
+    ],
+    [
+     1,
+     14
+    ],
+    [
+     2,
+     14
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     2
+    ],
+    [
+     2,
+     4
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 55,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     11
+    ],
+    [
+     1,
+     11
+    ],
+    [
+     2,
+     11
+    ],
+    [
+     3,
+     11
+    ],
+    [
+     4,
+     11
+    ],
+    [
+     0,
+     12
+    ],
+    [
+     1,
+     12
+    ],
+    [
+     2,
+     12
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     2
+    ],
+    [
+     2,
+     8
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 35,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     7
+    ],
+    [
+     1,
+     7
+    ],
+    [
+     2,
+     7
+    ],
+    [
+     3,
+     7
+    ],
+    [
+     4,
+     7
+    ],
+    [
+     0,
+     8
+    ],
+    [
+     1,
+     8
+    ],
+    [
+     2,
+     8
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     2
+    ],
+    [
+     4,
+     1
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 65,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     13
+    ],
+    [
+     1,
+     13
+    ],
+    [
+     2,
+     13
+    ],
+    [
+     3,
+     13
+    ],
+    [
+     4,
+     13
+    ],
+    [
+     0,
+     14
+    ],
+    [
+     1,
+     14
+    ],
+    [
+     2,
+     14
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     2
+    ],
+    [
+     4,
+     9
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 35,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     3,
+     0
+    ],
+    [
+     4,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     6
+    ],
+    [
+     2,
+     5
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 45,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     9
+    ],
+    [
+     1,
+     9
+    ],
+    [
+     2,
+     9
+    ],
+    [
+     3,
+     9
+    ],
+    [
+     4,
+     9
+    ],
+    [
+     0,
+     10
+    ],
+    [
+     1,
+     10
+    ],
+    [
+     2,
+     10
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     6
+    ],
+    [
+     2,
+     12
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 15,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     3
+    ],
+    [
+     1,
+     3
+    ],
+    [
+     2,
+     3
+    ],
+    [
+     3,
+     3
+    ],
+    [
+     4,
+     3
+    ],
+    [
+     0,
+     4
+    ],
+    [
+     1,
+     4
+    ],
+    [
+     2,
+     4
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     6
+    ],
+    [
+     4,
+     1
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 45,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     9
+    ],
+    [
+     1,
+     9
+    ],
+    [
+     2,
+     9
+    ],
+    [
+     3,
+     9
+    ],
+    [
+     4,
+     9
+    ],
+    [
+     0,
+     10
+    ],
+    [
+     1,
+     10
+    ],
+    [
+     2,
+     10
+    ]
+   ]
+  },
+  {
+   "rep_support": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     14
+    ],
+    [
+     2,
+     13
+    ]
+   ],
+   "b_weight": 14,
+   "f_weight": 3,
+   "coset_min_weight": 3,
+   "translates_seam_good": 65,
+   "translates_total": 75,
+   "hostile_translates": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     3,
+     0
+    ],
+    [
+     4,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ]
+  }
+ ]
+}
