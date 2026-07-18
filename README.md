@@ -37,7 +37,7 @@ This repo contains **only the Lean library** — polished, sorry-free formalizat
 grossStabilizerCodeWithDistance : StabilizerCodeWithDistance 144 12 12
 ```
 
-The distance proof is unconditional and axiom-clean (the standard three axioms plus Lean's `native_decide` compiler axiom; no `sorry`), mechanizing the free-ℤ₂-cover argument of the analytic write-up: safe/dangerous sector dichotomy over the `[[72,12,6]]` base, the small-cycle theorem, the light-stabilizer classification, and the Smith-coset confined floor (`QEC/Stabilizer/Codes/BivariateBicycle/`). A fully analytic paper proof (no computer search in the argument) is at [qec-lab: gross-distance-proof.md](https://github.com/Stavan-Jain/qec-lab/blob/main/docs/gross-distance-proof.md).
+The distance proof is unconditional and axiom-clean (the standard three axioms plus Lean's `native_decide` compiler axiom; no `sorry`), mechanizing the free-ℤ₂-cover argument of the analytic write-up: safe/dangerous sector dichotomy over the `[[72,12,6]]` base, the small-cycle theorem, the light-stabilizer classification, and the Smith-coset confined floor (`QEC/Stabilizer/Codes/BivariateBicycle/`).
 
 **The toric family.** For every `L ≥ 2`, the `L × L` toric code is a verified `[[2L², 2, L]]` stabilizer code:
 
