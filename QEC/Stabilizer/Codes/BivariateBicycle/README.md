@@ -75,7 +75,9 @@ Class F (generated fragments between `-- BEGIN/END GENERATED` markers,
 hand-curated shell): `Gross/SafeFloor/MImAssembly.lean`
 (`scripts/gen_assembly_2d.py`). Everything else is Class H (hand-maintained;
 may embed machine-*validated* data). Rule: **a hand-edit to a Class-G file is
-a bug — change the generator and regenerate, in the same PR.** Operational
+a bug — change the generator (in the qec-lab companion repo) and regenerate,
+landing both repos' changes together.** Generators run from a sibling qec-lab
+checkout and write here via `QECLEAN_ROOT` (default `../QECLean`). Operational
 details (env, clobber guards, stale generators): `qec-lab:experiments/bb_lab/GENERATORS.md`.
 
 ## Edit rules
