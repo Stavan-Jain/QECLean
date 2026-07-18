@@ -7,10 +7,12 @@ import QEC.Stabilizer.Codes.BivariateBicycle.Gross.Assembly
 import QEC.Stabilizer.Codes.BivariateBicycle.Gross.BaseDistance
 import QEC.Stabilizer.Codes.BivariateBicycle.Gross.DangerousSector
 import QEC.Stabilizer.Codes.BivariateBicycle.Gross.SafeSector
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.StabilizerCodeData
 import QEC.Stabilizer.Codes.BivariateBicycle.Gross.StabilizerCode
 import QEC.Stabilizer.Codes.BivariateBicycle.Gross.LightStab
 import QEC.Stabilizer.Codes.BivariateBicycle.Gross.LightStabClassify
 import QEC.Stabilizer.Codes.BivariateBicycle.Gross.SafeFloor
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.Distance
 import QEC.Stabilizer.Codes.BivariateBicycle.Gross.LayerInstance
 
 /-!
@@ -47,6 +49,8 @@ Chain-level formalization of the gross bivariate-bicycle code and its
                     unconditional
 - `SafeFloor/`    — everything discharging `MImBound` (the safe-sector floor):
                     engine + Tier-3 analytic track; see `SafeFloor.lean`
+- `Distance`      — the capstones (`grossStabilizerCode_hasCodeDistance_12_uncond`,
+                    `grossStabilizerCodeWithDistance`) in one hand-written file
 - `LayerInstance` — the gross ↔ bb72 cover packaged as `grossCoverData :
                     XDoubleCoverData`, and the unconditional `d(gross) = 12`
                     re-derived through the parametric doubling layer

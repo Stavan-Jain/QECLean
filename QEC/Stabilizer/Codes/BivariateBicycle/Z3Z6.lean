@@ -13,6 +13,7 @@ import QEC.Stabilizer.Codes.BivariateBicycle.Z3Z6.LightStab
 import QEC.Stabilizer.Codes.BivariateBicycle.Z3Z6.Dangerous
 import QEC.Stabilizer.Codes.BivariateBicycle.Z3Z6.SafeFloor
 import QEC.Stabilizer.Codes.BivariateBicycle.Z3Z6.Distance
+import QEC.Stabilizer.Codes.BivariateBicycle.Z3Z6.StabilizerCodeData
 import QEC.Stabilizer.Codes.BivariateBicycle.Z3Z6.StabilizerCode
 
 /-!

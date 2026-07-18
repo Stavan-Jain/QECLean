@@ -44,7 +44,7 @@ per-module one-liner maps live in the umbrella docstrings (`Gross.lean`,
 | `MImBound` | `Gross/SafeFloor/MImAssembly.lean` (`mimBound_holds`, 64-case dispatch → 5 orbit reps) | mixed (see per-orbit rows) |
 | — orbit Y0/Y1/Y4 (wt 16/18) | `SafeFloor/MImFloorY{0,1,4}.lean` (`floor_of_data` engine leaf) | engine (`native_decide`) — flips analytic when A7 Props 30–31 close |
 | — orbit Y11/Y12 (wt 24) | `SafeFloor/MImFloorY{11,12}.lean` via `WtFloor24Bridge.costFromComps_ge_12_of_blocks` | **analytic** (kernel `decide`) |
-| capstones | `Gross/SafeFloor/MImAssembly.lean` (`grossStabilizerCode_hasCodeDistance_12_uncond`, `grossStabilizerCodeWithDistance`) + `Gross/LayerInstance.lean` (`gross_chain/pauli_distance_eq_12` through the layer) | — |
+| capstones | `Gross/Distance.lean` (`grossStabilizerCode_hasCodeDistance_12_uncond`, `grossStabilizerCodeWithDistance`) + `Gross/LayerInstance.lean` (`gross_chain/pauli_distance_eq_12` through the layer) | — |
 
 Z3Z6 mirror: `StrongBaseFloor 4` → `Z3Z6/BaseDistance.lean`; `DeckTrivialOnH1`
 → `Z3Z6/DeckHomotopy.lean`; `DangerousFloorNZ 8` → `Z3Z6/Dangerous.lean`;
@@ -65,10 +65,10 @@ already flipped. Status changes belong HERE, not in module names.
 
 | File | Generator (`experiments/bb_lab/`) | Data |
 |---|---|---|
-| `Gross/StabilizerCode.lean` §1 data (split into `StabilizerCodeData.lean` pending) | `phase5/gen_file.py` — **STALE, do not run** (template predates the hand-completed §2–§6 proofs; see GENERATORS.md) | `phase5/data.json` |
+| `Gross/StabilizerCodeData.lean` | `phase5/gen_file.py` (`--force` guard; emits data only) | `phase5/data.json` |
 | `Gross/SafeFloor/MImFloorData.lean` | `scripts/gen_floor_lean.py` | in-script |
 | `Gross/SafeFloor/MImFloorY{0,1,4,11,12}.lean` | `scripts/gen_yrep_module.py <i>` | in-script |
-| `Z3Z6/StabilizerCode.lean` §1 data (split pending) | `scripts/gen_pair72_packaging_data.py` | validation-gated |
+| `Z3Z6/StabilizerCodeData.lean` | `scripts/gen_pair72_packaging_data.py` (retarget to data-only queued — do not run without reading GENERATORS.md) | validation-gated |
 | `BaseFloors/*.lean` | `scripts/gen_base_floor_lean.py` | per-instance |
 
 Class F (generated fragments between `-- BEGIN/END GENERATED` markers,

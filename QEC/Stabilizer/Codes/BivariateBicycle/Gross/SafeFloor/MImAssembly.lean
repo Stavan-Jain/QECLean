@@ -7,6 +7,7 @@ Regenerate fragments rather than hand-editing dispatch rows.
 /-
 # Phase 6: assembling `MImBound` — the 2-D-orbit dispatch
 
+(The human-facing capstones live in `Gross/Distance.lean`.)
 `floor_kcombo` dispatches an arbitrary `ker ∂₂` class `kcombo c` over its 64 free-cell values:
 the zero class is vacuous (`seamC 0 = 0`, so the coset is a boundary, contradicting the
 hypothesis), and each of the 63 nonzero classes is a `(j,k)`-translate of one of the **5**
@@ -468,25 +469,3 @@ theorem mimBound_holds : MImBound := by
   exact floor_kcombo (ζ (4,4)) (ζ (4,5)) (ζ (5,2)) (ζ (5,3)) (ζ (5,4)) (ζ (5,5)) f hb
 
 end Quantum.Stabilizer.Homological.BB.LightStab
-
-namespace Quantum.Stabilizer.Homological.BB
-
-/-- **Unconditional `HasCodeDistance grossStabilizerCode 12`** — the Gross `[[144,12,12]]`
-bivariate-bicycle code has distance exactly 12, with NO remaining assumed hypotheses.  The
-last analytic input `MImBound` is discharged by `LightStab.mimBound_holds`; the
-`LightStabilizerClassification` input was discharged earlier by
-`LightStab.lightStabilizerClassification_holds`.  Axiom-clean (the standard three + the
-`native_decide` compiler axiom). -/
-theorem grossStabilizerCode_hasCodeDistance_12_uncond :
-    Quantum.StabilizerGroup.HasCodeDistance grossStabilizerCode 12 :=
-  grossStabilizerCode_hasCodeDistance_12 LightStab.mimBound_holds
-
-/-- **The Gross `[[144, 12, 12]]` code as a fully-parametrized object.**  Bundles the
-stabilizer code (`StabilizerCode 144 12`) with its now-unconditional distance proof into a
-single `StabilizerCodeWithDistance` carrying all three `[[n, k, d]]` parameters in its type. -/
-noncomputable def grossStabilizerCodeWithDistance :
-    Quantum.StabilizerGroup.StabilizerCodeWithDistance 144 12 12 where
-  toStabilizerCode := grossStabilizerCode
-  hasDistance := grossStabilizerCode_hasCodeDistance_12_uncond
-
-end Quantum.Stabilizer.Homological.BB

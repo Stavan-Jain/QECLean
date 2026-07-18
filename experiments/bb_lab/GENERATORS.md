@@ -21,11 +21,11 @@ regenerated output in the same PR.
 
 | Script | Emits | Notes |
 |---|---|---|
-| `phase5/gen_file.py` | `Gross/StabilizerCode.lean` | **STALE — DO NOT RUN** (top-of-file warning in place): its template still emits the WIP skeleton and would clobber ~1,100 lines of hand-completed §2–§6 proofs. Queued rewrite: emit only a `Gross/StabilizerCodeData.lean` §1 data module with banner + `--force` guard |
+| `phase5/gen_file.py` | `Gross/StabilizerCodeData.lean` | rewritten 2026-07-18: emits ONLY the §1 data module (7 defs, line-wrapped ≤100 chars) with banner + `--force` guard; the proof file `Gross/StabilizerCode.lean` is hand-maintained and never touched |
 | `scripts/gen_floor_lean.py` | `Gross/SafeFloor/MImFloorData.lean` | cost tables `D3V`/`RCELL` + Γ data |
 | `scripts/gen_yrep_module.py <i>` | `Gross/SafeFloor/MImFloorY<i>.lean` | i ∈ {0,1,4,11,12}; per-orbit floor leaves |
 | `scripts/gen_assembly_2d.py` | fragments for `Gross/SafeFloor/MImAssembly.lean` | Class F: paste between the `BEGIN/END GENERATED` markers only |
-| `scripts/gen_pair72_packaging_data.py` | `Z3Z6/StabilizerCode.lean` | 15-check ALL-PASS validation gate + `--force` guard (the reference implementation); §1-data split queued |
+| `scripts/gen_pair72_packaging_data.py` | `Z3Z6/StabilizerCodeData.lean` | 15-check ALL-PASS validation gate + `--force` guard; NOTE: the Lean-side split is done but the generator still emits the pre-split full file — retarget to data-only before the next regen |
 | `scripts/gen_base_floor_lean.py` | `BaseFloors/<Name>.lean` | class-member small-cycle bundles (A15/T2) |
 | `scripts/gen_f2a6_z5z30_data.py` | data feed for `Z5Z15F2A6/` | A17 line |
 
