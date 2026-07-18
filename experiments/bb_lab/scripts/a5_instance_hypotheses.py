@@ -252,6 +252,13 @@ def orbit_fields(odd_orders: tuple[int, ...]) -> list[OrbitField]:
 ZERO = "zero"
 UNIT = "unit"
 ENGINE_RADICAL = "engine_radical"
+# A15 Entry-8.1b widening: the engine's SUPPORT dichotomy needs only the
+# four slot values pairwise distinct (⟺ {0,a,b,a+b} distinct in the
+# U,V-coordinates) — field-generic, no |F₄ˣ| = 3 input.  ENGINE_RADICAL
+# ("one zero + three distinct") is the sub-case with a zero slot; the
+# label below marks the distinct-no-zero radicals the widened one-sided
+# floor also covers.  Additive: no pre-existing classification changes.
+ENGINE_RADICAL_WIDENED = "engine_radical_widened"
 RADICAL_OTHER = "radical_other"
 
 
@@ -306,6 +313,8 @@ def classify_component(
         n_zero = len(vec) - len(nonzero)
         if n_zero == 1 and len(set(nonzero)) == 3:
             return ENGINE_RADICAL
+        if len(set(vec)) == 4:
+            return ENGINE_RADICAL_WIDENED
     return RADICAL_OTHER
 
 
@@ -444,7 +453,8 @@ def kill_vectors(
         return []
     out: list[KillVector] = []
     for c in comps:
-        if c.kind not in (ENGINE_RADICAL, RADICAL_OTHER):
+        if c.kind not in (ENGINE_RADICAL, ENGINE_RADICAL_WIDENED,
+                          RADICAL_OTHER):
             continue
         ce, cx, cy, cxy = c.value_vector
         r = len(ce)
@@ -558,6 +568,17 @@ class InstanceReport:
         )
 
     @property
+    def verdict_i_widened(self) -> bool:
+        """(i) with the A15 Entry-8.1b field-generic predicate: every
+        component a unit or a pairwise-distinct-slot radical.  Licenses
+        the widened one-sided floor μ(Ann) ≥ 6 on Z₂×Z₂ frames with
+        ANY odd part (the classification layers stay F₄-only)."""
+        return all(
+            c.kind in (UNIT, ENGINE_RADICAL, ENGINE_RADICAL_WIDENED)
+            for c in self.comps_A + self.comps_B
+        )
+
+    @property
     def verdict_ii(self) -> bool:
         return self.diff.verdict
 
@@ -575,6 +596,7 @@ class InstanceReport:
             "B": self.B.canonical_string(),
             "frame": self.frame.shape,
             "i": self.verdict_i,
+            "i_widened": self.verdict_i_widened,
             "ii": self.verdict_ii,
             "iii": self.verdict_iii,
             "ii_mult_free": self.diff.dA_mult_free and self.diff.dB_mult_free,

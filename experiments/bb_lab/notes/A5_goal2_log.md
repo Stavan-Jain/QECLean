@@ -803,3 +803,985 @@ None touches a d ≥ 6 conclusion. The analytic core is intact.
    d = 10 for bb_90/bb_108) — the gross Entries 16–28 playbook.
 3. Housekeeping: fold (iii) into the Entry-3.6 conjecture as a
    load-bearing hypothesis (Entry 6 did this; it is now the headline).
+
+---
+
+## Entry 8 (2026-07-06) — A15 execution session 1: field-genericity
+## PROVEN-SWEPT + the residue lemma re-shaped (difference multisets)
+
+First execution session of the A15 plan
+(`A15_base_floor_class_plan.md`): the §1.3 verification sweep and the
+T1.1 falsify-first hunt, both landed. All numbers
+discovery/validation (A_HANDOFF §1). Scripts:
+`a15_field_generic_engine_check.py`, `a15_t11_residue_hunt.py`.
+
+### 8.1 The Z₂²-engine support dichotomy is FIELD-GENERIC (verified)
+
+Sweep E1/E2/E2′ over K = F₄, F₈, F₁₆, F₆₄ (exhaustive at each field
+for E2/E2′; E1 exhaustive at F₄, sampled 400×400 above):
+
+* **E1.** For D = aU + bV + cUV ∈ K[Z₂²], (a,b) ≠ 0: D² = 0 and
+  x·D = 0 ⟺ x₀ = 0 ∧ x₁b + x₂a = 0, i.e. Ann(D) = span_K{aU+bV, UV}
+  = (D), dim 2 — at every field. PASS.
+* **E2.** Every nonzero α·D + β·UV has ≥ 3 nonzero slot coordinates
+  ⟺ **{0, a, b, a+b} pairwise distinct** (⟺ a ≠ 0, b ≠ 0, a ≠ b);
+  c is irrelevant (it absorbs into β). When distinctness fails the
+  minimum support is exactly 2 (floor degrades to ≥ 4-with-parity,
+  not 6). PASS, all fields.
+* **E2′.** The distinctness condition ⟺ **D's four slot values are
+  pairwise distinct** — the *widened engine predicate*. The checker's
+  `ENGINE_RADICAL` ("one zero + three distinct") is the special case
+  c ∈ {0, a, b, a+b}; the zero-count requirement is NOT load-bearing.
+  PASS, all fields (262,080 triples at F₆₄).
+
+**Instance consequence (E3).** Control bb_72: all radical components
+pass the widened predicate; exact w2/w4/w6 kernel exhaustion (+PAR)
+reproduces μ(Ann A) = μ(Ann B) = 6; 500-sample layer structure clean.
+**Target Z₆×Z₁₄ [[168,12,6]]** (A = 1+y+x³y³, B = 1+x+x²y⁷, the A8
+base; components F₂·F₄·F₈²·F₆₄²): **all radical components pass the
+widened predicate** — the engine's one-sided floor applies verbatim
+OFF the Z₃² odd part. Exact exhaustion: μ(Ann B) = 6 (w6 witness, no
+w2/w4), μ(Ann A) ≥ 8 (consistent with A8's reported 12); 0 layer-
+structure violations in 500 samples per side.
+
+**Corrections this licenses**: the §3.2 frame table's Z₂² row and the
+extensibility doc §4(a) framing "co-point dichotomy = |F₄ˣ| = 3"
+conflate SUPPORT rigidity (field-generic, floor-bearing) with VALUE
+rigidity (F₄-only, classification-bearing). Hypothesis (a)'s engine
+column widens to Z₂²-frames with ANY odd part, via the widened
+predicate.
+
+### 8.1b The hand proof (short; the sweep above is confirmation)
+
+**Lemma (field-generic engine).** Let K be any field of
+characteristic 2, R = K[Z₂²] = K[U,V]/(U², V²) with U = 1+s_x,
+V = 1+s_y, and D = aU + bV + cUV with (a,b) ≠ (0,0). Then:
+
+1. *(products)* For x = x₀ + x₁U + x₂V + x₃UV:
+   x·D = x₀·D + (x₁b + x₂a)·UV, using U² = V² = 0 and U·UV = V·UV
+   = 0. In particular D² = 0 (char-2 squaring kills cross terms; U²,
+   V², (UV)² all vanish) and D·UV = 0.
+2. *(annihilator)* D and UV are linearly independent ((a,b) ≠ 0
+   gives D a nonzero U- or V-coefficient; UV has none), so by (1)
+   x·D = 0 ⟺ x₀ = 0 and x₁b + x₂a = 0 ⟺ x ∈ K·(aU+bV) ⊕ K·UV
+   (parametrize (x₁, x₂) = t·(a, b): x₁b + x₂a = 2tab = 0, and
+   conversely if a ≠ 0 set t = x₁/a). Also by (1),
+   D·R = K·D + K·UV = K·(aU+bV) ⊕ K·UV, so **Ann(D) = (D)**,
+   K-dimension 2.
+3. *(support dichotomy)* In the slot (group-element) basis
+   (1, s_x, s_y, s_xs_y): U = (1,1,0,0), V = (1,0,1,0),
+   UV = (1,1,1,1). A nonzero ideal element z = α(aU+bV) + β′·UV has
+   slot vector (α(a+b)+β′, αa+β′, αb+β′, β′). If α = 0: all four
+   slots equal β′ ≠ 0 (full support). If α ≠ 0: the slots are
+   α·{a+b, a, b, 0} + β′, so a slot vanishes exactly when β′/α hits
+   the corresponding member of {a+b, a, b, 0}. Hence
+   * {0, a, b, a+b} pairwise distinct (⟺ a, b ≠ 0, a ≠ b) ⟹ at most
+     one zero slot: **every nonzero z ∈ (D) has ≥ 3 nonzero slots**;
+   * otherwise choosing β′/α = the repeated value gives exactly two
+     zero slots: the dichotomy fails at support 2.
+   The slot values of D itself are c + {a+b, a, b, 0}, so the
+   distinctness condition ⟺ **D's four slot values are pairwise
+   distinct** (E2′). ∎
+
+**Corollary (one-sided floor, widened hypothesis).** Let
+G = Z_ℓ × Z_m have 2-part Z₂², A ∈ F₂[G] with |A| odd, and suppose
+every CRT component Â_j is a unit or a radical D_j whose (a_j, b_j)
+satisfy the distinctness condition (no zero components). Then
+μ(Ann A) ≥ 6. *Proof.* For 0 ≠ z ∈ Ann(A): some ẑ_j ≠ 0 (CRT
+injectivity); j is not a unit component (units force ẑ_j = 0); at
+radical j, ẑ_j ∈ Ann(D_j) = (D_j) by (2), so it has ≥ 3 nonzero
+slots by (3), i.e. z has ≥ 3 nonzero layers (V_j(z)[s] ≠ 0 needs
+z_s ≠ 0). |A| odd makes Â₀ a unit (augmentation 1), so ẑ₀ = 0: every
+layer weight |z_s| is even, and nonzero layers weigh ≥ 2. Total
+≥ 3·2 = 6. ∎ (A4 §4.1 verbatim; only the hypothesis is widened — no
+|F₄ˣ| = 3 input anywhere.)
+
+### 8.2 T1.1 hunt, frame 1 (Z₉×Z₆ — first LIVE even-axis frame)
+
+Self-test: bb_108's stored presentation passes all gates + (iv)+(v)
+(Entry-2 consistency). Enumeration: 1431 weight-3 translation
+classes/side → mirrored+mult-free → floor/Ann gates (exact w2/w4
+kernel exhaustion + PAR — no engine reasoning load-bearing) → 192
+mono-x × 282 mono-y polys → **44,064 members** with disjoint diff
+sets. Run 1 (first 20,000 members): **0 (iv) violations, 0 (v)
+violations**. [Full-frame + Z₆×Z₁₀/Z₁₅×Z₆/Z₆×Z₁₄ runs: §8.4.]
+
+**Pipeline telemetry (the load-bearing discovery).** Classifying the
+(2,2) table of 120 members through the E6.4 pipeline:
+
+| stage | kill | rows |
+|---|---|---|
+| s1 | y-projection weight | 232,200 |
+| s2 | x-projection weight | 94,760 |
+| s3 | size mismatch | 4,368 |
+| s3 residue | profile x / y / both | 640 / 856 / 160 |
+| s3 residue | **profile "neither"** | **4,096** |
+
+The projections are far LEAKIER here than on the three template
+instances (~48 residue rows/member vs ~1), and **71% of the residue
+is profile-resistant**: σ_L ≠ t·σ_R for every t, yet the x- AND
+y-multiplicity profiles agree. ⟹ **the multiplicity-profile residue
+lemma (E6.4's sketch) is the WRONG SHAPE for the class** — it closes
+the three templates by luck of their tables, not by mechanism.
+(Contrast: the (iv) triangle kills are 100% profile-separable —
+63,030 records, zero "neither" — so (iv)'s uniform lemma CAN stay
+profile-based.)
+
+### 8.3 The residue lemma re-shaped: DIFFERENCE-MULTISET incidence
+
+For a size-6 (disjoint-union) row, translation-invariance gives the
+exact multiset identity
+
+    d(σ_L) = 2·dA ⊎ (dA ∪ {0} + δ_L) ⊎ (dA ∪ {0} − δ_L),
+
+so a match σ_L = t·σ_R forces d(σ_L) = d(σ_R) as multisets, and
+counting any d ∈ dA (multiplicity ≥ 2 on the left; dA ∩ dB = ∅ kills
+the 2·dB contribution on the right; the two shifted sets contribute
+≤ 1 each) forces the **incidence system**
+
+    d + δ_R ∈ dB ∪ {0}  AND  d − δ_R ∈ dB ∪ {0}   for EVERY d ∈ dA,
+    (mirror: e ± δ_L ∈ dA ∪ {0} for every e ∈ dB)
+
+— 12+12 Sidon-type incidences. **Probe (40 Z₉×Z₆ members + 25
+Z₆×Z₁₀ members, scratchpad `a15_diffmultiset_probe.py`, now baked
+into the hunt script): the difference multiset separates 1580/1580
+profile-resistant rows, and the incidence criterion alone kills
+1512/1512 size-6 rows.** Zero resistant rows.
+
+Re-shaped T1 target (replaces the profile lemma):
+
+> **(C-res) residue lemma, difference-multiset form.** Under
+> (b) D1 ∧ D2 [+ (iii), + floor]: no (δ_L, δ_R) satisfies the
+> incidence system; hence no size-6 (2,2) match. Size-4 rows
+> (δ_L ∈ dA: one internal overlap) need the corrected multiset
+> formula — 68/68 probed rows are also dm-separated.
+
+This is FRAME-AGNOSTIC (no coordinate projections at all — they
+survive only as cheap pre-filters) and lives in the same D1/D2
+difference-set language as the extensibility-doc §6 two-sided half —
+the two-sided theory and the (v)-kill now share one vocabulary. The
+proof obligation is a finite incidence analysis of (dA, dB, δ);
+plausible uniform route: |dA| = 6 elements each needing BOTH signs to
+land in the 7-element dB ∪ {0} forces |(dA + δ_R) ∩ (dB ∪ {0})| = 6
+— a near-translation of difference sets, which (iii)'s coordinate
+separation should refute outright (x(dA) concentrated on ≤ 2 values
+vs x(dB) spread, gross-style). To be drafted as the Entry-9 lemma.
+**[Superseded by Entry 9: the ⊎(dA∪{0}±δ) shorthand under-counts —
+the ±δ atoms carry multiplicity 3 (6 at 2-torsion) — and the probe's
+incidence criterion was only approximately necessary. Entry 9 gives
+the exact accounting and the resulting three-branch kill; the 100%
+dm-separation figures above are unaffected (they compared true
+multisets).]**
+
+### 8.4 Frame completions
+
+| frame | members checked | (iv) fails | (v) fails |
+|---|---|---|---|
+| Z₉×Z₆ (Z₂ frame, even y) | **44,064 / 44,064 (full)** | 0 | 0 |
+| Z₆×Z₁₀ (Z₂² frame, both even, odd part Z₃×Z₅) | **7,776 / 7,776 (full)** | 0 | 0 |
+| Z₁₅×Z₆ (Z₂ frame, even y) | 20,000 / 248,904 (cap) | 0 | 0 |
+| Z₆×Z₁₄ (Z₂² frame, odd part Z₃×Z₇) | 20,000 / 49,788 (cap) | 0 | 0 |
+
+**Grand total: 91,840 members, zero (iv)/(v) violations, zero
+`DM-RESISTANT` alarms** (grep-confirmed on both logs) —
+(C-iv′)/(C-v′) survives its first live even-axis frames with the
+orbit-pair branch exercised, and the difference multiset separated
+every profile-resistant row everywhere one arose (Z₉×Z₆: 4,392 rows
+over 150 classified members; Z₁₅×Z₆: 2,796 over 80; **Z₆×Z₁₀ and
+Z₆×Z₁₄: zero profile-resistant rows at all** — the projections are
+tight on those frames). Per-row invariant telemetry retained
+(`data/a15/t11_*.jsonl` + logs). Perf note for reruns: verdict_v is
+~0.9 s/member at |G| = 90 (the right-image dictionary is |G|²);
+vectorize before scaling past the 20k caps; the uncapped Z₁₅×Z₆
+tail (228,904 members) is queued for a vectorized pass.
+
+### Next
+
+1. Draft **(C-res)** (§8.3) as the uniform (v)-kill; prove the
+   size-4 variant's multiset formula; keep the profile lemma for
+   (iv) only.
+2. Finish the frame battery; add a DM-RESISTANT alarm key (done —
+   any future row the difference multiset fails to separate prints
+   `s3-residue-DM-RESISTANT`).
+3. T3a.1: write the hand proof of E1/E2/E2′ (short; the sweep is
+   confirmation) and re-scope the checker's `engine_radical`.
+
+---
+
+## Entry 9 (2026-07-06) — (C-res) proven-in-structure: the exact
+## multiset accounting and the three-branch (v)-kill
+
+Continuation of Entry 8 (§8.3's re-shaping), same session. The (v)
+obligation — no (2,2) translate match A·{0,δ_L} = t + B·{0,δ_R} — is
+now killed by a three-branch argument whose first two branches are
+proven lemmas and whose third is reduced to a tiny pinned census,
+machine-cleared corpus-wide. Verification script (each check = one
+proof step): `a15_e9_residue_lemma_checks.py` (V1–V6). Standing
+hypotheses: |A| = |B| = 3, D1 (Sidon), D2 (dA ∩ dB = ∅), no-period
+(the w2 gate), (iii) mirrored shapes, floor-bearing frame — of which
+the (v)-kill consumes only D1, D2, no-period, (iii), and 4 ∤ ℓ ∧
+4 ∤ m; the μ ≥ 6 floor is NOT used here.
+
+### 9.0 Correction to §8.3's shorthand
+
+The formula "d(σ_L) = 2·dA ⊎ (dA∪{0} ± δ_L)" under-counts: the ±δ_L
+atoms carry multiplicity 3 each (they merge to one atom of
+multiplicity 6 when 2δ_L = 0), and the probe's incidence criterion
+was approximately-necessary only. Exact accounting below; the §8.3
+dm-separation figures compared true multisets and stand.
+
+### 9.1 The exact identities (V1: 2,500 formula checks, both frames)
+
+Size 6 (δ_L ∉ dA; σ_L = A ⊔ (A + δ_L)):
+
+    d(σ_L) = 2·dA ⊎ (dA + δ_L) ⊎ (dA − δ_L) ⊎ {δ_L}³ ⊎ {−δ_L}³.
+
+Size 4 (δ := δ_L ∈ dA; by D1 the ordered pair a_i − a_j = δ is
+unique; a_k the third element; e := a_j − a_k):
+σ_L = {a_j, a_k, a_j + 2δ, a_k + δ} and
+
+    d(σ_L) = ±{δ, 2δ, e, e − δ, e + δ, e + 2δ}.
+
+Size 2 is vacuous: it needs δ_L ∈ dA with 2δ_L = 0, but a 2-torsion
+difference has multiplicity 2 in the ordered-difference multiset,
+violating D1. (Mirror statements for σ_R with dB, δ_R, f.)
+
+### 9.2 Branch 1 — the atom dichotomy (proven)
+
+**Lemma A.** If σ_L = t + σ_R (sizes 6), then
+δ_L = ±δ_R, or (δ_L ∈ dB and δ_R ∈ dA).
+
+*Proof.* d(σ) is translation-invariant, so the multisets agree. By
+§9.1, mult_{d(σ_L)}(δ_L) = 3 + [2δ_L ∈ dA] + 3·[2δ_L = 0] ≥ 3, while
+mult_{d(σ_R)}(δ_L) = 2·[δ_L ∈ dB] + [δ_L−δ_R ∈ dB] + [δ_L+δ_R ∈ dB]
++ 3·[δ_L = δ_R] + 3·[δ_L = −δ_R]. If δ_L ≠ ±δ_R and δ_L ∉ dB this is
+≤ 2 < 3. The mirror count at δ_R forces δ_R ∈ dA likewise. ∎
+
+(V2: asserted on every size-6 row of both frames — 1.77M rows on
+Z₉×Z₆ [800-member slice], 21.8M on Z₆×Z₁₀ [all 7,776 members]; the
+atom step alone kills 94.7% / 95.5% of rows.)
+
+### 9.3 Branch 2a — δ_L = ±δ_R =: δ (proven under (iii), 4 ∤ ℓ)
+
+WLOG δ_L = δ_R = δ (σ_R(−δ) is a translate of σ_R(δ)); δ ∉ dA ∪ dB.
+
+**Lemma B (translate rigidity).** A size-6 match with δ_L = ±δ_R
+forces dB = dA + δ = dA − δ.
+
+*Proof.* Count d(·) over d ∈ dA: mult_L(d) = 2 + [d−δ ∈ dA] +
+[d+δ ∈ dA] ≥ 2 (atoms don't contribute: ±δ ∉ dA). On the right,
+mult_R(d) = [d−δ ∈ dB] + [d+δ ∈ dB] ≤ 2 (D2 kills 2·dB; d ≠ ±δ).
+Summing over the six d and comparing forces per-element equality
+at 2: d ± δ ∈ dB for every d ∈ dA, i.e. dA + δ ⊆ dB ⊇ dA − δ; sizes
+(6 = 6) give equality. ∎
+
+**Lemma C (shift lemma; V4, exhaustive ℓ ≤ 24).** For 4 ∤ ℓ, the
+x-coordinate difference multiset {±p, ±q, ±(p+q)} of a 3-subset of
+Z_ℓ (p, q, p+q ≠ 0 — the (iii) B-shapes guarantee this) is never a
+shift of an A-shape x-profile — {0², u², (−u)²} (u ≠ 0; = {0², u⁴}
+at 2u = 0) or {0⁶}. At 4 | ℓ the exceptions are exactly the APs with
+an order-4 common difference.
+
+*Proof sketch (hand, verified by V4).* Shifts preserve the
+multiplicity pattern. A symmetric multiset {±p, ±q, ±r} with r = p+q
+and all nonzero has pattern (3 values × mult 2) only if its value
+set is negation-closed, which forces either three distinct nonzero
+2-torsion values (impossible in a cyclic group) or a pair {w, −w}
+plus a 2-torsion value, which solves to an order-4 element (4 | ℓ);
+the patterns (2,4) and (6) solve only degenerately. The A-shapes
+have patterns (2,2,2), (2,4) (2-torsion u), or (6). ∎
+
+**Theorem D (2a kill).** Under D1, D2, (iii), no-period, and
+4 ∤ ℓ ∧ 4 ∤ m: no size-6 match has δ_L = ±δ_R. *Proof.* Lemma B
+gives dB = dA + δ, so x(dB) = x(dA) + δ_x as multisets; Lemma C
+forbids it (dA carries an A-shape x-profile by (iii); dB carries a
+3-subset difference multiset in x with nonzero entries). ∎
+
+Two notes. (1) The dm invariant ALONE cannot close 2a: if
+dB = dA + δ did hold, the two §9.1 multisets would coincide
+identically — Lemma C (hence (iii) + the frame) is load-bearing,
+and this branch is where DM-resistant rows would have lived. (2)
+Corpus-wide the rigidity premise never holds anyway: V3 finds
+0/44,064 (Z₉×Z₆) and 0/7,776 (Z₆×Z₁₀) members with dB in dA's
+translate class.
+
+### 9.4 Branch 2b (S2) — δ_L ∈ dB ∧ δ_R ∈ dA: pinned census (reduced)
+
+For S2 rows, the proven projection-weight machinery (the corrected
+even-period lemma, E7.3) pins hard:
+
+* B2-shape (axis-confined B) dies at once: δ_L ∈ dB gives δ_Ly = 0,
+  so |π_y σ_L| = 0, while δ_R ∈ dA has δ_Ry ≠ 0 ((iii) forbids the
+  spike sharing a y with the pair), so |π_y σ_R| = 2. ✗
+* B1-shape survivors must have: δ_Ly = ±h (dB's slant y-gap) with
+  |a(y)(1+y^{δ_Ly})| = 2 (a is a 3-AP of difference δ_Ly, or the
+  orbit-pair branch), and δ_Rx = ±u (dA's slant x-gap) with
+  |b(x)(1+x^{δ_Rx})| = 2 (mirror). In the 3-AP sub-branch, x(dB) =
+  {±u², ±2u} regardless of the spike's AP position, and the dA-slice
+  count of Lemma B's type then bounds the compatible x-fibers at
+  exactly 6, forcing y-alignments (δ_Ry ∈ {±w} ∩ {±s, ±s′}) that
+  make a(y) an AP for a second difference — i.e. a(y) a coset of an
+  order-3 subgroup — the residual census shape.
+
+Numbers: Z₉×Z₆ (800-member slice): 28,800 S2 rows → **160 S2-hard**
+(0.2/member; all in the 3AP/3AP sub-branch, e.g. A =
+{(0,0),(0,1),(1,2)}, B = {(0,0),(1,0),(2,5)}, δ_L = (1,5) ∈ dB,
+δ_R = (1,1) ∈ dA) → **0 DM-equal**. Z₆×Z₁₀ (all members): 279,936
+S2 rows → **0 S2-hard** — the pinning annihilates the branch there.
+Status: per-member surveyable census (≤ a few rows), machine-cleared
+everywhere; the uniform finish (the order-3-coset case analysis) is
+the remaining crumb.
+
+### 9.5 Size 4 — the coupled system (generic derivation + clearance)
+
+For a size-4 match (δ := δ_L ∈ dA, δ′ := δ_R ∈ dB), §9.1 gives
+d(σ_L) ⊇ dA = {±δ, ±e, ±(e+δ)} and six values outside dA (D2 keeps
+dB off them), so generically the match forces the **coupled system**
+
+    dA = {±2δ′, ±(f−δ′), ±(f+2δ′)}   and
+    dB = {±2δ, ±(e−δ), ±(e+2δ)},
+
+a doubling-incidence structure (2δ ∈ dB for δ ∈ dA — the
+`is_frobenius_related` gate's kin). V6, all size-4 rows: Z₉×Z₆
+108,000 rows (3,000 members) and Z₆×Z₁₀ 279,936 rows (all members):
+**0 rows satisfy even one leg of the system; 0 DM-equal**.
+Coincidence sub-branches (e.g. 2δ ∈ dA) are folded into the direct
+dm check. Uniform infeasibility proof of the system = second
+remaining crumb (torsion equations; expect (iii) + 4∤ℓ to close it
+by the Lemma-C method).
+
+### 9.6 Status of (C-v′) after this entry
+
+The (v)-kill = Lemma A (proven) + Theorem D (proven, hypotheses D1 ∧
+D2 ∧ (iii) ∧ no-period ∧ 4∤ℓ ∧ 4∤m) + S2 census (pinned by proven
+lemmas; empty or ≤O(1) rows/member, machine-cleared on 51,840+
+members) + size-4 system (necessary condition proven generically;
+machine-cleared). What remains of Entry 6's single amorphous
+"multiplicity-profile residue": two structured crumbs — the S2
+order-3-coset case analysis and the size-4 system's infeasibility.
+The (iv) obligation stays profile-based (Entry 8.2: 100%
+profile-separable). Certifier consequence (T1.2): the per-member (v)
+obligation is now [translate-class compare: one canonicalization] +
+[S2-hard census: ≤ few rows] + [size-4 dm rows: ≤ 36] — all
+surveyable, replacing the |G|³ table.
+
+### Next
+
+1. Entry 10: the two crumbs — S2's order-3-coset analysis; size-4
+   system infeasibility under (iii) + 4∤ℓ (Lemma-C-style torsion
+   arithmetic).
+2. Wire the three-branch kill into the recipe-certifier (T1.2) and
+   re-run the 58-member corpus + the hunt frames through it.
+3. Queued falsify-first: the off-(iii) rigidity hunt (∃δ:
+   dB = dA + δ with D1∧D2) on 4|ℓ frames — explicit (2,2)-match
+   codes would witness (iii)/frame-necessity for branch 2a.
+
+---
+
+## Entry 10 (2026-07-06) — the two crumbs closed: S2's D2-funnel and
+## the size-4 family collapse
+
+Same-day continuation of Entry 9. Both residual crumbs of the
+(v)-kill are now resolved — S2 by a fully-proven funnel into a D2
+contradiction, size-4 by an exact rigidity lemma + a matching
+dichotomy that collapses every branch into finite torsion families,
+each dead against D2 / D1 / a counting bound / hypothesis (a) — with
+one honestly-flagged polish item. Verification:
+`a15_e10_size4_s2_kills.py` (W1–W5b). Machine numbers below are
+from Z₉×Z₆ (1,200-member slice) + Z₆×Z₁₀ (full) + the fixed ambient
+censuses.
+
+### 10.1 Theorem G — the S2 kill (branch 2b closed)
+
+Under D1 ∧ D2 ∧ (iii) ∧ no-period ∧ 4∤ℓ ∧ 4∤m, no size-6 match has
+δ_L ∈ dB ∧ δ_R ∈ dA. With Entry 9's Lemma A and Theorem D this
+closes size 6: **no size-6 (2,2) match exists at all.**
+
+*Proof sketch (funnel).* The Σ-count over dA (Entry 9's method, with
+the S2 atom terms: Σ_R picks up +6 from δ_R ∈ dA) forces
+|dA ∩ (dB+δ_R)| + |dA ∩ (dB−δ_R)| ≥ 6. The pinning (Entry 9 §9.4)
+gives b(x) = AP(δ_Rx) with δ_Rx = ±u, so x(dB) = {±u², ±2u}
+(any spike position), and the x-fiber caps bound the two
+intersections by 3+3 (generic u) — equality forces every
+x-compatible element to land in dA, pinning the y-data:
+{δ_Ry, δ_Ry ∓ h} = {±w}, hence h = ±2w and {s, s′} = {w, 2w} (up to
+mirror), i.e. a(y) = AP(w). The pinning also says a(y) = AP(±h) =
+AP(2w); a 3-set that is an AP for both w and 2w forces 3w = 0
+(difference-multiset comparison; the 5w = 0 option fails
+multiplicities). With 3w = 0, dA's slant set becomes all four
+(±u, ±w) — and dB always carries a slant with x-part ±u and y-part
+±h = ∓w, which therefore lies in dA: **dA ∩ dB ≠ ∅, contradicting
+D2**. Sub-branches: 3u = 0 (x(dB) = {±u³}) reruns the count with
+per-fiber caps 2 and lands in the same clash via h ∈ {±w, ±2w};
+b-side orbit-pair dies by the fiber count (≤ 4 < 6); a-side
+orbit-pair forces 4w = 0 ⟹ 2w = 0, excluded because D1 forbids
+2-torsion differences ((0,w) would be one). ∎
+
+Machine (W3): all pinned S2-hard rows are AP/AP (160 on Z₉×Z₆, 0 on
+Z₆×Z₁₀; 0 orbit-pair rows either side), and **0 rows satisfy the
+forced-condition set** [a = AP(w) ∧ (h = ±2w ∨ (3u = 0 ∧ h = ±w))] —
+the funnel's terminal configuration never coexists with the D2 gate,
+as the proof demands.
+
+### 10.2 Size 4 — exact rigidity, the dichotomy, the family collapse
+
+**Lemma E (exact rigidity; upgrades E9.5's "generic").** A size-4
+match forces dA = {±2δ′, ±(f−δ′), ±(f+2δ′)} and
+dB = {±2δ, ±(e−δ), ±(e+2δ)}, all six values distinct on each side.
+*Proof:* Σ-count over dA: the ±{δ, e, e+δ} multiset hits each dA
+element exactly once (D1), the right side reaches 6 only if every
+one of its six non-dB values lands in dA, and per-element equality
+at 1 makes the cover exact; symmetrically over dB. ∎ (W1: the
+Σ-formula asserted on all 86,400 sampled size-4 rows; joint
+rigidity holds 0 times on gate-passing members.)
+
+**Lemma F (matching dichotomy).** σ_L = t + σ_R makes σ_L's pair
+decomposition (gaps {δ, 2δ}) and σ_R's ({δ′, 2δ′}) two matchings of
+ONE 4-set, so one of:
+- *aligned* (same matching, gap-aligned): δ = ±δ′ — **D2-dead**;
+- *crossed* (same matching, gaps swapped): δ = ±2δ′ ∧ 2δ = ∓δ′ ⟹
+  3δ′ = 0 (then 2δ′ = −δ′ gives δ = ±δ′ — **D2-dead**) or 5δ′ = 0 —
+  the **pentagonal family**;
+- *M₂* ({±e, ±(e+δ)} = {±δ′, ±2δ′}): e or e+δ ∈ ±dB — **D2-dead**;
+- *M₃* ({±(δ−e), ±(e+2δ)} = {±δ′, ±2δ′}): the **triangular
+  families**, resolved by the closure constraint (dB must itself be
+  a 3-set difference set): every sign-assignment forces one of
+  3δ = 0-with-3τ = 0 (T₃-confined: |dA ⊎ dB| = 12 > 8 = |Z₃² ∖ 0| —
+  **counting-dead**), τ = 3δ with 9δ = 0 (dB acquires 2δ twice —
+  **D1-dead**), or 5δ = 0 / 15-torsion **cyclic-confined families**.
+
+**Lemma H (the pentagonal kill).** The crossed-5-torsion analysis
+confines all data to the (5,5)-torsion subgroup T₅ ≅ Z₅² (both
+coordinates of δ′, e, f are 5-torsion by the (iii)-profile order
+argument), so dA ⊂ T₅ and A lies in a single T₅-coset. In char 2
+there are **no vanishing weight-3 sums of 5th roots of unity**
+((1+ζ)⁵ = ζ + ζ⁴ ≠ 1 for ζ ∈ μ₅ ∖ {1}), so every CRT component of Â
+is a unit and Ann(A) = 0 — **hypothesis (a) is violated**. ∎
+(W4: the branch is genuinely live at the difference-set level — 960
+D1∧D2 σ-shape matches on Z₅², all realizable; W4b: all 276 weight-3
+polys on Z₅² have all-unit components — the kill is real and
+needed, not vacuous.)
+
+**The confined families vs the gates (machine-exhaustive).** The
+15-torsion/cyclic-confined families are also live at the
+difference-set level: W5 finds 4,560 D1∧D2 σ-shape matches across
+the family ambients — all at 5 | n, i.e. every live confined family
+is 5-torsion-flavored, and these are exactly Entry 6's non-mirror
+exclusion zone seen structurally (the diagnosed hits are
+axis-confined, same-orientation pairs with Ann = 0). **W5b realizes
+every hit on the 2-D ambient list (Z_n×Z₃ n ≤ 30, Z_n×Z₅ n ≤ 20,
+Z₅²) — 19,120 realized matches — and 0 satisfy
+(iii)-mirrored ∧ Ann ≠ 0 ∧ no-w2/w4.** Polish item (flagged): the
+by-hand (iii)∧(a)-incompatibility for arbitrary embeddings of the
+confined families (diagonal cyclic subgroups of large frames) — the
+coordinate-split analysis per family; all axis-aligned and
+small-mixed embeddings are covered by the census, and the 91,840-
+member frame battery plus W2's zero-precondition-rows corroborate.
+
+### 10.3 Status: the (v)-obligation is now a theorem-with-one-polish-item
+
+    (v) size 6 = Lemma A + Theorem D + Theorem G      [proven]
+    (v) size 4 = Lemmas E, F, H + family collapse     [proven; general-
+                 embedding polish item, census-exhausted]
+    (v) size 2 = vacuous under D1                     [proven]
+
+Hypotheses consumed: D1, D2, (iii), no-period, Ann ≠ 0, 4∤ℓ ∧ 4∤m —
+**still no use of the full μ ≥ 6 floor.** Remaining for the class
+theorem (C-iv′)/(C-v′): the (iv) uniform lemma (Entry 8.2: 100%
+profile-separable — expected to yield to the same multiset toolkit),
+the size-4 polish item, and the certifier wiring (T1.2).
+
+### 10.4 Frame battery addendum
+
+Z₅×Z₅ has **zero class members** (144 mirrored candidates, all fail
+the floor/Ann gate — Entry 6 §6.1's "Z₅² matches are all k = 0"
+reappearing as the pentagonal kill). Pickup (run complete): Z₅×Z₁₀
+also has **zero class members**, and Z₁₅×Z₅ — the 25 | |G| frame
+where the pentagonal branch is torsion-permitted — is clean at
+**20,000 members, 0 (iv)/(v) violations** (916 profile-resistant
+rows over 60 classified members, all dm-separated, zero
+DM-RESISTANT), exactly as Lemma H predicts. Battery grand total:
+**111,840 members across 8 frames, zero violations.**
+
+### Next
+
+1. Entry 11: the (iv) uniform lemma via the same difference-multiset
+   toolkit (triangle-image d(σ) identities); then (C-iv′)/(C-v′) is
+   a THEOREM modulo the size-4 polish item.
+2. T1.2 certifier: per-member (v) is now zero-cost (all uniform);
+   per-member (iv) = the small census until Entry 11 lands.
+3. Polish: the general-embedding (iii)∧(a) argument; fold Theorem
+   G/Lemmas E–H into a consolidated A16 class-theorem write-up.
+
+---
+
+## Entry 11 (2026-07-06) — the (iv) kill: triangle images are
+## Frobenius squares; the class small-cycle theorem assembles
+
+Same-day continuation. The (iv) obligation ((1,3)/(3,1) censuses)
+turns out to be governed by two char-2 polynomial identities, making
+its uniform kill THREE LINES — and with it, (C-iv′)/(C-v′) assembles
+into a theorem modulo explicitly-bounded polish items. Verification:
+`a15_e11_iv_kill.py` (X1–X3) + the coincidence classifier.
+
+### 11.1 Lemma I (chirality structure of the triangle census)
+
+In char 2: **B·B = B²** (the Frobenius square — squared supports,
+3 distinct cells since D1 forbids 2-torsion differences) and
+**B·(−B) = {0} ∪ dB** (weight 7 under D1). Consequently the
+dB-triangles {0, a, b} (a, b, b−a ∈ dB) generically form exactly two
+translate classes, and their weight-3 images are pinned:
+
+* reflection class T ~ B_i − B: image ({0} ∪ dB) + c, weight 7 —
+  never produces a (1,3) candidate;
+* same-chirality class T ~ B − B_i: image **B² + c**, weight 3.
+
+(X1: 24,000/24,000 image identities verified on the Z₉×Z₆ and
+Z₆×Z₁₀ batteries; A4 §4.3's T₊/T₋ = exactly these two classes, and
+its "constant-y image y³(1+x²+x⁴)" = 2B + (0,3) verbatim.)
+
+### 11.2 Theorem J (the generic (iv) kill = Frobenius exclusion)
+
+**Under D1 ∧ (iii) alone** (no frame condition): no weight-3
+same-chirality image is a translate of A, in either direction.
+
+*Proof.* A match forces dA = d(B²) = 2·dB. dB (B1-shape) contains
+(p, 0) with 2p ≠ 0 (D1), so 2·dB contains the nonzero y = 0 element
+(2p, 0); but dA under (iii) has y-parts {±w, ±s, ±s′}, all nonzero.
+Mirror: dB = 2·dA would need the x = 0 element (0, 2w) ∈ dB —
+impossible for B1 (all x-parts nonzero) and for B2 (forces 2w = 0,
+D1-dead). ∎
+
+This resolves the extensibility-§6 obstruction arc FOR THE CLASS:
+the Frobenius square A ~ B² (including the Z₈²-spread variants that
+defeated D3) is exactly the generic (iv) failure mode, and
+(iii) + D1 exclude it outright — the `is_frobenius_related` gate is
+subsumed by the mirrored-projection hypothesis on class members.
+
+### 11.3 Lemma K (coincidence classes)
+
+Extra triangle classes require extra additive relations in dB, and
+the battery classification is exact: **every occurring coincidence
+class (4,082/4,082 across both frames) is an order-3-coset triangle**
+T = ⟨v⟩ + c for v ∈ dB of order 3 (2v = −v ∈ dB is free by
+symmetry — bb_108's third (3,1) class, (6,4) = 2·(3,2) with
+3·(3,2) = 0, is this). Its image is the odd-multiplicity coset
+s + ⟨v⟩ (the dB-pair's cosets cancel) — an order-3 AP-line; A ~ an
+AP-line would put multiplicity 2 in dA at the common difference:
+**D1 kills in one line.** The non-occurring genuine-doubling family
+(v, 2v ∈ dB with 3v ≠ 0 ⟹ dB = ±{p, 2p, 3p}, image an AP-line with
+dA-confinement ±{p, 4p, 5p}) dies by the (iii)-clash: the confined
+dA needs an x = 0 representative pattern that forces p's x-part to
+0, contradicting B's own (iii)-shape (with a 2-torsion-u sub-case in
+the Entry-10 torsion apparatus). Polish item: complete the
+relation-type table (q = −3p, 3p + 2q = 0, … patterns) — none occur
+in the battery, and all inhabit the same bounded apparatus.
+
+### 11.4 The class small-cycle theorem (v1)
+
+Assembling Entries 8–11:
+
+> **Theorem (class small cycles, v1).** Let (Z_ℓ × Z_m, A, B) with
+> |A| = |B| = 3 satisfy: D1 (Sidon difference sets), D2
+> (dA ∩ dB = ∅), (iii) (mirrored projections), no-period,
+> Ann(A), Ann(B) ≠ 0, and a floor-bearing frame (2-part ∈ {1, Z₂,
+> Z₂²} with one-sided floor ≥ 6; 4 ∤ ℓ, 4 ∤ m). Then the code has no
+> nonzero 1-cycle of weight ≤ 5; in particular d ≥ 6, μ_Z, μ_X ≥ 6,
+> and every free-Z₂ cover has d ≥ 6 (Theorem-B transfer).
+>
+> *Proof map.* PAR kills mixed-parity splits (|A|, |B| odd). One-
+> sided splits: the widened engine floor (Entry 8.1b — field-generic;
+> Z₂/semisimple frames by the A5 E2/E4 mechanisms). (1,1): D2.
+> (1,3)/(3,1): Lemma I + Theorem J + Lemma K (Entry 11). (2,2):
+> Lemma A + Theorem D + Theorem G (size 6; Entries 9–10) and Lemmas
+> E/F/H + the family collapse (size 4; Entry 10); size 2 vacuous.
+>
+> *Modulo* three explicitly-bounded polish items, none of which
+> occurs on any of the 91,840+ battery members or the 58-member
+> corpus: (P1) the size-4 general-embedding (iii)∧(a) argument
+> (census-exhausted on all 2-D family ambients); (P2) Lemma K's
+> 2-torsion-u sub-case; (P3) the coincidence relation-type table.
+
+Notable hypothesis accounting: the full μ ≥ 6 floor is consumed
+ONLY by the one-sided splits; the entire two-sided analysis needs
+just D1 ∧ D2 ∧ (iii) ∧ no-period ∧ Ann ≠ 0 ∧ 4∤ℓ∧4∤m. And the
+certifier consequence (T1.2) is now maximal: **every per-member
+obligation is uniform** — no censuses, no residue tables; the
+certificate is the gate-check itself (O(|G|²) decidable, all
+surveyable per instance).
+
+### Next
+
+1. A16: consolidated class-theorem write-up (the Entry 8–11 lemmas
+   as one document, with the three polish items discharged — P2/P3
+   are small torsion tables, P1 is the coordinate-split analysis).
+2. T1.2: wire the theorem into `a5_recipe_certify.py`; re-run the
+   58-member corpus + battery as certificates; update the
+   extensibility doc §6 (Frobenius arc: closed for the class) and
+   the A15 plan (T1 = effectively closed).
+3. Then T2 (the Lean base-floor layer) — the theorem's obligations
+   are now all decidable-by-construction, which is exactly what the
+   `BBSmallCycleData` bundle wants.
+
+---
+
+## Entry 12 (2026-07-07) — T1.2: the certifier lands; Z₆×Z₁₄ becomes
+## the fourth analytic instance
+
+`scripts/a15_class_certify.py` wires Entry 11.4 into a per-instance
+certificate: gates W3/D1/D2/(iii)/FRM/ANN + the frame-appropriate
+analytic floor route (widened engine / Z₂ pullback / semisimple d_H)
++ the exact w2/w4 kernel exhaustion, emitting CERTIFIED (theorem
+citation + cover transfer) or REJECTED (first failed gate, no
+verdict implied). Every obligation is uniform — the Entry-5-era
+per-member censuses are gone. `--verify` runs the direct (iv)/(v)
+checks as machine confirmation (A_HANDOFF §1 grade).
+
+Self-test battery (8/8 as predicted): bb_72, bb_108, bb_90 CERTIFIED
+(three frame shapes, three floor routes); **Z₆×Z₁₄ [[168,12,6]]
+(A = 1+y+x³y³, B = 1+x+x²y⁷) CERTIFIED with the widened-engine
+route — the fourth analytic instance and the FIRST off the Z₃² odd
+part (components F₂·F₄·F₈²·F₆₄²), subsuming T3a.3's planned
+per-instance grid**; its two n = 336 free-Z₂ covers inherit d ≥ 6
+(and are SAT-known d = 12 doubles — the natural next engine
+targets). gross-as-base and bb_288-base REJECTED at FRM (the Z₄
+wall, as designed); the Entry-6 Z₃×Z₅ falsifier and the Z₇²
+Frobenius square REJECTED at (iii).
+
+Doc updates: extensibility §6 update block (the class theorem closes
+the obstruction arc for mirrored members; engine not frame-locked;
+Frobenius subsumed; difference multiset = the stable invariant);
+A15 plan header (T1 closed-mod-polish).
+
+### Next (unchanged from Entry 11 + re-ranked)
+
+1. A16 consolidation (discharge P1–P3, one document for Entries
+   8–12).
+2. T2: the Lean `BBSmallCycleData` layer — all obligations now
+   decidable-by-construction; pilot bb_108/bb_90/z6z14.
+3. T4 (w = 5 sweep) / T3c (Z₄ pilot) per the plan ranking.
+
+---
+
+## Entry 13 (2026-07-07) — P1/P2/P3 discharged: the class theorem is
+## UNCONDITIONAL; A16 write-up of record lands
+
+All three Entry-11.4 polish items are discharged
+(`a16_polish_checks.py` Y1–Y3; write-up `A16_class_theorem_writeup.md`):
+
+* **P3 (relation-type table) — COMPLETE.** Every non-generic triangle
+  relation among dB's positive reps (2s ∈ dB, q−p ∈ dB, 2p+q ∈ dB,
+  p+2q ∈ dB) resolves, after discarding D1-dead options, to exactly
+  two families: **O3** (an order-3 element of dB; coset triangle) and
+  **PROG** (dB = ±{c, 2c, 3c} — every linear relation q = 2p,
+  q = −3p, 3p+2q = 0, … lands here). Y1: 7,674 extra classes over
+  23,028 D1-sets across ~40 ambients — all O3 or PROG, zero others.
+* **P2 (the doubling family's kill) — a ONE-LINER, subsuming the old
+  coordinate route.** The PROG-AP image is {0, 4c, 5c} + t, whose
+  difference set contains c ∈ dB: a match puts c ∈ dA ∩ dB,
+  violating **D2** directly. No coordinates, no frame condition, no
+  2-torsion sub-case. (O3 images are AP-lines — D1, as before.)
+  Y2: 3,138/3,138 PROG images carry c ∈ d(σ) ∩ ±dB.
+* **P1 (general embeddings) — discharged by torsion factoring + one
+  new case analysis.** The pentagonal family was already
+  embedding-general (Lemma H's confinement is coordinate-shape-based;
+  5-torsion factors through Z₅², so W4b's census is complete). The
+  last triangular family **F-tri-5** (ord δ = 5, ord τ = 3;
+  dA = {±δ, ±τ, ±(τ+δ)}, dB = {±2δ, ±(τ−δ), ±(τ+2δ)}) is genuinely
+  live at the difference-set level (192/192 Z₁₅² data pass D1 ∧ D2!)
+  and dies by the (iii)-slot case analysis: x=0-slot = δ ⟹ dB ∋
+  (0, 2δ_y) vs B-shapes; = τ ⟹ dB's y-parts can't produce B1's
+  zero-pair nor B2 (coprime 3·5-torsion); = τ+δ ⟹ 3u = 5u = 0 ⟹
+  u = 0. Any embedding factors through the 15-torsion ⊆ Z₁₅×Z₁₅, so
+  Y3's sweep of all 192 data (0 admit an (iii)-mirrored shape pair)
+  is **embedding-complete**.
+
+Net: **the class small-cycle theorem carries no caveats.** The two
+load-bearing fixed censuses (Z₅² all-unit components; Z₁₅² F-tri-5
+shape-incompatibility) are instance-independent, hand-provable
+(§6.3/App. B of A16), and of d₃-dictionary epistemic grade.
+Doc/tooling updates: A16 write-up of record; certifier citation
+updated (unconditional); extensibility §6 block and A15 plan header
+updated; research_log entry added.
+
+### Next
+
+1. T2: the Lean `BBSmallCycleData` layer (pilot bb_108/bb_90/z6z14).
+2. T4 (w = 5 sweep) / T3c (Z₄ pilot) per the plan ranking.
+3. Paper positioning: the class theorem + certifier is the natural
+   §"class results" companion to the gross mechanism paper
+   ([[bb-paper1-positioning]]); Lin–Pryadko baseline comparison per
+   member.
+
+---
+
+## Entry 14 (2026-07-07) — T2 SHIPPED: the parametric Lean base-floor
+## layer (`SmallCycleData`) + three kernel-checked pilots
+
+**The class theorem's Lean packaging exists.** New Framework module
+`QEC/Stabilizer/Framework/Homological/BBSmallCycle.lean` defines
+
+> `SmallCycleData G` (namespace `Quantum.Stabilizer.Homological.BB`):
+> fields `A B : G → ZMod 2`, `epsA/epsB` (ε = 1), `check_two/check_four`
+> (no normalized weight-2/4 cycle, tuple form),
+
+and derives **generically** (parametrizing the gross
+`BaseDistance.lean` argument: translation normalization + PAR +
+sparse-syndrome bridge to the finite checks):
+
+* `D.cycle_weight_ge_6` — the strong small-cycle floor (every nonzero
+  1-cycle weighs ≥ 6, boundaries included);
+* `D.chain_floor` / `D.dual_chain_floor` (via
+  `bb_cycle_bound_iff_dual_bound`) / `D.logical_weight_ge_6` (Pauli
+  level, via `chainWeight_lower_bound_transfers`) /
+  `D.stab_weight_ge_6` (the μ ≥ 6 half);
+* `XDoubleCoverData.strongBaseFloor_of_smallCycle` — any free-ℤ₂ cover
+  of a bundled base gets `StrongBaseFloor 6`, feeding the
+  Theorem-B/BBDoubling machinery directly (T6 routing hook).
+
+**Two-grade design as planned**: the four obligations are plain `Prop`s.
+The pilots discharge them by `native_decide` (engineering grade); the
+analytic grade replaces exactly those four leaves with the class
+theorem's per-split kills — invisible downstream.
+
+**Generator + pilots.** `experiments/bb_lab/scripts/gen_base_floor_lean.py`
+validates the four obligations offline (bitmask syndromes; ~2.1M
+subset checks across the pilots; k cross-checked: 8/8/12) and emits
+`QEC/Stabilizer/Codes/BivariateBicycle/BaseFloors/{BB108,BB90,Z6Z14}.lean`.
+All three build (kernel-accepted):
+
+| pilot | group | params | floor | build |
+|---|---|---|---|---|
+| bb_108 | Z₉×Z₆ | [[108,8,10]] | d ≥ 6 (true d = 10) | 228 s |
+| bb_90 | Z₁₅×Z₃ | [[90,8,10]] | d ≥ 6 (true d = 10) | 123 s |
+| z6z14 | Z₆×Z₁₄ | [[168,12,6]] | d ≥ 6 — **tight** | 640 s |
+
+Each exports `strong_floor`, `chain_floor`, `dual_chain_floor`,
+`logical_weight_ge_6`, `stab_weight_ge_6`. These are the first Lean
+floors for codes with no prior per-code formalization (the gross/bb72
+/pair72 files were bespoke); marginal cost of the next member ≈ one
+generator entry + one build.
+
+**Engineering findings** (now baked into the generator template):
+
+* **One declaration per `native_decide`.** Bundling all four checks
+  inside the `def floorData` structure literal blows the single-
+  declaration 200k-heartbeat budget at `whnf` once |G| ≳ 54 (BB90 at
+  45 squeaked through; BB108/Z6Z14 died with a cascade of misleading
+  `Unknown identifier` errors downstream). Hoisting each obligation to
+  its own lemma (fresh budget each — exactly how the gross file is
+  shaped) fixes it with no heartbeat bumps.
+* **`decide` on the ε sums is not cheap-per-case** (~90 s kernel
+  reduction per 45-term `ZMod 2` `Finset.sum`); `native_decide`
+  matches the gross precedent.
+* Debug hygiene relearned: read the FIRST error of the raw log —
+  two rounds of tail-filtered build output hid the heartbeat root
+  cause behind its own cascade; and don't leave the MCP `lake serve`
+  alive across a `lake build`.
+
+**Verification scope** (cold worktree): `lake build` of
+`Framework.Homological` umbrella (3367 jobs ✓ — includes the new
+module + the edited umbrella), `BaseFloors` + all three instances
+(3363 jobs ✓). The `Codes.BivariateBicycle` umbrella edit adds one
+import of a target built above; the full gross Y-floor stack was not
+rebuilt on this worktree (hours; unchanged by this diff).
+
+### Next
+
+1. **T6 routing**: when a cover's `XDoubleCoverData` lands (hit3-y /
+   Z₆×Z₁₄→[[336,12,12]] engine targets),
+   `strongBaseFloor_of_smallCycle` is the one-liner base-floor input.
+2. **IsLeast for d = 6 members** (z6z14 + the other 23): needs one new
+   generic lemma — odd pairing with a dual cycle certifies
+   `∉ boundaries` — then a weight-6 witness per member (one
+   convolution decides). Queued.
+3. **Analytic-grade leaves**: discharge `check_two/check_four` from
+   the class theorem inside Lean (tier-2; the statement shape is
+   already final).
+4. T4 (w = 5 sweep) / T3c (Z₄ pilot) — unchanged plan ranking.
+
+## Entry 15 (2026-07-12) — T4.2: the w = 5 sweep — zero falsifiers at
+## population scale; 450 members land exactly at d = 2w = 10; the class
+## sieve surfaces gross-rivalling code candidates
+
+**Question** (plan §T4): do the class hypotheses at w = 5 — W5, D1
+(both Sidon), D2 (disjoint difference sets), (iii) (A parity-mono in
+exactly x, B in exactly y), k > 0, Ann(A) ≠ 0 ≠ Ann(B), on
+floor-bearing frames (4∤ℓ, 4∤m, |G| ≥ 41 by the D1∧D2 counting
+bound 2·2·C(5,2) = 40 ≤ |G|−1) — come with d = 2w = 10?
+Falsify-first; Frobenius flags recorded as columns, not gates.
+
+**Method** (`scripts/a15_t42_w5_sweep.py`). Per frame:
+translation-normalized mono-x/mono-y Sidon pools, deduped to
+translation classes (Sidon supports have trivial translation
+stabilizer ⟹ exactly w zero-normalized reps per class), per-side
+zd-filter (Ann ≠ 0 — translation/unit-invariant, so a POOL gate),
+D2 pairing by difference-set bitmask, per-pair k > 0
+(k = 2·dim(Ann A ∩ Ann B): rank[cA|cB] = dim (A,B) and F₂[G] is
+Frobenius, so dim Ann((A,B)) = |G| − dim (A,B)), THEN canonical
+dedupe of k-positive pairs only (unit scalings × per-side
+retranslation, + transpose-swap on square frames). Both
+mono-orientations are covered by one enumeration: the opposite
+assignment is the standard pair (B, A) after the block-column qubit
+permutation CSS(A,B) ≅ CSS(B,A). Selftest: the gross base passes
+every gate and SATs to d = 6 = 2w; the gather-circulant and direct-k
+fast paths are asserted against the reference implementations.
+
+**Engineering (two walls, both moved).**
+1. *Structural*: pairing-then-canonicalizing stalls at |G| ≥ 54
+   (canon on 10⁵–10⁶ D2 pairs). Fix = the gate reorder above (units
+   dominate the pools, so the zd-filter collapses the quadratic loop)
+   + a per-frame difference-index table making each class circulant a
+   single numpy gather instead of `checks.circulant`'s O(n²) Python
+   loop.
+2. *SAT*: pysat CaDiCaL on Tseitin XOR chains — the first Z₆×Z₉
+   member burned 20+ CPU-min without resolving (the A15 CMS lesson
+   resurfacing). Fix = native-XOR CryptoMiniSat backend in
+   `sat_distance.py` (pycryptosat; parity rows and logical indicator
+   variables as XOR clauses, seqcounter cardinality unchanged, shared
+   IDPool; the LRAT/CaDiCaL CLI proof path untouched) + member-level
+   multiprocessing (`--sat-jobs`). Cost calibration on a Z₆×Z₁₀
+   member (n = 120): 0.06 / 0.50 / 3.25 / 29.8 / 141 / 590 / 1910 s
+   for the w = 2..8 UNSAT rounds — ~7× per weight increment, so
+   exact ub = 10 distances are unaffordable at population scale.
+   Verdict protocol therefore tiered: exact SAT screen at ub = 6;
+   MC witness hunt at wmax = 9 (below); deep UNSAT confirms reserved
+   for chosen representatives (A14 coset-query + orbit-transport
+   port, queued).
+
+**Lemma E (small-axis kill at w = 5).** On Z_ℓ × Z_m a 5-point Sidon
+set parity-mono in the m-axis and NOT parity-mono in the ℓ-axis
+exists only if ℓ ≥ 5; hence the w = 5 class is EMPTY on every frame
+with an axis of order ≤ 3. *Proof.* ℓ = 2: c₀ + c₁ = 5 forces
+exactly one odd count — every 5-set is parity-mono on a Z₂ axis, so
+non-mono is unsatisfiable. ℓ = 3: mono-m means the y-count multiset
+has exactly one odd part, i.e. {5}, {4,1}, {3,2}, or {2,2,1}; the
+first two need ≥ 4 distinct x in one row (impossible in Z₃); {3,2}'s
+same-y triple uses all of Z₃ and its six ordered x-differences cover
+{1,2} three times each; {2,2,1}'s two same-y pairs each contribute
+±(dx,0) with ±1 = {1,2} = ±2 mod 3 — repeats either way. ∎
+(ℓ = 4 excluded by FRM; ℓ = 5 realized.) Corroborated: all eight
+Z2/Z3 frames in [41,60] report an empty mono-small-axis pool
+(v1 log). Small-axis frames are skipped downstream.
+
+**The k-gate mechanism (what selects members).**
+(i) w = 5 odd ⟹ A(triv) = 1: no factor vanishing at the trivial
+character (no 1+g factor — (1+g)·C has even weight); the common
+annihilator k > 0 demands must be a nontrivial χ vanishing on BOTH
+sides (odd part) or a radical kill (2-part).
+(ii) A mono-axis side cannot vanish at a character trivial on the
+other axis: collapsing there leaves the parity-mono count pattern,
+whose mod-2 reduction is a single root of unity ≠ 0.
+(iii) Inhabitation is FIELD-theoretic, not parity-theoretic (an
+even/odd-frame guess died within minutes — Z₇×Z₉ is all-odd and
+inhabited): zero-divisorhood at w = 5 needs a vanishing 5-term
+root-of-unity sum in some CRT component field F_{2^ord₂}. Axes
+carrying 11 (ord₂ = 10) or 13 (ord₂ = 12) push components to fields
+where the Sidon-mono sums never vanish — Z₅×Z₁₁, Z₆×Z₁₁, Z₇×Z₁₁
+have EMPTY zd pools; Z₅×Z₁₃/Z₆×Z₁₃ nearly so. Small-ord₂ axes
+(9 → GF(64), 10, 15 → GF(16)) carry the members, with zd FRACTIONS
+tracking the fields: Z₅×Z₁₃ 0.3% → Z₅×Z₁₄ 25% → Z₅×Z₁₅ 72%. This is
+the A5 orbit-fields/component-table view resurfacing as the class's
+EXISTENCE theory; the analytic w = 5 kills will run per component
+field exactly as A16's did.
+(iv) Common annihilators are RARE among D2 pairs off the good
+frames: Z₅×Z₁₄ / Z₇×Z₁₀ have 7–10k D2 pairs among zero divisors and
+kpos = 0. The k-gate, not D2, binds at w = 5.
+
+**Census** (structural, `--sat-cap 0`; live frames = both axes ≥ 5,
+4∤; |G| ≤ 78 complete, tail in flight):
+
+| frame | G | poolA | poolB | zdA | zdB | d2 | kpos | members |
+|---|---|---|---|---|---|---|---|---|
+| Z6xZ7 | 42 | 792 | 408 | 192 | 168 | 0 | 0 | 0 |
+| Z5xZ9 | 45 | 2388 | 618 | 1092 | 138 | 0 | 0 | 0 |
+| Z7xZ7 | 49 | 2052 | 2052 | 1512 | 1512 | 144 | 0 | 0 |
+| Z5xZ10 | 50 | 3424 | 544 | 416 | 96 | 0 | 0 | 0 |
+| Z6xZ9 | 54 | 3996 | 1080 | 2832 | 708 | 1440 | 216 | **18** |
+| Z5xZ11 | 55 | 8060 | 1030 | 0 | 0 | 0 | 0 | 0 |
+| Z6xZ10 | 60 | 4298 | 848 | 626 | 352 | 336 | 64 | **8** |
+| Z7xZ9 | 63 | 8838 | 5004 | 3852 | 1962 | 34956 | 540 | **15** |
+| Z5xZ13 | 65 | 20140 | 1644 | 64 | 108 | 0 | 0 | 0 |
+| Z6xZ11 | 66 | 12800 | 1800 | 0 | 0 | 0 | 0 | 0 |
+| Z5xZ14 | 70 | 23872 | 1632 | 5968 | 96 | 7008 | 0 | 0 |
+| Z7xZ10 | 70 | 11760 | 4920 | 528 | 1344 | 9984 | 0 | 0 |
+| Z5xZ15 | 75 | 42300 | 2460 | 30540 | 1500 | 691008 | 67296 | **2103** |
+| Z7xZ11 | 77 | 25650 | 8340 | 0 | 0 | 0 | 0 | 0 |
+| Z6xZ13 | 78 | 31252 | 2832 | 24 | 816 | 960 | 0 | 0 |
+| Z9xZ9 | 81 | *(in flight)* | | | | | | |
+| Z6xZ14 | 84 | *(in flight)* | | | | | | |
+| Z5xZ17 | 85 | *(in flight)* | | | | | | |
+| Z6xZ15 | 90 | *(in flight)* | | | | | | |
+| Z9xZ10 | 90 | *(in flight)* | | | | | | |
+| Z5xZ18 | 90 | *(in flight)* | | | | | | |
+
+**Verdict: ZERO falsifiers anywhere.**
+* Tier-1 SAT screen (exact, CMS, ub = 6): **41/41** members of
+  Z₆×Z₉ / Z₆×Z₁₀ / Z₇×Z₉ at d > 6; every Frobenius flag false.
+* MC witness hunt (`scripts/a15_t42_mc_falsifier.py`,
+  QDistRnd-style random information sets, 800 iters/member,
+  witnesses self-certified against H_Z and L_Z; selftest: finds the
+  gross base's weight-6, nothing below): **2144 members
+  (2126 census + 18 Z₆×Z₉), 0 witnesses of weight ≤ 9.** The
+  translation orbit (~|G| copies of any min-weight logical) makes
+  800 iterations essentially exhaustive for true d ≤ 14 at these
+  sizes, so the absence is strong. The 2w − 2 = 8 wall mode — the
+  w = 3 story's Frobenius failure shape — is ABSENT from the entire
+  population.
+* One Z₆×Z₁₀ member carried by exact UNSAT rounds to **d ≥ 9**
+  (w = 9 in flight at entry time; an UNSAT there is the first full
+  floor confirmation, with MC bounding d ≤ 12–14 from above).
+
+**mc_min spectrum (upper bounds).**
+Z₅×Z₁₅ (2103): **450 @ 10** — witness-certified d ≤ 10, so with the
+floor these land EXACTLY at d = 2w = 10 (436 k=8, 14 k=16) — plus
+11 @ 12, 52 @ 14, 680 @ 16, 906 @ 18, 4 @ 20 (the high buckets
+almost entirely k = 8). Z₆×Z₉ (18): 14 @ 12, 4 @ 14 (k = 4).
+Z₆×Z₁₀ (8): 2 @ 12, 5 @ 14, 1 @ 16 (k = 8). Z₇×Z₉ (15): 1 @ 12,
+14 @ 14 (k = 12). Tightness at 10 is so far EXCLUSIVELY a Z₅×Z₁₅
+phenomenon — the small frames all overshoot the floor.
+Frame-dependence of tightness is a new structural datum.
+
+**The discovery-sieve surprise.** Taking the orbit-boosted MC bounds
+at face value, the class hypotheses surface candidate codes the
+standard BB tables don't list: Z₇×Z₉ k = 12 members at mc_min = 14
+(candidate [[126,12,12–14]] — gross-equal or gross-beating at 87.5%
+of the qubits); Z₅×Z₁₅ k = 8 members at mc_min = 16–18 (candidate
+[[150,8,14–18]]); Z₅×Z₁₅ k = 16 members at mc_min = 10
+([[150,16,10]]). CAVEATS: mc_min is an upper bound; exact values
+need the deep-UNSAT lane or analytic floors; check the BB literature
+tables before any novelty claim. But the sieve read stands: D1 ∧ D2
+(flat difference structure) selects for GOOD codes, not just
+floor-tight ones — exactly the intuition behind the difference-set
+side of the base-floor theory.
+
+**Read for T4.** The w = 5 class is (a) nonempty — massively so on
+GF(16)-component frames; (b) falsifier-free at population scale
+under two independent methods; (c) tight at 2w on a 450-member
+subpopulation. The naive-generalization risk (a w = 5 analog of the
+w = 3 Frobenius failure) did not materialize — and no D3-analog was
+even imposed. GREENLIGHT for the analytic work: port the A16
+per-component-field kills to w = 5, then extend the T2
+`SmallCycleData` packaging to floor 10 with the 450 tight members as
+the instance pool, and route survivors into the doubling layer
+(target: first analytic d = 20 covers).
+
+**Files.** `scripts/a15_t42_w5_sweep.py`,
+`scripts/a15_t42_mc_falsifier.py`, `scripts/a15_t42_verbose_probe.py`;
+CMS backend in `src/bb_lab/sat_distance.py` (+ pycryptosat dep in
+pyproject/uv.lock); data in `data/a15/`: `t42_w5_census.jsonl`
+(+ .log), `t42_w5_screen_ub6.jsonl` (+ .log), `t42_w5_mc.jsonl`
+(+ .log), `t42_w5_mc_6x9.jsonl`, `t42_verbose_probe.log`,
+`t42_w5_sweep_v1_stalled.log` (pre-reorder record; the empty
+`t42_w5_sat_pass_ub10_abandoned.jsonl` marks the retired ub = 10
+campaign).
+
+**Next.** (1) Census tail (9×9 / 6×14 / 5×17 / 6×15 / 9×10 / 5×18)
++ MC over any new members — addendum when it lands. (2) The probe
+member's w = 9 round → first full floor confirmation. (3) A14
+coset-query + orbit-transport port for affordable deep UNSAT
+confirms (the 7×-per-weight wall makes the full-space encoding a
+dead end past w ≈ 8). (4) BB-table novelty check + exact validation
+for the sieve candidates ([[126,12,·]] first). (5) The analytic
+w = 5 kills per component field (GF(16) first — it carries the
+tight members).

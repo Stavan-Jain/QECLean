@@ -24,6 +24,7 @@ dependencies = [
     { name = "duckdb" },
     { name = "numpy" },
     { name = "pyarrow" },
+    { name = "pycryptosat" },
     { name = "python-sat", extra = ["aiger", "pblib"] },
     { name = "pyyaml" },
 ]
@@ -43,6 +44,7 @@ requires-dist = [
     { name = "numpy", specifier = ">=1.26,<3" },
     { name = "pandas", marker = "extra == 'dev'", specifier = ">=2.0,<3" },
     { name = "pyarrow", specifier = ">=15,<22" },
+    { name = "pycryptosat", specifier = ">=5.14,<6" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8,<9" },
     { name = "pytest-xdist", marker = "extra == 'dev'", specifier = ">=3,<4" },
     { name = "python-sat", extras = ["pblib", "aiger"], specifier = ">=1.8.dev17" },
@@ -275,6 +277,23 @@ wheels = [
 ]
 
 [[package]]
+name = "pycryptosat"
+version = "5.14.7"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2c/37/5750df84670cf284d31be0a1de1965811e1e7314f79a3784f4aae2a36dae/pycryptosat-5.14.7-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:da6677feceacb256cfdf01fec301d761f4c34727a3dc0b5d7df80fa4f05af5c5", size = 1024069, upload-time = "2026-06-27T12:25:43.56Z" },
+    { url = "https://files.pythonhosted.org/packages/42/fb/b55ccb611dce0bb74c9b70d10ce3a67035816761ab447f7ca0d56bb16676/pycryptosat-5.14.7-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:bb00758f037e6fb47d1c43c212414ee59d40841befac8d39973e7eafc619fbcc", size = 948766, upload-time = "2026-06-27T12:25:45.269Z" },
+    { url = "https://files.pythonhosted.org/packages/e7/fe/e21196865d8dc51b852e9b9aff8e797333be758393a8bae4a045fc7c91e9/pycryptosat-5.14.7-cp311-cp311-manylinux_2_34_aarch64.whl", hash = "sha256:bc46a8126c1f614ac92fd6840bfc4816b440fe1898948a653be4d9b8fcc58327", size = 1269610, upload-time = "2026-06-27T12:25:46.699Z" },
+    { url = "https://files.pythonhosted.org/packages/0e/bf/e33d1b5d05c279e376a177955ca28071bdd9c33afe663529f0c4e3a300c0/pycryptosat-5.14.7-cp311-cp311-manylinux_2_34_x86_64.whl", hash = "sha256:2602fda971e7a67b787ffcf4c4eb70225575d846e4b413a9bb11d6faa48562e1", size = 1399336, upload-time = "2026-06-27T12:25:48.308Z" },
+    { url = "https://files.pythonhosted.org/packages/99/cb/9a179a4b2946edbd003a1eeff6e7904c157dad7b0e80b6da628f20aff9e5/pycryptosat-5.14.7-cp311-cp311-win_amd64.whl", hash = "sha256:3bc423b7c701799eeb7e583a2856253083b9e7e3601a8be9c1ab1af418cb4d85", size = 2021897, upload-time = "2026-06-27T12:25:49.775Z" },
+    { url = "https://files.pythonhosted.org/packages/fa/60/747be782b3fc17b209454aee809ef20915c2cce3c63fa00743ff4896b70c/pycryptosat-5.14.7-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:2939a97d4a5eee789345d46350c0fa6fe6e26ac8b4e04b1d984ef104d65acd12", size = 1024396, upload-time = "2026-06-27T12:25:51.35Z" },
+    { url = "https://files.pythonhosted.org/packages/99/5e/887d0ecfcca352b58a09a01e16526125870dc064107059ae58ee0f74bd29/pycryptosat-5.14.7-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:cac717552c8f866ca5f518615a62f73fef60eecebc9f742364b1d37d38eb70a7", size = 948716, upload-time = "2026-06-27T12:25:53.016Z" },
+    { url = "https://files.pythonhosted.org/packages/9c/9c/6463d6bd1f3a19b8af73713c8d1b636a6ea4c4b40009e9d65daf7eb0d559/pycryptosat-5.14.7-cp312-cp312-manylinux_2_34_aarch64.whl", hash = "sha256:d29dff9364470db73ccd8706870566629c648e95a073e898aebcddf6566646d2", size = 1269790, upload-time = "2026-06-27T12:25:54.709Z" },
+    { url = "https://files.pythonhosted.org/packages/82/02/7579c320f4244561dec6d33270ba7abb8a51cdd8408ff8abb261e71dd1c4/pycryptosat-5.14.7-cp312-cp312-manylinux_2_34_x86_64.whl", hash = "sha256:e3653df109761268144aa2ac547e17ef30a8e7fb10d80385e4400a4fba446219", size = 1399333, upload-time = "2026-06-27T12:25:57.012Z" },
+    { url = "https://files.pythonhosted.org/packages/ca/bb/7a7cc299994eea19c3568bda3f980c0cb1ea28ed48494ef61ed6bbbd0b1e/pycryptosat-5.14.7-cp312-cp312-win_amd64.whl", hash = "sha256:01fc4c1c54fbb4ed322ed5278218f5ef74df2cad3407f4c6237d0f2b42811078", size = 2022078, upload-time = "2026-06-27T12:25:58.498Z" },
+]
+
+[[package]]
 name = "pygments"
 version = "2.20.0"
 source = { registry = "https://pypi.org/simple" }
@@ -351,7 +370,6 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "six" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/88/88/8c7a1183bd8fdb9eeb3d847ddbbcefeaa825f0d02592e096bb031a6a3011/python_sat-1.9.dev4.tar.gz", hash = "sha256:341d4ea9de4dde2f67bb3531a93c48e185196b8ff03cd21e13f6e184f4592283", size = 6027798, upload-time = "2026-05-21T14:02:58.633Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/9d/fb/7114c6883dfa3de63bea096fba979097b7b876ffdad5461d31a2f4f8cfe0/python_sat-1.9.dev4-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:fff25c139a6484d10172a3ee324b2f410167a1fd7d40872b62c48d35994ea01c", size = 2565724, upload-time = "2026-05-21T14:01:45.243Z" },
     { url = "https://files.pythonhosted.org/packages/b3/55/08b08b1392f8dbb405f7f46a97fc3dd8e00f262aa6f9129d383264cbeffb/python_sat-1.9.dev4-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:d447dda637b2211b66da5b44df6a079aa9469249b36f0ff91ad30f0e784c2359", size = 2317569, upload-time = "2026-05-21T14:01:46.861Z" },
