@@ -4,7 +4,7 @@ import QEC.Stabilizer.Framework.Concatenation.Promotion
 # Concatenation, Tier 1b: the `concatenate` constructor
 
 Milestone **M3** of the CSS concatenation plan
-(`pipeline/attempts/concat_css_general/plan.md`).
+(`qec-lab:pipeline/attempts/concat_css_general/plan.md`).
 
 Assembles the M1 embedding calculus and the M2 promotion/generator-list into a
 bona-fide `StabilizerCode (n₁ * n₂) k₂` from a `ConcatCSSData`. The conceptual

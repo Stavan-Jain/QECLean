@@ -9,7 +9,7 @@ Mirrors the gross Phase-5 packaging
 (`QEC/Stabilizer/Codes/BivariateBicycle/StabilizerCode.lean`) at pair72 scale.
 
 This file embeds offline-validated `𝔽₂` linear-algebra data
-(`experiments/bb_lab/scripts/gen_pair72_packaging_data.py`, ALL-PASS gate):
+(`qec-lab:experiments/bb_lab/scripts/gen_pair72_packaging_data.py`, ALL-PASS gate):
 * `dropSet` — 2 faces / 2 vertices dropped to trim 72 generators to 68;
 * `redP2` / `redCM` — reduced bases of `ker ∂₂` / `ker cutMap` (2 each),
   satisfying `redP2 j (dropSet i) = [i=j]`, giving both the closure relations

@@ -6,7 +6,7 @@ import QEC.Stabilizer.Codes.Small.Steane7Distance
 # Steane ⊗ Steane: the concatenated `[[49, 1, 9]]` instance (Milestone M7)
 
 The validating concrete instance of the CSS concatenation framework
-(`pipeline/attempts/concat_css_general/plan.md`): concatenate the Steane `[[7,1,3]]` code with
+(`qec-lab:pipeline/attempts/concat_css_general/plan.md`): concatenate the Steane `[[7,1,3]]` code with
 itself. `steaneConcatData` bundles `Steane7.stabilizerCode` as both inner and outer code into a
 `ConcatCSSData 7 7 1` — the data the whole framework consumes.
 
@@ -27,7 +27,7 @@ of M6's `concat_hasCodeDistance` is discharged:
   are settled by `native_decide` on the concrete generator list (`concatGensConcrete`, `rfl`-equal
   to `steaneConcatData.concatGeneratorsList`).
 
-Recorded in `pipeline/attempts/concat_css_general/state.yaml`. The abstract framework (M1–M6) is
+Recorded in `qec-lab:pipeline/attempts/concat_css_general/state.yaml`. The abstract framework (M1–M6) is
 sorry-free; the only trust beyond the kernel is `native_decide`'s compiler trust on the small
 concrete enumerations.
 -/

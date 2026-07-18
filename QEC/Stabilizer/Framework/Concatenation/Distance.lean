@@ -5,7 +5,7 @@ import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
 # Concatenation, Tier 2b: the distance lower bound (Milestone M6)
 
 Milestone **M6** of the CSS concatenation plan
-(`pipeline/attempts/concat_css_general/plan.md`) — the headline distance result.
+(`qec-lab:pipeline/attempts/concat_css_general/plan.md`) — the headline distance result.
 
 The structural core is `weight_ge_d1_mul_d2`: every nontrivial logical of the
 concatenated code has weight at least `d₁ · d₂`. The argument assembles the M5

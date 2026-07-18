@@ -70,7 +70,7 @@ neither `IsZTypeElement` nor `IsXTypeElement`. Consequently:
 Stage 4 closed all 23 sorries from the original skeleton; the file
 compiles to `lake build` without warnings other than mathlib-style
 lints inherited from upstream files. See
-`pipeline/attempts/stab_5_1_3/result.md` for the full session log.
+`qec-lab:pipeline/attempts/stab_5_1_3/result.md` for the full session log.
 -/
 
 open NQubitPauliGroupElement

@@ -14,7 +14,7 @@ which yields the chain homotopy `1 + σ = ∂₂∘C + E∘∂₁` with module m
 `G300`-indexed kernel identity (150 points).  By A12 such a witness
 exists iff `k(cover) = k(base)` (8 = 8 here); provenance of `(P, Q)`
 (greedy-sparsified linear solve):
-`experiments/bb_lab/scripts/gen_f2a6_z5z30_data.py` §2.
+`qec-lab:experiments/bb_lab/scripts/gen_f2a6_z5z30_data.py` §2.
 
 (Compare the two `P = 0` instances: gross's `(1+x²)⋆B⋆B = 1+x⁶` and
 pair72's `p⋆B = 1+x³`.  Here a genuinely two-sided witness is used —

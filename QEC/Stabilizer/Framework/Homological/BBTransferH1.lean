@@ -19,7 +19,7 @@ This instantiates the abstract transfer-inequality core
 * `finrank_H1_sub_le_finrank_range_epsH1` (capstone) —
   `dim H₁(cover) − dim H₁(base) ≤ dim (1+σ)·H₁(cover)`, i.e. `E ≥ k̃ − k`:
   the inequality half of the A13 Bockstein rank equality
-  (`experiments/bb_lab/notes/A13_result.md` §1; A12 part 2).
+  (`qec-lab:experiments/bb_lab/notes/A13_result.md` §1; A12 part 2).
 -/
 
 import QEC.Stabilizer.Framework.Homological.BBCover

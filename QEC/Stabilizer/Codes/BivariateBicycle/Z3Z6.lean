@@ -20,7 +20,7 @@ import QEC.Stabilizer.Codes.BivariateBicycle.Z3Z6.StabilizerCode
 # The [[36,4,4]] → [[72,4,8]] doubling pair over `Z₃×Z₆ → Z₆×Z₆`
 
 The second full instance of the free-ℤ₂ doubling template — the pair of
-`docs/gross-distance-extensibility.md` §5, previously verified only by
+`qec-lab:docs/gross-distance-extensibility.md` §5, previously verified only by
 SAT, now proven through the parametric layer
 (`Framework/Homological/{BBCover,BBDoubling}.lean`):
 

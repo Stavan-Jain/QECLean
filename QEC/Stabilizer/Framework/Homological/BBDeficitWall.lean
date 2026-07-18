@@ -1,7 +1,7 @@
 /-
 # The deficit wall: parity, the seam transfer kernel, and the pushforward bound
 
-Lean layer for A17-P3 (`experiments/bb_lab/notes/A17_deficit_wall.md`): why
+Lean layer for A17-P3 (`qec-lab:experiments/bb_lab/notes/A17_deficit_wall.md`): why
 the safe floor of a non-doubling BB cover fails by at least two.
 
 * **Parity (L1).** With odd-weight polynomials (`∑ A = ∑ B = 1` in

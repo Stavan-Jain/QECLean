@@ -4,7 +4,7 @@ import QEC.Stabilizer.Framework.Concatenation.Constructor
 # Concatenation, Tier 2a (part 1): the block-restriction calculus
 
 Milestone **M5** of the CSS concatenation plan
-(`pipeline/attempts/concat_css_general/plan.md`), first half.
+(`qec-lab:pipeline/attempts/concat_css_general/plan.md`), first half.
 
 This file provides `restrictBlock b g`: the inner operator obtained by reading
 off block `b` of an `n₁ * n₂`-qubit operator `g` (a phase-0 element of the inner

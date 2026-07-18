@@ -2,7 +2,7 @@
 # The parametric free-ℤ₂ doubling template for BB codes
 
 Consumes an `XDoubleCoverData G H` bundle (`BBCover.lean`) and packages the
-gross-proof doubling architecture (docs/gross-distance-extensibility.md §3)
+gross-proof doubling architecture (qec-lab:docs/gross-distance-extensibility.md §3)
 as generic theorems.  Everything the gross development proved for the
 specific `Z₁₂×Z₆ → Z₆×Z₆` cover in `DeckHomotopy.lean`, `Assembly.lean`,
 `DangerousSector.lean` (rungs) and `SafeSector.lean` (reduction) is proved
@@ -266,7 +266,7 @@ theorem deckTrivial_of_homotopy_certificate
 
 /-! ## The homotopy (R) from a Bezout witness (A12)
 
-By A12 (`experiments/bb_lab/notes/A12_deck_homotopy_R.md`), (R) holds
+By A12 (`qec-lab:experiments/bb_lab/notes/A12_deck_homotopy_R.md`), (R) holds
 **iff** the deck polynomial `1 + x^{deckS}` lies in the ideal `(A, B)` of
 `𝔽₂[G]` — equivalently, iff `k(cover) = k(base)`.  The sufficiency
 direction is constructive and packaged here: a Bezout witness

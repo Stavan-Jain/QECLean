@@ -83,7 +83,7 @@ This convention makes the (anti)commutation table clean:
 
 This parametric family at `m = 2` is the **same code** as the existing
 `FourQubit_4_2_2.lean`, but uses a **different** logical-operator basis
-(see `pipeline/attempts/iceberg/informal_spec.md` § "Relation to
+(see `qec-lab:pipeline/attempts/iceberg/informal_spec.md` § "Relation to
 FourQubit_4_2_2.lean"). Both formalizations coexist as separate Lean
 objects, mirroring the `RepetitionCode3.lean` / `RepetitionCodeN.lean`
 pattern: we do NOT prove equivalence between the two.

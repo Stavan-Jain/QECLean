@@ -10,7 +10,7 @@ distance theorems — stated against `grossComplex.homologicalStabilizerGroup`
 `IsNontrivialLogicalOperator_of_toSubgroup_eq`.
 
 The offline-validated `𝔽₂` linear-algebra data lives in the generated
-`StabilizerCodeData.lean` (`experiments/bb_lab/phase5/`, `data.json`):
+`StabilizerCodeData.lean` (`qec-lab:experiments/bb_lab/phase5/`, `data.json`):
 * `dropSet` — 6 faces / 6 vertices dropped to trim 144 generators to 132;
 * `redP2` / `redCM` — reduced bases of `ker ∂₂` / `ker cutMap` (6 each),
   satisfying `redP2 j (dropSet i) = [i=j]`, giving both the closure relations

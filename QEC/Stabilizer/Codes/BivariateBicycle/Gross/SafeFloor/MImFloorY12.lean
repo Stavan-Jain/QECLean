@@ -1,8 +1,9 @@
 /-
 GENERATED FILE — DO NOT HAND-EDIT (edits WILL be clobbered by regen).
-Generator : experiments/bb_lab/scripts/gen_yrep_module.py (arg: 12)
-Regen     : cd experiments/bb_lab && uv run python scripts/gen_yrep_module.py 12
-To change this file, change the generator and regenerate — in the same PR.
+Generator : qec-lab:experiments/bb_lab/scripts/gen_yrep_module.py (arg: 12)
+Regen     : from a sibling qec-lab checkout (QECLEAN_ROOT points here):
+            cd qec-lab:experiments/bb_lab && uv run python scripts/gen_yrep_module.py 12
+To change this file, change the generator in qec-lab and regenerate — land both repos' changes together.
 -/
 /-
 # Phase 6: the safe-sector floor for y-orbit representative 12 — ANALYTIC (Tier 3, M1)

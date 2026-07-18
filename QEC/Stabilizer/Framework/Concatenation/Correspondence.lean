@@ -4,7 +4,7 @@ import QEC.Stabilizer.Framework.Concatenation.Restriction
 # Concatenation, Tier 2a (part 2): the induced outer logical
 
 Milestone **M5** of the CSS concatenation plan
-(`pipeline/attempts/concat_css_general/plan.md`), second half.
+(`qec-lab:pipeline/attempts/concat_css_general/plan.md`), second half.
 
 For a centralizing element `g` of the concatenated stabilizer, each block
 restriction `restrictBlock b g` lies in the inner centralizer (M5 part 1), so by

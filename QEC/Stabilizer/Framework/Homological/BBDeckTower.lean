@@ -2,7 +2,7 @@
 # The deck-tower descent: `σ_* = id` forces Bezout membership (A13)
 
 This file formalizes the **hard direction** of the tour-de-gross tower
-question (research note `experiments/bb_lab/notes/A13_deck_tower_plan.md`):
+question (research note `qec-lab:experiments/bb_lab/notes/A13_deck_tower_plan.md`):
 
 > For a free `ℤ_{2^r}` doubling cover with deck generator `σ`, if the deck
 > acts trivially on `H₁` of the top complex, then `1 + σ ∈ (A, B)` — hence
@@ -40,7 +40,7 @@ coefficient `z` satisfies `ε^t z = 0`, so `EpsFree` divides it by `ε^{N-t}`).
 `t = 2^{r-1}` is A12 applied to the top `ℤ₂`-step; here it is taken as the
 hypothesis `ε^m ∈ (A,B)`, `2 ≤ m ≤ N-2`.
 
-The `experiments/bb_lab/scripts/a13_deck_tower_block_sweep.py` screen checks
+The `qec-lab:experiments/bb_lab/scripts/a13_deck_tower_block_sweep.py` screen checks
 this statement, the canonical-cycle mechanism, and the intermediate
 identities exhaustively on CRT blocks up to deck order 8; all clean.
 -/

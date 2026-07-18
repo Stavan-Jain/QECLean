@@ -10,7 +10,7 @@ import QEC.Stabilizer.Framework.Concatenation.Independence
 # Framework.Concatenation
 
 Infrastructure for **code concatenation** (Tiers 0–1b of the CSS concatenation
-plan, `pipeline/attempts/concat_css_general/`).
+plan, `qec-lab:pipeline/attempts/concat_css_general/`).
 
 Sub-modules:
 - `QEC.Stabilizer.Framework.Concatenation.Embedding` (M1) — `qIdx` / `blockOf` /

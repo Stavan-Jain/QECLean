@@ -6,7 +6,7 @@ The second full instance of the free-ℤ₂ doubling template
 
 * **base** `[[36,4,4]]` on `G36 = Z₃ × Z₆`, `A = x² + y + y³`,
   `B = 1 + x + y²` (the verified pair of
-  `docs/gross-distance-extensibility.md` §5);
+  `qec-lab:docs/gross-distance-extensibility.md` §5);
 * **cover** `[[72,4,8]]` on `G72 = Z₆ × Z₆`, same polynomials, free ℤ₂
   cover doubling `x` (deck `σ = ·x³`).
 
@@ -14,8 +14,8 @@ This file instantiates the two chain complexes and the parametric cover
 bundle `coverData : XDoubleCoverData G72 G36`.  All finite obligations are
 discharged by kernel computation; the offline provenance (SAT distances,
 seam census, witness search) is
-`experiments/bb_lab/scripts/gen_pair72_z6z6_data.py`
-(data: `experiments/bb_lab/data/a9/pair72_z6z6_data.json`).
+`qec-lab:experiments/bb_lab/scripts/gen_pair72_z6z6_data.py`
+(data: `qec-lab:experiments/bb_lab/data/a9/pair72_z6z6_data.json`).
 
 Note the cover group `Z₆ × Z₆` coincides with the *base* group of the gross
 pair (`BB.BaseGroup`); this development consistently uses the local names

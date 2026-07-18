@@ -23,11 +23,11 @@ per-module one-liner maps live in the umbrella docstrings (`Gross.lean`,
   the spine in umbrella order (Defs → CRTFrame/CoverTransfer → DeckHomotopy →
   Witness → Assembly → BaseDistance → DangerousSector → SafeSector →
   LightStab → LightStabClassify → StabilizerCode). Paper version:
-  `docs/gross-distance-proof.md`.
+  `qec-lab:docs/gross-distance-proof.md`.
 - **Tier-3 analytic work** (retiring `native_decide` leaves; A7 Props 30–31):
   `Gross/SafeFloor/WtFloor1618.lean` + `WtFloor24Bridge.lean`.
 - **Regenerate a table / change generated data**: see the generated-files
-  table below and `experiments/bb_lab/GENERATORS.md`. Never hand-edit a
+  table below and `qec-lab:experiments/bb_lab/GENERATORS.md`. Never hand-edit a
   Class-G file.
 - **Add a new instance**: follow "Adding an instance" below.
 - **Change the doubling layer itself**: `Framework/Homological/BBDoubling.lean`
@@ -63,7 +63,7 @@ already flipped. Status changes belong HERE, not in module names.
 
 ## Generated files (Class G: fully generated — NEVER hand-edit)
 
-| File | Generator (`experiments/bb_lab/`) | Data |
+| File | Generator (`qec-lab:experiments/bb_lab/`) | Data |
 |---|---|---|
 | `Gross/StabilizerCodeData.lean` | `phase5/gen_file.py` (`--force` guard; emits data only) | `phase5/data.json` |
 | `Gross/SafeFloor/MImFloorData.lean` | `scripts/gen_floor_lean.py` | in-script |
@@ -76,7 +76,7 @@ hand-curated shell): `Gross/SafeFloor/MImAssembly.lean`
 (`scripts/gen_assembly_2d.py`). Everything else is Class H (hand-maintained;
 may embed machine-*validated* data). Rule: **a hand-edit to a Class-G file is
 a bug — change the generator and regenerate, in the same PR.** Operational
-details (env, clobber guards, stale generators): `experiments/bb_lab/GENERATORS.md`.
+details (env, clobber guards, stale generators): `qec-lab:experiments/bb_lab/GENERATORS.md`.
 
 ## Edit rules
 

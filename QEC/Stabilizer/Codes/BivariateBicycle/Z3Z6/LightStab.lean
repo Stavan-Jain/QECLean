@@ -13,7 +13,7 @@ floors, obtained from the mask-quantified sweep leaves (`SweepKer.lean`,
   ≤ 7 has weight exactly 6, and its `ker ∂₂` fiber contains a *seam-good*
   preimage — exactly the hypothesis of the generic single-shape rung.
 
-Provenance/cross-check: `experiments/bb_lab/scripts/gen_pair72_z6z6_data.py`
+Provenance/cross-check: `qec-lab:experiments/bb_lab/scripts/gen_pair72_z6z6_data.py`
 §§2,5 (census `{6: 24}`, all 24 classes seam-good).
 -/
 

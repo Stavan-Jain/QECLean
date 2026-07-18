@@ -1,9 +1,10 @@
 /-
 GENERATED FILE — DO NOT HAND-EDIT (edits WILL be clobbered by regen).
-Generator : experiments/bb_lab/phase5/gen_file.py
-Data      : experiments/bb_lab/phase5/data.json (offline-validated 𝔽₂ linear algebra)
-Regen     : uv run --project experiments/bb_lab python experiments/bb_lab/phase5/gen_file.py --force
-To change this file, change the generator/data and regenerate — in the same PR.
+Generator : qec-lab:experiments/bb_lab/phase5/gen_file.py
+Data      : qec-lab:experiments/bb_lab/phase5/data.json (offline-validated 𝔽₂ linear algebra)
+Regen     : from a sibling qec-lab checkout (QECLEAN_ROOT points here):
+            uv run --project qec-lab:experiments/bb_lab python qec-lab:experiments/bb_lab/phase5/gen_file.py --force
+To change this file, change the generator/data in qec-lab and regenerate — land both repos' changes together.
 -/
 /-
 # Gross packaging data (§1 of the `StabilizerCode 144 12` packaging)
@@ -22,7 +23,7 @@ import QEC.Stabilizer.Codes.BivariateBicycle.Gross.Defs
 
 namespace Quantum.Stabilizer.Homological.BB
 
-/-! ## §1  Offline-validated data (see `experiments/bb_lab/phase5/data.json`) -/
+/-! ## §1  Offline-validated data (see `qec-lab:experiments/bb_lab/phase5/data.json`) -/
 
 /-- The 6 faces / 6 vertices dropped to trim 144 generators down to 132. -/
 def dropSet : List GrossGroup :=

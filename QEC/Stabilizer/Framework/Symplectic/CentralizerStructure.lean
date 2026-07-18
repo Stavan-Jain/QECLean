@@ -18,7 +18,7 @@ import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
 # Inner-centralizer classification (Milestone M4)
 
 Milestone **M4** of the CSS concatenation plan
-(`pipeline/attempts/concat_css_general/plan.md`) — the long pole of the distance
+(`qec-lab:pipeline/attempts/concat_css_general/plan.md`) — the long pole of the distance
 argument. For a `k = 1` stabilizer code, the centralizer of the stabilizer is
 `stabilizer ⊔ ⟨X̄₁, Z̄₁⟩`; the distance proof needs to read off, per block, whether
 a centralizing operator is "stabilizer-like" or a genuine logical.

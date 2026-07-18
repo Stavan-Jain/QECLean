@@ -1,8 +1,8 @@
 /-
 GENERATED FILE — DO NOT HAND-EDIT (edits WILL be clobbered by regen).
-Generator : experiments/bb_lab/scripts/gen_pair72_packaging_data.py
+Generator : qec-lab:experiments/bb_lab/scripts/gen_pair72_packaging_data.py
 Data      : validated in-script (15-check ALL-PASS gate)
-Regen     : cd experiments/bb_lab && uv run python scripts/gen_pair72_packaging_data.py --force
+Regen     : cd qec-lab:experiments/bb_lab && uv run python scripts/gen_pair72_packaging_data.py --force
 To change this file, change the generator and regenerate — in the same PR.
 NOTE: generator retarget to emit this data-only module is queued; until
 then it emits the pre-split full packaging file (do not run without

@@ -6,7 +6,7 @@ import QEC.Stabilizer.Framework.Symplectic
 # Concatenation, Tier 1a: promotion map, `ConcatCSSData`, generator list
 
 Milestone **M2** of the CSS concatenation plan
-(`pipeline/attempts/concat_css_general/plan.md`).
+(`qec-lab:pipeline/attempts/concat_css_general/plan.md`).
 
 Promotes each single-qubit Pauli of an *outer* generator to the corresponding
 inner logical operator on its block: `I ↦ I`, `X ↦ X̄₁`, `Z ↦ Z̄₁` (CSS, so the

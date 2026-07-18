@@ -4,7 +4,7 @@ import QEC.Stabilizer.Foundations.PauliGroup.Commutation
 # Concatenation, Tier 0: the block-embedding / reindexing calculus
 
 This is milestone **M1** of the CSS code-concatenation plan
-(`pipeline/attempts/concat_css_general/plan.md`).
+(`qec-lab:pipeline/attempts/concat_css_general/plan.md`).
 
 The concatenated code lives on `n₁ * n₂` physical qubits, indexed as blocks
 `(b : Fin n₂, i : Fin n₁)` via the row-major map `qIdx b i = b * n₁ + i`

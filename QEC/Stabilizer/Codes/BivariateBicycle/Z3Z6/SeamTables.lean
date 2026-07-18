@@ -9,7 +9,7 @@ recomputing a 72-entry table.  This file tabulates the three class seams
 as literal chains and certifies each table with one (sub-second) kernel
 identity; the `SweepSafe*.lean` leaves sweep against the literals.
 
-Tables emitted by `experiments/bb_lab/scripts/gen_pair72_z6z6_data.py`
+Tables emitted by `qec-lab:experiments/bb_lab/scripts/gen_pair72_z6z6_data.py`
 (§5b); each has weight 12.
 -/
 

@@ -2,7 +2,7 @@
 # Phase 1: conditional assembly — d(gross) = 12 at the chain level
 
 The sector-dichotomy assembly of the bb_lab analytic proof
-(`experiments/bb_lab/notes/A4_writeup.md`, Theorems A–D), formalized at the
+(`qec-lab:experiments/bb_lab/notes/A4_writeup.md`, Theorems A–D), formalized at the
 `𝔽₂`-chain level with the three hard analytic inputs left as named
 hypotheses.  For a nontrivial gross cycle `v`, split on `b := p(v)`
 (pushforward to the bb72 base):

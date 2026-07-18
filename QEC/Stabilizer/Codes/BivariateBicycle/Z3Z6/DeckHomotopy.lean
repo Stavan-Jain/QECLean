@@ -16,7 +16,7 @@ case) yields the chain homotopy `1 + σ = ∂₂∘C + E∘∂₁` with module m
 kernel identity (36 points), replacing the previous 72-point `δ`-basis
 sweep of function equalities.  By A12 such a witness exists iff
 `k(cover) = k(base)` (4 = 4 here); provenance of `p`:
-`experiments/bb_lab/scripts/gen_pair72_z6z6_data.py` §3.
+`qec-lab:experiments/bb_lab/scripts/gen_pair72_z6z6_data.py` §3.
 
 (Compare gross's two-identity route `B⋆B = 1+x²+x⁴`,
 `(1+x²)(1+x²+x⁴) = 1+x⁶` in `Codes/BivariateBicycle/DeckHomotopy.lean` —

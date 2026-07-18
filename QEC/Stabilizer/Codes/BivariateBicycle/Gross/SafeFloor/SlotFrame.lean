@@ -3,7 +3,7 @@
 
 This module replaces the native-decidable confined-floor engine (`MImFloor`,
 `floorOK`, the `~2³⁰` per-orbit enumeration) with the **analytic slot-frame
-argument** of the self-contained proof (`docs/gross-distance-proof.md` §10).
+argument** of the self-contained proof (`qec-lab:docs/gross-distance-proof.md` §10).
 
 The endpoint each orbit rep must reach is the closed coset-weight obligation
 exposed by `MImClassify.chainWeight_coset_eq`:

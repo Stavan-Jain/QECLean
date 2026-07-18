@@ -5,7 +5,7 @@ For a free ℤ₂ BB cover with deck `σ`, `ε = 1+σ`, the transfer-LES
 connecting maps `δ₂ : H₂(base) → H₁(base)`, `δ₁ : H₁(base) → H₀(base)`
 compose to zero, which forces `dim (1+σ)H₁(cover) = k(cover) − k(base)`
 and the deck-module classification `H₁ ≅ D^{k̃−k} ⊕ F₂^{2k−k̃}`
-(`experiments/bb_lab/notes/A13_result.md`).
+(`qec-lab:experiments/bb_lab/notes/A13_result.md`).
 
 This file formalizes the **element-level core** of the proof: the
 composite's canonical representative `W = A·b + B·a` vanishes, because

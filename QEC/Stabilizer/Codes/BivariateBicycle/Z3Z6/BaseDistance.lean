@@ -10,7 +10,7 @@ chain of weight `k ≤ 3` over `ZMod 2` is a sum of `k` distinct `δ`-chains
 As a corollary the parametric Theorem-B floor gives the unconditional
 cover floor `d(cover) ≥ 4` (`pair72_cover_floor`).
 
-SAT cross-check: `experiments/bb_lab/scripts/gen_pair72_z6z6_data.py`
+SAT cross-check: `qec-lab:experiments/bb_lab/scripts/gen_pair72_z6z6_data.py`
 (base d = 4 exactly; the weight-4 logical is `Witness.lean`'s `uStar36`).
 -/
 

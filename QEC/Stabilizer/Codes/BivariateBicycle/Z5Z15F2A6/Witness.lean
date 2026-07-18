@@ -16,7 +16,7 @@ fed to `not_mem_boundaries_of_dual_witness`.  As a corollary `u*` itself
 is a nontrivial base logical, so the SAT-side base facts split as:
 `d(base) ≤ 8` kernel-checked here, `d(base) ≥ 8` certificate-checked
 (CaDiCaL `UNSAT@7`, corpus `d_exact`).  Provenance:
-`experiments/bb_lab/scripts/gen_f2a6_z5z30_data.py` §§3–4.
+`qec-lab:experiments/bb_lab/scripts/gen_f2a6_z5z30_data.py` §§3–4.
 -/
 
 import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.Defs

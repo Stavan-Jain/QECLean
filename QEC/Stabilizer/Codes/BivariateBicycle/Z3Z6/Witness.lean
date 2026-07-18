@@ -12,7 +12,7 @@ re-certified here by kernel computation).  Non-boundaryness is certified by
 an explicit dual witness `w` (left-block weight 12) with
 `dualBoundary w = 0` and `⟨w, τ(u*)⟩ = 1`, fed to
 `not_mem_boundaries_of_dual_witness`.  Provenance:
-`experiments/bb_lab/scripts/gen_pair72_z6z6_data.py` §4.
+`qec-lab:experiments/bb_lab/scripts/gen_pair72_z6z6_data.py` §4.
 -/
 
 import QEC.Stabilizer.Codes.BivariateBicycle.Z3Z6.Defs

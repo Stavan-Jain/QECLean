@@ -3,7 +3,7 @@
 
 The first `d ≥ 7` instance of the free-ℤ₂ doubling template
 (`Framework/Homological/BBDoubling.lean`), from the A17 hunt
-(`experiments/bb_lab/notes/A17_d7plus_doubling_hunt_plan.md` §6.1):
+(`qec-lab:experiments/bb_lab/notes/A17_d7plus_doubling_hunt_plan.md` §6.1):
 
 * **base** `[[150,8,8]]` on `G150 = Z₅ × Z₁₅`, `A = 1 + y + x`,
   `B = xy⁶ + xy¹⁰ + x²y¹²` (corpus instance `f2a6f17e1c41ff96`,
@@ -20,8 +20,8 @@ minimum at exactly `16`.  This file instantiates the two chain complexes
 and the parametric cover bundle `coverData : XDoubleCoverData G300 G150`;
 all finite obligations are discharged by kernel computation.  The offline
 provenance (SAT distances, certificates, witness search) is
-`experiments/bb_lab/scripts/gen_f2a6_z5z30_data.py`
-(data: `experiments/bb_lab/data/a17/f2a6_z5z30_lean_data.json`).
+`qec-lab:experiments/bb_lab/scripts/gen_f2a6_z5z30_data.py`
+(data: `qec-lab:experiments/bb_lab/data/a17/f2a6_z5z30_lean_data.json`).
 
 ## Convention bridge (lab → repo)
 
