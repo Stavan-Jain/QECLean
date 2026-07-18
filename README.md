@@ -1,7 +1,8 @@
 # Quantum Error Correction in Lean
 
 [![Lean V4](https://img.shields.io/badge/Lean-V4-blueviolet)](https://lean-lang.org/)
-[![Dashboard](https://img.shields.io/badge/pipeline%20dashboard-live-success)](https://stavan-jain.github.io/QECLean/)
+[![Dashboard](https://img.shields.io/badge/pipeline%20dashboard-live-success)](https://stavan-jain.github.io/qec-lab/)
+[![Research: qec-lab](https://img.shields.io/badge/research-qec--lab-informational)](https://github.com/Stavan-Jain/qec-lab)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
 This project formalizes foundational concepts in quantum error correction using the Lean 4 proof assistant, with the long-term goal of a broad formalization of Stabilizer Codes.
@@ -12,6 +13,8 @@ Along the way, it develops definitions and lemmas for reasoning about qubits, qu
 
 Modules are written in Lean 4 and rely on [mathlib](https://github.com/leanprover-community/mathlib4) for linear algebra and other foundations. Import everything via `QEC`, or use `QEC.Foundations.Foundations`, `QEC.RepetitionCode.RepetitionCode`, or `QEC.Stabilizer.Stabilizer` for a subset.
 
+This repo contains **only the Lean library** — polished, sorry-free formalizations, in the spirit of [mathlib](https://github.com/leanprover-community/mathlib4) and [cslib](https://github.com/leanprover/cslib). The research program behind it (the BB-code distance lab, the formalization pipeline, the human-readable proof write-ups, and the dashboard) lives in the companion repo [**qec-lab**](https://github.com/Stavan-Jain/qec-lab), which shares this repo's pre-split git history. New formalizations are developed there and upstreamed here by PR when complete.
+
 ### Features
 
 - **Foundational Quantum Computing**: Core definitions for qubits, quantum states, vectors, and norms
@@ -21,8 +24,8 @@ Modules are written in Lean 4 and rely on [mathlib](https://github.com/leanprove
 - **Stabilizer Formalism**: Single-qubit and n-qubit Pauli groups, commutation (including tactics), matrix representations, stabilizer groups, CSS structure, centralizer, and logical operators
 - **Binary Symplectic Representation**: Check matrices, symplectic inner product, symplectic span, and equivalence with independent generators
 - **Concrete Codes**: surface codes, 3-qubit repetition code, n-qubit repetition code, Steane 7-qubit code, Shor 9-qubit code, and quantum Hamming code
-- **Toric Code, end-to-end**: For every `L ≥ 2`, the `L × L` toric code is verified as a `StabilizerCode (2L²) 2` with **distance exactly `L`**. The chain complex, `H₁ ≅ 𝔽₂²` isomorphism, `(h, v)` wrapping invariants, and CSS distance bridge are all mechanized — see the [interactive write-up](https://stavan-jain.github.io/DistanceBlog/) (or [`docs/distance_proof.md`](docs/distance_proof.md) for the in-repo version) for the math, and `QEC/Stabilizer/Codes/Toric/` (code, lattice geometry, chain complex, distance) for the Lean.
-- **Bivariate-bicycle codes, incl. the gross code**: IBM's `[[144,12,12]]` gross code is verified with **distance exactly 12** (see Headline results), alongside its `[[72,12,6]]` base, the `[[72,4,8]]` pair, a `[[150,8,8]] → [[300,8,16]]` two-tier instance, and a parametric free-ℤ₂ **doubling framework** (`Framework/Homological/BB*`) with cover-transfer, deck-homotopy, deck-tower, Bockstein-rank, and class base-floor (`SmallCycleData`) layers. The accompanying analytic proof and research program live in [`docs/gross-distance-proof.md`](docs/gross-distance-proof.md), [`docs/gross-distance-extensibility.md`](docs/gross-distance-extensibility.md), and `experiments/bb_lab/`.
+- **Toric Code, end-to-end**: For every `L ≥ 2`, the `L × L` toric code is verified as a `StabilizerCode (2L²) 2` with **distance exactly `L`**. The chain complex, `H₁ ≅ 𝔽₂²` isomorphism, `(h, v)` wrapping invariants, and CSS distance bridge are all mechanized — see the [interactive write-up](https://stavan-jain.github.io/DistanceBlog/) (or the [in-repo version in qec-lab](https://github.com/Stavan-Jain/qec-lab/blob/main/docs/distance_proof.md)) for the math, and `QEC/Stabilizer/Codes/Toric/` (code, lattice geometry, chain complex, distance) for the Lean.
+- **Bivariate-bicycle codes, incl. the gross code**: IBM's `[[144,12,12]]` gross code is verified with **distance exactly 12** (see Headline results), alongside its `[[72,12,6]]` base, the `[[72,4,8]]` pair, a `[[150,8,8]] → [[300,8,16]]` two-tier instance, and a parametric free-ℤ₂ **doubling framework** (`Framework/Homological/BB*`) with cover-transfer, deck-homotopy, deck-tower, Bockstein-rank, and class base-floor (`SmallCycleData`) layers. The accompanying analytic proof and research program live in qec-lab: [gross-distance-proof.md](https://github.com/Stavan-Jain/qec-lab/blob/main/docs/gross-distance-proof.md), [gross-distance-extensibility.md](https://github.com/Stavan-Jain/qec-lab/blob/main/docs/gross-distance-extensibility.md), and [experiments/bb_lab](https://github.com/Stavan-Jain/qec-lab/tree/main/experiments/bb_lab).
 - **CSS concatenation**: parametric `[[n₁n₂, k₂, ≥ d₁d₂]]` concatenation with unconditional `[[49,1,9]]` (Steane ⊗ Steane) and `[[28,2,6]]` (Steane ⊗ [[4,2,2]]) instances.
 - **Verified Properties**: Mechanized proofs of key properties, including the obligations used to instantiate `StabilizerCode` instances (generator count/independence/commutation, exclusion of `-I`, and logical-operator centralizer + anticommutation conditions), along with distance theorems.
 
@@ -34,7 +37,7 @@ Modules are written in Lean 4 and rely on [mathlib](https://github.com/leanprove
 grossStabilizerCodeWithDistance : StabilizerCodeWithDistance 144 12 12
 ```
 
-The distance proof is unconditional and axiom-clean (the standard three axioms plus Lean's `native_decide` compiler axiom; no `sorry`), mechanizing the free-ℤ₂-cover argument of the in-repo analytic write-up: safe/dangerous sector dichotomy over the `[[72,12,6]]` base, the small-cycle theorem, the light-stabilizer classification, and the Smith-coset confined floor (`QEC/Stabilizer/Codes/BivariateBicycle/`). A fully analytic paper proof (no computer search in the argument) is at [`docs/gross-distance-proof.md`](docs/gross-distance-proof.md).
+The distance proof is unconditional and axiom-clean (the standard three axioms plus Lean's `native_decide` compiler axiom; no `sorry`), mechanizing the free-ℤ₂-cover argument of the analytic write-up: safe/dangerous sector dichotomy over the `[[72,12,6]]` base, the small-cycle theorem, the light-stabilizer classification, and the Smith-coset confined floor (`QEC/Stabilizer/Codes/BivariateBicycle/`). A fully analytic paper proof (no computer search in the argument) is at [qec-lab: gross-distance-proof.md](https://github.com/Stavan-Jain/qec-lab/blob/main/docs/gross-distance-proof.md).
 
 **The toric family.** For every `L ≥ 2`, the `L × L` toric code is a verified `[[2L², 2, L]]` stabilizer code:
 
@@ -53,11 +56,11 @@ Every step of the homological distance argument is mechanized — no `sorry`s an
 - **Distance lower bound.** Any non-trivial cycle has weight `≥ L` (one of `h`, `v` is `1`, forcing one edge per slice across `L` disjoint slices).
 - **CSS bridge.** `d = min(d_X, d_Z)`; both equal `L` by symmetry.
 
-The accompanying expository proof is available as an [interactive write-up](https://stavan-jain.github.io/DistanceBlog/) with diagrams (or [`docs/distance_proof.md`](docs/distance_proof.md) for the in-repo version).
+The accompanying expository proof is available as an [interactive write-up](https://stavan-jain.github.io/DistanceBlog/) with diagrams (or the [in-repo version in qec-lab](https://github.com/Stavan-Jain/qec-lab/blob/main/docs/distance_proof.md)).
 
-## Pipeline dashboard
+## Research companion repo
 
-A [live dashboard](https://stavan-jain.github.io/QECLean/) tracks formalization progress across all 267 codes in the [Error Correction Zoo](https://errorcorrectionzoo.org/) catalog — which codes are done, in-flight, queued by priority, or deliberately deferred. The dashboard also surfaces moonshot-track research attempts (codes with no known clean distance proof), where failure write-ups are first-class outputs alongside any successes. See [`docs/pipeline.md`](docs/pipeline.md) for the architecture and [`docs/pipeline-usage.md`](docs/pipeline-usage.md) for the operator's manual.
+[**qec-lab**](https://github.com/Stavan-Jain/qec-lab) is the workbench behind this library: the BB-code distance research program (`experiments/bb_lab/`), the catalog-driven formalization pipeline covering all 267 codes in the [Error Correction Zoo](https://errorcorrectionzoo.org/), the human-readable proof documents, and the [live dashboard](https://stavan-jain.github.io/qec-lab/) tracking which codes are done, in-flight, queued, or deferred. Some Lean files here (marked `GENERATED FILE — DO NOT HAND-EDIT`) are emitted by generators in qec-lab — change the generator there and regenerate rather than editing the Lean.
 
 ## Project Structure
 
@@ -77,7 +80,7 @@ Import the whole development via `QEC` (or `QEC.Foundations.Foundations`, `QEC.R
 ### Building
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Stavan-Jain/QECLean
 cd QECLean
 lake build
 ```

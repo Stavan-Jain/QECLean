@@ -3,37 +3,44 @@
 This is a Lean 4 / mathlib formalization of the stabilizer formalism for
 quantum error correction. The active math is in `QEC/`. Build with `lake build`.
 
+## Two-repo layout
+
+This repo is the **library only** — polished, sorry-free Lean on `main`
+(mathlib/cslib model). The research program behind it lives in the sibling
+repo [**qec-lab**](https://github.com/Stavan-Jain/qec-lab) (shared pre-split
+git history; tag `archive/pre-split-20260718` marks the split point):
+the BB distance lab (`experiments/bb_lab/`), the formalization pipeline
+(`pipeline/`, `catalog/`, the four pipeline agent specs), the narrative
+docs, and the dashboard. Convention: qec-lab tooling expects this repo
+checked out as a **sibling directory** (env `QECLEAN_ROOT`, default
+`../QECLean`). WIP formalization branches live here (in worktrees), can be
+backed up to the qec-lab remote (`git push lab <branch>` works thanks to
+shared ancestry), and merge to `main` only when sorry-free. Read qec-lab's
+`CLAUDE.md` before any pipeline or research work.
+
 ## Where to look for what
 
 CLAUDE.md is the small must-read on every invocation. It carries
 codebase-wide orientation, naming/style policy, layering rules, and
 build/MCP workflow. Volatile or topic-scoped knowledge lives elsewhere:
 
-- **[`docs/lean-patterns.md`](docs/lean-patterns.md)** — tactical
-  patterns by code shape (CSS distance, non-CSS distance, parametric
-  families, mechanical fixes). Reach for this when your current code
-  matches one of its sections; add new patterns here when they're
+- **[qec-lab: `docs/lean-patterns.md`](https://github.com/Stavan-Jain/qec-lab/blob/main/docs/lean-patterns.md)**
+  — tactical patterns by code shape (CSS distance, non-CSS distance,
+  parametric families, mechanical fixes). Reach for this when your current
+  code matches one of its sections; add new patterns there when they're
   code-shape-specific rather than codebase-wide.
-- **[`docs/mathlib-version-quirks.md`](docs/mathlib-version-quirks.md)**
+- **[qec-lab: `docs/mathlib-version-quirks.md`](https://github.com/Stavan-Jain/qec-lab/blob/main/docs/mathlib-version-quirks.md)**
   — mathlib API drift (deprecations, renames, signature changes),
-  grouped by version. Add new entries here when you work around a
+  grouped by version. Add new entries there when you work around a
   mathlib version-specific quirk.
-- **[`docs/pipeline.md`](docs/pipeline.md)** and
-  **[`docs/pipeline-usage.md`](docs/pipeline-usage.md)** — the
-  formalization-pipeline architecture and recipes (weekly triage,
-  Stage 2/3/4/5/6 workflows).
-- **[`pipeline/attempts/<code_id>/result.md`](pipeline/attempts/)** —
-  per-code Stage-4 write-ups, including "Patterns discovered" sections.
-  Patterns that generalize get promoted to `lean-patterns.md` or
-  CLAUDE.md at Stage 6 (post-merge); see `pipeline-usage.md` § Recipe:
-  post-merge reflection.
 - **[`QEC/Stabilizer/Codes/BivariateBicycle/README.md`](QEC/Stabilizer/Codes/BivariateBicycle/README.md)**
   — orientation for the BB family (gross d=12 proof spine, instance
   dirs, hypothesis-discharge map, engine-vs-analytic status,
   generated-file manifest). Read before any BB edit. Generated files
   carry `GENERATED FILE — DO NOT HAND-EDIT` banners: change the
-  generator (see `experiments/bb_lab/GENERATORS.md`) and regenerate in
-  the same PR, never the emitted Lean.
+  generator (see qec-lab's `experiments/bb_lab/GENERATORS.md`) and
+  regenerate, landing both repos' changes together — never hand-edit
+  the emitted Lean.
 
 ## Project tour
 
@@ -119,8 +126,9 @@ content there. Same convention for the sub-umbrellas
   - **For code-shape-specific tactical patterns** (CSS distance-2 closer,
     multi-Z anti-witness, parametric `Fin n` workarounds, backtracking
     witness search for non-CSS distance, `_root_` qualification, mechanical
-    fixes), see [`docs/lean-patterns.md`](docs/lean-patterns.md). Add new
-    patterns there, not here, unless they generalize across multiple
+    fixes), see
+    [qec-lab: `docs/lean-patterns.md`](https://github.com/Stavan-Jain/qec-lab/blob/main/docs/lean-patterns.md).
+    Add new patterns there, not here, unless they generalize across multiple
     code shapes.
 - **Sorry markers**: `sorry  -- TODO(<short-tag>): <one-line note about goal shape>`.
   Always tag so the next session can grep for them.
@@ -134,8 +142,8 @@ content there. Same convention for the sub-umbrellas
   and unrelated proofs (especially `native_decide` ones) can break. The
   failure mode is distinctive: `failed to synthesize Decidable (∀-∃
   proposition)` on a proof that previously closed. See
-  `pipeline/attempts/stab_5_1_3/result.md` § "Lessons learned" for a
-  concrete worked example of this footgun and the locality fix.
+  qec-lab's `pipeline/attempts/stab_5_1_3/result.md` § "Lessons learned"
+  for a concrete worked example of this footgun and the locality fix.
 
 ## Linter policy
 
@@ -184,7 +192,8 @@ mathlib linter; don't introduce new violations):
 
 For CSS-specific simp-set idioms (e.g. when to drop
 `NQubitPauliOperator.identity`), see
-[`docs/lean-patterns.md`](docs/lean-patterns.md) § CSS distance proofs.
+[qec-lab: `docs/lean-patterns.md`](https://github.com/Stavan-Jain/qec-lab/blob/main/docs/lean-patterns.md)
+§ CSS distance proofs.
 
 ## Project-specific helpers (NOT mathlib)
 
@@ -392,43 +401,27 @@ local runbook).
 
 For workarounds to mathlib API drift (deprecations, renames, signature
 changes encountered during version bumps), see
-[`docs/mathlib-version-quirks.md`](docs/mathlib-version-quirks.md). Add new
-entries there when you hit a version-specific quirk; don't add them to
-this file (CLAUDE.md is the small must-read doc, the quirks file is the
+[qec-lab: `docs/mathlib-version-quirks.md`](https://github.com/Stavan-Jain/qec-lab/blob/main/docs/mathlib-version-quirks.md).
+Add new entries there when you hit a version-specific quirk; don't add them
+to this file (CLAUDE.md is the small must-read doc, the quirks file is the
 version-grouped reference).
 
 The "global typeclass instance can break unrelated `native_decide` proofs"
 footgun is documented in the "Global vs. `local instance` discipline"
 bullet in the *Naming and style conventions* section above — that's the
 canonical location for the rule and its worked example
-(`pipeline/attempts/stab_5_1_3/result.md` § "Lessons learned").
+(qec-lab's `pipeline/attempts/stab_5_1_3/result.md` § "Lessons learned").
 
-## Formalization pipeline
+## Formalization pipeline (lives in qec-lab)
 
-This repo has a catalog-driven pipeline for prioritizing and formalizing
-new QEC codes. Three documents define it:
-
-- **`docs/pipeline-usage.md`** — task-oriented recipes. Start here if you
-  want to *do* something: weekly triage, start a new code, review a
-  skeleton, run Stage 4, open a PR, refresh the catalog, initialize a
-  moonshot. Quick-reference table at the top maps every workflow to a
-  recipe.
-- **`docs/pipeline.md`** — architectural overview: stages, scoring rubric,
-  what each artifact contains. Read after the usage guide if you want to
-  understand *why* the pipeline is shaped the way it is.
-- **`.claude/agents/qec-{prioritizer,skeleton-drafter,formalization-runner,moonshot}.md`**
-  — operating specs for the four pipeline agents. Read these when
-  modifying agent behavior, not for normal day-to-day use.
-
-Key artifacts at a glance:
-
-- `catalog/zoo.yaml` — 267 quantum codes from the Error Correction Zoo
-- `catalog/scoring.yaml` — per-code formalization-priority scores
-- `pipeline/queue.md` — top-of-queue + tracks (engineering / moonshot /
-  defer / skip)
-- `pipeline/attempts/<code_id>/` — per-code formalization state
-- `pipeline/research_log.md` — index of moonshot attempts (including
-  failures, which are first-class outputs)
+The catalog-driven pipeline for prioritizing and formalizing new QEC codes
+— the EC-Zoo catalog, per-code scoring, the queue, per-code attempt state,
+the moonshot research log, and the four pipeline agent specs — lives
+entirely in [qec-lab](https://github.com/Stavan-Jain/qec-lab). Start with
+its `CLAUDE.md`, then `docs/pipeline-usage.md` (recipes) and
+`docs/pipeline.md` (architecture) there. Pipeline agents draft and prove
+Lean in a checkout of *this* repo (usually a worktree) while tracking
+their state in qec-lab.
 
 ## Canonical CSS code structure (`_TEMPLATE.lean`)
 
@@ -441,11 +434,11 @@ centralizer → `StabilizerCode` → distance), with variant notes for `k ≥ 2`
 codes, non-CSS codes, and parametric families.
 
 Before drafting a new code file by hand or via the
-`qec-skeleton-drafter` agent, **read `_TEMPLATE.lean` first**. The
-embedded code samples there are copy-paste-ready and capture the v4.30-era
-tactic patterns (notably the `_root_.mul_assoc` / `_root_.one_mul`
-qualification trick and the `change` step before `rw` after
-`closure_induction`).
+`qec-skeleton-drafter` agent (spec in qec-lab), **read `_TEMPLATE.lean`
+first**. The embedded code samples there are copy-paste-ready and capture
+the v4.30-era tactic patterns (notably the `_root_.mul_assoc` /
+`_root_.one_mul` qualification trick and the `change` step before `rw`
+after `closure_induction`).
 
 Concrete instantiations of the template:
 
@@ -505,5 +498,5 @@ adding or moving modules).
 One-time conversion patterns for linter sweeps and mathlib-version bumps
 (nested `induction'` on `Fin L`, structure-builder `refine` chains hit
 by `linter.style.multiGoal`, closure-induction case naming): see
-`docs/lean-conversion-recipes.md`. Pull it in when you hit the
-corresponding warning class.
+[qec-lab: `docs/lean-conversion-recipes.md`](https://github.com/Stavan-Jain/qec-lab/blob/main/docs/lean-conversion-recipes.md).
+Pull it in when you hit the corresponding warning class.
