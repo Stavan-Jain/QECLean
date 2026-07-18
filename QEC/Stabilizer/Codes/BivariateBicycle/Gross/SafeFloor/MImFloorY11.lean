@@ -1,4 +1,10 @@
 /-
+GENERATED FILE — DO NOT HAND-EDIT (edits WILL be clobbered by regen).
+Generator : experiments/bb_lab/scripts/gen_yrep_module.py (arg: 11)
+Regen     : cd experiments/bb_lab && uv run python scripts/gen_yrep_module.py 11
+To change this file, change the generator and regenerate — in the same PR.
+-/
+/-
 # Phase 6: the safe-sector floor for y-orbit representative 11 — ANALYTIC (Tier 3, M1)
 
 Y-orbit rep 11 (`ker ∂₂` element `kcombo 0 1 0 1 1 0`) is a **weight-24** orbit:
@@ -14,7 +20,7 @@ discharged by a `4⁶`-knob kernel `decide` (`Rdec`/`Ldec`).
 The only `native_decide` here is the small per-slot seam-offset read-off
 (`offs_eq`, one bundled compilation unit); the heavy `floorOK` leaf is gone.
 -/
-import QEC.Stabilizer.Codes.BivariateBicycle.WtFloor24Bridge
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.SafeFloor.WtFloor24Bridge
 
 open Quantum.Stabilizer.Homological.BB
 open Quantum.Stabilizer.Homological.BB.CRTFrame

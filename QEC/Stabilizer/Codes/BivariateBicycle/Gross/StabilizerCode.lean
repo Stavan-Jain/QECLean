@@ -29,9 +29,9 @@ conditional only on `MImBound`; the `LightStabilizerClassification` input is
 discharged by `LightStab.lightStabilizerClassification_holds`).
 -/
 
-import QEC.Stabilizer.Codes.BivariateBicycle.BaseDistance
-import QEC.Stabilizer.Codes.BivariateBicycle.SafeSector
-import QEC.Stabilizer.Codes.BivariateBicycle.LightStabClassify
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.BaseDistance
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.SafeSector
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.LightStabClassify
 import QEC.Stabilizer.Framework.Homological.LogicalCorrespondence
 import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
 import Mathlib.Data.List.GetD

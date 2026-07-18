@@ -41,9 +41,9 @@ Repo `∂₂ f = (A⋆f | B⋆f)`: A-block at `j = 0`, B-block at `j = 1`.
 **Repo-left = lab-right** (every "lighter block" reference in A4 §§9–14 flips).
 -/
 
-import QEC.Stabilizer.Codes.BivariateBicycle.SafeSector
-import QEC.Stabilizer.Codes.BivariateBicycle.LightStab
-import QEC.Stabilizer.Codes.BivariateBicycle.LightStabClassify
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.SafeSector
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.LightStab
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.LightStabClassify
 
 open Quantum.Stabilizer.Homological.BB
 open Quantum.Stabilizer.Homological.BB.CRTFrame

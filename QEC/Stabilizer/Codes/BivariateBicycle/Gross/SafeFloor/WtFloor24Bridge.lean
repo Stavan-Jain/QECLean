@@ -56,7 +56,7 @@ Everything here is **axiom-clean** except the three `rmul_*_mem` facts, which us
 `CRTFrame`'s `*_ann_eq_ideal` / `*_ideal_ge3`, not the `2³⁰` floor leaf).
 -/
 
-import QEC.Stabilizer.Codes.BivariateBicycle.WtFloor24
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.SafeFloor.WtFloor24
 
 open Quantum.Stabilizer.Homological.BB
 open Quantum.Stabilizer.Homological.BB.CRTFrame

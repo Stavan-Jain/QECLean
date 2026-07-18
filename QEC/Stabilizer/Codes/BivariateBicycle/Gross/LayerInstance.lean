@@ -30,7 +30,7 @@ layer-routed, now-unconditional `IsLeast` endpoints
 identical to `Assembly.lean`'s conditional forms.
 -/
 
-import QEC.Stabilizer.Codes.BivariateBicycle.MImAssembly
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.SafeFloor.MImAssembly
 import QEC.Stabilizer.Framework.Homological.BBDoubling
 
 namespace Quantum

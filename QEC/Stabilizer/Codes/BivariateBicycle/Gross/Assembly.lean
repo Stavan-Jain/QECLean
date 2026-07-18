@@ -32,7 +32,7 @@ condition `B⋆v_L = A⋆v_R`.  **Repo-left = lab-right.**  "Dangerous sector"
 = `[v] ∈ ker pr_*`, which at the chain level is `coverPush1 v ∈ boundaries`.
 -/
 
-import QEC.Stabilizer.Codes.BivariateBicycle.Witness
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.Witness
 
 namespace Quantum
 namespace Stabilizer

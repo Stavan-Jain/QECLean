@@ -1,9 +1,15 @@
 /-
+GENERATED FILE — DO NOT HAND-EDIT (edits WILL be clobbered by regen).
+Generator : experiments/bb_lab/scripts/gen_floor_lean.py
+Regen     : cd experiments/bb_lab && uv run python scripts/gen_floor_lean.py
+To change this file, change the generator and regenerate — in the same PR.
+-/
+/-
 # Phase 6: the confined-floor engine — machine-generated tables
 
 The finite data underpinning `MImFloor`'s native-decidable floor engine.  All arrays
 are emitted by `experiments/bb_lab/scripts/gen_floor_lean.py` and are **orbit-independent**
-(the per-orbit seam offsets live in the `MImFloorO0`..`MImFloorO4` modules); only the
+(the per-orbit seam offsets live in the `MImFloorY{0,1,4,11,12}` modules); only the
 cost tables and the Γⱼ coset-generator / fiber data sit here.
 
 Encoding: a ring element is its four `Z₂²`-slot values (`F₄ = 0..3`) in `allS` order

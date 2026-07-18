@@ -21,7 +21,7 @@ If both are green, routes R-C (LightStab) and R2 (MImBound) are de-risked and th
 CRT-frame infrastructure build (milestone M1) can start.
 -/
 
-import QEC.Stabilizer.Codes.BivariateBicycle.Defs
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.Defs
 import QEC.Stabilizer.Framework.Homological.BBChainComplex
 
 open Quantum.Stabilizer.Homological Quantum.Stabilizer.Homological.BB

@@ -13,7 +13,7 @@ reduction** `floor_shiftYk_combo`: if every coset of `[seamC (kcombo c)]` has we
 so does every coset of its `(0,k)`-translate.  Dispatch over the y-orbits then reduces all 63
 nonzero classes to the orbit reps.
 -/
-import QEC.Stabilizer.Codes.BivariateBicycle.MImClassify
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.SafeFloor.MImClassify
 
 open Quantum.Stabilizer.Homological.BB
 open Quantum.Stabilizer.Homological.BB.LightStab

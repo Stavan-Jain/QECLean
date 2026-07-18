@@ -34,7 +34,7 @@ shapes, bridged back to the function level:
 Everything is axiom-clean: the standard three (`propext`, `Classical.choice`,
 `Quot.sound`) plus sanctioned `native_decide`.  No `sorry`, no custom axioms.
 -/
-import QEC.Stabilizer.Codes.BivariateBicycle.LightStab
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.LightStab
 
 open Quantum.Stabilizer.Homological.BB
 open Quantum.Stabilizer.Homological.BB.CRTFrame

@@ -27,7 +27,7 @@ Repo convention: `∂₂ f = (A⋆f | B⋆f)`, `∂₁ c = B⋆c_L + A⋆c_R`.
 the lab's `d2c` (seam-crossing part), `N = seamN` the `d2nc`.
 -/
 
-import QEC.Stabilizer.Codes.BivariateBicycle.DangerousSector
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.DangerousSector
 
 namespace Quantum
 namespace Stabilizer

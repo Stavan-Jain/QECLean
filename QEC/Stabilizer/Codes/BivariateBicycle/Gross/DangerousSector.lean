@@ -26,7 +26,7 @@ Repo convention: `∂₂ f = (A⋆f | B⋆f)`, `∂₁ c = B⋆c_L + A⋆c_R`.
 **Repo-left = lab-right.**  Sheet 0 = the `coverSec` image (`x ∈ {0..5}`).
 -/
 
-import QEC.Stabilizer.Codes.BivariateBicycle.BaseDistance
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.BaseDistance
 
 namespace Quantum
 namespace Stabilizer

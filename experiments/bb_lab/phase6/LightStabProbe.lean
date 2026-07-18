@@ -18,8 +18,8 @@ the Floor lemma proper (needs the weight constraint + the unit-only-Fourier
 exclusion, NOT a corollary of ENG), the sharp one-block ≥16 bound, and the six
 per-shape kills + endgame transfers.
 -/
-import QEC.Stabilizer.Codes.BivariateBicycle.DangerousSector
-import QEC.Stabilizer.Codes.BivariateBicycle.CRTFrame
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.DangerousSector
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.CRTFrame
 
 open Quantum.Stabilizer.Homological.BB
 open Quantum.Stabilizer.Homological.BB.CRTFrame

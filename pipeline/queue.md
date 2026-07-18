@@ -38,7 +38,7 @@ Next up (21-30): `cubic_surface` (7.00), `quantum_parity` (7.00), `quantum_hammi
 High canonicality + hardware relevance but low tractability (no known clean distance proof).
 Failures here are first-class research outputs (`pipeline/research_log.md`).
 
-`gross` graduated from this track on 2026-07-06: d = 12 proven unconditionally (`grossStabilizerCodeWithDistance`, Codes/BivariateBicycle/MImAssembly.lean). The research program it spawned (A12-A18: doubling template, class small-cycle theorem, deficit wall, d >= 7 hunt) is active — open moonshot-grade problems there include the seamC <-> delta_2 homological transport (A13 L2), the (M)-robustness conjecture (A17), w >= 7 class floors (A15), and the Z5Z15F2A6 [[300,8,16]] two-tier completion (A17).
+`gross` graduated from this track on 2026-07-06: d = 12 proven unconditionally (`grossStabilizerCodeWithDistance`, Codes/BivariateBicycle/Gross/SafeFloor/MImAssembly.lean). The research program it spawned (A12-A18: doubling template, class small-cycle theorem, deficit wall, d >= 7 hunt) is active — open moonshot-grade problems there include the seamC <-> delta_2 homological transport (A13 L2), the (M)-robustness conjecture (A17), w >= 7 class floors (A15), and the Z5Z15F2A6 [[300,8,16]] two-tier completion (A17).
 
 | Code | Status | Composite | Why important | Why hard |
 |---|---|---|---|---|
@@ -90,7 +90,7 @@ High-value entries blocked on a missing abstraction (prereq < 5, or a standing a
 ### Non-catalog formalized objects (BB research program)
 
 - [x] Z3Z6 pair72 [[72,4,8]] — `pair72StabilizerCodeWithDistance : StabilizerCodeWithDistance 72 4 8` (Codes/BivariateBicycle/Z3Z6/StabilizerCode.lean; second doubling instance, S3.9)
-- [x] bb72 base floor — `base_distance_ge_6` / `base_chain_distance_eq_6` (Codes/BivariateBicycle/BaseDistance.lean); feeds the `bb72` queue entry above
+- [x] bb72 base floor — `base_distance_ge_6` / `base_chain_distance_eq_6` (Codes/BivariateBicycle/Gross/BaseDistance.lean); feeds the `bb72` queue entry above
 - [x] BaseFloors pilots — certified `SmallCycleData` d >= 6 floors for BB90, BB108, Z6Z14 (Codes/BivariateBicycle/BaseFloors/, A16 class small-cycle theorem T2 layer)
 - [ ] Z5Z15F2A6 [[300,8,16]] — two-tier claim in progress (A17): doubling theorem kernel-checked; d(base) >= 8 and (M) floors enter as named certificate hypotheses (Codes/BivariateBicycle/Z5Z15F2A6/Distance.lean)
 

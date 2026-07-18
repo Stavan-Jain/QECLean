@@ -1,4 +1,10 @@
 /-
+GENERATED FILE — DO NOT HAND-EDIT (edits WILL be clobbered by regen).
+Generator : experiments/bb_lab/scripts/gen_yrep_module.py (arg: 12)
+Regen     : cd experiments/bb_lab && uv run python scripts/gen_yrep_module.py 12
+To change this file, change the generator and regenerate — in the same PR.
+-/
+/-
 # Phase 6: the safe-sector floor for y-orbit representative 12 — ANALYTIC (Tier 3, M1)
 
 Y-orbit rep 12 (`ker ∂₂` element `kcombo 1 1 0 1 1 0`) is a **weight-24** orbit:
@@ -8,7 +14,7 @@ its two CRT blocks **decouple**, each reaching the standard-form floor `6`
 `ρ`-link reduction.  See `MImFloorY11` for the structure; only the seam offsets
 and the two `decide` tables differ.
 -/
-import QEC.Stabilizer.Codes.BivariateBicycle.WtFloor24Bridge
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.SafeFloor.WtFloor24Bridge
 
 open Quantum.Stabilizer.Homological.BB
 open Quantum.Stabilizer.Homological.BB.CRTFrame

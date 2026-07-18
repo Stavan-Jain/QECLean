@@ -13,7 +13,7 @@
     check that a hexagon ∂₂δ_g is reproduced, and that the sparse-syndrome membership
     predicate native_decides on a handful of inputs.
 -/
-import QEC.Stabilizer.Codes.BivariateBicycle.Defs
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.Defs
 
 open Quantum.Stabilizer.Homological.BB
 

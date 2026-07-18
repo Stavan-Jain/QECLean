@@ -23,7 +23,7 @@ function correspondence + `gateM` linearity (so `gateM(conv baseA z) = true ∀z
 then the assembly (translate-normalize lighter block, apply this, extract witness,
 feed the `LightStab` endgame transfers) + the x↔y swap for the B-light case.
 -/
-import QEC.Stabilizer.Codes.BivariateBicycle.Defs
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.Defs
 
 open Quantum.Stabilizer.Homological.BB
 

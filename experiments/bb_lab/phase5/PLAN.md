@@ -1,7 +1,7 @@
 # Phase 5 — gross `StabilizerCode 144 12` packaging: continuation plan
 
 > **✅ DONE (2026-06-13).** All 4 obligations are implemented and building in
-> `QEC/Stabilizer/Codes/BivariateBicycle/StabilizerCode.lean` (§1–§6); whole-repo
+> `QEC/Stabilizer/Codes/BivariateBicycle/Gross/StabilizerCode.lean` (§1–§6); whole-repo
 > `lake build` green; axiom audit clean (standard + native_decide oracles, no
 > `sorryAx`). The §6 perf blocker (kernel whnf runaway in `logicalQubit`) was
 > resolved with **abstract-chain helper lemmas** — see the file's §6 header and the
@@ -15,7 +15,7 @@ User chose **full honest packaging** (no named structural Props).
 
 ## Status (this checkpoint)
 
-`QEC/Stabilizer/Codes/BivariateBicycle/StabilizerCode.lean` compiles and is in
+`QEC/Stabilizer/Codes/BivariateBicycle/Gross/StabilizerCode.lean` compiles and is in
 the umbrella. It contains:
 - **§1** all offline-validated data: `dropSet`, `redP2`/`redCM` (reduced
   kernel bases), `phiX`/`phiZ` (decoders), `logX`/`logZ` (symplectic logicals).

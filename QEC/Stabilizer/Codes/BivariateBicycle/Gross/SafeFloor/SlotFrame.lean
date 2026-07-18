@@ -32,7 +32,7 @@ Repo `∂₂ f = (A⋆f | B⋆f)`: A-block at `j = 0`, B-block at `j = 1`.
 order `(e, x, y, xy)`; F₄ is `Fin 4` with `(0,1,ω,ω²) = (0,1,2,3)`.
 -/
 
-import QEC.Stabilizer.Codes.BivariateBicycle.MImClassify
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.SafeFloor.MImClassify
 
 open Quantum.Stabilizer.Homological.BB
 open Quantum.Stabilizer.Homological.BB.CRTFrame

@@ -21,7 +21,7 @@ multiplicativity identity `V_j(A·z) = Â_j·ẑ_j` (needs the F₂-linearity br
 lemma and carries the repo-left=lab-right / `ω` vs `ω²` convention risk).  This
 file is the M1 (F₄ + ring) + M3 (engine) foundation those build on.
 -/
-import QEC.Stabilizer.Codes.BivariateBicycle.Defs
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.Defs
 
 namespace Quantum
 namespace Stabilizer

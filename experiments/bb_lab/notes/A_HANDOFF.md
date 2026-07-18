@@ -133,7 +133,7 @@ A4 Theorem D).
 >   (`LightStab.lightStabilizerClassification_holds`,
 >   `LightStab.mimBound_holds`), headline
 >   `grossStabilizerCode_hasCodeDistance_12_uncond`
->   (`QEC/Stabilizer/Codes/BivariateBicycle/MImAssembly.lean`). The
+>   (`QEC/Stabilizer/Codes/BivariateBicycle/Gross/SafeFloor/MImAssembly.lean`). The
 >   LayerInstance retrofit landing today (branch
 >   `claude/gross-layer-instance`) re-derives the gross endpoints
 >   through the parametric doubling layer

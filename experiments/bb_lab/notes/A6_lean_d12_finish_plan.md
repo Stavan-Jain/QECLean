@@ -84,7 +84,7 @@ flips when transcribing.
 
 ## 3. Critical path: the shared CRT-frame infrastructure (build first)
 
-New module, e.g. `QEC/Stabilizer/Codes/BivariateBicycle/CRTFrame.lean`:
+New module, e.g. `QEC/Stabilizer/Codes/BivariateBicycle/Gross/CRTFrame.lean`:
 
 1. **`F4` computable** — `Fin 4` (or an inductive) + add/mul tables; instances
    `CommRing`/`Field`, `DecidableEq`, `Fintype`. Verify field axioms by `decide`.

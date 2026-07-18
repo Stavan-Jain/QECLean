@@ -53,7 +53,7 @@ a heavy kernel walk — `min_L + min_R` over the `16` cells × `V₀`), and Prop
 `118` `ρ`-link kills).  Until both land, the three light orbits stay on the
 `MImFloor` engine (`floorOK`).
 -/
-import QEC.Stabilizer.Codes.BivariateBicycle.WtFloor24Bridge
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.SafeFloor.WtFloor24Bridge
 
 open Quantum.Stabilizer.Homological.BB
 open Quantum.Stabilizer.Homological.BB.CRTFrame

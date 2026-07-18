@@ -39,8 +39,8 @@ Status: WIP skeleton. The two `native_decide` decoder identities (the
 independence hard-core) are proven; the framework wiring is `sorry`-stubbed.
 -/
 
-import QEC.Stabilizer.Codes.BivariateBicycle.BaseDistance
-import QEC.Stabilizer.Codes.BivariateBicycle.SafeSector
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.BaseDistance
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.SafeSector
 import QEC.Stabilizer.Framework.Homological.LogicalCorrespondence
 import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
 
@@ -125,5 +125,5 @@ end Quantum.Stabilizer.Homological.BB
 body=HEADER
 for k,v in [("%DROPSET%",dropSet),("%REDP2%",redP2),("%REDCM%",redCM),("%PHIX%",phiX),("%PHIZ%",phiZ),("%LOGX%",logX),("%LOGZ%",logZ)]:
     body=body.replace(k,v)
-open("QEC/Stabilizer/Codes/BivariateBicycle/StabilizerCode.lean","w").write(body)
+open("QEC/Stabilizer/Codes/BivariateBicycle/Gross/StabilizerCode.lean","w").write(body)
 print("wrote StabilizerCode.lean", len(body), "chars")

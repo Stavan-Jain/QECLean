@@ -15,7 +15,7 @@ Here D ∈ {Â₁,Â₃,Â₄,B̂₂,B̂₃,B̂₄}, all squaring to 0; uv = (1,
 If (i) and (ii) are decidable finite checks over the 256-element ring, the "no native_decide
 shortcut" claim is FALSE and L3/M3 is a finite leaf, not research-grade symbolic algebra.
 -/
-import QEC.Stabilizer.Codes.BivariateBicycle.Defs
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.Defs
 
 open Quantum.Stabilizer.Homological.BB
 

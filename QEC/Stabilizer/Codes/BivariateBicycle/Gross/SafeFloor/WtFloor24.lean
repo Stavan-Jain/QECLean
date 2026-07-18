@@ -30,7 +30,7 @@ and the bridge to the actual coset weight `chainWeight (seamC zrep + ∂₂ f)`
 (via `costFromComps`/`exCost`) are M1b, downstream of this file.
 -/
 
-import QEC.Stabilizer.Codes.BivariateBicycle.SlotFrame
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.SafeFloor.SlotFrame
 
 open Quantum.Stabilizer.Homological.BB
 open Quantum.Stabilizer.Homological.BB.CRTFrame

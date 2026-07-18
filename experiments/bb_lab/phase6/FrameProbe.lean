@@ -23,7 +23,7 @@ in `ψ`, or the layer/torus orientation — the probe is precisely the tool to p
 Run: `lake env lean experiments/bb_lab/phase6/FrameProbe.lean`.
 -/
 
-import QEC.Stabilizer.Codes.BivariateBicycle.Defs
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.Defs
 
 open Quantum.Stabilizer.Homological.BB
 

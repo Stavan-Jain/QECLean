@@ -53,7 +53,7 @@ VERIFICATION (re-run by hand, `lake env lean`, this session):
 >    value is the **base-coset / `seamC` form** specifically (exercises the plumbing
 >    the engine needs).
 > 2. **Stale path:** `CoverTransfer.lean` is at
->    `QEC/Stabilizer/Codes/BivariateBicycle/CoverTransfer.lean`, **not**
+>    `QEC/Stabilizer/Codes/BivariateBicycle/Gross/CoverTransfer.lean`, **not**
 >    `Framework/Homological/` (the §7 "Relevant files" citation is wrong).
 > 3. **Probe-1 as literally written is infeasible:** the LHS
 >    `∃ f : BaseGroup → ZMod 2, bbBoundary2Fn baseA baseB f = b` is an existential
@@ -171,7 +171,7 @@ The genuine research risk is **MImBound's confined-frame collapse (`M-COLLAPSE`)
 Build **one** new module, wired into the umbrella to dodge the orphan-module trap:
 
 ```
-QEC/Stabilizer/Codes/BivariateBicycle/CRTFrame.lean
+QEC/Stabilizer/Codes/BivariateBicycle/Gross/CRTFrame.lean
   → import in QEC/Stabilizer/Codes/BivariateBicycle.lean
   → (transitively) QEC/Stabilizer/Codes.lean
 ```
@@ -275,16 +275,16 @@ Create **`experiments/bb_lab/phase6/MembershipProbe.lean`** (sibling to the alre
 
 **Run via** `lake env lean experiments/bb_lab/phase6/MembershipProbe.lean` (symlinked packages verified; manifests match).
 
-**Go/no-go gate:** if (1) and (2) go GREEN, **promote the `FrameProbe`/`EngineProbe` F4+ring+V_j model verbatim into `QEC/Stabilizer/Codes/BivariateBicycle/CRTFrame.lean`**, wire it into `BivariateBicycle.lean` → `Codes.lean`, and begin M1→M2→M3. Then drive LightStab (M-DEC, L4a–L5d) to drop `hC` *before* attempting MImBound's research-grade `M-COLLAPSE`. Commit the four green phase6 probes as regression guards.
+**Go/no-go gate:** if (1) and (2) go GREEN, **promote the `FrameProbe`/`EngineProbe` F4+ring+V_j model verbatim into `QEC/Stabilizer/Codes/BivariateBicycle/Gross/CRTFrame.lean`**, wire it into `BivariateBicycle.lean` → `Codes.lean`, and begin M1→M2→M3. Then drive LightStab (M-DEC, L4a–L5d) to drop `hC` *before* attempting MImBound's research-grade `M-COLLAPSE`. Commit the four green phase6 probes as regression guards.
 
 **Relevant files (absolute paths):**
-- `/Users/stavanjain/Code/QuantumErrorCorrectionLean-fresh/.claude/worktrees/nifty-elion-8d9df3/QEC/Stabilizer/Codes/BivariateBicycle/DangerousSector.lean` (LightStab def `:528`, consumer `:540`, `pairDirections` `:323`, rungs `:172`/`:351`)
-- `/Users/stavanjain/Code/QuantumErrorCorrectionLean-fresh/.claude/worktrees/nifty-elion-8d9df3/QEC/Stabilizer/Codes/BivariateBicycle/SafeSector.lean` (MImBound def `:179`, `safe_sector_of_mim` `:187`, `seamC` `:128`, `gross_pauli_distance_eq_12_of_engine` `:265`)
-- `/Users/stavanjain/Code/QuantumErrorCorrectionLean-fresh/.claude/worktrees/nifty-elion-8d9df3/QEC/Stabilizer/Codes/BivariateBicycle/Assembly.lean` (`gross_chainWeight_ge_12_of_sectors` `:106` — takes `BaseDistanceGe6`/`DangerousSectorGe12`/`SafeSectorGe12`)
-- `/Users/stavanjain/Code/QuantumErrorCorrectionLean-fresh/.claude/worktrees/nifty-elion-8d9df3/QEC/Stabilizer/Codes/BivariateBicycle/StabilizerCode.lean` (`grossStabilizerCode_hasCodeDistance_12` `:2954`)
-- `/Users/stavanjain/Code/QuantumErrorCorrectionLean-fresh/.claude/worktrees/nifty-elion-8d9df3/QEC/Stabilizer/Codes/BivariateBicycle/BaseDistance.lean` (`cycle_weight_even` `:175`, `base_cycle_weight_ge_6` `:221`, `smallCycleCheck_four` `:209`)
+- `/Users/stavanjain/Code/QuantumErrorCorrectionLean-fresh/.claude/worktrees/nifty-elion-8d9df3/QEC/Stabilizer/Codes/BivariateBicycle/Gross/DangerousSector.lean` (LightStab def `:528`, consumer `:540`, `pairDirections` `:323`, rungs `:172`/`:351`)
+- `/Users/stavanjain/Code/QuantumErrorCorrectionLean-fresh/.claude/worktrees/nifty-elion-8d9df3/QEC/Stabilizer/Codes/BivariateBicycle/Gross/SafeSector.lean` (MImBound def `:179`, `safe_sector_of_mim` `:187`, `seamC` `:128`, `gross_pauli_distance_eq_12_of_engine` `:265`)
+- `/Users/stavanjain/Code/QuantumErrorCorrectionLean-fresh/.claude/worktrees/nifty-elion-8d9df3/QEC/Stabilizer/Codes/BivariateBicycle/Gross/Assembly.lean` (`gross_chainWeight_ge_12_of_sectors` `:106` — takes `BaseDistanceGe6`/`DangerousSectorGe12`/`SafeSectorGe12`)
+- `/Users/stavanjain/Code/QuantumErrorCorrectionLean-fresh/.claude/worktrees/nifty-elion-8d9df3/QEC/Stabilizer/Codes/BivariateBicycle/Gross/StabilizerCode.lean` (`grossStabilizerCode_hasCodeDistance_12` `:2954`)
+- `/Users/stavanjain/Code/QuantumErrorCorrectionLean-fresh/.claude/worktrees/nifty-elion-8d9df3/QEC/Stabilizer/Codes/BivariateBicycle/Gross/BaseDistance.lean` (`cycle_weight_even` `:175`, `base_cycle_weight_ge_6` `:221`, `smallCycleCheck_four` `:209`)
 - `/Users/stavanjain/Code/QuantumErrorCorrectionLean-fresh/.claude/worktrees/nifty-elion-8d9df3/QEC/Stabilizer/Framework/Homological/BBChainComplex.lean` (`bbBoundary2Fn` `:208`, `conv` `:49`, `_translate` `:308`, `_add` `:332`)
-- `/Users/stavanjain/Code/QuantumErrorCorrectionLean-fresh/.claude/worktrees/nifty-elion-8d9df3/QEC/Stabilizer/Codes/BivariateBicycle/CoverTransfer.lean` (`bb72Complex_chainWeight_eq` `:228`, `coverPush1_eq_zero_iff` `:198`, `coverPull_boundary1_comm` `:157`, `coverPull0_injective` `:189` — the exactness package M-R3's `seamC_mem_cycles` is built from) **[path corrected: this file is under `Codes/BivariateBicycle/`, not `Framework/Homological/`]**
+- `/Users/stavanjain/Code/QuantumErrorCorrectionLean-fresh/.claude/worktrees/nifty-elion-8d9df3/QEC/Stabilizer/Codes/BivariateBicycle/Gross/CoverTransfer.lean` (`bb72Complex_chainWeight_eq` `:228`, `coverPush1_eq_zero_iff` `:198`, `coverPull_boundary1_comm` `:157`, `coverPull0_injective` `:189` — the exactness package M-R3's `seamC_mem_cycles` is built from) **[path corrected: this file is under `Codes/BivariateBicycle/`, not `Framework/Homological/`]**
 - `/Users/stavanjain/Code/QuantumErrorCorrectionLean-fresh/.claude/worktrees/nifty-elion-8d9df3/experiments/bb_lab/phase6/{FrameProbe,EngineProbe,LeafProbe,Probe}.lean` (GREEN; promote into CRTFrame.lean) — **currently untracked; commit them**
 - `/Users/stavanjain/Code/QuantumErrorCorrectionLean-fresh/.claude/worktrees/nifty-elion-8d9df3/experiments/bb_lab/notes/A4_writeup.md` (§3 frame `:110–175`, §6.2–6.3 LightStab `:347–446`, §§9.4–13 MImBound `:694–1265`)
-- New module to create: `/Users/stavanjain/Code/QuantumErrorCorrectionLean-fresh/.claude/worktrees/nifty-elion-8d9df3/QEC/Stabilizer/Codes/BivariateBicycle/CRTFrame.lean`
+- New module to create: `/Users/stavanjain/Code/QuantumErrorCorrectionLean-fresh/.claude/worktrees/nifty-elion-8d9df3/QEC/Stabilizer/Codes/BivariateBicycle/Gross/CRTFrame.lean`

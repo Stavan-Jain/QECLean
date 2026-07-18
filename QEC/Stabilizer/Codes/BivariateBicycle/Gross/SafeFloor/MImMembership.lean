@@ -17,7 +17,7 @@ in `MImFloor §13`).  The membership theorems (`mem0`..`mem4`, `native_decide` o
 Comp 0 is the trivial character (`psi0 ≡ 1`), so `compF f psi0 = V psi0 · f` is `F₂`-valued
 (`V_psi0_lt2`); its membership is over that restricted image (Γ₀ has 16, not 256, entries).
 -/
-import QEC.Stabilizer.Codes.BivariateBicycle.MImFloor
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.SafeFloor.MImFloor
 
 open Quantum.Stabilizer.Homological.BB
 open Quantum.Stabilizer.Homological.BB.CRTFrame
@@ -118,7 +118,7 @@ chainWeight (§7) → `costFromComps` → (bridge §13) `exCost` → (soundness 
 The bridge's ten val-equalities are discharged cell-by-cell (`shifted_val_eq`) from the
 per-orbit offData (`oLoff*`/`oRoff*`) and the universal Γ-membership (`mem0`..`mem4`); the
 comp-1,2 indices land in range via `mem1/mem2 + nF*_eq`.  The per-orbit modules
-`MImFloorO0`..`MImFloorO4` instantiate this with their data + `floorOK … = true`. -/
+`MImFloorY{0,1,4,11,12}` instantiate this with their data + `floorOK … = true`. -/
 
 /-- Per-cell discharge of a bridge val-equality: `shifted o mult vf` matches the engine cell
 `gadd offset Γ-pair` given the offData (`hoff`) and membership (`hmem`) equalities. -/

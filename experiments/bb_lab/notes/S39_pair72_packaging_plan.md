@@ -24,7 +24,7 @@ in a new `QEC/Stabilizer/Codes/BivariateBicycle/Z3Z6/StabilizerCode.lean`,
 axiom bar unchanged (standard three + `Lean.ofReduceBool`).
 
 **Model:** the gross Phase-5 packaging
-(`QEC/Stabilizer/Codes/BivariateBicycle/StabilizerCode.lean`, §1–§6, plus
+(`QEC/Stabilizer/Codes/BivariateBicycle/Gross/StabilizerCode.lean`, §1–§6, plus
 `experiments/bb_lab/phase5/PLAN.md` as the design record and
 `MImAssembly.lean` §end for the final bundle). Everything below is that file
 re-instantiated at the pair72 scale, which is much smaller: 2-dim kernels

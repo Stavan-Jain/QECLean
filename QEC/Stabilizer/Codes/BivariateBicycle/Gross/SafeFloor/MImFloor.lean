@@ -20,14 +20,14 @@ The **soundness keystones** (`cellMin_le`, `rcell_le`) finite-check that `slabMi
 really lower-bound `exCost`; the per-cell bridges (`cell_slab_sound`, `cell_relaxed_sound'`)
 lift them to coset values, and the **monotone lemmas** (`slabMin_le_exCost`,
 `relaxed_le_exCost`) sum the eight cells.  Together they give: `floorOK oL oR = true`
-(decided per-orbit in `MImFloorO0`..`MImFloorO4`) ⟹ every coset weight `≥ 12`.
+(decided per-orbit in `MImFloorY{0,1,4,11,12}`) ⟹ every coset weight `≥ 12`.
 
 Note (a real soundness subtlety): the raw-support `d3` relaxation is **not** a valid lower
 bound, because the comp-1 seam offset is nonzero and shifts supports; `rcell` corrects this
 by baking the offsets `(o1,o2)` into the per-cell min.
 -/
-import QEC.Stabilizer.Codes.BivariateBicycle.MImClassify
-import QEC.Stabilizer.Codes.BivariateBicycle.MImFloorData
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.SafeFloor.MImClassify
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.SafeFloor.MImFloorData
 
 open Quantum.Stabilizer.Homological.BB
 open Quantum.Stabilizer.Homological.BB.CRTFrame

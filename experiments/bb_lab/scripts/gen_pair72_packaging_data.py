@@ -478,7 +478,7 @@ S3.9 packaging: bundle `pair72Complex` (the `bbChainComplex a72 b72` of
 distance theorem `pair72_pauli_distance_eq_8` onto `HasCodeDistance`, and
 expose `pair72StabilizerCodeWithDistance : StabilizerCodeWithDistance 72 4 8`.
 Mirrors the gross Phase-5 packaging
-(`QEC/Stabilizer/Codes/BivariateBicycle/StabilizerCode.lean`) at pair72 scale.
+(`QEC/Stabilizer/Codes/BivariateBicycle/Gross/StabilizerCode.lean`) at pair72 scale.
 
 This file embeds offline-validated `𝔽₂` linear-algebra data
 (`experiments/bb_lab/scripts/gen_pair72_packaging_data.py`, ALL-PASS gate):

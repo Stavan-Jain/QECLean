@@ -21,7 +21,7 @@ condition `B⋆v_L = A⋆v_R`.  **Repo-left = lab-right** — hence `u*` carries
 `z*` in the *right* block (so `∂₁ u* = B⋆0 + A⋆z* = 0`).
 -/
 
-import QEC.Stabilizer.Codes.BivariateBicycle.DeckHomotopy
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.DeckHomotopy
 
 namespace Quantum
 namespace Stabilizer

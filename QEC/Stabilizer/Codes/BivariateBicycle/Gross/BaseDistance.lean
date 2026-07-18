@@ -37,7 +37,7 @@ Repo convention: `∂₂ f = (A⋆f | B⋆f)`, `∂₁ c = B⋆c_L + A⋆c_R`; c
 condition `B⋆v_L = A⋆v_R`.  **Repo-left = lab-right.**
 -/
 
-import QEC.Stabilizer.Codes.BivariateBicycle.Assembly
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.Assembly
 
 namespace Quantum
 namespace Stabilizer

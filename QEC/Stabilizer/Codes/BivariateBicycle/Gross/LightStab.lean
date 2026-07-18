@@ -35,8 +35,8 @@ in a tracked file carries a `sorry`.
 (since `f` is `F₂`-valued: `f̂(2c) = f̂(c)²`), so checking one representative per
 orbit suffices for support confinement.
 -/
-import QEC.Stabilizer.Codes.BivariateBicycle.CRTFrame
-import QEC.Stabilizer.Codes.BivariateBicycle.DangerousSector
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.CRTFrame
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.DangerousSector
 
 open Quantum.Stabilizer.Homological.BB.CRTFrame
 

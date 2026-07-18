@@ -23,7 +23,7 @@ chain is built from `rightHalf v`, and
 so `∂₂ z = (1+x⁶)⋆v = v + σv` blockwise.
 -/
 
-import QEC.Stabilizer.Codes.BivariateBicycle.CoverTransfer
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.CoverTransfer
 
 namespace Quantum
 namespace Stabilizer

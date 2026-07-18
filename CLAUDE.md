@@ -27,6 +27,13 @@ build/MCP workflow. Volatile or topic-scoped knowledge lives elsewhere:
   Patterns that generalize get promoted to `lean-patterns.md` or
   CLAUDE.md at Stage 6 (post-merge); see `pipeline-usage.md` § Recipe:
   post-merge reflection.
+- **[`QEC/Stabilizer/Codes/BivariateBicycle/README.md`](QEC/Stabilizer/Codes/BivariateBicycle/README.md)**
+  — orientation for the BB family (gross d=12 proof spine, instance
+  dirs, hypothesis-discharge map, engine-vs-analytic status,
+  generated-file manifest). Read before any BB edit. Generated files
+  carry `GENERATED FILE — DO NOT HAND-EDIT` banners: change the
+  generator (see `experiments/bb_lab/GENERATORS.md`) and regenerate in
+  the same PR, never the emitted Lean.
 
 ## Project tour
 
@@ -58,6 +65,10 @@ QEC/
     │                        # FinPeriodic, GridIndexing, CellComplexTypes
     └── Codes/               # Concrete codes, organized by family:
         ├── _TEMPLATE.lean       # Canonical structural reference for new CSS codes
+        ├── BivariateBicycle/    # BB family, one subdir per instance:
+        │                        # Gross/ (+ Gross/SafeFloor/), Z3Z6/, Z5Z15F2A6/,
+        │                        # BaseFloors/. READ ITS README.md BEFORE EDITING —
+        │                        # task router, discharge map, generated-file rules
         ├── Toric/               # Parametric L×L toric code: CodeN, Chains,
         │                        # BoundaryMaps, Homology, H1Dimension,
         │                        # LogicalCorrespondence{X,Z}, ChainComplex,
@@ -486,6 +497,8 @@ never linted, errors silently hidden. `QuantumHamming.lean` sat in this
 orphan state with two stale `Nat.xor_*` references that `lake build`
 never surfaced. When adding a module, append the import to the immediate
 umbrella; the chain to `Stabilizer.lean` takes care of itself.
+`bash scripts/check-umbrellas.sh` verifies the whole tree (run it after
+adding or moving modules).
 
 ## Cleanup recipes
 

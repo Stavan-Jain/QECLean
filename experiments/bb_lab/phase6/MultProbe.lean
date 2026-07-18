@@ -19,7 +19,7 @@ characters ψ₀=1, ψ₁=ω^{t_y}, ψ₂=ω^{t_x}, ψ₃=ω^{t_x+t_y}, ψ₄=ω
   ωu+v       = (3,2,1,0)  [B̂₂,B̂₃,B̂₄]
 Run: `lake env lean experiments/bb_lab/phase6/MultProbe.lean`.
 -/
-import QEC.Stabilizer.Codes.BivariateBicycle.Defs
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.Defs
 
 open Quantum.Stabilizer.Homological.BB
 
