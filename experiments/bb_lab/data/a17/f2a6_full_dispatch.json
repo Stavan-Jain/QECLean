@@ -1,0 +1,1251 @@
+{
+ "complete_enumeration": true,
+ "verdicts": {
+  "W+(t=3)": 75,
+  "W+(t=2)": 260,
+  "S": 5765,
+  "P": 1170,
+  "W": 1205
+ },
+ "classes": [
+  {
+   "class": 0,
+   "stratum": "nearker",
+   "b_weight": 10,
+   "coset_min": 33,
+   "translates": {},
+   "poke_min": 10,
+   "verdicts": {
+    "W+(t=3)": 75
+   }
+  },
+  {
+   "class": 1,
+   "stratum": "nearker",
+   "b_weight": 12,
+   "coset_min": 32,
+   "translates": {},
+   "poke_min": 10,
+   "verdicts": {
+    "W+(t=2)": 75
+   }
+  },
+  {
+   "class": 2,
+   "stratum": "small",
+   "b_weight": 6,
+   "coset_min": 1,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 3,
+   "stratum": "small",
+   "b_weight": 10,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 70,
+    "P": 5
+   }
+  },
+  {
+   "class": 4,
+   "stratum": "nearker",
+   "b_weight": 14,
+   "coset_min": 31,
+   "translates": {},
+   "poke_min": 10,
+   "verdicts": {
+    "W": 75
+   }
+  },
+  {
+   "class": 5,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 6,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "S": 65,
+    "P": 10
+   }
+  },
+  {
+   "class": 7,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 8,
+   "stratum": "small",
+   "b_weight": 10,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 55,
+    "P": 20
+   }
+  },
+  {
+   "class": 9,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 10,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 11,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "S": 50,
+    "P": 25
+   }
+  },
+  {
+   "class": 12,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "poke_min": 2,
+   "verdicts": {
+    "S": 55,
+    "P": 15,
+    "W": 5
+   }
+  },
+  {
+   "class": 13,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "poke_min": 2,
+   "verdicts": {
+    "S": 55,
+    "W": 5,
+    "P": 15
+   }
+  },
+  {
+   "class": 14,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "S": 50,
+    "P": 25
+   }
+  },
+  {
+   "class": 15,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 16,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "S": 65,
+    "P": 10
+   }
+  },
+  {
+   "class": 17,
+   "stratum": "small",
+   "b_weight": 10,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 70,
+    "P": 5
+   }
+  },
+  {
+   "class": 18,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "S": 50,
+    "P": 25
+   }
+  },
+  {
+   "class": 19,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 3,
+   "translates": {},
+   "poke_min": 2,
+   "verdicts": {
+    "S": 70,
+    "W+(t=2)": 5
+   }
+  },
+  {
+   "class": 20,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 21,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "S": 50,
+    "P": 25
+   }
+  },
+  {
+   "class": 22,
+   "stratum": "small",
+   "b_weight": 10,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 23,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 24,
+   "stratum": "nearker",
+   "b_weight": 14,
+   "coset_min": 31,
+   "translates": {},
+   "poke_min": 8,
+   "verdicts": {
+    "W": 75
+   }
+  },
+  {
+   "class": 25,
+   "stratum": "nearker",
+   "b_weight": 14,
+   "coset_min": 31,
+   "translates": {},
+   "poke_min": 8,
+   "verdicts": {
+    "W": 75
+   }
+  },
+  {
+   "class": 26,
+   "stratum": "nearker",
+   "b_weight": 14,
+   "coset_min": 31,
+   "translates": {},
+   "poke_min": 8,
+   "verdicts": {
+    "W": 75
+   }
+  },
+  {
+   "class": 27,
+   "stratum": "nearker",
+   "b_weight": 12,
+   "coset_min": 32,
+   "translates": {},
+   "poke_min": 9,
+   "verdicts": {
+    "W+(t=2)": 75
+   }
+  },
+  {
+   "class": 28,
+   "stratum": "nearker",
+   "b_weight": 12,
+   "coset_min": 32,
+   "translates": {},
+   "poke_min": 8,
+   "verdicts": {
+    "W+(t=2)": 75
+   }
+  },
+  {
+   "class": 29,
+   "stratum": "nearker",
+   "b_weight": 14,
+   "coset_min": 31,
+   "translates": {},
+   "poke_min": 7,
+   "verdicts": {
+    "W": 75
+   }
+  },
+  {
+   "class": 30,
+   "stratum": "nearker",
+   "b_weight": 14,
+   "coset_min": 33,
+   "translates": {},
+   "poke_min": 8,
+   "verdicts": {
+    "W": 75
+   }
+  },
+  {
+   "class": 31,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "poke_min": 2,
+   "verdicts": {
+    "P": 25,
+    "W": 5,
+    "S": 45
+   }
+  },
+  {
+   "class": 32,
+   "stratum": "nearker",
+   "b_weight": 14,
+   "coset_min": 31,
+   "translates": {},
+   "poke_min": 7,
+   "verdicts": {
+    "W": 75
+   }
+  },
+  {
+   "class": 33,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "S": 55,
+    "P": 20
+   }
+  },
+  {
+   "class": 34,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 3,
+   "translates": {},
+   "poke_min": 2,
+   "verdicts": {
+    "W+(t=2)": 30,
+    "S": 45
+   }
+  },
+  {
+   "class": 35,
+   "stratum": "small",
+   "b_weight": 10,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "P": 10,
+    "S": 65
+   }
+  },
+  {
+   "class": 36,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "P": 35,
+    "S": 40
+   }
+  },
+  {
+   "class": 37,
+   "stratum": "nearker",
+   "b_weight": 14,
+   "coset_min": 31,
+   "translates": {},
+   "poke_min": 8,
+   "verdicts": {
+    "W": 75
+   }
+  },
+  {
+   "class": 38,
+   "stratum": "nearker",
+   "b_weight": 14,
+   "coset_min": 33,
+   "translates": {},
+   "poke_min": 10,
+   "verdicts": {
+    "W": 75
+   }
+  },
+  {
+   "class": 39,
+   "stratum": "nearker",
+   "b_weight": 14,
+   "coset_min": 31,
+   "translates": {},
+   "poke_min": 9,
+   "verdicts": {
+    "W": 75
+   }
+  },
+  {
+   "class": 40,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "P": 10,
+    "S": 65
+   }
+  },
+  {
+   "class": 41,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "S": 65,
+    "P": 10
+   }
+  },
+  {
+   "class": 42,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "S": 55,
+    "P": 20
+   }
+  },
+  {
+   "class": 43,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 44,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 45,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 46,
+   "stratum": "small",
+   "b_weight": 10,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "P": 30,
+    "S": 45
+   }
+  },
+  {
+   "class": 47,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "S": 65,
+    "P": 10
+   }
+  },
+  {
+   "class": 48,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 49,
+   "stratum": "nearker",
+   "b_weight": 14,
+   "coset_min": 31,
+   "translates": {},
+   "poke_min": 9,
+   "verdicts": {
+    "W": 75
+   }
+  },
+  {
+   "class": 50,
+   "stratum": "nearker",
+   "b_weight": 14,
+   "coset_min": 33,
+   "translates": {},
+   "poke_min": 8,
+   "verdicts": {
+    "W": 75
+   }
+  },
+  {
+   "class": 51,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 52,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 53,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 54,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "poke_min": 2,
+   "verdicts": {
+    "P": 25,
+    "S": 45,
+    "W": 5
+   }
+  },
+  {
+   "class": 55,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "S": 35,
+    "P": 40
+   }
+  },
+  {
+   "class": 56,
+   "stratum": "nearker",
+   "b_weight": 14,
+   "coset_min": 33,
+   "translates": {},
+   "poke_min": 8,
+   "verdicts": {
+    "W": 75
+   }
+  },
+  {
+   "class": 57,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "S": 70,
+    "P": 5
+   }
+  },
+  {
+   "class": 58,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 59,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "P": 50,
+    "S": 25
+   }
+  },
+  {
+   "class": 60,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "poke_min": 2,
+   "verdicts": {
+    "S": 55,
+    "W": 5,
+    "P": 15
+   }
+  },
+  {
+   "class": 61,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "poke_min": 2,
+   "verdicts": {
+    "P": 15,
+    "W": 5,
+    "S": 55
+   }
+  },
+  {
+   "class": 62,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "S": 55,
+    "P": 20
+   }
+  },
+  {
+   "class": 63,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "S": 65,
+    "P": 10
+   }
+  },
+  {
+   "class": 64,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 65,
+   "stratum": "nearker",
+   "b_weight": 14,
+   "coset_min": 31,
+   "translates": {},
+   "poke_min": 9,
+   "verdicts": {
+    "W": 75
+   }
+  },
+  {
+   "class": 66,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "poke_min": 2,
+   "verdicts": {
+    "S": 55,
+    "P": 10,
+    "W": 10
+   }
+  },
+  {
+   "class": 67,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "P": 50,
+    "S": 25
+   }
+  },
+  {
+   "class": 68,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 69,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "P": 35,
+    "S": 40
+   }
+  },
+  {
+   "class": 70,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 71,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "S": 60,
+    "P": 15
+   }
+  },
+  {
+   "class": 72,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 73,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 74,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 75,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 76,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "S": 40,
+    "P": 35
+   }
+  },
+  {
+   "class": 77,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 78,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 79,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 80,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "P": 15,
+    "S": 60
+   }
+  },
+  {
+   "class": 81,
+   "stratum": "nearker",
+   "b_weight": 14,
+   "coset_min": 31,
+   "translates": {},
+   "poke_min": 8,
+   "verdicts": {
+    "W": 75
+   }
+  },
+  {
+   "class": 82,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "P": 35,
+    "S": 40
+   }
+  },
+  {
+   "class": 83,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "S": 70,
+    "P": 5
+   }
+  },
+  {
+   "class": 84,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "S": 45,
+    "P": 30
+   }
+  },
+  {
+   "class": 85,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "S": 70,
+    "P": 5
+   }
+  },
+  {
+   "class": 86,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "poke_min": 2,
+   "verdicts": {
+    "W": 5,
+    "P": 5,
+    "S": 65
+   }
+  },
+  {
+   "class": 87,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "P": 15,
+    "S": 60
+   }
+  },
+  {
+   "class": 88,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "P": 40,
+    "S": 35
+   }
+  },
+  {
+   "class": 89,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "P": 15,
+    "S": 60
+   }
+  },
+  {
+   "class": 90,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "P": 20,
+    "S": 55
+   }
+  },
+  {
+   "class": 91,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 92,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "poke_min": 2,
+   "verdicts": {
+    "P": 25,
+    "W": 5,
+    "S": 45
+   }
+  },
+  {
+   "class": 93,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 94,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "poke_min": 2,
+   "verdicts": {
+    "W": 10,
+    "P": 10,
+    "S": 55
+   }
+  },
+  {
+   "class": 95,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 96,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 97,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "P": 30,
+    "S": 45
+   }
+  },
+  {
+   "class": 98,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "P": 40,
+    "S": 35
+   }
+  },
+  {
+   "class": 99,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "poke_min": 2,
+   "verdicts": {
+    "S": 65,
+    "P": 5,
+    "W": 5
+   }
+  },
+  {
+   "class": 100,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "P": 20,
+    "S": 55
+   }
+  },
+  {
+   "class": 101,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "poke_min": 2,
+   "verdicts": {
+    "S": 65,
+    "P": 5,
+    "W": 5
+   }
+  },
+  {
+   "class": 102,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 103,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 104,
+   "stratum": "small",
+   "b_weight": 12,
+   "coset_min": 2,
+   "translates": {},
+   "verdicts": {
+    "S": 75
+   }
+  },
+  {
+   "class": 105,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "P": 30,
+    "S": 45
+   }
+  },
+  {
+   "class": 106,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "S": 70,
+    "P": 5
+   }
+  },
+  {
+   "class": 107,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "P": 10,
+    "S": 65
+   }
+  },
+  {
+   "class": 108,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "P": 10,
+    "S": 65
+   }
+  },
+  {
+   "class": 109,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "poke_min": 2,
+   "verdicts": {
+    "W": 5,
+    "P": 5,
+    "S": 65
+   }
+  },
+  {
+   "class": 110,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "poke_min": 2,
+   "verdicts": {
+    "P": 25,
+    "S": 45,
+    "W": 5
+   }
+  },
+  {
+   "class": 111,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "P": 30,
+    "S": 45
+   }
+  },
+  {
+   "class": 112,
+   "stratum": "small",
+   "b_weight": 14,
+   "coset_min": 3,
+   "translates": {},
+   "verdicts": {
+    "P": 60,
+    "S": 15
+   }
+  }
+ ]
+}
