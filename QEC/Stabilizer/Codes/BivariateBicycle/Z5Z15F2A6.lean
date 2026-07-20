@@ -1,4 +1,7 @@
 import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.Defs
+import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.ClassData
+import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.CertSweep
+import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.Classification
 import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.DeckHomotopy
 import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.Witness
 import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.Distance
