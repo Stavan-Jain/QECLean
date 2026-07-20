@@ -700,6 +700,273 @@ end OrderFourLift
 
 end XDoubleCoverData
 
+/-! ## The concrete order-4 lift for doubled-axis `ZMod` products -/
+
+/-- If `4 • a = 0` and `2 • a ≠ 0` then `a` has additive order exactly 4. -/
+lemma addOrderOf_eq_four_of_nsmul {A : Type*} [AddMonoid A] {a : A}
+    (h4 : (4 : ℕ) • a = 0) (h2 : (2 : ℕ) • a ≠ 0) : addOrderOf a = 4 := by
+  have hdvd : addOrderOf a ∣ 4 := addOrderOf_dvd_iff_nsmul_eq_zero.mpr h4
+  have hnd : ¬ addOrderOf a ∣ 2 := fun hd =>
+    h2 (addOrderOf_dvd_iff_nsmul_eq_zero.mp hd)
+  have hle : addOrderOf a ≤ 4 := Nat.le_of_dvd (by norm_num) hdvd
+  have hpos : 0 < addOrderOf a := Nat.pos_of_dvd_of_pos hdvd (by norm_num)
+  set d := addOrderOf a with hd
+  interval_cases d
+  · exact absurd (one_dvd 2) hnd
+  · exact absurd dvd_rfl hnd
+  · exact absurd hdvd (by norm_num)
+  · rfl
+
+namespace XDoubleCoverData
+
+variable {H : Type} [Fintype H] [AddCommGroup H] [DecidableEq H]
+
+/-- **The element form for doubled-axis `ZMod` products** — the concrete
+order-4 lift.  For a cover group `ZMod (2n) × ZMod m` whose deck is
+`(n, t)` (the standard doubled-axis deck; `t` any order-2 twist, `0`
+included), the Frattini lift `ZMod (4n) × ZMod m` with `σ̂ = (n, t)` and
+`q = cast × id` discharges `BocksteinElementForm` unconditionally: `σ̂`
+has exact order 4 (`2σ̂ = (2n, 0) ≠ 0` in `ZMod (4n)`), `q` is surjective
+with kernel `{0, 2σ̂}` (the two multiples of `2n` below `4n`).  Every
+free-ℤ₂ BB doubling cover in the program has this shape. -/
+theorem elementForm_of_zmod_double {n m : ℕ} [NeZero n] [NeZero m]
+    (D : XDoubleCoverData (ZMod (2 * n) × ZMod m) H)
+    (t : ZMod m) (ht : t + t = 0)
+    (hdeck : D.deckS = (((n : ℕ) : ZMod (2 * n)), t)) :
+    D.BocksteinElementForm := by
+  have hn := Nat.pos_of_ne_zero (NeZero.ne n)
+  have hdvd : (2 * n) ∣ (4 * n) := ⟨2, by ring⟩
+  refine D.elementForm_of_orderFourLift
+    (AddMonoidHom.prodMap (ZMod.castHom hdvd (ZMod (2 * n))).toAddMonoidHom
+      (AddMonoidHom.id (ZMod m)))
+    (((n : ℕ) : ZMod (4 * n)), t) ?_ ?_ ?_ ?_
+  · -- exact order 4
+    apply addOrderOf_eq_four_of_nsmul
+    · have h1 : (4 : ℕ) • ((n : ℕ) : ZMod (4 * n)) = 0 := by
+        rw [nsmul_eq_mul, ← Nat.cast_mul]
+        exact ZMod.natCast_self (4 * n)
+      have h2 : (4 : ℕ) • t = 0 := by
+        have h22 : (2 : ℕ) • t = 0 := by rw [two_nsmul]; exact ht
+        rw [show (4 : ℕ) = 2 * 2 by norm_num, mul_nsmul, h22, smul_zero]
+      rw [Prod.smul_mk, h1, h2]
+      rfl
+    · intro hcon
+      rw [Prod.smul_mk] at hcon
+      have h1 : (2 : ℕ) • ((n : ℕ) : ZMod (4 * n)) = 0 := by
+        have h := congrArg Prod.fst hcon
+        simpa using h
+      rw [nsmul_eq_mul, ← Nat.cast_mul, ZMod.natCast_eq_zero_iff] at h1
+      have hle := Nat.le_of_dvd (by omega) h1
+      omega
+  · -- surjectivity
+    rw [AddMonoidHom.coe_prodMap]
+    exact Function.Surjective.prodMap (ZMod.castHom_surjective hdvd)
+      Function.surjective_id
+  · -- maps to the deck
+    rw [hdeck]
+    have happ : (AddMonoidHom.prodMap
+        (ZMod.castHom hdvd (ZMod (2 * n))).toAddMonoidHom
+        (AddMonoidHom.id (ZMod m))) (((n : ℕ) : ZMod (4 * n)), t)
+        = ((ZMod.castHom hdvd (ZMod (2 * n))) ((n : ℕ) : ZMod (4 * n)), t) :=
+      rfl
+    rw [happ, map_natCast]
+  · -- kernel = {0, σ̂ + σ̂}
+    intro x
+    obtain ⟨x₁, x₂⟩ := x
+    have happ : (AddMonoidHom.prodMap
+        (ZMod.castHom hdvd (ZMod (2 * n))).toAddMonoidHom
+        (AddMonoidHom.id (ZMod m))) (x₁, x₂)
+        = ((ZMod.castHom hdvd (ZMod (2 * n))) x₁, x₂) := rfl
+    have hσσ : ((((n : ℕ) : ZMod (4 * n)), t) + (((n : ℕ) : ZMod (4 * n)), t))
+        = (((2 * n : ℕ) : ZMod (4 * n)), (0 : ZMod m)) := by
+      rw [Prod.mk_add_mk, ht, ← Nat.cast_add, show n + n = 2 * n by ring]
+    rw [happ, hσσ]
+    have hval : ((x₁.val : ℕ) : ZMod (4 * n)) = x₁ := by
+      rw [ZMod.natCast_val, ZMod.cast_id]
+    constructor
+    · intro h0
+      have h1 : (ZMod.castHom hdvd (ZMod (2 * n))) x₁ = 0 :=
+        (Prod.mk_eq_zero.mp h0).1
+      have h2 : x₂ = 0 := (Prod.mk_eq_zero.mp h0).2
+      have hcast : (ZMod.castHom hdvd (ZMod (2 * n))) x₁
+          = ((x₁.val : ℕ) : ZMod (2 * n)) := by
+        conv_lhs => rw [← hval]
+        rw [map_natCast]
+      rw [hcast, ZMod.natCast_eq_zero_iff] at h1
+      have hlt : x₁.val < 4 * n := ZMod.val_lt x₁
+      obtain ⟨c, hc⟩ := h1
+      have hc2 : c < 2 := by
+        have h4 : 2 * n * c < 2 * n * 2 := by
+          calc 2 * n * c = x₁.val := hc.symm
+            _ < 4 * n := hlt
+            _ = 2 * n * 2 := by ring
+        exact Nat.lt_of_mul_lt_mul_left h4
+      interval_cases c
+      · left
+        have hx1 : x₁ = 0 := by
+          rw [← hval, hc, mul_zero, Nat.cast_zero]
+        rw [hx1, h2]
+        rfl
+      · right
+        have hx1 : x₁ = ((2 * n : ℕ) : ZMod (4 * n)) := by
+          rw [← hval, hc, mul_one]
+        rw [hx1, h2]
+    · rintro (h0 | h0)
+      · have h1 : x₁ = 0 := (Prod.mk_eq_zero.mp h0).1
+        have h2 : x₂ = 0 := (Prod.mk_eq_zero.mp h0).2
+        rw [h1, h2, map_zero]
+        rfl
+      · have h1 : x₁ = ((2 * n : ℕ) : ZMod (4 * n)) := (Prod.ext_iff.mp h0).1
+        have h2 : x₂ = 0 := (Prod.ext_iff.mp h0).2
+        rw [h1, h2, map_natCast, ZMod.natCast_self]
+        rfl
+
+/-- **`BocksteinVanishes` for doubled-axis `ZMod` products** —
+unconditional over the concrete BB doubling family. -/
+theorem bocksteinVanishes_of_zmod_double {n m : ℕ} [NeZero n] [NeZero m]
+    (D : XDoubleCoverData (ZMod (2 * n) × ZMod m) H)
+    (t : ZMod m) (ht : t + t = 0)
+    (hdeck : D.deckS = (((n : ℕ) : ZMod (2 * n)), t)) :
+    D.BocksteinVanishes :=
+  D.bocksteinVanishes_of_elementForm (D.elementForm_of_zmod_double t ht hdeck)
+
+/-- **The Bockstein rank equality for doubled-axis `ZMod` products**:
+`dim (1+σ)·H₁(cover) = k̃ − k`, unconditionally (A13 Theorem, claim 2,
+for every free-ℤ₂ BB doubling cover of the program). -/
+theorem finrank_range_epsH1_eq_of_zmod_double {n m : ℕ} [NeZero n] [NeZero m]
+    (D : XDoubleCoverData (ZMod (2 * n) × ZMod m) H)
+    (t : ZMod m) (ht : t + t = 0)
+    (hdeck : D.deckS = (((n : ℕ) : ZMod (2 * n)), t)) :
+    Module.finrank (ZMod 2) (LinearMap.range D.epsH1)
+      = Module.finrank (ZMod 2) D.coverComplex.H1
+        - Module.finrank (ZMod 2) D.baseComplex.H1 :=
+  D.finrank_range_epsH1_eq (D.bocksteinVanishes_of_zmod_double t ht hdeck)
+
+/-- **The element form for doubled-axis `ZMod` products, second-axis
+mirror** — the concrete order-4 lift with the doubled factor in the
+*second* coordinate (the y-deck orientation, e.g. A19-type y-deck
+covers).  For a cover group `ZMod m × ZMod (2n)` whose deck is `(t, n)`
+(`t` any order-2 twist, `0` included), the Frattini lift
+`ZMod m × ZMod (4n)` with `σ̂ = (t, n)` and `q = id × cast` discharges
+`BocksteinElementForm` unconditionally.  Mirror of
+`elementForm_of_zmod_double`. -/
+theorem elementForm_of_zmod_double_right {n m : ℕ} [NeZero n] [NeZero m]
+    (D : XDoubleCoverData (ZMod m × ZMod (2 * n)) H)
+    (t : ZMod m) (ht : t + t = 0)
+    (hdeck : D.deckS = (t, ((n : ℕ) : ZMod (2 * n)))) :
+    D.BocksteinElementForm := by
+  have hn := Nat.pos_of_ne_zero (NeZero.ne n)
+  have hdvd : (2 * n) ∣ (4 * n) := ⟨2, by ring⟩
+  refine D.elementForm_of_orderFourLift
+    (AddMonoidHom.prodMap (AddMonoidHom.id (ZMod m))
+      (ZMod.castHom hdvd (ZMod (2 * n))).toAddMonoidHom)
+    (t, ((n : ℕ) : ZMod (4 * n))) ?_ ?_ ?_ ?_
+  · -- exact order 4
+    apply addOrderOf_eq_four_of_nsmul
+    · have h1 : (4 : ℕ) • ((n : ℕ) : ZMod (4 * n)) = 0 := by
+        rw [nsmul_eq_mul, ← Nat.cast_mul]
+        exact ZMod.natCast_self (4 * n)
+      have h2 : (4 : ℕ) • t = 0 := by
+        have h22 : (2 : ℕ) • t = 0 := by rw [two_nsmul]; exact ht
+        rw [show (4 : ℕ) = 2 * 2 by norm_num, mul_nsmul, h22, smul_zero]
+      rw [Prod.smul_mk, h1, h2]
+      rfl
+    · intro hcon
+      rw [Prod.smul_mk] at hcon
+      have h1 : (2 : ℕ) • ((n : ℕ) : ZMod (4 * n)) = 0 := by
+        have h := congrArg Prod.snd hcon
+        simpa using h
+      rw [nsmul_eq_mul, ← Nat.cast_mul, ZMod.natCast_eq_zero_iff] at h1
+      have hle := Nat.le_of_dvd (by omega) h1
+      omega
+  · -- surjectivity
+    rw [AddMonoidHom.coe_prodMap]
+    exact Function.Surjective.prodMap Function.surjective_id
+      (ZMod.castHom_surjective hdvd)
+  · -- maps to the deck
+    rw [hdeck]
+    have happ : (AddMonoidHom.prodMap (AddMonoidHom.id (ZMod m))
+        (ZMod.castHom hdvd (ZMod (2 * n))).toAddMonoidHom)
+        (t, ((n : ℕ) : ZMod (4 * n)))
+        = (t, (ZMod.castHom hdvd (ZMod (2 * n))) ((n : ℕ) : ZMod (4 * n))) :=
+      rfl
+    rw [happ, map_natCast]
+  · -- kernel = {0, σ̂ + σ̂}
+    intro x
+    obtain ⟨x₁, x₂⟩ := x
+    have happ : (AddMonoidHom.prodMap (AddMonoidHom.id (ZMod m))
+        (ZMod.castHom hdvd (ZMod (2 * n))).toAddMonoidHom) (x₁, x₂)
+        = (x₁, (ZMod.castHom hdvd (ZMod (2 * n))) x₂) := rfl
+    have hσσ : ((t, ((n : ℕ) : ZMod (4 * n))) + (t, ((n : ℕ) : ZMod (4 * n))))
+        = ((0 : ZMod m), ((2 * n : ℕ) : ZMod (4 * n))) := by
+      rw [Prod.mk_add_mk, ht, ← Nat.cast_add, show n + n = 2 * n by ring]
+    rw [happ, hσσ]
+    have hval : ((x₂.val : ℕ) : ZMod (4 * n)) = x₂ := by
+      rw [ZMod.natCast_val, ZMod.cast_id]
+    constructor
+    · intro h0
+      have h1 : (ZMod.castHom hdvd (ZMod (2 * n))) x₂ = 0 :=
+        (Prod.mk_eq_zero.mp h0).2
+      have h2 : x₁ = 0 := (Prod.mk_eq_zero.mp h0).1
+      have hcast : (ZMod.castHom hdvd (ZMod (2 * n))) x₂
+          = ((x₂.val : ℕ) : ZMod (2 * n)) := by
+        conv_lhs => rw [← hval]
+        rw [map_natCast]
+      rw [hcast, ZMod.natCast_eq_zero_iff] at h1
+      have hlt : x₂.val < 4 * n := ZMod.val_lt x₂
+      obtain ⟨c, hc⟩ := h1
+      have hc2 : c < 2 := by
+        have h4 : 2 * n * c < 2 * n * 2 := by
+          calc 2 * n * c = x₂.val := hc.symm
+            _ < 4 * n := hlt
+            _ = 2 * n * 2 := by ring
+        exact Nat.lt_of_mul_lt_mul_left h4
+      interval_cases c
+      · left
+        have hx2 : x₂ = 0 := by
+          rw [← hval, hc, mul_zero, Nat.cast_zero]
+        rw [hx2, h2]
+        rfl
+      · right
+        have hx2 : x₂ = ((2 * n : ℕ) : ZMod (4 * n)) := by
+          rw [← hval, hc, mul_one]
+        rw [hx2, h2]
+    · rintro (h0 | h0)
+      · have h1 : x₂ = 0 := (Prod.mk_eq_zero.mp h0).2
+        have h2 : x₁ = 0 := (Prod.mk_eq_zero.mp h0).1
+        rw [h1, h2, map_zero]
+        rfl
+      · have h1 : x₂ = ((2 * n : ℕ) : ZMod (4 * n)) := (Prod.ext_iff.mp h0).2
+        have h2 : x₁ = 0 := (Prod.ext_iff.mp h0).1
+        rw [h1, h2, map_natCast, ZMod.natCast_self]
+        rfl
+
+/-- **`BocksteinVanishes` for doubled-axis `ZMod` products, second-axis
+mirror** — unconditional for y-deck covers (e.g. A19-type). -/
+theorem bocksteinVanishes_of_zmod_double_right {n m : ℕ} [NeZero n] [NeZero m]
+    (D : XDoubleCoverData (ZMod m × ZMod (2 * n)) H)
+    (t : ZMod m) (ht : t + t = 0)
+    (hdeck : D.deckS = (t, ((n : ℕ) : ZMod (2 * n)))) :
+    D.BocksteinVanishes :=
+  D.bocksteinVanishes_of_elementForm
+    (D.elementForm_of_zmod_double_right t ht hdeck)
+
+/-- **The Bockstein rank equality for doubled-axis `ZMod` products,
+second-axis mirror**: `dim (1+σ)·H₁(cover) = k̃ − k`, unconditionally,
+for y-deck covers. -/
+theorem finrank_range_epsH1_eq_of_zmod_double_right {n m : ℕ}
+    [NeZero n] [NeZero m]
+    (D : XDoubleCoverData (ZMod m × ZMod (2 * n)) H)
+    (t : ZMod m) (ht : t + t = 0)
+    (hdeck : D.deckS = (t, ((n : ℕ) : ZMod (2 * n)))) :
+    Module.finrank (ZMod 2) (LinearMap.range D.epsH1)
+      = Module.finrank (ZMod 2) D.coverComplex.H1
+        - Module.finrank (ZMod 2) D.baseComplex.H1 :=
+  D.finrank_range_epsH1_eq
+    (D.bocksteinVanishes_of_zmod_double_right t ht hdeck)
+
+end XDoubleCoverData
+
 end BB
 end Homological
 end Stabilizer
