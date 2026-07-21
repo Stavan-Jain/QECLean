@@ -3,6 +3,13 @@ import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.ClassData
 import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.CertSweep
 import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.Classification
 import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.WindowEngine
+import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.SweepWin1
+import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.SweepWin2
+import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.SweepWin3
+import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.SweepWin4
+import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.SweepWin5
+import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.SweepWin6
+import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.SweepWin7
 import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.DeckHomotopy
 import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.Witness
 import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.Distance

@@ -559,6 +559,40 @@ lemma localChainOf_append_singleton (cells : List Nat) (e : Nat)
       shiftRight_cons_length c cs lam]
 
 
+/-- Bridge from an empty falsifier filter to the flat sweep statement.
+The sweep leaves state their `native_decide` cores as
+`(List.range (2 ^ L)).filter (falsifier) = []` rather than as a
+`Fin`-indexed ball: `List.filter` is a native tail-recursive stdlib
+loop, so only the per-mask predicate is interpreted (about 5× cheaper
+than the ball's per-item `Fin` overhead) and the C stack stays flat at
+any `L`.  This lemma recovers the `∀`-form the `window_sound_*`
+wrappers consume. -/
+theorem forall_of_filter_nil {L : Nat} (syn : Nat → Nat) (chk : Nat → Bool)
+    (h : (List.range (2 ^ L)).filter (fun m => syn m == 0 && !chk m) = []) :
+    ∀ lam : Fin (2 ^ L), syn lam.val = 0 → chk lam.val = true := by
+  intro lam hs
+  cases hchk : chk lam.val
+  · exfalso
+    have hmem : lam.val ∈ (List.range (2 ^ L)).filter
+        (fun m => syn m == 0 && !chk m) := by
+      refine List.mem_filter.mpr ⟨List.mem_range.mpr lam.isLt, ?_⟩
+      show (syn lam.val == 0 && !chk lam.val) = true
+      rw [hs, hchk]
+      rfl
+    rw [h] at hmem
+    exact List.not_mem_nil hmem
+  · rfl
+
+/-- Transport membership through a certified filter evaluation: if the
+filter of `l` by `p` is the literal list `out`, every member of `l`
+satisfying `p` is a member of `out`.  Used with `native_decide`-certified
+survivor lists to dispatch the extension sweeps over the finitely many
+surviving extra cells. -/
+theorem mem_of_filter_eq {p : Nat → Bool} {l out : List Nat}
+    (hf : l.filter p = out) {c : Nat} (hc : c ∈ l) (hp : p c = true) :
+    c ∈ out :=
+  hf ▸ List.mem_filter.mpr ⟨hc, hp⟩
+
 /-! ## Survivor tests and the extended candidate table -/
 
 /-- Single-cell survivor test: the extra cell's checks stay inside the
