@@ -5,6 +5,7 @@ Data source: qec-lab:experiments/bb_lab/data/a17/f2a6_light_classes.jsonl
 Regen: cd experiments/bb_lab && uv run python scripts/gen_f2a6_dangerous_lean.py --force
 -/
 
+import Mathlib.Tactic.FinCases
 import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.KernelCert
 
 /-!
@@ -35,6 +36,8 @@ namespace Stabilizer
 namespace Homological
 namespace BB
 namespace Z5Z15F2A6
+
+set_option maxRecDepth 4096
 
 private theorem win_sweep0_4_cert :
     (((winCellList (4 : Fin 113)).length == 25)
@@ -1397,6 +1400,390 @@ theorem win_sweepE_28 :
     exact win_sweepE_28_c57
   · rw [hc]
     exact win_sweepE_28_c98
+
+/-! ## Assembly support: class-shape certificates + sweep dispatch -/
+
+theorem kind_cases : ∀ i : Fin 113,
+    KIND.getD i.val 0 = 0 ∨ KIND.getD i.val 0 = 1 := by
+  native_decide
+
+theorem win_t_cases : ∀ i : Fin 113, KIND.getD i.val 0 = 1 →
+    tOf i = 1 ∨ tOf i = 2 ∨ tOf i = 3 := by
+  native_decide
+
+theorem s_weight_certs : ∀ i : Fin 113, KIND.getD i.val 0 = 0 →
+    (Finset.univ.filter fun j : G150 × Fin 2 =>
+      bbBoundary2Fn a150 b150 (sF0Chain i) j ≠ 0).card
+      = BW.getD i.val 0 := by
+  native_decide
+
+theorem win_sweep0_dispatch (i : Fin 113) (hk : KIND.getD i.val 0 = 1) :
+    ∀ lam : Fin (2 ^ (winCellList i).length),
+      syndFold (winCellList i) lam.val = 0 →
+      (tableEntries i 150).any
+        (fun pr => lam.val == localMaskOf (winCellList i) pr.2) = true := by
+  fin_cases i
+  · exact win_sweep0_0
+  · exact win_sweep0_1
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact win_sweep0_4
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact win_sweep0_24
+  · exact win_sweep0_25
+  · exact win_sweep0_26
+  · exact win_sweep0_27
+  · exact win_sweep0_28
+  · exact win_sweep0_29
+  · exact win_sweep0_30
+  · exact absurd hk (by decide)
+  · exact win_sweep0_32
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact win_sweep0_37
+  · exact win_sweep0_38
+  · exact win_sweep0_39
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact win_sweep0_49
+  · exact win_sweep0_50
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact win_sweep0_56
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact win_sweep0_65
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact win_sweep0_81
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+
+theorem win_sweepE_dispatch (i : Fin 113) (hk : KIND.getD i.val 0 = 1) (ht : 2 ≤ tOf i) :
+    ∀ e : G150 × Fin 2, winMem i e = false →
+      survivorB i (cellIdx e) = true →
+      ∀ lam : Fin (2 ^ (winCellList i ++ [cellIdx e]).length),
+        syndFold (winCellList i ++ [cellIdx e]) lam.val = 0 →
+        (tableEntries i (cellIdx e)).any (fun pr =>
+          lam.val == localMaskOf (winCellList i ++ [cellIdx e]) pr.2)
+          = true := by
+  fin_cases i
+  · exact win_sweepE_0
+  · exact win_sweepE_1
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd ht (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd ht (by decide)
+  · exact absurd ht (by decide)
+  · exact absurd ht (by decide)
+  · exact win_sweepE_27
+  · exact win_sweepE_28
+  · exact absurd ht (by decide)
+  · exact absurd ht (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd ht (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd ht (by decide)
+  · exact absurd ht (by decide)
+  · exact absurd ht (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd ht (by decide)
+  · exact absurd ht (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd ht (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd ht (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd ht (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+
+theorem win_sweepP_dispatch (i : Fin 113) (hk : KIND.getD i.val 0 = 1) (ht : tOf i = 3) :
+    ∀ e₁ e₂ : G150 × Fin 2, winMem i e₁ = false →
+      winMem i e₂ = false → e₁ ≠ e₂ →
+      pairSurvivorB i (cellIdx e₁) (cellIdx e₂) = true →
+      ∀ lam : Fin (2 ^ ((winCellList i ++ [cellIdx e₁]) ++ [cellIdx e₂]).length),
+        syndFold ((winCellList i ++ [cellIdx e₁]) ++ [cellIdx e₂]) lam.val = 0 →
+        ((tableEntries i (cellIdx e₁)) ++ tableEntries i (cellIdx e₂)).any
+          (fun pr => lam.val ==
+            localMaskOf ((winCellList i ++ [cellIdx e₁]) ++ [cellIdx e₂])
+              pr.2) = true := by
+  fin_cases i
+  · exact win_sweepP_0
+  · exact absurd ht (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd ht (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd ht (by decide)
+  · exact absurd ht (by decide)
+  · exact absurd ht (by decide)
+  · exact absurd ht (by decide)
+  · exact absurd ht (by decide)
+  · exact absurd ht (by decide)
+  · exact absurd ht (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd ht (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd ht (by decide)
+  · exact absurd ht (by decide)
+  · exact absurd ht (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd ht (by decide)
+  · exact absurd ht (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd ht (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd ht (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd ht (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
+  · exact absurd hk (by decide)
 
 
 end Z5Z15F2A6

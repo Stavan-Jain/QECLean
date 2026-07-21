@@ -15,9 +15,14 @@ solver certificates.  Hypothesis status:
   `StrongBaseFloor 8` is *false* here (weight-6 generator columns), which
   is why the logical-floor assembly exists.
 * `hM : coverData.DangerousFloorNZ 16` — the (M)-half of the template.
-  Honest status: **assumption**, not yet certificate-backed; A11 found
-  0/465 violations corpus-wide, and the per-instance discharge route is
-  the light-boundary classification + the generic rungs (future work).
+  **Discharged**: `dangerousFloorNZ_of_lightClassification`
+  (`Dangerous.lean`) proves it from `hbase` + the light-boundary
+  classification, so the `_of_classification` variants below replace
+  this input by `hcls : LightClassification` — the exhaustive
+  SAT-enumeration completeness statement (9.6 h UNSAT with
+  translation-orbit blocking; Φ-closure cross-check; DRAT upgrade
+  path = kissat on the blocked n = 75 CNF).  The plain three-hypothesis
+  theorems are kept for reference.
 * `hMim : coverData.SeamCosetFloor 16` — the S4 certificate of the A17
   docket decision pass (`data/a17/docket_decision.jsonl`): CryptoMiniSat
   XOR-native `UNSAT@14` on the seam-coset G-orbit rep (975.8 s) + the
@@ -35,6 +40,7 @@ membership half of both `IsLeast` statements is unconditional
 
 import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.DeckHomotopy
 import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.Witness
+import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.Dangerous
 
 namespace Quantum
 namespace Stabilizer
@@ -82,6 +88,37 @@ theorem cover300_pauli_distance_eq_16
     tauUStar150_not_mem_boundaries
   norm_num at h
   exact h
+
+/-- The dangerous floor, discharged from the light-boundary
+classification (`Dangerous.lean`). -/
+theorem cover300_dangerousFloorNZ
+    (hbase : coverData.LogicalFloor 8) (hcls : LightClassification) :
+    coverData.DangerousFloorNZ 16 :=
+  dangerousFloorNZ_of_lightClassification hbase hcls
+
+/-- **Chain-level `d(cover) = 16`** with the (M)-half discharged: the
+hypothesis set is the logical base floor, the light-boundary
+classification, and the Smith-coset floor. -/
+theorem cover300_chain_distance_eq_16_of_classification
+    (hbase : coverData.LogicalFloor 8) (hcls : LightClassification)
+    (hMim : coverData.SeamCosetFloor 16) :
+    IsLeast {w : ℕ | ∃ v : G300 × Fin 2 → ZMod 2,
+      v ∈ coverData.coverComplex.cycles ∧
+      v ∉ coverData.coverComplex.boundaries ∧
+      coverData.coverComplex.chainWeight v = w} 16 :=
+  cover300_chain_distance_eq_16 hbase
+    (cover300_dangerousFloorNZ hbase hcls) hMim
+
+/-- **Pauli-level `d(cover) = 16`** with the (M)-half discharged. -/
+theorem cover300_pauli_distance_eq_16_of_classification
+    (hbase : coverData.LogicalFloor 8) (hcls : LightClassification)
+    (hMim : coverData.SeamCosetFloor 16) :
+    IsLeast {w : ℕ | ∃ g : NQubitPauliGroupElement coverData.coverComplex.numQubits,
+      Quantum.StabilizerGroup.IsNontrivialLogicalOperator g
+        coverData.coverComplex.homologicalStabilizerGroup ∧
+      NQubitPauliGroupElement.weight g = w} 16 :=
+  cover300_pauli_distance_eq_16 hbase
+    (cover300_dangerousFloorNZ hbase hcls) hMim
 
 end Z5Z15F2A6
 end BB

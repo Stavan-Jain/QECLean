@@ -7,6 +7,7 @@ import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.KernelCert
 import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.SweepWin
 import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.DeckHomotopy
 import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.Witness
+import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.Dangerous
 import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.Distance
 
 /-!
