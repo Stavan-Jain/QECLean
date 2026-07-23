@@ -9,11 +9,15 @@ packaged as the **Paper-1 two-tier claim**: the doubling theorem is
 kernel-checked; the floors enter as named hypotheses whose provenance is
 solver certificates.  Hypothesis status:
 
-* `hbase : coverData.LogicalFloor 8` — `d(base) ≥ 8`.  Certificate:
-  corpus `d_exact = 8` (CaDiCaL, witness@8 + `UNSAT@7`); the witness half
-  (`d(base) ≤ 8`) is kernel-checked in `Witness.lean`.  Note
-  `StrongBaseFloor 8` is *false* here (weight-6 generator columns), which
-  is why the logical-floor assembly exists.
+* `hbase : coverData.LogicalFloor 8` — `d(base) ≥ 8`.  **Discharged**:
+  `logicalFloor_8` (`BaseFloor.lean`, the A21 analytic proof — parity,
+  the y-span lemma, mirror symmetry, D2-pigeonholes, and the (3,3)
+  transversality localization, with the weight-6 classification closed
+  by translation-reduced coset sweeps).  The CaDiCaL `UNSAT@7`
+  certificate is fully replaced; the witness half (`d(base) ≤ 8`)
+  remains kernel-checked in `Witness.lean`.  Note `StrongBaseFloor 8`
+  is *false* here (weight-6 generator columns), which is why the
+  logical-floor assembly exists.
 * `hM : coverData.DangerousFloorNZ 16` — the (M)-half of the template.
   **Discharged**: `dangerousFloorNZ_of_lightClassification`
   (`Dangerous.lean`) proves it from `hbase` + the light-boundary
@@ -41,6 +45,7 @@ membership half of both `IsLeast` statements is unconditional
 import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.DeckHomotopy
 import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.Witness
 import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.Dangerous
+import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.BaseFloor
 
 namespace Quantum
 namespace Stabilizer
@@ -90,35 +95,34 @@ theorem cover300_pauli_distance_eq_16
   exact h
 
 /-- The dangerous floor, discharged from the light-boundary
-classification (`Dangerous.lean`). -/
-theorem cover300_dangerousFloorNZ
-    (hbase : coverData.LogicalFloor 8) (hcls : LightClassification) :
+classification (`Dangerous.lean`) and the proven base floor
+(`BaseFloor.lean`). -/
+theorem cover300_dangerousFloorNZ (hcls : LightClassification) :
     coverData.DangerousFloorNZ 16 :=
-  dangerousFloorNZ_of_lightClassification hbase hcls
+  dangerousFloorNZ_of_lightClassification logicalFloor_8 hcls
 
-/-- **Chain-level `d(cover) = 16`** with the (M)-half discharged: the
-hypothesis set is the logical base floor, the light-boundary
-classification, and the Smith-coset floor. -/
+/-- **Chain-level `d(cover) = 16`** with the base floor proven and the
+(M)-half discharged: the hypothesis set is the light-boundary
+classification and the Smith-coset floor. -/
 theorem cover300_chain_distance_eq_16_of_classification
-    (hbase : coverData.LogicalFloor 8) (hcls : LightClassification)
-    (hMim : coverData.SeamCosetFloor 16) :
+    (hcls : LightClassification) (hMim : coverData.SeamCosetFloor 16) :
     IsLeast {w : ℕ | ∃ v : G300 × Fin 2 → ZMod 2,
       v ∈ coverData.coverComplex.cycles ∧
       v ∉ coverData.coverComplex.boundaries ∧
       coverData.coverComplex.chainWeight v = w} 16 :=
-  cover300_chain_distance_eq_16 hbase
-    (cover300_dangerousFloorNZ hbase hcls) hMim
+  cover300_chain_distance_eq_16 logicalFloor_8
+    (cover300_dangerousFloorNZ hcls) hMim
 
-/-- **Pauli-level `d(cover) = 16`** with the (M)-half discharged. -/
+/-- **Pauli-level `d(cover) = 16`** with the base floor proven and the
+(M)-half discharged. -/
 theorem cover300_pauli_distance_eq_16_of_classification
-    (hbase : coverData.LogicalFloor 8) (hcls : LightClassification)
-    (hMim : coverData.SeamCosetFloor 16) :
+    (hcls : LightClassification) (hMim : coverData.SeamCosetFloor 16) :
     IsLeast {w : ℕ | ∃ g : NQubitPauliGroupElement coverData.coverComplex.numQubits,
       Quantum.StabilizerGroup.IsNontrivialLogicalOperator g
         coverData.coverComplex.homologicalStabilizerGroup ∧
       NQubitPauliGroupElement.weight g = w} 16 :=
-  cover300_pauli_distance_eq_16 hbase
-    (cover300_dangerousFloorNZ hbase hcls) hMim
+  cover300_pauli_distance_eq_16 logicalFloor_8
+    (cover300_dangerousFloorNZ hcls) hMim
 
 end Z5Z15F2A6
 end BB
