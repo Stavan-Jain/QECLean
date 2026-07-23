@@ -11,6 +11,10 @@ import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.BaseFloorKernel
 import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.BaseFloorSweep
 import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.BaseFloorChecks
 import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.BaseFloor
+import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.SeamSweepData
+import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.SeamFiber
+import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.SeamSweep
+import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.SeamReduction
 import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.Witness
 import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.Dangerous
 import QEC.Stabilizer.Codes.BivariateBicycle.Z5Z15F2A6.Distance
@@ -40,4 +44,10 @@ kernel-sweepable.
                    `cover300_pauli_distance_eq_16`) through the
                    logical-floor variant of the parametric layer (the
                    strong floor is false for `d = 8` bases)
+- `SeamSweepData`/`SeamFiber`/`SeamSweep`/`SeamReduction` — the A23
+                   analytic discharge of the Smith-coset floor:
+                   `seamCosetFloor_16 : coverData.SeamCosetFloor 16`
+                   via the CRT z-fiber site sweep (replaces the
+                   CryptoMiniSat certificate; not yet wired into
+                   `Distance`)
 -/
