@@ -1,0 +1,30 @@
+{
+  "name": "QECLean",
+  "build": { "dockerfile": "Dockerfile" },
+  "remoteUser": "vscode",
+
+  // Measured on a GitHub runner: `lake build QECLight` peaks at ~5.7 GB RSS
+  // and takes ~7 min with a warm mathlib cache. That does not fit comfortably
+  // in the 2-core/8 GB tier, so ask for 4 cores — which in Codespaces comes
+  // with 16 GB, leaving real headroom.
+  "hostRequirements": { "cpus": 4, "memory": "16gb", "storage": "32gb" },
+
+  "customizations": {
+    "vscode": {
+      "extensions": ["leanprover.lean4"],
+      "settings": {
+        "lean4.alwaysShowTitleBarMenu": true
+      }
+    }
+  },
+
+  // Runs while the container is still being created, and is the step a
+  // Codespaces prebuild captures — with prebuilds on, this is already done
+  // before anyone opens the repo.
+  "onCreateCommand": ".devcontainer/setup.sh",
+  "waitFor": "onCreateCommand",
+
+  "postAttachCommand": {
+    "open-playground": "code Playground.lean || true"
+  }
+}
