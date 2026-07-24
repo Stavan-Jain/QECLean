@@ -1,0 +1,11 @@
+{
+  "name": "QECLean (QCE26 tutorial)",
+  "default": true,
+  "sortOrder": 0,
+  "examples": [
+    {
+      "file": "Scratch.lean",
+      "name": "Start here"
+    }
+  ]
+}

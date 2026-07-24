@@ -1,0 +1,63 @@
+name: Tutorial environment
+
+# Guards the QCE26 tutorial environments (.devcontainer/ and deploy/lean4web/).
+#
+# The thing that can silently break is `QECTutorial.lean`: it re-lists the
+# `Codes` umbrella minus BivariateBicycle, so a new module added under
+# `QEC/Stabilizer/Codes/` is not picked up automatically the way
+# `scripts/check-umbrellas.sh` would catch it inside `QEC/`.
+#
+# Note the absence of the 12 GB swap step that `lean_action_ci.yml` needs.
+# That is the point: if this job ever starts OOM-ing, something heavy has
+# leaked into the tutorial target and a Codespace would fail too.
+
+on:
+  push:
+    paths:
+      - 'QEC/**'
+      - 'QECTutorial.lean'
+      - 'Scratch.lean'
+      - 'lakefile.toml'
+      - 'lean-toolchain'
+      - '.devcontainer/**'
+      - '.github/workflows/tutorial-env.yml'
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: tutorial-env-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install elan
+        run: |
+          curl https://elan.lean-lang.org/elan-init.sh -sSf | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Fetch mathlib cache
+        run: lake exe cache get
+
+      - name: Build tutorial target
+        run: |
+          set -o pipefail
+          /usr/bin/time -v lake build QECTutorial 2>&1 | tee build.log
+
+      - name: Report peak memory
+        if: always()
+        run: |
+          {
+            echo "### Tutorial target build"
+            echo
+            grep -E 'Maximum resident set size|Elapsed \(wall clock\)' build.log || true
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # The scratch file is not in any `lean_lib`, so `lake build` never sees
+      # it. Elaborate it explicitly — a broken Scratch.lean is the first thing
+      # every attendee would hit.
+      - name: Check Scratch.lean elaborates
+        run: lake env lean Scratch.lean

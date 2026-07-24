@@ -1,0 +1,31 @@
+{
+  "name": "QECLean — QCE26 tutorial",
+  "build": { "dockerfile": "Dockerfile" },
+  "remoteUser": "vscode",
+
+  // 4 cores / 8 GB is the smallest machine that gets through the tutorial
+  // target. Do not drop to 2 cores: the non-BB `native_decide` checks
+  // (FiveQubit_5_1_3, RotatedSurface/Three, Steane7Distance) get tight.
+  "hostRequirements": { "cpus": 4, "memory": "8gb", "storage": "32gb" },
+
+  "customizations": {
+    "vscode": {
+      "extensions": ["leanprover.lean4"],
+      "settings": {
+        // Attendees open Scratch.lean and start typing; without this the
+        // InfoView only appears after a manual command, which is the single
+        // most common "it's broken" moment in a room of first-time users.
+        "lean4.alwaysShowTitleBarMenu": true
+      }
+    }
+  },
+
+  // Runs while the Codespace is still being created, and — crucially — is the
+  // step captured by a prebuild. With prebuilds on, attendees skip all of it.
+  "onCreateCommand": ".devcontainer/setup.sh",
+  "waitFor": "onCreateCommand",
+
+  "postAttachCommand": {
+    "open-scratch": "code Scratch.lean || true"
+  }
+}
