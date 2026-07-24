@@ -26,8 +26,9 @@ open Quantum.StabilizerGroup
 -- concatenated code.
 #check Steane7.steaneConcatCodeWithDistance
 
--- The parametric toric code, for every `L ≥ 2`.
-#check @toricHomologicalCode
+-- The parametric toric code, for every `L ≥ 2`. (It lives under
+-- `Quantum.Stabilizer.Lattice`, not the `Quantum.StabilizerGroup` opened above.)
+#check @Quantum.Stabilizer.Lattice.toricHomologicalCode
 
 /-
 Your turn. For example:

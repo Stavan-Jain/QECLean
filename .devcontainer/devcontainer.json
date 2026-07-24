@@ -3,10 +3,11 @@
   "build": { "dockerfile": "Dockerfile" },
   "remoteUser": "vscode",
 
-  // 4 cores / 8 GB is the smallest machine that gets through `QECLight`.
-  // Do not drop to 2 cores: the remaining `native_decide` checks
-  // (FiveQubit_5_1_3, RotatedSurface/Three, Steane7Distance) get tight.
-  "hostRequirements": { "cpus": 4, "memory": "8gb", "storage": "32gb" },
+  // Measured on a GitHub runner: `lake build QECLight` peaks at ~5.7 GB RSS
+  // and takes ~7 min with a warm mathlib cache. That does not fit comfortably
+  // in the 2-core/8 GB tier, so ask for 4 cores — which in Codespaces comes
+  // with 16 GB, leaving real headroom.
+  "hostRequirements": { "cpus": 4, "memory": "16gb", "storage": "32gb" },
 
   "customizations": {
     "vscode": {

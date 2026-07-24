@@ -8,10 +8,14 @@ bivariate-bicycle safe-floor leaves peak around 3.75 GB each under
 4-core container nor a shared server can. Everything else in the library is
 available.
 
+Measured on a GitHub runner with a warm mathlib cache, `lake build QECLight`
+takes **~7 minutes** and peaks at **~5.7 GB** RSS. A full `lake build` is the
+thing that needs 12 GB of swap.
+
 | | Codespaces | lean4web |
 |---|---|---|
 | User needs | a GitHub account | nothing |
-| Startup | seconds with a prebuild, ~15–40 min without | instant |
+| Startup | seconds with a prebuild; otherwise the mathlib cache download plus ~7 min | instant |
 | Editor | full VS Code + InfoView | single-file web editor |
 | Runs on | GitHub's machines, billed per user | a box you run |
 | Good for | anyone wanting to develop against the library | a link people can click |
@@ -33,7 +37,7 @@ mathlib's prebuilt oleans, and builds `QECLight`. The container opens on
 ### Prebuilds
 
 Without a prebuild, the first open costs the full `lake exe cache get` plus the
-`QECLight` build — on the order of 15–40 minutes. With one, it is seconds.
+`QECLight` build (~7 min once the cache is down). With one, it is seconds.
 Prebuilds are configured in the GitHub UI, not in a file:
 
 **Settings → Codespaces → Set up prebuild**, with branch `main`, configuration
