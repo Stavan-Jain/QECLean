@@ -1,0 +1,29 @@
+{
+  "name": "QECLean",
+  "build": { "dockerfile": "Dockerfile" },
+  "remoteUser": "vscode",
+
+  // 4 cores / 8 GB is the smallest machine that gets through `QECLight`.
+  // Do not drop to 2 cores: the remaining `native_decide` checks
+  // (FiveQubit_5_1_3, RotatedSurface/Three, Steane7Distance) get tight.
+  "hostRequirements": { "cpus": 4, "memory": "8gb", "storage": "32gb" },
+
+  "customizations": {
+    "vscode": {
+      "extensions": ["leanprover.lean4"],
+      "settings": {
+        "lean4.alwaysShowTitleBarMenu": true
+      }
+    }
+  },
+
+  // Runs while the container is still being created, and is the step a
+  // Codespaces prebuild captures — with prebuilds on, this is already done
+  // before anyone opens the repo.
+  "onCreateCommand": ".devcontainer/setup.sh",
+  "waitFor": "onCreateCommand",
+
+  "postAttachCommand": {
+    "open-playground": "code Playground.lean || true"
+  }
+}

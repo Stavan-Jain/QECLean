@@ -1,0 +1,11 @@
+{
+  "name": "QECLean",
+  "default": true,
+  "sortOrder": 0,
+  "examples": [
+    {
+      "file": "Playground.lean",
+      "name": "Start here"
+    }
+  ]
+}
