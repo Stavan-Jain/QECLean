@@ -1271,6 +1271,125 @@ theorem dangerous_bound_of_window {d : ℕ}
     rw [hvform]
     exact add_mem (D.pull1_mem_boundaries hu_bd) (D.liftStab_mem_boundaries _)
 
+/-- **The generalized window rung** (`t ≥ 1`, floor-free): a dangerous
+cycle over a boundary `b = ∂₂ f₀` of weight `2d − 2t` either meets `t`
+off-slice cells (weight `≥ 2d` directly from the slice identity) or
+normalizes to a base cycle with at most `t − 1` cells outside the window
+`supp b ∪ supp (seam f₀)`.  If every such near-window cycle is a boundary
+— a per-instance finite check over the window plus `≤ t − 1` free cells —
+the dangerous cycle would be a boundary, contradiction.  At `t = 1` this
+is exactly `dangerous_bound_of_window` (see
+`dangerous_bound_of_window_of_general` below); the `t ≥ 2` cases are the
+rungs for the near-kernel `|b| < 2d − 2` classes, whose heavy preimages
+admit no seam-good coset element. -/
+theorem dangerous_bound_of_window_general {d t : ℕ} (ht : 1 ≤ t)
+    (f₀ : H → ZMod 2)
+    (hwb : D.baseComplex.chainWeight (bbBoundary2Fn D.Ab D.Bb f₀) + 2 * t
+      = 2 * d)
+    (hW : ∀ u : H × Fin 2 → ZMod 2, bbBoundary1Fn D.Ab D.Bb u = 0 →
+      (Finset.univ.filter fun j : H × Fin 2 => u j ≠ 0 ∧
+        ¬ (bbBoundary2Fn D.Ab D.Bb f₀ j ≠ 0
+          ∨ D.sheet0 (D.liftStab f₀) j ≠ 0)).card ≤ t - 1 →
+      u ∈ D.baseComplex.boundaries)
+    {v : G × Fin 2 → ZMod 2}
+    (hv : v ∈ D.coverComplex.cycles) (hnb : v ∉ D.coverComplex.boundaries)
+    (hb : D.push1 v = bbBoundary2Fn D.Ab D.Bb f₀) :
+    2 * d ≤ D.coverComplex.chainWeight v := by
+  classical
+  by_cases hoff : t ≤ (Finset.univ.filter fun j =>
+      D.sheet0 v j ≠ 0 ∧ D.push1 v j = 0).card
+  · -- `t` off-cells make up the deficit: `|v| = (2d − 2t) + 2·off ≥ 2d`
+    rw [D.chainWeight_sheet_eq, hb]
+    rw [hb] at hoff
+    omega
+  · push Not at hoff
+    exfalso
+    have hpush : D.push1 (v + D.liftStab f₀) = 0 := by
+      rw [map_add, hb, D.push1_liftStab]
+      funext j
+      exact CharTwo.add_self_eq_zero _
+    obtain ⟨u, hu⟩ := (D.push1_eq_zero_iff _).mp hpush
+    have hvtilde_cyc : D.pull1 u ∈ D.coverComplex.cycles := by
+      rw [← hu]
+      have h1 : bbBoundary1Fn D.Ac D.Bc (v + D.liftStab f₀) = 0 := by
+        have hv0 : bbBoundary1Fn D.Ac D.Bc v = 0 := hv
+        have hs0 : bbBoundary1Fn D.Ac D.Bc (D.liftStab f₀) = 0 :=
+          bbBoundaryFn_comp D.Ac D.Bc (D.liftC2 f₀)
+        rw [bbBoundary1Fn_add, hv0, hs0, add_zero]
+      exact h1
+    have hu_cyc : bbBoundary1Fn D.Ab D.Bb u = 0 := D.descend_cycle hvtilde_cyc
+    have hu_eq : u = D.sheet0 v + D.sheet0 (D.liftStab f₀) := by
+      have := congrArg D.sheet0 hu
+      rw [D.sheet0_pull1] at this
+      rw [← this]
+      rfl
+    -- the normalized cycle has at most `t − 1` cells outside the window
+    have hu_off : (Finset.univ.filter fun j : H × Fin 2 => u j ≠ 0 ∧
+        ¬ (bbBoundary2Fn D.Ab D.Bb f₀ j ≠ 0
+          ∨ D.sheet0 (D.liftStab f₀) j ≠ 0)).card ≤ t - 1 := by
+      have hsub : (Finset.univ.filter fun j : H × Fin 2 => u j ≠ 0 ∧
+          ¬ (bbBoundary2Fn D.Ab D.Bb f₀ j ≠ 0
+            ∨ D.sheet0 (D.liftStab f₀) j ≠ 0))
+          ⊆ Finset.univ.filter fun j =>
+              D.sheet0 v j ≠ 0 ∧ D.push1 v j = 0 := by
+        intro j hj
+        simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hj ⊢
+        obtain ⟨hju, hjW⟩ := hj
+        push Not at hjW
+        obtain ⟨hjb, hjs⟩ := hjW
+        have hseamj : D.liftStab f₀ (D.sec1 j) = 0 := hjs
+        have hsheet : D.sheet0 v j ≠ 0 := by
+          rw [hu_eq] at hju
+          simpa [Pi.add_apply, hseamj] using hju
+        have hpj : D.push1 v j = 0 := by
+          rw [hb]
+          exact hjb
+        exact ⟨hsheet, hpj⟩
+      have := Finset.card_le_card hsub
+      omega
+    have hu_bd : u ∈ D.baseComplex.boundaries := hW u hu_cyc hu_off
+    apply hnb
+    have hvform : v = D.pull1 u + D.liftStab f₀ := by
+      rw [← hu]
+      funext p
+      have key : ∀ a c : ZMod 2, a = a + c + c := by decide
+      exact key (v p) (D.liftStab f₀ p)
+    rw [hvform]
+    exact add_mem (D.pull1_mem_boundaries hu_bd) (D.liftStab_mem_boundaries _)
+
+/-- Regression check: the `t = 1` window rung is the `t = 1` instance of
+the general rung (the empty-off-support form of the window hypothesis is
+the card-`≤ 0` form). -/
+theorem dangerous_bound_of_window_of_general {d : ℕ}
+    (f₀ : H → ZMod 2)
+    (hwb : D.baseComplex.chainWeight (bbBoundary2Fn D.Ab D.Bb f₀) + 2
+      = 2 * d)
+    (hW : ∀ u : H × Fin 2 → ZMod 2, bbBoundary1Fn D.Ab D.Bb u = 0 →
+      (∀ j : H × Fin 2, u j ≠ 0 →
+        bbBoundary2Fn D.Ab D.Bb f₀ j ≠ 0 ∨ D.sheet0 (D.liftStab f₀) j ≠ 0) →
+      u ∈ D.baseComplex.boundaries)
+    {v : G × Fin 2 → ZMod 2}
+    (hv : v ∈ D.coverComplex.cycles) (hnb : v ∉ D.coverComplex.boundaries)
+    (hb : D.push1 v = bbBoundary2Fn D.Ab D.Bb f₀) :
+    2 * d ≤ D.coverComplex.chainWeight v := by
+  classical
+  refine D.dangerous_bound_of_window_general le_rfl f₀ ?_ ?_ hv hnb hb
+  · rw [mul_one]
+    exact hwb
+  · intro u hu hcard
+    refine hW u hu ?_
+    intro j hj
+    by_contra hcon
+    have hjmem : j ∈ Finset.univ.filter fun j : H × Fin 2 => u j ≠ 0 ∧
+        ¬ (bbBoundary2Fn D.Ab D.Bb f₀ j ≠ 0
+          ∨ D.sheet0 (D.liftStab f₀) j ≠ 0) :=
+      Finset.mem_filter.mpr ⟨Finset.mem_univ j, hj, hcon⟩
+    have hpos : 0 < (Finset.univ.filter fun j : H × Fin 2 => u j ≠ 0 ∧
+        ¬ (bbBoundary2Fn D.Ab D.Bb f₀ j ≠ 0
+          ∨ D.sheet0 (D.liftStab f₀) j ≠ 0)).card :=
+      Finset.card_pos.mpr ⟨j, hjmem⟩
+    omega
+
 /-! ## The safe-sector reduction -/
 
 /-- **The safe-sector reduction**: the homotopy (R) confines safe
