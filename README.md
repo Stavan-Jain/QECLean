@@ -9,6 +9,18 @@ This project formalizes foundational concepts in quantum error correction using 
 
 Along the way, it develops definitions and lemmas for reasoning about qubits, quantum states, and unitary operations, contributing toward a verified foundation for quantum computing and fault tolerance in Lean.
 
+## Try it without installing anything
+
+[**Open in GitHub Codespaces**](https://codespaces.new/Stavan-Jain/QECLean) — a full Lean 4 environment with mathlib cached and the library prebuilt, in the browser. It opens on [`Playground.lean`](Playground.lean).
+
+Both that and the self-hosted [web editor](deploy/README.md) build [`QECLight`](QECLight.lean), which is the library minus the bivariate-bicycle code family: those proofs peak around 3.75 GB per `native_decide` leaf, more than a small container or a shared session can carry. Everything else — the Pauli and binary-symplectic layer, the stabilizer framework, toric, rotated surface, Steane, Shor, `[[5,1,3]]`, concatenation — is available. `QECLight` is also a fast way to build the library locally on a modest machine:
+
+```bash
+lake exe cache get && lake build QECLight
+```
+
+See [`deploy/README.md`](deploy/README.md) for running your own instance.
+
 ## Overview
 
 Modules are written in Lean 4 and rely on [mathlib](https://github.com/leanprover-community/mathlib4) for linear algebra and other foundations. Import everything via `QEC`, or use `QEC.Foundations.Foundations`, `QEC.RepetitionCode.RepetitionCode`, or `QEC.Stabilizer.Stabilizer` for a subset.

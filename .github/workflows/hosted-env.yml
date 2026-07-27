@@ -1,0 +1,62 @@
+name: Hosted environments
+
+# Guards `QECLight` and the environments built on it (.devcontainer/, deploy/).
+#
+# The thing that can silently break is `QECLight.lean`: it re-lists the `Codes`
+# umbrella minus BivariateBicycle, so a module added under
+# `QEC/Stabilizer/Codes/` is not picked up automatically the way
+# `scripts/check-umbrellas.sh` would catch it inside `QEC/`.
+#
+# Note the absence of the 12 GB swap step that `lean_action_ci.yml` needs.
+# That is the point: if this job starts OOM-ing, something heavy has leaked
+# into `QECLight` and every hosted environment would fail too.
+
+on:
+  push:
+    paths:
+      - 'QEC/**'
+      - 'QECLight.lean'
+      - 'Playground.lean'
+      - 'lakefile.toml'
+      - 'lean-toolchain'
+      - '.devcontainer/**'
+      - '.github/workflows/hosted-env.yml'
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: hosted-env-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install elan
+        run: |
+          curl https://elan.lean-lang.org/elan-init.sh -sSf | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Fetch mathlib cache
+        run: lake exe cache get
+
+      - name: Build QECLight
+        run: |
+          set -o pipefail
+          /usr/bin/time -v lake build QECLight 2>&1 | tee build.log
+
+      - name: Report peak memory
+        if: always()
+        run: |
+          {
+            echo "### QECLight build"
+            echo
+            grep -E 'Maximum resident set size|Elapsed \(wall clock\)' build.log || true
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # Playground.lean is in no `lean_lib`, so `lake build` never sees it.
+      # Elaborate it explicitly — it is the first file anyone opens.
+      - name: Check Playground.lean elaborates
+        run: lake env lean Playground.lean

@@ -17,6 +17,13 @@ scope = "leanprover-community"
 [[lean_lib]]
 name = "QEC"
 
+# Light import surface for memory-constrained environments; excludes the
+# BivariateBicycle leaves, which need more than a 4-core container or a shared
+# web-editor session has. Deliberately not in `defaultTargets` — `lake build`
+# still means the full library. See `QECLight.lean`.
+[[lean_lib]]
+name = "QECLight"
+
 [[lean_lib]]
 name = "Foundations"
 srcDir = "QEC"
