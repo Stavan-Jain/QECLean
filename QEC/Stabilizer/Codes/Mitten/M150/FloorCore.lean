@@ -33,7 +33,7 @@ private lemma xor_left_comm (a b c : Nat) :
     a ^^^ (b ^^^ c) = b ^^^ (a ^^^ c) := by
   rw [← Nat.xor_assoc, Nat.xor_comm a b, Nat.xor_assoc]
 
-private lemma testBit_one' (k : Nat) : Nat.testBit 1 k = decide (k = 0) := by
+lemma testBit_one' (k : Nat) : Nat.testBit 1 k = decide (k = 0) := by
   cases k with
   | zero => rfl
   | succ k =>
@@ -654,6 +654,355 @@ lemma packTriple_hi {mu mw : Nat} (mt : Nat) (hmu : mu < 2 ^ 30)
   have h60 : 60 + i ≥ 60 := by omega
   have hsub : 60 + i - 60 = i := by omega
   simp [hmub, hmwb, h30, h60, hsub]
+
+/-- Four-way XOR regrouping. -/
+lemma xor_xor_pair (a b x y : Nat) :
+    (a ^^^ b) ^^^ (x ^^^ y) = (a ^^^ x) ^^^ (b ^^^ y) := by
+  apply Nat.eq_of_testBit_eq
+  intro i
+  simp only [Nat.testBit_xor]
+  cases a.testBit i <;> cases b.testBit i <;> cases x.testBit i <;>
+    cases y.testBit i <;> rfl
+
+/-- **Predicate extension**: a XOR-closed predicate holding at the images
+of `0` and the basis masks under a XOR-linear map holds on all images of
+masks `< 2^n`.  (The membership analog of `linear_ext`; used for the
+`Ann`-coset arguments.) -/
+lemma linear_pred {F : Nat → Nat} {P : Nat → Prop} (n : Nat)
+    (hFx : ∀ m₁ m₂, F (m₁ ^^^ m₂) = F m₁ ^^^ F m₂)
+    (hP0 : P (F 0))
+    (hPcl : ∀ a b, P a → P b → P (a ^^^ b))
+    (hbit : ∀ i < n, P (F (1 <<< i))) :
+    ∀ m < 2 ^ n, P (F m) := by
+  intro m
+  induction m using Nat.strong_induction_on with
+  | _ m ih =>
+    intro hm
+    rcases Nat.eq_zero_or_pos m with rfl | hpos
+    · exact hP0
+    · have hm0 : m ≠ 0 := by omega
+      have hlog : m.log2 < n := by
+        have h1 : 2 ^ m.log2 ≤ m := Nat.log2_self_le hm0
+        by_contra hcon
+        push Not at hcon
+        have : 2 ^ n ≤ 2 ^ m.log2 := Nat.pow_le_pow_right (by norm_num) hcon
+        omega
+      set m' := m ^^^ 1 <<< m.log2 with hm'
+      have hlt : m' < m := xor_top_bit_lt hm0
+      have hm'2 : m' < 2 ^ n := lt_trans hlt hm
+      have hsplit : m = m' ^^^ 1 <<< m.log2 := by
+        rw [hm', Nat.xor_assoc, Nat.xor_self, Nat.xor_zero]
+      rw [hsplit, hFx]
+      exact hPcl _ _ (ih m' hlt hm'2) (hbit _ hlog)
+
+/-! ## §6  Parity functionals -/
+
+lemma popCntGo_zero (f : Nat) : popCntGo f 0 = 0 := by
+  induction f with
+  | zero => rfl
+  | succ f ih =>
+    change (0 &&& 1) + popCntGo f (0 >>> 1) = 0
+    simpa using ih
+
+/-- Parity of a XOR is the mod-2 sum of parities (low `f` bits). -/
+lemma popCntGo_xor_mod2 (f : Nat) : ∀ a b : Nat,
+    popCntGo f (a ^^^ b) % 2 = (popCntGo f a + popCntGo f b) % 2 := by
+  induction f with
+  | zero => intro a b; simp [popCntGo]
+  | succ f ih =>
+    intro a b
+    have hsh : (a ^^^ b) >>> 1 = a >>> 1 ^^^ b >>> 1 := by
+      apply Nat.eq_of_testBit_eq
+      intro i
+      simp [Nat.testBit_shiftRight, Nat.testBit_xor]
+    have hand : (a ^^^ b) &&& 1 = (a &&& 1) ^^^ (b &&& 1) :=
+      Nat.and_xor_distrib_right
+    change (((a ^^^ b) &&& 1) + popCntGo f ((a ^^^ b) >>> 1)) % 2
+        = (((a &&& 1) + popCntGo f (a >>> 1)) + ((b &&& 1) + popCntGo f (b >>> 1))) % 2
+    rw [hsh, hand]
+    have hih := ih (a >>> 1) (b >>> 1)
+    have h1 : a &&& 1 = a % 2 := Nat.and_one_is_mod a
+    have h2 : b &&& 1 = b % 2 := Nat.and_one_is_mod b
+    rw [h1, h2]
+    rcases Nat.mod_two_eq_zero_or_one a with e1 | e1 <;>
+      rcases Nat.mod_two_eq_zero_or_one b with e2 | e2 <;>
+      · rw [e1, e2]
+        first
+        | (rw [Nat.zero_xor]; omega)
+        | (rw [Nat.xor_zero]; omega)
+        | (rw [Nat.xor_self]; omega)
+
+/-- `{0,1}`-valued mod-2 sums are XORs. -/
+private lemma mod2_add_eq_xor {x y : Nat} (hx : x < 2) (hy : y < 2) :
+    (x + y) % 2 = x ^^^ y := by
+  interval_cases x <;> interval_cases y <;> rfl
+
+/-- A single set bit has popcount 1. -/
+lemma popCntGo_one_shiftLeft {n i : Nat} (hi : i < n) :
+    popCntGo n (1 <<< i) = 1 := by
+  rw [popCntGo_eq_card]
+  have hset : (Finset.range n).filter (fun j => (1 <<< i).testBit j) = {i} := by
+    ext j
+    simp only [Finset.mem_filter, Finset.mem_range, Finset.mem_singleton,
+      Nat.testBit_shiftLeft, testBit_one', Bool.and_eq_true, decide_eq_true_eq]
+    constructor
+    · rintro ⟨-, hge, hsub⟩
+      omega
+    · rintro rfl
+      exact ⟨hi, by omega, by omega⟩
+  rw [hset, Finset.card_singleton]
+
+/-- Tables with odd-weight columns give parity-preserving folds. -/
+lemma parity_xorFold_odd {tbl : List Nat} {n : Nat}
+    (hodd : ∀ i < n, popCntGo n (tbl.getD i 0) % 2 = 1) :
+    ∀ m < 2 ^ n, popCntGo n (xorFold tbl m) % 2 = popCntGo n m % 2 := by
+  have hF0 : popCntGo n (xorFold tbl 0) % 2 = 0 := by
+    rw [xorFold_zero, popCntGo_zero]
+  have hG0 : popCntGo n (0 : Nat) % 2 = 0 := by
+    rw [popCntGo_zero]
+  have hFx : ∀ m₁ m₂ : Nat, popCntGo n (xorFold tbl (m₁ ^^^ m₂)) % 2
+      = popCntGo n (xorFold tbl m₁) % 2 ^^^ popCntGo n (xorFold tbl m₂) % 2 := by
+    intro m₁ m₂
+    rw [xorFold_xor, popCntGo_xor_mod2, Nat.add_mod,
+      mod2_add_eq_xor (Nat.mod_lt _ (by omega)) (Nat.mod_lt _ (by omega))]
+  have hGx : ∀ m₁ m₂ : Nat, popCntGo n (m₁ ^^^ m₂) % 2
+      = popCntGo n m₁ % 2 ^^^ popCntGo n m₂ % 2 := by
+    intro m₁ m₂
+    rw [popCntGo_xor_mod2, Nat.add_mod,
+      mod2_add_eq_xor (Nat.mod_lt _ (by omega)) (Nat.mod_lt _ (by omega))]
+  have hbit : ∀ i < n, popCntGo n (xorFold tbl (1 <<< i)) % 2
+      = popCntGo n (1 <<< i) % 2 := by
+    intro i hi
+    rw [xorFold_bit, hodd i hi, popCntGo_one_shiftLeft hi]
+  exact linear_ext n hF0 hG0 hFx hGx hbit
+
+/-- Left-null filters vanishing on the columns vanish on the image. -/
+lemma parity_and_xorFold {tbl : List Nat} {ln : Nat} {n : Nat}
+    (hb : ∀ i < n, popCntGo n (ln &&& tbl.getD i 0) % 2 = 0) :
+    ∀ m < 2 ^ n, popCntGo n (ln &&& xorFold tbl m) % 2 = 0 := by
+  have hF0 : popCntGo n (ln &&& xorFold tbl 0) % 2 = 0 := by
+    rw [xorFold_zero, Nat.and_zero, popCntGo_zero]
+  have hFx : ∀ m₁ m₂ : Nat, popCntGo n (ln &&& xorFold tbl (m₁ ^^^ m₂)) % 2
+      = popCntGo n (ln &&& xorFold tbl m₁) % 2
+        ^^^ popCntGo n (ln &&& xorFold tbl m₂) % 2 := by
+    intro m₁ m₂
+    rw [xorFold_xor, Nat.and_xor_distrib_left, popCntGo_xor_mod2, Nat.add_mod,
+      mod2_add_eq_xor (Nat.mod_lt _ (by omega)) (Nat.mod_lt _ (by omega))]
+  have hbit : ∀ i < n, popCntGo n (ln &&& xorFold tbl (1 <<< i)) % 2 = 0 := by
+    intro i hi
+    rw [xorFold_bit]
+    exact hb i hi
+  exact linear_ext (G := fun _ => 0) n hF0 rfl hFx
+    (fun _ _ => by simp) hbit
+
+/-! ## §7  Composite-fold transfer (basis facts → map identities) -/
+
+/-- Basis composition facts extend to all masks: `t2 ∘ t1 = t3`. -/
+lemma xorFold_comp {t1 t2 t3 : List Nat} {n : Nat}
+    (hb : ∀ i < n, xorFold t2 (t1.getD i 0) = t3.getD i 0) :
+    ∀ m < 2 ^ n, xorFold t2 (xorFold t1 m) = xorFold t3 m := by
+  have hFx : ∀ m₁ m₂ : Nat, xorFold t2 (xorFold t1 (m₁ ^^^ m₂))
+      = xorFold t2 (xorFold t1 m₁) ^^^ xorFold t2 (xorFold t1 m₂) := by
+    intro m₁ m₂
+    rw [xorFold_xor, xorFold_xor]
+  have hbit : ∀ i < n, xorFold t2 (xorFold t1 (1 <<< i))
+      = xorFold t3 (1 <<< i) := by
+    intro i hi
+    rw [xorFold_bit, xorFold_bit]
+    exact hb i hi
+  exact linear_ext n (by simp) (by simp) hFx (xorFold_xor t3) hbit
+
+/-- Basis inverse facts extend to all masks: `t2 ∘ t1 = id`. -/
+lemma xorFold_comp_id {t1 t2 : List Nat} {n : Nat}
+    (hb : ∀ i < n, xorFold t2 (t1.getD i 0) = 1 <<< i) :
+    ∀ m < 2 ^ n, xorFold t2 (xorFold t1 m) = m := by
+  have hFx : ∀ m₁ m₂ : Nat, xorFold t2 (xorFold t1 (m₁ ^^^ m₂))
+      = xorFold t2 (xorFold t1 m₁) ^^^ xorFold t2 (xorFold t1 m₂) := by
+    intro m₁ m₂
+    rw [xorFold_xor, xorFold_xor]
+  have hbit : ∀ i < n, xorFold t2 (xorFold t1 (1 <<< i)) = 1 <<< i := by
+    intro i hi
+    rw [xorFold_bit]
+    exact hb i hi
+  exact linear_ext (G := fun m => m) n (by simp) rfl hFx (fun _ _ => rfl) hbit
+
+/-- Identity-column tables fold to the identity. -/
+lemma xorFold_id {t1 : List Nat} {n : Nat}
+    (hb : ∀ i < n, t1.getD i 0 = 1 <<< i) :
+    ∀ m < 2 ^ n, xorFold t1 m = m := by
+  have hbit : ∀ i < n, xorFold t1 (1 <<< i) = 1 <<< i := by
+    intro i hi
+    rw [xorFold_bit]
+    exact hb i hi
+  exact linear_ext (G := fun m => m) n (by simp) rfl (xorFold_xor t1)
+    (fun _ _ => rfl) hbit
+
+/-- Folding a table whose columns lie in a XOR-closed list stays in it. -/
+lemma xorFold_mem_closed {ann : List Nat} (h0 : (0 : Nat) ∈ ann)
+    (hcl : ∀ a ∈ ann, ∀ b ∈ ann, a ^^^ b ∈ ann) :
+    ∀ {tbl : List Nat}, (∀ c ∈ tbl, c ∈ ann) → ∀ m, xorFold tbl m ∈ ann := by
+  intro tbl
+  induction tbl with
+  | nil => intro _ m; simpa using h0
+  | cons c rest ih =>
+    intro hc m
+    change (if m &&& 1 = 1 then c else 0) ^^^ xorFold rest (m >>> 1) ∈ ann
+    refine hcl _ ?_ _ (ih (fun x hx => hc x (List.mem_cons_of_mem _ hx)) _)
+    split
+    · exact hc c List.mem_cons_self
+    · exact h0
+
+/-! ## §8  Classification and join consumption -/
+
+private lemma or3_eq_zero {a b c : Nat} (h : a ||| b ||| c = 0) :
+    a = 0 ∧ b = 0 ∧ c = 0 := by
+  have hbit : ∀ i, a.testBit i = false ∧ b.testBit i = false
+      ∧ c.testBit i = false := by
+    intro i
+    have h0 := congrArg (fun x => x.testBit i) h
+    simp only [Nat.testBit_or, Nat.zero_testBit, Bool.or_eq_false_iff] at h0
+    exact ⟨h0.1.1, h0.1.2, h0.2⟩
+  refine ⟨Nat.eq_of_testBit_eq fun i => ?_, Nat.eq_of_testBit_eq fun i => ?_,
+    Nat.eq_of_testBit_eq fun i => ?_⟩
+  · rw [(hbit i).1, Nat.zero_testBit]
+  · rw [(hbit i).2.1, Nat.zero_testBit]
+  · rw [(hbit i).2.2, Nat.zero_testBit]
+
+/-- `okTriple = true` means the triple is zero or classified. -/
+lemma okTriple_cases {cls : List Nat} {mu mw mt : Nat}
+    (h : okTriple cls mu mw mt = true) :
+    (mu = 0 ∧ mw = 0 ∧ mt = 0) ∨ packTriple mu mw mt ∈ cls := by
+  rcases Bool.or_eq_true_iff.mp h with h' | h'
+  · left
+    exact or3_eq_zero (by simpa using h')
+  · right
+    simpa using h'
+
+/-- **Join soundness**: two classified triples sharing `t` with total weight
+`≤ 9` pack to a listed generator row. -/
+theorem checkJoin_sound {cls0 cls1 rows : List Nat}
+    (hchk : checkJoin cls0 cls1 rows = true)
+    {mu0 mw0 mu1 mw1 mt : Nat}
+    (hu0 : mu0 < 2 ^ 30) (hw0 : mw0 < 2 ^ 30)
+    (hu1 : mu1 < 2 ^ 30) (hw1 : mw1 < 2 ^ 30) (hmt : mt < 2 ^ 30)
+    (h0 : packTriple mu0 mw0 mt ∈ cls0) (h1 : packTriple mu1 mw1 mt ∈ cls1)
+    (hwt : popCntGo 30 mu0 + popCntGo 30 mw0 + popCntGo 30 mu1
+        + popCntGo 30 mw1 + popCntGo 30 mt ≤ 9) :
+    pack5 (packTriple mu0 mw0 mt) (packTriple mu1 mw1 mt) ∈ rows := by
+  set pk0 := packTriple mu0 mw0 mt with hpk0
+  set pk1 := packTriple mu1 mw1 mt with hpk1
+  have hj0 : (pk0, pk0 >>> 60,
+      popCnt (pk0 &&& 1073741823) + popCnt ((pk0 >>> 30) &&& 1073741823))
+      ∈ joinPairs cls0 := List.mem_map_of_mem h0
+  have hj1 : (pk1, pk1 >>> 60,
+      popCnt (pk1 &&& 1073741823) + popCnt ((pk1 >>> 30) &&& 1073741823))
+      ∈ joinPairs cls1 := List.mem_map_of_mem h1
+  have h := List.all_eq_true.mp (List.all_eq_true.mp hchk _ hj0) _ hj1
+  have h' : ((pk0 >>> 60) != (pk1 >>> 60)
+      || decide (9 < (popCnt (pk0 &&& 1073741823)
+            + popCnt ((pk0 >>> 30) &&& 1073741823)
+          + (popCnt (pk1 &&& 1073741823)
+            + popCnt ((pk1 >>> 30) &&& 1073741823))
+          + popCnt (pk0 >>> 60)))
+      || rows.contains (pack5 pk0 pk1)) = true := h
+  have hand : ∀ x : Nat, x &&& 1073741823 = x % 2 ^ 30 := by
+    intro x
+    have h30 : (1073741823 : Nat) = 2 ^ 30 - 1 := by norm_num
+    rw [h30, Nat.and_two_pow_sub_one_eq_mod]
+  have ht0 : pk0 >>> 60 = mt := packTriple_hi mt hu0 hw0
+  have ht1 : pk1 >>> 60 = mt := packTriple_hi mt hu1 hw1
+  have hwsum : (popCnt (pk0 &&& 1073741823) + popCnt ((pk0 >>> 30) &&& 1073741823)
+      + (popCnt (pk1 &&& 1073741823) + popCnt ((pk1 >>> 30) &&& 1073741823))
+      + popCnt (pk0 >>> 60)) ≤ 9 := by
+    rw [ht0, hand pk0, hand pk1, hand (pk0 >>> 30), hand (pk1 >>> 30),
+      packTriple_lo mw0 mt hu0, packTriple_lo mw1 mt hu1,
+      packTriple_mid mt hu0 hw0, packTriple_mid mt hu1 hw1,
+      popCnt_eq hu0, popCnt_eq hu1, popCnt_eq hw0, popCnt_eq hw1,
+      popCnt_eq hmt]
+    omega
+  rcases Bool.or_eq_true_iff.mp h' with h'' | hcont
+  · exfalso
+    rcases Bool.or_eq_true_iff.mp h'' with hb | hd
+    · rw [ht0, ht1] at hb
+      simp at hb
+    · exact absurd (of_decide_eq_true hd) (by omega)
+  · simpa using hcont
+
+/-! ## §9  `pack5` extraction (for the row-reconstruction step) -/
+
+private lemma m60_testBit (i : Nat) :
+    (1152921504606846975 : Nat).testBit i = decide (i < 60) := by
+  have h : (1152921504606846975 : Nat) = 2 ^ 60 - 1 := by norm_num
+  rw [h, Nat.testBit_two_pow_sub_one]
+
+lemma pack5_mod (pk0 pk1 : Nat) : pack5 pk0 pk1 % 2 ^ 30 = pk0 % 2 ^ 30 := by
+  apply Nat.eq_of_testBit_eq
+  intro i
+  simp only [pack5, Nat.testBit_mod_two_pow, Nat.testBit_or, Nat.testBit_and,
+    Nat.testBit_shiftLeft, m60_testBit]
+  by_cases hi : i < 30
+  · have h60 : ¬(i ≥ 60) := by omega
+    have h120 : ¬(i ≥ 120) := by omega
+    have hlt : i < 60 := by omega
+    simp [hi, h60, h120, hlt]
+  · simp [hi]
+
+lemma pack5_shr30_mod (pk0 pk1 : Nat) :
+    (pack5 pk0 pk1 >>> 30) % 2 ^ 30 = (pk0 >>> 30) % 2 ^ 30 := by
+  apply Nat.eq_of_testBit_eq
+  intro i
+  simp only [pack5, Nat.testBit_mod_two_pow, Nat.testBit_shiftRight,
+    Nat.testBit_or, Nat.testBit_and, Nat.testBit_shiftLeft, m60_testBit]
+  by_cases hi : i < 30
+  · have h60 : ¬(30 + i ≥ 60) := by omega
+    have h120 : ¬(30 + i ≥ 120) := by omega
+    have hlt : 30 + i < 60 := by omega
+    simp [hi, h60, h120, hlt]
+  · simp [hi]
+
+lemma pack5_shr60_mod (pk0 pk1 : Nat) :
+    (pack5 pk0 pk1 >>> 60) % 2 ^ 30 = pk1 % 2 ^ 30 := by
+  apply Nat.eq_of_testBit_eq
+  intro i
+  simp only [pack5, Nat.testBit_mod_two_pow, Nat.testBit_shiftRight,
+    Nat.testBit_or, Nat.testBit_and, Nat.testBit_shiftLeft, m60_testBit]
+  by_cases hi : i < 30
+  · have hm : ¬(60 + i < 60) := by omega
+    have h60 : 60 + i ≥ 60 := by omega
+    have h120 : ¬(60 + i ≥ 120) := by omega
+    have hsub : 60 + i - 60 = i := by omega
+    have hlt : i < 60 := by omega
+    simp [hi, hm, h60, h120, hsub, hlt]
+  · simp [hi]
+
+lemma pack5_shr90_mod (pk0 pk1 : Nat) :
+    (pack5 pk0 pk1 >>> 90) % 2 ^ 30 = (pk1 >>> 30) % 2 ^ 30 := by
+  apply Nat.eq_of_testBit_eq
+  intro i
+  simp only [pack5, Nat.testBit_mod_two_pow, Nat.testBit_shiftRight,
+    Nat.testBit_or, Nat.testBit_and, Nat.testBit_shiftLeft, m60_testBit]
+  by_cases hi : i < 30
+  · have hm : ¬(90 + i < 60) := by omega
+    have h60 : 90 + i ≥ 60 := by omega
+    have h120 : ¬(90 + i ≥ 120) := by omega
+    have hsub : 90 + i - 60 = 30 + i := by omega
+    have hlt : 30 + i < 60 := by omega
+    simp [hi, hm, h60, h120, hsub, hlt]
+  · simp [hi]
+
+lemma pack5_shr120 (pk0 pk1 : Nat) :
+    pack5 pk0 pk1 >>> 120 = pk0 >>> 60 := by
+  apply Nat.eq_of_testBit_eq
+  intro i
+  simp only [pack5, Nat.testBit_shiftRight, Nat.testBit_or, Nat.testBit_and,
+    Nat.testBit_shiftLeft, m60_testBit]
+  have hm : ¬(120 + i < 60) := by omega
+  have h60 : 120 + i ≥ 60 := by omega
+  have h120 : 120 + i ≥ 120 := by omega
+  have hsub60 : 120 + i - 60 = 60 + i := by omega
+  have hm2 : ¬(60 + i < 60) := by omega
+  have hsub120 : 120 + i - 120 = i := by omega
+  simp [hm, h60, h120, hsub60, hm2, hsub120]
 
 end M150
 end LP
