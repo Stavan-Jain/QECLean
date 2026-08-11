@@ -2,6 +2,10 @@ import QEC.Stabilizer.Codes.Mitten.M150.Data
 import QEC.Stabilizer.Codes.Mitten.M150.Defs
 import QEC.Stabilizer.Codes.Mitten.M150.StabilizerCode
 import QEC.Stabilizer.Codes.Mitten.M150.Witness
+import QEC.Stabilizer.Codes.Mitten.M150.FloorCore
+import QEC.Stabilizer.Codes.Mitten.M150.FloorData
+import QEC.Stabilizer.Codes.Mitten.M150.FloorSweepX
+import QEC.Stabilizer.Codes.Mitten.M150.FloorSweepZ
 
 /-!
 # Mitten codes
