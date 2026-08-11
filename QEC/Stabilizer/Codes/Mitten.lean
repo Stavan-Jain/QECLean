@@ -1,5 +1,7 @@
 import QEC.Stabilizer.Codes.Mitten.M150.Data
 import QEC.Stabilizer.Codes.Mitten.M150.Defs
+import QEC.Stabilizer.Codes.Mitten.M150.StabilizerCode
+import QEC.Stabilizer.Codes.Mitten.M150.Witness
 
 /-!
 # Mitten codes
