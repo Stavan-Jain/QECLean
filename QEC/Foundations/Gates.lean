@@ -50,13 +50,14 @@ abbrev ThreeQubitGate : Type := QuantumGate ThreeQubitBasis
 /-- Gate type for n-qubit systems (indexed by NQubitBasis n). -/
 abbrev NQubitGate (n : ℕ) : Type := QuantumGate (NQubitBasis n)
 
+/-- The matrix underlying the inverse of a gate is the conjugate transpose. -/
 @[simp] lemma gate_inv_val
   {α : Type*} [Fintype α] [DecidableEq α]
   (G : QuantumGate α) :
   (G⁻¹ : QuantumGate α).val = star G.val := by
   rfl
 
--- Inverse-related lemmas (API stubs, proofs later)
+/-- The matrix inverse of a unitary gate's matrix is its conjugate transpose. -/
 @[simp] lemma gate_val_inv
   {α : Type*} [Fintype α] [DecidableEq α]
   (G : QuantumGate α) :
@@ -70,6 +71,7 @@ abbrev NQubitGate (n : ℕ) : Type := QuantumGate (NQubitBasis n)
     _ = 1 * star G.val := by rw [nonsing_inv_mul _ h_unit]
     _ = star G.val := by rw [one_mul]
 
+/-- A gate times its inverse is the identity matrix. -/
 @[simp] lemma gate_val_mul_inv
   {α : Type*} [Fintype α] [DecidableEq α]
   (G : QuantumGate α) :
@@ -77,6 +79,7 @@ abbrev NQubitGate (n : ℕ) : Type := QuantumGate (NQubitBasis n)
   rw [gate_inv_val]
   exact Matrix.mem_unitaryGroup_iff.1 G.2
 
+/-- A gate's inverse times the gate is the identity matrix. -/
 @[simp] lemma gate_val_inv_mul
   {α : Type*} [Fintype α] [DecidableEq α]
   (G : QuantumGate α) :
@@ -90,7 +93,7 @@ abbrev NQubitGate (n : ℕ) : Type := QuantumGate (NQubitBasis n)
   (G₁ G₂ : QuantumGate α) :
   (G₁ * G₂).val = G₁.val * G₂.val := rfl
 
-/-- The identity gate. -/
+/-- The matrix underlying the identity gate is the identity matrix. -/
 @[simp] lemma gate_one_val
 {α : Type*} [Fintype α] [DecidableEq α] :
   (1 : QuantumGate α).val = (1 : Matrix α α ℂ) := rfl
@@ -190,6 +193,7 @@ def conjByGate
 /-- The type of unit complex numbers (those with absolute value 1). -/
 def UnitComplex : Type := {z : ℂ // z * star z = 1}
 
+/-- Coerce a unit complex number to its underlying complex number. -/
 instance : Coe UnitComplex ℂ := ⟨Subtype.val⟩
 
 /-- Construct a unit complex number from a complex number and a proof that it
@@ -208,9 +212,13 @@ def UnitComplex.one : UnitComplex := ⟨1, by simp⟩
 /-- The complex number `-1` as a unit complex number. -/
 def UnitComplex.negOne : UnitComplex := ⟨-1, by simp⟩
 
+/-- `UnitComplex.one` coerces to the complex number `1`. -/
 @[simp] lemma UnitComplex.one_coe : (UnitComplex.one : ℂ) = 1 := rfl
+/-- `UnitComplex.negOne` coerces to the complex number `-1`. -/
 @[simp] lemma UnitComplex.negOne_coe : (UnitComplex.negOne : ℂ) = -1 := rfl
+/-- `UnitComplex.I` coerces to the complex number `i`. -/
 @[simp] lemma UnitComplex.I_coe : (UnitComplex.I : ℂ) = Complex.I := rfl
+/-- `UnitComplex.negI` coerces to the complex number `-i`. -/
 @[simp] lemma UnitComplex.negI_coe : (UnitComplex.negI : ℂ) = -Complex.I := rfl
 
 /-- Scalar multiplication of a gate by a unit complex number.
@@ -232,6 +240,7 @@ noncomputable instance smul_UnitComplex_QuantumGate
     simp only [h_unit, h_G, one_smul]
     }
 
+/-- The matrix underlying a phase-scaled gate is the scaled matrix. -/
 @[simp] lemma smul_UnitComplex_gate_val
   {α : Type*} [Fintype α] [DecidableEq α]
   (c : UnitComplex) (G : QuantumGate α) :
@@ -281,7 +290,6 @@ macro_rules
   | `(tactic| vec_expand) => `(
     tactic| (
       ext i
-      -- If the index is a pair, split it and case-split each component.
       first
         | (rcases i with ⟨i₁, i₂⟩
            <;> fin_cases i₁
@@ -309,35 +317,34 @@ macro_rules
     ))
 
 
+/-- Apply a matrix to a raw function `α → ℂ` (matrix-vector product). -/
 noncomputable abbrev applyMatrixVec' {α : Type*}
   [Fintype α] [DecidableEq α] :
   Matrix α α ℂ → (α → ℂ) → (α → ℂ) :=
   Matrix.mulVec
 
+/-- Apply a matrix to an amplitude `Vector α` (matrix-vector product). -/
 noncomputable abbrev applyMatrixVec
   {α : Type*} [Fintype α] [DecidableEq α] :
   Matrix α α ℂ → Vector α → Vector α :=
   Matrix.mulVec
 
 
+/-- Unitary gates are norm-preserving: `‖Uv‖ = ‖v‖` for every amplitude vector `v`. -/
 lemma gate_preserves_norm
   {α : Type*} [Fintype α] [DecidableEq α]
   (G : QuantumGate α) :
   ∀ v : Vector α, norm (Matrix.mulVec (G.val) v) = norm v :=
 by
   have h_unitary : ∀ (v : Quantum.Vector α), (star G.val).mulVec (G.val.mulVec v) = v := by
-    -- Since $G$ is unitary, we have $G.val * star G.val = 1$, which implies
-    -- that $(star G.val) * G.val = 1$ as well.
     have h_unitary : (star G.val) * G.val = 1 := by
       convert mul_eq_one_comm.mp ( G.2.2 ) using 1;
     exact fun v => by rw [ Matrix.mulVec_mulVec, h_unitary, Matrix.one_mulVec ] ;
-  -- By definition of norm, we have that ‖Gv‖^2 = ⟨Gv, Gv⟩.
   have h_norm_sq : ∀ (v : Quantum.Vector α),
       (Quantum.norm (G.val.mulVec v))^2 =
       ∑ i, (G.val.mulVec v i) * star (G.val.mulVec v i) := by
     simp +decide [ Quantum.norm, Complex.mul_conj, Complex.normSq_eq_norm_sq ];
     norm_cast ; norm_num [ Real.sq_sqrt ( Finset.sum_nonneg fun _ _ => sq_nonneg _ ) ];
-  -- By definition of inner product, we have that ⟨Gv, Gv⟩ = v* G* G v.
   have h_inner : ∀ (v : Quantum.Vector α),
       ∑ i, (G.val.mulVec v i) * star (G.val.mulVec v i) =
       ∑ i, v i * star (v i) := by
@@ -352,14 +359,14 @@ by
         Finset.sum_congr rfl fun _ _ => by ring )
     generalize_proofs at *; (
     rw [ h_inner, h_unitary ]);
-  -- By combining h_norm_sq and h_inner, we can conclude that the square of
-  -- the norm of Gv is equal to the square of the norm of v.
   intros v
   have := h_norm_sq v
   have := h_inner v
   simp_all +decide [ Complex.normSq, Complex.sq_norm ];
   simp_all +decide [ Complex.ext_iff, Finset.sum_add_distrib, mul_comm ]
 
+/-- Apply a gate to a quantum state, producing a quantum state (unitarity keeps
+the result normalized). -/
 noncomputable def applyGate
   {α : Type*} [Fintype α] [DecidableEq α]
   (G : QuantumGate α) (ψ : QuantumState α) :
@@ -372,49 +379,59 @@ by
   rw [ψ.property] at h
   exact h
 
+/-- The amplitude vector of `applyGate G ψ` is the matrix-vector product `G ψ`. -/
 @[simp] lemma applyGate_val
   {α : Type*} [Fintype α] [DecidableEq α]
   (G : QuantumGate α) (ψ : QuantumState α) :
   (applyGate G ψ).val = Matrix.mulVec (G.val) ψ.val := rfl
 
+/-- Coercion form of `applyGate_val`. -/
 @[simp] lemma applyGate_coe
   {α : Type*} [Fintype α] [DecidableEq α]
   (G : QuantumGate α) (ψ : QuantumState α) :
   (applyGate G ψ : Vector α) = Matrix.mulVec (G.val) ψ := rfl
 
+/-- Gates act on amplitude vectors by matrix-vector multiplication. -/
 noncomputable instance smul_Vector_by_QuantumGate
   {α : Type*} [Fintype α] [DecidableEq α] :
   SMul (QuantumGate α) (Vector α) :=
 { smul := fun U v => Matrix.mulVec (U.val) v }
 
+/-- Gates act on quantum states via `applyGate`. -/
 noncomputable instance smul_QuantumState_by_QuantumGate
   {α : Type*} [Fintype α] [DecidableEq α] :
   SMul (QuantumGate α) (QuantumState α) :=
 { smul := applyGate }
 
+/-- The vector coercion of `G • ψ` is the matrix-vector product `G ψ`. -/
 @[simp] lemma smul_val
   {α} [Fintype α] [DecidableEq α]
   (G : QuantumGate α) (ψ : QuantumState α) :
   (G • ψ : Vector α) = Matrix.mulVec (G.val) ψ := rfl
 
+/-- The `.val` field of `G • ψ` is the matrix-vector product `G ψ`. -/
 @[simp] lemma smul_QState_val
   {α : Type*} [Fintype α] [DecidableEq α]
   (G : QuantumGate α) (ψ : QuantumState α) :
   (G • ψ).val = Matrix.mulVec (G.val) ψ.val := rfl
 
+/-- A matrix is Hermitian when it equals its own conjugate transpose. -/
 def Hermitian {α : Type*} [DecidableEq α] [Fintype α] (M : Matrix α α ℂ) : Prop :=
   Mᴴ = M
 
+/-- Unfold `Hermitian` to the equation `Mᴴ = M`. -/
 @[simp] lemma Hermitian_def {α : Type*} [DecidableEq α] [Fintype α] (M : Matrix α α ℂ) :
   Hermitian M ↔ Mᴴ = M := Iff.rfl
 
+/-- A matrix is involutary when it squares to the identity. -/
 def Involutary {α : Type*} [Fintype α] [DecidableEq α] (M : Matrix α α ℂ) : Prop :=
   M * M = 1
 
+/-- Unfold `Involutary` to the equation `M * M = 1`. -/
 @[simp] lemma Involutary_def {α : Type*} [DecidableEq α] [Fintype α] (M : Matrix α α ℂ) :
   Involutary M ↔ M * M = 1 := Iff.rfl
 
--- Inverse-related lemmas (API stubs, proofs later)
+/-- An involutary matrix is its own inverse. -/
 lemma involutary_inv_eq
   {α : Type*} [Fintype α] [DecidableEq α]
   {M : Matrix α α ℂ} (h : Involutary M) :
@@ -444,14 +461,18 @@ lemma unitary_of_hermitian_involutary
 /-- Identity matrix on the qubit basis. -/
 def Imat : Matrix QubitBasis QubitBasis ℂ := 1
 
+/-- The identity matrix is Hermitian. -/
 lemma Imat_hermitian : Hermitian Imat := by
   rw [Hermitian_def, Imat, conjTranspose_one]
 
+/-- The identity matrix is involutary. -/
 lemma Imat_involutary : Involutary Imat := by
   rw [Involutary_def, Imat, mul_one]
 
+/-- `Imat` squares to the identity. -/
 @[simp] lemma Imat_sq : Imat * Imat = 1 := Imat_involutary
 
+/-- The identity matrix is unitary. -/
 lemma Imat_mem_unitaryGroup :
   Imat ∈ Matrix.unitaryGroup QubitBasis ℂ := by
   have h := unitary_of_hermitian_involutary Imat_hermitian Imat_involutary
@@ -461,26 +482,27 @@ lemma Imat_mem_unitaryGroup :
 noncomputable def I : OneQubitGate :=
   ⟨Imat, Imat_mem_unitaryGroup⟩
 
-/- Pauli X matrix -/
+/-- Pauli X matrix, indexed by the qubit basis `Fin 2`. -/
 def Xmat : Matrix QubitBasis QubitBasis ℂ := !![0, 1; 1, 0]
 
+/-- The Pauli X matrix is Hermitian. -/
 lemma Xmat_hermitian : Hermitian Xmat := by matrix_expand[Xmat]
 
+/-- The Pauli X matrix is involutary. -/
 lemma Xmat_involutary : Involutary Xmat := by matrix_expand[Xmat]
 
+/-- `Xmat` squares to the identity. -/
 @[simp] lemma Xmat_sq : Xmat * Xmat = 1 := Xmat_involutary
 
+/-- The Pauli X matrix is unitary. -/
 lemma Xmat_mem_unitaryGroup :
   Xmat ∈ Matrix.unitaryGroup QubitBasis ℂ :=
 by
-  -- old lemma: gives (UUᴴ = 1 ∧ UᴴU = 1)
   have h := unitary_of_hermitian_involutary Xmat_hermitian Xmat_involutary
-  -- we only need U * Uᴴ = 1
   have hU : Xmat * Xmatᴴ = 1 := h.1
-  -- mathlib's membership lemma:
-  --   A ∈ unitaryGroup ↔ A ⬝ Aᴴ = 1
   exact (Matrix.mem_unitaryGroup_iff.mpr hU)
 
+/-- Pauli X as a one-qubit gate. -/
 noncomputable def X : OneQubitGate :=
 { val      := Xmat
 , property := Xmat_mem_unitaryGroup }
@@ -489,12 +511,16 @@ noncomputable def X : OneQubitGate :=
 def Ymat : Matrix QubitBasis QubitBasis ℂ :=
   !![0, -Complex.I; Complex.I, 0]
 
+/-- The Pauli Y matrix is Hermitian. -/
 lemma Ymat_hermitian : Hermitian Ymat := by matrix_expand[Ymat]
 
+/-- The Pauli Y matrix is involutary. -/
 lemma Ymat_involutary : Involutary Ymat := by matrix_expand[Ymat]
 
+/-- `Ymat` squares to the identity. -/
 @[simp] lemma Ymat_sq : Ymat * Ymat = 1 := Ymat_involutary
 
+/-- The Pauli Y matrix is unitary. -/
 lemma Ymat_mem_unitaryGroup :
   Ymat ∈ Matrix.unitaryGroup QubitBasis ℂ :=
 by
@@ -511,10 +537,13 @@ noncomputable def Y : OneQubitGate :=
 def Zmat : Matrix QubitBasis QubitBasis ℂ :=
   !![1, 0; 0, -1]
 
+/-- The Pauli Z matrix is Hermitian. -/
 lemma Zmat_hermitian : Hermitian Zmat := by matrix_expand[Zmat]
 
+/-- The Pauli Z matrix is involutary. -/
 lemma Zmat_involutary : Involutary Zmat := by matrix_expand[Zmat]
 
+/-- `Zmat` squares to the identity. -/
 @[simp] lemma Zmat_sq : Zmat * Zmat = 1 := Zmat_involutary
 
 /-- Pauli matrix cross products: X * Y = iZ -/
@@ -535,6 +564,7 @@ lemma Zmat_mul_Xmat : Zmat * Xmat = Complex.I • Ymat := by matrix_expand[Xmat,
 /-- Pauli matrix cross products: X * Z = -iY -/
 lemma Xmat_mul_Zmat : Xmat * Zmat = -Complex.I • Ymat := by matrix_expand[Xmat, Ymat, Zmat]
 
+/-- The Pauli Z matrix is unitary. -/
 lemma Zmat_mem_unitaryGroup :
   Zmat ∈ Matrix.unitaryGroup QubitBasis ℂ :=
 by
@@ -546,12 +576,16 @@ by
 noncomputable def Hmat : Matrix QubitBasis QubitBasis ℂ :=
   (1 / Real.sqrt 2) • !![1, 1; 1, -1]
 
+/-- The Hadamard matrix is Hermitian. -/
 lemma Hmat_hermitian : Hermitian Hmat := by matrix_expand[Hmat]
 
+/-- The Hadamard matrix is involutary. -/
 lemma Hmat_involutary : Involutary Hmat := by matrix_expand[Hmat]
 
+/-- `Hmat` squares to the identity. -/
 @[simp] lemma Hmat_sq : Hmat * Hmat = 1 := Hmat_involutary
 
+/-- The Hadamard matrix is unitary. -/
 lemma Hmat_mem_unitaryGroup :
   Hmat ∈ Matrix.unitaryGroup QubitBasis ℂ :=
 by
@@ -570,10 +604,15 @@ noncomputable def Z : OneQubitGate :=
 { val := Zmat
 , property := Zmat_mem_unitaryGroup }
 
+/-- The matrix underlying the gate `I` is `Imat`. -/
 @[simp] lemma coe_I : (I : Matrix QubitBasis QubitBasis ℂ) = Imat := rfl
+/-- The matrix underlying the gate `X` is `Xmat`. -/
 @[simp] lemma coe_X : (X : Matrix QubitBasis QubitBasis ℂ) = Xmat := rfl
+/-- The matrix underlying the gate `Y` is `Ymat`. -/
 @[simp] lemma coe_Y : (Y : Matrix QubitBasis QubitBasis ℂ) = Ymat := rfl
+/-- The matrix underlying the gate `Z` is `Zmat`. -/
 @[simp] lemma coe_Z : (Z : Matrix QubitBasis QubitBasis ℂ) = Zmat := rfl
+/-- The matrix underlying the gate `H` is `Hmat`. -/
 @[simp] lemma coe_H : (H : Matrix QubitBasis QubitBasis ℂ) = Hmat := rfl
 
 /-- Pauli gate cross products: X * Y = iZ -/
@@ -618,22 +657,27 @@ noncomputable def Z : OneQubitGate :=
       UnitComplex.negI_coe]
     exact Xmat_mul_Zmat)
 
+/-- `I` is self-inverse (it is Hermitian and involutary). -/
 @[simp] lemma inv_I : I⁻¹ = I := by
   ext
   rw [gate_inv_val, coe_I, star_eq_conjTranspose, (Hermitian_def Imat).1 Imat_hermitian]
 
+/-- `X` is self-inverse (it is Hermitian and involutary). -/
 @[simp] lemma inv_X : X⁻¹ = X := by
   ext
   rw [gate_inv_val, coe_X, star_eq_conjTranspose, (Hermitian_def Xmat).1 Xmat_hermitian]
 
+/-- `Y` is self-inverse (it is Hermitian and involutary). -/
 @[simp] lemma inv_Y : Y⁻¹ = Y := by
   ext
   rw [gate_inv_val, coe_Y, star_eq_conjTranspose, (Hermitian_def Ymat).1 Ymat_hermitian]
 
+/-- `Z` is self-inverse (it is Hermitian and involutary). -/
 @[simp] lemma inv_Z : Z⁻¹ = Z := by
   ext
   rw [gate_inv_val, coe_Z, star_eq_conjTranspose, (Hermitian_def Zmat).1 Zmat_hermitian]
 
+/-- `H` is self-inverse (it is Hermitian and involutary). -/
 @[simp] lemma inv_H : H⁻¹ = H := by
   ext
   rw [gate_inv_val, coe_H, star_eq_conjTranspose, (Hermitian_def Hmat).1 Hmat_hermitian]
@@ -657,34 +701,39 @@ noncomputable def S : OneQubitGate :=
 /-- The inverse of the phase gate S (S†). -/
 noncomputable def inv_S : OneQubitGate := S⁻¹
 
+/-- The matrix underlying the gate `S` is `Smat`. -/
 @[simp] lemma coe_S : (S : Matrix QubitBasis QubitBasis ℂ) = Smat := rfl
 
+/-- The matrix underlying `inv_S` is the conjugate transpose of `Smat`. -/
 lemma inv_S_val : inv_S.val = star S.val := by
   rw [inv_S, gate_inv_val]
 
+/-- X flips |0⟩ to |1⟩. -/
 @[simp] lemma X_on_ket0 : X • |0⟩ = |1⟩ := by
   vec_expand_simp [Xmat, ket0, ket1]
 
+/-- X flips |1⟩ to |0⟩. -/
 @[simp] lemma X_on_ket1 : X • |1⟩ = |0⟩ := by
   vec_expand_simp [Xmat, ket0, ket1]
 
--- Controlled version of a gate `g` on `k`, acting on `QubitBasis × k`.
+/-- Controlled version of a gate `g` on `k`, acting on `QubitBasis × k`.
+
+The first factor is the control qubit: on the `|0⟩` block the gate acts as the
+identity on `k`, on the `|1⟩` block it acts as `g`, and the off-diagonal blocks
+are zero.
+-/
 noncomputable def controllize
   {k : Type*} [Fintype k] [DecidableEq k]
   (g : QuantumGate k) : QuantumGate (QubitBasis × k) :=
 by
   classical
   exact ⟨
-    -- underlying matrix
     Matrix.of (fun (q₁, t₁) (q₂, t₂) =>
       if (q₁, q₂) = (0, 0) then
-        -- control = 0: act as identity on k
         (if t₁ = t₂ then (1 : ℂ) else 0)
       else if (q₁, q₂) = (1, 1) then
-        -- control = 1: apply g on k
         (g : Matrix k k ℂ) t₁ t₂
       else
-        -- off-diagonal blocks: zero
         0)
     ,
     by
@@ -696,6 +745,7 @@ by
   ⟩
 scoped notation "C[" g "]" => controllize g
 
+/-- The block matrix underlying `controllize g`. -/
 @[simp] lemma controllize_val
   {k : Type*} [Fintype k] [DecidableEq k]
   (g : QuantumGate k) :
@@ -709,11 +759,14 @@ scoped notation "C[" g "]" => controllize g
         0) :=
 rfl
 
-/-- CNOT gate on two qubits: control = first, target = second. -/
+/-- CNOT gate on two qubits: control = first, target = second.
+
+This is `controllize X` with `k = QubitBasis`.
+-/
 noncomputable def CNOT : TwoQubitGate :=
   C[X]
-  -- i.e. controllize X, with k = QubitBasis
 
+/-- Pointwise amplitudes of the two-qubit basis state `ket00`. -/
 @[simp] lemma ket00_apply
   (q : QubitBasis) (t : QubitBasis) :
   (|00⟩ : QuantumState TwoQubitBasis).val (q, t)
@@ -721,15 +774,19 @@ noncomputable def CNOT : TwoQubitGate :=
 by
   simp [ket00]
 
+/-- CNOT maps |00⟩ to |00⟩. -/
 lemma CNOT_on_ket00 : CNOT • |00⟩ = |00⟩ := by
   vec_expand_simp [Matrix.mulVec, CNOT, ket00]
 
+/-- CNOT maps |01⟩ to |01⟩. -/
 lemma CNOT_on_ket01 : CNOT • |01⟩ = |01⟩ := by
   vec_expand_simp[Matrix.mulVec, CNOT, ket01]
 
+/-- CNOT maps |10⟩ to |11⟩. -/
 lemma CNOT_on_ket10 : CNOT • |10⟩ = |11⟩ := by
   vec_expand_simp[Matrix.mulVec, CNOT, ket10, ket11, Xmat]
 
+/-- CNOT maps |11⟩ to |10⟩. -/
 lemma CNOT_on_ket11 : CNOT • |11⟩ = |10⟩ := by
   vec_expand_simp[Matrix.mulVec, CNOT, ket10, ket11, Xmat]
 

@@ -30,6 +30,8 @@ namespace Quantum
 open Matrix
 open Kronecker
 
+/-- The conjugate transpose of a Kronecker product is the Kronecker product of the
+conjugate transposes. -/
 @[simp]
 theorem star_kron
   {α β : Type*}
@@ -51,6 +53,8 @@ theorem kron_unitary
   classical
   simp [Matrix.mem_unitaryGroup_iff, star_kron, ← Matrix.mul_kronecker_mul]
 
+/-- Tensor product of two gates: the Kronecker product of their matrices, acting
+independently on the two subsystems. -/
 noncomputable def tensorGate
   {α β : Type*}
   [Fintype α] [DecidableEq α]
@@ -64,6 +68,7 @@ by
 
 scoped notation G₁:60 " ⊗ᵍ " G₂:60 => tensorGate G₁ G₂
 
+/-- The matrix underlying `tensorGate G₁ G₂` is the Kronecker product `G₁ ⊗ₖ G₂`. -/
 @[simp]
 lemma tensorGate_val
   {α β : Type*} [Fintype α] [DecidableEq α]
@@ -95,7 +100,8 @@ by
   erw [ Finset.sum_product ]
   simp_all [ ←Finset.mul_sum]
 
-/-- Tensor product of quantum states. -/
+/-- Tensor product of two quantum states: amplitudes multiply component-wise,
+and the result is again normalized. -/
 noncomputable def tensorState
   {α β : Type*} [Fintype α] [DecidableEq α]
   [Fintype β] [DecidableEq β]
@@ -103,23 +109,27 @@ noncomputable def tensorState
   QuantumState (α × β) :=
 by
   refine ⟨tensorVec ψ.val φ.val, ?_⟩
-  -- use the norm lemma with hv := ψ.property, hw := φ.property
   exact norm_tensorVec_of_norm1 ψ.property φ.property
 
 scoped notation ψ:60 " ⊗ₛ " φ:60 => tensorState ψ φ
 
+/-- X on the first of two qubits (X ⊗ I). -/
 noncomputable def X_q1_2 : TwoQubitGate :=
   tensorGate X 1
 
+/-- X on the second of two qubits (I ⊗ X). -/
 noncomputable def X_q2_2 : TwoQubitGate :=
   tensorGate 1 X
 
+/-- Z on the first of two qubits (Z ⊗ I). -/
 noncomputable def Z_q1_2 : TwoQubitGate :=
   tensorGate Z 1
 
+/-- Z on the second of two qubits (I ⊗ Z). -/
 noncomputable def Z_q2_2 : TwoQubitGate :=
   tensorGate 1 Z
 
+/-- X on the first qubit and Z on the second (X ⊗ Z). -/
 noncomputable def X_q1Z_q2_2 : TwoQubitGate :=
   tensorGate X Z
 
@@ -131,171 +141,215 @@ noncomputable def XX_2 : TwoQubitGate :=
 noncomputable def ZZ_2 : TwoQubitGate :=
   tensorGate Z Z
 
+/-- X ⊗ I: |00⟩ ↦ |10⟩. -/
 @[simp] lemma X_q1_2_on_ket00 : X_q1_2 • |00⟩ = |10⟩ := by
   vec_expand_simp [X_q1_2, Matrix.mulVec, ket00, ket10, Xmat]
 
+/-- X ⊗ I: |01⟩ ↦ |11⟩. -/
 @[simp] lemma X_q1_2_on_ket01 : X_q1_2 • |01⟩ = |11⟩ := by
   vec_expand_simp [X_q1_2,  Matrix.mulVec, ket01, ket11, Xmat]
 
+/-- X ⊗ I: |10⟩ ↦ |00⟩. -/
 @[simp] lemma X_q1_2_on_ket10 : X_q1_2 • |10⟩ = |00⟩ := by
   vec_expand_simp [X_q1_2,  Matrix.mulVec, ket10, ket00, Xmat]
 
+/-- X ⊗ I: |11⟩ ↦ |01⟩. -/
 @[simp] lemma X_q1_2_on_ket11 : X_q1_2 • |11⟩ = |01⟩ := by
   vec_expand_simp [X_q1_2,  Matrix.mulVec, ket11, ket01, Xmat]
 
+/-- I ⊗ X: |00⟩ ↦ |01⟩. -/
 @[simp] lemma X_q2_2_on_ket00 : X_q2_2 • |00⟩ = |01⟩ := by
   vec_expand_simp [X_q2_2,  Matrix.mulVec, ket00, ket01, Xmat]
 
+/-- I ⊗ X: |01⟩ ↦ |00⟩. -/
 @[simp] lemma X_q2_2_on_ket01 : X_q2_2 • |01⟩ = |00⟩ := by
   vec_expand_simp [X_q2_2,  Matrix.mulVec, ket01, ket00, Xmat]
 
+/-- I ⊗ X: |10⟩ ↦ |11⟩. -/
 @[simp] lemma X_q2_2_on_ket10 : X_q2_2 • |10⟩ = |11⟩ := by
   vec_expand_simp [X_q2_2,  Matrix.mulVec, ket10, ket11, Xmat]
 
+/-- I ⊗ X: |11⟩ ↦ |10⟩. -/
 @[simp] lemma X_q2_2_on_ket11 : X_q2_2 • |11⟩ = |10⟩ := by
   vec_expand_simp [X_q2_2,  Matrix.mulVec, ket11, ket10, Xmat]
 
--- X on first qubit, I on others: X ⊗ I ⊗ I
+/-- X on the first of three qubits (X ⊗ I ⊗ I). -/
 noncomputable def X_q1_3 : ThreeQubitGate :=
   tensorGate X 1
 
--- X on second qubit, I elsewhere: I ⊗ X ⊗ I
+/-- X on the second of three qubits (I ⊗ X ⊗ I). -/
 noncomputable def X_q2_3 : ThreeQubitGate :=
   tensorGate 1 (tensorGate X 1)
 
--- X on third qubit, I elsewhere: I ⊗ I ⊗ X
+/-- X on the third of three qubits (I ⊗ I ⊗ X). -/
 noncomputable def X_q3_3 : ThreeQubitGate :=
   tensorGate 1 (tensorGate 1 X)
 
--- X on qubits 1 2 3 (X ⊗ X ⊗ X)
+/-- X on all three qubits (X ⊗ X ⊗ X). -/
 noncomputable def X_q1q2q3_3 : ThreeQubitGate :=
   tensorGate X (tensorGate X X)
 
+/-- X ⊗ I ⊗ I: |000⟩ ↦ |100⟩. -/
 @[simp] lemma X_q1_3_on_ket000 : X_q1_3 • ket000 = ket100 := by
   vec_expand_simp [X_q1_3, Matrix.mulVec, Xmat]
 
+/-- X ⊗ I ⊗ I: |001⟩ ↦ |101⟩. -/
 @[simp] lemma X_q1_3_on_ket001 : X_q1_3 • ket001 = ket101 := by
   vec_expand_simp [X_q1_3, Matrix.mulVec, Xmat]
 
+/-- X ⊗ I ⊗ I: |010⟩ ↦ |110⟩. -/
 @[simp] lemma X_q1_3_on_ket010 : X_q1_3 • ket010 = ket110 := by
   vec_expand_simp [X_q1_3, Matrix.mulVec, Xmat]
 
+/-- X ⊗ I ⊗ I: |011⟩ ↦ |111⟩. -/
 @[simp] lemma X_q1_3_on_ket011 : X_q1_3 • ket011 = ket111 := by
   vec_expand_simp [X_q1_3, Matrix.mulVec, Xmat]
 
+/-- X ⊗ I ⊗ I: |100⟩ ↦ |000⟩. -/
 @[simp] lemma X_q1_3_on_ket100 : X_q1_3 • ket100 = ket000 := by
   vec_expand_simp [X_q1_3, Matrix.mulVec, Xmat]
 
+/-- X ⊗ I ⊗ I: |101⟩ ↦ |001⟩. -/
 @[simp] lemma X_q1_3_on_ket101 : X_q1_3 • ket101 = ket001 := by
   vec_expand_simp [X_q1_3, Matrix.mulVec, Xmat]
 
+/-- X ⊗ I ⊗ I: |110⟩ ↦ |010⟩. -/
 @[simp] lemma X_q1_3_on_ket110 : X_q1_3 • ket110 = ket010 := by
   vec_expand_simp [X_q1_3, Matrix.mulVec, Xmat]
 
+/-- X ⊗ I ⊗ I: |111⟩ ↦ |011⟩. -/
 @[simp] lemma X_q1_3_on_ket111 : X_q1_3 • ket111 = ket011 := by
   vec_expand_simp [X_q1_3, Matrix.mulVec, Xmat]
 
+/-- X ⊗ X ⊗ X: |000⟩ ↦ |111⟩. -/
 @[simp] lemma X_q1q2q3_on_ket000 : X_q1q2q3_3 • ket000 = ket111 := by
   vec_expand_simp[X_q1q2q3_3, Matrix.mulVec, Xmat]
 
+/-- X ⊗ X ⊗ X: |111⟩ ↦ |000⟩. -/
 @[simp] lemma X_q1q2q3_on_ket111 : X_q1q2q3_3 • ket111 = ket000 := by
   vec_expand_simp[X_q1q2q3_3, Matrix.mulVec, Xmat]
 
-/-
-  X_q2_3 : I ⊗ X ⊗ I
-  Flips the second bit.
--/
+/-! ### `X_q2_3` (I ⊗ X ⊗ I): flips the second bit -/
 
+
+/-- I ⊗ X ⊗ I: |000⟩ ↦ |010⟩. -/
 @[simp] lemma X_q2_3_on_ket000 : X_q2_3 • ket000 = ket010 := by
   vec_expand_simp [X_q2_3, Matrix.mulVec, Xmat]
 
+/-- I ⊗ X ⊗ I: |001⟩ ↦ |011⟩. -/
 @[simp] lemma X_q2_3_on_ket001 : X_q2_3 • ket001 = ket011 := by
   vec_expand_simp [X_q2_3, Matrix.mulVec, Xmat]
 
+/-- I ⊗ X ⊗ I: |010⟩ ↦ |000⟩. -/
 @[simp] lemma X_q2_3_on_ket010 : X_q2_3 • ket010 = ket000 := by
   vec_expand_simp [X_q2_3, Matrix.mulVec, Xmat]
 
+/-- I ⊗ X ⊗ I: |011⟩ ↦ |001⟩. -/
 @[simp] lemma X_q2_3_on_ket011 : X_q2_3 • ket011 = ket001 := by
   vec_expand_simp [X_q2_3, Matrix.mulVec, Xmat]
 
+/-- I ⊗ X ⊗ I: |100⟩ ↦ |110⟩. -/
 @[simp] lemma X_q2_3_on_ket100 : X_q2_3 • ket100 = ket110 := by
   vec_expand_simp [X_q2_3, Matrix.mulVec, Xmat]
 
+/-- I ⊗ X ⊗ I: |101⟩ ↦ |111⟩. -/
 @[simp] lemma X_q2_3_on_ket101 : X_q2_3 • ket101 = ket111 := by
   vec_expand_simp [X_q2_3, Matrix.mulVec, Xmat]
 
+/-- I ⊗ X ⊗ I: |110⟩ ↦ |100⟩. -/
 @[simp] lemma X_q2_3_on_ket110 : X_q2_3 • ket110 = ket100 := by
   vec_expand_simp [X_q2_3, Matrix.mulVec, Xmat]
 
+/-- I ⊗ X ⊗ I: |111⟩ ↦ |101⟩. -/
 @[simp] lemma X_q2_3_on_ket111 : X_q2_3 • ket111 = ket101 := by
   vec_expand_simp [X_q2_3, Matrix.mulVec, Xmat]
 
 
-/-
-  X_q3_3 : I ⊗ I ⊗ X
-  Flips the third bit.
--/
+/-! ### `X_q3_3` (I ⊗ I ⊗ X): flips the third bit -/
 
+
+/-- I ⊗ I ⊗ X: |000⟩ ↦ |001⟩. -/
 @[simp] lemma X_q3_3_on_ket000 : X_q3_3 • ket000 = ket001 := by
   vec_expand_simp [X_q3_3, Matrix.mulVec, Xmat]
 
+/-- I ⊗ I ⊗ X: |001⟩ ↦ |000⟩. -/
 @[simp] lemma X_q3_3_on_ket001 : X_q3_3 • ket001 = ket000 := by
   vec_expand_simp [X_q3_3, Matrix.mulVec, Xmat]
 
+/-- I ⊗ I ⊗ X: |010⟩ ↦ |011⟩. -/
 @[simp] lemma X_q3_3_on_ket010 : X_q3_3 • ket010 = ket011 := by
   vec_expand_simp [X_q3_3, Matrix.mulVec, Xmat]
 
+/-- I ⊗ I ⊗ X: |011⟩ ↦ |010⟩. -/
 @[simp] lemma X_q3_3_on_ket011 : X_q3_3 • ket011 = ket010 := by
   vec_expand_simp [X_q3_3, Matrix.mulVec, Xmat]
 
+/-- I ⊗ I ⊗ X: |100⟩ ↦ |101⟩. -/
 @[simp] lemma X_q3_3_on_ket100 : X_q3_3 • ket100 = ket101 := by
   vec_expand_simp [X_q3_3, Matrix.mulVec, Xmat]
 
+/-- I ⊗ I ⊗ X: |101⟩ ↦ |100⟩. -/
 @[simp] lemma X_q3_3_on_ket101 : X_q3_3 • ket101 = ket100 := by
   vec_expand_simp [X_q3_3, Matrix.mulVec, Xmat]
 
+/-- I ⊗ I ⊗ X: |110⟩ ↦ |111⟩. -/
 @[simp] lemma X_q3_3_on_ket110 : X_q3_3 • ket110 = ket111 := by
   vec_expand_simp [X_q3_3, Matrix.mulVec, Xmat]
 
+/-- I ⊗ I ⊗ X: |111⟩ ↦ |110⟩. -/
 @[simp] lemma X_q3_3_on_ket111 : X_q3_3 • ket111 = ket110 := by
   vec_expand_simp [X_q3_3, Matrix.mulVec, Xmat]
 
-/-- CNOT on qubits 1 (control) and 2 (target) of a 3-qubit register. -/
+/-- CNOT on qubits 1 (control) and 2 (target) of a 3-qubit register.
+
+The control sits on q1 and the controlled gate on `(q2, q3)` flips q2 only.
+-/
 noncomputable def CNOT_q1_q2_3 : ThreeQubitGate :=
-  -- control on q1, gate on (q2,q3) flips q2 only
   controllize (X_q1_2)
 
-/-- CNOT on qubits 1 (control) and 3 (target) of a 3-qubit register. -/
+/-- CNOT on qubits 1 (control) and 3 (target) of a 3-qubit register.
+
+The control sits on q1 and the controlled gate on `(q2, q3)` flips q3 only.
+-/
 noncomputable def CNOT_q1_q3_3 : ThreeQubitGate :=
-  -- control on q1, gate on (q2,q3) flips q3 only
   controllize (X_q2_2)
 
-/-- CNOT on qubits 2 (control) and 3 (target) of a 3-qubit register. -/
+/-- CNOT on qubits 2 (control) and 3 (target) of a 3-qubit register.
+
+This is the identity on q1 tensored with CNOT on `(q2, q3)`.
+-/
 noncomputable def CNOT_q2_q3_3 : ThreeQubitGate :=
-  -- identity on q1, CNOT on (q2,q3)
   tensorGate (1 : OneQubitGate) CNOT
 
+/-- CNOT with control q2 and target q3: |000⟩ ↦ |000⟩. -/
 @[simp] lemma CNOT_q2_q3_3_on_ket000 : CNOT_q2_q3_3 • ket000 = ket000 := by
   vec_expand_simp [CNOT_q2_q3_3, Matrix.mulVec, CNOT, controllize, Xmat]
 
+/-- CNOT with control q2 and target q3: |001⟩ ↦ |001⟩. -/
 @[simp] lemma CNOT_q2_q3_3_on_ket001 : CNOT_q2_q3_3 • ket001 = ket001 := by
   vec_expand_simp [CNOT_q2_q3_3,  Matrix.mulVec, CNOT, controllize, Xmat]
 
+/-- CNOT with control q2 and target q3: |010⟩ ↦ |011⟩. -/
 @[simp] lemma CNOT_q2_q3_3_on_ket010 : CNOT_q2_q3_3 • ket010 = ket011 := by
   vec_expand_simp [CNOT_q2_q3_3,  Matrix.mulVec, CNOT, controllize, Xmat]
 
+/-- CNOT with control q2 and target q3: |011⟩ ↦ |010⟩. -/
 @[simp] lemma CNOT_q2_q3_3_on_ket011 : CNOT_q2_q3_3 • ket011 = ket010 := by
   vec_expand_simp [CNOT_q2_q3_3,  Matrix.mulVec, CNOT, controllize, Xmat]
 
+/-- CNOT with control q2 and target q3: |100⟩ ↦ |100⟩. -/
 @[simp] lemma CNOT_q2_q3_3_on_ket100 : CNOT_q2_q3_3 • ket100 = ket100 := by
   vec_expand_simp [CNOT_q2_q3_3,  Matrix.mulVec, CNOT, controllize, Xmat]
 
+/-- CNOT with control q2 and target q3: |101⟩ ↦ |101⟩. -/
 @[simp] lemma CNOT_q2_q3_3_on_ket101 : CNOT_q2_q3_3 • ket101 = ket101 := by
   vec_expand_simp [CNOT_q2_q3_3,  Matrix.mulVec, CNOT, controllize, Xmat]
 
+/-- CNOT with control q2 and target q3: |110⟩ ↦ |111⟩. -/
 @[simp] lemma CNOT_q2_q3_3_on_ket110 : CNOT_q2_q3_3 • ket110 = ket111 := by
   vec_expand_simp [CNOT_q2_q3_3,  Matrix.mulVec, CNOT, controllize, Xmat]
 
+/-- CNOT with control q2 and target q3: |111⟩ ↦ |110⟩. -/
 @[simp] lemma CNOT_q2_q3_3_on_ket111 : CNOT_q2_q3_3 • ket111 = ket110 := by
   vec_expand_simp [CNOT_q2_q3_3,  Matrix.mulVec, CNOT, controllize, Xmat]
 
