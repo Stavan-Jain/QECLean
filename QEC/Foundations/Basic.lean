@@ -37,9 +37,11 @@ variable {α : Type*} [Fintype α] [DecidableEq α]
 /-- Complex amplitude vector over basis `α` (not necessarily normalized). -/
 abbrev Vector (α : Type*) [Fintype α] [DecidableEq α] := α → ℂ
 
+/-- Euclidean norm of an amplitude vector: `√(∑ᵢ ‖v i‖²)`. -/
 noncomputable def norm (v : Vector α) :=
   Real.sqrt (∑ i, ‖v i‖^2)
 
+/-- Unfold `norm` into the square root of the sum of squared magnitudes. -/
 @[simp] lemma norm_def {v : Vector α} : norm v = Real.sqrt (∑ i, ‖v i‖^2) := rfl
 
 /-- The norm is always non-negative. -/
@@ -113,6 +115,8 @@ This is isomorphic to `NQubitBasis 2` but uses tuples for convenience with
 pattern matching and tensor products. Use `TwoQubitBasis.toNQubitBasis` to convert.
 -/
 abbrev TwoQubitBasis : Type := QubitBasis × QubitBasis
+
+/-- Normalized 2-qubit state. -/
 abbrev TwoQubitState : Type := QuantumState TwoQubitBasis
 
 /-- Basis type for 3-qubit systems using tuple representation.
@@ -121,7 +125,11 @@ This is isomorphic to `NQubitBasis 3` but uses tuples for convenience with
 pattern matching and tensor products. Use `ThreeQubitBasis.toNQubitBasis` to convert.
 -/
 abbrev ThreeQubitBasis := QubitBasis × QubitBasis × QubitBasis
+
+/-- Unnormalized 3-qubit amplitudes (same as `Vector ThreeQubitBasis`). -/
 abbrev ThreeQubitVec := ThreeQubitBasis → ℂ
+
+/-- Normalized 3-qubit state. -/
 abbrev ThreeQubitState := QuantumState ThreeQubitBasis
 
 /-!
@@ -164,17 +172,19 @@ This is a convenience constructor that makes it easier to work with n-qubit basi
 -/
 def nQubitBasisOf (n : ℕ) (f : Fin n → QubitBasis) : NQubitBasis n := f
 
-/-- Convert a tuple representation to function representation for small n.
+/-- Convert the tuple representation `(a, b) : QubitBasis × QubitBasis` to the
+function representation `NQubitBasis 2`.
 
-For n=2, converts `(a, b) : QubitBasis × QubitBasis` to `NQubitBasis 2`.
-For n=3, converts `(a, b, c) : QubitBasis × QubitBasis × QubitBasis` to `NQubitBasis 3`.
-
-These are useful for connecting the existing tuple-based basis types with
-the new function-based n-qubit basis type.
+Useful for connecting the tuple-based basis types with the function-based
+n-qubit basis type.
 -/
 def TwoQubitBasis.toNQubitBasis (b : TwoQubitBasis) : NQubitBasis 2 :=
   fun i => if i = 0 then b.1 else b.2
 
+/-- Convert the tuple representation
+`(a, b, c) : QubitBasis × QubitBasis × QubitBasis` to the function
+representation `NQubitBasis 3`.
+-/
 def ThreeQubitBasis.toNQubitBasis (b : ThreeQubitBasis) : NQubitBasis 3 :=
   fun i => if i = 0 then b.1 else if i = 1 then b.2.1 else b.2.2
 
@@ -201,14 +211,17 @@ def nQubitBasisZeros (n : ℕ) : NQubitBasis n :=
 def nQubitBasisOnes (n : ℕ) : NQubitBasis n :=
   nQubitBasisAll n 1
 
--- The "constructor" for basis vectors
+/-- The computational basis vector concentrated at `i0`: amplitude `1` at `i0`
+and `0` elsewhere. -/
 noncomputable def basisVec (i0 : α) : Vector α :=
   fun i => if i = i0 then (1 : ℂ) else 0
 
+/-- Pointwise value of a basis vector. -/
 @[simp] lemma basisVec_apply {α : Type*} [DecidableEq α] [Fintype α] (a x : α) :
   basisVec a x = (if x = a then 1 else 0) :=
 by simp[basisVec]
 
+/-- Dotting a vector against a basis vector reads off the corresponding component. -/
 @[simp] lemma dot_basisVec_left
   {α} [Fintype α] [DecidableEq α] (v : α → ℂ) (i : α) :
   (v ⬝ᵥ basisVec i) = v i := by
@@ -218,6 +231,7 @@ by simp[basisVec]
 
 open scoped BigOperators
 
+/-- Basis vectors are normalized. -/
 lemma norm_basisVec {α : Type*} [Fintype α] [DecidableEq α] (i0 : α) :
   norm (basisVec i0 : α → ℂ) = 1 := by
   classical
@@ -247,22 +261,27 @@ This creates a quantum state corresponding to a computational basis vector.
 noncomputable def nQubitKet (n : ℕ) (b : NQubitBasis n) : NQubitState n :=
   ⟨nQubitBasisVec n b, by simpa using norm_basisVec b⟩
 
+/-- Two-qubit computational basis state |00⟩. -/
 noncomputable def ket00 : TwoQubitState :=
   ⟨ basisVec ((0, 0) : TwoQubitBasis),
     by simpa using norm_basisVec ((0, 0) : TwoQubitBasis) ⟩
 
+/-- Two-qubit computational basis state |01⟩. -/
 noncomputable def ket01 : TwoQubitState :=
   ⟨ basisVec ((0, 1) : TwoQubitBasis),
     by simpa using norm_basisVec ((0, 1) : TwoQubitBasis) ⟩
 
+/-- Two-qubit computational basis state |10⟩. -/
 noncomputable def ket10 : TwoQubitState :=
   ⟨ basisVec ((1, 0) : TwoQubitBasis),
     by simpa using norm_basisVec ((1, 0) : TwoQubitBasis) ⟩
 
+/-- Two-qubit computational basis state |11⟩. -/
 noncomputable def ket11 : TwoQubitState :=
   ⟨ basisVec ((1, 1) : TwoQubitBasis),
     by simpa using norm_basisVec ((1, 1) : TwoQubitBasis) ⟩
 
+/-- The `|+⟩` amplitude vector `(1/√2, 1/√2)` has unit norm. -/
 lemma ketPlusNorm1 : norm (![1 / (Real.sqrt 2), 1 / (Real.sqrt 2)]) = 1 := by
   have h : (2⁻¹ : ℝ) + 2⁻¹ = 1 := by norm_num
   simp
@@ -271,6 +290,7 @@ lemma ketPlusNorm1 : norm (![1 / (Real.sqrt 2), 1 / (Real.sqrt 2)]) = 1 := by
 /-- Hadamard-basis ket |+⟩ = (|0⟩ + |1⟩)/√2. -/
 noncomputable def ketPlus : Qubit := ⟨(![1 / (Real.sqrt 2), 1 / (Real.sqrt 2)]), ketPlusNorm1⟩
 
+/-- The `|−⟩` amplitude vector `(1/√2, -1/√2)` has unit norm. -/
 lemma ketMinusNorm1 : norm (![1 / (Real.sqrt 2), -(1 / (Real.sqrt 2))]) = 1 := by
   norm_num [norm_def, Fin.sum_univ_two]
 
@@ -278,53 +298,69 @@ lemma ketMinusNorm1 : norm (![1 / (Real.sqrt 2), -(1 / (Real.sqrt 2))]) = 1 := b
 noncomputable def ketMinus : Qubit :=
   ⟨(![1 / (Real.sqrt 2), -(1 / (Real.sqrt 2))]), ketMinusNorm1⟩
 
+/-- Three-qubit computational basis state |000⟩. -/
 noncomputable def ket000 : ThreeQubitState :=
   ⟨basisVec (0, 0, 0), by
     simpa using
       (norm_basisVec (α := ThreeQubitBasis) (i0 := (0, 0, 0)))⟩
 
+/-- Three-qubit computational basis state |001⟩. -/
 noncomputable def ket001 : ThreeQubitState :=
   ⟨basisVec (0, 0, 1), by
     simpa using
       (norm_basisVec (α := ThreeQubitBasis) (i0 := (0, 0, 1)))⟩
 
+/-- Three-qubit computational basis state |010⟩. -/
 noncomputable def ket010 : ThreeQubitState :=
   ⟨basisVec (0, 1, 0), by
     simpa using
       (norm_basisVec (α := ThreeQubitBasis) (i0 := (0, 1, 0)))⟩
 
+/-- Three-qubit computational basis state |011⟩. -/
 noncomputable def ket011 : ThreeQubitState :=
   ⟨basisVec (0, 1, 1), by
     simpa using
       (norm_basisVec (α := ThreeQubitBasis) (i0 := (0, 1, 1)))⟩
 
+/-- Three-qubit computational basis state |100⟩. -/
 noncomputable def ket100 : ThreeQubitState :=
   ⟨basisVec (1, 0, 0), by
     simpa using
       (norm_basisVec (α := ThreeQubitBasis) (i0 := (1, 0, 0)))⟩
 
+/-- Three-qubit computational basis state |101⟩. -/
 noncomputable def ket101 : ThreeQubitState :=
   ⟨basisVec (1, 0, 1), by
     simpa using
       (norm_basisVec (α := ThreeQubitBasis) (i0 := (1, 0, 1)))⟩
 
+/-- Three-qubit computational basis state |110⟩. -/
 noncomputable def ket110 : ThreeQubitState :=
   ⟨basisVec (1, 1, 0), by
     simpa using
       (norm_basisVec (α := ThreeQubitBasis) (i0 := (1, 1, 0)))⟩
 
+/-- Three-qubit computational basis state |111⟩. -/
 noncomputable def ket111 : ThreeQubitState :=
   ⟨basisVec (1, 1, 1), by
     simpa using
       (norm_basisVec (α := ThreeQubitBasis) (i0 := (1, 1, 1)))⟩
 
+/-- Amplitude vector underlying `ket000`. -/
 @[simp] lemma ket000_val : (ket000 : ThreeQubitVec) = basisVec (0, 0, 0) := rfl
+/-- Amplitude vector underlying `ket001`. -/
 @[simp] lemma ket001_val : (ket001 : ThreeQubitVec) = basisVec (0, 0, 1) := rfl
+/-- Amplitude vector underlying `ket010`. -/
 @[simp] lemma ket010_val : (ket010 : ThreeQubitVec) = basisVec (0, 1, 0) := rfl
+/-- Amplitude vector underlying `ket011`. -/
 @[simp] lemma ket011_val : (ket011 : ThreeQubitVec) = basisVec (0, 1, 1) := rfl
+/-- Amplitude vector underlying `ket100`. -/
 @[simp] lemma ket100_val : (ket100 : ThreeQubitVec) = basisVec (1, 0, 0) := rfl
+/-- Amplitude vector underlying `ket101`. -/
 @[simp] lemma ket101_val : (ket101 : ThreeQubitVec) = basisVec (1, 0, 1) := rfl
+/-- Amplitude vector underlying `ket110`. -/
 @[simp] lemma ket110_val : (ket110 : ThreeQubitVec) = basisVec (1, 1, 0) := rfl
+/-- Amplitude vector underlying `ket111`. -/
 @[simp] lemma ket111_val : (ket111 : ThreeQubitVec) = basisVec (1, 1, 1) := rfl
 
 /-!
