@@ -662,10 +662,10 @@ noncomputable def inv_S : OneQubitGate := S⁻¹
 lemma inv_S_val : inv_S.val = star S.val := by
   rw [inv_S, gate_inv_val]
 
-@[simp] lemma X_on_ket0 : X • ket0 = ket1 := by
+@[simp] lemma X_on_ket0 : X • |0⟩ = |1⟩ := by
   vec_expand_simp [Xmat, ket0, ket1]
 
-@[simp] lemma X_on_ket1 : X • ket1 = ket0 := by
+@[simp] lemma X_on_ket1 : X • |1⟩ = |0⟩ := by
   vec_expand_simp [Xmat, ket0, ket1]
 
 -- Controlled version of a gate `g` on `k`, acting on `QubitBasis × k`.
@@ -716,21 +716,21 @@ noncomputable def CNOT : TwoQubitGate :=
 
 @[simp] lemma ket00_apply
   (q : QubitBasis) (t : QubitBasis) :
-  (ket00 : QuantumState TwoQubitBasis).val (q, t)
+  (|00⟩ : QuantumState TwoQubitBasis).val (q, t)
     = (if (q, t) = (0, 0) then (1 : ℂ) else 0) :=
 by
   simp [ket00]
 
-lemma CNOT_on_ket00 : CNOT • ket00 = ket00 := by
+lemma CNOT_on_ket00 : CNOT • |00⟩ = |00⟩ := by
   vec_expand_simp [Matrix.mulVec, CNOT, ket00]
 
-lemma CNOT_on_ket01 : CNOT • ket01 = ket01 := by
+lemma CNOT_on_ket01 : CNOT • |01⟩ = |01⟩ := by
   vec_expand_simp[Matrix.mulVec, CNOT, ket01]
 
-lemma CNOT_on_ket10 : CNOT • ket10 = ket11 := by
+lemma CNOT_on_ket10 : CNOT • |10⟩ = |11⟩ := by
   vec_expand_simp[Matrix.mulVec, CNOT, ket10, ket11, Xmat]
 
-lemma CNOT_on_ket11 : CNOT • ket11 = ket10 := by
+lemma CNOT_on_ket11 : CNOT • |11⟩ = |10⟩ := by
   vec_expand_simp[Matrix.mulVec, CNOT, ket10, ket11, Xmat]
 
 end Quantum

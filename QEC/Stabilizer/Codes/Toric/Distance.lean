@@ -200,7 +200,7 @@ theorem toricCodeN_distance_eq_L :
 /-- The toric code on an `L × L` lattice packaged as a `[[2L², 2, L]]`
 stabilizer code with distance. -/
 noncomputable def toricStabilizerCodeWithDistance :
-    StabilizerCodeWithDistance (numQubits L) 2 L where
+    StabilizerCodeWithDistance (2 * L * L) 2 L where
   toStabilizerCode := toricStabilizerCode L
   hasDistance      := toricCodeN_distance_eq_L L
 

@@ -268,7 +268,15 @@ lemma ketPlusNorm1 : norm (![1 / (Real.sqrt 2), 1 / (Real.sqrt 2)]) = 1 := by
   simp
   exact h
 
+/-- Hadamard-basis ket |+⟩ = (|0⟩ + |1⟩)/√2. -/
 noncomputable def ketPlus : Qubit := ⟨(![1 / (Real.sqrt 2), 1 / (Real.sqrt 2)]), ketPlusNorm1⟩
+
+lemma ketMinusNorm1 : norm (![1 / (Real.sqrt 2), -(1 / (Real.sqrt 2))]) = 1 := by
+  norm_num [norm_def, Fin.sum_univ_two]
+
+/-- Hadamard-basis ket |−⟩ = (|0⟩ − |1⟩)/√2. -/
+noncomputable def ketMinus : Qubit :=
+  ⟨(![1 / (Real.sqrt 2), -(1 / (Real.sqrt 2))]), ketMinusNorm1⟩
 
 noncomputable def ket000 : ThreeQubitState :=
   ⟨basisVec (0, 0, 0), by
@@ -318,5 +326,41 @@ noncomputable def ket111 : ThreeQubitState :=
 @[simp] lemma ket101_val : (ket101 : ThreeQubitVec) = basisVec (1, 0, 1) := rfl
 @[simp] lemma ket110_val : (ket110 : ThreeQubitVec) = basisVec (1, 1, 0) := rfl
 @[simp] lemma ket111_val : (ket111 : ThreeQubitVec) = basisVec (1, 1, 1) := rfl
+
+/-!
+## Dirac ket notation
+
+Scoped notation for the standard kets above, so proofs and statements can be written
+the way they are on paper: `|0⟩`, `|+⟩`, `|01⟩`, …
+
+Bring them into scope with `open scoped Quantum` (or `open Quantum`). They are
+`scoped` deliberately: the tokens begin with `|`, so an unqualified `open` would make
+`{x |0 ≤ x}`-style set-builders (no space after the bar) fail to parse in that file.
+Writing `{x | 0 ≤ x}` with the usual space is unaffected.
+-/
+
+/-- Computational basis ket `|0⟩`, i.e. `ket0`. -/
+scoped notation "|0⟩" => ket0
+
+/-- Computational basis ket `|1⟩`, i.e. `ket1`. -/
+scoped notation "|1⟩" => ket1
+
+/-- Hadamard-basis ket `|+⟩ = (|0⟩ + |1⟩)/√2`, i.e. `ketPlus`. -/
+scoped notation "|+⟩" => ketPlus
+
+/-- Hadamard-basis ket `|−⟩ = (|0⟩ − |1⟩)/√2`, i.e. `ketMinus`. -/
+scoped notation "|-⟩" => ketMinus
+
+/-- Two-qubit computational basis ket `|00⟩`, i.e. `ket00`. -/
+scoped notation "|00⟩" => ket00
+
+/-- Two-qubit computational basis ket `|01⟩`, i.e. `ket01`. -/
+scoped notation "|01⟩" => ket01
+
+/-- Two-qubit computational basis ket `|10⟩`, i.e. `ket10`. -/
+scoped notation "|10⟩" => ket10
+
+/-- Two-qubit computational basis ket `|11⟩`, i.e. `ket11`. -/
+scoped notation "|11⟩" => ket11
 
 end Quantum

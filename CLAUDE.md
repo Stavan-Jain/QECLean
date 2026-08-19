@@ -47,7 +47,6 @@ build/MCP workflow. Volatile or topic-scoped knowledge lives elsewhere:
 ```
 QEC/
 ├── Foundations/         # Hilbert spaces, vectors, gates, tensor product
-├── RepetitionCode/      # Classical repetition code recovery (older module)
 └── Stabilizer/          # Main formalization, organized into 4 clusters
     ├── Foundations/         # Pauli + binary-symplectic algebra (the floor)
     │   ├── PauliGroupSingle/    # Single-qubit Pauli operators (X, Y, Z, I, phases)

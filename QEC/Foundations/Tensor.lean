@@ -131,28 +131,28 @@ noncomputable def XX_2 : TwoQubitGate :=
 noncomputable def ZZ_2 : TwoQubitGate :=
   tensorGate Z Z
 
-@[simp] lemma X_q1_2_on_ket00 : X_q1_2 • ket00 = ket10 := by
+@[simp] lemma X_q1_2_on_ket00 : X_q1_2 • |00⟩ = |10⟩ := by
   vec_expand_simp [X_q1_2, Matrix.mulVec, ket00, ket10, Xmat]
 
-@[simp] lemma X_q1_2_on_ket01 : X_q1_2 • ket01 = ket11 := by
+@[simp] lemma X_q1_2_on_ket01 : X_q1_2 • |01⟩ = |11⟩ := by
   vec_expand_simp [X_q1_2,  Matrix.mulVec, ket01, ket11, Xmat]
 
-@[simp] lemma X_q1_2_on_ket10 : X_q1_2 • ket10 = ket00 := by
+@[simp] lemma X_q1_2_on_ket10 : X_q1_2 • |10⟩ = |00⟩ := by
   vec_expand_simp [X_q1_2,  Matrix.mulVec, ket10, ket00, Xmat]
 
-@[simp] lemma X_q1_2_on_ket11 : X_q1_2 • ket11 = ket01 := by
+@[simp] lemma X_q1_2_on_ket11 : X_q1_2 • |11⟩ = |01⟩ := by
   vec_expand_simp [X_q1_2,  Matrix.mulVec, ket11, ket01, Xmat]
 
-@[simp] lemma X_q2_2_on_ket00 : X_q2_2 • ket00 = ket01 := by
+@[simp] lemma X_q2_2_on_ket00 : X_q2_2 • |00⟩ = |01⟩ := by
   vec_expand_simp [X_q2_2,  Matrix.mulVec, ket00, ket01, Xmat]
 
-@[simp] lemma X_q2_2_on_ket01 : X_q2_2 • ket01 = ket00 := by
+@[simp] lemma X_q2_2_on_ket01 : X_q2_2 • |01⟩ = |00⟩ := by
   vec_expand_simp [X_q2_2,  Matrix.mulVec, ket01, ket00, Xmat]
 
-@[simp] lemma X_q2_2_on_ket10 : X_q2_2 • ket10 = ket11 := by
+@[simp] lemma X_q2_2_on_ket10 : X_q2_2 • |10⟩ = |11⟩ := by
   vec_expand_simp [X_q2_2,  Matrix.mulVec, ket10, ket11, Xmat]
 
-@[simp] lemma X_q2_2_on_ket11 : X_q2_2 • ket11 = ket10 := by
+@[simp] lemma X_q2_2_on_ket11 : X_q2_2 • |11⟩ = |10⟩ := by
   vec_expand_simp [X_q2_2,  Matrix.mulVec, ket11, ket10, Xmat]
 
 -- X on first qubit, I on others: X ⊗ I ⊗ I

@@ -1,5 +1,4 @@
 import QEC.Foundations.Foundations
-import QEC.RepetitionCode.RepetitionCode
 import QEC.Stabilizer.Stabilizer
 
 /-!

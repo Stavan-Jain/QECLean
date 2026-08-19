@@ -28,6 +28,3 @@ name = "QECLight"
 name = "Foundations"
 srcDir = "QEC"
 
-[[lean_lib]]
-name = "RepetitionCode"
-srcDir = "QEC"

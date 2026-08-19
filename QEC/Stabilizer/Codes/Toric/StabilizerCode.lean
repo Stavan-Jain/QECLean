@@ -1521,7 +1521,7 @@ private theorem generators_independent_packaged (L : ℕ) [Fact (2 ≤ L)] :
 
 /-- The toric code as a `StabilizerCode [[2L², 2]]`. -/
 noncomputable def toricStabilizerCode (L : ℕ) [Fact (2 ≤ L)] :
-    StabilizerCode (numQubits L) 2 where
+    StabilizerCode (2 * L * L) 2 where
   hk := by
     have hL : 2 ≤ L := Fact.out
     have hq : 2 ≤ numQubits L := by
