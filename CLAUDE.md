@@ -167,6 +167,18 @@ tool (it takes a fully qualified name). A declaration that prints those three,
 or "does not depend on any axioms", passes. **Anything else fails**, no matter
 how convincing the proof is.
 
+**This is enforced in CI**, so a violation fails the build rather than landing
+quietly. To check the whole repo the way CI does:
+
+```bash
+lake env lean scripts/AxiomCheck.lean
+```
+
+It walks every declaration defined under `QEC/` (~6.3k of them), reports each
+offender with its module and the offending axioms, and exits non-zero. It is
+not part of any `lean_lib`, so a normal `lake build` does not pay for it —
+but it needs a completed build to run against.
+
 The two ways this gets violated in practice:
 
 - **`native_decide`** — evaluates the proposition with the compiled

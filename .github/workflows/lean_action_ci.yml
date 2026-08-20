@@ -42,6 +42,14 @@ jobs:
           sudo swapon /mnt/swapfile
           free -h
       - uses: leanprover/lean-action@v1
+      # Enforce CLAUDE.md § "Axiom policy": every declaration defined under QEC/
+      # must depend on exactly [propext, Classical.choice, Quot.sound]. Catches
+      # `native_decide` (whose axiom is named per-declaration since v4.30, so a
+      # grep for `Lean.ofReduceBool` would miss it), `sorry`, and bespoke `axiom`
+      # declarations. Runs against the build lean-action just produced, so it
+      # costs seconds rather than a rebuild.
+      - name: Axiom policy (standard three axioms only)
+        run: lake env lean scripts/AxiomCheck.lean
       # docgen rebuilds API docs for the project + all of mathlib (~1-2h with
       # no cache). Skip it on every push/PR; only run on tag pushes or manual
       # dispatch so day-to-day CI stays fast.
