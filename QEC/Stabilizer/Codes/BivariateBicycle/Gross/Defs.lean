@@ -106,17 +106,17 @@ def coverPi : GrossGroup →+ BaseGroup :=
 /-- Fibers of `coverPi` are deck orbits: `π g' = π g ↔ g' = g ∨ g' = g + deckS`. -/
 theorem coverPi_fiber :
     ∀ g g' : GrossGroup, coverPi g' = coverPi g ↔ g' = g ∨ g' = g + deckS := by
-  native_decide
+  decide +kernel
 
 theorem coverPi_surjective : Function.Surjective ⇑coverPi := by
-  native_decide
+  decide +kernel
 
 /-- A set-theoretic section of `coverPi` (lift the `x`-coordinate by its
 canonical representative). -/
 def coverSec : BaseGroup → GrossGroup := fun p => ((p.1.val : ZMod 12), p.2)
 
 theorem coverPi_coverSec : ∀ p : BaseGroup, coverPi (coverSec p) = p := by
-  native_decide
+  decide +kernel
 
 /-! ## Deck shifts on chains -/
 

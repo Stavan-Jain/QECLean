@@ -24,12 +24,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      # The gross BB safe-sector floor still has three `native_decide` leaves
-      # (MImFloorY0/Y1/Y4, ~3.75 GB each). lake has no `-j`/parallelism flag, so
-      # it builds all three concurrently at the tail and exhausts the runner's
-      # 16 GB → the job is killed (exit 143). Add swap so the peak spills to disk
-      # instead of OOM-ing. Remove once Tier-3 retires those leaves (cf. Y11/Y12).
-      - name: Add swap space (BB floor_holds native_decide memory peaks)
+      # The gross BB safe-sector floor leaves (MImFloorY0/Y1/Y4) are memory-hungry
+      # kernel `decide` checks. lake has no `-j`/parallelism flag, so it builds all
+      # three concurrently at the tail and exhausts the runner's 16 GB → the job is
+      # killed (exit 143). Add swap so the peak spills to disk instead of OOM-ing.
+      # NOTE: these are no longer `native_decide` (that was retired in PR #66) — the
+      # cost is kernel reduction, so this swap is still required. Symptom to watch
+      # for locally: an apparent hang on MImFloorY{0,1,4} with workers at 4-10% CPU
+      # is this same contention, not a proof regression. Built alone each takes ~40s.
+      - name: Add swap space (BB safe-floor kernel-decide memory peaks)
         # The runner already has an active /swapfile, so add an extra one on the
         # large /mnt ephemeral disk rather than touching the existing swap.
         run: |
@@ -39,6 +42,14 @@ jobs:
           sudo swapon /mnt/swapfile
           free -h
       - uses: leanprover/lean-action@v1
+      # Enforce CLAUDE.md § "Axiom policy": every declaration defined under QEC/
+      # must depend on exactly [propext, Classical.choice, Quot.sound]. Catches
+      # `native_decide` (whose axiom is named per-declaration since v4.30, so a
+      # grep for `Lean.ofReduceBool` would miss it), `sorry`, and bespoke `axiom`
+      # declarations. Runs against the build lean-action just produced, so it
+      # costs seconds rather than a rebuild.
+      - name: Axiom policy (standard three axioms only)
+        run: lake env lean scripts/AxiomCheck.lean
       # docgen rebuilds API docs for the project + all of mathlib (~1-2h with
       # no cache). Skip it on every push/PR; only run on tag pushes or manual
       # dispatch so day-to-day CI stays fast.

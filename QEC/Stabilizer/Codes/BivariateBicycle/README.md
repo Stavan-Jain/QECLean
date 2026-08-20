@@ -6,14 +6,13 @@ sibling umbrella `.lean`; the shared theory lives in
 `BBDeckTower`, `BBBocksteinRank`, `BBEpsFree*`, `BBSmallCycle`,
 `BBDeficitWall`). This README is the task router and status board; the
 per-module one-liner maps live in the umbrella docstrings (`Gross.lean`,
-`Gross/SafeFloor.lean`, `Z3Z6.lean`, …).
+`Gross/SafeFloor.lean`, `Z5Z15F2A6.lean`, …).
 
 ## Instances
 
 | Dir | Code | Distance status |
 |---|---|---|
-| `Gross/` | gross `[[144,12,12]]` (base `[[72,12,6]]`) | **d = 12 unconditional** (axiom-clean + `native_decide`; also re-derived through the parametric layer in `Gross/LayerInstance.lean`) |
-| `Z3Z6/` | pair72 `[[36,4,4]] → [[72,4,8]]` | d = 8 unconditional (the canonical complete instance — copy this shape) |
+| `Gross/` | gross `[[144,12,12]]` (base `[[72,12,6]]`) | **d = 12 unconditional, kernel-only** — axioms are exactly `propext`, `Classical.choice`, `Quot.sound`; no `native_decide`, no `sorry` (also re-derived through the parametric layer in `Gross/LayerInstance.lean`) |
 | `Z5Z15F2A6/` | `[[150,8,8]] → [[300,8,16]]` two-tier | in progress (A17 line; minimal starting skeleton to copy) |
 | `BaseFloors/` | class-member base floors (BB90, BB108, Z6Z14) | d ≥ 6 kernel-checked via `BBSmallCycle` (A15/A16 class theorem) |
 
@@ -38,38 +37,79 @@ per-module one-liner maps live in the umbrella docstrings (`Gross.lean`,
 | Named hypothesis | Discharged by | Grade |
 |---|---|---|
 | `BaseDistanceGe6` | `Gross/BaseDistance.lean` (small-cycle theorem) | kernel `decide` + analytic |
-| `LightStabilizerClassification` | `Gross/LightStabClassify.lean` (`lightStabilizerClassification_holds`) | engine (`native_decide`) |
-| `DangerousSectorGe12` | `Gross/DangerousSector.lean` ((M), m-rungs) | analytic, engine-fed |
+| `LightStabilizerClassification` | `Gross/LightStabClassify.lean` (`lightStabilizerClassification_holds`) | kernel `decide` |
+| `DangerousSectorGe12` | `Gross/DangerousSector.lean` ((M), m-rungs) | analytic + kernel `decide` |
 | `SafeSectorGe12` → `MImBound` | `Gross/SafeSector.lean` (Smith-coset reduction) | analytic |
-| `MImBound` | `Gross/SafeFloor/MImAssembly.lean` (`mimBound_holds`, 64-case dispatch → 5 orbit reps) | mixed (see per-orbit rows) |
-| — orbit Y0/Y1/Y4 (wt 16/18) | `SafeFloor/MImFloorY{0,1,4}.lean` (`floor_of_data` engine leaf) | engine (`native_decide`) — flips analytic when A7 Props 30–31 close |
+| `MImBound` | `Gross/SafeFloor/MImAssembly.lean` (`mimBound_holds`, 64-case dispatch → 5 orbit reps) | analytic (see per-orbit rows) |
+| — orbit Y0/Y1/Y4 (wt 16/18) | `SafeFloor/MImFloorY{0,1,4}.lean` via `LightFloor.floor_of_killOK` (the coupled spine certificate: Prop 30 `min_L + min_R ≥ 10` on all 1024 cells + Prop 31 ρ-link kill of the 10-tight cells) | **analytic** (kernel `decide`) |
 | — orbit Y11/Y12 (wt 24) | `SafeFloor/MImFloorY{11,12}.lean` via `WtFloor24Bridge.costFromComps_ge_12_of_blocks` | **analytic** (kernel `decide`) |
 | capstones | `Gross/Distance.lean` (`grossStabilizerCode_hasCodeDistance_12_uncond`, `grossStabilizerCodeWithDistance`) + `Gross/LayerInstance.lean` (`gross_chain/pauli_distance_eq_12` through the layer) | — |
 
-Z3Z6 mirror: `StrongBaseFloor 4` → `Z3Z6/BaseDistance.lean`; `DeckTrivialOnH1`
-→ `Z3Z6/DeckHomotopy.lean`; `DangerousFloorNZ 8` → `Z3Z6/Dangerous.lean`;
-`SeamCosetFloor 8` → `Z3Z6/SafeFloor.lean` (sweep leaves); capstone
-`Z3Z6/Distance.lean`.
+The Z3Z6 (pair72, `[[36,4,4]] → [[72,4,8]]`) and Z5Z15F2A6
+(`[[150,8,8]] → [[300,8,16]]`) instances, which used to mirror this map, are
+**parked on branch `claude/z3z6-parked`** pending de-nativization — see
+"Parked instances" below.
 
-## Engine vs analytic (native_decide counts, 2026-07-18)
+## Engine vs analytic (2026-08-20)
 
-`native_decide` total in this directory: ~303. Top carriers: gross
-`StabilizerCode` 35 (§5 decoder identities — data file split out as
-`StabilizerCodeData`), `LightStab` 30, `CRTFrame` 20, `MImFloor` 16,
-`MImFloorY0/1/4` 16 each, `Z3Z6/StabilizerCode` 16, `LightStabClassify` 15.
-The Tier-3 track (`SlotFrame` → `WtFloor24` → `WtFloor24Bridge` →
-`WtFloor1618`) replaces engine leaves with analytic proofs; Y11/Y12 are
-already flipped. Status changes belong HERE, not in module names.
+The gross `d = 12` cone contains **zero `native_decide`**: every leaf is a kernel
+`decide` (mostly `decide +kernel`) or an analytic proof, so the capstones carry
+only mathlib's three axioms. This is not an achievement local to `Gross/` — it is
+the repo-wide bar: everything on `main` must print exactly
+`[propext, Classical.choice, Quot.sound]`. See CLAUDE.md § "Axiom policy", and
+park rather than merge anything that cannot meet it. The techniques, in the order they matter: packed-`Nat`
+tables instead of `Array`/`List` lookups (an `Array.getD` is an O(n) list walk in
+the kernel); quantifier bridges (`mkRing`, `mkTorus`, `chainOfMask`) that let the
+kernel enumerate concrete lambdas rather than whnf a pi-`Fintype`; sparse rewrites
+of `conv`/`∂₂`/`seamC` in place of `Finset.sum`s over the group; and Gaussian-style
+certificates (the `ker ∂₂` peeling in `MImClassify.kerBasis_spans`) where a sweep
+would otherwise be needed.
+
+The Tier-3 track is complete: `SlotFrame` → `WtFloor24` → `WtFloor24Bridge`
+closes the weight-24 orbits, and `WtFloor1618` → `LightFloor` closes the coupled
+light orbits. The old confined-floor engine (`MImFloor`, `MImFloorData`,
+`MImMembership` and their `2³⁰` `floorOK` walk) has been **retired** — those
+modules are deleted, not merely unused. Status changes belong HERE, not in
+module names.
+
+`Gross/` is now the only BB instance in this tree, and the whole tree is
+`native_decide`-free: the other instances (`Z5Z15F2A6/`, `BaseFloors/`) were
+the last `native_decide` holders here and have been parked — see below.
+
+## Parked instances
+
+`main` is being driven to a `native_decide`-free state, so every instance that
+still carried one has been removed from this tree and lives on branch
+**`claude/z3z6-parked`**:
+
+| Parked | Result given up | `native_decide` |
+|---|---|---|
+| `Z3Z6/` (pair72, `[[36,4,4]] → [[72,4,8]]`, d = 8 unconditional) | `pair72_*_distance_eq_8` | 42, five of them `2^18` sweeps that dominated a whole-repo build |
+| `Z5Z15F2A6/` (`[[150,8,8]] → [[300,8,16]]`, two-tier) | `cover300_chain/pauli_distance_eq_16` | 9 (`Defs` coverData ×4, `Witness` ×4, `DeckHomotopy` Bezout ×1) |
+| `BaseFloors/` (BB90, BB108, Z6Z14) | three certified `BBSmallCycle` class members | 12 (`epsA/epsB/check_two/check_four` ×3 files) |
+
+`Z3Z6/PARKED.md` on that branch records the Z3Z6 rationale in detail. All three
+are clean leaves — nothing outside each directory imported its declarations
+(`Z5Z15F2A6/Distance.lean` is in-instance and went with it) — so restoring one
+means re-adding the directory, its sibling umbrella, the import line in
+`BivariateBicycle.lean`, and the rows removed from this README.
+
+The abstract machinery they exercised stays in this tree:
+`Framework/Homological/BBSmallCycle.lean` (the A15/A16 class small-cycle
+theorem) and `BBDoubling`/`BBCover` are untouched — they simply have no
+concrete instance here besides `Gross/`.
 
 ## Generated files (Class G: fully generated — NEVER hand-edit)
 
 | File | Generator (`qec-lab:experiments/bb_lab/`) | Data |
 |---|---|---|
 | `Gross/StabilizerCodeData.lean` | `phase5/gen_file.py` (`--force` guard; emits data only) | `phase5/data.json` |
-| `Gross/SafeFloor/MImFloorData.lean` | `scripts/gen_floor_lean.py` | in-script |
-| `Gross/SafeFloor/MImFloorY{0,1,4}.lean` | `scripts/gen_yrep_module.py <i>` | in-script |
+| `Gross/SafeFloor/MImFloorY{0,1,4}.lean` | **hand-maintained since the kernel-only conversion** (analytic Tier-3 form; formerly `gen_yrep_module.py`, which must be taught to refuse args 0/1/4) | — |
 | `Gross/SafeFloor/MImFloorY{11,12}.lean` | **hand-maintained since PR #58** (analytic Tier-3 form; formerly `gen_yrep_module.py`, which now refuses args 11/12) | — |
-| `Z3Z6/StabilizerCodeData.lean` | `scripts/gen_pair72_packaging_data.py` (retarget to data-only queued — do not run without reading GENERATORS.md) | validation-gated |
+
+**qec-lab follow-up owed**: `gen_floor_lean.py` now has no target in this repo
+(`MImFloorData.lean` is deleted) and `gen_yrep_module.py` must refuse args 0/1/4
+as it already refuses 11/12; both changes belong in a companion qec-lab PR.
 | `BaseFloors/*.lean` | `scripts/gen_base_floor_lean.py` | per-instance |
 
 Class F (generated fragments between `-- BEGIN/END GENERATED` markers,
@@ -94,10 +134,12 @@ details (env, clobber guards, stale generators): `qec-lab:experiments/bb_lab/GEN
 
 ## Adding an instance
 
-Copy the shape of `Z3Z6/` (complete) or `Z5Z15F2A6/` (minimal skeleton):
+Copy the shape of `Gross/` (complete, kernel-only) — the only instance in this
+tree; the parked `Z3Z6/` and `Z5Z15F2A6/` (branch `claude/z3z6-parked`) are
+further worked examples:
 
 1. `mkdir <Name>/` + sibling `<Name>.lean` umbrella. Name = base group +
-   disambiguating tag (`Z3Z6`, `Z5Z15F2A6` precedent).
+   disambiguating tag (`Z5Z15F2A6`, `Z3Z6` precedent).
 2. Minimum files, in dependency order: `Defs.lean` (complexes +
    `XDoubleCoverData` bundle against `Framework/Homological/BBCover.lean`) →
    `DeckHomotopy.lean` (Bezout witness via `deckTrivial_of_bezout`) →

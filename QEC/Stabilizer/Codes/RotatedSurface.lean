@@ -1,4 +1,3 @@
-import QEC.Stabilizer.Codes.RotatedSurface.Three
 import QEC.Stabilizer.Codes.RotatedSurface.N
 import QEC.Stabilizer.Codes.RotatedSurface.CellComplex
 import QEC.Stabilizer.Codes.RotatedSurface.BoundaryMaps
@@ -12,6 +11,7 @@ import QEC.Stabilizer.Codes.RotatedSurface.StabilizerCode
 /-!
 # Rotated surface code family
 
-Distance-3 specialization plus the parametric `L × L` rotated-surface code,
-with lattice geometry + chain complex + distance.
+The parametric `L × L` rotated-surface code, with lattice geometry + chain
+complex + distance.  The distance-3 specialization (`Three.lean`) is
+**parked on branch `claude/z3z6-parked`** pending de-nativization.
 -/

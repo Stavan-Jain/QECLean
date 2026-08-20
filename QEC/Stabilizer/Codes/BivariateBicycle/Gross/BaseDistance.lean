@@ -22,10 +22,12 @@ support point at group-origin) and **the parity lemma (PAR)** of A4 §4 —
 cycles have even weight, by applying the augmentation `ε` to the cycle
 condition (`ε(A) = ε(B) = 1`).  Parity kills all odd-weight supports, so
 the normalized finite sweep only covers `((0,0), b)` plus exactly 1 or 3
-further qubits — `2·(C(71,1) + C(71,3)) ≈ 1.2·10⁵` cases, swept by
-`native_decide` (`smallCycleCheckAux_*`) with the boundary evaluated
+further qubits — `2·(C(71,1) + C(71,3)) ≈ 1.2·10⁵` cases, swept by kernel
+`decide` (`smallCycleCheck_*`) with the boundary evaluated
 through the sparse syndrome form `syndAt` (the hand-proven bridge
-`bbBoundary1Fn_indicator` turns `∂₁(χ_S) = 0` into 36 few-term sums).
+`bbBoundary1Fn_indicator` turns `∂₁(χ_S) = 0` into 36 few-term sums; the
+weight-4 sweep runs on packed-`Nat` syndrome masks with a perfect-hash
+membership refuter, bridged back through `termAt_eq_testBit`).
 Replacing this finite leaf with the per-split CRT-engine analysis of
 A4 §§3–4 (the fully analytic Theorem A) is the tier-2 upgrade; the
 statement `base_distance_ge_6` is already in its final form, so the
@@ -69,7 +71,7 @@ lemma card_support_translate1 (c : BaseGroup) (u : BaseGroup × Fin 2 → ZMod 2
 
 For an indicator chain `χ_S`, the boundary `∂₁(χ_S)(h)` is the
 `|S|`-term sum `syndAt S h` — far cheaper to evaluate than the
-convolution form during the `native_decide` sweep. -/
+convolution form during the kernel `decide` sweep. -/
 
 /-- The syndrome contribution of a single qubit at a check position. -/
 def termAt (q : BaseGroup × Fin 2) (h : BaseGroup) : ZMod 2 :=
@@ -159,8 +161,8 @@ lemma cycle_total_parity (u : BaseGroup × Fin 2 → ZMod 2)
         = fun g => conv baseB (leftHalf u) g + conv baseA (rightHalf u) g
       from rfl]
     rw [Finset.sum_add_distrib, sum_conv, sum_conv]
-  have hA : (∑ h : BaseGroup, baseA h) = 1 := by native_decide
-  have hB : (∑ h : BaseGroup, baseB h) = 1 := by native_decide
+  have hA : (∑ h : BaseGroup, baseA h) = 1 := by decide +kernel
+  have hB : (∑ h : BaseGroup, baseB h) = 1 := by decide +kernel
   rw [hexp, hA, hB, one_mul, one_mul] at h0
   rw [Fintype.sum_prod_type]
   calc ∑ g : BaseGroup, ∑ j : Fin 2, u (g, j)
@@ -201,18 +203,208 @@ lemma smallCycleCheck_two : ∀ b : Fin 2, ∀ q : BaseGroup × Fin 2,
     q ≠ (((0, 0) : BaseGroup), b) →
     ∃ h : BaseGroup,
       termAt ((((0, 0) : BaseGroup)), b) h + termAt q h ≠ 0 := by
-  native_decide
+  decide +kernel
+
+/-! ### Packed-mask engine for the weight-4 sweep
+
+The `2·72³ ≈ 7.5·10⁵` weight-4 configurations are too many for a kernel
+`decide` through `ZMod` arithmetic, so the sweep runs on GMP-fast `Nat`
+bit operations instead: each qubit's three-check syndrome is a 36-bit mask
+(packed into the single literal `synTable`), the four-qubit syndrome is the
+XOR of four masks, and the innermost quantifier disappears —
+`m₀ ^^^ m₁ ^^^ m₂ ^^^ m₃ = 0` forces `m₃ = m₀ ^^^ m₁ ^^^ m₂`, so it
+suffices that the XOR of three masks never *is* another qubit's mask,
+checked by a perfect-hash membership refuter (`synInvTable`; modulus 351 is
+injective on the 72 masks).  `termAt_eq_testBit` (a small kernel `decide`)
+bridges each mask bit back to `termAt`, keeping the public statement of
+`smallCycleCheck_four` unchanged. -/
+
+/-- Qubit index `(g, j) ↦ (6·g₁ + g₂)·2 + j ∈ [0, 72)`. -/
+private def encQubit (q : BaseGroup × Fin 2) : Nat :=
+  (q.1.1.val * 6 + q.1.2.val) * 2 + q.2.val
+
+/-- Check index `h ↦ 6·h₁ + h₂ ∈ [0, 36)`. -/
+private def encCheck (h : BaseGroup) : Nat := h.1.val * 6 + h.2.val
+
+/-- Inverse of `encCheck` on `[0, 36)`. -/
+private def decCheck (k : Nat) : BaseGroup :=
+  (((k / 6 : ℕ) : ZMod 6), ((k % 6 : ℕ) : ZMod 6))
+
+/-- Packed syndrome table: bit `36·i + k` is `termAt` of qubit index `i` at
+check index `k` (72 lanes of 36 bits; certified by `termAt_eq_testBit`). -/
+private def synTable : Nat :=
+  0x0c0020000100000820840010000080000410c00008000040000208600004000800000104 <<< 2304 +
+  0x300002000400000082180001000200000041003000800804000020021000400402000010 <<< 2016 +
+  0x03000020020100000801800010012000000400c000080090000002006000040048000001 <<< 1728 +
+  0x0000c0020820100000000840010410080000000c00008208040000000600004104800000 <<< 1440 +
+  0x000300002082400000000180001041200000800003000020804000400021000010402000 <<< 1152 +
+  0x20003000000820100010001800000412000008000c000002090000040006000001048000 <<< 864 +
+  0x0200000c0000820100010000840000410080008000c00000208040004000600000104800 <<< 576 +
+  0x002000300000082400001000180000041200000800003000020804000400021000010402 <<< 288 +
+  0x00020003000000820100010001800000412000008000c000002090000040006000001048
+
+/-- The 36-bit syndrome mask of qubit index `i`. -/
+private def synMask (i : Nat) : Nat := (synTable >>> (36 * i)) % 2 ^ 36
+
+private lemma synMask_lt (i : Nat) : synMask i < 2 ^ 36 :=
+  Nat.mod_lt _ (Nat.two_pow_pos 36)
+
+/-- Perfect-hash inverse table: byte `synMask i % 351` holds `i + 1`, and
+`0` marks "no mask hashes here". -/
+private def synInvTable : Nat :=
+  0x000000000000000000434500470000000d004839000000000f00000000003b0000080000 <<< 2592 +
+  0x0000000011000000000000000000000001000002001000000000003c0000003500000000 <<< 2304 +
+  0x0700000000000036000000000000002c0000003e00000000030000000000044600001200 <<< 2016 +
+  0x000000000000000000000000000a000000002b15002f00000025003009000000003f0000 <<< 1728 +
+  0x000000230000380000000000002900000000000000000000001900001a00400000000000 <<< 1440 +
+  0x240000000500000000370000000000000600000000000000140000000e00000000330000 <<< 1152 +
+  0x000000341600002a00000000000000000000000000002200000000132d00170000003d00 <<< 864 +
+  0x1821000000002700000000000b0000200000000000004100000000000000000000003100 <<< 576 +
+  0x0032002800000000000c0000001d000000001f0000000000001e00000000000000440000 <<< 288 +
+  0x0026000000001b00000000001c2e00004200000000000000000000000000003a00000000
+
+/-- Membership refuter: `synNotHit b v = true` certifies that no mask
+`synMask i` with `i < 72`, `i ≠ b` equals `v` (via `synInv_sound`). -/
+private def synNotHit (b v : Nat) : Bool :=
+  let e := (synInvTable >>> (8 * (v % 351))) &&& 255
+  (e == 0) || (e == b + 1) || (synMask (e - 1) != v)
+
+/-- Bool core of the weight-4 sweep, one shard per origin index `b`. -/
+private def sweepOK (b : Nat) : Bool :=
+  (List.range 72).all fun i₁ =>
+    (i₁ == b) ||
+    (List.range 72).all fun i₂ =>
+      (i₂ == b) || synNotHit b (synMask b ^^^ synMask i₁ ^^^ synMask i₂)
+
+private lemma sweepOK_zero : sweepOK 0 = true := by decide +kernel
+
+private lemma sweepOK_one : sweepOK 1 = true := by decide +kernel
+
+/-- Lookup soundness: each mask hashes to its own slot of `synInvTable`. -/
+private lemma synInv_sound : ∀ i < 72,
+    (synInvTable >>> (8 * (synMask i % 351))) &&& 255 = i + 1 := by
+  decide +kernel
+
+private lemma nat_eq_of_xor_eq_zero {x y : Nat} (h : x ^^^ y = 0) : x = y := by
+  have h1 : (x ^^^ y) ^^^ y = y := by rw [h, Nat.zero_xor]
+  rwa [Nat.xor_assoc, Nat.xor_self, Nat.xor_zero] at h1
+
+/-- The mask-level sweep, back in quantified form. -/
+private lemma mask_sweep (b i₁ i₂ i₃ : Nat) (hb : b < 2) (h₁ : i₁ < 72)
+    (h₂ : i₂ < 72) (h₃ : i₃ < 72) :
+    i₁ = b ∨ i₂ = b ∨ i₃ = b ∨
+    synMask b ^^^ synMask i₁ ^^^ synMask i₂ ^^^ synMask i₃ ≠ 0 := by
+  have hOK : sweepOK b = true := by
+    have hb2 : b = 0 ∨ b = 1 := by omega
+    rcases hb2 with rfl | rfl
+    · exact sweepOK_zero
+    · exact sweepOK_one
+  simp only [sweepOK, List.all_eq_true, List.mem_range, Bool.or_eq_true,
+    beq_iff_eq] at hOK
+  rcases hOK i₁ h₁ with h | hOK1
+  · exact Or.inl h
+  rcases hOK1 i₂ h₂ with h | hHit
+  · exact Or.inr (Or.inl h)
+  by_cases hib : i₃ = b
+  · exact Or.inr (Or.inr (Or.inl hib))
+  refine Or.inr (Or.inr (Or.inr fun h0 => ?_))
+  have hv : synMask b ^^^ synMask i₁ ^^^ synMask i₂ = synMask i₃ :=
+    nat_eq_of_xor_eq_zero h0
+  rw [hv] at hHit
+  have hsound := synInv_sound i₃ h₃
+  simp only [synNotHit, Bool.or_eq_true, beq_iff_eq, bne_iff_ne] at hHit
+  rw [hsound] at hHit
+  rcases hHit with (hc | hc) | hc
+  · omega
+  · exact hib (by omega)
+  · rw [Nat.add_sub_cancel] at hc
+    exact hc rfl
+
+/-- The `termAt` ↔ mask-bit bridge. -/
+private lemma termAt_eq_testBit : ∀ q : BaseGroup × Fin 2, ∀ h : BaseGroup,
+    termAt q h
+      = if (synMask (encQubit q)).testBit (encCheck h) then 1 else 0 := by
+  decide +kernel
+
+private lemma encQubit_lt : ∀ q : BaseGroup × Fin 2, encQubit q < 72 := by
+  decide +kernel
+
+private lemma encQubit_origin : ∀ b : Fin 2,
+    encQubit (((0, 0) : BaseGroup), b) = b.val := by
+  decide +kernel
+
+private lemma eq_origin_of_encQubit_eq : ∀ b : Fin 2, ∀ q : BaseGroup × Fin 2,
+    encQubit q = b.val → q = (((0, 0) : BaseGroup), b) := by
+  decide +kernel
+
+private lemma encCheck_decCheck : ∀ k < 36, encCheck (decCheck k) = k := by
+  decide +kernel
+
+private lemma testBit_false_of_lt {x n i : Nat} (hx : x < 2 ^ n) (hi : n ≤ i) :
+    x.testBit i = false :=
+  Nat.testBit_lt_two_pow
+    (Nat.lt_of_lt_of_le hx (Nat.pow_le_pow_right (by omega) hi))
+
+/-- A nonzero `Nat` with only-zero bits at positions `≥ n` has a set bit
+below `n`. -/
+private lemma exists_testBit_of_ne_zero {n x : Nat}
+    (hhigh : ∀ i, n ≤ i → x.testBit i = false) (hne : x ≠ 0) :
+    ∃ k, k < n ∧ x.testBit k = true := by
+  by_contra hcon
+  push Not at hcon
+  apply hne
+  apply Nat.eq_of_testBit_eq
+  intro i
+  rw [Nat.zero_testBit]
+  by_cases hi : i < n
+  · cases hb : x.testBit i with
+    | false => rfl
+    | true => exact absurd hb (hcon i hi)
+  · exact hhigh i (Nat.le_of_not_lt hi)
+
+private lemma sum_ne_zero_of_xor : ∀ b₀ b₁ b₂ b₃ : Bool,
+    (((b₀ ^^ b₁) ^^ b₂) ^^ b₃) = true →
+    ((if b₀ then 1 else 0) + (if b₁ then 1 else 0) + (if b₂ then 1 else 0)
+      + (if b₃ then 1 else 0) : ZMod 2) ≠ 0 := by
+  decide
 
 /-- No normalized weight-≤4 chain containing the origin qubit is a cycle
 (disjunctive form: the hypotheses `qᵢ ≠ origin` are folded into the
-conclusion so the `Decidable` instance synthesizes structurally). -/
+conclusion; proven by the packed-mask engine — `mask_sweep` plus the
+`termAt_eq_testBit` bridge, with `exists_testBit_of_ne_zero` extracting the
+witness check position from the nonzero XOR mask). -/
 lemma smallCycleCheck_four : ∀ b : Fin 2, ∀ q₁ q₂ q₃ : BaseGroup × Fin 2,
     q₁ = (((0, 0) : BaseGroup), b) ∨ q₂ = (((0, 0) : BaseGroup), b) ∨
     q₃ = (((0, 0) : BaseGroup), b) ∨
     ∃ h : BaseGroup,
       termAt ((((0, 0) : BaseGroup)), b) h + termAt q₁ h + termAt q₂ h
         + termAt q₃ h ≠ 0 := by
-  native_decide
+  intro b q₁ q₂ q₃
+  rcases mask_sweep b.val (encQubit q₁) (encQubit q₂) (encQubit q₃) b.isLt
+      (encQubit_lt q₁) (encQubit_lt q₂) (encQubit_lt q₃) with h | h | h | hxor
+  · exact Or.inl (eq_origin_of_encQubit_eq b q₁ h)
+  · exact Or.inr (Or.inl (eq_origin_of_encQubit_eq b q₂ h))
+  · exact Or.inr (Or.inr (Or.inl (eq_origin_of_encQubit_eq b q₃ h)))
+  · refine Or.inr (Or.inr (Or.inr ?_))
+    obtain ⟨k, hk, hbit⟩ := exists_testBit_of_ne_zero (n := 36)
+      (fun i hi => by
+        simp only [Nat.testBit_xor]
+        rw [testBit_false_of_lt (synMask_lt _) hi,
+          testBit_false_of_lt (synMask_lt _) hi,
+          testBit_false_of_lt (synMask_lt _) hi,
+          testBit_false_of_lt (synMask_lt _) hi]
+        rfl)
+      hxor
+    refine ⟨decCheck k, ?_⟩
+    have hb0 := termAt_eq_testBit (((0, 0) : BaseGroup), b) (decCheck k)
+    have hb1 := termAt_eq_testBit q₁ (decCheck k)
+    have hb2 := termAt_eq_testBit q₂ (decCheck k)
+    have hb3 := termAt_eq_testBit q₃ (decCheck k)
+    rw [encQubit_origin b] at hb0
+    rw [encCheck_decCheck k hk] at hb0 hb1 hb2 hb3
+    rw [hb0, hb1, hb2, hb3]
+    apply sum_ne_zero_of_xor
+    simpa only [Nat.testBit_xor] using hbit
 
 /-! ## The small-cycle theorem (strong form) -/
 

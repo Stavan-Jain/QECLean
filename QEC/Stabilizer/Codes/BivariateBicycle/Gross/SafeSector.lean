@@ -360,6 +360,77 @@ theorem gross_chain_distance_eq_12_of_engine
   gross_chain_distance_eq_12_of_sectors base_distance_ge_6
     (dangerous_sector_of_classification hC) (safe_sector_of_mim hMim)
 
+/-! ## Sparse pointwise form of the seam-crossing map (kernel-evaluation layer)
+
+`seamC`'s definitional form evaluates a 72-term `Finset.sum` (`conv` over
+`GrossGroup`) through the bundled `coverPi` tower at every point — opaque to
+kernel reduction.  The lemmas below collapse it to three sheet-indicator
+translate terms per block, which the kernel evaluates in a few hundred steps
+per point.  This is the evaluation substrate for the seam-offset read-offs and
+the seam covariance certificates (all kernel `decide`, no `native_decide`). -/
+
+/-- Three-monomial sparse form of `conv`: convolving against an explicit
+three-point indicator collapses the `Finset.sum` to three translates. -/
+lemma conv_indicator3 {G : Type} [Fintype G] [AddCommGroup G] [DecidableEq G]
+    (m₁ m₂ m₃ : G) (h₁₂ : m₁ ≠ m₂) (h₁₃ : m₁ ≠ m₃) (h₂₃ : m₂ ≠ m₃)
+    (f : G → ZMod 2) (g : G) :
+    conv (fun h => if h = m₁ ∨ h = m₂ ∨ h = m₃ then 1 else 0) f g
+      = f (g - m₁) + f (g - m₂) + f (g - m₃) := by
+  have key : ∀ h : G,
+      (if h = m₁ ∨ h = m₂ ∨ h = m₃ then (1 : ZMod 2) else 0) * f (g - h)
+        = (if h = m₁ then f (g - h) else 0) + (if h = m₂ then f (g - h) else 0)
+          + (if h = m₃ then f (g - h) else 0) := by
+    intro h
+    by_cases e₁ : h = m₁
+    · subst e₁
+      simp [h₁₂, h₁₃]
+    · by_cases e₂ : h = m₂
+      · subst e₂
+        simp [e₁, h₂₃]
+      · by_cases e₃ : h = m₃ <;> simp [e₁, e₂, e₃, Ne.symm h₁₃, Ne.symm h₂₃]
+  rw [conv_apply, Finset.sum_congr rfl (fun h _ => key h)]
+  rw [Finset.sum_add_distrib, Finset.sum_add_distrib]
+  rw [Finset.sum_ite_eq' Finset.univ m₁ (fun h => f (g - h)),
+      Finset.sum_ite_eq' Finset.univ m₂ (fun h => f (g - h)),
+      Finset.sum_ite_eq' Finset.univ m₃ (fun h => f (g - h))]
+  simp
+
+/-- The seam-crossing map in explicit sparse form: three sheet-indicator
+translate terms per block, evaluated at the deck-shifted section point.
+Kernel-evaluable pointwise (no `Finset.sum`, no bundled-hom towers). -/
+def seamCSparse (ξ : BaseGroup → ZMod 2) : BaseGroup × Fin 2 → ZMod 2 := fun q =>
+  if q.2 = 0 then
+    liftC2 ξ (coverSec q.1 + deckS - (3, 0)) + liftC2 ξ (coverSec q.1 + deckS - (0, 1))
+      + liftC2 ξ (coverSec q.1 + deckS - (0, 2))
+  else
+    liftC2 ξ (coverSec q.1 + deckS - (0, 3)) + liftC2 ξ (coverSec q.1 + deckS - (1, 0))
+      + liftC2 ξ (coverSec q.1 + deckS - (2, 0))
+
+/-- `seamC` agrees with its sparse form. -/
+theorem seamC_eq_sparse (ξ : BaseGroup → ZMod 2) : seamC ξ = seamCSparse ξ := by
+  funext q
+  obtain ⟨p, j⟩ := q
+  change liftStab ξ (deckSigma1 (coverSec1 (p, j))) = _
+  rw [deckSigma1_apply]
+  change bbBoundary2Fn grossA grossB (liftC2 ξ) ((coverSec1 (p, j)).1 + deckS, j) = _
+  change (if j = 0 then conv grossA (liftC2 ξ) (coverSec p + deckS)
+        else conv grossB (liftC2 ξ) (coverSec p + deckS)) = _
+  have hA : conv grossA (liftC2 ξ) (coverSec p + deckS)
+      = liftC2 ξ (coverSec p + deckS - (3, 0)) + liftC2 ξ (coverSec p + deckS - (0, 1))
+        + liftC2 ξ (coverSec p + deckS - (0, 2)) :=
+    conv_indicator3 ((3, 0) : GrossGroup) (0, 1) (0, 2)
+      (by decide) (by decide) (by decide) (liftC2 ξ) (coverSec p + deckS)
+  have hB : conv grossB (liftC2 ξ) (coverSec p + deckS)
+      = liftC2 ξ (coverSec p + deckS - (0, 3)) + liftC2 ξ (coverSec p + deckS - (1, 0))
+        + liftC2 ξ (coverSec p + deckS - (2, 0)) :=
+    conv_indicator3 ((0, 3) : GrossGroup) (1, 0) (2, 0)
+      (by decide) (by decide) (by decide) (liftC2 ξ) (coverSec p + deckS)
+  by_cases hj : j = 0
+  · rw [if_pos hj, hA]
+    simp [seamCSparse, hj]
+  · rw [if_neg hj, hB]
+    simp [seamCSparse, hj]
+
 end BB
 end Homological
 end Stabilizer

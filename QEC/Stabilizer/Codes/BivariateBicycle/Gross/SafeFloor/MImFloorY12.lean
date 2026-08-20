@@ -28,8 +28,7 @@ set_option maxRecDepth 8192
 /-- Y-orbit-12 representative `ker ∂₂` element. -/
 def zrep : BaseGroup → ZMod 2 := kcombo 1 1 0 1 1 0
 
-/-! ### Seam offsets, read off concretely (the only `native_decide`, one bundled
-compilation unit).
+/-! ### Seam offsets, read off concretely (kernel `decide` through the packed mask).
 A-block (`seamOffL`): comp1 `(1,1,1,1)`, comp3 `(0,2,0,2)`, comp4 `(2,2,2,2)`;
 B-block (`seamOffR`): comp2 `(0,0,0,0)`, comp3 `(2,1,2,1)`, comp4 `(3,3,3,3)`.
 Components 0,2 vanish (Lemma 17). -/
@@ -42,7 +41,8 @@ private theorem offs_eq :
     (∀ s, seamOffL zrep psi3 s
       = if s = (0,0) then 0 else if s = (1,0) then 2 else if s = (0,1) then 0 else 2) ∧
     (∀ s, seamOffL zrep psi4 s = 2) := by
-  native_decide
+  simp only [zrep, seamOffL_mask, seamOffR_mask]
+  decide +kernel
 
 theorem offR2_eq : seamOffR zrep psi2 = fun _ => 0 := funext offs_eq.1
 theorem offR3_eq : seamOffR zrep psi3

@@ -73,20 +73,26 @@ QEC/
     └── Codes/               # Concrete codes, organized by family:
         ├── _TEMPLATE.lean       # Canonical structural reference for new CSS codes
         ├── BivariateBicycle/    # BB family, one subdir per instance:
-        │                        # Gross/ (+ Gross/SafeFloor/), Z3Z6/, Z5Z15F2A6/,
-        │                        # BaseFloors/. READ ITS README.md BEFORE EDITING —
-        │                        # task router, discharge map, generated-file rules
+        │                        # Gross/ (+ Gross/SafeFloor/). READ ITS
+        │                        # README.md BEFORE EDITING — task router,
+        │                        # discharge map, generated-file rules
         ├── Toric/               # Parametric L×L toric code: CodeN, Chains,
         │                        # BoundaryMaps, Homology, H1Dimension,
         │                        # LogicalCorrespondence{X,Z}, ChainComplex,
         │                        # Distance{,X,Z}, StabilizerCode (16 files)
-        ├── RotatedSurface/      # 3×3 special case + parametric N (10 files,
-        │                        # same shape as Toric)
+        ├── RotatedSurface/      # parametric N (9 files, same shape as Toric)
         ├── Repetition/          # Three.lean (3-qubit) + N.lean (parametric)
         └── Small/               # Single-instance codes: Shor9, Steane7,
                                  # Steane7TransversalGates, FourQubit_4_2_2,
                                  # QuantumHamming, FiveQubit_5_1_3 (first non-CSS)
 ```
+
+Everything under `Codes/` is `native_decide`-free. The instances that carried
+one are parked on branch `claude/z3z6-parked`:
+`BivariateBicycle/{Z3Z6,Z5Z15F2A6,BaseFloors}/`, `Codes/Concat/` (both Steane
+concatenations), `RotatedSurface/Three.lean`, and `Small/Steane7Distance.lean`.
+`Framework/` keeps the abstract machinery they exercised — notably
+`Framework/Concatenation/`, which now has no concrete instance in this tree.
 
 **Layering** (lower can be imported by higher; not the reverse):
 
@@ -116,7 +122,9 @@ content there. Same convention for the sub-umbrellas
 - **Tactics**:
   - `simp +decide` is preferred over hand-written `decide` (and avoids the
     "expected type must not contain free variables" trap).
-  - `native_decide` is allowed (per user preference).
+  - **`native_decide` is banned** — it puts a compiler-trust axiom in the
+    proof term. See "Axiom policy" below. Use `decide`, `decide +kernel`,
+    or an explicit certificate instead.
   - **Probing residual goals**: prefer the `lean_goal` MCP tool (see "Agent
     tooling" below) — it returns the live `goals_before` / `goals_after` at
     a position without any edit or rebuild. Fallback when the MCP isn't
@@ -144,6 +152,65 @@ content there. Same convention for the sub-umbrellas
   proposition)` on a proof that previously closed. See
   qec-lab's `pipeline/attempts/stab_5_1_3/result.md` § "Lessons learned"
   for a concrete worked example of this footgun and the locality fix.
+
+## Axiom policy
+
+**Everything that reaches `main` must depend on exactly mathlib's three
+standard axioms — and nothing else:**
+
+```
+[propext, Classical.choice, Quot.sound]
+```
+
+Check any result with `#print axioms Your.Theorem`, or the `lean_verify` MCP
+tool (it takes a fully qualified name). A declaration that prints those three,
+or "does not depend on any axioms", passes. **Anything else fails**, no matter
+how convincing the proof is.
+
+**This is enforced in CI**, so a violation fails the build rather than landing
+quietly. To check the whole repo the way CI does:
+
+```bash
+lake env lean scripts/AxiomCheck.lean
+```
+
+It walks every declaration defined under `QEC/` (~6.3k of them), reports each
+offender with its module and the offending axioms, and exits non-zero. It is
+not part of any `lean_lib`, so a normal `lake build` does not pay for it —
+but it needs a completed build to run against.
+
+The two ways this gets violated in practice:
+
+- **`native_decide`** — evaluates the proposition with the compiled
+  evaluator and seals the result behind a fresh axiom, so you are trusting
+  the Lean compiler and your CPU rather than the kernel. As of v4.30 it emits
+  a *per-declaration* axiom (`Your.Theorem._native.native_decide.ax_1_1`),
+  not the older fixed `Lean.ofReduceBool` — so don't grep for a fixed name,
+  read the `#print axioms` output. Banned.
+- **`sorry`** — emits `sorryAx`. Fine on a WIP branch, never on `main`.
+  Tag every one as `sorry  -- TODO(<tag>): <goal shape>` so it can be found.
+
+Custom `axiom` declarations are equally out. If you genuinely need an
+unproven input, make it a **named hypothesis** on the theorem instead — then
+the assumption is visible in the statement rather than hidden in the axiom
+set. `Z5Z15F2A6`'s floor inputs were the worked example of this pattern.
+
+**What to reach for instead**, in rough order of preference: `decide`
+(kernel), `decide +kernel` for the heavier finite checks, packed-`Nat` tables
+instead of `Array`/`List` lookups (an `Array.getD` is an O(n) list walk under
+kernel reduction), quantifier bridges so the kernel enumerates concrete
+lambdas rather than whnf-ing a pi-`Fintype`, sparse rewrites in place of
+`Finset.sum`s, and Gaussian-style certificates where a sweep would otherwise
+be needed. The gross `[[144,12,12]]` proof under `Codes/BivariateBicycle/Gross/`
+is the reference: it was converted from 135 native leaves to kernel-only, and
+its capstones print the standard three. Read it before concluding a check
+"has to" be native.
+
+Code that cannot yet meet this bar does not get deleted — it gets **parked**
+on `claude/z3z6-parked` with a note recording what it proves, why it was
+parked, and the route back. See that branch's `PARKED-NATIVE-DECIDE.md` and
+`Z3Z6/PARKED.md`. Parking preserves the work; merging it to `main` would
+silently widen the trust base of everything downstream.
 
 ## Linter policy
 
@@ -246,7 +313,7 @@ These are local to this codebase — search here before assuming mathlib has the
 ## Build & verification
 
 ```
-lake build                                    # whole repo (~10 min cold)
+lake build                                    # whole repo (~45 s warm)
 lake build QEC.Stabilizer.Framework.Core.Stabilizer.Codespace      # one module
 lake env lean /tmp/probe.lean                 # one-off file check
 ```
@@ -254,6 +321,29 @@ lake env lean /tmp/probe.lean                 # one-off file check
 Always verify with `lake build` before claiming a fix works. The error
 output prints the residual goal under each failure — read it before guessing
 tactics.
+
+**`lake build` alone is NOT sufficient before pushing.** `defaultTargets` is
+just `QEC`, so three things it does not touch will still fail CI. After any
+change that adds, moves, or removes a module, run all four:
+
+```bash
+lake build && lake build QECLight && lake env lean Playground.lean && lake env lean scripts/AxiomCheck.lean
+```
+
+- **`QECLight`** (root `QECLight.lean`) re-lists the `Codes` umbrella minus
+  `BivariateBicycle`. Deliberately outside `defaultTargets`, so a module added
+  to or removed from `Codes/` breaks it invisibly. Checked by the `hosted-env`
+  workflow.
+- **`Playground.lean`** `#check`s a few showcase declarations against
+  `QECLight`. Removing or renaming one of them breaks it. Checked by
+  `hosted-env`'s "Check Playground.lean elaborates" step.
+- **`scripts/AxiomCheck.lean`** enforces the axiom policy (see below).
+  Checked by `lean_action_ci`.
+
+`bash scripts/check-umbrellas.sh` covers the umbrella wiring *under* `QEC/`,
+but by construction it does not walk these root-level files — hence the list
+above. All three have been broken in practice by module removals that a green
+`lake build` reported as fine.
 
 ## Worktrees: reuse the main repo's prebuilt mathlib
 

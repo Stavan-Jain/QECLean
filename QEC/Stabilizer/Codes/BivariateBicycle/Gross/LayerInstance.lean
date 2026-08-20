@@ -6,7 +6,8 @@ gross ↔ bb72 cover (`Defs.lean` / `CoverTransfer.lean`) as an
 `XDoubleCoverData GrossGroup BaseGroup`, and the unconditional `d(gross) = 12`
 is re-derived **through the layer's generic assemblies**
 (`chain_distance_eq_double` / `pauli_distance_eq_double`), exactly as the
-`[[72,4,8]]` instance (`Z3Z6/Distance.lean`) is proven.
+`[[72,4,8]]` instance is proven (that instance is parked on branch
+`claude/z3z6-parked`).
 
 The retrofit is *interface-level*: the layer's five per-instance inputs are
 discharged by the existing gross theorems —

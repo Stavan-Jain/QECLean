@@ -10,7 +10,7 @@ The proof is the CRT-engine classification of A4 §§6.2–6.3, layered as:
 
   §1  the layer dictionary `d₃` over the torus `Z₃²` (A4 §3 "Layer dictionary"):
       a nonzero `F₂`-function whose `F₄`-valued torus-Fourier support is confined
-      to certain Frobenius orbits has a forced minimum weight — `native_decide`
+      to certain Frobenius orbits has a forced minimum weight — a kernel `decide`
       over the 512 functions.  Entries used downstream (one-block lemma, A4 §6.3):
       `d₃({1}) = d₃({3}) = 6`, `d₃({1,3}) = 4`.
 
@@ -91,33 +91,85 @@ def dead3 : List (ZMod 3 × ZMod 3) := [(0, 0), (0, 1), (1, 0), (1, 2)]
 /-- Dead reps for `W = {ψ₁,ψ₃}`: `ψ₀ (0,0)`, `ψ₂ (1,0)`, `ψ₄ (1,2)`. -/
 def dead13 : List (ZMod 3 × ZMod 3) := [(0, 0), (1, 0), (1, 2)]
 
-/-! ### The three dictionary lower bounds (512-function `native_decide`).
-These are the exact `d₃`-costs the one-block lemma (A4 §6.3) consumes. -/
+/-! ### The kernel-friendly chain constructor.
+
+The dictionary bounds sweep all 512 chains `f : Z₃² → F₂`.  Enumerating that
+pi-type directly makes the kernel whnf the pi-`Fintype` instance (the
+noncomputable-whnf hazard's finite cousin), so the sweeps are instead stated
+over nine `ZMod 2` cell values via `mkTorus`, with `eq_mkTorus` transporting
+the result to an arbitrary `f`. -/
+
+/-- Explicit torus chain from its nine cell values (row-major
+`(0,0),(0,1),(0,2),(1,0),(1,1),(1,2),(2,0),(2,1),(2,2)`). -/
+def mkTorus (v00 v01 v02 v10 v11 v12 v20 v21 v22 : ZMod 2) :
+    ZMod 3 × ZMod 3 → ZMod 2 := fun t =>
+  if t = (0, 0) then v00 else if t = (0, 1) then v01 else if t = (0, 2) then v02
+  else if t = (1, 0) then v10 else if t = (1, 1) then v11 else if t = (1, 2) then v12
+  else if t = (2, 0) then v20 else if t = (2, 1) then v21 else v22
+
+/-- Every torus chain is the `mkTorus` of its nine cell values. -/
+theorem eq_mkTorus (f : ZMod 3 × ZMod 3 → ZMod 2) :
+    f = mkTorus (f (0, 0)) (f (0, 1)) (f (0, 2)) (f (1, 0)) (f (1, 1)) (f (1, 2))
+        (f (2, 0)) (f (2, 1)) (f (2, 2)) := by
+  have h3 : ∀ x : ZMod 3, x = 0 ∨ x = 1 ∨ x = 2 := by decide
+  funext t
+  obtain ⟨t1, t2⟩ := t
+  rcases h3 t1 with rfl | rfl | rfl <;> rcases h3 t2 with rfl | rfl | rfl <;> rfl
+
+/-! ### The three dictionary lower bounds (512-chain kernel sweeps via
+`mkTorus`).  These are the exact `d₃`-costs the one-block lemma (A4 §6.3)
+consumes. -/
 
 /-- `d₃({1}) = 6`: a nonzero `f` with Fourier support `⊆ orbit(ψ₁)` has weight `≥ 6`. -/
 theorem d3_psi1_ge6 : ∀ f : ZMod 3 × ZMod 3 → ZMod 2,
-    f ≠ 0 → suppOutsideZero f dead1 = true → 6 ≤ weight3 f := by native_decide
+    f ≠ 0 → suppOutsideZero f dead1 = true → 6 ≤ weight3 f := by
+  have key : ∀ v00 v01 v02 v10 v11 v12 v20 v21 v22 : ZMod 2,
+      mkTorus v00 v01 v02 v10 v11 v12 v20 v21 v22 ≠ 0 →
+      suppOutsideZero (mkTorus v00 v01 v02 v10 v11 v12 v20 v21 v22) dead1 = true →
+      6 ≤ weight3 (mkTorus v00 v01 v02 v10 v11 v12 v20 v21 v22) := by decide +kernel
+  intro f hne hsupp
+  rw [eq_mkTorus f] at hne hsupp ⊢
+  exact key _ _ _ _ _ _ _ _ _ hne hsupp
 
 /-- `d₃({3}) = 6`: a nonzero `f` with Fourier support `⊆ orbit(ψ₃)` has weight `≥ 6`. -/
 theorem d3_psi3_ge6 : ∀ f : ZMod 3 × ZMod 3 → ZMod 2,
-    f ≠ 0 → suppOutsideZero f dead3 = true → 6 ≤ weight3 f := by native_decide
+    f ≠ 0 → suppOutsideZero f dead3 = true → 6 ≤ weight3 f := by
+  have key : ∀ v00 v01 v02 v10 v11 v12 v20 v21 v22 : ZMod 2,
+      mkTorus v00 v01 v02 v10 v11 v12 v20 v21 v22 ≠ 0 →
+      suppOutsideZero (mkTorus v00 v01 v02 v10 v11 v12 v20 v21 v22) dead3 = true →
+      6 ≤ weight3 (mkTorus v00 v01 v02 v10 v11 v12 v20 v21 v22) := by decide +kernel
+  intro f hne hsupp
+  rw [eq_mkTorus f] at hne hsupp ⊢
+  exact key _ _ _ _ _ _ _ _ _ hne hsupp
 
 /-- `d₃({1,3}) = 4`: a nonzero `f` with Fourier support `⊆ orbit(ψ₁) ∪ orbit(ψ₃)`
 has weight `≥ 4`. -/
 theorem d3_psi1or3_ge4 : ∀ f : ZMod 3 × ZMod 3 → ZMod 2,
-    f ≠ 0 → suppOutsideZero f dead13 = true → 4 ≤ weight3 f := by native_decide
+    f ≠ 0 → suppOutsideZero f dead13 = true → 4 ≤ weight3 f := by
+  have key : ∀ v00 v01 v02 v10 v11 v12 v20 v21 v22 : ZMod 2,
+      mkTorus v00 v01 v02 v10 v11 v12 v20 v21 v22 ≠ 0 →
+      suppOutsideZero (mkTorus v00 v01 v02 v10 v11 v12 v20 v21 v22) dead13 = true →
+      4 ≤ weight3 (mkTorus v00 v01 v02 v10 v11 v12 v20 v21 v22) := by decide +kernel
+  intro f hne hsupp
+  rw [eq_mkTorus f] at hne hsupp ⊢
+  exact key _ _ _ _ _ _ _ _ _ hne hsupp
 
 /-! ### Tightness: each bound is attained (guards against a vacuously-true,
-over-constrained support predicate). -/
+over-constrained support predicate).  Witnesses: `d₃({1})` — the two rows
+`t_y ∈ {0,1}`; `d₃({3})` — the two diagonals `t_x+t_y ∈ {0,1}`; `d₃({1,3})` —
+their symmetric difference (weight 4). -/
 
 theorem d3_psi1_tight : ∃ f : ZMod 3 × ZMod 3 → ZMod 2,
-    f ≠ 0 ∧ suppOutsideZero f dead1 = true ∧ weight3 f = 6 := by native_decide
+    f ≠ 0 ∧ suppOutsideZero f dead1 = true ∧ weight3 f = 6 :=
+  ⟨mkTorus 1 1 0 1 1 0 1 1 0, by decide, by decide, by decide⟩
 
 theorem d3_psi3_tight : ∃ f : ZMod 3 × ZMod 3 → ZMod 2,
-    f ≠ 0 ∧ suppOutsideZero f dead3 = true ∧ weight3 f = 6 := by native_decide
+    f ≠ 0 ∧ suppOutsideZero f dead3 = true ∧ weight3 f = 6 :=
+  ⟨mkTorus 1 1 0 1 0 1 0 1 1, by decide, by decide, by decide⟩
 
 theorem d3_psi1or3_tight : ∃ f : ZMod 3 × ZMod 3 → ZMod 2,
-    f ≠ 0 ∧ suppOutsideZero f dead13 = true ∧ weight3 f = 4 := by native_decide
+    f ≠ 0 ∧ suppOutsideZero f dead13 = true ∧ weight3 f = 4 :=
+  ⟨mkTorus 0 0 0 0 1 1 1 0 1, by decide, by decide, by decide⟩
 
 /-! ## §2 The base ↔ torus reindex bridge
 
@@ -188,8 +240,9 @@ theorem slice_add (a b : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) :
   funext t; rfl
 
 /-! ### The Fourier bridge `V ψⱼ s b = fhat3 (slice b s) (charⱼ)`.
-Both sides are `F₂`-additive in `b` and agree on every `δ_g` (native_decide over the
-36 `g × 4 s`), hence agree for all `b`. -/
+Both sides are `F₂`-additive in `b` and agree on every `δ_g` (kernel `decide`
+over the 36 `g` × 4 `s` — both sides are explicit `List.foldl`s, so the direct
+statement is already kernel-checkable), hence agree for all `b`. -/
 
 /-- Two `F₂`-additive maps `(BaseGroup → ZMod 2) → Fin 4` that agree on every `δ_g`
 agree everywhere. -/
@@ -215,15 +268,15 @@ theorem Nzero (s : ZMod 2 × ZMod 2) (c : ZMod 3 × ZMod 3) :
     fhat3 (slice (0 : BaseGroup → ZMod 2) s) c = 0 := by rw [slice_zero, fhat3_zero]
 
 theorem basis_agree0 : ∀ (g : BaseGroup) (s : ZMod 2 × ZMod 2),
-    V psi0 s (Pi.single g 1) = fhat3 (slice (Pi.single g 1) s) (0, 0) := by native_decide
+    V psi0 s (Pi.single g 1) = fhat3 (slice (Pi.single g 1) s) (0, 0) := by decide +kernel
 theorem basis_agree1 : ∀ (g : BaseGroup) (s : ZMod 2 × ZMod 2),
-    V psi1 s (Pi.single g 1) = fhat3 (slice (Pi.single g 1) s) (0, 1) := by native_decide
+    V psi1 s (Pi.single g 1) = fhat3 (slice (Pi.single g 1) s) (0, 1) := by decide +kernel
 theorem basis_agree2 : ∀ (g : BaseGroup) (s : ZMod 2 × ZMod 2),
-    V psi2 s (Pi.single g 1) = fhat3 (slice (Pi.single g 1) s) (1, 0) := by native_decide
+    V psi2 s (Pi.single g 1) = fhat3 (slice (Pi.single g 1) s) (1, 0) := by decide +kernel
 theorem basis_agree3 : ∀ (g : BaseGroup) (s : ZMod 2 × ZMod 2),
-    V psi3 s (Pi.single g 1) = fhat3 (slice (Pi.single g 1) s) (1, 1) := by native_decide
+    V psi3 s (Pi.single g 1) = fhat3 (slice (Pi.single g 1) s) (1, 1) := by decide +kernel
 theorem basis_agree4 : ∀ (g : BaseGroup) (s : ZMod 2 × ZMod 2),
-    V psi4 s (Pi.single g 1) = fhat3 (slice (Pi.single g 1) s) (1, 2) := by native_decide
+    V psi4 s (Pi.single g 1) = fhat3 (slice (Pi.single g 1) s) (1, 2) := by decide +kernel
 
 /-- Fourier bridge, `ψ₀` (parity). -/
 theorem fourier_bridge0 (b : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) :
@@ -308,44 +361,76 @@ def unitHat : Ring := fun s =>
 /-- `V₀(A⋆z) = Â₀·V₀(z)`, `Â₀ = unitHat`. -/
 theorem mult_A0 (z : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) :
     V psi0 s (conv baseA z) = rmul unitHat (fun s' => V psi0 s' z) s :=
-  mult_of_basis psi0 baseA unitHat (by native_decide) z s
+  mult_of_basis psi0 baseA unitHat (basis_of_translate (by decide +kernel)) z s
 /-- `V₂(A⋆z) = Â₂·V₂(z)`, `Â₂ = unitHat`. -/
 theorem mult_A2 (z : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) :
     V psi2 s (conv baseA z) = rmul unitHat (fun s' => V psi2 s' z) s :=
-  mult_of_basis psi2 baseA unitHat (by native_decide) z s
+  mult_of_basis psi2 baseA unitHat (basis_of_translate (by decide +kernel)) z s
 /-- `V₀(B⋆z) = B̂₀·V₀(z)`, `B̂₀ = unitHat`. -/
 theorem mult_B0 (z : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) :
     V psi0 s (conv baseB z) = rmul unitHat (fun s' => V psi0 s' z) s :=
-  mult_of_basis psi0 baseB unitHat (by native_decide) z s
+  mult_of_basis psi0 baseB unitHat (basis_of_translate (by decide +kernel)) z s
 /-- `V₁(B⋆z) = B̂₁·V₁(z)`, `B̂₁ = unitHat`. -/
 theorem mult_B1 (z : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) :
     V psi1 s (conv baseB z) = rmul unitHat (fun s' => V psi1 s' z) s :=
-  mult_of_basis psi1 baseB unitHat (by native_decide) z s
+  mult_of_basis psi1 baseB unitHat (basis_of_translate (by decide +kernel)) z s
 
-/-! ### Ring facts for the Fourier profile of `B·w` (native_decide over the
-256-element ring). -/
+/-! ### Ring facts for the Fourier profile of `B·w` (kernel `decide` over the
+256-element ring, swept through `mkRing`/`ring_eq_mkRing` so the kernel never
+whnfs the pi-type `Fintype` of `Ring`). -/
 
 /-- `V₂`: a `unitHat`-annihilated component is killed by `B̂₂` too. -/
 theorem unitHat_zero_to_Bhat2 : ∀ r : Ring,
-    rmul unitHat r = (fun _ => 0) → rmul Bhat2 r = (fun _ => 0) := by native_decide
+    rmul unitHat r = (fun _ => 0) → rmul Bhat2 r = (fun _ => 0) := by
+  have key : ∀ a b c d : Fin 4,
+      rmul unitHat (mkRing a b c d) = (fun _ => 0) →
+      rmul Bhat2 (mkRing a b c d) = (fun _ => 0) := by decide +kernel
+  intro r
+  rw [ring_eq_mkRing r]
+  exact key _ _ _ _
 
 /-- `V₄`: an `Â₄`-annihilated component is killed by `B̂₂` (since `B̂₄ = ω·Â₄`). -/
 theorem Ahat4_zero_to_Bhat2 : ∀ r : Ring,
-    rmul Ahat4 r = (fun _ => 0) → rmul Bhat2 r = (fun _ => 0) := by native_decide
+    rmul Ahat4 r = (fun _ => 0) → rmul Bhat2 r = (fun _ => 0) := by
+  have key : ∀ a b c d : Fin 4,
+      rmul Ahat4 (mkRing a b c d) = (fun _ => 0) →
+      rmul Bhat2 (mkRing a b c d) = (fun _ => 0) := by decide +kernel
+  intro r
+  rw [ring_eq_mkRing r]
+  exact key _ _ _ _
 
 /-- `V₃`: an `Â₁`-annihilated component, hit by `B̂₂`, lands in the socle — a
 constant vector, i.e. `0` or everywhere-nonzero. -/
 theorem Ahat1_zero_Bhat2_const : ∀ r : Ring,
     rmul Ahat1 r = (fun _ => 0) →
-    rmul Bhat2 r = (fun _ => 0) ∨ (∀ s, rmul Bhat2 r s ≠ 0) := by native_decide
+    rmul Bhat2 r = (fun _ => 0) ∨ (∀ s, rmul Bhat2 r s ≠ 0) := by
+  have key : ∀ a b c d : Fin 4,
+      rmul Ahat1 (mkRing a b c d) = (fun _ => 0) →
+      rmul Bhat2 (mkRing a b c d) = (fun _ => 0) ∨
+        (∀ s, rmul Bhat2 (mkRing a b c d) s ≠ 0) := by decide +kernel
+  intro r
+  rw [ring_eq_mkRing r]
+  exact key _ _ _ _
 
 /-- `V₁`: `rmul unitHat r` stays in `Ann(Â₁)` when `r` does (`B̂₁` is a unit). -/
 theorem Ahat1_unitHat_ann : ∀ r : Ring,
-    rmul Ahat1 r = (fun _ => 0) → rmul Ahat1 (rmul unitHat r) = (fun _ => 0) := by native_decide
+    rmul Ahat1 r = (fun _ => 0) → rmul Ahat1 (rmul unitHat r) = (fun _ => 0) := by
+  have key : ∀ a b c d : Fin 4,
+      rmul Ahat1 (mkRing a b c d) = (fun _ => 0) →
+      rmul Ahat1 (rmul unitHat (mkRing a b c d)) = (fun _ => 0) := by decide +kernel
+  intro r
+  rw [ring_eq_mkRing r]
+  exact key _ _ _ _
 
 /-- `V₁` structure: a nonzero `Ann(Â₁)` element has `≥ 3` nonzero layers. -/
 theorem annAhat1_zero_or_ge3 : ∀ r : Ring,
-    rmul Ahat1 r = (fun _ => 0) → r = (fun _ => 0) ∨ nLayers r ≥ 3 := by native_decide
+    rmul Ahat1 r = (fun _ => 0) → r = (fun _ => 0) ∨ nLayers r ≥ 3 := by
+  have key : ∀ a b c d : Fin 4,
+      rmul Ahat1 (mkRing a b c d) = (fun _ => 0) →
+      mkRing a b c d = (fun _ => 0) ∨ nLayers (mkRing a b c d) ≥ 3 := by decide +kernel
+  intro r
+  rw [ring_eq_mkRing r]
+  exact key _ _ _ _
 
 /-! ### Layer-count and Fourier-injectivity helpers. -/
 
@@ -364,10 +449,21 @@ theorem nLayers_eq_card (p : Ring) :
   intro _; exact allS_complete s
 
 /-- Torus-Fourier injectivity at the 5 orbit reps (contrapositive form): a nonzero
-function has a nonzero `fhat3` at some representative (`native_decide` over 512). -/
+function has a nonzero `fhat3` at some representative (kernel `decide` over the
+512 chains, via `mkTorus`). -/
 theorem fhat3_nonzero_reps : ∀ f : ZMod 3 × ZMod 3 → ZMod 2, f ≠ 0 →
     fhat3 f (0, 0) ≠ 0 ∨ fhat3 f (0, 1) ≠ 0 ∨ fhat3 f (1, 0) ≠ 0 ∨
-    fhat3 f (1, 1) ≠ 0 ∨ fhat3 f (1, 2) ≠ 0 := by native_decide
+    fhat3 f (1, 1) ≠ 0 ∨ fhat3 f (1, 2) ≠ 0 := by
+  have key : ∀ v00 v01 v02 v10 v11 v12 v20 v21 v22 : ZMod 2,
+      mkTorus v00 v01 v02 v10 v11 v12 v20 v21 v22 ≠ 0 →
+      fhat3 (mkTorus v00 v01 v02 v10 v11 v12 v20 v21 v22) (0, 0) ≠ 0 ∨
+      fhat3 (mkTorus v00 v01 v02 v10 v11 v12 v20 v21 v22) (0, 1) ≠ 0 ∨
+      fhat3 (mkTorus v00 v01 v02 v10 v11 v12 v20 v21 v22) (1, 0) ≠ 0 ∨
+      fhat3 (mkTorus v00 v01 v02 v10 v11 v12 v20 v21 v22) (1, 1) ≠ 0 ∨
+      fhat3 (mkTorus v00 v01 v02 v10 v11 v12 v20 v21 v22) (1, 2) ≠ 0 := by decide +kernel
+  intro f hne
+  rw [eq_mkTorus f] at hne ⊢
+  exact key _ _ _ _ _ _ _ _ _ hne
 
 /-- If every layer slice of `b` is zero then `b` is zero. -/
 theorem b_zero_of_slices (b : BaseGroup → ZMod 2) (h : ∀ s, slice b s = 0) : b = 0 := by
@@ -508,10 +604,16 @@ theorem bwt_add_le (a b : BaseGroup → ZMod 2) : bwt (a + b) ≤ bwt a + bwt b 
 
 /-- A single hexagon A-block has weight exactly 3. -/
 theorem bwt_baseA_single : ∀ g : BaseGroup, bwt (conv baseA (Pi.single g 1)) = 3 := by
-  native_decide
+  have key : ∀ g : BaseGroup, bwt (fun h => baseA (h - g)) = 3 := by decide +kernel
+  intro g
+  rw [conv_single_right]
+  exact key g
 /-- A single hexagon B-block has weight exactly 3. -/
 theorem bwt_baseB_single : ∀ g : BaseGroup, bwt (conv baseB (Pi.single g 1)) = 3 := by
-  native_decide
+  have key : ∀ g : BaseGroup, bwt (fun h => baseB (h - g)) = 3 := by decide +kernel
+  intro g
+  rw [conv_single_right]
+  exact key g
 
 /-- `∂₂` block values (definitional). -/
 theorem bb2_zero (z : BaseGroup → ZMod 2) (h : BaseGroup) :
@@ -592,12 +694,30 @@ theorem bwt_blocks_le_boundary (f : BaseGroup → ZMod 2) :
     obtain ⟨b, _, hb⟩ := hpb
     exact absurd ((Prod.mk.injEq ..).mp hb).2 (by decide)
 
-/-- D-pair A-block is nonzero (weight ≥ 1). -/
+/-- D-pair A-block is nonzero (weight ≥ 1): the probe cell `g + (3,0)` — or
+`g + (0,1)` for the two directions `(3,4)`, `(3,5)`, whose second hexagon covers
+`g + (3,0)` — carries value 1 (kernel `decide`, 12 × 36 single-cell checks). -/
 theorem bwt_baseA_dpair_ge1 : ∀ g : BaseGroup, ∀ d ∈ pairDirections,
-    1 ≤ bwt (conv baseA (Pi.single g 1 + Pi.single (g + d) 1)) := by native_decide
-/-- D-pair B-block has weight ≤ 6. -/
+    1 ≤ bwt (conv baseA (Pi.single g 1 + Pi.single (g + d) 1)) := by
+  have key : ∀ d ∈ pairDirections, ∀ g : BaseGroup,
+      ((fun h => baseA (h - g)) + fun h => baseA (h - (g + d)))
+        (g + (if d = (3, 4) ∨ d = (3, 5) then (0, 1) else (3, 0))) = 1 := by
+    decide +kernel
+  intro g d hd
+  rw [conv_add_right, conv_single_right, conv_single_right]
+  unfold bwt
+  exact Finset.one_le_card.mpr
+    ⟨_, Finset.mem_filter.mpr ⟨Finset.mem_univ _, key d hd g⟩⟩
+/-- D-pair B-block has weight ≤ 6 (subadditivity + two weight-3 hexagons). -/
 theorem bwt_baseB_dpair_le6 : ∀ g : BaseGroup, ∀ d ∈ pairDirections,
-    bwt (conv baseB (Pi.single g 1 + Pi.single (g + d) 1)) ≤ 6 := by native_decide
+    bwt (conv baseB (Pi.single g 1 + Pi.single (g + d) 1)) ≤ 6 := by
+  intro g d _
+  rw [conv_add_right]
+  calc bwt (conv baseB (Pi.single g 1) + conv baseB (Pi.single (g + d) 1))
+      ≤ bwt (conv baseB (Pi.single g 1)) + bwt (conv baseB (Pi.single (g + d) 1)) :=
+        bwt_add_le _ _
+    _ = 3 + 3 := by rw [bwt_baseB_single g, bwt_baseB_single (g + d)]
+    _ ≤ 6 := by norm_num
 
 /-- **Endgame transfer (D-pair)**: if the A-block of `∂₂f` is `A·(δ_g+δ_{g+d})`,
 `d ∈ pairDirections`, and `|∂₂f| ≤ 10`, then `∂₂f = ∂₂(δ_g+δ_{g+d})`.  The crude

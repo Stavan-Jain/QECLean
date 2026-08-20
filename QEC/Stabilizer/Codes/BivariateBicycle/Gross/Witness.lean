@@ -11,7 +11,7 @@ Non-boundaryness is certified by an explicit dual witness `w` with
 `dualBoundary w = 0` and `⟨w, τ(u*)⟩ = 1`, fed to
 `not_mem_boundaries_of_dual_witness`.  The witness support was found by `𝔽₂`
 row reduction offline; its provenance is irrelevant since both defining
-properties are re-checked here by `native_decide` (via the transpose formula
+properties are re-checked here by kernel `decide` (via the transpose formula
 `bb_dualBoundary_eq`).
 
 ## Convention bridge (lab notes → repo)
@@ -38,19 +38,19 @@ def zStar : BaseGroup → ZMod 2 := fun g =>
      g = (3, 0) ∨ g = (3, 4) then 1 else 0
 
 theorem conv_baseA_zStar : conv baseA zStar = 0 := by
-  native_decide
+  decide +kernel
 
 /-- The base 1-chain `u*`: `z*` in the right block, zero in the left. -/
 def uStar : BaseGroup × Fin 2 → ZMod 2 := fun p =>
   if p.2 = 1 then zStar p.1 else 0
 
 theorem uStar_mem_cycles : uStar ∈ bb72Complex.cycles := by
-  have h : bbBoundary1Fn baseA baseB uStar = 0 := by native_decide
+  have h : bbBoundary1Fn baseA baseB uStar = 0 := by decide +kernel
   exact h
 
 theorem chainWeight_uStar : bb72Complex.chainWeight uStar = 6 := by
   rw [bb72Complex_chainWeight_eq]
-  native_decide
+  decide +kernel
 
 /-! ## The pulled-back gross cycle `τ(u*)` -/
 
@@ -86,7 +86,7 @@ theorem fluxWitness_dual_raw :
     (fun f => conv (reflect grossA) (leftHalf fluxWitness) f
       + conv (reflect grossB) (rightHalf fluxWitness) f)
       = (0 : GrossGroup → ZMod 2) := by
-  native_decide
+  decide +kernel
 
 theorem fluxWitness_dualBoundary :
     grossComplex.dualBoundary fluxWitness = 0 := by
@@ -96,7 +96,7 @@ theorem fluxWitness_dualBoundary :
 
 theorem fluxWitness_pairing :
     ∑ e : GrossGroup × Fin 2, fluxWitness e * tauUStarFn e = 1 := by
-  native_decide
+  decide +kernel
 
 /-! ## Non-boundaryness and the headline -/
 

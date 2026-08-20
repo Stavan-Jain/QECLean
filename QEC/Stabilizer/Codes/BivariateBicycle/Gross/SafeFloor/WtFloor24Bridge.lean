@@ -11,7 +11,7 @@ of `floor_of_data_analytic`) to the per-slot / per-block `slotCost` machinery.
 
 * **`rmul_{Bhat2,Ahat1,Ahat4}_mem`** — the radical-multiplier image lies in the
   16-element ideal `{αD + β·uv}`: `rmul D r = αD + β·uv` for some `α, β`
-  (`native_decide` over the 256-element `Ring`, a `Fintype`).  This is what lets
+  (kernel `decide` over the 256-element `Ring` via `mkRing`).  This is what lets
   a coset's constrained component `off + D·(Vⱼ f)` be rewritten as a finite
   `(α, β)`-indexed ideal element.
 * **`inIdeal_to_exists`** — the `Bool` membership `inIdeal D r` to the `Prop`
@@ -51,8 +51,8 @@ The cost-preserving moves (`slotCost(L)_frob`, `slotCost_scale`) and
 `RBlock_std_ge6` are retained as the standard-form-reduction building blocks for
 the light orbits / any non-decoupling rep.
 
-Everything here is **axiom-clean** except the three `rmul_*_mem` facts, which use
-`native_decide` over the 256-element ring (the same foundational-ring category as
+Everything here is **axiom-clean** including the three `rmul_*_mem` facts, now
+kernel `decide` over the 256-element ring via `mkRing` (the same foundational-ring category as
 `CRTFrame`'s `*_ann_eq_ideal` / `*_ideal_ge3`, not the `2³⁰` floor leaf).
 -/
 
@@ -75,14 +75,29 @@ A coset's constrained component is `offset ⊕ D·(Vⱼ f)` for a radical multip
 into the `Prop` existential the rewrite needs. -/
 
 /-- `B̂₂·r` lies in the ideal `{α·B̂₂ + β·uv}` for every `r` (`Ring` is a
-`Fintype`; `native_decide` over its 256 elements). -/
-theorem rmul_Bhat2_mem : ∀ r : Ring, inIdeal Bhat2 (rmul Bhat2 r) = true := by native_decide
+`Fintype`; kernel `decide` over its 256 elements via `mkRing`). -/
+theorem rmul_Bhat2_mem : ∀ r : Ring, inIdeal Bhat2 (rmul Bhat2 r) = true := by
+  have core : ∀ a b c d : Fin 4, inIdeal Bhat2 (rmul Bhat2 (mkRing a b c d)) = true := by
+    decide +kernel
+  intro r
+  rw [ring_eq_mkRing r]
+  exact core _ _ _ _
 
 /-- `Â₁·r` lies in the ideal `{α·Â₁ + β·uv}` for every `r`. -/
-theorem rmul_Ahat1_mem : ∀ r : Ring, inIdeal Ahat1 (rmul Ahat1 r) = true := by native_decide
+theorem rmul_Ahat1_mem : ∀ r : Ring, inIdeal Ahat1 (rmul Ahat1 r) = true := by
+  have core : ∀ a b c d : Fin 4, inIdeal Ahat1 (rmul Ahat1 (mkRing a b c d)) = true := by
+    decide +kernel
+  intro r
+  rw [ring_eq_mkRing r]
+  exact core _ _ _ _
 
 /-- `Â₄·r` lies in the ideal `{α·Â₄ + β·uv}` for every `r`. -/
-theorem rmul_Ahat4_mem : ∀ r : Ring, inIdeal Ahat4 (rmul Ahat4 r) = true := by native_decide
+theorem rmul_Ahat4_mem : ∀ r : Ring, inIdeal Ahat4 (rmul Ahat4 r) = true := by
+  have core : ∀ a b c d : Fin 4, inIdeal Ahat4 (rmul Ahat4 (mkRing a b c d)) = true := by
+    decide +kernel
+  intro r
+  rw [ring_eq_mkRing r]
+  exact core _ _ _ _
 
 /-- The `Bool` ideal-membership `inIdeal D r` to the `Prop` witness
 `∃ a b, r = α·D + β·uv` (over all four slots). -/

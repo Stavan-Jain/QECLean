@@ -26,7 +26,8 @@ and the doubling-template bridge
 
 The obligations are plain `Prop`s, so an instance can discharge them
 either by `native_decide` (engineering grade — what the generated
-instances under `Codes/BivariateBicycle/BaseFloors/` do; provenance
+`BaseFloors/` instances did before they were parked on branch
+`claude/z3z6-parked`; provenance
 `qec-lab:experiments/bb_lab/scripts/gen_base_floor_lean.py`) or, eventually, by
 the analytic class small-cycle theorem (A16 write-up of record), whose
 hypotheses (D1 ∧ D2 ∧ (iii) ∧ (a), floor-bearing frame) imply exactly

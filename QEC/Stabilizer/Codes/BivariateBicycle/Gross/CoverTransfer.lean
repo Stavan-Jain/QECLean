@@ -128,10 +128,10 @@ noncomputable def coverPull1 :
 /-! ## The polynomials descend -/
 
 theorem coverPush_grossA : fiberSumFn ⇑coverPi grossA = baseA := by
-  native_decide
+  decide +kernel
 
 theorem coverPush_grossB : fiberSumFn ⇑coverPi grossB = baseB := by
-  native_decide
+  decide +kernel
 
 /-! ## Chain maps -/
 

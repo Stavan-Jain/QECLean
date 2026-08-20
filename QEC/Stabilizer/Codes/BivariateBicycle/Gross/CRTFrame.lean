@@ -5,7 +5,7 @@ Computable F₄, the group algebra `F₄[Z₂²]`, the CRT layer/torus coordinat
 `Z₆`, the six radical multipliers `Â_j`/`B̂_j`, and the **engine support-shape
 lemma** over the 256-element ring.  Everything is built on explicit `Fin 4`
 tables and `List.foldl` — NO `GaloisField`/`Finsupp`, which are noncomputable and
-would defeat `decide`/`native_decide` (the Phase-5 noncomputable-whnf hazard).
+would defeat `decide` (the Phase-5 noncomputable-whnf hazard).
 
 Promoted verbatim from the GREEN phase-6 probes `FrameProbe.lean` /
 `EngineProbe.lean`; see those for the de-risking history (EngineProbe refuted the
@@ -79,6 +79,21 @@ def rmul (p q : Ring) : Ring :=
 /-- The all-ones socle element `uv = 1 + s_x + s_y + s_xs_y`. -/
 def uv : Ring := fun _ => 1
 
+/-- Explicit ring element from its four layer values (canonical layer order
+`1, s_x, s_y, s_xs_y`).  Together with `ring_eq_mkRing` this converts
+`∀ r : Ring, …` sweeps into `∀ a b c d : Fin 4, …` sweeps — the form the
+kernel can enumerate without whnf-ing the 256-element pi-type `Fintype`. -/
+def mkRing (a b c d : Fin 4) : Ring := fun s =>
+  if s = (0, 0) then a else if s = (1, 0) then b else if s = (0, 1) then c else d
+
+/-- Every ring element is the `mkRing` of its four layer values. -/
+theorem ring_eq_mkRing (r : Ring) :
+    r = mkRing (r (0, 0)) (r (1, 0)) (r (0, 1)) (r (1, 1)) := by
+  have h2 : ∀ x : ZMod 2, x = 0 ∨ x = 1 := by decide
+  funext s
+  obtain ⟨s1, s2⟩ := s
+  rcases h2 s1 with rfl | rfl <;> rcases h2 s2 with rfl | rfl <;> rfl
+
 /-! ## §3 CRT coordinates on `Z₆`: layer (mod 2) and torus (mod 3). -/
 
 /-- Layer coordinate of `a ∈ Z₆` (reduce mod 2). -/
@@ -146,32 +161,32 @@ def annihilatedBy (D : Ring) (r : Ring) : Bool :=
 
 /-! ### Engine (D² = 0) for the three radical multipliers. -/
 
-theorem Ahat1_sq : rmul Ahat1 Ahat1 = (fun _ => 0) := by native_decide
-theorem Ahat4_sq : rmul Ahat4 Ahat4 = (fun _ => 0) := by native_decide
-theorem Bhat2_sq : rmul Bhat2 Bhat2 = (fun _ => 0) := by native_decide
+theorem Ahat1_sq : rmul Ahat1 Ahat1 = (fun _ => 0) := by decide +kernel
+theorem Ahat4_sq : rmul Ahat4 Ahat4 = (fun _ => 0) := by decide +kernel
+theorem Bhat2_sq : rmul Bhat2 Bhat2 = (fun _ => 0) := by decide +kernel
 
 /-! ### Engine (i): `Ann(D) = (D)`.  The 256-element annihilator set equals the
 16-element ideal `{αD + β·uv}`. -/
 
 theorem Ahat1_ann_eq_ideal :
-    allRing.all (fun r => annihilatedBy Ahat1 r == inIdeal Ahat1 r) = true := by native_decide
+    allRing.all (fun r => annihilatedBy Ahat1 r == inIdeal Ahat1 r) = true := by decide +kernel
 theorem Ahat4_ann_eq_ideal :
-    allRing.all (fun r => annihilatedBy Ahat4 r == inIdeal Ahat4 r) = true := by native_decide
+    allRing.all (fun r => annihilatedBy Ahat4 r == inIdeal Ahat4 r) = true := by decide +kernel
 theorem Bhat2_ann_eq_ideal :
-    allRing.all (fun r => annihilatedBy Bhat2 r == inIdeal Bhat2 r) = true := by native_decide
+    allRing.all (fun r => annihilatedBy Bhat2 r == inIdeal Bhat2 r) = true := by decide +kernel
 
 /-! ### Engine (ii): every NONZERO ideal element has `≥ 3` nonzero layers.
 This is the exact L4b "Floor" input. -/
 
 theorem Ahat1_ideal_ge3 : all16.all (fun ab =>
     let r : Ring := fun s => fadd (fmul ab.1 (Ahat1 s)) (fmul ab.2 (uv s))
-    decide (r = (fun _ => 0)) || decide (nLayers r ≥ 3)) = true := by native_decide
+    decide (r = (fun _ => 0)) || decide (nLayers r ≥ 3)) = true := by decide +kernel
 theorem Ahat4_ideal_ge3 : all16.all (fun ab =>
     let r : Ring := fun s => fadd (fmul ab.1 (Ahat4 s)) (fmul ab.2 (uv s))
-    decide (r = (fun _ => 0)) || decide (nLayers r ≥ 3)) = true := by native_decide
+    decide (r = (fun _ => 0)) || decide (nLayers r ≥ 3)) = true := by decide +kernel
 theorem Bhat2_ideal_ge3 : all16.all (fun ab =>
     let r : Ring := fun s => fadd (fmul ab.1 (Bhat2 s)) (fmul ab.2 (uv s))
-    decide (r = (fun _ => 0)) || decide (nLayers r ≥ 3)) = true := by native_decide
+    decide (r = (fun _ => 0)) || decide (nLayers r ≥ 3)) = true := by decide +kernel
 
 /-! ## §6 The component transform `V` and its F₂-linearity (M2 bridge).
 
@@ -180,8 +195,8 @@ fact for the multiplicativity engine is that `V` is **F₂-linear in the chain**
 `f` (`V_add`), proved from a generic char-2 fold-splitting lemma (`foldl_char2`,
 whose only arithmetic content is one `decide` over the 256 `Bool²×Fin 4³`
 accumulator cases).  This is what lifts the basis-chain multiplicativity
-(M2-(A): `V_j(baseP⋆δ_p) = P̂_j·V_j(δ_p)`, native_decide on the 36 `δ_p`, all 10
-(j,P) instances GREEN in `phase6/MultProbe.lean`) to all chains `z`.  The five
+(M2-(A): `V_j(baseP⋆δ_p) = P̂_j·V_j(δ_p)`, a kernel `decide` over the 36 `δ_p`, all
+10 (j,P) instances GREEN in `phase6/MultProbe.lean`) to all chains `z`.  The five
 component characters are the A4 §3 frame characters. -/
 
 /-- Enumeration of the base group (36 cells). -/
@@ -233,7 +248,7 @@ def V (psi : BaseGroup → Fin 4) (s : ZMod 2 × ZMod 2) (f : BaseGroup → ZMod
 
 /-- **The F₂-linearity bridge (M2-(B)): `V` is additive in the chain.**  This is
 the load-bearing step that lifts the basis-chain multiplicativity (M2-(A),
-native_decide on the 36 `δ_p`) to all chains `z`; it is the piece with no
+a kernel `decide` over the 36 `δ_p`) to all chains `z`; it is the piece with no
 mathlib analogue (F₄ is `Fin 4`+tables, so there is no `AddCommMonoid` to borrow
 `Finset.sum` additivity from — hence the hand-rolled char-2 `foldl_char2`). -/
 theorem V_add (psi : BaseGroup → Fin 4) (s : ZMod 2 × ZMod 2)
@@ -249,7 +264,7 @@ theorem V_add (psi : BaseGroup → Fin 4) (s : ZMod 2 × ZMod 2)
 
 /-! ## §7 General multiplicativity `V_j(baseP⋆z) = P̂_j·V_j(z)` for all chains.
 
-The basis-chain identity (M2-(A): `V_j(baseP⋆δ_p) = P̂_j·V_j(δ_p)`, native_decide
+The basis-chain identity (M2-(A): `V_j(baseP⋆δ_p) = P̂_j·V_j(δ_p)`, kernel `decide`
 on the `Pi.single p 1`, all 10 (j,P) instances GREEN in `phase6/MultProbe.lean`)
 lifts to **all** chains `z` because every map in sight is F₂-linear: the
 convolution `conv baseP ·` (`conv_add_right`), the transform `V` (`V_add`), and
@@ -364,38 +379,58 @@ theorem mult_of_basis (psi : BaseGroup → Fin 4) (P : BaseGroup → ZMod 2)
   exact key _ s
 
 /-! ### The six radical-multiplier multiplicativity identities (engine inputs).
-Each `by native_decide` discharges the 36-`δ_p` basis case; `mult_of_basis`
-lifts it to all `z`. -/
+For each, a kernel `decide` discharges the 36-`δ_p` basis case (in the sparse
+`conv P δ_p = P (· - p)` form supplied by `basis_of_translate`, so no
+`Finset.sum` ever reaches the kernel); `mult_of_basis` lifts it to all `z`. -/
+
+/-- Sparse form of right-convolution with a point mass:
+`conv P δ_p = P (· - p)` (from `conv_comm` + `conv_single_left`). -/
+theorem conv_single_right (P : BaseGroup → ZMod 2) (p : BaseGroup) :
+    conv P (Pi.single p 1) = fun g => P (g - p) := by
+  rw [conv_comm, conv_single_left]
+
+/-- Reduce the `hbasis` obligation of `mult_of_basis` to its translate form
+`V psi s (P (· - p)) = …`: a closed 144-case statement with no `Finset.sum`
+under the binder, hence checkable by a plain kernel `decide` (the direct form
+would force the kernel through 36 `Finset.univ` sums per case). -/
+theorem basis_of_translate {psi : BaseGroup → Fin 4} {P : BaseGroup → ZMod 2}
+    {Phat : Ring}
+    (h : ∀ (p : BaseGroup) (s : ZMod 2 × ZMod 2),
+      V psi s (fun g => P (g - p)) = rmul Phat (fun s' => V psi s' (Pi.single p 1)) s)
+    (p : BaseGroup) (s : ZMod 2 × ZMod 2) :
+    V psi s (conv P (Pi.single p 1)) = rmul Phat (fun s' => V psi s' (Pi.single p 1)) s := by
+  rw [conv_single_right]
+  exact h p s
 
 /-- `Â₁`: `V₁(A⋆z) = Â₁·V₁(z)`. -/
 theorem mult_A1 (z : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) :
     V psi1 s (conv baseA z) = rmul Ahat1 (fun s' => V psi1 s' z) s :=
-  mult_of_basis psi1 baseA Ahat1 (by native_decide) z s
+  mult_of_basis psi1 baseA Ahat1 (basis_of_translate (by decide +kernel)) z s
 
 /-- `Â₃ = Â₁`: `V₃(A⋆z) = Â₁·V₃(z)`. -/
 theorem mult_A3 (z : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) :
     V psi3 s (conv baseA z) = rmul Ahat1 (fun s' => V psi3 s' z) s :=
-  mult_of_basis psi3 baseA Ahat1 (by native_decide) z s
+  mult_of_basis psi3 baseA Ahat1 (basis_of_translate (by decide +kernel)) z s
 
 /-- `Â₄`: `V₄(A⋆z) = Â₄·V₄(z)`. -/
 theorem mult_A4 (z : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) :
     V psi4 s (conv baseA z) = rmul Ahat4 (fun s' => V psi4 s' z) s :=
-  mult_of_basis psi4 baseA Ahat4 (by native_decide) z s
+  mult_of_basis psi4 baseA Ahat4 (basis_of_translate (by decide +kernel)) z s
 
 /-- `B̂₂`: `V₂(B⋆z) = B̂₂·V₂(z)`. -/
 theorem mult_B2 (z : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) :
     V psi2 s (conv baseB z) = rmul Bhat2 (fun s' => V psi2 s' z) s :=
-  mult_of_basis psi2 baseB Bhat2 (by native_decide) z s
+  mult_of_basis psi2 baseB Bhat2 (basis_of_translate (by decide +kernel)) z s
 
 /-- `B̂₃ = B̂₂`: `V₃(B⋆z) = B̂₂·V₃(z)`. -/
 theorem mult_B3 (z : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) :
     V psi3 s (conv baseB z) = rmul Bhat2 (fun s' => V psi3 s' z) s :=
-  mult_of_basis psi3 baseB Bhat2 (by native_decide) z s
+  mult_of_basis psi3 baseB Bhat2 (basis_of_translate (by decide +kernel)) z s
 
 /-- `B̂₄ = B̂₂`: `V₄(B⋆z) = B̂₂·V₄(z)`. -/
 theorem mult_B4 (z : BaseGroup → ZMod 2) (s : ZMod 2 × ZMod 2) :
     V psi4 s (conv baseB z) = rmul Bhat2 (fun s' => V psi4 s' z) s :=
-  mult_of_basis psi4 baseB Bhat2 (by native_decide) z s
+  mult_of_basis psi4 baseB Bhat2 (basis_of_translate (by decide +kernel)) z s
 
 end CRTFrame
 end BB
