@@ -18,8 +18,8 @@ namespace Quantum.Stabilizer.Homological.BB
 bivariate-bicycle code has distance exactly 12, with NO remaining assumed hypotheses.  The
 last analytic input `MImBound` is discharged by `LightStab.mimBound_holds`; the
 `LightStabilizerClassification` input was discharged earlier by
-`LightStab.lightStabilizerClassification_holds`.  Axiom-clean (the standard three + the
-`native_decide` compiler axiom). -/
+`LightStab.lightStabilizerClassification_holds`.  **Kernel-only**: the axioms are exactly
+`propext`, `Classical.choice` and `Quot.sound` — no `native_decide`, no `sorry`. -/
 theorem grossStabilizerCode_hasCodeDistance_12_uncond :
     Quantum.StabilizerGroup.HasCodeDistance grossStabilizerCode 12 :=
   grossStabilizerCode_hasCodeDistance_12 LightStab.mimBound_holds

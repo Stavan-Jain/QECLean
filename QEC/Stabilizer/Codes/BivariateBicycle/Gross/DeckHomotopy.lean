@@ -33,17 +33,17 @@ namespace BB
 /-! ## Machine-certified polynomial identities -/
 
 theorem gross_conv_B_B : conv grossB grossB = bSquaredPoly := by
-  native_decide
+  decide +kernel
 
 theorem gross_conv_onePlusX2_Bsq :
     conv onePlusX2 bSquaredPoly = onePlusX6 := by
-  native_decide
+  decide +kernel
 
 /-! ## `1 + x⁶` acts as `1 + deck shift` -/
 
 theorem onePlusX6_eq :
     onePlusX6 = Pi.single (0 : GrossGroup) 1 + Pi.single deckS 1 := by
-  native_decide
+  decide +kernel
 
 theorem conv_onePlusX6 (v : GrossGroup → ZMod 2) :
     conv onePlusX6 v = v + deckShift0 v := by

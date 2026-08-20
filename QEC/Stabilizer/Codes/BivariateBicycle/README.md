@@ -12,7 +12,7 @@ per-module one-liner maps live in the umbrella docstrings (`Gross.lean`,
 
 | Dir | Code | Distance status |
 |---|---|---|
-| `Gross/` | gross `[[144,12,12]]` (base `[[72,12,6]]`) | **d = 12 unconditional** (axiom-clean + `native_decide`; also re-derived through the parametric layer in `Gross/LayerInstance.lean`) |
+| `Gross/` | gross `[[144,12,12]]` (base `[[72,12,6]]`) | **d = 12 unconditional, kernel-only** — axioms are exactly `propext`, `Classical.choice`, `Quot.sound`; no `native_decide`, no `sorry` (also re-derived through the parametric layer in `Gross/LayerInstance.lean`) |
 | `Z3Z6/` | pair72 `[[36,4,4]] → [[72,4,8]]` | d = 8 unconditional (the canonical complete instance — copy this shape) |
 | `Z5Z15F2A6/` | `[[150,8,8]] → [[300,8,16]]` two-tier | in progress (A17 line; minimal starting skeleton to copy) |
 | `BaseFloors/` | class-member base floors (BB90, BB108, Z6Z14) | d ≥ 6 kernel-checked via `BBSmallCycle` (A15/A16 class theorem) |
@@ -38,11 +38,11 @@ per-module one-liner maps live in the umbrella docstrings (`Gross.lean`,
 | Named hypothesis | Discharged by | Grade |
 |---|---|---|
 | `BaseDistanceGe6` | `Gross/BaseDistance.lean` (small-cycle theorem) | kernel `decide` + analytic |
-| `LightStabilizerClassification` | `Gross/LightStabClassify.lean` (`lightStabilizerClassification_holds`) | engine (`native_decide`) |
-| `DangerousSectorGe12` | `Gross/DangerousSector.lean` ((M), m-rungs) | analytic, engine-fed |
+| `LightStabilizerClassification` | `Gross/LightStabClassify.lean` (`lightStabilizerClassification_holds`) | kernel `decide` |
+| `DangerousSectorGe12` | `Gross/DangerousSector.lean` ((M), m-rungs) | analytic + kernel `decide` |
 | `SafeSectorGe12` → `MImBound` | `Gross/SafeSector.lean` (Smith-coset reduction) | analytic |
-| `MImBound` | `Gross/SafeFloor/MImAssembly.lean` (`mimBound_holds`, 64-case dispatch → 5 orbit reps) | mixed (see per-orbit rows) |
-| — orbit Y0/Y1/Y4 (wt 16/18) | `SafeFloor/MImFloorY{0,1,4}.lean` (`floor_of_data` engine leaf) | engine (`native_decide`) — flips analytic when A7 Props 30–31 close |
+| `MImBound` | `Gross/SafeFloor/MImAssembly.lean` (`mimBound_holds`, 64-case dispatch → 5 orbit reps) | analytic (see per-orbit rows) |
+| — orbit Y0/Y1/Y4 (wt 16/18) | `SafeFloor/MImFloorY{0,1,4}.lean` via `LightFloor.floor_of_killOK` (the coupled spine certificate: Prop 30 `min_L + min_R ≥ 10` on all 1024 cells + Prop 31 ρ-link kill of the 10-tight cells) | **analytic** (kernel `decide`) |
 | — orbit Y11/Y12 (wt 24) | `SafeFloor/MImFloorY{11,12}.lean` via `WtFloor24Bridge.costFromComps_ge_12_of_blocks` | **analytic** (kernel `decide`) |
 | capstones | `Gross/Distance.lean` (`grossStabilizerCode_hasCodeDistance_12_uncond`, `grossStabilizerCodeWithDistance`) + `Gross/LayerInstance.lean` (`gross_chain/pauli_distance_eq_12` through the layer) | — |
 
@@ -51,24 +51,39 @@ Z3Z6 mirror: `StrongBaseFloor 4` → `Z3Z6/BaseDistance.lean`; `DeckTrivialOnH1`
 `SeamCosetFloor 8` → `Z3Z6/SafeFloor.lean` (sweep leaves); capstone
 `Z3Z6/Distance.lean`.
 
-## Engine vs analytic (native_decide counts, 2026-07-18)
+## Engine vs analytic (2026-08-20)
 
-`native_decide` total in this directory: ~303. Top carriers: gross
-`StabilizerCode` 35 (§5 decoder identities — data file split out as
-`StabilizerCodeData`), `LightStab` 30, `CRTFrame` 20, `MImFloor` 16,
-`MImFloorY0/1/4` 16 each, `Z3Z6/StabilizerCode` 16, `LightStabClassify` 15.
-The Tier-3 track (`SlotFrame` → `WtFloor24` → `WtFloor24Bridge` →
-`WtFloor1618`) replaces engine leaves with analytic proofs; Y11/Y12 are
-already flipped. Status changes belong HERE, not in module names.
+The gross `d = 12` cone contains **zero `native_decide`**: every leaf is a kernel
+`decide` (mostly `decide +kernel`) or an analytic proof, so the capstones carry
+only mathlib's three axioms. The techniques, in the order they matter: packed-`Nat`
+tables instead of `Array`/`List` lookups (an `Array.getD` is an O(n) list walk in
+the kernel); quantifier bridges (`mkRing`, `mkTorus`, `chainOfMask`) that let the
+kernel enumerate concrete lambdas rather than whnf a pi-`Fintype`; sparse rewrites
+of `conv`/`∂₂`/`seamC` in place of `Finset.sum`s over the group; and Gaussian-style
+certificates (the `ker ∂₂` peeling in `MImClassify.kerBasis_spans`) where a sweep
+would otherwise be needed.
+
+The Tier-3 track is complete: `SlotFrame` → `WtFloor24` → `WtFloor24Bridge`
+closes the weight-24 orbits, and `WtFloor1618` → `LightFloor` closes the coupled
+light orbits. The old confined-floor engine (`MImFloor`, `MImFloorData`,
+`MImMembership` and their `2³⁰` `floorOK` walk) has been **retired** — those
+modules are deleted, not merely unused. Status changes belong HERE, not in
+module names.
+
+Other BB instances (`Z3Z6/`, `Z5Z15F2A6/`, `BaseFloors/`) still use
+`native_decide`; only the gross cone is kernel-only.
 
 ## Generated files (Class G: fully generated — NEVER hand-edit)
 
 | File | Generator (`qec-lab:experiments/bb_lab/`) | Data |
 |---|---|---|
 | `Gross/StabilizerCodeData.lean` | `phase5/gen_file.py` (`--force` guard; emits data only) | `phase5/data.json` |
-| `Gross/SafeFloor/MImFloorData.lean` | `scripts/gen_floor_lean.py` | in-script |
-| `Gross/SafeFloor/MImFloorY{0,1,4}.lean` | `scripts/gen_yrep_module.py <i>` | in-script |
+| `Gross/SafeFloor/MImFloorY{0,1,4}.lean` | **hand-maintained since the kernel-only conversion** (analytic Tier-3 form; formerly `gen_yrep_module.py`, which must be taught to refuse args 0/1/4) | — |
 | `Gross/SafeFloor/MImFloorY{11,12}.lean` | **hand-maintained since PR #58** (analytic Tier-3 form; formerly `gen_yrep_module.py`, which now refuses args 11/12) | — |
+
+**qec-lab follow-up owed**: `gen_floor_lean.py` now has no target in this repo
+(`MImFloorData.lean` is deleted) and `gen_yrep_module.py` must refuse args 0/1/4
+as it already refuses 11/12; both changes belong in a companion qec-lab PR.
 | `Z3Z6/StabilizerCodeData.lean` | `scripts/gen_pair72_packaging_data.py` (retarget to data-only queued — do not run without reading GENERATORS.md) | validation-gated |
 | `BaseFloors/*.lean` | `scripts/gen_base_floor_lean.py` | per-instance |
 

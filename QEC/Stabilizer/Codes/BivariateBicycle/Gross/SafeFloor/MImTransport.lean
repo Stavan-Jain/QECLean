@@ -5,7 +5,8 @@ The five (resp. thirteen) per-orbit floors cover only the orbit representatives;
 supplies the symmetry that carries each to its whole translation orbit.  The key fact is that
 `seamC` is **y-translation covariant at the chain level** (the x-direction fails — the §9.3
 cut-shift — but y holds exactly): `seamC (translate (0,k) ζ) = translate1 (0,k) (seamC ζ)`,
-verified by `native_decide` over `ker ∂₂` (the 64 `kcombo`s) × the 6 shifts.
+verified by kernel `decide` over `ker ∂₂` (the 64 `kcombo`s) × the 6 shifts,
+through the sparse seam form (`seamC_eq_sparse`).
 
 Combined with `chainWeight`'s translation-invariance (`translate1` permutes the 72 qubits) and
 `∂₂`'s translation-equivariance (`bbBoundary2Fn_translate`), this gives the **transport
@@ -63,11 +64,18 @@ theorem boundary_shuffle_k (k : ZMod 6) (f : BaseGroup → ZMod 2) :
 /-! ## §16 The `seamC` y-covariance and the transport reduction -/
 
 /-- **`seamC` is y-translation covariant** on `ker ∂₂` (the x-direction fails; y holds at the
-chain level).  `native_decide` over the 6 shifts × 64 `kcombo`s. -/
+chain level).  Kernel `decide` over the 6 shifts × 64 `kcombo`s. -/
 theorem seamC_shiftYk_combo : ∀ (k : ZMod 6) (c0 c1 c2 c3 c4 c5 : ZMod 2),
     seamC (translate ((0,k) : BaseGroup) (kcombo c0 c1 c2 c3 c4 c5))
       = translate1 ((0,k) : BaseGroup) (seamC (kcombo c0 c1 c2 c3 c4 c5)) := by
-  native_decide
+  have core : ∀ (k : ZMod 6) (c0 c1 c2 c3 c4 c5 : ZMod 2) (q : BaseGroup × Fin 2),
+      seamCSparse (translate ((0,k) : BaseGroup) (kcombo c0 c1 c2 c3 c4 c5)) q
+        = translate1 ((0,k) : BaseGroup) (seamCSparse (kcombo c0 c1 c2 c3 c4 c5)) q := by
+    decide +kernel
+  intro k c0 c1 c2 c3 c4 c5
+  rw [seamC_eq_sparse, seamC_eq_sparse]
+  funext q
+  exact core k c0 c1 c2 c3 c4 c5 q
 
 /-- **The transport reduction**: the safe-sector floor for `kcombo c` propagates to every
 `(0,k)`-translate of it.  (`seamC` covariance ▸ boundary shuffle ▸ `translate1` additivity ▸

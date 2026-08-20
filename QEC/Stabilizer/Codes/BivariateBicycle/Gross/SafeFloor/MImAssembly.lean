@@ -50,8 +50,9 @@ set_option synthInstance.maxSize 4000 in
 -- term far larger than the default `synthInstance.maxSize` of 128; the search
 -- itself is cheap.
 /-- The 63 class-level covariance certificates `seamC z' = T_c (seamC zrep) + ∂₂ δ`
-consumed by `floor_kcombo`, bundled into a single `native_decide` so the file costs
-one native compilation unit instead of 63. -/
+consumed by `floor_kcombo`, bundled into a single kernel `decide`: every `seamC` is
+read through its packed mask (`seamC_kcombo_mask`) and every `∂₂` through its sparse
+form, so the 63 function equalities are 63 cheap `Nat` walks. -/
 private theorem transfer_covs :
     (seamC (kcombo 0 0 0 0 0 1)
           = translate1 ((1, 5) : BaseGroup) (seamC Y1.zrep)
@@ -251,7 +252,8 @@ private theorem transfer_covs :
     (seamC (kcombo 1 1 1 1 1 1)
           = translate1 ((4, 3) : BaseGroup) (seamC Y1.zrep)
             + bbBoundary2Fn baseA baseB (mkZeta [(0,0),(0,3),(0,4),(0,5),(1,3),(1,5)])) := by
-  native_decide
+  simp only [Y0.zrep, Y1.zrep, Y4.zrep, Y11.zrep, Y12.zrep, seamC_kcombo_mask, bb2_fun_sparse]
+  decide +kernel
 
 /-- **The 2-D-orbit dispatch**: every `ker ∂₂` class, addressed by its six free-cell values, has
 safe-sector floor `≥ 12` (the zero class is vacuous; the rest transport to one of the 5

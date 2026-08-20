@@ -153,19 +153,84 @@ lemma card_filter_split {I : Type} [Fintype I] (u : I → ZMod 2)
   (Finset.card_filter_add_card_filter_not
     (s := Finset.univ.filter fun j => u j ≠ 0) (p := P)).symm
 
+/-! ### Pointwise `∂₂` plumbing (kernel-decide support)
+
+The rung side conditions below are finite checks over `∂₂` of point masses.
+Evaluating the convolution sums inside a kernel `decide` is too slow, so
+each check is first reduced to the pointwise form
+`∂₂(δ_c)(h, j) = if j = 0 then A (h - c) else B (h - c)`
+(`bbBoundary2Fn_single_pt`), the lifted stabilizer of a point mass to a gross
+point mass at the section (`liftC2_single`), and the D-pair statements to
+their `g = 0` translates (`card_filter_comp_equiv`); only the reduced forms
+are swept by `decide +kernel`. -/
+
+/-- Pair-argument form of `bbBoundary2Fn_single`. -/
+private lemma bbBoundary2Fn_single_pt {G : Type} [Fintype G] [AddCommGroup G]
+    [DecidableEq G] (A B : G → ZMod 2) (c : G) (p : G × Fin 2) :
+    bbBoundary2Fn A B (Pi.single c 1) p
+      = if p.2 = 0 then A (p.1 - c) else B (p.1 - c) := by
+  obtain ⟨h, j⟩ := p
+  exact bbBoundary2Fn_single A B c h j
+
+/-- Sheet-0 lift of a base point mass is the gross point mass at the
+section point. -/
+private lemma liftC2_single : ∀ g : BaseGroup,
+    liftC2 (Pi.single g 1) = Pi.single (coverSec g) 1 := by
+  decide +kernel
+
+private lemma liftC2_add (f f' : BaseGroup → ZMod 2) :
+    liftC2 (f + f') = liftC2 f + liftC2 f' := by
+  funext i
+  show (if i = coverSec (coverPi i) then (f + f') (coverPi i) else 0)
+    = (if i = coverSec (coverPi i) then f (coverPi i) else 0)
+      + (if i = coverSec (coverPi i) then f' (coverPi i) else 0)
+  by_cases h : i = coverSec (coverPi i)
+  · rw [if_pos h, if_pos h, if_pos h]
+    rfl
+  · rw [if_neg h, if_neg h, if_neg h, add_zero]
+
 /-! ## The hexagon rung (`m(hexagon) ≥ 3`) -/
+
+private lemma hexagon_weight_check : ∀ g : BaseGroup,
+    (Finset.univ.filter fun j : BaseGroup × Fin 2 =>
+      (if j.2 = 0 then baseA (j.1 - g) else baseB (j.1 - g)) ≠ 0).card = 6 := by
+  decide +kernel
 
 /-- Hexagons have weight 6. -/
 lemma hexagon_weight : ∀ g : BaseGroup,
     (Finset.univ.filter fun j : BaseGroup × Fin 2 =>
       bbBoundary2Fn baseA baseB (Pi.single g 1) j ≠ 0).card = 6 := by
-  native_decide
+  intro g
+  have hfil : (Finset.univ.filter fun j : BaseGroup × Fin 2 =>
+      bbBoundary2Fn baseA baseB (Pi.single g 1) j ≠ 0)
+      = Finset.univ.filter fun j : BaseGroup × Fin 2 =>
+          (if j.2 = 0 then baseA (j.1 - g) else baseB (j.1 - g)) ≠ 0 := by
+    apply Finset.filter_congr
+    intro j _
+    rw [bbBoundary2Fn_single_pt]
+  rw [hfil]
+  exact hexagon_weight_check g
+
+private lemma hexagon_seam_check : ∀ g : BaseGroup, ∀ j : BaseGroup × Fin 2,
+    (if j.2 = 0 then grossA (coverSec j.1 - coverSec g)
+      else grossB (coverSec j.1 - coverSec g)) ≠ 0 →
+    (if j.2 = 0 then baseA (j.1 - g) else baseB (j.1 - g)) ≠ 0 := by
+  decide +kernel
 
 /-- The sheet-0 seam part of a lifted hexagon is supported in the hexagon. -/
 lemma hexagon_seam_subset : ∀ g : BaseGroup, ∀ j : BaseGroup × Fin 2,
     sheet0 (liftStab (Pi.single g 1)) j ≠ 0 →
     bbBoundary2Fn baseA baseB (Pi.single g 1) j ≠ 0 := by
-  native_decide
+  intro g j hne
+  have e1 : sheet0 (liftStab (Pi.single g 1)) j
+      = if j.2 = 0 then grossA (coverSec j.1 - coverSec g)
+        else grossB (coverSec j.1 - coverSec g) := by
+    show bbBoundary2Fn grossA grossB (liftC2 (Pi.single g 1)) (coverSec1 j) = _
+    rw [liftC2_single g, bbBoundary2Fn_single_pt]
+    rfl
+  rw [e1] at hne
+  rw [bbBoundary2Fn_single_pt]
+  exact hexagon_seam_check g j hne
 
 /-- **The hexagon rung**: a nontrivial dangerous cycle over a hexagon has
 weight ≥ 12. -/
@@ -324,27 +389,103 @@ def pairDirections : Finset BaseGroup :=
   {(0, 1), (0, 5), (3, 1), (3, 2), (3, 4), (3, 5),
    (1, 0), (1, 3), (2, 3), (4, 3), (5, 0), (5, 3)}
 
+private lemma dpair_weight_check : ∀ d ∈ pairDirections,
+    (Finset.univ.filter fun j : BaseGroup × Fin 2 =>
+      (if j.2 = 0 then baseA j.1 + baseA (j.1 - d)
+        else baseB j.1 + baseB (j.1 - d)) ≠ 0).card = 10 := by
+  decide +kernel
+
 /-- D-pairs have weight 10. -/
 lemma dpair_weight : ∀ g : BaseGroup, ∀ d ∈ pairDirections,
     (Finset.univ.filter fun j : BaseGroup × Fin 2 =>
       bbBoundary2Fn baseA baseB
         (Pi.single g 1 + Pi.single (g + d) 1) j ≠ 0).card = 10 := by
-  native_decide
+  intro g d hd
+  have hfil : (Finset.univ.filter fun j : BaseGroup × Fin 2 =>
+      bbBoundary2Fn baseA baseB (Pi.single g 1 + Pi.single (g + d) 1) j ≠ 0)
+      = Finset.univ.filter fun j : BaseGroup × Fin 2 =>
+          (if j.2 = 0 then baseA (j.1 - g) + baseA (j.1 - g - d)
+            else baseB (j.1 - g) + baseB (j.1 - g - d)) ≠ 0 := by
+    apply Finset.filter_congr
+    intro j _
+    rw [bbBoundary2Fn_add, Pi.add_apply, bbBoundary2Fn_single_pt,
+      bbBoundary2Fn_single_pt, sub_add_eq_sub_sub]
+    by_cases hj : j.2 = 0
+    · rw [if_pos hj, if_pos hj, if_pos hj]
+    · rw [if_neg hj, if_neg hj, if_neg hj]
+  have htrans : (Finset.univ.filter fun j : BaseGroup × Fin 2 =>
+      (if j.2 = 0 then baseA (j.1 - g) + baseA (j.1 - g - d)
+        else baseB (j.1 - g) + baseB (j.1 - g - d)) ≠ 0).card
+      = (Finset.univ.filter fun j : BaseGroup × Fin 2 =>
+          (if j.2 = 0 then baseA j.1 + baseA (j.1 - d)
+            else baseB j.1 + baseB (j.1 - d)) ≠ 0).card :=
+    card_filter_comp_equiv ((Equiv.subRight g).prodCongr (Equiv.refl (Fin 2)))
+      (fun j : BaseGroup × Fin 2 =>
+        (if j.2 = 0 then baseA j.1 + baseA (j.1 - d)
+          else baseB j.1 + baseB (j.1 - d)) ≠ 0)
+  rw [hfil, htrans]
+  exact dpair_weight_check d hd
+
+private lemma dpair_union_check : ∀ d ∈ pairDirections,
+    (Finset.univ.filter fun j : BaseGroup × Fin 2 =>
+      (if j.2 = 0 then baseA j.1 else baseB j.1) ≠ 0 ∨
+      (if j.2 = 0 then baseA (j.1 - d) else baseB (j.1 - d)) ≠ 0).card
+      ≤ 11 := by
+  decide +kernel
 
 /-- The 11-qubit union: the two hexagons of a D-pair overlap. -/
 lemma dpair_union_card : ∀ g : BaseGroup, ∀ d ∈ pairDirections,
     (Finset.univ.filter fun j : BaseGroup × Fin 2 =>
       bbBoundary2Fn baseA baseB (Pi.single g 1) j ≠ 0 ∨
       bbBoundary2Fn baseA baseB (Pi.single (g + d) 1) j ≠ 0).card ≤ 11 := by
-  native_decide
+  intro g d hd
+  have hfil : (Finset.univ.filter fun j : BaseGroup × Fin 2 =>
+      bbBoundary2Fn baseA baseB (Pi.single g 1) j ≠ 0 ∨
+      bbBoundary2Fn baseA baseB (Pi.single (g + d) 1) j ≠ 0)
+      = Finset.univ.filter fun j : BaseGroup × Fin 2 =>
+          (if j.2 = 0 then baseA (j.1 - g) else baseB (j.1 - g)) ≠ 0 ∨
+          (if j.2 = 0 then baseA (j.1 - g - d)
+            else baseB (j.1 - g - d)) ≠ 0 := by
+    apply Finset.filter_congr
+    intro j _
+    rw [bbBoundary2Fn_single_pt, bbBoundary2Fn_single_pt, sub_add_eq_sub_sub]
+  have htrans : (Finset.univ.filter fun j : BaseGroup × Fin 2 =>
+      (if j.2 = 0 then baseA (j.1 - g) else baseB (j.1 - g)) ≠ 0 ∨
+      (if j.2 = 0 then baseA (j.1 - g - d)
+        else baseB (j.1 - g - d)) ≠ 0).card
+      = (Finset.univ.filter fun j : BaseGroup × Fin 2 =>
+          (if j.2 = 0 then baseA j.1 else baseB j.1) ≠ 0 ∨
+          (if j.2 = 0 then baseA (j.1 - d) else baseB (j.1 - d)) ≠ 0).card :=
+    card_filter_comp_equiv ((Equiv.subRight g).prodCongr (Equiv.refl (Fin 2)))
+      (fun j : BaseGroup × Fin 2 =>
+        (if j.2 = 0 then baseA j.1 else baseB j.1) ≠ 0 ∨
+        (if j.2 = 0 then baseA (j.1 - d) else baseB (j.1 - d)) ≠ 0)
+  rw [hfil, htrans]
+  exact dpair_union_check d hd
 
-/-- The sheet-0 seam part of a lifted D-pair is supported in the union. -/
+/-- The sheet-0 seam part of a lifted D-pair is supported in the union
+(analytic: the lifted stabilizer is additive, and a nonzero `ZMod 2` sum
+has a nonzero summand, so the hexagon seam lemma applies to each half). -/
 lemma dpair_seam_subset : ∀ g : BaseGroup, ∀ d ∈ pairDirections,
     ∀ j : BaseGroup × Fin 2,
     sheet0 (liftStab (Pi.single g 1 + Pi.single (g + d) 1)) j ≠ 0 →
     (bbBoundary2Fn baseA baseB (Pi.single g 1) j ≠ 0 ∨
      bbBoundary2Fn baseA baseB (Pi.single (g + d) 1) j ≠ 0) := by
-  native_decide
+  intro g d _hd j hne
+  have hsplit : liftStab (Pi.single g 1 + Pi.single (g + d) 1)
+      = liftStab (Pi.single g 1) + liftStab (Pi.single (g + d) 1) := by
+    unfold liftStab
+    rw [liftC2_add, bbBoundary2Fn_add]
+  rw [hsplit, sheet0_add] at hne
+  have hcases : sheet0 (liftStab (Pi.single g 1)) j ≠ 0 ∨
+      sheet0 (liftStab (Pi.single (g + d) 1)) j ≠ 0 := by
+    by_contra hcon
+    push Not at hcon
+    rw [Pi.add_apply, hcon.1, hcon.2, add_zero] at hne
+    exact hne rfl
+  rcases hcases with h | h
+  · exact Or.inl (hexagon_seam_subset g j h)
+  · exact Or.inr (hexagon_seam_subset (g + d) j h)
 
 /-- **The D-pair rung**: a nontrivial dangerous cycle over a D-pair has
 weight ≥ 12. -/

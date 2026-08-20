@@ -47,8 +47,8 @@ Chain-level formalization of the gross bivariate-bicycle code and its
                     (`lightStabilizerClassification_holds`) by the effective
                     CRT-engine classification, making `DangerousSectorGe12`
                     unconditional
-- `SafeFloor/`    — everything discharging `MImBound` (the safe-sector floor):
-                    engine + Tier-3 analytic track; see `SafeFloor.lean`
+- `SafeFloor/`    — everything discharging `MImBound` (the safe-sector floor),
+                    all of it Tier-3 analytic; see `SafeFloor.lean`
 - `Distance`      — the capstones (`grossStabilizerCode_hasCodeDistance_12_uncond`,
                     `grossStabilizerCodeWithDistance`) in one hand-written file
 - `LayerInstance` — the gross ↔ bb72 cover packaged as `grossCoverData :
@@ -60,7 +60,8 @@ Chain-level formalization of the gross bivariate-bicycle code and its
 
 Both CRT-engine inputs — `LightStabilizerClassification` (`LightStabClassify`)
 and `MImBound` (`SafeFloor/MImAssembly`) — are discharged, so the distance of
-the gross `[[144,12,12]]` code is **unconditional and axiom-clean** (the
-standard three axioms + the `native_decide` compiler axiom; no `sorry`).
-See `../README.md` for the discharge map and status board.
+the gross `[[144,12,12]]` code is **unconditional and kernel-only**: the
+capstones depend on exactly `propext`, `Classical.choice` and `Quot.sound` —
+no `native_decide` (hence no compiler-trust axiom) and no `sorry` anywhere in
+the cone.  See `../README.md` for the discharge map and status board.
 -/

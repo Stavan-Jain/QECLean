@@ -10,14 +10,18 @@ the gross `[[144,12,12]]` BB code conditional.  With it, the dangerous-sector bo
 ## Strategy (A4 §6.3, the CRT-engine classification, made effective)
 
 The classification — *every nonzero base boundary `∂₂f` of weight ≤ 11 is a hexagon
-or a D-pair* — is reduced to a finite `native_decide` over the two lighter A-block
+or a D-pair* — is reduced to a finite kernel `decide` over the two lighter A-block
 shapes, bridged back to the function level:
 
 * **Bitmask scan** (`classifyCore`, `classifyCoreEven`): every *gated* weight-≤5
   origin-containing A-block mask is a hexagon/D-pair A-block, or has no `|b|≤10`
   completion (its minimal B-block coset weight is too large).  The odd scan
   `supMask [0,q₁,q₂,q₃,q₄]` covers weights 3, 5 (hexagons); the even scan
-  `supMask [0,q₁,q₂,q₃]` covers weight 4 (D-pairs).
+  `supMask [0,q₁,q₂,q₃]` covers weight 4 (D-pairs).  Kernel-checked via a packed
+  row-syndrome sweep (§G″): the 12 `HA_rows` parities of a candidate mask are
+  read off a per-bit signature table, the last index is resolved by a reverse
+  syndrome lookup (so the 36⁴ scan is really a 36³ sweep), and the surviving
+  masks are checked once against a precomputed verdict list.
 * **Soundness bridge** (`bitmaskOf_add`, `wtM_eq_bwt`, `gateM_conv_baseA`,
   `coset_mem`, `minBcoset_le_bwt`): a keystone `Nat`-XOR additivity for `bitmaskOf`
   lifts the bitmask facts to the actual `conv baseA`/`conv baseB`.  In particular
@@ -32,7 +36,8 @@ shapes, bridged back to the function level:
   to the B-lighter case.
 
 Everything is axiom-clean: the standard three (`propext`, `Classical.choice`,
-`Quot.sound`) plus sanctioned `native_decide`.  No `sorry`, no custom axioms.
+`Quot.sound`) only — every decision procedure is kernel-checked (`decide` /
+`decide +kernel`, no native-code evaluation).  No `sorry`, no custom axioms.
 -/
 import QEC.Stabilizer.Codes.BivariateBicycle.Gross.LightStab
 
@@ -41,6 +46,9 @@ open Quantum.Stabilizer.Homological.BB.CRTFrame
 open Quantum.Stabilizer.Homological.BB.LightStab
 
 namespace Quantum.Stabilizer.Homological.BB.LightStab
+
+-- kernel decide needs more recursion headroom here.
+set_option maxRecDepth 40000
 
 /-! ## Bitmask layer (data + defs) -/
 
@@ -280,30 +288,43 @@ theorem gateM_xor {m n : Nat} (hm : gateM m = true) (hn : gateM n = true) :
   rw [hsplit, hmr, hnr]
   rfl
 
-theorem gateM_zero : gateM 0 = true := by native_decide
+theorem gateM_zero : gateM 0 = true := by decide
 
 
 
-/-! ## Native-decide cores (the combinatorial heart) -/
+/-! ## Kernel-decide hexagon tables
+
+`conv P (Pi.single c 1)` is a translate of `P` (`conv_single_right`), so the
+hexagon tables reduce to a cheap pointwise kernel `decide` — the `Finset.sum`
+convolution tower is never evaluated by the kernel.
+
+The two scan cores `classifyCore` / `classifyCoreEven` are stated and proved in
+§G″ below (after the `supMask` reshaping lemmas they depend on), against a
+packed row-syndrome sweep instead of a per-tuple `gateM` evaluation. -/
+
+/-- Convolving with a point mass on the right translates:
+`P ⋆ δ_c = P (· - c)` (right-handed sibling of `conv_single_left`). -/
+private theorem conv_single_right (P : BaseGroup → ZMod 2) (c : BaseGroup) :
+    conv P (Pi.single c 1) = fun g => P (g - c) := by
+  rw [conv_comm, conv_single_left]
 
 theorem hexA_correct : ∀ g : Fin 36,
-    hexA.getD g.val 0 = bitmaskOf (conv baseA (Pi.single (cellOf g.val) 1)) := by native_decide
-theorem gate_hexA : ∀ g : Fin 36, gateM (hexA.getD g.val 0) = true := by native_decide
+    hexA.getD g.val 0 = bitmaskOf (conv baseA (Pi.single (cellOf g.val) 1)) := by
+  have tab : ∀ g : Fin 36,
+      hexA.getD g.val 0 = bitmaskOf (fun x => baseA (x - cellOf g.val)) := by decide
+  intro g
+  rw [conv_single_right]
+  exact tab g
+
+theorem gate_hexA : ∀ g : Fin 36, gateM (hexA.getD g.val 0) = true := by decide
+
 theorem hexB_correct : ∀ g : Fin 36,
-    hexB.getD g.val 0 = bitmaskOf (conv baseB (Pi.single (cellOf g.val) 1)) := by native_decide
-
-theorem classifyCore : ∀ q₁ q₂ q₃ q₄ : Fin 36,
-    gateM (supMask [0, q₁, q₂, q₃, q₄]) = true →
-    isHexDpairA (supMask [0, q₁, q₂, q₃, q₄]) = true
-      ∨ 10 < wtM (supMask [0, q₁, q₂, q₃, q₄]) + minBcoset (supMask [0, q₁, q₂, q₃, q₄]) := by
-  native_decide
-
-theorem classifyCoreEven : ∀ q₁ q₂ q₃ : Fin 36,
-    gateM (supMask [0, q₁, q₂, q₃]) = true →
-    3 ≤ wtM (supMask [0, q₁, q₂, q₃]) →
-    isHexDpairA (supMask [0, q₁, q₂, q₃]) = true
-      ∨ 10 < wtM (supMask [0, q₁, q₂, q₃]) + minBcoset (supMask [0, q₁, q₂, q₃]) := by
-  native_decide
+    hexB.getD g.val 0 = bitmaskOf (conv baseB (Pi.single (cellOf g.val) 1)) := by
+  have tab : ∀ g : Fin 36,
+      hexB.getD g.val 0 = bitmaskOf (fun x => baseB (x - cellOf g.val)) := by decide
+  intro g
+  rw [conv_single_right]
+  exact tab g
 
 /-! ## Generic XOR-lift (additive map into an XOR-closed predicate, basis ⟹ all) -/
 
@@ -429,7 +450,7 @@ theorem Phi_add (a b : BaseGroup → ZMod 2) : Phi (a + b) = Phi a ^^^ Phi b := 
 
 theorem coset_basis : ∀ g : Fin 36,
     inBspan (applyCols MBAcols (hexA.getD g.val 0) ^^^ hexB.getD g.val 0) := by
-  native_decide
+  decide
 
 theorem coset_mem (f : BaseGroup → ZMod 2) : inBspan (Phi f) := by
   apply xorLift Phi inBspan Phi_zero Phi_add inBspan_zero (fun _ _ => inBspan_xor)
@@ -490,11 +511,11 @@ def dpairDirList : List BaseGroup :=
    (1, 0), (1, 3), (2, 3), (4, 3), (5, 0), (5, 3)]
 
 theorem gdMaps_lt : ∀ k : Fin 12, ∀ g : Fin 36,
-    (gdMaps.getD k.val #[]).getD g.val 0 < 36 := by native_decide
+    (gdMaps.getD k.val #[]).getD g.val 0 < 36 := by decide
 
 theorem gdMaps_dir : ∀ k : Fin 12, ∀ g : Fin 36,
     cellOf ((gdMaps.getD k.val #[]).getD g.val 0)
-      = cellOf g.val + dpairDirList.getD k.val 0 := by native_decide
+      = cellOf g.val + dpairDirList.getD k.val 0 := by decide
 
 theorem dpairDirList_mem : ∀ k : Fin 12, dpairDirList.getD k.val 0 ∈ pairDirections := by decide
 
@@ -684,9 +705,9 @@ theorem exists_supMask4 (a : BaseGroup → ZMod 2) (horig : a (0, 0) = 1)
 
 /-! ## §G′ minimum distance: a gated nonzero A-block has weight ≥ 3 -/
 
-theorem no_gated_weight1 : ∀ i : Fin 36, gateM (1 <<< i.val) = false := by native_decide
+theorem no_gated_weight1 : ∀ i : Fin 36, gateM (1 <<< i.val) = false := by decide
 theorem no_gated_weight2 : ∀ i j : Fin 36, i ≠ j →
-    gateM (1 <<< i.val ^^^ 1 <<< j.val) = false := by native_decide
+    gateM (1 <<< i.val ^^^ 1 <<< j.val) = false := by decide
 
 theorem gated_bwt_ge3 (b : BaseGroup → ZMod 2) (hgate : gateM (bitmaskOf b) = true)
     (hge1 : 1 ≤ bwt b) : 3 ≤ bwt b := by
@@ -710,6 +731,299 @@ theorem gated_bwt_ge3 (b : BaseGroup → ZMod 2) (hgate : gateM (bitmaskOf b) = 
     rw [hbm, no_gated_weight2 x y hne] at hgate
     exact absurd hgate (by simp)
 
+
+
+/-! ## §G″ the scan cores, kernel-checked (packed syndrome sweep)
+
+The combinatorial heart of the classification: the odd scan (`classifyCore`,
+36⁴ tuples) and the even scan (`classifyCoreEven`, 36³ tuples).  A per-tuple
+kernel evaluation of `gateM` (12 six-term row folds) is far too slow, so the
+sweep is restructured around three ideas, with the public statements unchanged:
+
+* **Packed row syndromes.** Each `HA_rows` parity is `F₂`-linear in the mask,
+  so the 12-bit row syndrome of `supMask [0,q₁,…]` is the XOR of per-bit
+  signatures `sigOfN i` read out of one 432-bit constant `SIGN`.  The bridge
+  `gateM (supMask L) = true → signature XOR = 0` is proved structurally:
+  `rowsSyn` packs the 12 row folds into one `Nat` (`two_mul_add_xor` gives
+  XOR-linearity of the packing), and a 36-case `decide` identifies its value
+  on single-bit masks with the signature table.
+* **Reverse syndrome lookup.** The 36 signatures are distinct, so the last
+  scan index is determined by the previous ones: `sigRev` reads the unique
+  matching index (plus one, `0` = no match) out of a 4096-entry table `SREV`.
+  The 36⁴ odd scan thereby collapses to a 36³ `Bool` sweep (`oddSweep`), and
+  the even scan to 36² (`evenSweep`).
+* **Verdict lists.** A sweep survivor is only checked for *membership* in a
+  precomputed list of its possible masks (`okList4`, 68 entries, ordered by
+  hit frequency; `okList3`, 14 entries).  The expensive per-mask conclusion —
+  hexagon/D-pair recognition or the `minBcoset` bound — is evaluated once per
+  listed mask (`okList4_verdict`, `okList3_verdict`), not once per tuple.
+  `minBcoset` is evaluated through `minBK`, a clone whose column tables are
+  packed into `Nat` constants (`MBAP`, `BBP`) instead of `Array.getD` walks;
+  `minBK_eq` transports the result back.
+-/
+
+private def SIGN : Nat := 5546016392195778575349587638645148519065408117042022706256463562791712927660644751301446342934763037356032547634123095380974383115
+private def sigOfN (i : Nat) : Nat := (SIGN >>> (12 * i)) &&& 4095
+private def SREV : Nat := 9691089473373107447052631477821169989553646124591747148354571276809555266825455457320741323284144843438071093236717718894409510467302471600175749575401391740190977675854235411268878232663598971438294709050900299998005985759287024503545424749211630837312681098634572647111366713394131561277156085540683358421108250912309788942557611276915840813735218052234182936286385331953696796658212957052395440736224480830480139362089838565359297153738343568642516756745686442743720770451483773485566267806383799854696579972616681039214284251358598859730620451878664498780009391775724474891511196787534482293890220880317816043347778515296316418052589899965776294933766726330649879113681771908054459484980104228243428326465728961285765532618685072084231313714574821505970810271480442421255600434752446595256269443623752731607469233332359133162550364872127221976060550828810603334120684973753402562766309003216933196717488866043102198919009919426066794341989369695565911287084649230462252039777428135104418840560615059944464740150639495341910900913074975947620427932221139876105293100081039214674356076679187609075049203803433076508672351331373081348839647194634974140493072197023070320731523283156228086540170854942894918446063897717577414635632298785308889302550553240664647437653122280121462891221100247923640801894428727865799213318488416531928161192179717621585256467134865381768287733240887873259139635736039694866048861182064379865179584890362609905848345989735873786850469642821103093588931564358074686972735416742836725671826268179068784794073228420078068511750202248657192247514613331774136127531893065522869950420266280087612498102491046873020920250829588856690933047397872885693568573534735216151066750321574800885657450354070597381287150065463611610911950006676784253121082591634910840655384158763946285471424423320672562836545742234138018625857543003245990706604870786189355640735724643047073095121221938838734451308125022464409064653196884350453122925318781544693221657997747068773420416466821325010894037839947880379176364662149853959767416455224604781555232952951276398886225748350922300892718577673462673832513522005184810051276048202813122080568532663233644208219982647426892882230844255178466770039415134516071340482934887827299821723124046114909543318202917316674099041907511077398580999528695901532602069122615793970055432631606756672275171276360209813096518907026542276118976125435790784039227151299371725893524873082755012777520179104289051068552545031579476051579510696821344877965044499682333417679895168787737616307391228218174681309372347079475108827896377067539906151206105127745423294751064127712421966038541852821852156385308958373034107033277396958688426418979769120012341701236559951367994829180303106354750773657073937332251639789790219156771077976196824358069309611448288773447768032900110954143484194701617667974584804015656719045148284692535021862806063903161332706362465958104674486915890817528971073532423910144402157022659772095277517919394015544899988713131450537033711751966597570386808676316890932121903656886635940646774010105841587325389031522754453492194062323995947961665582439415841966413420708904686105605279431294208465691915661187278109322440108646005309432596317975581323116258577280003774169456282578182549077835105017245196967250744091420821252485856884905405440085989252504216339002158766506781688245604657434521283227760468139242442079809051496071798268163699108427441522495574652382344379506208462809622048636834576330110217433779137231215063178076034104878135348007955275928040991390422170831929073518687623100215761693085369469917119555510478870089429993972896808801861181066830335076000829357979388094289565803117403253319859001440884848296055697240960159589787010898951956749916842438198286703271852441005986598444187439746807246369356781969721335233650855332666049450184311743104307462495235073808253592448827580325884992202015391989860814544711047183572444256300517787859480300556356998304541698753228953417125711581796224204527864729203324341434739451426359510410432505561015955951514600515847150679972537201469211878443865820736079164191156183868763916644972133870200002581729795986938682243263536194678933646950805652107687963988557869465117667475135109832893127979714899449186325938417017262675432682418076133151113276913232223071279192375387490123807095185912733057394944958348718962237964639339855577375095913170329744634369983683022163509316079539081600896347211945587946171805818399690456839132372300680083129168080735393054569559885296519202059333526904389993598915393224815693616364687377124684987204044260518766163952844223707942383664152244944514596567087575083335731389075548104458660664531536670775306485287989629731773139176753124446387726077937703534900352891408834626765933258450172446743514946887581757253719474782959472099945627620092256390510976075861976794327099552957013407827890903399245087264408707687377925795534121729657632749534528779834618368086791119310987991342249051412947608017109348054428518593872710766558825960131156893200895249877217920881078370857022523468654875569448950597199620730802330829790031659936163994569488142209518845146065271023498256274376971976948615935617997395459451520581658927190875550297914364611518176771629867527392167447517809063226384671648670063097667194622494227214614336828004090515470385579927825231037068600924581175605678784772747014647934745938769270808262939699940267598915675337559144836897795902735046681065677993891986974440372649409218092289289140079682364750408433355044057551688599996328026306101164582357832640409712840849572121956630391880247021414834566523057668142902169332737435484222898356272058709469465267573973225710120502115970385767734659229612412919958747749863444244231875655870671784444951452173087454710174590633222267793668870817140194709530233282198566086740465796585528354857598555708853311254528709512359818657077691511540054336159617622513405457342033436407065109772329014556461827442374960684407866261423753308957752676552413777001613094643185355787888587008263526785185593565201782485052528572525442566922352289377579445026025564124573759435752071964087654983365388522231820709342205918667861285343280332008288704399888986175168245319393836249589829639118895628737935188943589493928644643702275948704725086557116659493389064965128918167230081506042535366158097572366937740542821798133417018881456664371431326933894020720207852790715612509724416561335839065923002068702504826651586379526968853868088067210902454466685793344559747362555393255453650478960454587579029196100310780113686743094587982306743882477119055438241059383303180806879019324793183272296294033162138526434756506773702512826397453405746067672756806858980994690863610015184907516938650967870677632174171935355389355345520329603327102992606655414619390140530136598857417135955757230080320726910410821437512052348188370391412244537719192975423936627546942532325271359538448407537568679700147098664050511173146726656492441766028608
+private def sigRev (s : Nat) : Nat := (SREV >>> (6 * s)) &&& 63
+private def MBAP : Nat := 23425013702033017333483998876353718355037181147191862692455933805657544970491641732475352194265411354010995278510573207946525499565942001315306837885048328950819597352935050535820994837429638246369487043509666415257080525617795977543566965669984096160410769105762404313694562605311459123320524376621415015595944531587250002661632027512937161820164
+private def BBP : Nat := 712278005249543643502795367564561756261087250053748698165343225
+private def mbaOf (i : Nat) : Nat := (MBAP >>> (36 * i)) &&& 68719476735
+private def bbOf (i : Nat) : Nat := (BBP >>> (36 * i)) &&& 68719476735
+private def applyK (m : Nat) : Nat := selXor mbaOf 36 m
+private def bOffK (c : Nat) : Nat := selXor bbOf 6 c
+private def minBK (m : Nat) : Nat :=
+  (List.range 64).foldl (fun acc c => min acc (wtM (applyK m ^^^ bOffK c))) 99
+private def conclB (m : Nat) : Bool := isHexDpairA m || decide (10 < wtM m + minBK m)
+private def conclB3 (m : Nat) : Bool :=
+  decide (wtM m < 3) || (isHexDpairA m || decide (10 < wtM m + minBK m))
+private def okList4 : List Nat := [8388611, 21, 4194337, 1572865, 262150, 42, 3145730, 524300, 6291460, 1048600, 12582920, 2097200, 8650768, 786464, 536871104, 1344, 268437568, 100663360, 16777600, 2688, 201326720, 33555200, 402653440, 67110400, 805306880, 134220800, 553649152, 50333696, 34359750656, 86016, 17180004352, 6442455040, 1073766400, 172032, 12884910080, 2147532800, 25769820160, 4295065600, 51539640320, 8590131200, 35433545728, 3221356544, 5505024, 11010048, 352321536, 704643072, 22548578304, 45097156608, 2097167, 1048615, 4718599, 1310731, 524339, 5242899, 2359331, 4456461, 8912933, 2883589, 13631493, 262201, 10485785, 2621481, 9175049, 7340041, 9437233, 3407889, 13107217, 14942209]
+private def okList3 : List Nat := [0, 4194315, 262163, 2621443, 1048589, 2097189, 8650757, 524313, 8388649, 2359305, 6291473, 1310753, 4980737, 11534337]
+
+private def evenSweep : Bool :=
+  (List.range 36).all fun n1 =>
+    (List.range 36).all fun n2 =>
+      (sigRev ((sigOfN 0 ^^^ sigOfN n1) ^^^ sigOfN n2) == 0)
+      || okList3.any (fun x => (((1 <<< 0 ^^^ 1 <<< n1) ^^^ 1 <<< n2)
+          ^^^ 1 <<< (sigRev ((sigOfN 0 ^^^ sigOfN n1) ^^^ sigOfN n2) - 1)) == x)
+
+private def oddSweep : Bool :=
+  (List.range 36).all fun n1 =>
+    (List.range 36).all fun n2 =>
+      (List.range 36).all fun n3 =>
+        (sigRev (((sigOfN 0 ^^^ sigOfN n1) ^^^ sigOfN n2) ^^^ sigOfN n3) == 0)
+        || okList4.any (fun x => ((((1 <<< 0 ^^^ 1 <<< n1) ^^^ 1 <<< n2) ^^^ 1 <<< n3)
+            ^^^ 1 <<< (sigRev (((sigOfN 0 ^^^ sigOfN n1) ^^^ sigOfN n2) ^^^ sigOfN n3) - 1)) == x)
+
+private theorem evenSweep_true : evenSweep = true := by decide +kernel
+private theorem oddSweep_true : oddSweep = true := by decide +kernel
+private theorem okList4_verdict : okList4.all (fun m => conclB m) = true := by decide +kernel
+private theorem okList3_verdict : okList3.all (fun m => conclB3 m) = true := by decide +kernel
+
+private theorem foldl_congr_mem {α β : Type} {f g : β → α → β} :
+    ∀ (l : List α), (∀ b a, a ∈ l → f b a = g b a) → ∀ (b : β), l.foldl f b = l.foldl g b := by
+  intro l
+  induction l with
+  | nil => intro _ b; rfl
+  | cons x t ih =>
+    intro h b
+    rw [List.foldl_cons, List.foldl_cons, h b x (List.mem_cons_self ..)]
+    exact ih (fun b' a ha => h b' a (List.mem_cons_of_mem x ha)) _
+
+private theorem mbaOf_eq : ∀ i : Fin 36, mbaOf i.val = MBAcols.getD i.val 0 := by decide
+private theorem bbOf_eq : ∀ i : Fin 6, bbOf i.val = Bbasis.getD i.val 0 := by decide
+
+private theorem applyK_eq (m : Nat) : applyK m = applyCols MBAcols m := by
+  rw [applyCols_eq]
+  unfold applyK selXor
+  apply foldl_congr_mem
+  intro b i hi
+  have hlt : i < 36 := List.mem_range.mp hi
+  have h : mbaOf i = MBAcols.getD i 0 := mbaOf_eq ⟨i, hlt⟩
+  rw [h]
+
+private theorem bOffK_eq (c : Nat) : bOffK c = bOffset c := by
+  unfold bOffK bOffset selXor
+  apply foldl_congr_mem
+  intro b i hi
+  have hlt : i < 6 := List.mem_range.mp hi
+  have h : bbOf i = Bbasis.getD i 0 := bbOf_eq ⟨i, hlt⟩
+  rw [h]
+
+private theorem minBK_eq (m : Nat) : minBK m = minBcoset m := by
+  unfold minBK minBcoset
+  congr 1
+  funext acc c
+  rw [applyK_eq, bOffK_eq]
+
+private def rowFold (m : Nat) (row : List Nat) : Nat :=
+  row.foldl (fun acc i => acc ^^^ ((m >>> i) &&& 1)) 0
+
+private theorem gateM_eq_rows (m : Nat) :
+    gateM m = HA_rows.all (fun row => rowFold m row == 0) := rfl
+
+private theorem rowFold_xor (x y : Nat) (row : List Nat) :
+    rowFold (x ^^^ y) row = rowFold x row ^^^ rowFold y row := by
+  unfold rowFold
+  rw [show (fun acc i => acc ^^^ (((x ^^^ y) >>> i) &&& 1))
+        = (fun acc i => acc ^^^ (((x >>> i) &&& 1) ^^^ ((y >>> i) &&& 1))) from by
+      funext acc i; rw [Nat.shiftRight_xor_distrib, Nat.and_xor_distrib_right]]
+  have hsplit := foldl_xor_split (fun i => (x >>> i) &&& 1) (fun i => (y >>> i) &&& 1) row 0 0
+  simp only [Nat.xor_zero] at hsplit
+  exact hsplit
+
+private theorem rowFold_le_one (m : Nat) (row : List Nat) : rowFold m row ≤ 1 := by
+  unfold rowFold
+  suffices h : ∀ (L : List Nat) (acc : Nat), acc ≤ 1 →
+      L.foldl (fun acc i => acc ^^^ ((m >>> i) &&& 1)) acc ≤ 1 from h row 0 (by omega)
+  intro L
+  induction L with
+  | nil => intro acc h; exact h
+  | cons x t ih =>
+    intro acc h
+    rw [List.foldl_cons]
+    apply ih
+    have h1 : (m >>> x) &&& 1 ≤ 1 := Nat.and_le_right
+    have h2 := Nat.xor_lt_two_pow (x := acc) (y := (m >>> x) &&& 1) (n := 1)
+    rw [pow_one] at h2
+    have h3 := h2 (by omega) (by omega)
+    omega
+
+private theorem two_mul_add_xor (a c b d : Nat) (hb : b ≤ 1) (hd : d ≤ 1) :
+    (2 * a + b) ^^^ (2 * c + d) = 2 * (a ^^^ c) + (b ^^^ d) := by
+  have hbd : b ^^^ d ≤ 1 := by
+    rcases Nat.le_one_iff_eq_zero_or_eq_one.mp hb with rfl | rfl <;>
+      rcases Nat.le_one_iff_eq_zero_or_eq_one.mp hd with rfl | rfl <;> decide
+  apply Nat.eq_of_testBit_eq
+  intro r
+  cases r with
+  | zero =>
+    rw [Nat.testBit_xor, Nat.testBit_zero, Nat.testBit_zero, Nat.testBit_zero]
+    have e1 : (2 * a + b) % 2 = b := by omega
+    have e2 : (2 * c + d) % 2 = d := by omega
+    have e3 : (2 * (a ^^^ c) + (b ^^^ d)) % 2 = b ^^^ d := by omega
+    rw [e1, e2, e3]
+    rcases Nat.le_one_iff_eq_zero_or_eq_one.mp hb with rfl | rfl <;>
+      rcases Nat.le_one_iff_eq_zero_or_eq_one.mp hd with rfl | rfl <;> decide
+  | succ r =>
+    rw [Nat.testBit_xor, Nat.testBit_add_one, Nat.testBit_add_one, Nat.testBit_add_one]
+    have e1 : (2 * a + b) / 2 = a := by omega
+    have e2 : (2 * c + d) / 2 = c := by omega
+    have e3 : (2 * (a ^^^ c) + (b ^^^ d)) / 2 = a ^^^ c := by omega
+    rw [e1, e2, e3, Nat.testBit_xor]
+
+private def rowsSyn (m : Nat) (rows : List (List Nat)) : Nat :=
+  rows.foldr (fun row acc => 2 * acc + rowFold m row) 0
+
+private theorem rowsSyn_cons (m : Nat) (r : List Nat) (t : List (List Nat)) :
+    rowsSyn m (r :: t) = 2 * rowsSyn m t + rowFold m r := rfl
+
+private theorem rowsSyn_eq_zero (m : Nat) : ∀ (rows : List (List Nat)),
+    rows.all (fun row => rowFold m row == 0) = true → rowsSyn m rows = 0 := by
+  intro rows
+  induction rows with
+  | nil => intro _; rfl
+  | cons r t ih =>
+    intro h
+    rw [List.all_cons, Bool.and_eq_true] at h
+    have h1 : rowFold m r = 0 := by have := h.1; rwa [beq_iff_eq] at this
+    rw [rowsSyn_cons, h1, ih h.2]
+
+private theorem rowsSyn_xor (x y : Nat) : ∀ (rows : List (List Nat)),
+    rowsSyn (x ^^^ y) rows = rowsSyn x rows ^^^ rowsSyn y rows := by
+  intro rows
+  induction rows with
+  | nil => simp [rowsSyn]
+  | cons r t ih =>
+    rw [rowsSyn_cons, rowsSyn_cons, rowsSyn_cons, ih, rowFold_xor,
+      ← two_mul_add_xor (rowsSyn x t) (rowsSyn y t) (rowFold x r) (rowFold y r)
+        (rowFold_le_one x r) (rowFold_le_one y r)]
+
+private theorem rowsSyn_single : ∀ i : Fin 36,
+    rowsSyn (1 <<< i.val) HA_rows = sigOfN i.val := by decide
+
+private theorem sigRev_table : ∀ i : Fin 36, sigRev (sigOfN i.val) = i.val + 1 := by decide +kernel
+
+private theorem eq_of_xor_eq_zero {a b : Nat} (h : a ^^^ b = 0) : a = b := by
+  have h2 := congrArg (fun z => z ^^^ b) h
+  simp only [Nat.xor_assoc, Nat.xor_self, Nat.xor_zero, Nat.zero_xor] at h2
+  exact h2
+
+private theorem supMask_chain4 (q1 q2 q3 : Fin 36) :
+    supMask [0, q1, q2, q3]
+      = ((1 <<< 0 ^^^ 1 <<< q1.val) ^^^ 1 <<< q2.val) ^^^ 1 <<< q3.val := by
+  rw [supMask_cons, supMask_cons, supMask_cons, supMask_singleton,
+    ← Nat.xor_assoc, ← Nat.xor_assoc]
+  rfl
+
+private theorem supMask_chain5 (q1 q2 q3 q4 : Fin 36) :
+    supMask [0, q1, q2, q3, q4]
+      = (((1 <<< 0 ^^^ 1 <<< q1.val) ^^^ 1 <<< q2.val) ^^^ 1 <<< q3.val) ^^^ 1 <<< q4.val := by
+  rw [supMask_cons, supMask_cons, supMask_cons, supMask_cons, supMask_singleton,
+    ← Nat.xor_assoc, ← Nat.xor_assoc, ← Nat.xor_assoc]
+  rfl
+
+private theorem syn_chain4 (q1 q2 q3 : Fin 36)
+    (h : gateM (supMask [0, q1, q2, q3]) = true) :
+    sigOfN q3.val = (sigOfN 0 ^^^ sigOfN q1.val) ^^^ sigOfN q2.val := by
+  have h' : HA_rows.all (fun row =>
+      rowFold (((1 <<< 0 ^^^ 1 <<< q1.val) ^^^ 1 <<< q2.val) ^^^ 1 <<< q3.val) row == 0)
+        = true := by
+    rw [← gateM_eq_rows, ← supMask_chain4 q1 q2 q3]; exact h
+  have h0 := rowsSyn_eq_zero _ _ h'
+  rw [rowsSyn_xor, rowsSyn_xor, rowsSyn_xor] at h0
+  have t0 : rowsSyn (1 <<< 0) HA_rows = sigOfN 0 := rowsSyn_single 0
+  rw [t0, rowsSyn_single q1, rowsSyn_single q2, rowsSyn_single q3] at h0
+  exact (eq_of_xor_eq_zero h0).symm
+
+private theorem syn_chain5 (q1 q2 q3 q4 : Fin 36)
+    (h : gateM (supMask [0, q1, q2, q3, q4]) = true) :
+    sigOfN q4.val = ((sigOfN 0 ^^^ sigOfN q1.val) ^^^ sigOfN q2.val) ^^^ sigOfN q3.val := by
+  have h' : HA_rows.all (fun row =>
+      rowFold ((((1 <<< 0 ^^^ 1 <<< q1.val) ^^^ 1 <<< q2.val) ^^^ 1 <<< q3.val) ^^^ 1 <<< q4.val)
+        row == 0) = true := by
+    rw [← gateM_eq_rows, ← supMask_chain5 q1 q2 q3 q4]; exact h
+  have h0 := rowsSyn_eq_zero _ _ h'
+  rw [rowsSyn_xor, rowsSyn_xor, rowsSyn_xor, rowsSyn_xor] at h0
+  have t0 : rowsSyn (1 <<< 0) HA_rows = sigOfN 0 := rowsSyn_single 0
+  rw [t0, rowsSyn_single q1, rowsSyn_single q2, rowsSyn_single q3, rowsSyn_single q4] at h0
+  exact (eq_of_xor_eq_zero h0).symm
+
+theorem classifyCore : ∀ q₁ q₂ q₃ q₄ : Fin 36,
+    gateM (supMask [0, q₁, q₂, q₃, q₄]) = true →
+    isHexDpairA (supMask [0, q₁, q₂, q₃, q₄]) = true
+      ∨ 10 < wtM (supMask [0, q₁, q₂, q₃, q₄]) + minBcoset (supMask [0, q₁, q₂, q₃, q₄]) := by
+  intro q1 q2 q3 q4 hg
+  have hsig : sigOfN q4.val = ((sigOfN 0 ^^^ sigOfN q1.val) ^^^ sigOfN q2.val) ^^^ sigOfN q3.val :=
+    syn_chain5 q1 q2 q3 q4 hg
+  have h1 := List.all_eq_true.mp oddSweep_true q1.val (List.mem_range.mpr q1.isLt)
+  have h2 := List.all_eq_true.mp h1 q2.val (List.mem_range.mpr q2.isLt)
+  have h4 := List.all_eq_true.mp h2 q3.val (List.mem_range.mpr q3.isLt)
+  rw [← hsig, sigRev_table q4] at h4
+  have h5 : (false || okList4.any (fun x =>
+      ((((1 <<< 0 ^^^ 1 <<< q1.val) ^^^ 1 <<< q2.val) ^^^ 1 <<< q3.val) ^^^ 1 <<< q4.val) == x))
+      = true := h4
+  rw [Bool.false_or, List.any_eq_true] at h5
+  obtain ⟨x, hxmem, hxeq⟩ := h5
+  rw [beq_iff_eq] at hxeq
+  have hconcl := List.all_eq_true.mp okList4_verdict x hxmem
+  rw [← hxeq, ← supMask_chain5 q1 q2 q3 q4] at hconcl
+  unfold conclB at hconcl
+  rw [Bool.or_eq_true] at hconcl
+  rcases hconcl with hhex | hbig
+  · exact Or.inl hhex
+  · right
+    have hb := of_decide_eq_true hbig
+    rwa [minBK_eq] at hb
+
+theorem classifyCoreEven : ∀ q₁ q₂ q₃ : Fin 36,
+    gateM (supMask [0, q₁, q₂, q₃]) = true →
+    3 ≤ wtM (supMask [0, q₁, q₂, q₃]) →
+    isHexDpairA (supMask [0, q₁, q₂, q₃]) = true
+      ∨ 10 < wtM (supMask [0, q₁, q₂, q₃]) + minBcoset (supMask [0, q₁, q₂, q₃]) := by
+  intro q1 q2 q3 hg h3
+  have hsig : sigOfN q3.val = (sigOfN 0 ^^^ sigOfN q1.val) ^^^ sigOfN q2.val :=
+    syn_chain4 q1 q2 q3 hg
+  have h1 := List.all_eq_true.mp evenSweep_true q1.val (List.mem_range.mpr q1.isLt)
+  have h2 := List.all_eq_true.mp h1 q2.val (List.mem_range.mpr q2.isLt)
+  rw [← hsig, sigRev_table q3] at h2
+  have h5 : (false || okList3.any (fun x =>
+      (((1 <<< 0 ^^^ 1 <<< q1.val) ^^^ 1 <<< q2.val) ^^^ 1 <<< q3.val) == x)) = true := h2
+  rw [Bool.false_or, List.any_eq_true] at h5
+  obtain ⟨x, hxmem, hxeq⟩ := h5
+  rw [beq_iff_eq] at hxeq
+  have hconcl := List.all_eq_true.mp okList3_verdict x hxmem
+  rw [← hxeq, ← supMask_chain4 q1 q2 q3] at hconcl
+  unfold conclB3 at hconcl
+  rw [Bool.or_eq_true] at hconcl
+  rcases hconcl with hlt | h6
+  · exact absurd (of_decide_eq_true hlt) (by omega)
+  rw [Bool.or_eq_true] at h6
+  rcases h6 with hhex | hbig
+  · exact Or.inl hhex
+  · right
+    have hb := of_decide_eq_true hbig
+    rwa [minBK_eq] at hb
 
 
 /-! ## §H master classification of a light A-block (origin-normalized) -/
@@ -888,10 +1202,16 @@ theorem conv_zero_right (P : BaseGroup → ZMod 2) : conv P 0 = 0 := by
 
 theorem swap_basisA : ∀ g x : BaseGroup,
     conv baseA (swapFn (Pi.single g 1)) x = swapFn (conv baseB (Pi.single g 1)) x := by
-  native_decide
+  have key : ∀ g x : BaseGroup, baseA (x - swap g) = baseB (swap x - g) := by decide
+  intro g x
+  rw [swapFn_single, swapFn_apply, conv_single_right, conv_single_right]
+  exact key g x
 theorem swap_basisB : ∀ g x : BaseGroup,
     conv baseB (swapFn (Pi.single g 1)) x = swapFn (conv baseA (Pi.single g 1)) x := by
-  native_decide
+  have key : ∀ g x : BaseGroup, baseB (x - swap g) = baseA (swap x - g) := by decide
+  intro g x
+  rw [swapFn_single, swapFn_apply, conv_single_right, conv_single_right]
+  exact key g x
 
 theorem swap_convA (f : BaseGroup → ZMod 2) :
     conv baseA (swapFn f) = swapFn (conv baseB f) := by

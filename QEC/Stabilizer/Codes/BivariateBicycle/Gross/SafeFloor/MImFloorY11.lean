@@ -18,8 +18,8 @@ constrained component is rewritten as a radical-ideal element
 (`rmul_*_mem` ▸ `inIdeal_to_exists`), and the per-block `slotCost` slot sum is
 discharged by a `4⁶`-knob kernel `decide` (`Rdec`/`Ldec`).
 
-The only `native_decide` here is the small per-slot seam-offset read-off
-(`offs_eq`, one bundled compilation unit); the heavy `floorOK` leaf is gone.
+The per-slot seam-offset read-off (`offs_eq`) is a kernel `decide` through the
+packed seam mask; the heavy `floorOK` leaf is gone.
 -/
 import QEC.Stabilizer.Codes.BivariateBicycle.Gross.SafeFloor.WtFloor24Bridge
 
@@ -34,8 +34,7 @@ set_option maxRecDepth 8192
 /-- Y-orbit-11 representative `ker ∂₂` element. -/
 def zrep : BaseGroup → ZMod 2 := kcombo 0 1 0 1 1 0
 
-/-! ### Seam offsets, read off concretely (the only `native_decide`, one bundled
-compilation unit).
+/-! ### Seam offsets, read off concretely (kernel `decide` through the packed mask).
 A-block (`seamOffL`): comp1 `(2,2,2,2)`, comp3 `(3,3,3,3)`, comp4 `(0,1,0,1)`;
 B-block (`seamOffR`): comp2 `(0,0,0,0)`, comp3 `(1,1,1,1)`, comp4 `(1,3,1,3)`.
 Components 0,2 vanish (Lemma 17). -/
@@ -47,7 +46,8 @@ private theorem offs_eq :
     (∀ s, seamOffL zrep psi1 s = 2) ∧ (∀ s, seamOffL zrep psi3 s = 3) ∧
     (∀ s, seamOffL zrep psi4 s
       = if s = (0,0) then 0 else if s = (1,0) then 1 else if s = (0,1) then 0 else 1) := by
-  native_decide
+  simp only [zrep, seamOffL_mask, seamOffR_mask]
+  decide +kernel
 
 theorem offR2_eq : seamOffR zrep psi2 = fun _ => 0 := funext offs_eq.1
 theorem offR3_eq : seamOffR zrep psi3 = fun _ => 1 := funext offs_eq.2.1

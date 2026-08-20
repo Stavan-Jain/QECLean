@@ -155,7 +155,13 @@ of any `t` share their slot-frame direction `a`; the `XY`-shifts `b, b'` are fre
 theorem spine3_reduce : ∀ t : Ring, ∃ a b b' : Fin 4,
     rmul Ahat1 t = (fun s => fadd (fmul a (Ahat1 s)) (fmul b (uv s))) ∧
     rmul Bhat2 t = (fun s => fadd (fmul a (Bhat2 s)) (fmul b' (uv s))) := by
-  native_decide
+  have core : ∀ w x y z : Fin 4, ∃ a b b' : Fin 4,
+      rmul Ahat1 (mkRing w x y z) = (fun s => fadd (fmul a (Ahat1 s)) (fmul b (uv s))) ∧
+      rmul Bhat2 (mkRing w x y z) = (fun s => fadd (fmul a (Bhat2 s)) (fmul b' (uv s))) := by
+    decide +kernel
+  intro t
+  rw [ring_eq_mkRing t]
+  exact core _ _ _ _
 
 /-- **comp-4 spine reduction.**  The L-side (`Â₄`) and R-side (`B̂₂`) radical images
 of any `t` share their direction `a`, and the `B̂₂`-shift is `ω·(Â₄-shift)`
@@ -163,7 +169,13 @@ of any `t` share their direction `a`, and the `B̂₂`-shift is `ω·(Â₄-shif
 theorem spine4_reduce : ∀ t : Ring, ∃ a b : Fin 4,
     rmul Ahat4 t = (fun s => fadd (fmul a (Ahat4 s)) (fmul b (uv s))) ∧
     rmul Bhat2 t = (fun s => fadd (fmul a (Bhat2 s)) (fmul (fmul 2 b) (uv s))) := by
-  native_decide
+  have core : ∀ w x y z : Fin 4, ∃ a b : Fin 4,
+      rmul Ahat4 (mkRing w x y z) = (fun s => fadd (fmul a (Ahat4 s)) (fmul b (uv s))) ∧
+      rmul Bhat2 (mkRing w x y z) = (fun s => fadd (fmul a (Bhat2 s)) (fmul (fmul 2 b) (uv s))) := by
+    decide +kernel
+  intro t
+  rw [ring_eq_mkRing t]
+  exact core _ _ _ _
 
 /-- The reduced A/left-block cost: the four-slot `mFree2` sum (component 0 = `V₀`
 fixed, the unit-side component 2 freed) with comp-1 confining `a₁·Â₁ + b₁·XY`,
