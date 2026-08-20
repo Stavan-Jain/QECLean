@@ -313,7 +313,7 @@ These are local to this codebase — search here before assuming mathlib has the
 ## Build & verification
 
 ```
-lake build                                    # whole repo (~10 min cold)
+lake build                                    # whole repo (~45 s warm)
 lake build QEC.Stabilizer.Framework.Core.Stabilizer.Codespace      # one module
 lake env lean /tmp/probe.lean                 # one-off file check
 ```
@@ -321,6 +321,29 @@ lake env lean /tmp/probe.lean                 # one-off file check
 Always verify with `lake build` before claiming a fix works. The error
 output prints the residual goal under each failure — read it before guessing
 tactics.
+
+**`lake build` alone is NOT sufficient before pushing.** `defaultTargets` is
+just `QEC`, so three things it does not touch will still fail CI. After any
+change that adds, moves, or removes a module, run all four:
+
+```bash
+lake build && lake build QECLight && lake env lean Playground.lean && lake env lean scripts/AxiomCheck.lean
+```
+
+- **`QECLight`** (root `QECLight.lean`) re-lists the `Codes` umbrella minus
+  `BivariateBicycle`. Deliberately outside `defaultTargets`, so a module added
+  to or removed from `Codes/` breaks it invisibly. Checked by the `hosted-env`
+  workflow.
+- **`Playground.lean`** `#check`s a few showcase declarations against
+  `QECLight`. Removing or renaming one of them breaks it. Checked by
+  `hosted-env`'s "Check Playground.lean elaborates" step.
+- **`scripts/AxiomCheck.lean`** enforces the axiom policy (see below).
+  Checked by `lean_action_ci`.
+
+`bash scripts/check-umbrellas.sh` covers the umbrella wiring *under* `QEC/`,
+but by construction it does not walk these root-level files — hence the list
+above. All three have been broken in practice by module removals that a green
+`lake build` reported as fine.
 
 ## Worktrees: reuse the main repo's prebuilt mathlib
 

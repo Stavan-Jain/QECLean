@@ -22,9 +22,9 @@ open Quantum.StabilizerGroup
 #check @StabilizerCodeWithDistance
 #check @HasCodeDistance
 
--- A worked result to inspect: Steane ⊗ Steane, an unconditional `[[49, 1, 9]]`
--- concatenated code.
-#check Steane7.steaneConcatCodeWithDistance
+-- A worked result to inspect: the `[[5, 1, 3]]` perfect code, packaged with its
+-- proved distance. (It is the repo's first non-CSS code.)
+#check FiveQubit_5_1_3.stabilizerCodeWithDistance
 
 -- The parametric toric code, for every `L ≥ 2`. (It lives under
 -- `Quantum.Stabilizer.Lattice`, not the `Quantum.StabilizerGroup` opened above.)
