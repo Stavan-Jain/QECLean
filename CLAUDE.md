@@ -73,7 +73,7 @@ QEC/
     └── Codes/               # Concrete codes, organized by family:
         ├── _TEMPLATE.lean       # Canonical structural reference for new CSS codes
         ├── BivariateBicycle/    # BB family, one subdir per instance:
-        │                        # Gross/ (+ Gross/SafeFloor/), Z3Z6/, Z5Z15F2A6/,
+        │                        # Gross/ (+ Gross/SafeFloor/), Z5Z15F2A6/,
         │                        # BaseFloors/. READ ITS README.md BEFORE EDITING —
         │                        # task router, discharge map, generated-file rules
         ├── Toric/               # Parametric L×L toric code: CodeN, Chains,
