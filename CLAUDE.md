@@ -122,7 +122,9 @@ content there. Same convention for the sub-umbrellas
 - **Tactics**:
   - `simp +decide` is preferred over hand-written `decide` (and avoids the
     "expected type must not contain free variables" trap).
-  - `native_decide` is allowed (per user preference).
+  - **`native_decide` is banned** — it puts a compiler-trust axiom in the
+    proof term. See "Axiom policy" below. Use `decide`, `decide +kernel`,
+    or an explicit certificate instead.
   - **Probing residual goals**: prefer the `lean_goal` MCP tool (see "Agent
     tooling" below) — it returns the live `goals_before` / `goals_after` at
     a position without any edit or rebuild. Fallback when the MCP isn't
@@ -150,6 +152,53 @@ content there. Same convention for the sub-umbrellas
   proposition)` on a proof that previously closed. See
   qec-lab's `pipeline/attempts/stab_5_1_3/result.md` § "Lessons learned"
   for a concrete worked example of this footgun and the locality fix.
+
+## Axiom policy
+
+**Everything that reaches `main` must depend on exactly mathlib's three
+standard axioms — and nothing else:**
+
+```
+[propext, Classical.choice, Quot.sound]
+```
+
+Check any result with `#print axioms Your.Theorem`, or the `lean_verify` MCP
+tool (it takes a fully qualified name). A declaration that prints those three,
+or "does not depend on any axioms", passes. **Anything else fails**, no matter
+how convincing the proof is.
+
+The two ways this gets violated in practice:
+
+- **`native_decide`** — evaluates the proposition with the compiled
+  evaluator and seals the result behind a fresh axiom, so you are trusting
+  the Lean compiler and your CPU rather than the kernel. As of v4.30 it emits
+  a *per-declaration* axiom (`Your.Theorem._native.native_decide.ax_1_1`),
+  not the older fixed `Lean.ofReduceBool` — so don't grep for a fixed name,
+  read the `#print axioms` output. Banned.
+- **`sorry`** — emits `sorryAx`. Fine on a WIP branch, never on `main`.
+  Tag every one as `sorry  -- TODO(<tag>): <goal shape>` so it can be found.
+
+Custom `axiom` declarations are equally out. If you genuinely need an
+unproven input, make it a **named hypothesis** on the theorem instead — then
+the assumption is visible in the statement rather than hidden in the axiom
+set. `Z5Z15F2A6`'s floor inputs were the worked example of this pattern.
+
+**What to reach for instead**, in rough order of preference: `decide`
+(kernel), `decide +kernel` for the heavier finite checks, packed-`Nat` tables
+instead of `Array`/`List` lookups (an `Array.getD` is an O(n) list walk under
+kernel reduction), quantifier bridges so the kernel enumerates concrete
+lambdas rather than whnf-ing a pi-`Fintype`, sparse rewrites in place of
+`Finset.sum`s, and Gaussian-style certificates where a sweep would otherwise
+be needed. The gross `[[144,12,12]]` proof under `Codes/BivariateBicycle/Gross/`
+is the reference: it was converted from 135 native leaves to kernel-only, and
+its capstones print the standard three. Read it before concluding a check
+"has to" be native.
+
+Code that cannot yet meet this bar does not get deleted — it gets **parked**
+on `claude/z3z6-parked` with a note recording what it proves, why it was
+parked, and the route back. See that branch's `PARKED-NATIVE-DECIDE.md` and
+`Z3Z6/PARKED.md`. Parking preserves the work; merging it to `main` would
+silently widen the trust base of everything downstream.
 
 ## Linter policy
 

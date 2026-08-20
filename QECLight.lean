@@ -8,7 +8,6 @@ import QEC.Stabilizer.Codes.RotatedSurface
 import QEC.Stabilizer.Codes.Repetition
 import QEC.Stabilizer.Codes.Iceberg
 import QEC.Stabilizer.Codes.Small
-import QEC.Stabilizer.Codes.Concat
 
 /-!
 # QECLight — the library minus the memory-heavy code families
@@ -25,20 +24,26 @@ so `lake build` still means the whole library.
 ## What is left out, and why
 
 `import QEC` transitively pulls in `QEC.Stabilizer.Codes.BivariateBicycle`,
-whose gross-code safe-floor leaves (`MImFloorY0/Y1/Y4`) each peak around
-3.75 GB under `native_decide` — `.github/workflows/lean_action_ci.yml` has to
-add 12 GB of swap to get through them. That is a reasonable price for a
-release build on a dedicated runner, and prohibitive for a 4-core container or
-a shared server hosting many concurrent sessions.
+whose gross-code safe-floor leaves (`MImFloorY0/Y1/Y4`) are memory-hungry
+kernel `decide` checks. Lake has no `-j` flag, so it schedules all three
+concurrently at the tail of the build and their combined working set can
+exceed 16 GB — `.github/workflows/lean_action_ci.yml` adds swap to get
+through them. That is a reasonable price for a release build on a dedicated
+runner, and prohibitive for a 4-core container or a shared server hosting
+many concurrent sessions. (Cost is the only reason they are excluded: the
+proofs themselves are axiom-clean, like everything else on `main`.)
 
 `BivariateBicycle` is a leaf: outside its own directory, the only module that
 imports it is the `QEC.Stabilizer.Codes` umbrella. So this file re-lists that
 umbrella without it (and without `_TEMPLATE`, which is scaffolding rather than
-content). That drops 47 of the library's 59 `native_decide` files.
+content).
 
 Everything else is here: the Pauli and binary-symplectic layer, the stabilizer
 and homological framework, the toric and rotated-surface families, Steane,
-Shor, `[[5,1,3]]`, and the concatenation instances.
+Shor, and `[[5,1,3]]`. The concrete concatenation instances are currently
+parked on `claude/z3z6-parked` (see CLAUDE.md § "Axiom policy"), so
+`Codes.Concat` no longer exists to import; `Framework/Concatenation` is still
+included via `QEC.Stabilizer.Framework`.
 
 ## Keeping this in sync
 

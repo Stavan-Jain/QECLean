@@ -54,7 +54,10 @@ The Z3Z6 (pair72, `[[36,4,4]] → [[72,4,8]]`) and Z5Z15F2A6
 
 The gross `d = 12` cone contains **zero `native_decide`**: every leaf is a kernel
 `decide` (mostly `decide +kernel`) or an analytic proof, so the capstones carry
-only mathlib's three axioms. The techniques, in the order they matter: packed-`Nat`
+only mathlib's three axioms. This is not an achievement local to `Gross/` — it is
+the repo-wide bar: everything on `main` must print exactly
+`[propext, Classical.choice, Quot.sound]`. See CLAUDE.md § "Axiom policy", and
+park rather than merge anything that cannot meet it. The techniques, in the order they matter: packed-`Nat`
 tables instead of `Array`/`List` lookups (an `Array.getD` is an O(n) list walk in
 the kernel); quantifier bridges (`mkRing`, `mkTorus`, `chainOfMask`) that let the
 kernel enumerate concrete lambdas rather than whnf a pi-`Fintype`; sparse rewrites
