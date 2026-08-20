@@ -45,8 +45,9 @@ per-module one-liner maps live in the umbrella docstrings (`Gross.lean`,
 | — orbit Y11/Y12 (wt 24) | `SafeFloor/MImFloorY{11,12}.lean` via `WtFloor24Bridge.costFromComps_ge_12_of_blocks` | **analytic** (kernel `decide`) |
 | capstones | `Gross/Distance.lean` (`grossStabilizerCode_hasCodeDistance_12_uncond`, `grossStabilizerCodeWithDistance`) + `Gross/LayerInstance.lean` (`gross_chain/pauli_distance_eq_12` through the layer) | — |
 
-The Z3Z6 instance (pair72, `[[36,4,4]] → [[72,4,8]]`), which used to mirror this
-map, is **parked on branch `claude/z3z6-parked`** pending de-nativization — see
+The Z3Z6 (pair72, `[[36,4,4]] → [[72,4,8]]`) and Z5Z15F2A6
+(`[[150,8,8]] → [[300,8,16]]`) instances, which used to mirror this map, are
+**parked on branch `claude/z3z6-parked`** pending de-nativization — see
 "Parked instances" below.
 
 ## Engine vs analytic (2026-08-20)
@@ -68,19 +69,32 @@ light orbits. The old confined-floor engine (`MImFloor`, `MImFloorData`,
 modules are deleted, not merely unused. Status changes belong HERE, not in
 module names.
 
-The other BB instances (`Z5Z15F2A6/`, `BaseFloors/`) still use `native_decide`;
-only the gross cone is kernel-only.
+`Gross/` is now the only BB instance in this tree, and the whole tree is
+`native_decide`-free: the other instances (`Z5Z15F2A6/`, `BaseFloors/`) were
+the last `native_decide` holders here and have been parked — see below.
 
 ## Parked instances
 
-`Z3Z6/` (pair72, `[[36,4,4]] → [[72,4,8]]`, d = 8 unconditional) has been removed
-from this tree and lives on branch **`claude/z3z6-parked`**, whose
-`Z3Z6/PARKED.md` records why and how to bring it back. In short: it carried 42
-`native_decide`, five of them `2^18` sweeps that dominated a whole-repo build, and
-`main` is being driven to a `native_decide`-free state. The instance is a clean
-leaf — nothing outside `Z3Z6/` imported its declarations — so restoring it means
-re-adding the directory, its sibling umbrella, the one import line in
+`main` is being driven to a `native_decide`-free state, so every instance that
+still carried one has been removed from this tree and lives on branch
+**`claude/z3z6-parked`**:
+
+| Parked | Result given up | `native_decide` |
+|---|---|---|
+| `Z3Z6/` (pair72, `[[36,4,4]] → [[72,4,8]]`, d = 8 unconditional) | `pair72_*_distance_eq_8` | 42, five of them `2^18` sweeps that dominated a whole-repo build |
+| `Z5Z15F2A6/` (`[[150,8,8]] → [[300,8,16]]`, two-tier) | `cover300_chain/pauli_distance_eq_16` | 9 (`Defs` coverData ×4, `Witness` ×4, `DeckHomotopy` Bezout ×1) |
+| `BaseFloors/` (BB90, BB108, Z6Z14) | three certified `BBSmallCycle` class members | 12 (`epsA/epsB/check_two/check_four` ×3 files) |
+
+`Z3Z6/PARKED.md` on that branch records the Z3Z6 rationale in detail. All three
+are clean leaves — nothing outside each directory imported its declarations
+(`Z5Z15F2A6/Distance.lean` is in-instance and went with it) — so restoring one
+means re-adding the directory, its sibling umbrella, the import line in
 `BivariateBicycle.lean`, and the rows removed from this README.
+
+The abstract machinery they exercised stays in this tree:
+`Framework/Homological/BBSmallCycle.lean` (the A15/A16 class small-cycle
+theorem) and `BBDoubling`/`BBCover` are untouched — they simply have no
+concrete instance here besides `Gross/`.
 
 ## Generated files (Class G: fully generated — NEVER hand-edit)
 
@@ -117,9 +131,9 @@ details (env, clobber guards, stale generators): `qec-lab:experiments/bb_lab/GEN
 
 ## Adding an instance
 
-Copy the shape of `Gross/` (complete, kernel-only) or `Z5Z15F2A6/` (minimal
-skeleton); the parked `Z3Z6/` (branch `claude/z3z6-parked`) is another complete
-worked example:
+Copy the shape of `Gross/` (complete, kernel-only) — the only instance in this
+tree; the parked `Z3Z6/` and `Z5Z15F2A6/` (branch `claude/z3z6-parked`) are
+further worked examples:
 
 1. `mkdir <Name>/` + sibling `<Name>.lean` umbrella. Name = base group +
    disambiguating tag (`Z5Z15F2A6`, `Z3Z6` precedent).

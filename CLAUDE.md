@@ -73,20 +73,26 @@ QEC/
     └── Codes/               # Concrete codes, organized by family:
         ├── _TEMPLATE.lean       # Canonical structural reference for new CSS codes
         ├── BivariateBicycle/    # BB family, one subdir per instance:
-        │                        # Gross/ (+ Gross/SafeFloor/), Z5Z15F2A6/,
-        │                        # BaseFloors/. READ ITS README.md BEFORE EDITING —
-        │                        # task router, discharge map, generated-file rules
+        │                        # Gross/ (+ Gross/SafeFloor/). READ ITS
+        │                        # README.md BEFORE EDITING — task router,
+        │                        # discharge map, generated-file rules
         ├── Toric/               # Parametric L×L toric code: CodeN, Chains,
         │                        # BoundaryMaps, Homology, H1Dimension,
         │                        # LogicalCorrespondence{X,Z}, ChainComplex,
         │                        # Distance{,X,Z}, StabilizerCode (16 files)
-        ├── RotatedSurface/      # 3×3 special case + parametric N (10 files,
-        │                        # same shape as Toric)
+        ├── RotatedSurface/      # parametric N (9 files, same shape as Toric)
         ├── Repetition/          # Three.lean (3-qubit) + N.lean (parametric)
         └── Small/               # Single-instance codes: Shor9, Steane7,
                                  # Steane7TransversalGates, FourQubit_4_2_2,
                                  # QuantumHamming, FiveQubit_5_1_3 (first non-CSS)
 ```
+
+Everything under `Codes/` is `native_decide`-free. The instances that carried
+one are parked on branch `claude/z3z6-parked`:
+`BivariateBicycle/{Z3Z6,Z5Z15F2A6,BaseFloors}/`, `Codes/Concat/` (both Steane
+concatenations), `RotatedSurface/Three.lean`, and `Small/Steane7Distance.lean`.
+`Framework/` keeps the abstract machinery they exercised — notably
+`Framework/Concatenation/`, which now has no concrete instance in this tree.
 
 **Layering** (lower can be imported by higher; not the reverse):
 
