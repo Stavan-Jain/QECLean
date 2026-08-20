@@ -6,14 +6,13 @@ sibling umbrella `.lean`; the shared theory lives in
 `BBDeckTower`, `BBBocksteinRank`, `BBEpsFree*`, `BBSmallCycle`,
 `BBDeficitWall`). This README is the task router and status board; the
 per-module one-liner maps live in the umbrella docstrings (`Gross.lean`,
-`Gross/SafeFloor.lean`, `Z3Z6.lean`, …).
+`Gross/SafeFloor.lean`, `Z5Z15F2A6.lean`, …).
 
 ## Instances
 
 | Dir | Code | Distance status |
 |---|---|---|
 | `Gross/` | gross `[[144,12,12]]` (base `[[72,12,6]]`) | **d = 12 unconditional, kernel-only** — axioms are exactly `propext`, `Classical.choice`, `Quot.sound`; no `native_decide`, no `sorry` (also re-derived through the parametric layer in `Gross/LayerInstance.lean`) |
-| `Z3Z6/` | pair72 `[[36,4,4]] → [[72,4,8]]` | d = 8 unconditional (the canonical complete instance — copy this shape) |
 | `Z5Z15F2A6/` | `[[150,8,8]] → [[300,8,16]]` two-tier | in progress (A17 line; minimal starting skeleton to copy) |
 | `BaseFloors/` | class-member base floors (BB90, BB108, Z6Z14) | d ≥ 6 kernel-checked via `BBSmallCycle` (A15/A16 class theorem) |
 
@@ -46,10 +45,9 @@ per-module one-liner maps live in the umbrella docstrings (`Gross.lean`,
 | — orbit Y11/Y12 (wt 24) | `SafeFloor/MImFloorY{11,12}.lean` via `WtFloor24Bridge.costFromComps_ge_12_of_blocks` | **analytic** (kernel `decide`) |
 | capstones | `Gross/Distance.lean` (`grossStabilizerCode_hasCodeDistance_12_uncond`, `grossStabilizerCodeWithDistance`) + `Gross/LayerInstance.lean` (`gross_chain/pauli_distance_eq_12` through the layer) | — |
 
-Z3Z6 mirror: `StrongBaseFloor 4` → `Z3Z6/BaseDistance.lean`; `DeckTrivialOnH1`
-→ `Z3Z6/DeckHomotopy.lean`; `DangerousFloorNZ 8` → `Z3Z6/Dangerous.lean`;
-`SeamCosetFloor 8` → `Z3Z6/SafeFloor.lean` (sweep leaves); capstone
-`Z3Z6/Distance.lean`.
+The Z3Z6 instance (pair72, `[[36,4,4]] → [[72,4,8]]`), which used to mirror this
+map, is **parked on branch `claude/z3z6-parked`** pending de-nativization — see
+"Parked instances" below.
 
 ## Engine vs analytic (2026-08-20)
 
@@ -70,8 +68,19 @@ light orbits. The old confined-floor engine (`MImFloor`, `MImFloorData`,
 modules are deleted, not merely unused. Status changes belong HERE, not in
 module names.
 
-Other BB instances (`Z3Z6/`, `Z5Z15F2A6/`, `BaseFloors/`) still use
-`native_decide`; only the gross cone is kernel-only.
+The other BB instances (`Z5Z15F2A6/`, `BaseFloors/`) still use `native_decide`;
+only the gross cone is kernel-only.
+
+## Parked instances
+
+`Z3Z6/` (pair72, `[[36,4,4]] → [[72,4,8]]`, d = 8 unconditional) has been removed
+from this tree and lives on branch **`claude/z3z6-parked`**, whose
+`Z3Z6/PARKED.md` records why and how to bring it back. In short: it carried 42
+`native_decide`, five of them `2^18` sweeps that dominated a whole-repo build, and
+`main` is being driven to a `native_decide`-free state. The instance is a clean
+leaf — nothing outside `Z3Z6/` imported its declarations — so restoring it means
+re-adding the directory, its sibling umbrella, the one import line in
+`BivariateBicycle.lean`, and the rows removed from this README.
 
 ## Generated files (Class G: fully generated — NEVER hand-edit)
 
@@ -84,7 +93,6 @@ Other BB instances (`Z3Z6/`, `Z5Z15F2A6/`, `BaseFloors/`) still use
 **qec-lab follow-up owed**: `gen_floor_lean.py` now has no target in this repo
 (`MImFloorData.lean` is deleted) and `gen_yrep_module.py` must refuse args 0/1/4
 as it already refuses 11/12; both changes belong in a companion qec-lab PR.
-| `Z3Z6/StabilizerCodeData.lean` | `scripts/gen_pair72_packaging_data.py` (retarget to data-only queued — do not run without reading GENERATORS.md) | validation-gated |
 | `BaseFloors/*.lean` | `scripts/gen_base_floor_lean.py` | per-instance |
 
 Class F (generated fragments between `-- BEGIN/END GENERATED` markers,
@@ -109,10 +117,12 @@ details (env, clobber guards, stale generators): `qec-lab:experiments/bb_lab/GEN
 
 ## Adding an instance
 
-Copy the shape of `Z3Z6/` (complete) or `Z5Z15F2A6/` (minimal skeleton):
+Copy the shape of `Gross/` (complete, kernel-only) or `Z5Z15F2A6/` (minimal
+skeleton); the parked `Z3Z6/` (branch `claude/z3z6-parked`) is another complete
+worked example:
 
 1. `mkdir <Name>/` + sibling `<Name>.lean` umbrella. Name = base group +
-   disambiguating tag (`Z3Z6`, `Z5Z15F2A6` precedent).
+   disambiguating tag (`Z5Z15F2A6`, `Z3Z6` precedent).
 2. Minimum files, in dependency order: `Defs.lean` (complexes +
    `XDoubleCoverData` bundle against `Framework/Homological/BBCover.lean`) →
    `DeckHomotopy.lean` (Bezout witness via `deckTrivial_of_bezout`) →

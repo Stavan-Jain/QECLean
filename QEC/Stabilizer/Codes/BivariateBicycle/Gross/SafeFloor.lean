@@ -15,7 +15,7 @@ import QEC.Stabilizer.Codes.BivariateBicycle.Gross.SafeFloor.LightFloor
 /-!
 # Gross safe floor — everything discharging `MImBound`
 
-What `Z3Z6/SafeFloor.lean` does in one file (discharging `SeamCosetFloor 8`),
+What a small instance does in one file (discharging its `SeamCosetFloor`),
 gross needs this directory for (discharging `MImBound` — the safe-sector
 coset floor at weight 12). Every orbit is discharged by the **Tier-3 analytic** track; the old
 `native_decide` confined-floor engine (`MImFloor`, `MImFloorData`,

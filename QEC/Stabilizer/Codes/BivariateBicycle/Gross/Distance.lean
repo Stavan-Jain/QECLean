@@ -2,7 +2,7 @@
 # The gross code's distance capstones
 
 The human-facing results of the gross `[[144,12,12]]` formalization, in one
-hand-written file (mirroring `Z3Z6/Distance.lean` — every instance keeps its
+hand-written file (every instance keeps its
 results in `Distance.lean` / `StabilizerCode.lean`). The inputs are
 discharged upstream: `MImBound` by `SafeFloor/MImAssembly.lean`
 (`LightStab.mimBound_holds`), `LightStabilizerClassification` by

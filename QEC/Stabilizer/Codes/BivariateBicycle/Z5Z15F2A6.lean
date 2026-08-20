@@ -14,7 +14,7 @@ per-instance finite obligation are kernel-checked; the three floor inputs
 enter as named hypotheses backed by solver certificates (base distance:
 CaDiCaL; Smith-coset floor: CryptoMiniSat XOR-native `UNSAT@14` + parity +
 orbit transport, kissat DRAT cross-proof; dangerous floor: assumption,
-A11-screened).  Contrast `Z3Z6/`, where `n = 36` made all five inputs
+A11-screened).  Contrast the parked `Z3Z6/`, where `n = 36` made all five inputs
 kernel-sweepable.
 
 - `Defs`         — groups, polynomials, complexes, the `coverData` bundle
