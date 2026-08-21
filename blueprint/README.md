@@ -34,6 +34,11 @@ sudo apt-get install graphviz libgraphviz-dev texlive-binaries
 pip install leanblueprint
 ```
 
+On macOS none of that apt line applies: `kpsewhich` comes with MacTeX (already
+on `PATH` as `/Library/TeX/texbin/kpsewhich`), and current `pygraphviz` wheels
+bundle graphviz, so `pip install leanblueprint` into a virtualenv is the whole
+setup — no Homebrew graphviz needed.
+
 `texlive-binaries` is **not optional**, even though nothing here compiles TeX
 for the web build: it provides `kpsewhich`, which plasTeX shells out to in order
 to resolve `\input` paths. See "If the blueprint renders with no nodes" below —
@@ -54,8 +59,30 @@ bash scripts/check-blueprint-render.sh   # assert the nodes actually rendered
 `kpsewhich` has no default search path of its own. A full TeX Live installation
 sets one up and you can drop the prefix.
 
-Open `blueprint/web/index.html`. The dependency graph is linked from the
-navigation bar.
+Then serve it, rather than opening the files directly:
+
+```bash
+bash scripts/preview-blueprint.sh
+```
+
+The dependency graph is linked from the navigation bar. It has to be served
+over HTTP or the graph comes up empty — see the next section for why.
+
+### Working on the graph without building Lean
+
+The dependency-graph page's behaviour lives in `blueprint/src/` as ordinary CSS
+and JavaScript (`extra_styles.css`, `dep_graph_focus.js`), and none of it needs
+the Lean half to be rebuilt. To iterate on it, take the last CI render instead:
+
+```bash
+bash scripts/preview-blueprint.sh --from-ci
+```
+
+That downloads the newest successful Blueprint run's `blueprint-web` artifact
+with `gh`, copies in the current `extra-css` / `extra-js` files the way plasTeX
+would, and serves the result — no Lean build, no `leanblueprint`, no graphviz.
+Re-run it after each edit. Because it is the page CI actually emitted, it
+catches the things a hand-written test page would not.
 
 ### If the dependency graph page is blank
 
@@ -72,10 +99,11 @@ URL file://...`), so the renderer never runs and the container stays empty.
 This is not a build problem — the assets are all present under `blueprint/web/js/`
 and the graph data is embedded in the page as a graphviz `digraph`.
 
-Fix: serve the directory over HTTP.
+Fix: serve the directory over HTTP, which is all
+`scripts/preview-blueprint.sh` does.
 
 ```bash
-cd blueprint/web && python3 -m http.server 8000
+bash scripts/preview-blueprint.sh
 # then open http://localhost:8000/dep_graph_document.html
 ```
 
