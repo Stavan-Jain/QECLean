@@ -35,9 +35,14 @@ on:
         type: boolean
         default: false
 
+# Routine push/PR builds on the same ref coalesce -- only the newest matters.
+# A manual dispatch does not: it may be a Pages deploy, and cancelling one
+# halfway through wastes ~20 minutes of Lean build and silently drops the
+# deployment. So give each dispatch its own group and never cancel it, and
+# never let it cancel a push build either.
 concurrency:
-  group: blueprint-${{ github.ref }}
-  cancel-in-progress: true
+  group: blueprint-${{ github.ref }}-${{ github.event_name == 'workflow_dispatch' && github.run_id || 'auto' }}
+  cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
 
 permissions:
   contents: read
