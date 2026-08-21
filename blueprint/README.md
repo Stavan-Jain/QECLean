@@ -57,6 +57,33 @@ sets one up and you can drop the prefix.
 Open `blueprint/web/index.html`. The dependency graph is linked from the
 navigation bar.
 
+### If the dependency graph page is blank
+
+Symptom: the chapters and their theorem/definition boxes all render correctly,
+but `dep_graph_document.html` shows only the "Dependencies" header and an empty
+"Legend" — no graph.
+
+Cause: you opened the file directly, over `file://`. The graph is not baked into
+the HTML as static SVG; it is drawn in the browser by `d3-graphviz.js` and
+`hpcc.min.js`, which load `graphvizlib.wasm` at runtime. Chrome refuses those
+loads from a `file://` origin (`Unsafe attempt to load URL ... from frame with
+URL file://...`), so the renderer never runs and the container stays empty.
+
+This is not a build problem — the assets are all present under `blueprint/web/js/`
+and the graph data is embedded in the page as a graphviz `digraph`.
+
+Fix: serve the directory over HTTP.
+
+```bash
+cd blueprint/web && python3 -m http.server 8000
+# then open http://localhost:8000/dep_graph_document.html
+```
+
+Measured in headless Chromium on the same directory: over `file://` the page
+renders 0 graph nodes and 0 edges; over `http://` it renders all 85 nodes and
+their edges. The deployed GitHub Pages copy is served over HTTPS, so it does
+not need this workaround.
+
 ### If the blueprint renders with no nodes
 
 Symptom: every chapter of narrative is present, each one ends abruptly where a
