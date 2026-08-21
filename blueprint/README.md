@@ -84,6 +84,12 @@ would, and serves the result — no Lean build, no `leanblueprint`, no graphviz.
 Re-run it after each edit. Because it is the page CI actually emitted, it
 catches the things a hand-written test page would not.
 
+The repository is passed to `gh` explicitly, derived from the `origin` remote:
+this checkout has two GitHub remotes (`origin` and `lab`), so `gh` cannot infer
+which one a run belongs to and would otherwise demand a `gh repo set-default`.
+Set `BLUEPRINT_GH_REPO=owner/name` to read runs from somewhere else, such as
+upstream while working on a fork.
+
 ### If the dependency graph page is blank
 
 Symptom: the chapters and their theorem/definition boxes all render correctly,

@@ -38,13 +38,34 @@ src="$root/blueprint/src"
 
 if [ "$from_ci" = 1 ]; then
   command -v gh >/dev/null || { echo "gh is required for --from-ci" >&2; exit 1; }
-  run=$(gh run list --workflow=blueprint.yml --status=success --limit 1 \
-          --json databaseId --jq '.[0].databaseId // empty')
-  [ -n "$run" ] || { echo "no successful Blueprint run to download from" >&2; exit 1; }
-  echo "downloading blueprint-web from run $run"
+
+  # Name the repository explicitly. This checkout has two GitHub remotes --
+  # `origin` (the library) and `lab` (the research repo it was split out of) --
+  # so `gh` cannot infer which one a run belongs to and asks for
+  # `gh repo set-default`. Deriving it from `origin` keeps that out of the
+  # user's global gh config. $BLUEPRINT_GH_REPO overrides, e.g. to read runs
+  # from upstream while working on a fork.
+  repo="${BLUEPRINT_GH_REPO:-}"
+  if [ -z "$repo" ]; then
+    origin=$(git -C "$root" remote get-url origin 2>/dev/null || true)
+    origin="${origin%.git}"
+    case "$origin" in
+      *github.com[:/]*) repo=$(printf '%s' "${origin#*github.com}" | sed 's#^[:/]##') ;;
+    esac
+  fi
+  [ -n "$repo" ] || {
+    echo "could not work out the GitHub repository from the 'origin' remote." >&2
+    echo "Set it explicitly:  BLUEPRINT_GH_REPO=owner/name $0 --from-ci" >&2
+    exit 1
+  }
+
+  run=$(gh run list --repo "$repo" --workflow=blueprint.yml --status=success \
+          --limit 1 --json databaseId --jq '.[0].databaseId // empty')
+  [ -n "$run" ] || { echo "no successful Blueprint run in $repo to download from" >&2; exit 1; }
+  echo "downloading blueprint-web from $repo run $run"
   rm -rf "$web"
   mkdir -p "$web"
-  gh run download "$run" -n blueprint-web -D "$web"
+  gh run download "$run" --repo "$repo" -n blueprint-web -D "$web"
 
   # plasTeX copies each extra-css/extra-js file out of blueprint/src and adds a
   # tag for it to every page it renders. Redo that here, so assets newer than
