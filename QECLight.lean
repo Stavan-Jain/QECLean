@@ -1,5 +1,4 @@
 import QEC.Foundations.Foundations
-import QEC.RepetitionCode.RepetitionCode
 import QEC.Stabilizer.Foundations
 import QEC.Stabilizer.Geometry
 import QEC.Stabilizer.Framework

@@ -47,6 +47,3 @@ name = "QECBlueprint"
 name = "Foundations"
 srcDir = "QEC"
 
-[[lean_lib]]
-name = "RepetitionCode"
-srcDir = "QEC"

@@ -2,7 +2,7 @@
 # Orphan-module check: every D/*.lean must be imported by its umbrella.
 # Umbrella convention: sibling D.lean (Codes/Toric.lean for Codes/Toric/),
 # with the top-level inside-umbrella exceptions (QEC/Foundations/Foundations.lean,
-# QEC/Stabilizer/Stabilizer.lean, QEC/RepetitionCode/RepetitionCode.lean).
+# QEC/Stabilizer/Stabilizer.lean).
 # Exit 1 if any orphan is found.
 set -u
 cd "$(dirname "$0")/.."

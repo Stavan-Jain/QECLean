@@ -24,7 +24,7 @@ See [`deploy/README.md`](deploy/README.md) for running your own instance.
 
 ## Overview
 
-Modules are written in Lean 4 and rely on [mathlib](https://github.com/leanprover-community/mathlib4) for linear algebra and other foundations. Import everything via `QEC`, or use `QEC.Foundations.Foundations`, `QEC.RepetitionCode.RepetitionCode`, or `QEC.Stabilizer.Stabilizer` for a subset.
+Modules are written in Lean 4 and rely on [mathlib](https://github.com/leanprover-community/mathlib4) for linear algebra and other foundations. Import everything via `QEC`, or use `QEC.Foundations.Foundations` or `QEC.Stabilizer.Stabilizer` for a subset.
 
 This repo contains **only the Lean library** — polished, sorry-free formalizations, in the spirit of [mathlib](https://github.com/leanprover-community/mathlib4) and [cslib](https://github.com/leanprover/cslib). **Everything on `main` depends on exactly mathlib's three standard axioms — `propext`, `Classical.choice`, `Quot.sound` — and nothing else.** No `native_decide` (which would seal a claim behind a compiler-trust axiom instead of checking it in the kernel), no `sorry`, no bespoke `axiom` declarations; an input that cannot yet be proved is carried as a named hypothesis on the theorem, where it is visible in the statement. Verify any result with `#print axioms Your.Theorem`. Work that does not yet clear this bar is parked on a branch rather than merged — see `CLAUDE.md` § "Axiom policy". The research program behind it (the BB-code distance lab, the formalization pipeline, the human-readable proof write-ups, and the dashboard) lives in the companion repo [**qec-lab**](https://github.com/Stavan-Jain/qec-lab), which shares this repo's pre-split git history. New formalizations are developed there and upstreamed here by PR when complete.
 
@@ -106,10 +106,9 @@ See [`blueprint/README.md`](blueprint/README.md) for the full workflow.
 
 ## Project Structure
 
-Import the whole development via `QEC` (or `QEC.Foundations.Foundations`, `QEC.RepetitionCode.RepetitionCode`, `QEC.Stabilizer.Stabilizer`). The code is organized as:
+Import the whole development via `QEC` (or `QEC.Foundations.Foundations`, `QEC.Stabilizer.Stabilizer`). The code is organized as:
 
 - **`QEC/Foundations/`** — Qubits, quantum states, gates (including CNOT), and tensor products.
-- **`QEC/RepetitionCode/`** — 3-qubit bit-flip code: encode/decode, logical X, and recovery with proofs.
 - **`QEC/Stabilizer/`** — Pauli groups (single- and n-qubit), binary symplectic representation (check matrices, symplectic span), stabilizer core (groups, CSS, centralizer, codespace/distance/logical-operator tools), homological/chain-complex framework incl. the BB doubling layer, lattice and toric-homology infrastructure, and concrete codes: repetition (3- and n-qubit), rotated surface code, toric code families, bivariate-bicycle instances (gross and siblings), CSS concatenation instances, quantum Hamming, Steane 7, Shor 9, `[[5,1,3]]`, `[[4,2,2]]`, `[[6,2,2]]`, and the iceberg family.
 
 ## Getting Started
