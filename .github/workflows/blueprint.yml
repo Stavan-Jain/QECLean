@@ -105,12 +105,39 @@ jobs:
       - name: Install blueprint tooling
         run: |
           sudo apt-get update
-          sudo apt-get install -y graphviz libgraphviz-dev
+          # graphviz  -- dependency-graph layout, via pygraphviz.
+          # texlive-binaries -- provides `kpsewhich`, which plasTeX shells out to
+          #   in order to resolve \input paths. Without it plasTeX 3.1 falls back
+          #   to a pure-Python search matching only a bare filename against one
+          #   directory's entries, so every \input carrying a path separator
+          #   (macros/common, the ../../ index, and the absolute paths
+          #   LeanArchitect writes internally) silently fails to load -- yielding
+          #   a blueprint with zero nodes and an exit status of 0.
+          sudo apt-get install -y graphviz libgraphviz-dev texlive-binaries
           python3 -m pip install --upgrade pip
           python3 -m pip install leanblueprint
 
       - name: Build the web blueprint
-        run: leanblueprint web
+        # texlive-binaries ships no texmf tree, so kpsewhich has no default
+        # search path of its own; TEXINPUTS supplies one. Absolute \input paths
+        # resolve regardless, relative ones need this.
+        env:
+          TEXINPUTS: ".:"
+        run: |
+          set -o pipefail
+          leanblueprint web 2>&1 | tee /tmp/plastex.log
+          # plasTeX reports unresolved files and unknown macros as warnings and
+          # still exits 0. Treat those two classes as build failures.
+          if grep -qE 'File not found|unrecognized command/environment' /tmp/plastex.log; then
+            echo "::error::plasTeX failed to resolve part of the document (see log above)"
+            exit 1
+          fi
+
+      # Belt and braces: confirm the rendered HTML actually contains the nodes.
+      # The extraction check above validates the producer; this validates the
+      # consumer, which is the half that broke on the first run.
+      - name: Check the rendered blueprint contains every node
+        run: bash scripts/check-blueprint-render.sh
 
       - name: Build the PDF blueprint
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.pdf }}

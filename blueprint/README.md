@@ -30,21 +30,57 @@ than a progress tracker.
 Prerequisites: the usual Lean toolchain, plus
 
 ```bash
-sudo apt-get install graphviz libgraphviz-dev   # for the dependency graph
+sudo apt-get install graphviz libgraphviz-dev texlive-binaries
 pip install leanblueprint
 ```
+
+`texlive-binaries` is **not optional**, even though nothing here compiles TeX
+for the web build: it provides `kpsewhich`, which plasTeX shells out to in order
+to resolve `\input` paths. See "If the blueprint renders with no nodes" below —
+this is the one setup mistake that fails silently.
 
 Then, from the repository root:
 
 ```bash
 lake build QECBlueprint             # elaborate the annotations
 lake build QECBlueprint:blueprint   # extract the LaTeX
-leanblueprint web                   # render to blueprint/web/
-leanblueprint pdf                   # render to blueprint/print/ (needs xelatex)
+TEXINPUTS=".:" leanblueprint web    # render to blueprint/web/
+TEXINPUTS=".:" leanblueprint pdf    # render to blueprint/print/ (needs xelatex)
+
+bash scripts/check-blueprint-render.sh   # assert the nodes actually rendered
 ```
+
+`TEXINPUTS` is needed because `texlive-binaries` installs no texmf tree, so
+`kpsewhich` has no default search path of its own. A full TeX Live installation
+sets one up and you can drop the prefix.
 
 Open `blueprint/web/index.html`. The dependency graph is linked from the
 navigation bar.
+
+### If the blueprint renders with no nodes
+
+Symptom: every chapter of narrative is present, each one ends abruptly where a
+definition or theorem should be, and the dependency graph page is blank.
+
+Cause: plasTeX could not resolve the `\input`s that pull in the extracted
+nodes. It reports this as a warning and still exits 0:
+
+```
+WARNING: File not found: macros/common
+WARNING: File not found: ../../.lake/build/blueprint/library/QECBlueprint
+WARNING: unrecognized command/environment: inputleannode
+```
+
+plasTeX shells out to `kpsewhich` for path resolution. When that binary is
+missing it falls back to a pure-Python search that matches only a bare filename
+against the entries of a single directory (`if name in os.listdir(path)`), so
+every `\input` argument containing a path separator fails: `macros/common`, the
+`../../` index, and — decisively — the *absolute* paths LeanArchitect writes
+inside its own generated files. That last one is why flattening our own paths
+would not have been a fix; `kpsewhich` has to be present.
+
+Fix: install `texlive-binaries` and set `TEXINPUTS` as above. `scripts/check-blueprint-render.sh`
+catches the condition, and CI runs it on every push.
 
 `lake build QECBlueprint` is the step that matters day to day: it is what fails
 when a declaration named in an annotation has been renamed or removed. The
