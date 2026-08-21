@@ -33,6 +33,10 @@ build/MCP workflow. Volatile or topic-scoped knowledge lives elsewhere:
   — mathlib API drift (deprecations, renames, signature changes),
   grouped by version. Add new entries there when you work around a
   mathlib version-specific quirk.
+- **[`blueprint/README.md`](blueprint/README.md)** — the LeanArchitect
+  blueprint: what is generated vs. hand-written, how to add a node, how to
+  inspect one with `#show_blueprint`. Read before editing `QECBlueprint.lean`
+  or `blueprint/`. See also the "Blueprint" section below.
 - **[`QEC/Stabilizer/Codes/BivariateBicycle/README.md`](QEC/Stabilizer/Codes/BivariateBicycle/README.md)**
   — orientation for the BB family (gross d=12 proof spine, instance
   dirs, hypothesis-discharge map, engine-vs-analytic status,
@@ -323,11 +327,12 @@ output prints the residual goal under each failure — read it before guessing
 tactics.
 
 **`lake build` alone is NOT sufficient before pushing.** `defaultTargets` is
-just `QEC`, so three things it does not touch will still fail CI. After any
-change that adds, moves, or removes a module, run all four:
+just `QEC`, so four things it does not touch will still fail CI. After any
+change that adds, moves, or removes a module, run all five:
 
 ```bash
-lake build && lake build QECLight && lake env lean Playground.lean && lake env lean scripts/AxiomCheck.lean
+lake build && lake build QECLight && lake build QECBlueprint \
+  && lake env lean Playground.lean && lake env lean scripts/AxiomCheck.lean
 ```
 
 - **`QECLight`** (root `QECLight.lean`) re-lists the `Codes` umbrella minus
@@ -337,6 +342,11 @@ lake build && lake build QECLight && lake env lean Playground.lean && lake env l
 - **`Playground.lean`** `#check`s a few showcase declarations against
   `QECLight`. Removing or renaming one of them breaks it. Checked by
   `hosted-env`'s "Check Playground.lean elaborates" step.
+- **`QECBlueprint`** (root `QECBlueprint.lean`) carries the blueprint
+  annotations. Also outside `defaultTargets`. It names ~86 declarations by
+  fully-qualified name, so **renaming or removing an annotated declaration
+  breaks it** — and nothing else in the build will tell you. Checked by the
+  `blueprint` workflow. See "Blueprint" below.
 - **`scripts/AxiomCheck.lean`** enforces the axiom policy (see below).
   Checked by `lean_action_ci`.
 
@@ -344,6 +354,44 @@ lake build && lake build QECLight && lake env lean Playground.lean && lake env l
 but by construction it does not walk these root-level files — hence the list
 above. All three have been broken in practice by module removals that a green
 `lake build` reported as fine.
+
+## Blueprint
+
+The library has a [leanblueprint](https://github.com/PatrickMassot/leanblueprint)
+blueprint whose node content is generated from Lean by
+[LeanArchitect](https://github.com/hanwenzhu/LeanArchitect). Read
+[`blueprint/README.md`](blueprint/README.md) before touching it.
+
+Two files, and the split between them matters:
+
+- **`QECBlueprint.lean`** (repo root) — every node. Each is an
+  `attribute [blueprint "label" (title := ...) (statement := ...) (proof := ...)]
+  Fully.Qualified.Name` applied to a declaration that already exists in `QEC`.
+  Nothing is defined here.
+- **`blueprint/src/content.tex`** — the narrative: chapters, prose, and one
+  `\inputleannode{label}` per node, which fixes the order they appear in.
+
+**The annotations are deliberately not inline on the declarations.** Inline
+`@[blueprint]` would require `import Architect` in every annotated file, making
+LeanArchitect a hard dependency of `QEC` for every downstream consumer.
+Applying the attribute post-hoc from one module keeps `QEC` dependency-free.
+Dependency inference and the `\leanok` sorry-check still work (they read the
+environment); only tactic-proof docstrings are unavailable, which is why
+`(proof := ...)` is written out explicitly.
+
+Rules of thumb:
+
+- **LaTeX goes in `/-- ... -/`, never in a `"string"`.** A Lean string literal
+  reads `\mathcal` as an escape sequence and fails to parse. This applies to
+  `title` too, which accepts both forms.
+- **Never hand-write `\uses{}`.** LeanArchitect walks the proof term and stops
+  at the nearest tagged ancestor, so the edges are true by construction.
+  Tagging a new declaration mid-chain silently re-routes the edges that used to
+  run past it — that is usually what you want, but check the graph.
+- **Never edit anything under `.lake/build/blueprint/`** — regenerate with
+  `lake build QECBlueprint:blueprint`.
+- Renaming an annotated declaration breaks `lake build QECBlueprint` and
+  nothing else. It is in the pre-push list above for exactly that reason.
 
 ## Worktrees: reuse the main repo's prebuilt mathlib
 

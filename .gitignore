@@ -21,3 +21,11 @@ project_aristotle
 
 # Local-only reference PDFs (not part of the formalization)
 *.pdf
+
+# Blueprint build output (`leanblueprint web` / `leanblueprint pdf`).
+# The sources live in blueprint/src/; the extracted LaTeX is generated into
+# .lake/build/blueprint by `lake build QECBlueprint:blueprint`.
+/blueprint/web/
+/blueprint/print/
+/blueprint/src/web.paux
+/blueprint/src/*.bbl

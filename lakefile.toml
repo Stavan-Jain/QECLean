@@ -14,6 +14,16 @@ maxSynthPendingDepth = 3
 name = "mathlib"
 scope = "leanprover-community"
 
+# Blueprint extraction (https://github.com/hanwenzhu/LeanArchitect). Pinned to
+# the tag matching `lean-toolchain`; LeanArchitect publishes one tag per
+# toolchain, and its own requires (batteries, Cli) are already pinned at
+# v4.30.0-rc2 by mathlib, so adding it does not move any existing dependency.
+# Only `QECBlueprint` imports it -- see the note in QECBlueprint.lean.
+[[require]]
+name = "LeanArchitect"
+git = "https://github.com/hanwenzhu/LeanArchitect.git"
+rev = "v4.30.0-rc2"
+
 [[lean_lib]]
 name = "QEC"
 
@@ -23,6 +33,15 @@ name = "QEC"
 # still means the full library. See `QECLight.lean`.
 [[lean_lib]]
 name = "QECLight"
+
+# Blueprint annotations for the whole library (root module `QECBlueprint.lean`).
+# Deliberately NOT in `defaultTargets`: `lake build` should stay the plain
+# library build, and only this target pulls in LeanArchitect. Build the LaTeX
+# with `lake build QECBlueprint:blueprint`. The default glob is `.one`, so the
+# library is exactly the single root module -- which is what makes the emitted
+# index (`.lake/build/blueprint/library/QECBlueprint.tex`) contain every node.
+[[lean_lib]]
+name = "QECBlueprint"
 
 [[lean_lib]]
 name = "Foundations"

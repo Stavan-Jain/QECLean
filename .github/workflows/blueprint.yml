@@ -1,0 +1,187 @@
+name: Blueprint
+
+# Builds the LeanArchitect blueprint: elaborate the annotations in
+# `QECBlueprint.lean`, extract the LaTeX, and render the web version.
+#
+# The Lean half (`lake build QECBlueprint:blueprint`) is the real gate — it is
+# what catches a renamed declaration, a malformed `@[blueprint]` option, or a
+# node whose `\cref` points at nothing. The plasTeX half catches LaTeX errors
+# in the extracted prose.
+#
+# Deployment to GitHub Pages is deliberately manual (see the `deploy` input).
+# This repository's Pages site currently serves the path-preserving redirect
+# built by `pages-redirect.yml`, and whichever workflow deploys last wins, so
+# publishing the blueprint is a decision rather than a side effect of a push.
+
+on:
+  push:
+    paths:
+      - 'QEC/**'
+      - 'QECBlueprint.lean'
+      - 'blueprint/**'
+      - 'lakefile.toml'
+      - 'lake-manifest.json'
+      - 'lean-toolchain'
+      - '.github/workflows/blueprint.yml'
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Publish to GitHub Pages (overwrites the redirect site)'
+        type: boolean
+        default: false
+      pdf:
+        description: 'Also build the PDF (installs TeX Live, adds ~10 min)'
+        type: boolean
+        default: false
+
+concurrency:
+  group: blueprint-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Same reason as in `lean_action_ci.yml`: the gross BB safe-sector floor
+      # leaves are memory-hungry kernel `decide` checks, and `QECBlueprint`
+      # imports all of `QEC`. Blueprint extraction then loads that whole
+      # environment into one process, so the peak is if anything higher.
+      - name: Add swap space (BB safe-floor kernel-decide memory peaks)
+        run: |
+          sudo fallocate -l 12G /mnt/swapfile
+          sudo chmod 600 /mnt/swapfile
+          sudo mkswap /mnt/swapfile
+          sudo swapon /mnt/swapfile
+          free -h
+
+      - name: Install elan
+        run: |
+          curl https://elan.lean-lang.org/elan-init.sh -sSf | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Fetch mathlib cache
+        run: lake exe cache get
+
+      # Elaborates every `attribute [blueprint ...]` application. A declaration
+      # that has been renamed or removed fails here with an unknown-identifier
+      # error naming it.
+      - name: Build the blueprint annotations
+        run: lake build QECBlueprint
+
+      # Runs the extractor over the module and writes
+      # `.lake/build/blueprint/library/QECBlueprint.tex` plus one file per node.
+      - name: Extract the blueprint LaTeX
+        run: lake build QECBlueprint:blueprint
+
+      # Guards against the failure mode where extraction "succeeds" but emits
+      # nothing (e.g. the lean_lib glob stops matching the annotation module),
+      # which would otherwise surface as a blueprint full of silently missing
+      # nodes rather than as a build failure.
+      - name: Check the extraction is non-empty and complete
+        run: |
+          index=.lake/build/blueprint/library/QECBlueprint.tex
+          test -s "$index" || { echo "::error::$index missing or empty"; exit 1; }
+          artifacts=.lake/build/blueprint/module/QECBlueprint.artifacts
+          emitted=$(find "$artifacts" -name '*.tex' | wc -l)
+          expected=$(grep -oP '^attribute \[blueprint "\K[^"]+' QECBlueprint.lean | sort -u | wc -l)
+          echo "emitted $emitted node files, expected $expected"
+          test "$emitted" -eq "$expected" || {
+            echo "::error::node count mismatch: emitted $emitted, expected $expected"
+            exit 1
+          }
+          # Every node the narrative includes must have been emitted.
+          missing=0
+          for label in $(grep -oP '\\inputleannode\{\K[^}]+' blueprint/src/content.tex); do
+            test -f "$artifacts/$label.tex" || { echo "::error::no node emitted for '$label'"; missing=1; }
+          done
+          exit $missing
+
+      - name: Install blueprint tooling
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y graphviz libgraphviz-dev
+          python3 -m pip install --upgrade pip
+          python3 -m pip install leanblueprint
+
+      - name: Build the web blueprint
+        run: leanblueprint web
+
+      - name: Build the PDF blueprint
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.pdf }}
+        run: |
+          sudo apt-get install -y texlive-xetex texlive-latex-extra \
+            texlive-fonts-recommended texlive-science latexmk
+          leanblueprint pdf
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: blueprint-web
+          path: blueprint/web
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.pdf }}
+        with:
+          name: blueprint-pdf
+          path: blueprint/print/print.pdf
+          if-no-files-found: error
+
+      # Assemble the Pages site only when a deploy was explicitly asked for.
+      # The blueprint lands at the site root; the legacy dashboard redirect
+      # that `pages-redirect.yml` publishes is preserved as `404.html`, so old
+      # `/QECLean/<path>` links still bounce to the qec-lab dashboard.
+      - name: Assemble the Pages site
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy }}
+        run: |
+          mkdir -p site
+          cp -r blueprint/web/. site/
+          cat > site/404.html <<'HTML'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <title>Moved: QECLean pipeline dashboard</title>
+            <script>
+              location.replace('https://stavan-jain.github.io/qec-lab'
+                + location.pathname.replace(/^\/QECLean/, '')
+                + location.search + location.hash);
+            </script>
+            <meta http-equiv="refresh" content="0; url=https://stavan-jain.github.io/qec-lab/">
+            <link rel="canonical" href="https://stavan-jain.github.io/qec-lab/">
+          </head>
+          <body>
+            <p>The QECLean pipeline dashboard moved to
+               <a href="https://stavan-jain.github.io/qec-lab/">stavan-jain.github.io/qec-lab</a>.</p>
+          </body>
+          </html>
+          HTML
+          touch site/.nojekyll
+
+      - uses: actions/configure-pages@v5
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy }}
+
+      - uses: actions/upload-pages-artifact@v3
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy }}
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment

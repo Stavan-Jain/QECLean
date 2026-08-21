@@ -1,0 +1,24 @@
+% Web version of the QECLean blueprint.
+% Compile with `leanblueprint web` (or `plastex -c plastex.cfg web.tex`).
+
+\documentclass{report}
+
+\usepackage{amssymb, amsthm, amsmath}
+\usepackage{hyperref}
+\usepackage[nameinlink]{cleveref}
+\usepackage[showmore, dep_graph]{blueprint}
+
+\input{macros/common}
+\input{macros/web}
+
+\home{https://github.com/Stavan-Jain/QECLean}
+\github{https://github.com/Stavan-Jain/QECLean}
+\dochome{https://stavan-jain.github.io/QECLean/docs}
+
+\title{Quantum Error Correction in Lean}
+\author{The QECLean contributors}
+
+\begin{document}
+\maketitle
+\input{content}
+\end{document}
