@@ -257,17 +257,40 @@ middle of a chain will take over edges that previously ran past it.
 ## Deployment
 
 The `Blueprint` workflow builds on every push and uploads `blueprint/web` as a
-run artifact. Publishing to GitHub Pages is a manual `workflow_dispatch` with
-the `deploy` input set, because this repository's Pages site currently serves
-the path-preserving dashboard redirect from `pages-redirect.yml`, and whichever
-workflow deploys last wins. The deploy path keeps that redirect as `404.html`,
-so old `/QECLean/<path>` links still bounce to the qec-lab dashboard; only the
-site root changes meaning. If you want the blueprint published automatically,
-move the deploy steps onto the `push` trigger and retire `pages-redirect.yml`.
+run artifact. **A push to `main` also republishes
+[the site](https://stavan-jain.github.io/QECLean/)**, so what is served always
+matches `main`; pull requests and branch pushes build and check the blueprint
+but publish nothing. The `deploy` input on `workflow_dispatch` is still there
+for republishing without a content change.
+
+Publishing used to be manual, on the grounds that `pages-redirect.yml` also
+deploys to this Pages site and whichever workflow runs last wins. That workflow
+only triggers on an explicit dispatch or on a push that edits its own file, so
+it cannot clobber the blueprint by accident — while the manual gate reliably
+left the site behind `main` after every merge. The deploy still keeps the
+redirect as `404.html`, so old `/QECLean/<path>` links bounce to the qec-lab
+dashboard; only the site root changes meaning. The two workflows share a `pages`
+concurrency group so their deploys serialize.
+
+### The `\lean{}` links do not resolve yet
 
 `\dochome` in `web.tex` points at `https://stavan-jain.github.io/QECLean/docs`,
-so the `\lean{}` links resolve once API documentation is deployed there
-(`lean_action_ci.yml` builds it on tags and manual dispatch).
+so every node's **Lean** link goes to `…/docs/find/#doc/<decl>`. Nothing
+publishes anything at `/docs`, so those links currently fall through to
+`404.html` and bounce the reader to the qec-lab dashboard.
+
+The obstacle is that a repository has one Pages site and three workflows that
+would each publish at its root: this one, `pages-redirect.yml`, and
+`lean_action_ci.yml`, whose `docgen-action` step deploys API documentation on a
+tag push. Note the last of those: **tagging a release currently replaces the
+blueprint with the API docs**, until the next push to `main` puts it back.
+
+Making the links work means one workflow assembling the whole site — blueprint
+at `/`, API docs at `/docs` — which in turn means this workflow paying for a
+`doc-gen4` build. That is ~1–2 h cold, though `docgen-action` caches the
+mathlib half against `lake-manifest.json`. Dropping `\dochome` is not a
+workaround: leanblueprint then falls back to mathlib's doc site, where none of
+these declarations exist.
 
 ## Notes
 
