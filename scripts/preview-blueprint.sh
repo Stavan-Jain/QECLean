@@ -103,6 +103,34 @@ fi
   exit 1
 }
 
+# Find a port that is actually free rather than letting http.server bind-fail
+# with a traceback -- 8000 in particular is a popular default and is often
+# already taken by some other local server. Probe exactly the way http.server
+# binds below (localhost, SO_REUSEADDR, which HTTPServer sets) so the answer
+# is not merely advisory.
+requested=$port
+port=$(python3 - "$requested" <<'PORTPROBE'
+import socket, sys
+start = int(sys.argv[1])
+for candidate in range(start, start + 20):
+    probe = socket.socket()
+    probe.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    try:
+        probe.bind(('127.0.0.1', candidate))
+    except OSError:
+        continue
+    finally:
+        probe.close()
+    print(candidate)
+    break
+PORTPROBE
+)
+[ -n "$port" ] || {
+  echo "ports $requested-$((requested + 19)) are all in use; pass --port N" >&2
+  exit 1
+}
+[ "$port" = "$requested" ] || echo "port $requested is in use; serving on $port instead"
+
 echo
 echo "  http://localhost:$port/index.html"
 echo "  http://localhost:$port/dep_graph_document.html"
@@ -110,4 +138,6 @@ echo "  http://localhost:$port/dep_graph_document.html?focus=def:steane7&dir=up"
 echo
 echo "Ctrl-C to stop."
 cd "$web"
-exec python3 -m http.server "$port"
+# Bind to localhost: this is a preview of a not-yet-published site, and there
+# is no reason to offer it to the rest of the network.
+exec python3 -m http.server "$port" --bind 127.0.0.1

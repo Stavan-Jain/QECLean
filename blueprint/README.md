@@ -65,6 +65,9 @@ Then serve it, rather than opening the files directly:
 bash scripts/preview-blueprint.sh
 ```
 
+It serves on port 8000, stepping up to the next free port if something else
+already has it (`--port N` to choose). Localhost only.
+
 The dependency graph is linked from the navigation bar. It has to be served
 over HTTP or the graph comes up empty — see the next section for why.
 
