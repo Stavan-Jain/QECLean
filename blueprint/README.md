@@ -272,25 +272,41 @@ redirect as `404.html`, so old `/QECLean/<path>` links bounce to the qec-lab
 dashboard; only the site root changes meaning. The two workflows share a `pages`
 concurrency group so their deploys serialize.
 
-### The `\lean{}` links do not resolve yet
+### The `\lean{}` links are hidden, not fixed
 
 `\dochome` in `web.tex` points at `https://stavan-jain.github.io/QECLean/docs`,
 so every node's **Lean** link goes to `…/docs/find/#doc/<decl>`. Nothing
-publishes anything at `/docs`, so those links currently fall through to
-`404.html` and bounce the reader to the qec-lab dashboard.
+publishes anything at `/docs`, so those links fall through to `404.html` and
+bounce the reader to the qec-lab dashboard — worse than no link at all. Until
+the docs exist, `extra_styles.css` hides them:
 
-The obstacle is that a repository has one Pages site and three workflows that
-would each publish at its root: this one, `pages-redirect.yml`, and
-`lean_action_ci.yml`, whose `docgen-action` step deploys API documentation on a
-tag push. Note the last of those: **tagging a release currently replaces the
-blueprint with the API docs**, until the next push to `main` puts it back.
+```css
+a.lean_decl,
+button.modal.lean,
+button.modal.lean + div.modal-container { display: none; }
+```
 
-Making the links work means one workflow assembling the whole site — blueprint
-at `/`, API docs at `/docs` — which in turn means this workflow paying for a
-`doc-gen4` build. That is ~1–2 h cold, though `docgen-action` caches the
-mathlib half against `lake-manifest.json`. Dropping `\dochome` is not a
-workaround: leanblueprint then falls back to mathlib's doc site, where none of
-these declarations exist.
+Three selectors because the two page types render the link differently: a
+chapter page puts it behind the `L∃∀N` button's "Lean declarations" dialog,
+whose entire body is those anchors, so the button and its dialog go too; the
+dependency graph's node modals emit a plain `<a class="lean_link lean_decl">`.
+The neighbouring `uses` dialog is unaffected. Dropping `\dochome` instead is
+not a workaround — leanblueprint then falls back to mathlib's doc site, where
+none of these declarations exist.
+
+To restore the links, publish doc-gen4 output at `/docs` and delete that CSS
+block; nothing else needs to change. The obstacle is that a repository has one
+Pages site, so the workflow that publishes has to assemble all of it —
+blueprint at `/`, docs at `/docs` — which means this workflow paying for a
+doc-gen4 build: ~1–2 h cold, though `docgen-action` caches the mathlib half
+against `lake-manifest.json`.
+
+`lean_action_ci.yml` used to build those docs on tag pushes, but published them
+as the Pages site *root*, so **tagging a release replaced the blueprint with
+the API docs** until the next push to `main` put it back. That step has been
+removed; its manual-dispatch half never produced anything anyway, since
+`docgen-action` gates its build, upload and deploy on `github.event_name ==
+'push'`.
 
 ## Notes
 
