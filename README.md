@@ -70,6 +70,28 @@ Every step of the homological distance argument is mechanized — no `sorry`s an
 
 The accompanying expository proof is available as an [interactive write-up](https://stavan-jain.github.io/DistanceBlog/) with diagrams (or the [in-repo version in qec-lab](https://github.com/Stavan-Jain/qec-lab/blob/main/docs/distance_proof.md)).
 
+## Blueprint
+
+A [leanblueprint](https://github.com/PatrickMassot/leanblueprint)-style
+blueprint documents the architecture: ~85 nodes covering the Pauli and binary
+symplectic layer, the stabilizer framework, the homological CSS machinery, and
+the toric and gross-code distance spines, wired into a dependency graph.
+
+It is generated from Lean rather than maintained alongside it, using
+[LeanArchitect](https://github.com/hanwenzhu/LeanArchitect)
+([arXiv:2601.22554](https://arxiv.org/abs/2601.22554)): each node's statement,
+proof sketch and title live in an `@[blueprint]` annotation in
+[`QECBlueprint.lean`](QECBlueprint.lean), and the `\uses` edges are read off
+the real proof terms instead of being written by hand. There is therefore no
+second copy of the mathematics that can drift out of date — renaming a
+declaration breaks the build rather than silently orphaning a node.
+
+```bash
+lake build QECBlueprint:blueprint && leanblueprint web
+```
+
+See [`blueprint/README.md`](blueprint/README.md) for the full workflow.
+
 ## Project Structure
 
 Import the whole development via `QEC` (or `QEC.Foundations.Foundations`, `QEC.RepetitionCode.RepetitionCode`, `QEC.Stabilizer.Stabilizer`). The code is organized as:

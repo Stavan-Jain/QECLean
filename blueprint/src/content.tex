@@ -1,0 +1,342 @@
+% Content of the QECLean blueprint, shared by the web and pdf versions.
+%
+% The nodes themselves are NOT written here. They are extracted from Lean by
+% LeanArchitect out of the annotations in QECBlueprint.lean, and pulled in by
+% the \input below; this file supplies the narrative and decides the order in
+% which nodes appear. To change a statement or a proof sketch, edit the
+% annotation in QECBlueprint.lean and re-run `lake build QECBlueprint:blueprint`
+% -- do not edit the generated files under .lake/build/blueprint.
+
+\input{../../.lake/build/blueprint/library/QECBlueprint}
+
+\chapter{Introduction}
+\label{chap:intro}
+
+This is the blueprint for \href{https://github.com/Stavan-Jain/QECLean}{QECLean},
+a formalization of the stabilizer formalism for quantum error correction in Lean~4
+and Mathlib.
+
+A blueprint is a map of a formalization: informal mathematical exposition, one
+node per definition or theorem, wired into a dependency graph that shows how the
+results rest on one another and how much of the plan is already formal. Here
+every node is \emph{already} formal --- the library is complete and sorry-free ---
+so the graph is best read as a guide to the architecture rather than as a
+to-do list.
+
+\section{What is proved}
+
+Two results anchor the development.
+
+\begin{itemize}
+  \item \textbf{The toric family.} For every $L \ge 2$, the $L \times L$ toric
+    code is verified as an $[[2L^2, 2, L]]$ stabilizer code: the distance is
+    exactly $L$, not merely bounded below by it
+    (\cref{thm:toric-distance}).
+  \item \textbf{The gross code.} IBM's $[[144,12,12]]$ bivariate-bicycle code
+    --- the flagship qLDPC code of Bravyi et al. --- is verified with distance
+    exactly $12$, unconditionally (\cref{thm:gross-distance}).
+\end{itemize}
+
+Alongside these sit the rotated surface family, the repetition codes, the
+iceberg family, and the small named codes: Steane's $[[7,1,3]]$, Shor's
+$[[9,1,3]]$, the perfect $[[5,1,3]]$ code, and the $[[4,2,2]]$ detection code
+(\cref{chap:codes}).
+
+\section{The axiom discipline}
+
+Everything on the main branch depends on exactly Mathlib's three standard
+axioms --- \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound} ---
+and nothing else. In particular there is no \texttt{native\_decide}, which
+would replace a kernel check by a compiler-trust axiom, and no \texttt{sorry}.
+An input that cannot yet be proved is carried as a named hypothesis on the
+theorem, where it is visible in the statement rather than hidden in the axiom
+set. This is enforced in CI, so a violation fails the build rather than landing
+quietly.
+
+The discipline is not free. The gross code distance proof was originally
+carried by 135 \texttt{native\_decide} leaves and had to be converted to
+kernel-checkable form: packed natural-number tables instead of array lookups,
+quantifier bridges so the kernel enumerates concrete lambdas, sparse rewrites
+in place of large finite sums, and Gaussian-style certificates where a sweep
+would otherwise be needed.
+
+\section{Reading the graph}
+
+An edge $A \to B$ in the dependency graph means that $B$ is the nearest
+blueprint ancestor of $A$: LeanArchitect walks the type and the proof term of
+each annotated declaration and stops as soon as it reaches another annotated
+declaration. The edges are therefore read off the real proof terms rather than
+maintained by hand, and a node that a proof genuinely stopped needing loses its
+edge as soon as the proof changes.
+
+\chapter{The Pauli group}
+\label{chap:pauli}
+
+Everything begins with the group $\mathcal{P}_n$ of $n$-qubit Pauli operators
+with phases. The formalization splits an element into a phase exponent in
+$\Z_4$ and a phase-free operator $\mathrm{Fin}\,n \to \{I,X,Y,Z\}$. The split
+is what makes multiplication computable: the operator part multiplies
+qubitwise, and the phases that fall out of products such as $XZ = -iY$
+accumulate separately.
+
+\inputleannode{def:pauli-operator}
+\inputleannode{def:pauli-group-element}
+\inputleannode{def:nqubit-pauli-operator}
+\inputleannode{def:nqubit-pauli-group}
+
+The syntactic representation is tied to actual operators on a Hilbert space by
+a matrix interpretation; without it the development would be a study of a
+finite group with no quantum content.
+
+\inputleannode{def:pauli-to-matrix}
+\inputleannode{def:pauli-mulop}
+\inputleannode{thm:pauli-mul-assoc}
+
+\section{Weight}
+
+Code distance is a statement about how many qubits an operator touches, so
+support and weight are the measures everything else is phrased in.
+
+\inputleannode{def:pauli-support}
+\inputleannode{def:pauli-weight}
+
+\section{Commutation}
+
+The single most used fact in the development is that commutation in
+$\mathcal{P}_n$ is a parity condition. Two Paulis pick up a sign $-1$ for each
+qubit where they disagree nontrivially, so the global sign is $(-1)^k$ and
+there is no third possibility between commuting and anticommuting.
+
+\inputleannode{def:anticommutes-at}
+\inputleannode{thm:commutes-iff-even}
+\inputleannode{def:anticommute}
+\inputleannode{thm:commute-or-anticommute}
+
+\chapter{The binary symplectic representation}
+\label{chap:symplectic}
+
+Parity is linear algebra over $\F_2$, and that observation is the engine of the
+whole subject. Forgetting phases sends $\mathcal{P}_n$ onto $\F_2^{2n}$,
+products become sums, and --- by \cref{thm:commutes-iff-symplectic} ---
+commutation becomes orthogonality under a symplectic form. An abelian subgroup
+becomes a self-orthogonal subspace, and independence of generators becomes a
+rank computation.
+
+\inputleannode{def:to-symplectic}
+\inputleannode{thm:to-symplectic-injective}
+\inputleannode{def:symplectic-inner}
+\inputleannode{thm:commutes-iff-symplectic}
+\inputleannode{def:check-matrix}
+\inputleannode{def:rows-linear-independent}
+
+\chapter{Stabilizer groups and the codespace}
+\label{chap:stabilizer}
+
+\inputleannode{def:is-stabilized-by}
+\inputleannode{def:stabilizer-group}
+\inputleannode{thm:neg-identity-not-mem}
+\inputleannode{def:codespace}
+
+The two conditions in \cref{def:stabilizer-group} --- abelian, and not
+containing $-I$ --- are exactly what is needed for the codespace to be nonzero.
+Commutativity makes the eigenspace projectors compatible; excluding $-I$ rules
+out the contradiction $\psi = -\psi$. The proof that the codespace is genuinely
+nonempty runs through the group sum.
+
+\inputleannode{def:stabilizer-sum}
+\inputleannode{thm:codespace-nonempty}
+
+\section{The centralizer}
+
+Operators that preserve the codespace are those commuting with every
+stabilizer. For the Pauli group --- and this is special to it --- normalizing
+and centralizing coincide, which is why the literature uses the two words
+interchangeably in this setting.
+
+\inputleannode{def:centralizer}
+\inputleannode{thm:normalizer-eq-centralizer}
+\inputleannode{thm:stabilizer-le-centralizer}
+
+\chapter{Logical operators, codes, and distance}
+\label{chap:codes-abstract}
+
+The encoded information is acted on by the quotient
+$\mathcal{C}(\mathcal{S})/\mathcal{S}$: operators that preserve the codespace,
+modulo those that act trivially on it.
+
+\inputleannode{def:pauli-logical}
+\inputleannode{thm:logical-iff-generators}
+\inputleannode{def:nontrivial-logical}
+\inputleannode{thm:nontrivial-logical-iff}
+
+\Cref{def:nontrivial-logical} has three conditions, not two, and the third is
+easy to forget: no stabilizer may share the operator part of $g$. Without it a
+$g$ differing from a stabilizer only by a phase would count as acting
+nontrivially, and the CSS bridge argument of \cref{thm:not-both-boundary}
+would fail.
+
+\inputleannode{thm:nontrivial-logical-transfer}
+\inputleannode{def:logical-qubit-ops}
+
+\section{Packaging a code}
+
+\inputleannode{def:generators-independent}
+\inputleannode{thm:independent-of-check-matrix}
+\inputleannode{def:stabilizer-code}
+
+Instantiating \cref{def:stabilizer-code} for a concrete family \emph{is} the
+theorem that the family encodes $k$ qubits into $n$: the type carries $n$ and
+$k$, and the obligations --- generator count, independence, pairwise
+commutation, exclusion of $-I$, and the centralizer and anticommutation
+conditions on the logical operators --- must all be discharged to build an
+inhabitant.
+
+\section{Distance}
+
+\inputleannode{def:has-code-distance}
+\inputleannode{thm:distance-min-weight}
+\inputleannode{def:code-with-distance}
+
+Both halves of \cref{def:has-code-distance} matter. The lower bound is the
+error-correction guarantee; the witness of exact weight is what makes the
+distance a value rather than a bound, and it is usually the easier half to
+forget.
+
+\chapter{CSS structure}
+\label{chap:css}
+
+A CSS code is one whose stabilizer generators are each purely $X$-type or
+purely $Z$-type. The separation is what lets a homological argument apply: the
+$X$ and $Z$ sides become the two ends of a chain complex.
+
+\inputleannode{def:x-type}
+\inputleannode{def:z-type}
+\inputleannode{thm:css-distance-two}
+
+\chapter{The homological framework}
+\label{chap:homological}
+
+This chapter is the abstract heart of the development. A length-three chain
+complex over $\F_2$ induces a CSS code: $1$-chains are the physical qubits,
+$\partial_1 \partial_2 = 0$ is the commutation of the $X$- and $Z$-checks, and
+--- the slogan --- \emph{logical operators are homology classes}. Both the
+toric family and the gross code are instances, and both inherit their distance
+argument from \cref{thm:chain-weight-transfer}.
+
+\inputleannode{def:homological-code}
+\inputleannode{thm:boundary-comp-zero}
+\inputleannode{def:cycles}
+\inputleannode{def:boundaries}
+\inputleannode{thm:boundaries-le-cycles}
+\inputleannode{def:H1}
+\inputleannode{thm:finrank-H1}
+
+\section{From chains to Paulis}
+
+\inputleannode{def:chain-x-operator}
+\inputleannode{def:chain-z-operator}
+\inputleannode{thm:chain-x-add}
+\inputleannode{thm:x-logical-iff-cycle}
+
+\section{Distance from homology}
+
+\inputleannode{thm:not-both-boundary}
+\inputleannode{thm:chain-weight-transfer}
+
+\Cref{thm:chain-weight-transfer} is the load-bearing step: it is what allows a
+statement about minimum weights of homology representatives --- a question in
+$\F_2$ linear algebra --- to settle a statement about the weights of Pauli
+operators. Every concrete distance theorem below is an application of it.
+
+\chapter{The toric code}
+\label{chap:toric}
+
+The $L \times L$ square lattice on the torus, read as a chain complex. The
+$2L^2$ edges are the qubits; vertices carry the $Z$-checks and faces the
+$X$-checks.
+
+\inputleannode{def:toric-chain-complex}
+\inputleannode{def:toric-H1}
+\inputleannode{thm:toric-H1-dim}
+
+\section{Wrapping invariants}
+
+The homology of the torus is detected by two $\F_2$-valued winding numbers,
+counting how often a chain wraps horizontally and vertically. They are defined
+on all chains, are unchanged by adding a boundary, and together separate
+homology classes.
+
+\inputleannode{def:wrapping-h}
+\inputleannode{def:wrapping-v}
+\inputleannode{thm:wrapping-boundary-zero}
+\inputleannode{def:toric-phi}
+\inputleannode{thm:toric-phi-equiv}
+
+\section{The code and its distance}
+
+\inputleannode{def:toric-code}
+
+The natural generating set of the toric code has $2L^2$ elements, two more than
+the $n - k = 2L^2 - 2$ that \cref{def:stabilizer-code} demands: the vertex
+checks multiply to the identity, and so do the face checks. The packaging
+therefore uses a trimmed generator list, and the homological identities are
+what prove the trimmed list generates the same subgroup. Distance proofs stated
+against the untrimmed stabilizer group are carried across by
+\cref{thm:nontrivial-logical-transfer}.
+
+\inputleannode{thm:toric-dX}
+\inputleannode{thm:toric-dZ}
+\inputleannode{thm:toric-distance}
+\inputleannode{def:toric-code-with-distance}
+
+\chapter{Bivariate-bicycle codes and the gross code}
+\label{chap:bb}
+
+Bivariate-bicycle codes are qLDPC codes built from two commuting polynomial
+shift operators on an abelian group. The gross code is the $[[144,12,12]]$
+member of the family; the argument here derives its distance from that of its
+$[[72,12,6]]$ base by exhibiting the gross complex as a free $\Z_2$ cover of
+the base and showing the distance doubles.
+
+\inputleannode{def:x-double-cover}
+
+\section{The base floor}
+
+The base contributes a floor of six, established by ruling out every light
+cycle with a finite certificate that the kernel checks directly.
+
+\inputleannode{def:small-cycle-data}
+\inputleannode{thm:small-cycle-floor}
+\inputleannode{thm:base-distance}
+\inputleannode{thm:gross-logical-weight}
+
+\section{Doubling}
+
+Pushing a gross logical down to the base gives weight at least six. Getting to
+twelve requires knowing when the two sheets of the cover contribute
+independently. They do outside a \emph{dangerous} sector, where the deck
+transformation acts trivially on homology; there the light stabilizers are
+classified explicitly and the surviving classes are confined to Smith cosets
+whose floor is again twelve.
+
+\inputleannode{thm:gross-sector-dichotomy}
+\inputleannode{def:gross-stabilizer-code}
+\inputleannode{thm:gross-distance}
+\inputleannode{def:gross-code-with-distance}
+
+\chapter{Code instances}
+\label{chap:codes}
+
+The remaining codes exercise the same machinery on smaller or differently
+shaped examples. The $[[5,1,3]]$ code is the interesting outlier: its
+generators mix $X$ and $Z$ on the same qubit, so it is not CSS, the homological
+route is unavailable, and its distance is settled instead by a direct search
+over weight-one and weight-two anti-witnesses.
+
+\inputleannode{def:steane7}
+\inputleannode{def:shor9}
+\inputleannode{def:five-qubit}
+\inputleannode{def:four-qubit}
+\inputleannode{def:iceberg}
+\inputleannode{def:rotated-surface}
+\inputleannode{def:repetition-n}

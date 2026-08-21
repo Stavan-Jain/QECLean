@@ -1,0 +1,31 @@
+% Macros and settings shared by the pdf and the web version of the blueprint.
+
+% ---------------------------------------------------------------------------
+% Theorem-like environments.
+%
+% These are the environments that appear in the dependency graph. LeanArchitect
+% emits `theorem` for a tagged theorem and `definition` for a tagged definition
+% unless the annotation overrides it with `(latexEnv := "...")`, so those two
+% plus `proof` (from amsthm) are the ones that must exist. The others are here
+% so that an annotation may opt into them later without touching this file.
+% ---------------------------------------------------------------------------
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+
+% ---------------------------------------------------------------------------
+% Notation.
+%
+% Defined via \providecommand followed by \renewcommand so that the definition
+% wins whether or not the name is already taken by the document class or by one
+% of the packages loaded in web.tex / print.tex.
+% ---------------------------------------------------------------------------
+\providecommand{\F}{}\renewcommand{\F}{\mathbb{F}}      % \F_2, the two-element field
+\providecommand{\Z}{}\renewcommand{\Z}{\mathbb{Z}}      % \Z_4, phase exponents
+\providecommand{\C}{}\renewcommand{\C}{\mathbb{C}}      % complex amplitudes
+\providecommand{\wt}{}\renewcommand{\wt}{\operatorname{wt}}   % Pauli weight
+\providecommand{\supp}{}\renewcommand{\supp}{\operatorname{supp}}

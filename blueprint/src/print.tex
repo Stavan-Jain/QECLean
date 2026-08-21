@@ -1,0 +1,25 @@
+% Printable version of the QECLean blueprint.
+% Compile with `leanblueprint pdf` (xelatex via latexmkrc).
+
+\documentclass[a4paper]{report}
+
+\usepackage{geometry}
+
+\usepackage{expl3}
+
+\usepackage{amssymb, amsthm, mathtools}
+\usepackage[unicode,colorlinks=true,linkcolor=blue,urlcolor=magenta, citecolor=blue]{hyperref}
+\usepackage[nameinlink]{cleveref}
+
+\usepackage[warnings-off={mathtools-colon,mathtools-overbracket}]{unicode-math}
+
+\input{macros/common}
+\input{macros/print}
+
+\title{Quantum Error Correction in Lean}
+\author{The QECLean contributors}
+
+\begin{document}
+\maketitle
+\input{content}
+\end{document}
