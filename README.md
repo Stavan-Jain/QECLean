@@ -1,6 +1,7 @@
 # Quantum Error Correction in Lean
 
 [![Lean V4](https://img.shields.io/badge/Lean-V4-blueviolet)](https://lean-lang.org/)
+[![Blueprint](https://img.shields.io/badge/blueprint-live-success)](https://stavan-jain.github.io/QECLean/)
 [![Dashboard](https://img.shields.io/badge/pipeline%20dashboard-live-success)](https://stavan-jain.github.io/qec-lab/)
 [![Research: qec-lab](https://img.shields.io/badge/research-qec--lab-informational)](https://github.com/Stavan-Jain/qec-lab)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
@@ -71,6 +72,10 @@ Every step of the homological distance argument is mechanized — no `sorry`s an
 The accompanying expository proof is available as an [interactive write-up](https://stavan-jain.github.io/DistanceBlog/) with diagrams (or the [in-repo version in qec-lab](https://github.com/Stavan-Jain/qec-lab/blob/main/docs/distance_proof.md)).
 
 ## Blueprint
+
+**[Read it here.](https://stavan-jain.github.io/QECLean/)** The
+[dependency graph](https://stavan-jain.github.io/QECLean/dep_graph_document.html)
+is the quickest way in.
 
 A [leanblueprint](https://github.com/PatrickMassot/leanblueprint)-style
 blueprint documents the architecture: ~85 nodes covering the Pauli and binary
