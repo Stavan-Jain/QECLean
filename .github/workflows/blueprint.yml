@@ -8,10 +8,17 @@ name: Blueprint
 # node whose `\cref` points at nothing. The plasTeX half catches LaTeX errors
 # in the extracted prose.
 #
-# Deployment to GitHub Pages is deliberately manual (see the `deploy` input).
-# This repository's Pages site currently serves the path-preserving redirect
-# built by `pages-redirect.yml`, and whichever workflow deploys last wins, so
-# publishing the blueprint is a decision rather than a side effect of a push.
+# This workflow owns the GitHub Pages site: a push to `main` republishes the
+# blueprint, so what is served always matches `main`. It used to be a manual
+# `workflow_dispatch`, on the grounds that `pages-redirect.yml` also deploys
+# and whichever runs last wins -- but that workflow only triggers on its own
+# file changing or on an explicit dispatch, so it cannot clobber the blueprint
+# by accident, and the real cost of the manual gate was a site that silently
+# fell behind `main` after every merge. The `deploy` input is kept for
+# republishing without a content change.
+#
+# Deploys are restricted to `main`: pull requests and branch pushes build and
+# check the blueprint, and publish nothing.
 
 on:
   push:
@@ -27,7 +34,7 @@ on:
   workflow_dispatch:
     inputs:
       deploy:
-        description: 'Publish to GitHub Pages (overwrites the redirect site)'
+        description: 'Republish to GitHub Pages (pushes to main publish anyway)'
         type: boolean
         default: false
       pdf:
@@ -43,6 +50,12 @@ on:
 concurrency:
   group: blueprint-${{ github.ref }}-${{ github.event_name == 'workflow_dispatch' && github.run_id || 'auto' }}
   cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
+
+env:
+  # Publish from `main` only: on any push to it, or on a dispatch that ticked
+  # `deploy`. Steps read this; the deploy job cannot (the `env` context is not
+  # available in a job-level `if:`) and so spells the condition out again.
+  PUBLISH: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.deploy)) }}
 
 permissions:
   contents: read
@@ -164,12 +177,11 @@ jobs:
           path: blueprint/print/print.pdf
           if-no-files-found: error
 
-      # Assemble the Pages site only when a deploy was explicitly asked for.
       # The blueprint lands at the site root; the legacy dashboard redirect
       # that `pages-redirect.yml` publishes is preserved as `404.html`, so old
       # `/QECLean/<path>` links still bounce to the qec-lab dashboard.
       - name: Assemble the Pages site
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy }}
+        if: ${{ env.PUBLISH == 'true' }}
         run: |
           mkdir -p site
           cp -r blueprint/web/. site/
@@ -196,17 +208,22 @@ jobs:
           touch site/.nojekyll
 
       - uses: actions/configure-pages@v5
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy }}
+        if: ${{ env.PUBLISH == 'true' }}
 
       - uses: actions/upload-pages-artifact@v3
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy }}
+        if: ${{ env.PUBLISH == 'true' }}
         with:
           path: site
 
   deploy:
     needs: build
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy }}
+    if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.deploy)) }}
     runs-on: ubuntu-latest
+    # Serialize against the other workflow that can publish to Pages, so two
+    # deploys never race for the site. `pages-redirect.yml` uses this group.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
     permissions:
       contents: read
       pages: write

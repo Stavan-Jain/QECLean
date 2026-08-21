@@ -1,6 +1,7 @@
 # Quantum Error Correction in Lean
 
 [![Lean V4](https://img.shields.io/badge/Lean-V4-blueviolet)](https://lean-lang.org/)
+[![Blueprint](https://img.shields.io/badge/blueprint-live-success)](https://stavan-jain.github.io/QECLean/)
 [![Dashboard](https://img.shields.io/badge/pipeline%20dashboard-live-success)](https://stavan-jain.github.io/qec-lab/)
 [![Research: qec-lab](https://img.shields.io/badge/research-qec--lab-informational)](https://github.com/Stavan-Jain/qec-lab)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
@@ -72,6 +73,10 @@ The accompanying expository proof is available as an [interactive write-up](http
 
 ## Blueprint
 
+**[Read it here.](https://stavan-jain.github.io/QECLean/)** The
+[dependency graph](https://stavan-jain.github.io/QECLean/dep_graph_document.html)
+is the quickest way in.
+
 A [leanblueprint](https://github.com/PatrickMassot/leanblueprint)-style
 blueprint documents the architecture: ~85 nodes covering the Pauli and binary
 symplectic layer, the stabilizer framework, the homological CSS machinery, and
@@ -85,6 +90,13 @@ proof sketch and title live in an `@[blueprint]` annotation in
 the real proof terms instead of being written by hand. There is therefore no
 second copy of the mathematics that can drift out of date — renaming a
 declaration breaks the build rather than silently orphaning a node.
+
+The graph is filterable: picking a node restricts it to that node's transitive
+dependencies — the subgraph the result rests on — and re-runs the layout on just
+that part, so asking what `steane7` needs gives 22 nodes rather than all 85. The
+opposite direction (everything built on a node) and a depth cut-off are there
+too, and a filtered view is a shareable URL:
+`dep_graph_document.html?focus=thm:gross-distance&dir=up`.
 
 ```bash
 lake build QECBlueprint:blueprint && leanblueprint web

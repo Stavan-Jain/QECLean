@@ -34,6 +34,11 @@ sudo apt-get install graphviz libgraphviz-dev texlive-binaries
 pip install leanblueprint
 ```
 
+On macOS none of that apt line applies: `kpsewhich` comes with MacTeX (already
+on `PATH` as `/Library/TeX/texbin/kpsewhich`), and current `pygraphviz` wheels
+bundle graphviz, so `pip install leanblueprint` into a virtualenv is the whole
+setup — no Homebrew graphviz needed.
+
 `texlive-binaries` is **not optional**, even though nothing here compiles TeX
 for the web build: it provides `kpsewhich`, which plasTeX shells out to in order
 to resolve `\input` paths. See "If the blueprint renders with no nodes" below —
@@ -54,8 +59,39 @@ bash scripts/check-blueprint-render.sh   # assert the nodes actually rendered
 `kpsewhich` has no default search path of its own. A full TeX Live installation
 sets one up and you can drop the prefix.
 
-Open `blueprint/web/index.html`. The dependency graph is linked from the
-navigation bar.
+Then serve it, rather than opening the files directly:
+
+```bash
+bash scripts/preview-blueprint.sh
+```
+
+It serves on port 8000, stepping up to the next free port if something else
+already has it (`--port N` to choose). Localhost only.
+
+The dependency graph is linked from the navigation bar. It has to be served
+over HTTP or the graph comes up empty — see the next section for why.
+
+### Working on the graph without building Lean
+
+The dependency-graph page's behaviour lives in `blueprint/src/` as ordinary CSS
+and JavaScript (`extra_styles.css`, `dep_graph_focus.js`), and none of it needs
+the Lean half to be rebuilt. To iterate on it, take the last CI render instead:
+
+```bash
+bash scripts/preview-blueprint.sh --from-ci
+```
+
+That downloads the newest successful Blueprint run's `blueprint-web` artifact
+with `gh`, copies in the current `extra-css` / `extra-js` files the way plasTeX
+would, and serves the result — no Lean build, no `leanblueprint`, no graphviz.
+Re-run it after each edit. Because it is the page CI actually emitted, it
+catches the things a hand-written test page would not.
+
+The repository is passed to `gh` explicitly, derived from the `origin` remote:
+this checkout has two GitHub remotes (`origin` and `lab`), so `gh` cannot infer
+which one a run belongs to and would otherwise demand a `gh repo set-default`.
+Set `BLUEPRINT_GH_REPO=owner/name` to read runs from somewhere else, such as
+upstream while working on a fork.
 
 ### If the dependency graph page is blank
 
@@ -72,10 +108,11 @@ URL file://...`), so the renderer never runs and the container stays empty.
 This is not a build problem — the assets are all present under `blueprint/web/js/`
 and the graph data is embedded in the page as a graphviz `digraph`.
 
-Fix: serve the directory over HTTP.
+Fix: serve the directory over HTTP, which is all
+`scripts/preview-blueprint.sh` does.
 
 ```bash
-cd blueprint/web && python3 -m http.server 8000
+bash scripts/preview-blueprint.sh
 # then open http://localhost:8000/dep_graph_document.html
 ```
 
@@ -115,6 +152,74 @@ extraction step is cheap once the build is warm, but note that it loads the
 whole `QEC` environment into a single process, so it wants the same headroom as
 building the bivariate-bicycle leaves.
 
+## Reading one result's dependencies
+
+The dependency graph shows all 85 nodes at once, which answers "what is in this
+library" but not "what does this one theorem actually rest on". The controls
+above the graph narrow it to a single node's transitive dependencies:
+
+- **Focus on** — a node, by full label (`def:steane7`), by the short name shown
+  on the graph (`steane7`), or by any unambiguous fragment of either. The list
+  is a `<datalist>`, so typing filters it.
+- **show** — `what it depends on` (the default) walks *up* to everything the
+  node rests on; `what depends on it` walks down to everything built on top of
+  it; `both directions` is the union.
+- **to depth** — how many edges out to walk. `all the way` is the full
+  transitive closure; a small number is useful on a node near the top of the
+  library, where the closure is most of the graph.
+- **Show everything** restores the full graph.
+
+The subgraph is laid out afresh rather than highlighted in place, so what you
+get is a small readable picture instead of a scattering of nodes across the
+original canvas. The focused node is drawn with a heavy double outline; the
+node colours are left alone, because the legend gives them a meaning.
+
+Clicking a node opens its statement, as before, and that panel now carries a
+**Focus on this** button.
+
+A focused view is a URL, so it can be linked from a discussion or an issue:
+
+```
+dep_graph_document.html?focus=thm:gross-distance&dir=up
+dep_graph_document.html?focus=def:steane7&dir=up&depth=2
+```
+
+`dir` is `up`, `down`, or `both`; `depth` is omitted for the full closure.
+
+**On edge direction**, which is easy to get backwards: plastexdepgraph draws
+`A -> B` to mean *B uses A*, so arrows run from a prerequisite towards the
+result that needs it. The dependencies of a node are therefore its ancestors,
+found by walking the arrows backwards — which is what `what it depends on`
+does.
+
+### How it is wired in
+
+[`src/dep_graph_focus.js`](src/dep_graph_focus.js), listed as `extra-js` in
+`plastex.cfg`. plasTeX copies any `extra-js` file from `blueprint/src/` into
+`web/js/` and the upstream dependency-graph template emits a `<script>` tag for
+it, so no template is forked. It is loaded on every page and does nothing on
+the ones with no graph.
+
+The one thing it needs and is not handed is the graphviz source: the template
+interpolates it directly into a ``.renderDot(`...`)`` call rather than into a
+variable, so the script reads it back out of that call, parses it, and re-emits
+the induced subgraph. If that ever stops working the script leaves the stock
+graph untouched rather than breaking the page — silent, so
+`scripts/check-blueprint-render.sh` asserts the shape it depends on and CI
+fails instead.
+
+Two smaller things worth knowing before editing it:
+
+- Register `end` handlers *before* calling `renderDot`, never chained after it.
+  Once the graphviz wasm is loaded a render completes synchronously and
+  dispatches `end` before `renderDot` returns, so a handler attached afterwards
+  never fires. Upstream can chain because its render is the one that waits for
+  the wasm to load.
+- Re-renders rebind only the node click handlers, not upstream's whole
+  `interactive()`. That function also binds the legend toggle and the modal
+  close buttons with jQuery, whose handlers accumulate — calling it twice makes
+  the legend toggle a no-op.
+
 ## Inspecting a single node
 
 ```lean
@@ -152,17 +257,56 @@ middle of a chain will take over edges that previously ran past it.
 ## Deployment
 
 The `Blueprint` workflow builds on every push and uploads `blueprint/web` as a
-run artifact. Publishing to GitHub Pages is a manual `workflow_dispatch` with
-the `deploy` input set, because this repository's Pages site currently serves
-the path-preserving dashboard redirect from `pages-redirect.yml`, and whichever
-workflow deploys last wins. The deploy path keeps that redirect as `404.html`,
-so old `/QECLean/<path>` links still bounce to the qec-lab dashboard; only the
-site root changes meaning. If you want the blueprint published automatically,
-move the deploy steps onto the `push` trigger and retire `pages-redirect.yml`.
+run artifact. **A push to `main` also republishes
+[the site](https://stavan-jain.github.io/QECLean/)**, so what is served always
+matches `main`; pull requests and branch pushes build and check the blueprint
+but publish nothing. The `deploy` input on `workflow_dispatch` is still there
+for republishing without a content change.
+
+Publishing used to be manual, on the grounds that `pages-redirect.yml` also
+deploys to this Pages site and whichever workflow runs last wins. That workflow
+only triggers on an explicit dispatch or on a push that edits its own file, so
+it cannot clobber the blueprint by accident — while the manual gate reliably
+left the site behind `main` after every merge. The deploy still keeps the
+redirect as `404.html`, so old `/QECLean/<path>` links bounce to the qec-lab
+dashboard; only the site root changes meaning. The two workflows share a `pages`
+concurrency group so their deploys serialize.
+
+### The `\lean{}` links are hidden, not fixed
 
 `\dochome` in `web.tex` points at `https://stavan-jain.github.io/QECLean/docs`,
-so the `\lean{}` links resolve once API documentation is deployed there
-(`lean_action_ci.yml` builds it on tags and manual dispatch).
+so every node's **Lean** link goes to `…/docs/find/#doc/<decl>`. Nothing
+publishes anything at `/docs`, so those links fall through to `404.html` and
+bounce the reader to the qec-lab dashboard — worse than no link at all. Until
+the docs exist, `extra_styles.css` hides them:
+
+```css
+a.lean_decl,
+button.modal.lean,
+button.modal.lean + div.modal-container { display: none; }
+```
+
+Three selectors because the two page types render the link differently: a
+chapter page puts it behind the `L∃∀N` button's "Lean declarations" dialog,
+whose entire body is those anchors, so the button and its dialog go too; the
+dependency graph's node modals emit a plain `<a class="lean_link lean_decl">`.
+The neighbouring `uses` dialog is unaffected. Dropping `\dochome` instead is
+not a workaround — leanblueprint then falls back to mathlib's doc site, where
+none of these declarations exist.
+
+To restore the links, publish doc-gen4 output at `/docs` and delete that CSS
+block; nothing else needs to change. The obstacle is that a repository has one
+Pages site, so the workflow that publishes has to assemble all of it —
+blueprint at `/`, docs at `/docs` — which means this workflow paying for a
+doc-gen4 build: ~1–2 h cold, though `docgen-action` caches the mathlib half
+against `lake-manifest.json`.
+
+`lean_action_ci.yml` used to build those docs on tag pushes, but published them
+as the Pages site *root*, so **tagging a release replaced the blueprint with
+the API docs** until the next push to `main` put it back. That step has been
+removed; its manual-dispatch half never produced anything anyway, since
+`docgen-action` gates its build, upload and deploy on `github.event_name ==
+'push'`.
 
 ## Notes
 

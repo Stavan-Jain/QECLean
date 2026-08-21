@@ -371,6 +371,14 @@ Two files, and the split between them matters:
 - **`blueprint/src/content.tex`** — the narrative: chapters, prose, and one
   `\inputleannode{label}` per node, which fixes the order they appear in.
 
+Presentation lives alongside those in `blueprint/src/` as `extra-css` /
+`extra-js` entries in `plastex.cfg`; `dep_graph_focus.js` is the one with real
+logic in it (it narrows the dependency graph to a chosen node's transitive
+dependencies). It reads the graph source back out of the upstream template's
+inline `renderDot` call, so `scripts/check-blueprint-render.sh` asserts that
+call's shape — if you change how the graph is rendered, read
+[`blueprint/README.md`](blueprint/README.md) § "How it is wired in" first.
+
 **The annotations are deliberately not inline on the declarations.** Inline
 `@[blueprint]` would require `import Architect` in every annotated file, making
 LeanArchitect a hard dependency of `QEC` for every downstream consumer.
