@@ -115,6 +115,74 @@ extraction step is cheap once the build is warm, but note that it loads the
 whole `QEC` environment into a single process, so it wants the same headroom as
 building the bivariate-bicycle leaves.
 
+## Reading one result's dependencies
+
+The dependency graph shows all 85 nodes at once, which answers "what is in this
+library" but not "what does this one theorem actually rest on". The controls
+above the graph narrow it to a single node's transitive dependencies:
+
+- **Focus on** — a node, by full label (`def:steane7`), by the short name shown
+  on the graph (`steane7`), or by any unambiguous fragment of either. The list
+  is a `<datalist>`, so typing filters it.
+- **show** — `what it depends on` (the default) walks *up* to everything the
+  node rests on; `what depends on it` walks down to everything built on top of
+  it; `both directions` is the union.
+- **to depth** — how many edges out to walk. `all the way` is the full
+  transitive closure; a small number is useful on a node near the top of the
+  library, where the closure is most of the graph.
+- **Show everything** restores the full graph.
+
+The subgraph is laid out afresh rather than highlighted in place, so what you
+get is a small readable picture instead of a scattering of nodes across the
+original canvas. The focused node is drawn with a heavy double outline; the
+node colours are left alone, because the legend gives them a meaning.
+
+Clicking a node opens its statement, as before, and that panel now carries a
+**Focus on this** button.
+
+A focused view is a URL, so it can be linked from a discussion or an issue:
+
+```
+dep_graph_document.html?focus=thm:gross-distance&dir=up
+dep_graph_document.html?focus=def:steane7&dir=up&depth=2
+```
+
+`dir` is `up`, `down`, or `both`; `depth` is omitted for the full closure.
+
+**On edge direction**, which is easy to get backwards: plastexdepgraph draws
+`A -> B` to mean *B uses A*, so arrows run from a prerequisite towards the
+result that needs it. The dependencies of a node are therefore its ancestors,
+found by walking the arrows backwards — which is what `what it depends on`
+does.
+
+### How it is wired in
+
+[`src/dep_graph_focus.js`](src/dep_graph_focus.js), listed as `extra-js` in
+`plastex.cfg`. plasTeX copies any `extra-js` file from `blueprint/src/` into
+`web/js/` and the upstream dependency-graph template emits a `<script>` tag for
+it, so no template is forked. It is loaded on every page and does nothing on
+the ones with no graph.
+
+The one thing it needs and is not handed is the graphviz source: the template
+interpolates it directly into a ``.renderDot(`...`)`` call rather than into a
+variable, so the script reads it back out of that call, parses it, and re-emits
+the induced subgraph. If that ever stops working the script leaves the stock
+graph untouched rather than breaking the page — silent, so
+`scripts/check-blueprint-render.sh` asserts the shape it depends on and CI
+fails instead.
+
+Two smaller things worth knowing before editing it:
+
+- Register `end` handlers *before* calling `renderDot`, never chained after it.
+  Once the graphviz wasm is loaded a render completes synchronously and
+  dispatches `end` before `renderDot` returns, so a handler attached afterwards
+  never fires. Upstream can chain because its render is the one that waits for
+  the wasm to load.
+- Re-renders rebind only the node click handlers, not upstream's whole
+  `interactive()`. That function also binds the legend toggle and the modal
+  close buttons with jQuery, whose handlers accumulate — calling it twice makes
+  the legend toggle a no-op.
+
 ## Inspecting a single node
 
 ```lean

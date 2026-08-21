@@ -24,3 +24,76 @@ div.proof_content {
 	border-left: .08rem solid grey;
 }
 
+
+/* --- Focused-subgraph controls on the dependency graph page ---------------
+ * Added by `dep_graph_focus.js`, which restricts the graph to one node's
+ * transitive dependencies. Loaded after dep_graph.css, so the #graph height
+ * override below wins and the toolbar does not push the graph off-screen. */
+
+div#focus-controls {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: .4rem .6rem;
+	padding: .4rem 0 .5rem 0;
+	font-size: 95%;
+}
+
+div#focus-controls label {
+	color: #444;
+}
+
+div#focus-controls input#focus-node {
+	min-width: 22rem;
+	flex: 1 1 22rem;
+	padding: .2rem .4rem;
+	border: 1px solid #497da5;
+	border-radius: 4px;
+	font: inherit;
+}
+
+div#focus-controls select {
+	padding: .2rem;
+	border: 1px solid #497da5;
+	border-radius: 4px;
+	font: inherit;
+	background: white;
+}
+
+div#focus-controls button#focus-clear {
+	padding: .2rem .6rem;
+	border: 1px solid #497da5;
+	border-radius: 4px;
+	background: white;
+	font: inherit;
+	cursor: pointer;
+}
+
+div#focus-controls button#focus-clear:hover {
+	background: #eef4f9;
+}
+
+div#focus-controls span#focus-status {
+	margin-left: auto;
+	color: #555;
+	font-style: italic;
+}
+
+div#graph {
+	height: calc(90vh - 3rem);
+}
+
+button.focus-link {
+	margin-left: 1rem;
+	padding: .1rem .5rem;
+	border: 1px solid #497da5;
+	border-radius: 4px;
+	background: white;
+	font-size: 90%;
+	font-style: italic;
+	cursor: pointer;
+}
+
+button.focus-link:hover {
+	background: #eef4f9;
+}

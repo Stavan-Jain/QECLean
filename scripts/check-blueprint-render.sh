@@ -57,4 +57,34 @@ if [ "$gnodes" -lt 1 ]; then
   fail=1
 fi
 
+# --- the focused-subgraph control ------------------------------------------
+#
+# `blueprint/src/dep_graph_focus.js` restricts the graph to one node's
+# transitive dependencies. It has two dependencies on machinery we do not own,
+# and both fail quietly rather than loudly, so assert them here.
+#
+# 1. plasTeX has to copy the file out of blueprint/src and the dep-graph
+#    template has to emit a <script> tag for it. A typo in the `extra-js` line
+#    of plastex.cfg logs one line to stderr and renders a page without it.
+# 2. The script recovers the graphviz source by reading it back out of the
+#    template's inline `.renderDot(`...`)` call, because the template
+#    interpolates the dot straight into that call rather than into a variable.
+#    If plastexdepgraph ever changes that shape the script degrades to leaving
+#    the stock graph alone -- correct, but silent. Catch it at build time.
+
+focus_js="$web/js/dep_graph_focus.js"
+if [ ! -s "$focus_js" ]; then
+  echo "::error::$focus_js missing -- check the extra-js line in blueprint/src/plastex.cfg"
+  fail=1
+elif ! grep -qF 'js/dep_graph_focus.js' "$graph"; then
+  echo "::error::$graph does not load dep_graph_focus.js"
+  fail=1
+elif ! grep -qF 'renderDot(`' "$graph"; then
+  echo "::error::the dependency-graph template no longer renders via renderDot(\`...\`);"
+  echo "::error::dep_graph_focus.js reads the graph source from that call and will now no-op"
+  fail=1
+else
+  echo "focused-subgraph control: script present and graph source readable"
+fi
+
 exit $fail

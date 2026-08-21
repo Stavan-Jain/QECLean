@@ -86,6 +86,13 @@ the real proof terms instead of being written by hand. There is therefore no
 second copy of the mathematics that can drift out of date — renaming a
 declaration breaks the build rather than silently orphaning a node.
 
+The graph is filterable: picking a node restricts it to that node's transitive
+dependencies — the subgraph the result rests on — and re-runs the layout on just
+that part, so asking what `steane7` needs gives 22 nodes rather than all 85. The
+opposite direction (everything built on a node) and a depth cut-off are there
+too, and a filtered view is a shareable URL:
+`dep_graph_document.html?focus=thm:gross-distance&dir=up`.
+
 ```bash
 lake build QECBlueprint:blueprint && leanblueprint web
 ```
