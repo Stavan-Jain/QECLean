@@ -1,0 +1,46 @@
+{
+  // LaTeX Workshop, configured for the blueprint only.
+  //
+  // The root document is blueprint/src/print.tex, which \inputs content.tex;
+  // content.tex in turn \inputs the node files generated from Lean by
+  //     lake build QECBlueprint && lake build QECBlueprint:blueprint
+  // so re-run those two after editing an annotation in QECBlueprint.lean.
+  // Narrative edits to content.tex need no Lean build.
+
+  // Only ever treat print.tex as a root; without this, LaTeX Workshop also
+  // offers web.tex (a plasTeX source, not xelatex-compilable).
+  "latex-workshop.latex.search.rootFiles.include": ["blueprint/src/print.tex"],
+  "latex-workshop.latex.rootFile.doNotPrompt": true,
+
+  // /blueprint/print/ is already gitignored, so aux files stay out of the tree.
+  "latex-workshop.latex.outDir": "%WORKSPACE_FOLDER%/blueprint/print",
+
+  // Two xelatex passes rather than latexmk: this MacTeX install has no
+  // latexmk (`sudo tlmgr install latexmk` would add it). Pass two is what
+  // resolves \cref references and the table of contents.
+  //
+  // TEXINPUTS is what lets kpsewhich resolve `macros/common` and the
+  // ../../.lake node index -- the same reason the README prefixes its
+  // leanblueprint commands with it.
+  "latex-workshop.latex.tools": [
+    {
+      "name": "xelatex",
+      "command": "xelatex",
+      "args": [
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "-output-directory=%OUTDIR%",
+        "%DOC%"
+      ],
+      "env": { "TEXINPUTS": ".:" }
+    }
+  ],
+  "latex-workshop.latex.recipes": [
+    { "name": "blueprint (xelatex x2)", "tools": ["xelatex", "xelatex"] }
+  ],
+
+  "latex-workshop.latex.autoBuild.run": "onFileChange",
+  "latex-workshop.view.pdf.viewer": "tab",
+  "latex-workshop.synctex.afterBuild.enabled": true
+}
