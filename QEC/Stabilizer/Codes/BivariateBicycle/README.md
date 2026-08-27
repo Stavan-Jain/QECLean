@@ -85,14 +85,19 @@ still carried one has been removed from this tree and lives on branch
 | Parked | Result given up | `native_decide` |
 |---|---|---|
 | `Z3Z6/` (pair72, `[[36,4,4]] → [[72,4,8]]`, d = 8 unconditional) | `pair72_*_distance_eq_8` | 42, five of them `2^18` sweeps that dominated a whole-repo build |
-| `Z5Z15F2A6/` (`[[150,8,8]] → [[300,8,16]]`, two-tier) | `cover300_chain/pauli_distance_eq_16` | 9 (`Defs` coverData ×4, `Witness` ×4, `DeckHomotopy` Bezout ×1) |
+| `Z5Z15F2A6/` (`[[150,8,8]] → [[300,8,16]]`, d = 16 unconditional) | `cover300_chain/pauli_distance_eq_16` | 101 native leaves (the a15/a17 discharge engine — see the branch's `PARKED-NATIVE-DECIDE.md`) |
 | `BaseFloors/` (BB90, BB108, Z6Z14) | three certified `BBSmallCycle` class members | 12 (`epsA/epsB/check_two/check_four` ×3 files) |
 
-`Z3Z6/PARKED.md` on that branch records the Z3Z6 rationale in detail. All three
-are clean leaves — nothing outside each directory imported its declarations
-(`Z5Z15F2A6/Distance.lean` is in-instance and went with it) — so restoring one
-means re-adding the directory, its sibling umbrella, the import line in
-`BivariateBicycle.lean`, and the rows removed from this README.
+`Z3Z6/PARKED.md` on that branch records the Z3Z6 rationale in detail, and the
+branch's root `PARKED-NATIVE-DECIDE.md` covers the rest — including the
+2026-08-27 refresh that brought `Z5Z15F2A6/` to its unconditional a15 state
+(`e6f03ad`: all three floor hypotheses discharged as kernel-checked theorems)
+together with the `Framework/Homological/{BBCoverTranslate,BBDoubling}`
+extensions it depends on. All three are clean leaves in this tree — nothing
+outside each directory imported its declarations — so restoring one means
+re-adding the directory, its sibling umbrella, the import line in
+`BivariateBicycle.lean`, the rows removed from this README, and (for
+`Z5Z15F2A6/`) porting those two framework companions.
 
 The abstract machinery they exercised stays in this tree:
 `Framework/Homological/BBSmallCycle.lean` (the A15/A16 class small-cycle
