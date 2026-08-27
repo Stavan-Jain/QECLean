@@ -15,7 +15,7 @@ This file covers everything else.
 | Path | `native_decide` | Result given up |
 |---|---|---|
 | `Codes/BivariateBicycle/BaseFloors/{BB90,BB108,Z6Z14}.lean` | 12 (4 each) | three certified `BBSmallCycle` class members (`SmallCycleData` bundles) |
-| `Codes/BivariateBicycle/Z5Z15F2A6/` | 9 | `cover300_chain_distance_eq_16`, `cover300_pauli_distance_eq_16` — the `[[150,8,8]] → [[300,8,16]]` two-tier instance |
+| `Codes/BivariateBicycle/Z5Z15F2A6/` + `Framework/Homological/{BBCoverTranslate,BBDoubling}` additions | 101 native leaves | `cover300_chain_distance_eq_16`, `cover300_pauli_distance_eq_16` — the `[[150,8,8]] → [[300,8,16]]` instance, **unconditional** since the 2026-08-27 refresh (see below) |
 | `Codes/Concat/SteaneSteane.lean` | 6 | `steaneConcat_hasCodeDistance_nine` — the `[[49,1,9]]` Steane⊗Steane code |
 | `Codes/Concat/SteaneFourQubit.lean` | 6 | `steane422_hasCodeDistance_six` — the `[[28,2,6]]` Steane⊗`[[4,2,2]]` code (the `k₂ = 2` path) |
 | `Codes/RotatedSurface/Three.lean` | 1 | the 3×3 rotated-surface specialization |
@@ -30,12 +30,17 @@ Per-file detail:
   the generator to emit kernel `decide`, or discharging the same obligations
   through the analytic A16 class small-cycle theorem — `BBSmallCycle.lean`
   is explicitly designed so both routes fit the same fields.
-- **`Z5Z15F2A6/`** — `Defs.lean` `coverData` fields (`proj_fiber`, `proj_sec`,
-  `push_A`, `push_B`), `Witness.lean` (`uStar150_mem_cycles`,
-  `chainWeight_uStar150`, `fluxWitness300_dual_raw`, `fluxWitness300_pairing`),
-  `DeckHomotopy.lean` (`pq_bezout`). `Distance.lean` carries **no**
-  `native_decide` but depends entirely on the three that do, so the instance
-  was parked as a unit.
+- **`Z5Z15F2A6/`** — since the 2026-08-27 refresh (see below) this is the
+  full a15/a17 engine at `e6f03ad`: the three floor inputs
+  (`logicalFloor_8`, `lightClassification`, `seamCosetFloor_16`) are
+  kernel-checked theorems and `Distance.lean`'s capstones take no
+  hypotheses (the parametric template statements survive as `*_cond`).
+  Per `e6f03ad`, `#print axioms cover300_pauli_distance_eq_16` = the
+  standard three + 101 named `native_decide` obligations, 0 other. The
+  native leaves are spread across the engine's sweep/certificate files
+  (`SweepWin`, `CertSweep`, `BaseFloor*`, `Light*`, `Seam*`,
+  `WindowEngine`) plus the original `Defs`/`Witness`/`DeckHomotopy`
+  sites.
 - **`Concat/*`** — per file: `*_generatorsIndependent` (×2 sites),
   `witness*_weight`, `*_comm`, `*z*_comm`, `*_anti_*_symp`. These are small
   tables (`2⁸` and `2⁶` for the independence checks) and are the most likely
@@ -46,10 +51,42 @@ Per-file detail:
   case table. Its header notes the `native_decide` there was deliberate, to
   keep the global synthesis path intact (cf. `FiveQubit_5_1_3.lean`).
 
+## 2026-08-27 refresh — the unconditional cover300
+
+This branch was originally cut from `main@7d8bf6d` (the last main state
+still carrying `Z3Z6/`), which predates the a17/a21/a22/a23 discharge
+work: the 13-commit chain ending in `e6f03ad` — `feat(a17):
+d([[300,8,16]]) = 16 UNCONDITIONAL` — lived only on
+`claude/a15-m-kernel-route` and never reached `main`, so neither
+`17aad14`'s removal diff nor this branch's first cut contained it. Until
+the refresh, this branch therefore preserved only the *conditional*
+two-tier snapshot (its `Distance.lean` still called the dangerous-floor
+input an assumption).
+
+The refresh merged the a15 tip `e6f03ad` into this branch, so it now
+preserves:
+
+- `Z5Z15F2A6/` at its final state: `cover300_chain_distance_eq_16` and
+  `cover300_pauli_distance_eq_16` with **no hypotheses** — the program's
+  first solver-free `d > 12` distance theorem.
+- `Framework/Homological/BBCoverTranslate.lean` and the `BBDoubling`
+  extensions the discharge depends on. These coexist with the main-side
+  `BBBocksteinTransport.lean` (a13 L2) that entered via the `7d8bf6d`
+  base; the two sides' declaration sets are disjoint. As of the refresh,
+  `main` has not touched `BBDoubling`/`Homological.lean` since the fork,
+  so the framework deltas would still apply cleanly on a restore.
+
+`e6f03ad` records "Full instance + Z3Z6 regression green" for its own
+tree; the merged union here (a15 + `main@7d8bf6d`'s a13-L2 and
+hosted-env additions) has not been rebuilt end-to-end.
+`claude/a15-m-kernel-route` on origin still preserves the pre-merge a15
+state independently.
+
 ## Restoring one
 
 All six are clean leaves — nothing outside each directory imported their
-declarations. To bring one back:
+declarations (for `Z5Z15F2A6/`, the leaf now also includes its two
+`Framework/Homological` companions from the refresh). To bring one back:
 
 1. Restore the directory (or file) and its sibling umbrella.
 2. Re-add the import line to the parent umbrella: `BivariateBicycle.lean`,
