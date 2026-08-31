@@ -10,23 +10,11 @@ This project formalizes foundational concepts in quantum error correction using 
 
 Along the way, it develops definitions and lemmas for reasoning about qubits, quantum states, and unitary operations, contributing toward a verified foundation for quantum computing and fault tolerance in Lean.
 
-## Try it without installing anything
-
-[**Open in GitHub Codespaces**](https://codespaces.new/Stavan-Jain/QECLean) — a full Lean 4 environment with mathlib cached and the library prebuilt, in the browser. It opens on [`Playground.lean`](Playground.lean).
-
-Both that and the self-hosted [web editor](deploy/README.md) build [`QECLight`](QECLight.lean), which is the library minus the bivariate-bicycle code family: those proofs are memory-hungry kernel checks that a small container or a shared session cannot carry. Everything else — the Pauli and binary-symplectic layer, the stabilizer framework, toric, rotated surface, Steane, Shor, `[[5,1,3]]` — is available. `QECLight` is also a fast way to build the library locally on a modest machine:
-
-```bash
-lake exe cache get && lake build QECLight
-```
-
-See [`deploy/README.md`](deploy/README.md) for running your own instance.
-
 ## Overview
 
 Modules are written in Lean 4 and rely on [mathlib](https://github.com/leanprover-community/mathlib4) for linear algebra and other foundations. Import everything via `QEC`, or use `QEC.Foundations.Foundations` or `QEC.Stabilizer.Stabilizer` for a subset.
 
-This repo contains **only the Lean library** — polished, sorry-free formalizations, in the spirit of [mathlib](https://github.com/leanprover-community/mathlib4) and [cslib](https://github.com/leanprover/cslib). **Everything on `main` depends on exactly mathlib's three standard axioms — `propext`, `Classical.choice`, `Quot.sound` — and nothing else.** No `native_decide` (which would seal a claim behind a compiler-trust axiom instead of checking it in the kernel), no `sorry`, no bespoke `axiom` declarations; an input that cannot yet be proved is carried as a named hypothesis on the theorem, where it is visible in the statement. Verify any result with `#print axioms Your.Theorem`. Work that does not yet clear this bar is parked on a branch rather than merged — see `CLAUDE.md` § "Axiom policy". The research program behind it (the BB-code distance lab, the formalization pipeline, the human-readable proof write-ups, and the dashboard) lives in the companion repo [**qec-lab**](https://github.com/Stavan-Jain/qec-lab), which shares this repo's pre-split git history. New formalizations are developed there and upstreamed here by PR when complete.
+This repo contains **only the Lean library** — sorry-free formalizations, in the spirit of [mathlib](https://github.com/leanprover-community/mathlib4) and [cslib](https://github.com/leanprover/cslib). **Everything on `main` depends on exactly mathlib's three standard axioms — `propext`, `Classical.choice`, `Quot.sound`.** Verify any result with `#print axioms Your.Theorem`. Work that does not yet clear this bar is parked on a branch rather than merged. The research program behind it (the BB-code distance lab, the formalization pipeline, the human-readable proof write-ups, and the dashboard) lives in the companion repo [**qec-lab**](https://github.com/Stavan-Jain/qec-lab), which shares this repo's pre-split git history. New formalizations are developed there and upstreamed here by PR when complete.
 
 ### Features
 
@@ -50,7 +38,7 @@ This repo contains **only the Lean library** — polished, sorry-free formalizat
 grossStabilizerCodeWithDistance : StabilizerCodeWithDistance 144 12 12
 ```
 
-The distance proof is unconditional and axiom-clean — it depends on exactly the standard three axioms (`propext`, `Classical.choice`, `Quot.sound`), with no `native_decide` compiler-trust axiom and no `sorry` — mechanizing the free-ℤ₂-cover argument of the analytic write-up: safe/dangerous sector dichotomy over the `[[72,12,6]]` base, the small-cycle theorem, the light-stabilizer classification, and the Smith-coset confined floor (`QEC/Stabilizer/Codes/BivariateBicycle/`).
+The distance proof is unconditional and axiom-clean.
 
 **The toric family.** For every `L ≥ 2`, the `L × L` toric code is a verified `[[2L², 2, L]]` stabilizer code:
 
@@ -61,7 +49,7 @@ theorem toricCodeN_distance_eq_L (L : ℕ) [Fact (2 ≤ L)] :
 
 Here `toricStabilizerCode L : StabilizerCode (numQubits L) 2` carries `n = 2L²` and `k = 2` in its type (`numQubits L` unfolds to `2 * L * L`); the theorem above supplies `d = L`.
 
-Every step of the homological distance argument is mechanized — no `sorry`s anywhere in the proof:
+Every step of the homological distance argument is mechanized:
 
 - **Chain complex.** `∂₁ ∘ ∂₂ = 0` over `𝔽₂`.
 - **Homology.** `dim(H₁) = 2` via rank-nullity on `∂₁` and `∂₂`.
@@ -69,7 +57,7 @@ Every step of the homological distance argument is mechanized — no `sorry`s an
 - **Distance lower bound.** Any non-trivial cycle has weight `≥ L` (one of `h`, `v` is `1`, forcing one edge per slice across `L` disjoint slices).
 - **CSS bridge.** `d = min(d_X, d_Z)`; both equal `L` by symmetry.
 
-The accompanying expository proof is available as an [interactive write-up](https://stavan-jain.github.io/DistanceBlog/) with diagrams (or the [in-repo version in qec-lab](https://github.com/Stavan-Jain/qec-lab/blob/main/docs/distance_proof.md)).
+An in-progress accompanying expository proof is available as an [interactive write-up](https://stavan-jain.github.io/DistanceBlog/) with diagrams (or the [in-repo version in qec-lab](https://github.com/Stavan-Jain/qec-lab/blob/main/docs/distance_proof.md)).
 
 ## Blueprint
 
