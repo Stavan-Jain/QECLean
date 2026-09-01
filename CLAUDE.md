@@ -284,16 +284,25 @@ These are local to this codebase — search here before assuming mathlib has the
 - `NQubitPauliGroupElement.commutes_iff_even_anticommutes` — main parity-based
   commutation lemma for general Paulis (the "count of anticommuting qubits is
   even" characterization)
-- **`Decidable (NQubitPauliGroupElement.Anticommute p q)`** (in
-  `PauliGroup/Commutation.lean`) — closes `Anticommute p q` goals via
-  `by decide`. The instance is `noncomputable` because `Mul` on
-  `NQubitPauliGroupElement` is itself noncomputable, but `decide` still
-  reduces through the kernel. `native_decide` does **not** work for
-  the same reason — prefer `decide`. Builds on the computable
-  `DecidableEq (NQubitPauliOperator n)` from `Representation.lean`
-  (the `Classical.decEq` override has been removed). Used heavily by
-  the [[5,1,3]] distance proof for the 105-case weight-{1,2}
-  anti-witness tables.
+- **`DecidableEq (NQubitPauliGroupElement n)`** and
+  **`Decidable (NQubitPauliGroupElement.Anticommute p q)`** (global instances in
+  `PauliGroup/Commutation.lean`) — close element-equality, commutation
+  (`p * q = q * p`), and `Anticommute p q` goals on literal elements via
+  `by decide`. Every pairwise commutation/anticommutation lemma in the concrete
+  codes is a one-liner through these; do **not** batch all pairs of a generator
+  list into a single `decide` (the nested evaluation blows
+  `maxRecDepth`/heartbeats — keep one named lemma per pair). The `Anticommute`
+  instance is `noncomputable` because `Mul` on `NQubitPauliGroupElement` is
+  itself noncomputable, but `decide` still reduces through the kernel;
+  `native_decide` does **not** work for the same reason — prefer `decide`.
+  Builds on the computable `DecidableEq (NQubitPauliOperator n)` from
+  `Representation.lean` (the `Classical.decEq` override has been removed). Used
+  heavily by the [[5,1,3]] distance proof for the 105-case weight-{1,2}
+  anti-witness tables. (These were file-local to `FiveQubit_5_1_3.lean` while
+  `RotatedSurfaceCode3.lean`'s `native_decide` proof needed the Pi-decidability
+  synthesis path; that proof is parked, so they are global again. For symbolic
+  /parametric elements `decide` does not apply — use the
+  `pauli_comm_even_anticommutes` tactic + explicit anticommute-`Finset` pattern.)
 - `StabilizerGroup`, `.toSubgroup`, `.is_abelian`, `.one_mem`,
   `.neg_identity_not_mem`, `.codespaceSubmodule`
 - `IsNontrivialLogicalOperator` has **three** conditions (see

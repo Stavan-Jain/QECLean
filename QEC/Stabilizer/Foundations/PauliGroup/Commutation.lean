@@ -243,12 +243,30 @@ and finally `Decidable (Anticommute p q)`. The `Anticommute` instance is
 is noncomputable, but the kernel can still reduce `decide` through it.
 (`native_decide` does not work for the same reason — prefer `decide`.) -/
 
--- (Stage-4 follow-up for stab_5_1_3 added a `DecidableEq
--- (NQubitPauliGroupElement n)` and `Decidable Anticommute` here, but they
--- caused a downstream synthesis failure in RotatedSurfaceCode3's
--- native_decide proof. They are temporarily removed pending a clean
--- resolution. stab_5_1_3's distance proof currently DOES NOT BUILD
--- against this configuration — needs refactor.)
+-- (History: these two instances were briefly global during Stage 4 of stab_5_1_3,
+-- were localised into `FiveQubit_5_1_3.lean` after they disrupted typeclass
+-- synthesis in RotatedSurfaceCode3.lean's `native_decide` proof, and are global
+-- again now that that proof is parked off `main` and `native_decide` is banned.
+-- If the parked branch `claude/z3z6-parked` is ever revived, its `native_decide`
+-- proofs will need re-checking against this instance pool.)
+
+/-- `DecidableEq` on `NQubitPauliGroupElement n` via field-wise decision, computable
+through the `DecidableEq (NQubitPauliOperator n)` instance from `Representation.lean`.
+Besides equality goals, this is what lets `decide` close concrete commutation checks
+`p * q = q * p` on literal elements — the pairwise-commutation lemmas of the concrete
+codes are one-line `by decide` proofs through this instance. -/
+instance instDecidableEq : DecidableEq (NQubitPauliGroupElement n) := fun p q =>
+  decidable_of_iff (p.phasePower = q.phasePower ∧ p.operators = q.operators)
+    ⟨fun ⟨h1, h2⟩ => by cases p; cases q; simp_all,
+     fun h => by cases h; exact ⟨rfl, rfl⟩⟩
+
+/-- `Decidable (Anticommute p q)`: `Anticommute` unfolds to an equality of two Pauli
+group elements, decided via `instDecidableEq`. Marked `noncomputable` because `*` on
+`NQubitPauliGroupElement` is noncomputable; `decide` still reduces through the
+kernel. (`native_decide` does not work for the same reason — prefer `decide`.) -/
+noncomputable instance instDecidableAnticommute (p q : NQubitPauliGroupElement n) :
+    Decidable (Anticommute p q) :=
+  show Decidable (p * q = minusOne n * (q * p)) from inferInstance
 
 /-- Anticommutation reduces to the mulOp phase differing by 2 (mod 4). -/
 lemma anticommutes_iff_mulOp_phasePower (p q : NQubitPauliGroupElement n) :

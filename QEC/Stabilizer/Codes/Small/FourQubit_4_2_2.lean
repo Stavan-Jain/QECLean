@@ -106,15 +106,7 @@ lemma XGenerators_are_XType :
 `ZZZZ` and `XXXX` overlap at all 4 qubits, so they anticommute pairwise at all 4
 positions — count is 4 (even) ⇒ commute. -/
 
-private lemma Z1_comm_X1 : Z1 * X1 = X1 * Z1 := by
-  classical
-  pauli_comm_even_anticommutes
-  let p := NQubitPauliGroupElement.anticommutesAt (n := 4) Z1.operators X1.operators
-  have hfilter : (Finset.univ.filter p) = ({0, 1, 2, 3} : Finset (Fin 4)) := by
-    ext i; fin_cases i <;>
-      simp [p, NQubitPauliGroupElement.anticommutesAt, Z1, X1, NQubitPauliOperator.set,
-        PauliOperator.mulOp]
-  rw [hfilter]; decide
+private lemma Z1_comm_X1 : Z1 * X1 = X1 * Z1 := by decide
 
 /-- The unique Z-generator commutes with the unique X-generator (the only cross
 case for this CSS code). -/
@@ -234,33 +226,11 @@ def logicalZ_2 : NQubitPauliGroupElement 4 := σ[IZIZ]
 
 /-- `X̄₁` and `Z̄₁` anticommute (overlap at qubit 3 only — odd parity). -/
 theorem logicalX_1_anticommutes_logicalZ_1 :
-    NQubitPauliGroupElement.Anticommute logicalX_1 logicalZ_1 := by
-  classical
-  pauli_anticomm_odd_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 4)
-              logicalX_1.operators logicalZ_1.operators)) =
-        ({3} : Finset (Fin 4)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, logicalX_1, logicalZ_1,
-        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
-  rw [hfilter]; decide
+    NQubitPauliGroupElement.Anticommute logicalX_1 logicalZ_1 := by decide
 
 /-- `X̄₂` and `Z̄₂` anticommute (overlap at qubit 3 only — odd parity). -/
 theorem logicalX_2_anticommutes_logicalZ_2 :
-    NQubitPauliGroupElement.Anticommute logicalX_2 logicalZ_2 := by
-  classical
-  pauli_anticomm_odd_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 4)
-              logicalX_2.operators logicalZ_2.operators)) =
-        ({3} : Finset (Fin 4)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, logicalX_2, logicalZ_2,
-        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
-  rw [hfilter]; decide
+    NQubitPauliGroupElement.Anticommute logicalX_2 logicalZ_2 := by decide
 
 /-! ### Off-diagonal logical commutation (the k = 2 novelty) -/
 
@@ -271,33 +241,11 @@ theorem logicalX_1_commutes_logicalX_2 :
 
 /-- `X̄₁` and `Z̄₂` commute (anticommute at qubits 1 and 3, count 2 = even). -/
 theorem logicalX_1_commutes_logicalZ_2 :
-    logicalX_1 * logicalZ_2 = logicalZ_2 * logicalX_1 := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 4)
-              logicalX_1.operators logicalZ_2.operators)) =
-        ({1, 3} : Finset (Fin 4)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, logicalX_1, logicalZ_2,
-        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
-  rw [hfilter]; decide
+    logicalX_1 * logicalZ_2 = logicalZ_2 * logicalX_1 := by decide
 
 /-- `X̄₂` and `Z̄₁` commute (anticommute at qubits 2 and 3, count 2 = even). -/
 theorem logicalX_2_commutes_logicalZ_1 :
-    logicalX_2 * logicalZ_1 = logicalZ_1 * logicalX_2 := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 4)
-              logicalX_2.operators logicalZ_1.operators)) =
-        ({2, 3} : Finset (Fin 4)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, logicalX_2, logicalZ_1,
-        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
-  rw [hfilter]; decide
+    logicalX_2 * logicalZ_1 = logicalZ_1 * logicalX_2 := by decide
 
 /-- `Z̄₁` and `Z̄₂` commute (both Z-type — trivial). -/
 theorem logicalZ_1_commutes_logicalZ_2 :
@@ -306,34 +254,12 @@ theorem logicalZ_1_commutes_logicalZ_2 :
 
 /-! ### Logical operators are in the centralizer -/
 
-private lemma logicalX_1_commutes_Z1 : logicalX_1 * Z1 = Z1 * logicalX_1 := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 4)
-              logicalX_1.operators Z1.operators)) =
-        ({1, 3} : Finset (Fin 4)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, logicalX_1, Z1,
-        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
-  rw [hfilter]; decide
+private lemma logicalX_1_commutes_Z1 : logicalX_1 * Z1 = Z1 * logicalX_1 := by decide
 
 private lemma logicalX_1_commutes_X1 : logicalX_1 * X1 = X1 * logicalX_1 := by
   pauli_comm_componentwise [logicalX_1, X1]
 
-private lemma logicalX_2_commutes_Z1 : logicalX_2 * Z1 = Z1 * logicalX_2 := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 4)
-              logicalX_2.operators Z1.operators)) =
-        ({2, 3} : Finset (Fin 4)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, logicalX_2, Z1,
-        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
-  rw [hfilter]; decide
+private lemma logicalX_2_commutes_Z1 : logicalX_2 * Z1 = Z1 * logicalX_2 := by decide
 
 private lemma logicalX_2_commutes_X1 : logicalX_2 * X1 = X1 * logicalX_2 := by
   pauli_comm_componentwise [logicalX_2, X1]
@@ -341,34 +267,12 @@ private lemma logicalX_2_commutes_X1 : logicalX_2 * X1 = X1 * logicalX_2 := by
 private lemma logicalZ_1_commutes_Z1 : logicalZ_1 * Z1 = Z1 * logicalZ_1 := by
   pauli_comm_componentwise [logicalZ_1, Z1]
 
-private lemma logicalZ_1_commutes_X1 : logicalZ_1 * X1 = X1 * logicalZ_1 := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 4)
-              logicalZ_1.operators X1.operators)) =
-        ({2, 3} : Finset (Fin 4)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, logicalZ_1, X1,
-        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
-  rw [hfilter]; decide
+private lemma logicalZ_1_commutes_X1 : logicalZ_1 * X1 = X1 * logicalZ_1 := by decide
 
 private lemma logicalZ_2_commutes_Z1 : logicalZ_2 * Z1 = Z1 * logicalZ_2 := by
   pauli_comm_componentwise [logicalZ_2, Z1]
 
-private lemma logicalZ_2_commutes_X1 : logicalZ_2 * X1 = X1 * logicalZ_2 := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 4)
-              logicalZ_2.operators X1.operators)) =
-        ({1, 3} : Finset (Fin 4)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, logicalZ_2, X1,
-        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
-  rw [hfilter]; decide
+private lemma logicalZ_2_commutes_X1 : logicalZ_2 * X1 = X1 * logicalZ_2 := by decide
 
 /-- `X̄₁ = IXIX` commutes with every element of the stabilizer (vs. `ZZZZ` even
 overlap at qubits 1, 3; vs. `XXXX` all X — both commute). -/
