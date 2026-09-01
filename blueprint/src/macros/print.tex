@@ -27,3 +27,65 @@
  {\clist_map_inline:nn{#1}{\vphantom{\ref{##1}}}%
   \ignorespaces}
 \ExplSyntaxOff
+
+% ---------------------------------------------------------------------------
+% cleveref names for the shared-counter theorem environments.
+%
+% macros/common.tex declares proposition/lemma/corollary/definition as
+% `\newtheorem{...}[theorem]{...}` so that they all share one numbering
+% sequence. cleveref names a reference after the *counter* the environment
+% steps, not after the environment, so all four rendered as "theorem N" --
+% `\cref{def:pauli-group-element}` on a definition printed "theorem 2".
+%
+% aliascnt fixes this without disturbing the numbering: `\newaliascnt{definition}
+% {theorem}` makes \c@definition and \c@theorem the very same counter, so
+% re-declaring the environment against `definition` keeps the shared sequence
+% while giving cleveref a distinct counter name to look up. The environments
+% already exist at this point, so \let each one back to \relax first --
+% \newtheorem refuses to redefine a live command.
+%
+% Print-only: plasTeX takes the name from the environment's caption rather than
+% from a counter, so the web version already rendered these correctly.
+% ---------------------------------------------------------------------------
+\usepackage{aliascnt}
+
+\newcommand{\bpaliascounter}[2]{%
+  \newaliascnt{#1}{theorem}%
+  \expandafter\let\csname #1\endcsname\relax
+  \expandafter\let\csname end#1\endcsname\relax
+  \newtheorem{#1}[#1]{#2}%
+  \aliascntresetthe{#1}%
+}
+\theoremstyle{plain}
+\bpaliascounter{proposition}{Proposition}
+\bpaliascounter{lemma}{Lemma}
+\bpaliascounter{corollary}{Corollary}
+\theoremstyle{definition}
+\bpaliascounter{definition}{Definition}
+
+% ---------------------------------------------------------------------------
+% Bracket-safe theorem notes.
+%
+% amsthm grabs the optional note of \begin{theorem}[...] with a scan delimited
+% by the first `]`, so a title containing brackets -- every `[[n,k,d]]` title in
+% this blueprint -- ends the note early and drops the remainder into math mode.
+% Six nodes hit this (def:steane7, def:shor9, def:five-qubit, def:four-qubit,
+% def:iceberg, thm:base-distance).
+%
+% Re-grab the note with an xparse `o` argument, which balances nested brackets,
+% and hand it to the original environment wrapped in braces so amsthm's scan
+% never sees a bracket. Only the pdf build needs this: plasTeX parses the
+% optional argument itself and renders these titles correctly as they stand.
+% ---------------------------------------------------------------------------
+\newcommand{\bracketsafethm}[1]{%
+  \expandafter\let\csname bpsafe@#1\expandafter\endcsname\csname #1\endcsname
+  \expandafter\let\csname endbpsafe@#1\expandafter\endcsname\csname end#1\endcsname
+  \RenewDocumentEnvironment{#1}{o}
+    {\IfValueTF{##1}{\csname bpsafe@#1\endcsname[{##1}]}{\csname bpsafe@#1\endcsname}}
+    {\csname endbpsafe@#1\endcsname}%
+}
+\bracketsafethm{theorem}
+\bracketsafethm{proposition}
+\bracketsafethm{lemma}
+\bracketsafethm{corollary}
+\bracketsafethm{definition}

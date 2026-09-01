@@ -43,21 +43,29 @@ the shape of the dependency graph — no dependency is written by hand.
 
 ## Rebuilding
 
+An edit here does not reach either rendering until the emitted LaTeX under
+`.lake/build/blueprint` is regenerated -- `content.tex` reads that directory,
+not this file, so skipping the second step re-renders the previous prose
+without complaining.
+
 ```
 lake build QECBlueprint            -- elaborate the annotations
 lake build QECBlueprint:blueprint  -- emit the LaTeX under .lake/build/blueprint
-leanblueprint web && leanblueprint pdf
+leanblueprint web                  -- render blueprint/web
 ```
+
+For the pdf, `bash scripts/build-blueprint-pdf.sh` does all three (`--tex-only`
+skips the two lake builds) and needs neither `leanblueprint` nor `latexmk`.
 
 See `blueprint/README.md`. Use `#show_blueprint Some.Decl` to inspect a single
 extracted node.
 -/
 
-/-! ## Chapter 1 — The Pauli group -/
+/-! ## Chapter 2 — The Pauli group -/
 
 attribute [blueprint "def:pauli-operator"
   (title := /-- Single-qubit Pauli operator -/)
-  (statement := /-- The four single-qubit Pauli *operators* $I$, $X$, $Y$, $Z$,
+  (statement := /-- The four single-qubit Pauli \emph{operators} $I$, $X$, $Y$, $Z$,
     taken without a phase. This is the operator part of a Pauli group element;
     the phase is tracked separately by \cref{def:pauli-group-element}. -/)]
   Quantum.PauliOperator
@@ -73,7 +81,7 @@ attribute [blueprint "def:pauli-group-element"
 
 attribute [blueprint "def:nqubit-pauli-operator"
   (title := /-- $n$-qubit Pauli operator -/)
-  (statement := /-- An $n$-qubit Pauli *operator* is a function
+  (statement := /-- An $n$-qubit Pauli \emph{operator} is a function
     $\mathrm{Fin}\,n \to \{I,X,Y,Z\}$, i.e. one single-qubit Pauli per qubit.
     Again this is the phase-free part. -/)]
   Quantum.NQubitPauliOperator
@@ -91,9 +99,8 @@ attribute [blueprint "def:nqubit-pauli-group"
 attribute [blueprint "def:pauli-to-matrix"
   (title := /-- Matrix representation -/)
   (statement := /-- The unitary matrix $i^a\, P_1 \otimes \cdots \otimes P_n$ on
-    $(\C^2)^{\otimes n}$ represented by a Pauli group element. This is the
-    semantic anchor of the formalization: it is what makes the syntactic
-    bookkeeping over $\Z_4 \times \{I,X,Y,Z\}^n$ a statement about operators on
+    $(\C^2)^{\otimes n}$ represented by a Pauli group element. It interprets the syntactic
+    bookkeeping over $\Z_4 \times \{I,X,Y,Z\}^n$ as a statement about operators on
     a Hilbert space. -/)]
   Quantum.NQubitPauliGroupElement.toMatrix
 
@@ -126,14 +133,13 @@ attribute [blueprint "def:pauli-weight"
   (title := /-- Weight -/)
   (statement := /-- The weight $\wt(g)$ of a Pauli group element is the
     cardinality of its support (\cref{def:pauli-support}) — the number of qubits
-    it acts on nontrivially. Code distance is a statement about weights. -/)]
+    it acts on nontrivially. -/)]
   Quantum.NQubitPauliGroupElement.weight
 
 attribute [blueprint "def:anticommutes-at"
   (title := /-- Local anticommutation -/)
-  (statement := /-- Two $n$-qubit Pauli operators *anticommute at qubit $i$* if
-    their $i$-th single-qubit operators are distinct and neither is $I$. This is
-    the local test whose global parity governs commutation. -/)]
+  (statement := /-- Two $n$-qubit Pauli operators \emph{anticommute at qubit $i$} if
+    their $i$-th single-qubit operators are distinct and neither is $I$. -/)]
   Quantum.NQubitPauliGroupElement.anticommutesAt
 
 attribute [blueprint "thm:commutes-iff-even"
@@ -150,9 +156,9 @@ attribute [blueprint "thm:commutes-iff-even"
 
 attribute [blueprint "def:anticommute"
   (title := /-- Anticommutation -/)
-  (statement := /-- $p$ and $q$ *anticommute* when $pq = -qp$. Anticommutation
-    with a stabilizer generator is the syndrome signal that detects an
-    error. -/)]
+  (statement := /-- Two elements $p, q \in \mathcal{P}_n$ \emph{anticommute} when
+    $pq = -qp$. Anticommutation with a stabilizer generator is the syndrome
+    signal that detects an error. -/)]
   Quantum.NQubitPauliGroupElement.Anticommute
 
 attribute [blueprint "thm:commute-or-anticommute"
@@ -164,22 +170,20 @@ attribute [blueprint "thm:commute-or-anticommute"
     either $+1$ or $-1$. -/)]
   Quantum.NQubitPauliGroupElement.commute_or_anticommute
 
-/-! ## Chapter 2 — The binary symplectic representation -/
+/-! ## Chapter 3 — The binary symplectic representation -/
 
 attribute [blueprint "def:to-symplectic"
   (title := /-- Symplectic vector of a Pauli operator -/)
-  (statement := /-- The linear-algebra shadow of a Pauli operator: an $n$-qubit
-    Pauli operator is sent to a vector in $\F_2^{2n}$, recording in its first
+  (statement := /-- A linear-algebra semantics of a Pauli operator: an $n$-qubit
+    Pauli operator is interpreted as a vector in $\F_2^{2n}$, recording in its first
     $n$ coordinates which qubits carry an $X$ component and in its last $n$
-    which carry a $Z$ component (so $Y$ contributes to both). Products of Paulis
-    become sums of vectors, which is what turns questions about the group
-    $\mathcal{P}_n$ into linear algebra over $\F_2$. -/)]
+    which carry a $Z$ component (and $Y$ contributes to both). -/)]
   Quantum.NQubitPauliOperator.toSymplectic
 
 attribute [blueprint "thm:to-symplectic-injective"
   (title := /-- The symplectic representation is faithful -/)
   (statement := /-- \Cref{def:to-symplectic} is injective: a Pauli operator is
-    determined by its symplectic vector. Phases are of course not recorded. -/)
+    determined by its symplectic vector. Phases are not recorded. -/)
   (proof := /-- The pair of bits at position $i$ determines the $i$-th
     single-qubit operator, since the four Paulis $I, X, Z, Y$ are sent to the
     four distinct pairs $(0,0)$, $(1,0)$, $(0,1)$, $(1,1)$. -/)]
@@ -195,9 +199,7 @@ attribute [blueprint "def:symplectic-inner"
 attribute [blueprint "thm:commutes-iff-symplectic"
   (title := /-- Commutation is symplectic orthogonality -/)
   (statement := /-- Two elements of $\mathcal{P}_n$ commute if and only if their
-    symplectic vectors are orthogonal under \cref{def:symplectic-inner}. This is
-    the bridge that lets the whole theory be done with linear algebra over
-    $\F_2$: an abelian subgroup becomes a self-orthogonal subspace. -/)
+    symplectic vectors are orthogonal under \cref{def:symplectic-inner}. -/)
   (proof := /-- By \cref{thm:commutes-iff-even} commutation is the parity of the
     number of locally anticommuting qubits. Qubit $i$ contributes $1$ to
     $\langle u, v \rangle$ exactly when the two single-qubit operators there are
@@ -221,7 +223,7 @@ attribute [blueprint "def:rows-linear-independent"
     discharge the independence obligation of \cref{def:stabilizer-code}. -/)]
   Quantum.NQubitPauliGroupElement.rowsLinearIndependent
 
-/-! ## Chapter 3 — Stabilizer groups and the codespace -/
+/-! ## Chapter 4 — Stabilizer groups and the codespace -/
 
 attribute [blueprint "def:is-stabilized-by"
   (title := /-- Stabilized state -/)
@@ -232,7 +234,7 @@ attribute [blueprint "def:is-stabilized-by"
 
 attribute [blueprint "def:stabilizer-group"
   (title := /-- Stabilizer group -/)
-  (statement := /-- A *stabilizer group* is an abelian subgroup
+  (statement := /-- A \emph{stabilizer group} is an abelian subgroup
     $\mathcal{S} \le \mathcal{P}_n$ that does not contain $-I$. The two
     conditions are exactly what is needed for the common $+1$ eigenspace to be
     nonzero: commutativity makes the eigenspace projectors compatible, and
@@ -246,7 +248,7 @@ attribute [blueprint "thm:neg-identity-not-mem"
   (proof := /-- Immediate from the defining field of
     \cref{def:stabilizer-group}. It is recorded separately because it is the
     obligation that concrete codes must discharge by hand, and it is the step
-    that fails for a would-be "stabilizer group" generated by anticommuting
+    that fails for a would-be ``stabilizer group" generated by anticommuting
     operators. -/)]
   Quantum.StabilizerGroup.neg_identity_not_mem
 
@@ -260,9 +262,7 @@ attribute [blueprint "def:codespace"
 attribute [blueprint "def:stabilizer-sum"
   (title := /-- Stabilizer sum -/)
   (statement := /-- The operator $\sum_{g \in \mathcal{S}} g$, which is
-    $|\mathcal{S}|$ times the orthogonal projector onto the codespace. Summing
-    over the group is the standard route to showing the codespace is
-    nonzero. -/)]
+    $|\mathcal{S}|$ times the orthogonal projector onto the codespace. -/)]
   Quantum.StabilizerGroup.stabilizerSum
 
 attribute [blueprint "thm:codespace-nonempty"
@@ -281,8 +281,7 @@ attribute [blueprint "def:centralizer"
   (title := /-- Centralizer -/)
   (statement := /-- The centralizer $\mathcal{C}(\mathcal{S})$ of a stabilizer
     group inside $\mathcal{P}_n$: the Pauli operators commuting with every
-    element of $\mathcal{S}$. These are exactly the operators that preserve the
-    codespace, so they are the candidates for logical operators. -/)]
+    element of $\mathcal{S}$.  -/)]
   Quantum.StabilizerGroup.centralizer
 
 attribute [blueprint "thm:normalizer-eq-centralizer"
@@ -290,30 +289,73 @@ attribute [blueprint "thm:normalizer-eq-centralizer"
   (statement := /-- For a stabilizer group, the Pauli normalizer and the
     centralizer coincide. This is special to the Pauli group and is the reason
     the literature uses the two words interchangeably here. -/)
-  (proof := /-- One inclusion is general. Conversely, if $g$ normalizes
+  (proof := /-- The first inclusion is immediate. Conversely, if $g$ normalizes
     $\mathcal{S}$ then for $s \in \mathcal{S}$ we have
-    $gsg^{-1} \in \mathcal{S}$, and by \cref{thm:commute-or-anticommute} that
-    conjugate is $\pm s$. The value $-s$ is impossible: it would put
+    $gsg^{-1} \in \mathcal{S}$, and by \cref{thm:commute-or-anticommute}
+    that conjugate is $\pm s$. The value $-s$ is impossible: it would put
     $-I = (-s)s^{-1}$ in $\mathcal{S}$, contradicting
-    \cref{thm:neg-identity-not-mem}. So $gsg^{-1} = s$. -/)]
+    \cref{thm:neg-identity-not-mem}. We conclude that
+    $gsg^{-1} = s$ and so $g \in \mathcal{C}(\mathcal{S})$. -/)]
   Quantum.StabilizerGroup.pauliNormalizer_eq_centralizer
 
 attribute [blueprint "thm:stabilizer-le-centralizer"
   (title := /-- The stabilizer sits inside its centralizer -/)
   (statement := /-- $\mathcal{S} \le \mathcal{C}(\mathcal{S})$. -/)
-  (proof := /-- Restatement of commutativity of \cref{def:stabilizer-group}. The
-    quotient $\mathcal{C}(\mathcal{S})/\mathcal{S}$ is what carries the logical
-    operators. -/)]
+  (proof := /-- Restatement of commutativity of \cref{def:stabilizer-group}. -/)]
   Quantum.StabilizerGroup.stabilizer_le_centralizer
 
-/-! ## Chapter 4 — Logical operators, codes, and distance -/
+/-! ## Chapter 5 — Logical operators, codes, and distance -/
+
+attribute [blueprint "def:logical-gate"
+  (title := /-- Logical gate -/)
+  (statement := /-- A unitary $U$ on $n$ qubits is a \emph{logical gate} for
+    $\mathcal{S}$ when it belongs to the logical gate group: for every
+    $g \in \mathcal{S}$ and every codespace state $\psi$, the conjugate
+    $U g U^{\dagger}$ fixes $\psi$. -/)]
+  Quantum.StabilizerGroup.IsLogicalGate
+
+attribute [blueprint "thm:logical-gate-iff"
+  (title := /-- Logical gates preserve the codespace -/)
+  (statement := /-- $U$ is a logical gate for $\mathcal{S}$ if and only if
+    $U\psi$ lies in the codespace whenever $\psi$ does. -/)
+  (proof := /-- The conjugation condition says $U g U^{\dagger}$ fixes every
+    codespace state. Extend it from unit vectors to the whole codespace
+    submodule by linearity, which also shows $U^{\dagger}$ maps the codespace
+    into itself; then for $\psi$ in the codespace and $g \in \mathcal{S}$,
+    $g U \psi = U (U^{\dagger} g U) \psi = U \psi$. Conversely, if $U$ maps the
+    codespace into itself then $U^{\dagger}$ does too, and the conjugation
+    identity follows by applying $g$ to $U^{\dagger}\psi$. -/)]
+  Quantum.StabilizerGroup.isLogicalGate_iff
 
 attribute [blueprint "def:pauli-logical"
   (title := /-- Pauli logical operator -/)
-  (statement := /-- A Pauli operator is *logical* when it lies in the
-    centralizer \cref{def:centralizer}, i.e. it commutes with every stabilizer
-    and therefore maps the codespace to itself. -/)]
+  (statement := /-- A Pauli group element is a \emph{logical operator} when the
+    unitary it represents (\cref{def:pauli-to-matrix}) is a logical gate
+    (\cref{def:logical-gate}). The defining condition is therefore semantic ---
+    it is about the action on the codespace, not about commutation. -/)]
   Quantum.StabilizerGroup.IsPauliLogicalOperator
+
+attribute [blueprint "thm:pauli-logical-iff-centralizer"
+  (title := /-- Logical operators are exactly the centralizer -/)
+  (statement := /-- A Pauli group element preserves the codespace if and only if
+    it lies in the centralizer (\cref{def:centralizer}), i.e. commutes with
+    every stabilizer. -/)
+  (proof := /-- If $g$ commutes with every $s \in \mathcal{S}$ then for $\psi$
+    in the codespace, $s(g\psi) = g(s\psi) = g\psi$, so $g\psi$ is again in the
+    codespace; unitarity of $g$ is what makes this an honest state.
+
+    Conversely, suppose $g \notin \mathcal{C}(\mathcal{S})$. Then some
+    $s \in \mathcal{S}$ fails to commute with $g$, and by
+    \cref{thm:commute-or-anticommute} it anticommutes. For $\psi$ in the
+    codespace, $s(g\psi) = -g(s\psi) = -g\psi$, so $g\psi$ would have to be
+    both fixed and negated by $s$, forcing $g\psi = 0$ --- impossible for a
+    unitary applied to a state, and the codespace is nonempty by
+    \cref{thm:codespace-nonempty}. So $g$ is not a logical operator.
+
+    This equivalence is what licenses the rest of the development to work with
+    commutation alone: every later logicality check is a finite commutation
+    test, and this theorem is why that suffices. -/)]
+  Quantum.StabilizerGroup.isPauliLogicalOperator_iff_mem_centralizer
 
 attribute [blueprint "thm:logical-iff-generators"
   (title := /-- Checking logicality on generators -/)
@@ -327,7 +369,7 @@ attribute [blueprint "thm:logical-iff-generators"
 
 attribute [blueprint "def:nontrivial-logical"
   (title := /-- Nontrivial logical operator -/)
-  (statement := /-- A *nontrivial* logical operator is one that acts on the
+  (statement := /-- A \emph{nontrivial} logical operator is one that acts on the
     encoded information rather than fixing it. The predicate has three
     conditions: $g$ is in the centralizer, $g \notin \mathcal{S}$, and no
     element of $\mathcal{S}$ has the same operator part as $g$.
@@ -387,13 +429,13 @@ attribute [blueprint "def:stabilizer-code"
   (statement := /-- An $[[n,k]]$ stabilizer code: a list of $n-k$ independent,
     pairwise commuting generators avoiding $-I$, together with $k$ pairs of
     logical operators (\cref{def:logical-qubit-ops}). The type carries $n$ and
-    $k$, so instantiating it *is* the theorem that a given family of operators
+    $k$, so instantiating it \emph{is} the theorem that a given family of operators
     encodes $k$ qubits into $n$. -/)]
   Quantum.StabilizerGroup.StabilizerCode
 
 attribute [blueprint "def:has-code-distance"
   (title := /-- Code distance -/)
-  (statement := /-- A code *has distance $d$* when every nontrivial logical
+  (statement := /-- A code \emph{has distance $d$} when every nontrivial logical
     operator (\cref{def:nontrivial-logical}) has weight at least $d$, and some
     nontrivial logical operator has weight exactly $d$. Both halves matter: the
     lower bound is the error-correction guarantee, the witness makes the value
@@ -415,7 +457,7 @@ attribute [blueprint "def:code-with-distance"
     development are inhabitants of this type. -/)]
   Quantum.StabilizerGroup.StabilizerCodeWithDistance
 
-/-! ## Chapter 5 — CSS structure -/
+/-! ## Chapter 6 — CSS structure -/
 
 attribute [blueprint "def:x-type"
   (title := /-- $X$-type element -/)
@@ -444,7 +486,7 @@ attribute [blueprint "thm:css-distance-two"
     \cref{chap:codes}. -/)]
   Quantum.StabilizerGroup.hasCodeDistance_two_of_anticommute_witness
 
-/-! ## Chapter 6 — The homological framework -/
+/-! ## Chapter 7 — The homological framework -/
 
 attribute [blueprint "def:homological-code"
   (title := /-- Homological code -/)
@@ -488,7 +530,7 @@ attribute [blueprint "def:H1"
   (title := /-- First homology -/)
   (statement := /-- $H_1 = Z_1 / B_1$ (\cref{def:cycles},
     \cref{def:boundaries}). The slogan of the whole framework is
-    *logical operators are homology classes*: nontrivial logical operators
+    \emph{logical operators are homology classes}: nontrivial logical operators
     correspond to nonzero classes in $H_1$, and the code distance is the minimum
     weight of a chain representing a nonzero class. -/)]
   Quantum.Stabilizer.Homological.HomologicalCode.H1
@@ -560,7 +602,7 @@ attribute [blueprint "thm:chain-weight-transfer"
     the toric family and the gross code. -/)]
   Quantum.Stabilizer.Homological.HomologicalCode.chainWeight_lower_bound_transfers
 
-/-! ## Chapter 7 — The toric code -/
+/-! ## Chapter 8 — The toric code -/
 
 attribute [blueprint "def:toric-chain-complex"
   (title := /-- The toric chain complex -/)
@@ -640,7 +682,7 @@ attribute [blueprint "def:toric-code"
     The natural generating set has $2L^2$ elements, two more than the
     $n - k = 2L^2 - 2$ that \cref{def:stabilizer-code} demands, because the
     vertex checks multiply to the identity and so do the face checks. The
-    packaging therefore uses a *trimmed* list, and the homological identities
+    packaging therefore uses a \emph{trimmed} list, and the homological identities
     are what prove the trimmed list generates the same subgroup. -/)]
   Quantum.StabilizerGroup.ToricCodeN.toricStabilizerCode
 
@@ -683,7 +725,7 @@ attribute [blueprint "def:toric-code-with-distance"
     \cref{def:code-with-distance}, for every $L \ge 2$. -/)]
   Quantum.StabilizerGroup.ToricCodeN.toricStabilizerCodeWithDistance
 
-/-! ## Chapter 8 — Bivariate-bicycle codes and the gross code -/
+/-! ## Chapter 9 — Bivariate-bicycle codes and the gross code -/
 
 attribute [blueprint "def:x-double-cover"
   (title := /-- Free $\Z_2$ cover of a bivariate-bicycle complex -/)
@@ -738,9 +780,9 @@ attribute [blueprint "thm:gross-logical-weight"
 attribute [blueprint "thm:gross-sector-dichotomy"
   (title := /-- Safe and dangerous sectors -/)
   (statement := /-- Every nontrivial gross logical operator falls into one of
-    two sectors, and in each the weight is at least twelve: the *safe* sector,
+    two sectors, and in each the weight is at least twelve: the \emph{safe} sector,
     where the two sheets of the cover contribute independently, and the
-    *dangerous* sector, where they do not and a finer argument is needed. -/)
+    \emph{dangerous} sector, where they do not and a finer argument is needed. -/)
   (proof := /-- In the safe sector the class survives to each sheet separately,
     so \cref{thm:gross-logical-weight} applies twice and the weights add to at
     least $6 + 6 = 12$. The dangerous sector is where the deck transformation
@@ -773,7 +815,7 @@ attribute [blueprint "def:gross-code-with-distance"
     development. -/)]
   Quantum.Stabilizer.Homological.BB.grossStabilizerCodeWithDistance
 
-/-! ## Chapter 9 — Small and parametric code instances -/
+/-! ## Chapter 10 — Code instances -/
 
 attribute [blueprint "def:steane7"
   (title := /-- The Steane $[[7,1,3]]$ code -/)
@@ -799,7 +841,7 @@ attribute [blueprint "def:five-qubit"
 
 attribute [blueprint "def:four-qubit"
   (title := /-- The $[[4,2,2]]$ code -/)
-  (statement := /-- The smallest error-*detecting* code, encoding two qubits
+  (statement := /-- The smallest error-\emph{detecting} code, encoding two qubits
     with distance two. Its distance is closed by
     \cref{thm:css-distance-two}. -/)]
   Quantum.StabilizerGroup.FourQubit_4_2_2.stabilizerCodeWithDistance
@@ -821,7 +863,6 @@ attribute [blueprint "def:rotated-surface"
 attribute [blueprint "def:repetition-n"
   (title := /-- The $n$-qubit repetition code -/)
   (statement := /-- The bit-flip repetition code as a stabilizer code, with
-    $Z_i Z_{i+1}$ generators. It has distance one as a *quantum* code — phase
-    errors are undetectable — which is why it appears here as a degenerate
-    reference point rather than as a usable code. -/)]
+    $Z_i Z_{i+1}$ generators. It has distance one as a \emph{quantum} code — phase
+    errors are undetectable. -/)]
   Quantum.StabilizerGroup.RepetitionCodeN.stabilizerCode

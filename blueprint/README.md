@@ -59,6 +59,28 @@ bash scripts/check-blueprint-render.sh   # assert the nodes actually rendered
 `kpsewhich` has no default search path of its own. A full TeX Live installation
 sets one up and you can drop the prefix.
 
+For the PDF alone there is a wrapper that does not need `leanblueprint` on
+`PATH` at all:
+
+```bash
+bash scripts/build-blueprint-pdf.sh            # both lake builds, then xelatex
+bash scripts/build-blueprint-pdf.sh --tex-only # only blueprint/src/*.tex changed
+bash scripts/build-blueprint-pdf.sh --open     # ... and open the result
+```
+
+It runs the same engine and flags `latexmkrc` specifies, so it produces the same
+file, but it drives `xelatex` directly rather than through `latexmk` — which
+TeX Live's `basic` scheme does not install. It repeats passes until the `\cref`
+numbers stop moving, keeps `lake`'s (very long) warning output in
+`blueprint/print/lake-build.log` unless a build fails, and reports any label
+still rendering as `??`.
+
+The thing it exists to prevent: **a Lean edit does not reach the PDF until
+`lake build QECBlueprint:blueprint` re-emits the node LaTeX.**
+`content.tex`'s `\inputleannode{}` reads `.lake/build/blueprint/`, not
+`QECBlueprint.lean`, so running only `xelatex` after editing an annotation
+rebuilds the PDF with the previous prose and says nothing.
+
 Then serve it, rather than opening the files directly:
 
 ```bash

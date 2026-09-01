@@ -13,6 +13,11 @@
 
 \usepackage[warnings-off={mathtools-colon,mathtools-overbracket}]{unicode-math}
 
+% Flush-left paragraphs with vertical separation instead of a first-line indent,
+% matching the web rendering (plasTeX's HTML5 theme never indents paragraphs).
+% Loaded last so it can undo the list spacing the packages above set up.
+\usepackage{parskip}
+
 \input{macros/common}
 \input{macros/print}
 

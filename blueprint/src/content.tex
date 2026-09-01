@@ -13,80 +13,53 @@
 \label{chap:intro}
 
 This is the blueprint for \href{https://github.com/Stavan-Jain/QECLean}{QECLean},
-a formalization of the stabilizer formalism for quantum error correction in Lean~4
-and Mathlib.
+an ongoing formalization effort for quantum error correction in Lean~4. It consists of an informal mathematical exposition along with a dependency graph that shows how the formalized definitions and theorems in QECLean relate to each other. 
 
-A blueprint is a map of a formalization: informal mathematical exposition, one
-node per definition or theorem, wired into a dependency graph that shows how the
-results rest on one another and how much of the plan is already formal. Here
-every node is \emph{already} formal --- the library is complete and sorry-free ---
-so the graph is best read as a guide to the architecture rather than as a
-to-do list.
+\section{What QECLean contains}
 
-\section{What is proved}
+The final goal of QECLean is to provide a comprehensive formalization of Quantum Error Correction theory. As of August 2026, we've built abstractions to formalize the proofs of the canonical $[[n, k, d]]$ parameters of stabilizer codes. 
 
-Two results anchor the development.
+Our formalization begins with the definition of the n-qubit Pauli group $\mathcal{P}_n$ (\cref{chap:pauli}) and builds theory leading up to the definitions of a StabilizerCode and code distance (\cref{chap:codes-abstract}). We then instantiate our abstract StabilizerCode definition with a variety of well-known quantum error correcting codes (\cref{chap:toric}, \cref{chap:bb}, \cref{chap:codes}). Along the way, we develop frameworks to prove properties of these codes with the goal of making the proofs as general and modular as possible. In \cref{chap:symplectic}, we present the binary symplectic representation to provide efficient procedures to prove commutation and independence properties of stabilizer generators. We also provide extensive support for CSS codes via the homological framework (\cref{chap:homological}). 
 
-\begin{itemize}
-  \item \textbf{The toric family.} For every $L \ge 2$, the $L \times L$ toric
-    code is verified as an $[[2L^2, 2, L]]$ stabilizer code: the distance is
-    exactly $L$, not merely bounded below by it
+Our most notable formalizations are the following:
+
+\begin{enumerate}
+  \item \textbf{The toric family.} For every $L \ge 2$, we verify that the $L \times L$ toric
+    code is a $[[2L^2, 2, L]]$ stabilizer code. Notably, we parametrically prove that the distance is exactly $L$.
     (\cref{thm:toric-distance}).
-  \item \textbf{The gross code.} IBM's $[[144,12,12]]$ bivariate-bicycle code
-    --- the flagship qLDPC code of Bravyi et al. --- is verified with distance
-    exactly $12$, unconditionally (\cref{thm:gross-distance}).
-\end{itemize}
+  \item \textbf{The gross code.} We verify IBM's gross code [Bravyi et al.] as a $[[144,12,12]]$ bivariate-bicycle code. Notably, we prove that the distance is exactly 12 (\cref{thm:gross-distance}).
+\end{enumerate}
 
-Alongside these sit the rotated surface family, the repetition codes, the
+Alongside these sit the rotated surface code family, the repetition codes, the
 iceberg family, and the small named codes: Steane's $[[7,1,3]]$, Shor's
 $[[9,1,3]]$, the perfect $[[5,1,3]]$ code, and the $[[4,2,2]]$ detection code
 (\cref{chap:codes}).
 
-\section{The axiom discipline}
-
-Everything on the main branch depends on exactly Mathlib's three standard
-axioms --- \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound} ---
-and nothing else. In particular there is no \texttt{native\_decide}, which
-would replace a kernel check by a compiler-trust axiom, and no \texttt{sorry}.
-An input that cannot yet be proved is carried as a named hypothesis on the
-theorem, where it is visible in the statement rather than hidden in the axiom
-set. This is enforced in CI, so a violation fails the build rather than landing
-quietly.
-
-The discipline is not free. The gross code distance proof was originally
-carried by 135 \texttt{native\_decide} leaves and had to be converted to
-kernel-checkable form: packed natural-number tables instead of array lookups,
-quantifier bridges so the kernel enumerates concrete lambdas, sparse rewrites
-in place of large finite sums, and Gaussian-style certificates where a sweep
-would otherwise be needed.
+Everything on the main branch depends only on the standard axioms
+\texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}.
 
 \section{Reading the graph}
 
 An edge $A \to B$ in the dependency graph means that $B$ is the nearest
 blueprint ancestor of $A$: LeanArchitect walks the type and the proof term of
 each annotated declaration and stops as soon as it reaches another annotated
-declaration. The edges are therefore read off the real proof terms rather than
-maintained by hand, and a node that a proof genuinely stopped needing loses its
-edge as soon as the proof changes.
+declaration. The edges are therefore read off the proof terms rather than
+maintained by hand.
 
 \chapter{The Pauli group}
 \label{chap:pauli}
 
-Everything begins with the group $\mathcal{P}_n$ of $n$-qubit Pauli operators
-with phases. The formalization splits an element into a phase exponent in
-$\Z_4$ and a phase-free operator $\mathrm{Fin}\,n \to \{I,X,Y,Z\}$. The split
-is what makes multiplication computable: the operator part multiplies
+In the textbook Quantum Computation and Quantum Information, Nielsen and Chuang write ``The key to the power of the stabilizer formalism lies in the clever use of group theory". The group of interest is the Pauli group $\mathcal{P}_n$ on $n$ qubits. It is defined as the group $n$-qubit Pauli operators with phases $\{\pm 1, \pm i\}$. Our formalization splits an element of this group into a phase exponent in $\Z_4$ and a phase-free operator $\mathrm{Fin}\,n \to \{I,X,Y,Z\}$. The split makes multiplication easy: the operator part multiplies
 qubitwise, and the phases that fall out of products such as $XZ = -iY$
-accumulate separately.
+accumulate separately. 
 
 \inputleannode{def:pauli-operator}
 \inputleannode{def:pauli-group-element}
 \inputleannode{def:nqubit-pauli-operator}
 \inputleannode{def:nqubit-pauli-group}
 
-The syntactic representation is tied to actual operators on a Hilbert space by
-a matrix interpretation; without it the development would be a study of a
-finite group with no quantum content.
+The syntactic representation of $\mathcal{P}_n$ as an inductive type is tied to actual operators on a Hilbert space by
+a matrix interpretation:
 
 \inputleannode{def:pauli-to-matrix}
 \inputleannode{def:pauli-mulop}
@@ -94,32 +67,26 @@ finite group with no quantum content.
 
 \section{Weight}
 
-Code distance is a statement about how many qubits an operator touches, so
-support and weight are the measures everything else is phrased in.
+The following definitions build up to and are motivated by the definition of code distance in \cref{chap:codes-abstract}:
 
 \inputleannode{def:pauli-support}
 \inputleannode{def:pauli-weight}
 
 \section{Commutation}
 
-The single most used fact in the development is that commutation in
-$\mathcal{P}_n$ is a parity condition. Two Paulis pick up a sign $-1$ for each
-qubit where they disagree nontrivially, so the global sign is $(-1)^k$ and
-there is no third possibility between commuting and anticommuting.
+To prove that a group of Paulis form a stabilizer group, we need to show that the group is abelian. A convenient fact that helps us prove that two Paulis commute is that commutation in
+$\mathcal{P}_n$ is a parity condition. In particular, two Paulis pick up a sign $-1$ for each
+qubit where they disagree nontrivially (i.e. the operators on the qubit are both not $I$). If they disagree nontrivially on k qubits, the global sign is $(-1)^k$. Thus, two Paulis commute if they disagree nontrivially on an even number of qubits (k is even) and anticommute if they disagree nontrivially on an odd number of qubits (k is odd).
 
+\inputleannode{def:anticommute}
 \inputleannode{def:anticommutes-at}
 \inputleannode{thm:commutes-iff-even}
-\inputleannode{def:anticommute}
 \inputleannode{thm:commute-or-anticommute}
 
 \chapter{The binary symplectic representation}
 \label{chap:symplectic}
 
-Parity is linear algebra over $\F_2$, and that observation is the engine of the
-whole subject. Forgetting phases sends $\mathcal{P}_n$ onto $\F_2^{2n}$,
-products become sums, and --- by \cref{thm:commutes-iff-symplectic} ---
-commutation becomes orthogonality under a symplectic form. An abelian subgroup
-becomes a self-orthogonal subspace, and independence of generators becomes a
+This chapter introduces the binary symplectic framework that allows us to prove properties about Paulis by doing linear algebra over $\F_2$. In particular, we view Pauli operators as ``symplectic" vectors in $\F_2^{2n}$. Commutation of two Paulis is interpreted as orthogonality of their corresponding symplectic vectors and the independence of a set of paulis is interpreted as linear independence of the matrix of symplectic vectors. Thus, commutation becomes an orthogonality check and independence of generators becomes a
 rank computation.
 
 \inputleannode{def:to-symplectic}
@@ -132,26 +99,22 @@ rank computation.
 \chapter{Stabilizer groups and the codespace}
 \label{chap:stabilizer}
 
+This chapter defines the key abstractions of the stabilizer formalism and sets up the group theoretic properties that are needed to define logical operators in \cref{chap:codes-abstract}. 
+
 \inputleannode{def:is-stabilized-by}
 \inputleannode{def:stabilizer-group}
 \inputleannode{thm:neg-identity-not-mem}
 \inputleannode{def:codespace}
-
-The two conditions in \cref{def:stabilizer-group} --- abelian, and not
-containing $-I$ --- are exactly what is needed for the codespace to be nonzero.
-Commutativity makes the eigenspace projectors compatible; excluding $-I$ rules
-out the contradiction $\psi = -\psi$. The proof that the codespace is genuinely
-nonempty runs through the group sum.
-
 \inputleannode{def:stabilizer-sum}
+
+The two conditions in \cref{def:stabilizer-group} ( abelian, and not
+containing $-I$) are exactly what is needed for the codespace to be nonzero.
+
 \inputleannode{thm:codespace-nonempty}
 
 \section{The centralizer}
 
-Operators that preserve the codespace are those commuting with every
-stabilizer. For the Pauli group --- and this is special to it --- normalizing
-and centralizing coincide, which is why the literature uses the two words
-interchangeably in this setting.
+The analysis of error-correcting properties of a stabilizer code begins with an analysis of how operators behave on the code's codespace. The behavior of an operator on the codespace is directly connected to whether it commutes or anticommutes with the stabilizers. This section defines the subgroup that identifies the operators that commute with the stabilizers. Later, in \cref{thm:pauli-logical-iff-centralizer}, we show that these are exactly the Pauli operators that preserve the codespace.
 
 \inputleannode{def:centralizer}
 \inputleannode{thm:normalizer-eq-centralizer}
@@ -164,7 +127,16 @@ The encoded information is acted on by the quotient
 $\mathcal{C}(\mathcal{S})/\mathcal{S}$: operators that preserve the codespace,
 modulo those that act trivially on it.
 
+What makes an operator logical is semantic --- it must map the codespace into
+itself --- and that is how the definition is set up here, first for an arbitrary
+unitary and then for a Pauli. That this coincides with the syntactic condition of
+commuting with every stabilizer is a theorem, not a definition. It is the reason
+every logicality check later in the development can be a finite commutation test.
+
+\inputleannode{def:logical-gate}
+\inputleannode{thm:logical-gate-iff}
 \inputleannode{def:pauli-logical}
+\inputleannode{thm:pauli-logical-iff-centralizer}
 \inputleannode{thm:logical-iff-generators}
 \inputleannode{def:nontrivial-logical}
 \inputleannode{thm:nontrivial-logical-iff}
@@ -328,9 +300,8 @@ whose floor is again twelve.
 \label{chap:codes}
 
 The remaining codes exercise the same machinery on smaller or differently
-shaped examples. The $[[5,1,3]]$ code is the interesting outlier: its
-generators mix $X$ and $Z$ on the same qubit, so it is not CSS, the homological
-route is unavailable, and its distance is settled instead by a direct search
+shaped examples. The $[[5,1,3]]$ code is the outlier: it is not CSS, and so the homological
+route is unavailable, Its distance is settled instead by a direct search
 over weight-one and weight-two anti-witnesses.
 
 \inputleannode{def:steane7}
