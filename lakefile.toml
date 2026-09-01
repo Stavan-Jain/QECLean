@@ -47,3 +47,12 @@ name = "QECBlueprint"
 name = "Foundations"
 srcDir = "QEC"
 
+# Infoview widgets (root module `QECWidgets.lean`): Pauli support strips,
+# commutation parity views, and friends, built on ProofWidgets (already a
+# transitive dependency via mathlib — no new `require`). Deliberately NOT in
+# `defaultTargets` (same policy as QECBlueprint): only this target imports
+# ProofWidgets, and `lake build` stays the plain library build. Build with
+# `lake build QECWidgets`; it is part of the pre-push checklist in CLAUDE.md.
+[[lean_lib]]
+name = "QECWidgets"
+

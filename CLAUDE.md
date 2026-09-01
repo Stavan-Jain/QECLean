@@ -37,6 +37,11 @@ build/MCP workflow. Volatile or topic-scoped knowledge lives elsewhere:
   blueprint: what is generated vs. hand-written, how to add a node, how to
   inspect one with `#show_blueprint`. Read before editing `QECBlueprint.lean`
   or `blueprint/`. See also the "Blueprint" section below.
+- **[`QECWidgets/README.md`](QECWidgets/README.md)** — the ProofWidgets-based
+  infoview widgets (`#pauli_strip`, `#toric_chain`, `#check_matrix`, and the
+  expression presenters): what each renders, how meta-level reduction drives
+  them, and the linter rules for adding widget files. Read before editing
+  `QECWidgets/`.
 - **[`QEC/Stabilizer/Codes/BivariateBicycle/README.md`](QEC/Stabilizer/Codes/BivariateBicycle/README.md)**
   — orientation for the BB family (gross d=12 proof spine, instance
   dirs, hypothesis-discharge map, engine-vs-analytic status,
@@ -326,11 +331,12 @@ output prints the residual goal under each failure — read it before guessing
 tactics.
 
 **`lake build` alone is NOT sufficient before pushing.** `defaultTargets` is
-just `QEC`, so four things it does not touch will still fail CI. After any
-change that adds, moves, or removes a module, run all five:
+just `QEC`, so five things it does not touch will still fail CI. After any
+change that adds, moves, or removes a module, run all six:
 
 ```bash
 lake build && lake build QECLight && lake build QECBlueprint \
+  && lake build QECWidgets \
   && lake env lean Playground.lean && lake env lean scripts/AxiomCheck.lean
 ```
 
@@ -346,6 +352,11 @@ lake build && lake build QECLight && lake build QECBlueprint \
   fully-qualified name, so **renaming or removing an annotated declaration
   breaks it** — and nothing else in the build will tell you. Checked by the
   `blueprint` workflow. See "Blueprint" below.
+- **`QECWidgets`** (root `QECWidgets.lean`) carries the ProofWidgets-based
+  infoview widgets. Also outside `defaultTargets`, so that only it imports
+  ProofWidgets and `lake build` stays the plain library build. Checked by
+  the "Build QECWidgets" step in `lean_action_ci`. See
+  [`QECWidgets/README.md`](QECWidgets/README.md).
 - **`scripts/AxiomCheck.lean`** enforces the axiom policy (see below).
   Checked by `lean_action_ci`.
 
@@ -430,6 +441,24 @@ If `lake build` was already invoked and is partway through cloning
 mathlib, killing it leaves `.lake/packages/mathlib/` in a half-cloned
 state (just a `.git/` directory). `rm -rf .lake/packages` cleans it up,
 then symlink as above.
+
+**Cold-build memory cliff (16 GB machines).** The worktree's own
+`.lake/build/` starts empty, so the first `lake build` compiles all of
+`QEC/` — and its tail runs the three BB safe-floor kernel-`decide` leaves
+(`Gross/SafeFloor/MImFloorY{0,1,4}`, ~3.75 GB peak each) concurrently.
+On a 16 GB machine this can OOM-kill the build (and the session driving
+it); CI adds 12 GB of swap for exactly this (see the comment in
+`lean_action_ci.yml`). Locally, build the three leaves sequentially
+first, then the rest:
+
+```bash
+for m in Y0 Y1 Y4; do
+  lake build QEC.Stabilizer.Codes.BivariateBicycle.Gross.SafeFloor.MImFloor$m
+done
+lake build
+```
+
+Quit or idle the Lean LSP first — its file workers hold gigabytes too.
 
 ## Agent tooling: lean-lsp MCP
 

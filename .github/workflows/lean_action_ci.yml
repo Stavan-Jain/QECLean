@@ -50,6 +50,12 @@ jobs:
       # costs seconds rather than a rebuild.
       - name: Axiom policy (standard three axioms only)
         run: lake env lean scripts/AxiomCheck.lean
+      # Infoview widgets live in their own lib so that only it imports
+      # ProofWidgets (see lakefile.toml). It is outside `defaultTargets`, so a
+      # green `lake build` alone would let it rot invisibly — build it
+      # explicitly. Cheap: everything it imports was just built above.
+      - name: Build QECWidgets (infoview widgets)
+        run: lake build QECWidgets
       # API documentation used to be built here with
       # `leanprover-community/docgen-action`, on tag pushes and manual
       # dispatch. It has been removed because it published to GitHub Pages,
