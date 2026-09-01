@@ -274,6 +274,16 @@ For CSS-specific simp-set idioms (e.g. when to drop
 
 These are local to this codebase — search here before assuming mathlib has them:
 
+- **`σ[…]` Pauli construction notation** (scoped — `open scoped Pauli`; defined in
+  `PauliGroup/Notation.lean`): `σ[XZZXI] : NQubitPauliGroupElement 5`, with phase
+  prefixes `iσ[…]` (phasePower 1), `-σ[…]` (2), `-iσ[…]` (3). Elaborates to
+  **exactly** the literal `⟨phase, (NQubitPauliOperator.identity n).set i₀ op₀ …⟩`
+  normal form (non-identity positions, increasing index order), so
+  `rfl`/`decide`/`simp` behavior is identical to a hand-written `.set`-chain; a
+  delaborator displays literal-shaped elements back as `σ[…]` in goals. Concrete
+  literal codes (`Codes/Small/`, `Repetition/Three.lean`) use it; parametric
+  families with symbolic indices (`Repetition/N.lean`, `Iceberg/N.lean`, toric)
+  cannot.
 - `NQubitPauliGroupElement.toMatrix`, `.mulOp`, `.phasePower`, `.operators`
 - `NQubitPauliGroupElement.Anticommute`, `.anticommutesAt`
 - `NQubitPauliGroupElement.commutes_iff_even_anticommutes` — main parity-based

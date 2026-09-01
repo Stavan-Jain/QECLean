@@ -20,6 +20,7 @@ import QEC.Stabilizer.Framework.Symplectic.IndependentEquiv
 
 namespace Quantum
 open scoped BigOperators
+open scoped Pauli
 
 namespace StabilizerGroup
 namespace FourQubit_4_2_2
@@ -55,16 +56,10 @@ open NQubitPauliGroupElement
 /-! ## Generators -/
 
 /-- Z-check stabilizer: `ZZZZ` (Z on every qubit). -/
-def Z1 : NQubitPauliGroupElement 4 :=
-  ⟨0,
-    (((NQubitPauliOperator.identity 4).set 0 PauliOperator.Z).set 1 PauliOperator.Z).set 2
-      PauliOperator.Z |>.set 3 PauliOperator.Z⟩
+def Z1 : NQubitPauliGroupElement 4 := σ[ZZZZ]
 
 /-- X-check stabilizer: `XXXX` (X on every qubit). -/
-def X1 : NQubitPauliGroupElement 4 :=
-  ⟨0,
-    (((NQubitPauliOperator.identity 4).set 0 PauliOperator.X).set 1 PauliOperator.X).set 2
-      PauliOperator.X |>.set 3 PauliOperator.X⟩
+def X1 : NQubitPauliGroupElement 4 := σ[XXXX]
 
 /-- The single Z-check generator. -/
 def ZGenerators : Set (NQubitPauliGroupElement 4) :=
@@ -224,20 +219,16 @@ The four logical operators consistent with the codeword basis above:
 -/
 
 /-- Logical X for logical qubit 1: `IXIX`. -/
-def logicalX_1 : NQubitPauliGroupElement 4 :=
-  ⟨0, ((NQubitPauliOperator.identity 4).set 1 PauliOperator.X).set 3 PauliOperator.X⟩
+def logicalX_1 : NQubitPauliGroupElement 4 := σ[IXIX]
 
 /-- Logical X for logical qubit 2: `IIXX`. -/
-def logicalX_2 : NQubitPauliGroupElement 4 :=
-  ⟨0, ((NQubitPauliOperator.identity 4).set 2 PauliOperator.X).set 3 PauliOperator.X⟩
+def logicalX_2 : NQubitPauliGroupElement 4 := σ[IIXX]
 
 /-- Logical Z for logical qubit 1: `IIZZ`. -/
-def logicalZ_1 : NQubitPauliGroupElement 4 :=
-  ⟨0, ((NQubitPauliOperator.identity 4).set 2 PauliOperator.Z).set 3 PauliOperator.Z⟩
+def logicalZ_1 : NQubitPauliGroupElement 4 := σ[IIZZ]
 
 /-- Logical Z for logical qubit 2: `IZIZ`. -/
-def logicalZ_2 : NQubitPauliGroupElement 4 :=
-  ⟨0, ((NQubitPauliOperator.identity 4).set 1 PauliOperator.Z).set 3 PauliOperator.Z⟩
+def logicalZ_2 : NQubitPauliGroupElement 4 := σ[IZIZ]
 
 /-! ### Diagonal anticommutation: X̄_ℓ anticommutes Z̄_ℓ -/
 

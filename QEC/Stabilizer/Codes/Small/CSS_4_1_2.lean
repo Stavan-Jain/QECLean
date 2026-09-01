@@ -20,6 +20,7 @@ import QEC.Stabilizer.Framework.Symplectic.IndependentEquiv
 
 namespace Quantum
 open scoped BigOperators
+open scoped Pauli
 
 namespace StabilizerGroup
 namespace CSS_4_1_2
@@ -69,20 +70,13 @@ open NQubitPauliGroupElement
 /-! ## §1 — Generators -/
 
 /-- First Z-check stabilizer: `Z Z I I` (Z on qubits 0, 1). -/
-def S_Z1 : NQubitPauliGroupElement 4 :=
-  ⟨0,
-    ((NQubitPauliOperator.identity 4).set 0 PauliOperator.Z).set 1 PauliOperator.Z⟩
+def S_Z1 : NQubitPauliGroupElement 4 := σ[ZZII]
 
 /-- Second Z-check stabilizer: `I I Z Z` (Z on qubits 2, 3). -/
-def S_Z2 : NQubitPauliGroupElement 4 :=
-  ⟨0,
-    ((NQubitPauliOperator.identity 4).set 2 PauliOperator.Z).set 3 PauliOperator.Z⟩
+def S_Z2 : NQubitPauliGroupElement 4 := σ[IIZZ]
 
 /-- The X-check stabilizer: `X X X X` (X on every qubit). -/
-def S_X1 : NQubitPauliGroupElement 4 :=
-  ⟨0,
-    (((NQubitPauliOperator.identity 4).set 0 PauliOperator.X).set 1 PauliOperator.X).set 2
-      PauliOperator.X |>.set 3 PauliOperator.X⟩
+def S_X1 : NQubitPauliGroupElement 4 := σ[XXXX]
 
 /-! ## §2 — Generator sets and subgroup -/
 
@@ -276,12 +270,10 @@ basis kets is constant on each codeword).
 -/
 
 /-- Logical X: `X X I I` (overlaps `S_Z1` at qubits 0, 1; even ⇒ commutes). -/
-def logicalX : NQubitPauliGroupElement 4 :=
-  ⟨0, ((NQubitPauliOperator.identity 4).set 0 PauliOperator.X).set 1 PauliOperator.X⟩
+def logicalX : NQubitPauliGroupElement 4 := σ[XXII]
 
 /-- Logical Z: `Z I Z I` (overlaps `S_X1` at qubits 0, 2; even ⇒ commutes). -/
-def logicalZ : NQubitPauliGroupElement 4 :=
-  ⟨0, ((NQubitPauliOperator.identity 4).set 0 PauliOperator.Z).set 2 PauliOperator.Z⟩
+def logicalZ : NQubitPauliGroupElement 4 := σ[ZIZI]
 
 /-! ### §11 — Logical anticommutation -/
 
