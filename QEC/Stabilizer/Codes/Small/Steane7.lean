@@ -17,6 +17,7 @@ import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
 
 namespace Quantum
 open scoped BigOperators
+open scoped Pauli
 
 namespace StabilizerGroup
 namespace Steane7
@@ -46,40 +47,22 @@ open NQubitPauliGroupElement
 -/
 
 /-- Z-check on row r₁ = {0,1,2,4}: Z on qubits 0,1,2,4 and I elsewhere. -/
-def Z1 : NQubitPauliGroupElement 7 :=
-  ⟨0,
-    (((NQubitPauliOperator.identity 7).set 0 PauliOperator.Z).set 1 PauliOperator.Z).set 2
-      PauliOperator.Z |>.set 4 PauliOperator.Z⟩
+def Z1 : NQubitPauliGroupElement 7 := σ[ZZZIZII]
 
 /-- Z-check on row r₂ = {0,1,3,5}: Z on qubits 0,1,3,5 and I elsewhere. -/
-def Z2 : NQubitPauliGroupElement 7 :=
-  ⟨0,
-    (((NQubitPauliOperator.identity 7).set 0 PauliOperator.Z).set 1 PauliOperator.Z).set 3
-      PauliOperator.Z |>.set 5 PauliOperator.Z⟩
+def Z2 : NQubitPauliGroupElement 7 := σ[ZZIZIZI]
 
 /-- Z-check on row r₃ = {0,2,3,6}: Z on qubits 0,2,3,6 and I elsewhere. -/
-def Z3 : NQubitPauliGroupElement 7 :=
-  ⟨0,
-    (((NQubitPauliOperator.identity 7).set 0 PauliOperator.Z).set 2 PauliOperator.Z).set 3
-      PauliOperator.Z |>.set 6 PauliOperator.Z⟩
+def Z3 : NQubitPauliGroupElement 7 := σ[ZIZZIIZ]
 
 /-- X-check on row r₁ = {0,1,2,4}: X on qubits 0,1,2,4 and I elsewhere. -/
-def X1 : NQubitPauliGroupElement 7 :=
-  ⟨0,
-    (((NQubitPauliOperator.identity 7).set 0 PauliOperator.X).set 1 PauliOperator.X).set 2
-      PauliOperator.X |>.set 4 PauliOperator.X⟩
+def X1 : NQubitPauliGroupElement 7 := σ[XXXIXII]
 
 /-- X-check on row r₂ = {0,1,3,5}: X on qubits 0,1,3,5 and I elsewhere. -/
-def X2 : NQubitPauliGroupElement 7 :=
-  ⟨0,
-    (((NQubitPauliOperator.identity 7).set 0 PauliOperator.X).set 1 PauliOperator.X).set 3
-      PauliOperator.X |>.set 5 PauliOperator.X⟩
+def X2 : NQubitPauliGroupElement 7 := σ[XXIXIXI]
 
 /-- X-check on row r₃ = {0,2,3,6}: X on qubits 0,2,3,6 and I elsewhere. -/
-def X3 : NQubitPauliGroupElement 7 :=
-  ⟨0,
-    (((NQubitPauliOperator.identity 7).set 0 PauliOperator.X).set 2 PauliOperator.X).set 3
-      PauliOperator.X |>.set 6 PauliOperator.X⟩
+def X3 : NQubitPauliGroupElement 7 := σ[XIXXIIX]
 
 /-- The three Z-check generators (Z on each parity-check row). -/
 def ZGenerators : Set (NQubitPauliGroupElement 7) :=

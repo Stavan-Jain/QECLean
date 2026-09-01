@@ -19,6 +19,7 @@ import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
 
 namespace Quantum
 open scoped BigOperators
+open scoped Pauli
 
 namespace StabilizerGroup
 namespace FiveQubit_5_1_3
@@ -106,28 +107,16 @@ noncomputable local instance decidableAnticommute
 /-! ## §1 — Generators (cyclic shifts of `XZZXI`) -/
 
 /-- First generator: `X Z Z X I` (positions 0..4). -/
-def g1 : NQubitPauliGroupElement 5 :=
-  ⟨0,
-    ((((NQubitPauliOperator.identity 5).set 0 PauliOperator.X).set 1 PauliOperator.Z).set 2
-      PauliOperator.Z).set 3 PauliOperator.X⟩
+def g1 : NQubitPauliGroupElement 5 := σ[XZZXI]
 
 /-- Second generator: `I X Z Z X` (cyclic shift of `g1` by 1). -/
-def g2 : NQubitPauliGroupElement 5 :=
-  ⟨0,
-    ((((NQubitPauliOperator.identity 5).set 1 PauliOperator.X).set 2 PauliOperator.Z).set 3
-      PauliOperator.Z).set 4 PauliOperator.X⟩
+def g2 : NQubitPauliGroupElement 5 := σ[IXZZX]
 
 /-- Third generator: `X I X Z Z` (cyclic shift of `g1` by 2). -/
-def g3 : NQubitPauliGroupElement 5 :=
-  ⟨0,
-    ((((NQubitPauliOperator.identity 5).set 0 PauliOperator.X).set 2 PauliOperator.X).set 3
-      PauliOperator.Z).set 4 PauliOperator.Z⟩
+def g3 : NQubitPauliGroupElement 5 := σ[XIXZZ]
 
 /-- Fourth generator: `Z X I X Z` (cyclic shift of `g1` by 3). -/
-def g4 : NQubitPauliGroupElement 5 :=
-  ⟨0,
-    ((((NQubitPauliOperator.identity 5).set 0 PauliOperator.Z).set 1 PauliOperator.X).set 3
-      PauliOperator.X).set 4 PauliOperator.Z⟩
+def g4 : NQubitPauliGroupElement 5 := σ[ZXIXZ]
 
 /-! ## §2 — Generator set and subgroup
 
@@ -557,10 +546,7 @@ private lemma anticommute_of_operators_eq
 I, X` and phase power 2. This is the operator-part of `logicalX * g1` (see
 `logicalX_w3_eq_mul` below for the equivalence). Defined explicitly (not via
 the `*` of noncomputable group operations) so that `decide` can reduce it. -/
-def logicalX_w3 : NQubitPauliGroupElement 5 :=
-  ⟨2,
-    (((NQubitPauliOperator.identity 5).set 1 PauliOperator.Y).set 2
-      PauliOperator.Y).set 4 PauliOperator.X⟩
+def logicalX_w3 : NQubitPauliGroupElement 5 := -σ[IYYIX]
 
 /-- Sanity check: the explicit definition matches `logicalX * g1`. -/
 lemma logicalX_w3_eq_mul : logicalX_w3 = logicalX * g1 := by

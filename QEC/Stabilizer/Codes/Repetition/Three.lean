@@ -16,6 +16,7 @@ import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
 
 namespace Quantum
 open scoped BigOperators
+open scoped Pauli
 
 namespace StabilizerGroup
 namespace RepetitionCode3
@@ -28,12 +29,10 @@ logical X = X₁X₂X₃, logical Z = Z₁Z₂Z₃. The subgroup is abelian and 
 -/
 
 /-- Z₁Z₂: Z on qubits 0 and 1, I on qubit 2. -/
-def Z1Z2 : NQubitPauliGroupElement 3 :=
-  ⟨0, ((NQubitPauliOperator.identity 3).set 0 PauliOperator.Z).set 1 PauliOperator.Z⟩
+def Z1Z2 : NQubitPauliGroupElement 3 := σ[ZZI]
 
 /-- Z₂Z₃: I on qubit 0, Z on qubits 1 and 2. -/
-def Z2Z3 : NQubitPauliGroupElement 3 :=
-  ⟨0, ((NQubitPauliOperator.identity 3).set 1 PauliOperator.Z).set 2 PauliOperator.Z⟩
+def Z2Z3 : NQubitPauliGroupElement 3 := σ[IZZ]
 
 /-- The generator set for the 3-qubit repetition-code stabilizer subgroup. -/
 def generators : Set (NQubitPauliGroupElement 3) :=
@@ -236,8 +235,7 @@ The repetition code has distance 1: a single Z on any physical qubit is a nontri
 open NQubitPauliOperator NQubitPauliGroupElement
 
 /-- Z on qubit 2 only (I on qubits 0 and 1). -/
-def Z_on_qubit2 : NQubitPauliGroupElement 3 :=
-  ⟨0, (NQubitPauliOperator.identity 3).set 2 PauliOperator.Z⟩
+def Z_on_qubit2 : NQubitPauliGroupElement 3 := σ[IIZ]
 
 lemma Z_on_qubit2_operators (i : Fin 3) :
     Z_on_qubit2.operators i = if i = 2 then PauliOperator.Z else PauliOperator.I := by

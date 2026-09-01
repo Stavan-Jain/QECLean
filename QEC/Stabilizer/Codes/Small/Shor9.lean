@@ -9,6 +9,7 @@ import QEC.Stabilizer.Foundations.PauliGroup.CommutationTactics
 
 namespace Quantum
 open scoped BigOperators
+open scoped Pauli
 
 namespace StabilizerGroup
 namespace Shor9
@@ -40,42 +41,28 @@ presentation; overlapping supports).
 -/
 
 /-- Z⊗Z on qubits 0 and 1 (first block, adjacent pair). -/
-def M1 : NQubitPauliGroupElement 9 :=
-  ⟨0, ((NQubitPauliOperator.identity 9).set 0 PauliOperator.Z).set 1 PauliOperator.Z⟩
+def M1 : NQubitPauliGroupElement 9 := σ[ZZIIIIIII]
 
 /-- Z⊗Z on qubits 1 and 2 (first block, adjacent pair). -/
-def M2 : NQubitPauliGroupElement 9 :=
-  ⟨0, ((NQubitPauliOperator.identity 9).set 1 PauliOperator.Z).set 2 PauliOperator.Z⟩
+def M2 : NQubitPauliGroupElement 9 := σ[IZZIIIIII]
 
 /-- Z⊗Z on qubits 3 and 4 (second block). -/
-def M3 : NQubitPauliGroupElement 9 :=
-  ⟨0, ((NQubitPauliOperator.identity 9).set 3 PauliOperator.Z).set 4 PauliOperator.Z⟩
+def M3 : NQubitPauliGroupElement 9 := σ[IIIZZIIII]
 
 /-- Z⊗Z on qubits 4 and 5 (second block). -/
-def M4 : NQubitPauliGroupElement 9 :=
-  ⟨0, ((NQubitPauliOperator.identity 9).set 4 PauliOperator.Z).set 5 PauliOperator.Z⟩
+def M4 : NQubitPauliGroupElement 9 := σ[IIIIZZIII]
 
 /-- Z⊗Z on qubits 6 and 7 (third block). -/
-def M5 : NQubitPauliGroupElement 9 :=
-  ⟨0, ((NQubitPauliOperator.identity 9).set 6 PauliOperator.Z).set 7 PauliOperator.Z⟩
+def M5 : NQubitPauliGroupElement 9 := σ[IIIIIIZZI]
 
 /-- Z⊗Z on qubits 7 and 8 (third block). -/
-def M6 : NQubitPauliGroupElement 9 :=
-  ⟨0, ((NQubitPauliOperator.identity 9).set 7 PauliOperator.Z).set 8 PauliOperator.Z⟩
+def M6 : NQubitPauliGroupElement 9 := σ[IIIIIIIZZ]
 
 /-- X on each of qubits 0–5 (six-qubit X stabilizer, overlapping first two blocks). -/
-def M7 : NQubitPauliGroupElement 9 :=
-  ⟨0,
-    ((((((NQubitPauliOperator.identity 9).set 0 PauliOperator.X).set 1 PauliOperator.X).set 2
-                PauliOperator.X).set 3 PauliOperator.X).set 4 PauliOperator.X).set 5
-      PauliOperator.X⟩
+def M7 : NQubitPauliGroupElement 9 := σ[XXXXXXIII]
 
 /-- X on each of qubits 3–8 (six-qubit X stabilizer, overlapping last two blocks). -/
-def M8 : NQubitPauliGroupElement 9 :=
-  ⟨0,
-    ((((((NQubitPauliOperator.identity 9).set 3 PauliOperator.X).set 4 PauliOperator.X).set 5
-                PauliOperator.X).set 6 PauliOperator.X).set 7 PauliOperator.X).set 8
-      PauliOperator.X⟩
+def M8 : NQubitPauliGroupElement 9 := σ[IIIXXXXXX]
 
 /-- The six Z-type generators `M1`–`M6`. -/
 def ZGenerators : Set (NQubitPauliGroupElement 9) :=

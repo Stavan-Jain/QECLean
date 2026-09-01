@@ -12,6 +12,7 @@ import QEC.Stabilizer.Foundations.PauliGroup.Commutation
 import QEC.Stabilizer.Foundations.PauliGroup.CommutationTactics
 import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
 import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
+import QEC.Stabilizer.Foundations.PauliGroup.Notation
 import QEC.Stabilizer.Foundations.BinarySymplectic.Core
 import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrix
 import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrixDecidable
@@ -82,35 +83,46 @@ namespace StabilizerGroup
 namespace _Template
 
 open NQubitPauliGroupElement
+open scoped Pauli
 
 /-!
 ## §1 — Generators
 
 For an `[[n, k, d]]` CSS code, you need `m_Z` Z-type generators and `m_X`
 X-type generators, with `m_Z + m_X = n - k`. Each is an
-`NQubitPauliGroupElement n` with `phasePower = 0`.
+`NQubitPauliGroupElement n` with `phasePower = 0`, written with the scoped
+`σ[…]` construction notation (`open scoped Pauli`, provided by
+`QEC.Stabilizer.Foundations.PauliGroup.Notation` — see this file's header).
 
 Pattern (Steane code, [[7, 1, 3]], `m_Z = m_X = 3`):
 
 ```lean
 /-- Z-check on row r₁ = {0,1,2,4}: Z on qubits 0,1,2,4 and I elsewhere. -/
-def Z1 : NQubitPauliGroupElement 7 :=
-  ⟨0,
-    (((NQubitPauliOperator.identity 7).set 0 PauliOperator.Z).set 1 PauliOperator.Z).set 2
-      PauliOperator.Z |>.set 4 PauliOperator.Z⟩
+def Z1 : NQubitPauliGroupElement 7 := σ[ZZZIZII]
 ```
+
+`σ[ZZZIZII]` elaborates to **exactly** the literal normal form
+
+```lean
+⟨0,
+  (((NQubitPauliOperator.identity 7).set 0 PauliOperator.Z).set 1 PauliOperator.Z).set 2
+    PauliOperator.Z |>.set 4 PauliOperator.Z⟩
+```
+
+(`.set` applied at the non-identity positions in increasing index order), so
+`rfl`/`decide`/`simp` behavior is identical to writing the chain by hand, and
+goals display such literals back as `σ[…]`.
 
 Conventions:
 
-- `phasePower = 0` always for stabilizer generators (the `0 : Fin 4` in the
-  anonymous constructor).
-- 0-based qubit indexing.
-- Chain `.set` calls left-to-right by increasing qubit index for readability.
+- `phasePower = 0` always for stabilizer generators — the plain `σ[…]` form.
+  (Phase-prefix variants exist for other elements: `iσ[…]` = phase `i`,
+  `-σ[…]` = phase `-1`, `-iσ[…]` = phase `-i`.)
+- 0-based qubit indexing: the k-th letter is the operator on qubit k.
 - One `def` per generator. Name them `Z1, Z2, …, X1, X2, …`.
 
-**Non-CSS variant.** Mixed-Pauli generators (e.g., 5-qubit perfect code
-`XZZXI`) use a single chain of `.set` with the appropriate `PauliOperator`
-per qubit; there is no Z/X partition.
+**Non-CSS variant.** Mixed-Pauli generators use the same notation (e.g., the
+5-qubit perfect code's `σ[XZZXI]`); there is no Z/X partition.
 -/
 
 /-!

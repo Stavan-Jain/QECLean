@@ -20,6 +20,7 @@ import QEC.Stabilizer.Framework.Symplectic.IndependentEquiv
 
 namespace Quantum
 open scoped BigOperators
+open scoped Pauli
 
 namespace StabilizerGroup
 namespace SixQubit_6_2_2
@@ -85,28 +86,16 @@ Qubit indexing is 0-based; qubits 0,1 are the "top" pair, 2,3 the
 -/
 
 /-- First Z-check stabilizer: `Z Z Z Z I I` (Z on qubits 0,1,2,3). -/
-def S_Z1 : NQubitPauliGroupElement 6 :=
-  ⟨0,
-    (((NQubitPauliOperator.identity 6).set 0 PauliOperator.Z).set 1 PauliOperator.Z).set 2
-      PauliOperator.Z |>.set 3 PauliOperator.Z⟩
+def S_Z1 : NQubitPauliGroupElement 6 := σ[ZZZZII]
 
 /-- Second Z-check stabilizer: `Z Z I I Z Z` (Z on qubits 0,1,4,5). -/
-def S_Z2 : NQubitPauliGroupElement 6 :=
-  ⟨0,
-    (((NQubitPauliOperator.identity 6).set 0 PauliOperator.Z).set 1 PauliOperator.Z).set 4
-      PauliOperator.Z |>.set 5 PauliOperator.Z⟩
+def S_Z2 : NQubitPauliGroupElement 6 := σ[ZZIIZZ]
 
 /-- First X-check stabilizer: `X X X X I I` (X on qubits 0,1,2,3). -/
-def S_X1 : NQubitPauliGroupElement 6 :=
-  ⟨0,
-    (((NQubitPauliOperator.identity 6).set 0 PauliOperator.X).set 1 PauliOperator.X).set 2
-      PauliOperator.X |>.set 3 PauliOperator.X⟩
+def S_X1 : NQubitPauliGroupElement 6 := σ[XXXXII]
 
 /-- Second X-check stabilizer: `X X I I X X` (X on qubits 0,1,4,5). -/
-def S_X2 : NQubitPauliGroupElement 6 :=
-  ⟨0,
-    (((NQubitPauliOperator.identity 6).set 0 PauliOperator.X).set 1 PauliOperator.X).set 4
-      PauliOperator.X |>.set 5 PauliOperator.X⟩
+def S_X2 : NQubitPauliGroupElement 6 := σ[XXIIXX]
 
 /-! ## §2 — Generator sets and subgroup -/
 
@@ -336,24 +325,16 @@ Indexing: `_1` ≡ Knill's "L" (long support on Z, short on X);
 -/
 
 /-- Logical X for logical qubit 1: `IIXXII` (X on qubits 2, 3). -/
-def logicalX_1 : NQubitPauliGroupElement 6 :=
-  ⟨0, ((NQubitPauliOperator.identity 6).set 2 PauliOperator.X).set 3 PauliOperator.X⟩
+def logicalX_1 : NQubitPauliGroupElement 6 := σ[IIXXII]
 
 /-- Logical X for logical qubit 2: `IXIXXI` (X on qubits 1, 3, 4). -/
-def logicalX_2 : NQubitPauliGroupElement 6 :=
-  ⟨0,
-    (((NQubitPauliOperator.identity 6).set 1 PauliOperator.X).set 3 PauliOperator.X).set 4
-      PauliOperator.X⟩
+def logicalX_2 : NQubitPauliGroupElement 6 := σ[IXIXXI]
 
 /-- Logical Z for logical qubit 1: `ZIIZZI` (Z on qubits 0, 3, 4). -/
-def logicalZ_1 : NQubitPauliGroupElement 6 :=
-  ⟨0,
-    (((NQubitPauliOperator.identity 6).set 0 PauliOperator.Z).set 3 PauliOperator.Z).set 4
-      PauliOperator.Z⟩
+def logicalZ_1 : NQubitPauliGroupElement 6 := σ[ZIIZZI]
 
 /-- Logical Z for logical qubit 2: `IIIIZZ` (Z on qubits 4, 5). -/
-def logicalZ_2 : NQubitPauliGroupElement 6 :=
-  ⟨0, ((NQubitPauliOperator.identity 6).set 4 PauliOperator.Z).set 5 PauliOperator.Z⟩
+def logicalZ_2 : NQubitPauliGroupElement 6 := σ[IIIIZZ]
 
 /-! ### Diagonal anticommutation: X̄_ℓ anticommutes Z̄_ℓ -/
 
