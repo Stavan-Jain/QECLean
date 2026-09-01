@@ -76,35 +76,12 @@ lints inherited from upstream files. See
 
 open NQubitPauliGroupElement
 
-/-! ## Local Decidable instances
+/-! ## §1 — Generators (cyclic shifts of `XZZXI`)
 
-These are scoped to this file (via `local instance`) because adding them
-to the global instance pool — as `PauliGroup/Commutation.lean` originally
-did during Stage 4 — disrupted the typeclass synthesis of the
-`weight_2_pairs_span_coeffs` `native_decide` proof in `RotatedSurfaceCode3.lean`.
-The standard Pi-decidability chain in that proof must remain primary, so
-we localise the group-element-level instances here, where the [[5,1,3]]
-distance proof needs them. -/
-
-/-- `DecidableEq` on `NQubitPauliGroupElement n` via field-wise decision.
-File-local to keep RotatedSurfaceCode3.lean's synthesis path intact. -/
-local instance instDecidableEqNQubitPauliGroupElement (n : ℕ) :
-    DecidableEq (NQubitPauliGroupElement n) := fun p q =>
-  decidable_of_iff (p.phasePower = q.phasePower ∧ p.operators = q.operators)
-    ⟨fun ⟨h1, h2⟩ => by cases p; cases q; simp_all,
-     fun h => by cases h; exact ⟨rfl, rfl⟩⟩
-
-/-- `Decidable (Anticommute p q)`: unfolds to equality of two Pauli group
-elements and decides via the local `DecidableEq` above. Marked
-`noncomputable` because `*` on `NQubitPauliGroupElement` is noncomputable,
-but `decide` still reduces through the kernel. (`native_decide` does not
-work — prefer `decide`.) -/
-noncomputable local instance decidableAnticommute
-(p q : NQubitPauliGroupElement 5) :
-    Decidable (NQubitPauliGroupElement.Anticommute p q) :=
-  show Decidable (p * q = NQubitPauliGroupElement.minusOne 5 * (q * p)) from inferInstance
-
-/-! ## §1 — Generators (cyclic shifts of `XZZXI`) -/
+(The `DecidableEq (NQubitPauliGroupElement n)` and `Decidable (Anticommute p q)`
+instances this file's tables lean on were once file-local here; they are global in
+`PauliGroup/Commutation.lean` now that `RotatedSurfaceCode3.lean`'s `native_decide`
+proof — the reason for the localisation — is parked off `main`.) -/
 
 /-- First generator: `X Z Z X I` (positions 0..4). -/
 def g1 : NQubitPauliGroupElement 5 := σ[XZZXI]
@@ -142,81 +119,21 @@ both fail.
 
 Each pair has an even number of anticommuting qubit positions (count = 2
 in every case — see `informal_spec.md` for the explicit Finsets).
-Closed by `pauli_comm_even_anticommutes` + explicit Finset computation,
-mirroring `Steane7.lean`'s `Zᵢ_comm_Xⱼ` pattern.
+Closed by `decide` through the global `DecidableEq (NQubitPauliGroupElement n)`
+instance, mirroring `Steane7.lean`'s `Zᵢ_comm_Xⱼ` pattern.
 -/
 
-private lemma g1_comm_g2 : g1 * g2 = g2 * g1 := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 5) g1.operators g2.operators)) =
-        ({1, 3} : Finset (Fin 5)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, g1, g2,
-        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
-  rw [hfilter]; decide
+private lemma g1_comm_g2 : g1 * g2 = g2 * g1 := by decide
 
-private lemma g1_comm_g3 : g1 * g3 = g3 * g1 := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 5) g1.operators g3.operators)) =
-        ({2, 3} : Finset (Fin 5)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, g1, g3,
-        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
-  rw [hfilter]; decide
+private lemma g1_comm_g3 : g1 * g3 = g3 * g1 := by decide
 
-private lemma g1_comm_g4 : g1 * g4 = g4 * g1 := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 5) g1.operators g4.operators)) =
-        ({0, 1} : Finset (Fin 5)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, g1, g4,
-        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
-  rw [hfilter]; decide
+private lemma g1_comm_g4 : g1 * g4 = g4 * g1 := by decide
 
-private lemma g2_comm_g3 : g2 * g3 = g3 * g2 := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 5) g2.operators g3.operators)) =
-        ({2, 4} : Finset (Fin 5)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, g2, g3,
-        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
-  rw [hfilter]; decide
+private lemma g2_comm_g3 : g2 * g3 = g3 * g2 := by decide
 
-private lemma g2_comm_g4 : g2 * g4 = g4 * g2 := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 5) g2.operators g4.operators)) =
-        ({3, 4} : Finset (Fin 5)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, g2, g4,
-        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
-  rw [hfilter]; decide
+private lemma g2_comm_g4 : g2 * g4 = g4 * g2 := by decide
 
-private lemma g3_comm_g4 : g3 * g4 = g4 * g3 := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 5) g3.operators g4.operators)) =
-        ({0, 3} : Finset (Fin 5)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, g3, g4,
-        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
-  rw [hfilter]; decide
+private lemma g3_comm_g4 : g3 * g4 = g4 * g3 := by decide
 
 /-! ## §5 — All-pair commutation (full stabilizer abelianness) -/
 
@@ -349,109 +266,21 @@ Eight per-generator commutation lemmas (4 for `logicalX`, 4 for
 Finset. Then bundled via `Subgroup.forall_comm_closure_iff`.
 -/
 
-private lemma logicalX_commutes_g1 : logicalX * g1 = g1 * logicalX := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 5) logicalX.operators g1.operators)) =
-        ({1, 2} : Finset (Fin 5)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, logicalX, g1,
-        NQubitPauliOperator.X, NQubitPauliOperator.set, NQubitPauliOperator.identity,
-        PauliOperator.mulOp]
-  rw [hfilter]; decide
+private lemma logicalX_commutes_g1 : logicalX * g1 = g1 * logicalX := by decide
 
-private lemma logicalX_commutes_g2 : logicalX * g2 = g2 * logicalX := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 5) logicalX.operators g2.operators)) =
-        ({2, 3} : Finset (Fin 5)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, logicalX, g2,
-        NQubitPauliOperator.X, NQubitPauliOperator.set, NQubitPauliOperator.identity,
-        PauliOperator.mulOp]
-  rw [hfilter]; decide
+private lemma logicalX_commutes_g2 : logicalX * g2 = g2 * logicalX := by decide
 
-private lemma logicalX_commutes_g3 : logicalX * g3 = g3 * logicalX := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 5) logicalX.operators g3.operators)) =
-        ({3, 4} : Finset (Fin 5)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, logicalX, g3,
-        NQubitPauliOperator.X, NQubitPauliOperator.set, NQubitPauliOperator.identity,
-        PauliOperator.mulOp]
-  rw [hfilter]; decide
+private lemma logicalX_commutes_g3 : logicalX * g3 = g3 * logicalX := by decide
 
-private lemma logicalX_commutes_g4 : logicalX * g4 = g4 * logicalX := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 5) logicalX.operators g4.operators)) =
-        ({0, 4} : Finset (Fin 5)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, logicalX, g4,
-        NQubitPauliOperator.X, NQubitPauliOperator.set, NQubitPauliOperator.identity,
-        PauliOperator.mulOp]
-  rw [hfilter]; decide
+private lemma logicalX_commutes_g4 : logicalX * g4 = g4 * logicalX := by decide
 
-private lemma logicalZ_commutes_g1 : logicalZ * g1 = g1 * logicalZ := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 5) logicalZ.operators g1.operators)) =
-        ({0, 3} : Finset (Fin 5)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, logicalZ, g1,
-        NQubitPauliOperator.Z, NQubitPauliOperator.set, NQubitPauliOperator.identity,
-        PauliOperator.mulOp]
-  rw [hfilter]; decide
+private lemma logicalZ_commutes_g1 : logicalZ * g1 = g1 * logicalZ := by decide
 
-private lemma logicalZ_commutes_g2 : logicalZ * g2 = g2 * logicalZ := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 5) logicalZ.operators g2.operators)) =
-        ({1, 4} : Finset (Fin 5)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, logicalZ, g2,
-        NQubitPauliOperator.Z, NQubitPauliOperator.set, NQubitPauliOperator.identity,
-        PauliOperator.mulOp]
-  rw [hfilter]; decide
+private lemma logicalZ_commutes_g2 : logicalZ * g2 = g2 * logicalZ := by decide
 
-private lemma logicalZ_commutes_g3 : logicalZ * g3 = g3 * logicalZ := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 5) logicalZ.operators g3.operators)) =
-        ({0, 2} : Finset (Fin 5)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, logicalZ, g3,
-        NQubitPauliOperator.Z, NQubitPauliOperator.set, NQubitPauliOperator.identity,
-        PauliOperator.mulOp]
-  rw [hfilter]; decide
+private lemma logicalZ_commutes_g3 : logicalZ * g3 = g3 * logicalZ := by decide
 
-private lemma logicalZ_commutes_g4 : logicalZ * g4 = g4 * logicalZ := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 5) logicalZ.operators g4.operators)) =
-        ({1, 3} : Finset (Fin 5)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, logicalZ, g4,
-        NQubitPauliOperator.Z, NQubitPauliOperator.set, NQubitPauliOperator.identity,
-        PauliOperator.mulOp]
-  rw [hfilter]; decide
+private lemma logicalZ_commutes_g4 : logicalZ * g4 = g4 * logicalZ := by decide
 
 /-- `X̄` commutes with every element of the stabilizer. -/
 theorem logicalX_mem_centralizer :
@@ -562,11 +391,7 @@ lemma logicalX_w3_eq_mul : logicalX_w3 = logicalX * g1 := by
 /-- `logicalX_w3` anticommutes with `logicalZ`. By the parity criterion, the
 overlap pattern `IYYIX` vs `ZZZZZ` anticommutes at qubits 1, 2, 4 (odd count). -/
 private lemma logicalX_w3_anticomm_logicalZ :
-    NQubitPauliGroupElement.Anticommute logicalX_w3 logicalZ := by
-  change logicalX_w3 * logicalZ = NQubitPauliGroupElement.minusOne 5 * (logicalZ * logicalX_w3)
-  apply NQubitPauliGroupElement.ext
-  · decide
-  · funext i; fin_cases i <;> decide
+    NQubitPauliGroupElement.Anticommute logicalX_w3 logicalZ := by decide
 
 /-- `logicalX_w3 ∈ centralizer (stabilizerCode.toStabilizerGroup)`. Use the
 equivalence `logicalX_w3 = logicalX * g1`: `logicalX` is in the centralizer

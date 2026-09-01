@@ -182,25 +182,18 @@ machinery in §6 / §12 works directly without typing predicates.
 /-!
 ## §4 — Cross-commutation (CSS: Z-generators commute with X-generators)
 
-For each `(z, x) ∈ ZGenerators × XGenerators`, prove `z * x = x * z`. The
-shape of the proof is:
+For each `(z, x) ∈ ZGenerators × XGenerators`, prove `z * x = x * z`. For
+concrete literal generators this is one line per pair — the global
+`DecidableEq (NQubitPauliGroupElement n)` instance in `PauliGroup/Commutation.lean`
+lets the kernel decide the product equality directly:
 
 ```lean
-private lemma Z1_comm_X1 : Z1 * X1 = X1 * Z1 := by
-  classical
-  pauli_comm_even_anticommutes
-  -- residual goal: even number of anticommuting qubits between Z1 and X1
-  have hfilter :
-      (Finset.univ.filter
-        (NQubitPauliGroupElement.anticommutesAt Z1.operators X1.operators)) =
-      (<the explicit Finset>) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, Z1, X1,
-            NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
-  rw [hfilter]; decide
+private lemma Z1_comm_X1 : Z1 * X1 = X1 * Z1 := by decide
 ```
 
-Then bundle into a `∀`-statement:
+Keep one named `private lemma` per pair (do NOT try to batch all pairs into a
+single `decide` over the generator lists — the nested evaluation blows
+`maxRecDepth`/heartbeats). Then bundle into a `∀`-statement:
 
 ```lean
 lemma ZGenerators_commute_XGenerators :
@@ -214,19 +207,16 @@ lemma ZGenerators_commute_XGenerators :
       | …
 ```
 
-The `pauli_comm_even_anticommutes` tactic is in `PauliGroup/CommutationTactics.lean`;
-it converts the commutation goal into a parity-of-anticommuting-qubits goal,
-which is then closed by computing the explicit `Finset` and `decide`-ing its
-cardinality is even.
-
-**Performance note.** For small `n` (≤ 9 with few generators), the whole
-batch may close as a single `by decide` on the symplectic check-matrix
-product without spelling out the per-pair filter Finsets. Try that first.
-For larger codes, the explicit-Finset approach is cleaner and reliably fast.
+**Parametric variant.** When the generators are symbolic (toric, rotated
+surface, `Repetition/N`), `decide` does not apply; use
+`pauli_comm_even_anticommutes` (in `PauliGroup/CommutationTactics.lean`) to
+convert the commutation goal into a parity-of-anticommuting-qubits goal,
+identify the anticommute `Finset` explicitly, and `decide` its cardinality —
+the pattern the concrete codes used before the global instance existed.
 
 **Non-CSS variant.** Without Z/X partition, prove pairwise commutation for
-*every* pair of generators (`m * (m-1)/2` cases for `m` generators); fall
-back to the same `pauli_comm_even_anticommutes` machinery.
+*every* pair of generators (`m * (m-1)/2` cases for `m` generators) — same
+one-line `by decide` shape (see `FiveQubit_5_1_3.lean` §4).
 -/
 
 /-!
@@ -425,9 +415,14 @@ The `(by decide)` discharges `Odd n` (anticommutation requires odd `n` for
 the all-X/all-Z pair to anticommute — true for Steane7 (n=7), false for
 [[4,2,2]] (n=4)).
 
-**Non-all-X variant.** For partial-support logicals, use
-`pauli_comm_even_anticommutes` like in §4 and compute the anticommute
-filter explicitly.
+**Non-all-X variant.** For partial-support literal logicals, `by decide`
+closes both commutation and anticommutation goals directly (the
+`Decidable (Anticommute p q)` instance lives in `PauliGroup/Commutation.lean`):
+
+```lean
+theorem logicalX_anticommutes_logicalZ :
+    NQubitPauliGroupElement.Anticommute logicalX logicalZ := by decide
+```
 
 **`k ≥ 2` variant.** You need *four* relations per logical qubit *pair*:
 
@@ -499,8 +494,8 @@ theorem logicalX_mem_centralizer :
    scope, both `_root_.mul_assoc` and `NQubitPauliGroupElement.mul_assoc`
    resolve. Qualify with `_root_.mul_assoc` (same for `one_mul`, `mul_one`).
 3. **Per-generator commutation lemmas (e.g. `logicalX_commutes_Z1`) need
-   to be separate `private lemma`s** before this theorem — define them with
-   the same `pauli_comm_even_anticommutes` + filter pattern from §4.
+   to be separate `private lemma`s** before this theorem — one-line
+   `by decide` each, same shape as §4.
 -/
 
 /-!
