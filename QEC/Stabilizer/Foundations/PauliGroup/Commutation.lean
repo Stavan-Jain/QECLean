@@ -236,19 +236,22 @@ def Anticommute (p q : NQubitPauliGroupElement n) : Prop :=
 /-! ### Decidability of equality and `Anticommute`
 
 `DecidableEq (NQubitPauliOperator n)` is computable (via the underlying
-function type `Fin n → PauliOperator`, see `Representation.lean`). We
-derive `DecidableEq (NQubitPauliGroupElement n)` from field-wise decision
-and finally `Decidable (Anticommute p q)`. The `Anticommute` instance is
-`noncomputable` because the `Mul` instance on `NQubitPauliGroupElement`
-is noncomputable, but the kernel can still reduce `decide` through it.
-(`native_decide` does not work for the same reason — prefer `decide`.) -/
+function type `Fin n → PauliOperator`, see `Representation.lean`). From it one
+can derive `DecidableEq (NQubitPauliGroupElement n)` by field-wise decision and
+then `Decidable (Anticommute p q)` (which unfolds to an equality of two group
+elements); the latter is necessarily `noncomputable`, because the `Mul`
+instance on `NQubitPauliGroupElement` is, but the kernel still reduces
+`decide` through it (`native_decide` does not work for the same reason —
+prefer `decide`).
 
--- (Stage-4 follow-up for stab_5_1_3 added a `DecidableEq
--- (NQubitPauliGroupElement n)` and `Decidable Anticommute` here, but they
--- caused a downstream synthesis failure in RotatedSurfaceCode3's
--- native_decide proof. They are temporarily removed pending a clean
--- resolution. stab_5_1_3's distance proof currently DOES NOT BUILD
--- against this configuration — needs refactor.)
+Neither instance is declared here, on purpose. They were once added globally
+and disrupted typeclass synthesis in an unrelated `native_decide` proof
+(`RotatedSurfaceCode3`, since parked on `claude/z3z6-parked`) — the footgun
+recorded under "Global vs. `local instance` discipline" in `CLAUDE.md`. They
+now live as `local instance`s in `Codes/Small/FiveQubit_5_1_3.lean`
+(§ "Local Decidable instances"), where the [[5,1,3]] distance proof needs
+them; copy them from there into any other file that wants `decide` on
+`Anticommute`. -/
 
 /-- Anticommutation reduces to the mulOp phase differing by 2 (mod 4). -/
 lemma anticommutes_iff_mulOp_phasePower (p q : NQubitPauliGroupElement n) :

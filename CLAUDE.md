@@ -292,16 +292,17 @@ These are local to this codebase — search here before assuming mathlib has the
 - `NQubitPauliGroupElement.commutes_iff_even_anticommutes` — main parity-based
   commutation lemma for general Paulis (the "count of anticommuting qubits is
   even" characterization)
-- **`Decidable (NQubitPauliGroupElement.Anticommute p q)`** (in
-  `PauliGroup/Commutation.lean`) — closes `Anticommute p q` goals via
-  `by decide`. The instance is `noncomputable` because `Mul` on
-  `NQubitPauliGroupElement` is itself noncomputable, but `decide` still
-  reduces through the kernel. `native_decide` does **not** work for
-  the same reason — prefer `decide`. Builds on the computable
-  `DecidableEq (NQubitPauliOperator n)` from `Representation.lean`
-  (the `Classical.decEq` override has been removed). Used heavily by
-  the [[5,1,3]] distance proof for the 105-case weight-{1,2}
-  anti-witness tables.
+- **`Decidable (NQubitPauliGroupElement.Anticommute p q)`** is a
+  **file-local** instance, not a global one: `Codes/Small/FiveQubit_5_1_3.lean`
+  (§ "Local Decidable instances") declares `local instance`s for
+  `DecidableEq (NQubitPauliGroupElement n)` and `Decidable (Anticommute p q)`
+  on top of the computable `DecidableEq (NQubitPauliOperator n)` from
+  `Representation.lean`, and its 105-case weight-{1,2} anti-witness tables
+  close by `decide` (the instance is `noncomputable` because `Mul` is;
+  `native_decide` does **not** work — prefer `decide`). A new non-CSS code
+  that needs this should copy those two instances rather than make them
+  global, per the `local instance` discipline above — see the note in
+  `PauliGroup/Commutation.lean` § "Decidability of equality and `Anticommute`".
 - `StabilizerGroup`, `.toSubgroup`, `.is_abelian`, `.one_mem`,
   `.neg_identity_not_mem`, `.codespaceSubmodule`
 - `IsNontrivialLogicalOperator` has **three** conditions (see
