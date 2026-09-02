@@ -11,6 +11,7 @@ import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrix
 import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrixDecidable
 import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
 import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
+import QEC.Stabilizer.Framework.Core.CodeNotation
 import QEC.Stabilizer.Framework.Symplectic.IndependentEquiv
 import QEC.Stabilizer.Foundations.BinarySymplectic.SymplecticInner
 import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
@@ -481,7 +482,7 @@ private def logicalOpsSteane7 : Fin 1 → LogicalQubitOps 7 stabilizerGroup :=
     logicalX_anticommutes_logicalZ⟩
 
 /-- The Steane code as a stabilizer code [[7, 1]]: one logical qubit. -/
-noncomputable def stabilizerCode : StabilizerCode 7 1 where
+noncomputable def stabilizerCode : Code[[7, 1]] where
   hk := by decide
   generatorsList := generatorsList
   generators_length := rfl
