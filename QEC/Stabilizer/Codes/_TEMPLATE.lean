@@ -42,8 +42,10 @@ straightforwardly to:
   `logical_commute_cross` — for `k = 1` the `Subsingleton.elim` shortcut
   suffices; for `k ≥ 2` you need explicit case-splits on `Fin k × Fin k`.
 - **Parametric families** (toric, rotated surface, …) — generators are
-  defined as functions of `L` (written with the symbolic `σ[n | i ↦ Z, …]`
-  form, see §1), the subgroup is parametric, and the
+  defined as functions of `L` (the toric, repetition and iceberg families
+  write theirs with the symbolic `σ[n | i ↦ Z, …]` form, see §1; the rotated
+  surface code builds them through the homological-code layer instead),
+  the subgroup is parametric, and the
   `StabilizerCode` packaging often requires a *trimmed* generator list (see
   `ToricCodeNStabilizerCode.lean` for the pattern). The distance proof
   typically lives in a *separate file* (`<Code>Distance.lean`).

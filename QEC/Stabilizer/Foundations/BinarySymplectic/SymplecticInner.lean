@@ -57,22 +57,12 @@ exactly that operator-level form** — so `commutes_iff_symplectic_inner_zero`,
 the delaborator prints the form back as `⟪p, q⟫ₛ`. The `ₛ` suffix keeps it clear of
 mathlib's inner-product brackets `⟪x, y⟫_𝕜`.
 
-`NQubitPauliGroupElement.symplecticInner p q` and `NQubitPauliGroupElement.symp g` are the
-same two quantities as plain definitions (dot notation `p.symplecticInner q`, `g.symp`, and
-`symp '' S` as a set image); both unfold to the operator-level form by `rfl`
-(`symplecticInner_def`, `symp_def`, both `simp`). `symplecticInner` is `protected` so a bare
-`symplecticInner` keeps meaning the operator-level one in files that open both namespaces. -/
+The delaborator is `scoped` with the notation, so `⟪p, q⟫ₛ` only appears in files that can
+parse it; elsewhere the operator-level form prints as is. There is deliberately no
+group-level definition behind the notation: the operator-level function is the single
+normal form every lemma is stated in. -/
 
 namespace NQubitPauliGroupElement
-
-/-- Symplectic inner product of two Pauli group elements: that of their operator parts
-(`⟪p, q⟫ₛ` is notation for the unfolded form, see `symplecticInner_def`). -/
-protected def symplecticInner (p q : NQubitPauliGroupElement n) : ZMod 2 :=
-  NQubitPauliOperator.symplecticInner p.operators q.operators
-
-/-- The symplectic vector of a Pauli group element: that of its operator part. -/
-def symp (g : NQubitPauliGroupElement n) : Fin (n + n) → ZMod 2 :=
-  NQubitPauliOperator.toSymplectic g.operators
 
 /-- `⟪p, q⟫ₛ` is the symplectic inner product of the operator parts of the Pauli group
 elements `p`, `q`: it elaborates to exactly
@@ -82,16 +72,10 @@ scoped notation:max "⟪" p ", " q "⟫ₛ" =>
   NQubitPauliOperator.symplecticInner (NQubitPauliGroupElement.operators p)
     (NQubitPauliGroupElement.operators q)
 
-@[simp] lemma symplecticInner_def (p q : NQubitPauliGroupElement n) :
-    p.symplecticInner q = ⟪p, q⟫ₛ := rfl
-
-@[simp] lemma symp_def (g : NQubitPauliGroupElement n) :
-    symp g = NQubitPauliOperator.toSymplectic g.operators := rfl
-
 open Lean PrettyPrinter Delaborator SubExpr in
 /-- Display `NQubitPauliOperator.symplecticInner p.operators q.operators` as `⟪p, q⟫ₛ`;
 any other application of `symplecticInner` keeps the default printer. -/
-@[app_delab Quantum.NQubitPauliOperator.symplecticInner]
+@[scoped app_delab Quantum.NQubitPauliOperator.symplecticInner]
 def delabSymplecticInner : Delab :=
   whenPPOption getPPNotation <| whenNotPPOption getPPExplicit do
     let e ← getExpr
@@ -107,10 +91,27 @@ section RoundTrip
 example (p q : NQubitPauliGroupElement n) :
     ⟪p, q⟫ₛ = NQubitPauliOperator.symplecticInner p.operators q.operators := rfl
 
-example (p q : NQubitPauliGroupElement n) : p.symplecticInner q = ⟪p, q⟫ₛ := rfl
+open Lean Elab Command in
+/-- Display test: elaborate `stx` and check that its pretty-printed text is `expected`
+(`exact := false`: contains `expected`). Run through `run_cmd` so no `#`-command is needed. -/
+private def checkDisplay (stx : Syntax) (expected : String) (exact : Bool := true) :
+    CommandElabM Unit :=
+  liftTermElabM do
+    let e ← Term.elabTerm stx none
+    Term.synthesizeSyntheticMVarsNoPostponing
+    let s := toString (← Meta.ppExpr (← instantiateMVars e))
+    unless (if exact then s == expected else (s.splitOn expected).length > 1) do
+      throwError "display test failed:{indentD s}\nexpected{indentD expected}"
 
-example (g : NQubitPauliGroupElement n) : symp g = NQubitPauliOperator.toSymplectic g.operators :=
-  rfl
+run_cmd do
+  checkDisplay (← `(fun (p q : NQubitPauliGroupElement 3) => ⟪p, q⟫ₛ))
+    "⟪p, q⟫ₛ" (exact := false)
+-- a bare operator on one side keeps the default printer
+run_cmd do
+  checkDisplay
+    (← `(fun (op : NQubitPauliOperator 3) (q : NQubitPauliGroupElement 3) =>
+          NQubitPauliOperator.symplecticInner op q.operators))
+    "op.symplecticInner q.operators" (exact := false)
 
 end RoundTrip
 
@@ -225,8 +226,8 @@ lemma toSymplectic_inv_operators (g : NQubitPauliGroupElement n) :
   span of the symplectic vectors of the set. -/
 lemma toSymplectic_mem_span_of_mem_closure {S : Set (NQubitPauliGroupElement n)}
     {x : NQubitPauliGroupElement n} (hx : x ∈ Subgroup.closure S) :
-    toSymplectic x.operators ∈ span (ZMod 2) (NQubitPauliGroupElement.symp '' S) := by
-  let sp := span (ZMod 2) (NQubitPauliGroupElement.symp '' S)
+    toSymplectic x.operators ∈ span (ZMod 2) ((fun g => toSymplectic g.operators) '' S) := by
+  let sp := span (ZMod 2) ((fun g => toSymplectic g.operators) '' S)
   suffices toSymplectic x.operators ∈ sp by exact this
   refine Subgroup.closure_induction
     (p := fun k _ => toSymplectic k.operators ∈ sp) ?_ ?_ ?_ ?_ hx

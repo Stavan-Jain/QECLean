@@ -110,45 +110,15 @@ namespace StabilizerCode
 noncomputable def toStabilizerGroup (C : StabilizerCode n k) : StabilizerGroup n :=
   mkStabilizerFromGenerators n C.generatorsList C.generators_commute C.closure_no_neg_identity
 
-/-- Logical X for logical qubit ℓ. -/
-def logicalX (C : StabilizerCode n k) (ℓ : Fin k) : NQubitPauliGroupElement n :=
+/-- Logical X for logical qubit ℓ, i.e. `(C.logicalOps ℓ).xOp`. A reducible abbreviation,
+so `simp` sees through it and lemmas may be stated in either spelling; there is deliberately
+no display rewriting between the two — a goal prints whichever spelling its term carries. -/
+abbrev logicalX (C : StabilizerCode n k) (ℓ : Fin k) : NQubitPauliGroupElement n :=
   (C.logicalOps ℓ).xOp
 
-/-- Logical Z for logical qubit ℓ. -/
-def logicalZ (C : StabilizerCode n k) (ℓ : Fin k) : NQubitPauliGroupElement n :=
+/-- Logical Z for logical qubit ℓ, i.e. `(C.logicalOps ℓ).zOp` (see `logicalX`). -/
+abbrev logicalZ (C : StabilizerCode n k) (ℓ : Fin k) : NQubitPauliGroupElement n :=
   (C.logicalOps ℓ).zOp
-
-section Delab
-
-open Lean PrettyPrinter Delaborator SubExpr
-
-/-- Build the syntax `C.f ℓ` (generalized field notation) from delaborated `C`, `ℓ`. -/
-private def mkFieldApp (C : Term) (f : Name) (ℓ : Term) : Term :=
-  let proj : Term := ⟨Syntax.node .none ``Lean.Parser.Term.proj #[C, mkAtom ".", mkIdent f]⟩
-  ⟨Syntax.node .none ``Lean.Parser.Term.app #[proj, Syntax.node .none nullKind #[ℓ]]⟩
-
-/-- Delaborate `(C.logicalOps ℓ).xOp` / `(C.logicalOps ℓ).zOp` as `C.logicalX ℓ` /
-`C.logicalZ ℓ`. Fires only when the `LogicalQubitOps` argument is literally a
-`StabilizerCode.logicalOps` application; any other projection keeps the default printer. -/
-private def delabLogicalProj (f : Name) : Delab :=
-  whenPPOption getPPNotation <| whenNotPPOption getPPExplicit do
-    let e ← getExpr
-    unless e.getAppNumArgs == 3 do failure
-    let ops := e.appArg!
-    unless ops.isAppOfArity ``Quantum.StabilizerGroup.StabilizerCode.logicalOps 4 do failure
-    let C ← withNaryArg 2 <| withNaryArg 2 delab
-    let ℓ ← withNaryArg 2 <| withNaryArg 3 delab
-    return mkFieldApp C f ℓ
-
-/-- `(C.logicalOps ℓ).xOp` displays as `C.logicalX ℓ`. -/
-@[app_delab Quantum.StabilizerGroup.LogicalQubitOps.xOp]
-def delabLogicalX : Delab := delabLogicalProj `logicalX
-
-/-- `(C.logicalOps ℓ).zOp` displays as `C.logicalZ ℓ`. -/
-@[app_delab Quantum.StabilizerGroup.LogicalQubitOps.zOp]
-def delabLogicalZ : Delab := delabLogicalProj `logicalZ
-
-end Delab
 
 /-- Logical X for qubit ℓ is not in the stabilizer subgroup. -/
 theorem logicalX_not_mem_subgroup (C : StabilizerCode n k) (ℓ : Fin k) :

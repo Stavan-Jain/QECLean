@@ -62,13 +62,15 @@ Terms of exactly that literal shape (literal phase, literal indices, `PauliOpera
 constructors, literal qubit count) display back as `σ[…]`/`iσ[…]`/`-σ[…]`/`-iσ[…]` in
 goals and diagnostics, and a literal-shaped `.set` chain on its own displays as `P[…]`
 (so an element whose phase is not a literal shows as `⟨k, P[…]⟩`; a bare `identity n`
-keeps its name). A `.set` chain over an `identity n` that is not of that literal shape —
-symbolic qubit count or indices, an out-of-range literal index — displays in the symbolic
-form `σ[n | i ↦ Z, …]` / `P[n | i ↦ Z, …]` as long as its operators are `X`/`Y`/`Z`
-constructors, with the `.set`s listed innermost first (the written order). Anything else
-— variable phase or operators, an explicit `I`, a chain not rooted at `identity` — is left
-to the default printer. The delaborators are registered globally, so the display is
-independent of whether the scope is open; `set_option pp.notation false` (or
+keeps its name). The letters form is used only for a chain in the literal normal form —
+literal indices in strictly increasing order, no explicit `I` — so that the display
+re-parses to the very same term. Any other `.set` chain over an `identity n` whose
+operators are `X`/`Y`/`Z` constructors — symbolic qubit count or indices, literal indices
+out of order or out of range — displays in the symbolic form `σ[n | i ↦ Z, …]` /
+`P[n | i ↦ Z, …]`, with the `.set`s listed innermost first (the written order). Anything
+else — variable phase or operators, an explicit `I`, a chain not rooted at `identity` — is
+left to the default printer. The delaborators are `scoped` with the notation, so a goal
+only ever shows syntax the current file can parse; `set_option pp.notation false` (or
 `pp.explicit true`) recovers the raw term.
 -/
 
@@ -284,10 +286,16 @@ def lettersOf? (n : Nat) (sets : List (Nat × Char)) : Option Ident := do
     sets.foldl (fun acc ic => if ic.1 == j then ic.2 else acc) 'I'
   return mkIdent (.mkSimple letters)
 
-/-- The letters identifier of the literal `set`-chain at the current position, if it is
-one over `n > 0` qubits with in-range literal indices. -/
+/-- The letters identifier of the `set`-chain `e`, if it is in the literal normal form the
+letters notation expands to: literal `n > 0`, literal in-range indices in strictly
+increasing order, and no explicit `I`. A chain of any other shape (an out-of-order literal
+index, a set `I`) is left to the symbolic printer, so that the display always re-parses to
+the same term. -/
 def literalLetters? (e : Expr) : Option Ident := do
   let (n, sets) ← setChain? e
+  guard (sets.all fun ic => ic.2 != 'I')
+  let idxs := sets.map (·.1)
+  guard ((idxs.zip (idxs.drop 1)).all fun ab => ab.1 < ab.2)
   lettersOf? n sets
 
 /-- Delaborate the symbolic `set`-chain at the current position: a chain
@@ -312,10 +320,11 @@ partial def delabSymbolicChain : DelabM (Term × Array Term × Array Ident) := d
 
 /-- Delaborate `NQubitPauliGroupElement.mk` applications back to the
 `σ[…]`/`iσ[…]`/`-σ[…]`/`-iσ[…]` notation. Fires only when the phase is a literal `0`–`3`
-and the operator part is a `set`-chain over `identity n`: a literal chain (literal `n > 0`,
-in-range literal indices) displays in the letters form `σ[XIZ]`, any other chain with
-`X`/`Y`/`Z` operators in the symbolic form `σ[n | i ↦ Z, …]`; stays silent otherwise. -/
-@[app_delab Quantum.NQubitPauliGroupElement.mk]
+and the operator part is a `set`-chain over `identity n`: a chain in the literal normal
+form (see `literalLetters?`) displays in the letters form `σ[XIZ]`, any other chain with
+`X`/`Y`/`Z` operators in the symbolic form `σ[n | i ↦ Z, …]`; stays silent otherwise.
+Scoped with the notation. -/
+@[scoped app_delab Quantum.NQubitPauliGroupElement.mk]
 def delabSigma : Delab :=
   whenPPOption getPPNotation <| whenNotPPOption getPPExplicit do
     let e ← getExpr
@@ -339,12 +348,13 @@ def delabSigma : Delab :=
       | _ => failure
 
 /-- Delaborate `NQubitPauliOperator.set` chains back to the `P[…]` notation. Fires only on
-a `set` application whose whole chain runs over an `identity n`: a literal chain (literal
-`n > 0`, in-range literal indices) displays as `P[XIZ]`, any other chain with `X`/`Y`/`Z`
+a `set` application whose whole chain runs over an `identity n`: a chain in the literal
+normal form (see `literalLetters?`) displays as `P[XIZ]`, any other chain with `X`/`Y`/`Z`
 operators as `P[n | i ↦ Z, …]`; stays silent otherwise (in particular a bare `identity n`
 keeps its name). An over-applied chain — the operator string evaluated at a qubit,
-`P[XIZ] i` — is handled by `withOverApp`, so the extra arguments follow the notation. -/
-@[app_delab Quantum.NQubitPauliOperator.set]
+`P[XIZ] i` — is handled by `withOverApp`, so the extra arguments follow the notation.
+Scoped with the notation. -/
+@[scoped app_delab Quantum.NQubitPauliOperator.set]
 def delabPauliString : Delab :=
   whenPPOption getPPNotation <| whenNotPPOption getPPExplicit <| withOverApp 4 do
     let e ← getExpr
@@ -445,5 +455,52 @@ example (n : ℕ) (i j : Fin n) : σ[n | i ↦ X, j ↦ Z].operators = P[n | i �
 
 example (i : Fin 3) : P[3 | i ↦ Z] = (NQubitPauliOperator.identity 3).set i PauliOperator.Z :=
   rfl
+
+/-! ### Display
+
+The printers are checked on their output: literal normal forms print in the letters form,
+everything else that re-parses prints in the symbolic form, and a chain that would not
+re-parse to itself (an explicit `I`) is left to the default printer. -/
+
+open Lean Elab Command in
+/-- Display test: elaborate `stx` and check that its pretty-printed text is `expected`
+(`exact := false`: contains `expected`). Run through `run_cmd` so no `#`-command is needed. -/
+private def checkDisplay (stx : Syntax) (expected : String) (exact : Bool := true) :
+    CommandElabM Unit :=
+  liftTermElabM do
+    let e ← Term.elabTerm stx none
+    Term.synthesizeSyntheticMVarsNoPostponing
+    let s := toString (← Meta.ppExpr (← instantiateMVars e))
+    unless (if exact then s == expected else (s.splitOn expected).length > 1) do
+      throwError "display test failed:{indentD s}\nexpected{indentD expected}"
+
+run_cmd do
+  checkDisplay (← `(σ[XIZ])) "σ[XIZ]"
+run_cmd do
+  checkDisplay (← `(-iσ[XI])) "-iσ[XI]"
+run_cmd do
+  checkDisplay (← `(P[XIZ])) "P[XIZ]"
+run_cmd do
+  checkDisplay (← `(σ[IIII])) "σ[IIII]"
+-- written order that is not the sorted normal form stays symbolic (a different term)
+run_cmd do
+  checkDisplay (← `(σ[3 | 1 ↦ Z, 0 ↦ X])) "σ[3 | 1 ↦ Z, 0 ↦ X]"
+run_cmd do
+  checkDisplay (← `(P[3 | 1 ↦ Z, 0 ↦ Z])) "P[3 | 1 ↦ Z, 0 ↦ Z]"
+-- sorted written order is the literal normal form
+run_cmd do
+  checkDisplay (← `(P[3 | 0 ↦ Z, 1 ↦ Z])) "P[ZZI]"
+-- an explicit `I` never prints as a letters string that would drop it
+run_cmd do
+  checkDisplay
+    (← `(((NQubitPauliOperator.identity 3).set 0 PauliOperator.X).set 1 PauliOperator.I))
+    "P[XII].set 1 PauliOperator.I"
+-- symbolic qubit count and indices
+run_cmd do
+  checkDisplay (← `(fun (n : ℕ) (i j : Fin n) => σ[n | j ↦ X, i ↦ Y]))
+    "σ[n | j ↦ X, i ↦ Y]" (exact := false)
+run_cmd do
+  checkDisplay (← `(fun (n : ℕ) (i : Fin n) => P[n | i ↦ Z] i))
+    "P[n | i ↦ Z] i" (exact := false)
 
 end RoundTrip

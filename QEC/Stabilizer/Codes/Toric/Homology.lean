@@ -18,14 +18,15 @@ def toricBoundaries : Submodule (ZMod 2) (C1 L) :=
   LinearMap.range (∂₂ (L := L))
 
 /-- `Z₁ L` is the toric 1-cycle submodule `toricCycles L` (`L` explicit, as for `∂₁`).
-Scoped: `open scoped ToricChain`. -/
+Scoped: `open scoped ToricChain`. The `RotatedSurfaceChain` scope binds the same tokens
+`Z₁`/`B₁`/`H₁` to the rotated-surface submodules, so open one of the two scopes per file;
+the notation names the lattice constants, not the `ToricCodeN` aliases of them. -/
 scoped[ToricChain] notation "Z₁" => Quantum.Stabilizer.Lattice.toricCycles
 
 /-- `B₁ L` is the toric 1-boundary submodule `toricBoundaries L`.
 Scoped: `open scoped ToricChain`. -/
 scoped[ToricChain] notation "B₁" => Quantum.Stabilizer.Lattice.toricBoundaries
 
-open scoped ToricChain
 
 /-- Every boundary is a cycle (`im ∂2 ≤ ker ∂1`). -/
 theorem toricBoundaries_le_toricCycles :
@@ -43,7 +44,6 @@ abbrev toricH1 : Type :=
 Scoped: `open scoped ToricChain`. -/
 scoped[ToricChain] notation "H₁" => Quantum.Stabilizer.Lattice.toricH1
 
-open scoped ToricChain
 
 end Lattice
 end Stabilizer

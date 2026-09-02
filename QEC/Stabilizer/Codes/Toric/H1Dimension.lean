@@ -280,18 +280,18 @@ theorem toric_rank_boundary1 :
   have hcut_rk :
       dim₂ (LinearMap.range (δ⁰ (L := L))) = L * L - 1 := by
     have hcut_rn := LinearMap.finrank_range_add_finrank_ker (δ⁰ (L := L))
-    have hC0 := toric_finrank_C0 (L := L)
-    have hker := toric_finrank_ker_cutMap_eq_one (L := L)
+    have hC0 := toric_finrank_C0 L
+    have hker := toric_finrank_ker_cutMap_eq_one L
     omega
-  have hbridge := toric_rank_boundary1_eq_rank_cutMap (L := L)
+  have hbridge := toric_rank_boundary1_eq_rank_cutMap L
   omega
 
 /-- Target cycle-space dimension formula. -/
 theorem toric_finrank_cycles :
     dim₂ (Z₁ L) = L * L + 1 := by
-  have hrn := toric_rank_nullity_boundary1 (L := L)
-  have hC1 := toric_finrank_C1 (L := L)
-  have hrk := toric_rank_boundary1 (L := L)
+  have hrn := toric_rank_nullity_boundary1 L
+  have hC1 := toric_finrank_C1 L
+  have hrk := toric_rank_boundary1 L
   rw [hC1, hrk] at hrn
   have hEq : dim₂ (Z₁ L) + (L * L - 1) = 2 * L * L := by
     simpa [add_comm, add_left_comm, add_assoc] using hrn.symm
@@ -393,34 +393,34 @@ theorem toric_finrank_ker_boundary2_eq_one :
 /-- Target boundary-space dimension formula. -/
 theorem toric_finrank_boundaries :
     dim₂ (B₁ L) = L * L - 1 := by
-  have hrn := toric_rank_nullity_boundary2 (L := L)
-  have hC2 := toric_finrank_C2 (L := L)
-  have hker := toric_finrank_ker_boundary2_eq_one (L := L)
+  have hrn := toric_rank_nullity_boundary2 L
+  have hC2 := toric_finrank_C2 L
+  have hker := toric_finrank_ker_boundary2_eq_one L
   omega
 
 /-- Quotient-dimension bridge for `H₁ = Z₁ / B₁`. -/
 theorem toric_finrank_H1_eq_cycles_sub_boundaries
     :
     @Module.finrank (ZMod 2) (H₁ L) _
-      (Submodule.Quotient.addCommGroup (toricBoundarySubmoduleInCycles (L := L))).toAddCommMonoid
-      (Submodule.Quotient.module (toricBoundarySubmoduleInCycles (L := L))) =
+      (Submodule.Quotient.addCommGroup (toricBoundarySubmoduleInCycles L)).toAddCommMonoid
+      (Submodule.Quotient.module (toricBoundarySubmoduleInCycles L)) =
       dim₂ (Z₁ L) -
         dim₂ (B₁ L) := by
   have hquot :
       @Module.finrank (ZMod 2) (H₁ L) _
           (Submodule.Quotient.addCommGroup
-            (toricBoundarySubmoduleInCycles (L := L))).toAddCommMonoid
-          (Submodule.Quotient.module (toricBoundarySubmoduleInCycles (L := L))) +
-          dim₂ (toricBoundarySubmoduleInCycles (L := L)) =
+            (toricBoundarySubmoduleInCycles L)).toAddCommMonoid
+          (Submodule.Quotient.module (toricBoundarySubmoduleInCycles L)) +
+          dim₂ (toricBoundarySubmoduleInCycles L) =
         dim₂ (Z₁ L) := by
     simpa [toricH1, toricBoundarySubmoduleInCycles] using
       (Submodule.finrank_quotient_add_finrank (R := ZMod 2)
-        (toricBoundarySubmoduleInCycles (L := L)))
+        (toricBoundarySubmoduleInCycles L))
   have hcomap :
-      dim₂ (toricBoundarySubmoduleInCycles (L := L)) =
+      dim₂ (toricBoundarySubmoduleInCycles L) =
         dim₂ (B₁ L) := by
     simpa [toricBoundarySubmoduleInCycles] using
-      (Submodule.comapSubtypeEquivOfLe (toric_boundaries_le_cycles (L := L))).finrank_eq
+      (Submodule.comapSubtypeEquivOfLe (toric_boundaries_le_cycles L)).finrank_eq
   rw [hcomap] at hquot
   exact Nat.eq_sub_of_add_eq hquot
 
@@ -428,11 +428,11 @@ theorem toric_finrank_H1_eq_cycles_sub_boundaries
 theorem toric_finrank_H1_eq_two
     :
     @Module.finrank (ZMod 2) (H₁ L) _
-      (Submodule.Quotient.addCommGroup (toricBoundarySubmoduleInCycles (L := L))).toAddCommMonoid
-      (Submodule.Quotient.module (toricBoundarySubmoduleInCycles (L := L))) = 2 := by
-  have hH := toric_finrank_H1_eq_cycles_sub_boundaries (L := L)
-  have hC := toric_finrank_cycles (L := L)
-  have hB := toric_finrank_boundaries (L := L)
+      (Submodule.Quotient.addCommGroup (toricBoundarySubmoduleInCycles L)).toAddCommMonoid
+      (Submodule.Quotient.module (toricBoundarySubmoduleInCycles L)) = 2 := by
+  have hH := toric_finrank_H1_eq_cycles_sub_boundaries L
+  have hC := toric_finrank_cycles L
+  have hB := toric_finrank_boundaries L
   rw [hC, hB] at hH
   have hsq : 1 ≤ L * L := by
     have hL : 0 < L := Fact.out

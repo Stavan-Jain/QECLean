@@ -79,20 +79,27 @@ kernel `decide`s downstream run through. Monomials are `1`, `x`, `y`, `x^i`, `y^
 declare_syntax_cat bbPoly (behavior := both)
 
 /-- The constant monomial `1` (the point `(0, 0)`); other numerals are rejected. -/
-syntax num : bbPoly
+scoped syntax num : bbPoly
 /-- The monomial `x` or `x^i` (the point `(i, 0)`). -/
-syntax &"x" ("^" num)? : bbPoly
+scoped syntax &"x" ("^" num)? : bbPoly
 /-- The monomial `y` or `y^j` (the point `(0, j)`). -/
-syntax &"y" ("^" num)? : bbPoly
+scoped syntax &"y" ("^" num)? : bbPoly
 /-- The monomial `x^i*y^j` (the point `(i, j)`), either exponent optional. -/
-syntax &"x" ("^" num)? "*" &"y" ("^" num)? : bbPoly
+scoped syntax &"x" ("^" num)? "*" &"y" ("^" num)? : bbPoly
 /-- Polynomial sum, left-associative. -/
-syntax:65 bbPoly:65 " + " bbPoly:66 : bbPoly
+scoped syntax:65 bbPoly:65 " + " bbPoly:66 : bbPoly
 
 /-- `poly[x^3 + y + y^2]` is the indicator function
 `fun g => if g = (3, 0) ∨ g = (0, 1) ∨ g = (0, 2) then 1 else 0` of the monomials'
 exponent points, for use as a bivariate-bicycle polynomial `G → ZMod 2`. Scoped to
-`Quantum.Stabilizer.Homological.BB`. -/
+`Quantum.Stabilizer.Homological.BB`.
+
+The `+` is a union of *distinct* exponent points, not addition in `𝔽₂[G]`: the literal is
+the polynomial it spells only when the written monomials are pairwise distinct modulo the
+group orders. A syntactically repeated monomial is rejected, but a coincidence modulo the
+orders cannot be seen at macro time — `poly[1 + x^6]` is `1 + x⁶` over `ZMod 12 × ZMod 6`
+but the constant `1` (not `0`) over `ZMod 6 × ZMod 6` — so check the exponents against the
+intended group. There is no literal for the zero polynomial; write `0`. -/
 scoped syntax:max (name := polyLit) "poly[" bbPoly "]" : term
 
 /-- The exponent points `(a, b)` of a `bbPoly` sum, in the written order. -/
@@ -114,6 +121,9 @@ partial def monomialsOf : TSyntax `bbPoly → MacroM (List (Nat × Nat))
 macro_rules
   | `(poly[$p]) => do
     let mons ← monomialsOf p
+    if let some d := mons.find? fun m => mons.count m > 1 then
+      Macro.throwErrorAt p
+        s!"repeated monomial x^{d.1}*y^{d.2}: `+` in `poly[…]` is a union of distinct points"
     let g := mkIdent `g
     let some (last, init) := mons.getLast?.map fun l => (l, mons.dropLast) | Macro.throwUnsupported
     let mkEq : Nat × Nat → MacroM Term := fun (a, b) =>
@@ -173,14 +183,23 @@ private def monomialSyntax (m : Nat × Nat) : DelabM (TSyntax `bbPoly) := do
   | (a, b) => `(bbPoly| x ^ $(lit a) * y ^ $(lit b))
 
 /-- Delaborate `fun g => if g = (a₁, b₁) ∨ … then 1 else 0` back to `poly[…]`. Fires only on
-a lambda of exactly that shape with literal exponents; every other lambda is left to the
-default printer. -/
-@[delab lam]
+a lambda of exactly that shape, of type `ZMod ℓ × ZMod m → ZMod 2`, with literal exponents
+and without a `Classical` decidability instance (a `classical` indicator would print the
+same but re-elaborate to a different term); every other lambda is left to the default
+printer. Scoped with the notation. -/
+@[scoped delab lam]
 def delabPolyLit : Delab :=
   whenPPOption getPPNotation <| whenNotPPOption getPPExplicit do
     let e ← getExpr
-    let .lam _ _ body _ := e | failure
+    let .lam _ dom body _ := e | failure
     unless body.isAppOfArity ``ite 5 do failure
+    let dom ← Meta.whnfR dom
+    unless dom.isAppOfArity ``Prod 2 && (dom.getArg! 0).isAppOfArity ``ZMod 1 &&
+        (dom.getArg! 1).isAppOfArity ``ZMod 1 do failure
+    let cod ← Meta.whnfR (body.getArg! 0)
+    unless cod.isAppOfArity ``ZMod 1 && numeral? (cod.getArg! 0) == some 2 do failure
+    if ((body.getArg! 2).find? fun c => c.isConstOf ``Classical.propDecidable).isSome then
+      failure
     unless numeral? (body.getArg! 3) == some 1 && numeral? (body.getArg! 4) == some 0 do
       failure
     let some mons := exponentPoints? (body.getArg! 1) | failure
@@ -593,6 +612,31 @@ example (a b : G → ZMod 2) : a ⋆ b = conv a b := rfl
 example (a b c : G → ZMod 2) : a ⋆ b ⋆ c = conv (conv a b) c := rfl
 
 example (a b : G → ZMod 2) (g : G) : (a ⋆ b) g = conv a b g := rfl
+
+open Lean Elab Command in
+/-- Display test: elaborate `stx` and check that its pretty-printed text is `expected`
+(`exact := false`: contains `expected`). Run through `run_cmd` so no `#`-command is needed. -/
+private def checkDisplay (stx : Syntax) (expected : String) (exact : Bool := true) :
+    CommandElabM Unit :=
+  liftTermElabM do
+    let e ← Term.elabTerm stx none
+    Term.synthesizeSyntheticMVarsNoPostponing
+    let s := toString (← Meta.ppExpr (← instantiateMVars e))
+    unless (if exact then s == expected else (s.splitOn expected).length > 1) do
+      throwError "display test failed:{indentD s}\nexpected{indentD expected}"
+
+run_cmd do
+  checkDisplay (← `((poly[x^3 + y + y^2] : ZMod 12 × ZMod 6 → ZMod 2)))
+    "poly[x^3 + y + y^2]"
+run_cmd do
+  checkDisplay (← `((poly[1 + x*y^2] : ZMod 3 × ZMod 3 → ZMod 2))) "poly[1 + x*y^2]"
+-- an indicator of the same shape over another type is not a bivariate-bicycle polynomial
+run_cmd do
+  checkDisplay (← `(fun p : ℕ × ℕ => if p = (1, 2) ∨ p = (0, 3) then (1 : ℕ) else 0))
+    "if p = (1, 2) ∨ p = (0, 3) then 1 else 0" (exact := false)
+run_cmd do
+  checkDisplay (← `(fun (a b : ZMod 12 × ZMod 6 → ZMod 2) => a ⋆ b))
+    "a ⋆ b" (exact := false)
 
 end RoundTrip
 

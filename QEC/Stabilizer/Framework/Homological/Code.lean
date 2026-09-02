@@ -23,7 +23,8 @@ The CSS construction itself is in `QEC/Stabilizer/Homological/CSS.lean`.
 
 /-- `dim₂ V` is `Module.finrank (ZMod 2) V`, the `𝔽₂`-dimension of a chain space, cycle
 space, or homology group (mathlib precedent: `local notation "dim" => Module.finrank ℝ`).
-`dim₂ V` elaborates to exactly `Module.finrank (ZMod 2) V`. Scoped: enable with
+`dim₂ V` elaborates to exactly `Module.finrank (ZMod 2) V`, and the unexpander the
+`notation` command generates prints it back while the scope is open. Scoped: enable with
 `open scoped Homology`. -/
 scoped[Homology] notation "dim₂" => Module.finrank (ZMod 2)
 
@@ -34,11 +35,20 @@ namespace Homological
 open scoped BigOperators
 open scoped Homology
 
-/-- Display `Module.finrank (ZMod 2) V` as `dim₂ V`. -/
-@[app_unexpander Module.finrank]
-def unexpandDim₂ : Lean.PrettyPrinter.Unexpander
-  | `($_ (ZMod 2) $V) => `(dim₂ $V)
-  | _ => throw ()
+open Lean Elab Command in
+/-- Display test: elaborate `stx` and check that its pretty-printed text is `expected`
+(`exact := false`: contains `expected`). Run through `run_cmd` so no `#`-command is needed. -/
+private def checkDisplay (stx : Syntax) (expected : String) (exact : Bool := true) :
+    CommandElabM Unit :=
+  liftTermElabM do
+    let e ← Term.elabTerm stx none
+    Term.synthesizeSyntheticMVarsNoPostponing
+    let s := toString (← Meta.ppExpr (← instantiateMVars e))
+    unless (if exact then s == expected else (s.splitOn expected).length > 1) do
+      throwError "display test failed:{indentD s}\nexpected{indentD expected}"
+
+run_cmd do
+  checkDisplay (← `(Module.finrank (ZMod 2) (Fin 3 → ZMod 2))) "dim₂ (Fin 3 → ZMod 2)"
 
 /-- A length-3 chain complex over `ZMod 2` with finite, decidable cells.
 

@@ -61,7 +61,6 @@ scoped[ToricChain] notation "Z¹" => Quantum.Stabilizer.Lattice.toricDualCycles
 vertex cut map). Scoped: `open scoped ToricChain`. -/
 scoped[ToricChain] notation "B¹" => Quantum.Stabilizer.Lattice.toricDualBoundaries
 
-open scoped ToricChain
 
 /-- Every dual boundary is a dual cycle (∂₂ᵀ ∘ ∂₁ᵀ = 0). -/
 theorem toricDualBoundaries_le_toricDualCycles (L : ℕ) [Fact (0 < L)] :

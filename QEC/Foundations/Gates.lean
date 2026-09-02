@@ -37,11 +37,6 @@ Depends on `Basic.lean` for `QubitBasis`, `NQubitBasis`, and state types.
 abbrev QuantumGate (α : Type*) [DecidableEq α] [Fintype α] :=
   Matrix.unitaryGroup α ℂ
 
-/-- A gate is its matrix: `(U : Matrix α α ℂ)` / `↑U` is `U.val`, so matrix-level
-statements can be written `Uᴴ * M * U` instead of `star U.val * M * U.val`. -/
-instance {α : Type*} [DecidableEq α] [Fintype α] : Coe (QuantumGate α) (Matrix α α ℂ) :=
-  ⟨Subtype.val⟩
-
 /-- Single-qubit gates: 2×2 unitaries in the computational basis. -/
 abbrev OneQubitGate : Type :=
   QuantumGate QubitBasis

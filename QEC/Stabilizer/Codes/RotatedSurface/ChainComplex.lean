@@ -40,7 +40,8 @@ def rscBoundaries : Submodule (ZMod 2) (VtxIdx L → ZMod 2) :=
   LinearMap.range (∂₂ L)
 
 /-- `Z₁ L` is the rotated-surface 1-cycle submodule `rscCycles L` (`L` explicit, as for
-`∂₁`). Scoped: `open scoped RotatedSurfaceChain`. -/
+`∂₁`). Scoped: `open scoped RotatedSurfaceChain`. The `ToricChain` scope binds the same
+tokens `Z₁`/`B₁`/`H₁` to the toric submodules, so open one of the two scopes per file. -/
 scoped[RotatedSurfaceChain] notation "Z₁" => Quantum.Stabilizer.Lattice.RotatedSurface.rscCycles
 
 /-- `B₁ L` is the rotated-surface 1-boundary submodule `rscBoundaries L`.
@@ -48,7 +49,6 @@ Scoped: `open scoped RotatedSurfaceChain`. -/
 scoped[RotatedSurfaceChain] notation "B₁" =>
   Quantum.Stabilizer.Lattice.RotatedSurface.rscBoundaries
 
-open scoped RotatedSurfaceChain
 
 /-- Every boundary is a cycle (`∂₁ ∘ ∂₂ = 0`). -/
 theorem rscBoundaries_le_rscCycles [Fact (Odd L)] :
@@ -65,7 +65,6 @@ abbrev rscH1 [Fact (Odd L)] : Type :=
 Scoped: `open scoped RotatedSurfaceChain`. -/
 scoped[RotatedSurfaceChain] notation "H₁" => Quantum.Stabilizer.Lattice.RotatedSurface.rscH1
 
-open scoped RotatedSurfaceChain
 
 /-! ## Row-major qubit indexing -/
 
