@@ -56,6 +56,7 @@ namespace Homological
 namespace BB
 
 open scoped BigOperators
+open scoped Homology
 
 -- Defeq checks through `coverComplex`/`baseComplex` projections and the
 -- `liftCoverData` structure literal unfold deep `Prod`/`ZMod` instance
@@ -485,23 +486,23 @@ theorem bocksteinVanishes_of_elementForm (hEF : D.BocksteinElementForm) :
 /-- **The Bockstein rank equality** under the element form:
 `dim (1+σ)·H₁(cover) = k̃ − k`. -/
 theorem finrank_range_epsH1_eq_of_elementForm (hEF : D.BocksteinElementForm) :
-    Module.finrank (ZMod 2) (LinearMap.range D.epsH1)
-      = Module.finrank (ZMod 2) D.coverComplex.H1
-        - Module.finrank (ZMod 2) D.baseComplex.H1 :=
+    dim₂ (LinearMap.range D.epsH1)
+      = dim₂ D.coverComplex.H1
+        - dim₂ D.baseComplex.H1 :=
   D.finrank_range_epsH1_eq (D.bocksteinVanishes_of_elementForm hEF)
 
 /-- Additive form: `E + k = k̃` (in particular `k̃ ≥ k`). -/
 theorem finrank_range_epsH1_add_eq_of_elementForm
     (hEF : D.BocksteinElementForm) :
-    Module.finrank (ZMod 2) (LinearMap.range D.epsH1)
-        + Module.finrank (ZMod 2) D.baseComplex.H1
-      = Module.finrank (ZMod 2) D.coverComplex.H1 :=
+    dim₂ (LinearMap.range D.epsH1)
+        + dim₂ D.baseComplex.H1
+      = dim₂ D.coverComplex.H1 :=
   D.finrank_range_epsH1_add_eq (D.bocksteinVanishes_of_elementForm hEF)
 
 /-- Companion rank: `dim ker ε_* = k`. -/
 theorem finrank_ker_epsH1_eq_of_elementForm (hEF : D.BocksteinElementForm) :
-    Module.finrank (ZMod 2) (LinearMap.ker D.epsH1)
-      = Module.finrank (ZMod 2) D.baseComplex.H1 :=
+    dim₂ (LinearMap.ker D.epsH1)
+      = dim₂ D.baseComplex.H1 :=
   D.finrank_ker_epsH1_eq (D.bocksteinVanishes_of_elementForm hEF)
 
 /-! ## Discharging the element form from an order-4 lift of the deck -/
@@ -690,9 +691,9 @@ theorem finrank_range_epsH1_eq_of_orderFourLift {Ghat : Type}
     (hsurj : Function.Surjective ⇑q)
     (hshat : q shat = D.deckS)
     (hker : ∀ x : Ghat, q x = 0 ↔ x = 0 ∨ x = shat + shat) :
-    Module.finrank (ZMod 2) (LinearMap.range D.epsH1)
-      = Module.finrank (ZMod 2) D.coverComplex.H1
-        - Module.finrank (ZMod 2) D.baseComplex.H1 :=
+    dim₂ (LinearMap.range D.epsH1)
+      = dim₂ D.coverComplex.H1
+        - dim₂ D.baseComplex.H1 :=
   D.finrank_range_epsH1_eq
     (D.bocksteinVanishes_of_orderFourLift q shat horder hsurj hshat hker)
 
@@ -837,9 +838,9 @@ theorem finrank_range_epsH1_eq_of_zmod_double {n m : ℕ} [NeZero n] [NeZero m]
     (D : XDoubleCoverData (ZMod (2 * n) × ZMod m) H)
     (t : ZMod m) (ht : t + t = 0)
     (hdeck : D.deckS = (((n : ℕ) : ZMod (2 * n)), t)) :
-    Module.finrank (ZMod 2) (LinearMap.range D.epsH1)
-      = Module.finrank (ZMod 2) D.coverComplex.H1
-        - Module.finrank (ZMod 2) D.baseComplex.H1 :=
+    dim₂ (LinearMap.range D.epsH1)
+      = dim₂ D.coverComplex.H1
+        - dim₂ D.baseComplex.H1 :=
   D.finrank_range_epsH1_eq (D.bocksteinVanishes_of_zmod_double t ht hdeck)
 
 /-- **The element form for doubled-axis `ZMod` products, second-axis
@@ -959,9 +960,9 @@ theorem finrank_range_epsH1_eq_of_zmod_double_right {n m : ℕ}
     (D : XDoubleCoverData (ZMod m × ZMod (2 * n)) H)
     (t : ZMod m) (ht : t + t = 0)
     (hdeck : D.deckS = (t, ((n : ℕ) : ZMod (2 * n)))) :
-    Module.finrank (ZMod 2) (LinearMap.range D.epsH1)
-      = Module.finrank (ZMod 2) D.coverComplex.H1
-        - Module.finrank (ZMod 2) D.baseComplex.H1 :=
+    dim₂ (LinearMap.range D.epsH1)
+      = dim₂ D.coverComplex.H1
+        - dim₂ D.baseComplex.H1 :=
   D.finrank_range_epsH1_eq
     (D.bocksteinVanishes_of_zmod_double_right t ht hdeck)
 

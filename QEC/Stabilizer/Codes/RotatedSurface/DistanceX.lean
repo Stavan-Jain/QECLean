@@ -36,6 +36,7 @@ namespace StabilizerGroup
 namespace RotatedSurfaceCodeN
 
 open scoped BigOperators
+open scoped Homology
 open scoped RotatedSurfaceChain
 open NQubitPauliGroupElement
 open Stabilizer.Lattice
@@ -281,7 +282,7 @@ theorem middleColChain_not_mem_boundaries :
   rw [h1] at h0
   exact (by decide : (1 : ZMod 2) ≠ 0) h0
 
-/-- The class of `middleColChain` in `rscH1 L` is non-zero. -/
+/-- The class of `middleColChain` in `H₁ L` is non-zero. -/
 private lemma middleColChain_class_ne_zero :
     (Submodule.Quotient.mk
       (⟨middleColChain L, middleColChain_mem_cycles L⟩ :
@@ -300,7 +301,7 @@ theorem cycle_sub_middleColChain_mem_boundaries
     (hc_cycle : c ∈ RotatedSurface.rscCycles L)
     (hc_nontrivial : c ∉ RotatedSurface.rscBoundaries L) :
     c - middleColChain L ∈ RotatedSurface.rscBoundaries L := by
-  have h_dim : Module.finrank (ZMod 2) (RotatedSurface.rscH1 L) = 1 :=
+  have h_dim : dim₂ (RotatedSurface.rscH1 L) = 1 :=
     RotatedSurface.rsc_finrank_H1_eq_one (L := L)
   -- By dim = 1: every element is a scalar multiple of [middleColChain].
   have h_spans :

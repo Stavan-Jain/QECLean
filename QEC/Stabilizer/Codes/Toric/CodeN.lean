@@ -629,15 +629,15 @@ abbrev toricBoundary1 (L : ℕ) [Fact (0 < L)] :=
 
 /-- Alias for toric 1-cycles from the lattice homology layer. -/
 abbrev toricCycles (L : ℕ) [Fact (0 < L)] :=
-  Stabilizer.Lattice.toricCycles (L := L)
+  Stabilizer.Lattice.toricCycles L
 
 /-- Alias for toric 1-boundaries from the lattice homology layer. -/
 abbrev toricBoundaries (L : ℕ) [Fact (0 < L)] :=
-  Stabilizer.Lattice.toricBoundaries (L := L)
+  Stabilizer.Lattice.toricBoundaries L
 
 /-- Alias for toric first homology from the lattice homology layer. -/
 abbrev toricH1 (L : ℕ) [Fact (0 < L)] :=
-  Stabilizer.Lattice.toricH1 (L := L)
+  Stabilizer.Lattice.toricH1 L
 
 end ToricCodeN
 end StabilizerGroup
