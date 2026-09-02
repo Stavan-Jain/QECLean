@@ -26,19 +26,19 @@ conjugation by the transversal gate matrix star U * P * U).
 -/
 
 /-- H Z H† = X (Hadamard conjugates Z to X). -/
-lemma H_conj_Z : H.val * Zmat * star H.val = Xmat := by
+lemma H_conj_Z : H ⊳ Zmat = Xmat := by
   matrix_expand[Hmat, Zmat, Xmat]
 
 /-- H X H† = Z (Hadamard conjugates X to Z). -/
-lemma H_conj_X : H.val * Xmat * star H.val = Zmat := by
+lemma H_conj_X : H ⊳ Xmat = Zmat := by
   matrix_expand[Hmat, Xmat, Zmat]
 
 /-- H† Z H = X. Used when rewriting conjugation by the adjoint transversal gate. -/
-lemma H_adj_Z_H : star H.val * Zmat * H.val = Xmat := by
+lemma H_adj_Z_H : H.valᴴ * Zmat * H.val = Xmat := by
   matrix_expand[Hmat, Xmat, Zmat]
 
 /-- H† X H = Z. Used when rewriting conjugation by the adjoint transversal gate. -/
-lemma H_adj_X_H : star H.val * Xmat * H.val = Zmat := by
+lemma H_adj_X_H : H.valᴴ * Xmat * H.val = Zmat := by
   matrix_expand[Hmat, Xmat, Zmat]
 
 /-! ### Phase gate S
@@ -48,23 +48,23 @@ So S Z S† = Z and S X S† = Y.
 -/
 
 /-- S Z S† = Z (S commutes with Z). -/
-lemma S_conj_Z : S.val * Zmat * star S.val = Zmat := by
+lemma S_conj_Z : S ⊳ Zmat = Zmat := by
   matrix_expand[Smat, Zmat]
 
 /-- S X S† = Y (S conjugates X to Y). -/
-lemma S_conj_X : S.val * Xmat * star S.val = Ymat := by
+lemma S_conj_X : S ⊳ Xmat = Ymat := by
   matrix_expand[Smat, Xmat, Ymat]
 
 /-- S† Z S = Z. Used when rewriting conjugation by the adjoint transversal gate. -/
-lemma S_adj_Z_S : star S.val * Zmat * S.val = Zmat := by
+lemma S_adj_Z_S : S.valᴴ * Zmat * S.val = Zmat := by
   matrix_expand[Smat, Zmat]
 
 /-- S† X S = -Y. Used when rewriting conjugation by the adjoint transversal gate. -/
-lemma S_adj_X_S : star S.val * Xmat * S.val = -Ymat := by
+lemma S_adj_X_S : S.valᴴ * Xmat * S.val = -Ymat := by
   matrix_expand[Smat, Xmat, Ymat]
 
 /-- `inv_S` conjugates Z to itself: `inv_S Z inv_S† = Z`. -/
-lemma inv_S_conj_Z : inv_S.val * Zmat * star inv_S.val = Zmat := by
+lemma inv_S_conj_Z : inv_S ⊳ Zmat = Zmat := by
   calc
     inv_S.val * Zmat * star inv_S.val = star S.val * Zmat * S.val := by
       simp [inv_S_val]
@@ -84,8 +84,7 @@ lemma inv_S_conj_Y : inv_S.val * Ymat * star inv_S.val = Xmat := by
 
 /-- `inv_S` conjugates identity to identity. -/
 lemma inv_S_conj_I :
-    inv_S.val * (1 : Matrix QubitBasis QubitBasis ℂ) * star inv_S.val =
-      (1 : Matrix QubitBasis QubitBasis ℂ) := by
+    inv_S ⊳ (1 : Matrix QubitBasis QubitBasis ℂ) = (1 : Matrix QubitBasis QubitBasis ℂ) := by
   have hU : inv_S.val * star inv_S.val = (1 : Matrix QubitBasis QubitBasis ℂ) := by
     exact Matrix.mem_unitaryGroup_iff.1 inv_S.2
   calc
@@ -96,28 +95,28 @@ lemma inv_S_conj_I :
 /-! ### CNOT (control = first qubit, target = second) -/
 
 /-- CNOT† (X ⊗ I) CNOT = X ⊗ X. -/
-lemma CNOT_adj_X_q1_CNOT : star CNOT.val * X_q1_2.val * CNOT.val = XX_2.val := by
+lemma CNOT_adj_X_q1_CNOT : CNOT.valᴴ * X_q1_2.val * CNOT.val = XX_2.val := by
   rw [CNOT, controllize_val, coe_X, X_q1_2, XX_2, tensorGate_val X 1, tensorGate_val X X]
   ext ⟨c₁, t₁⟩ ⟨c₂, t₂⟩
   fin_cases c₁ <;> fin_cases t₁ <;> fin_cases c₂ <;> fin_cases t₂ <;>
     simp [Matrix.mul_apply, Fintype.sum_prod_type, Xmat]
 
 /-- CNOT† (I ⊗ X) CNOT = I ⊗ X. -/
-lemma CNOT_adj_X_q2_CNOT : star CNOT.val * X_q2_2.val * CNOT.val = X_q2_2.val := by
+lemma CNOT_adj_X_q2_CNOT : CNOT.valᴴ * X_q2_2.val * CNOT.val = X_q2_2.val := by
   rw [CNOT, controllize_val, coe_X, X_q2_2, tensorGate_val 1 X]
   ext ⟨c₁, t₁⟩ ⟨c₂, t₂⟩
   fin_cases c₁ <;> fin_cases t₁ <;> fin_cases c₂ <;> fin_cases t₂ <;>
     simp [Matrix.mul_apply, Fintype.sum_prod_type, Xmat]
 
 /-- CNOT† (Z ⊗ I) CNOT = Z ⊗ I. -/
-lemma CNOT_adj_Z_q1_CNOT : star CNOT.val * Z_q1_2.val * CNOT.val = Z_q1_2.val := by
+lemma CNOT_adj_Z_q1_CNOT : CNOT.valᴴ * Z_q1_2.val * CNOT.val = Z_q1_2.val := by
   rw [CNOT, controllize_val, coe_X, Z_q1_2, tensorGate_val Z 1]
   ext ⟨c₁, t₁⟩ ⟨c₂, t₂⟩
   fin_cases c₁ <;> fin_cases t₁ <;> fin_cases c₂ <;> fin_cases t₂ <;>
     simp [Matrix.mul_apply, Fintype.sum_prod_type, Zmat, Xmat]
 
 /-- CNOT† (I ⊗ Z) CNOT = Z ⊗ Z. -/
-lemma CNOT_adj_Z_q2_CNOT : star CNOT.val * Z_q2_2.val * CNOT.val = ZZ_2.val := by
+lemma CNOT_adj_Z_q2_CNOT : CNOT.valᴴ * Z_q2_2.val * CNOT.val = ZZ_2.val := by
   rw [CNOT, controllize_val, coe_X, Z_q2_2, ZZ_2, tensorGate_val 1 Z, tensorGate_val Z Z]
   ext ⟨c₁, t₁⟩ ⟨c₂, t₂⟩
   fin_cases c₁ <;> fin_cases t₁ <;> fin_cases c₂ <;> fin_cases t₂ <;>

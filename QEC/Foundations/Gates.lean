@@ -37,6 +37,11 @@ Depends on `Basic.lean` for `QubitBasis`, `NQubitBasis`, and state types.
 abbrev QuantumGate (α : Type*) [DecidableEq α] [Fintype α] :=
   Matrix.unitaryGroup α ℂ
 
+/-- A gate is its matrix: `(U : Matrix α α ℂ)` / `↑U` is `U.val`, so matrix-level
+statements can be written `Uᴴ * M * U` instead of `star U.val * M * U.val`. -/
+instance {α : Type*} [DecidableEq α] [Fintype α] : Coe (QuantumGate α) (Matrix α α ℂ) :=
+  ⟨Subtype.val⟩
+
 /-- Single-qubit gates: 2×2 unitaries in the computational basis. -/
 abbrev OneQubitGate : Type :=
   QuantumGate QubitBasis
@@ -108,6 +113,11 @@ noncomputable def conjBy
   {α : Type*} [Fintype α] [DecidableEq α]
   (U : QuantumGate α) (M : Matrix α α ℂ) : Matrix α α ℂ :=
   U.val * M * star U.val
+
+/-- `U ⊳ M` is the conjugation `conjBy U M = U M U†` of a matrix by a gate. Scoped to
+`Quantum` (active throughout the library's namespace). Precedence `70`, like `*`; the
+result is a matrix, so `U ⊳ M = N` needs no parentheses and `(U ⊳ M) i j` does. -/
+scoped notation:70 U:71 " ⊳ " M:71 => conjBy U M
 
 /-- Definitional expansion of `conjBy`. -/
 @[simp] lemma conjBy_def
