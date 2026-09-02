@@ -284,9 +284,13 @@ These are local to this codebase — search here before assuming mathlib has the
   phase-less Pauli string is `P[…]` (`P[XZZXI] : NQubitPauliOperator 5`), which
   elaborates to exactly the bare `.set` chain and displays back as `P[…]` (an
   element with a non-literal phase shows as `⟨k, P[…]⟩`). Concrete
-  literal codes (`Codes/Small/`, `Repetition/Three.lean`) use it; parametric
-  families with symbolic indices (`Repetition/N.lean`, `Iceberg/N.lean`, toric)
-  cannot.
+  literal codes (`Codes/Small/`, `Repetition/Three.lean`) use it. Parametric
+  families with symbolic qubit counts / indices (`Repetition/N.lean`,
+  `Iceberg/N.lean`, `Toric/CodeN.lean`) use the **symbolic form**
+  `σ[n | i ↦ Z, j ↦ Z]` (same leading tokens: `iσ[n | …]`, `-σ[n | …]`,
+  `-iσ[n | …]`, `P[n | …]`; letters `X`/`Y`/`Z`), which elaborates to exactly
+  `⟨0, ((NQubitPauliOperator.identity n).set i Z).set j Z⟩` with the `.set`s in
+  the written order, and displays back the same way.
 - `NQubitPauliGroupElement.toMatrix`, `.mulOp`, `.phasePower`, `.operators`
 - `NQubitPauliGroupElement.Anticommute`, `.anticommutesAt`
 - `NQubitPauliGroupElement.commutes_iff_even_anticommutes` — main parity-based

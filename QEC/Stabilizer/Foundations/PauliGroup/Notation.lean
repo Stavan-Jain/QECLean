@@ -21,6 +21,16 @@ The letters between the brackets form a single identifier over the alphabet `X`,
 of qubits, so `σ[XIZ] : NQubitPauliGroupElement 3` and `P[XIZ] : NQubitPauliOperator 3`
 with no ascription needed.
 
+Parametric families, whose qubit count and positions are terms rather than numerals, use
+the **symbolic form** with the same leading tokens:
+
+- `σ[n | i ↦ Z, j ↦ Z]` — `Z` at qubits `i` and `j` of `n`, phase `+1`
+- `iσ[n | …]`, `-σ[n | …]`, `-iσ[n | …]` — the same with the phase prefixes
+- `P[n | i ↦ Z, j ↦ Z]` — the bare Pauli string
+
+where `n` and the indices are arbitrary terms and the letters are `X`, `Y`, `Z` (see
+§ "Symbolic (parametric) form" below).
+
 The notation is **scoped**: enable it with `open scoped Pauli`. It must be opt-in
 because any notation whose leading token is `σ[` takes over that token from `GetElem`
 indexing (`σ[i]`) for variables named `σ` (likewise `iσ[…]` for variables named `iσ`, and
@@ -52,10 +62,14 @@ Terms of exactly that literal shape (literal phase, literal indices, `PauliOpera
 constructors, literal qubit count) display back as `σ[…]`/`iσ[…]`/`-σ[…]`/`-iσ[…]` in
 goals and diagnostics, and a literal-shaped `.set` chain on its own displays as `P[…]`
 (so an element whose phase is not a literal shows as `⟨k, P[…]⟩`; a bare `identity n`
-keeps its name). Anything else — variable phase or operators, symbolic indices, a
-partially reduced chain — is left to the default printer. The delaborators are
-registered globally, so the display is independent of whether the scope is open;
-`set_option pp.notation false` (or `pp.explicit true`) recovers the raw term.
+keeps its name). A `.set` chain over an `identity n` that is not of that literal shape —
+symbolic qubit count or indices, an out-of-range literal index — displays in the symbolic
+form `σ[n | i ↦ Z, …]` / `P[n | i ↦ Z, …]` as long as its operators are `X`/`Y`/`Z`
+constructors, with the `.set`s listed innermost first (the written order). Anything else
+— variable phase or operators, an explicit `I`, a chain not rooted at `identity` — is left
+to the default printer. The delaborators are registered globally, so the display is
+independent of whether the scope is open; `set_option pp.notation false` (or
+`pp.explicit true`) recovers the raw term.
 -/
 
 namespace Pauli
@@ -130,10 +144,92 @@ macro_rules
   | `(P[$letters:ident]) => expandPauliString letters
 
 /-!
+## Symbolic (parametric) form
+
+`σ[n | i ↦ Z, j ↦ Z]` is the same literal with the qubit count `n` and the indices
+`i`, `j` arbitrary terms — the form parametric families need, where the qubit count is
+`numQubits L` or `n + 2` and the positions are `hEdge L x y` or `Fin.succ i`. It expands
+to exactly
+
+```lean
+⟨0, ((NQubitPauliOperator.identity n).set i PauliOperator.Z).set j PauliOperator.Z⟩
+```
+
+with the `.set`s applied **in the written order** (there is no index to sort by), so a
+downstream `simp [NQubitPauliOperator.set, NQubitPauliOperator.identity]` sees the same
+chain it always did. The letters are `X`, `Y`, `Z` (an explicit `I` is rejected: leave the
+qubit out instead). The phase prefixes and `P[n | …]` work the same way.
+-/
+
+/-- One qubit assignment `i ↦ Z` in a symbolic `σ[n | …]`-family literal: the index `i` is
+an arbitrary term, the letter is `X`, `Y`, or `Z`. -/
+syntax pauliAssign := term " ↦ " ident
+
+/-- `σ[n | i ↦ Z, j ↦ Z]` is the `NQubitPauliGroupElement n` with phase `+1` whose
+operator at `i` is `Z`, at `j` is `Z`, and `I` elsewhere, for arbitrary terms `n`, `i`,
+`j` (letters `X`, `Y`, `Z`). Scoped: enable with `open scoped Pauli`. Elaborates to the
+literal `⟨0, ((NQubitPauliOperator.identity n).set i Z).set j Z⟩`, the `.set`s in the
+written order. -/
+scoped syntax:max (name := sigmaSym) "σ[" term " | " pauliAssign,+ "]" : term
+
+/-- `iσ[n | i ↦ Z, …]`: as `σ[n | i ↦ Z, …]` but with phase `i` (`phasePower = 1`).
+Scoped: enable with `open scoped Pauli`. -/
+scoped syntax:max (name := iSigmaSym) "iσ[" term " | " pauliAssign,+ "]" : term
+
+/-- `-σ[n | i ↦ Z, …]`: as `σ[n | i ↦ Z, …]` but with phase `-1` (`phasePower = 2`).
+Scoped: enable with `open scoped Pauli`. -/
+scoped syntax:max (name := negSigmaSym) "-σ[" term " | " pauliAssign,+ "]" : term
+
+/-- `-iσ[n | i ↦ Z, …]`: as `σ[n | i ↦ Z, …]` but with phase `-i` (`phasePower = 3`).
+Scoped: enable with `open scoped Pauli`. -/
+scoped syntax:max (name := negISigmaSym) "-iσ[" term " | " pauliAssign,+ "]" : term
+
+/-- `P[n | i ↦ Z, j ↦ Z]` is the bare Pauli string on `n` qubits with `Z` at `i` and at
+`j`, for arbitrary terms `n`, `i`, `j`; it is `σ[n | i ↦ Z, j ↦ Z].operators`. Scoped:
+enable with `open scoped Pauli`. Elaborates to the literal
+`((NQubitPauliOperator.identity n).set i Z).set j Z`, the `.set`s in the written order. -/
+scoped syntax:max (name := pauliStringSym) "P[" term " | " pauliAssign,+ "]" : term
+
+/-- The `PauliOperator` constructor named by a letter identifier `X`, `Y`, or `Z`. -/
+def pauliOpOfLetter (c : Ident) : MacroM Term :=
+  match c.getId.eraseMacroScopes with
+  | .str .anonymous "X" => `(Quantum.PauliOperator.X)
+  | .str .anonymous "Y" => `(Quantum.PauliOperator.Y)
+  | .str .anonymous "Z" => `(Quantum.PauliOperator.Z)
+  | _ => Macro.throwErrorAt c "expected a Pauli letter X, Y, or Z"
+
+/-- Expand the symbolic assignments `i₀ ↦ op₀, i₁ ↦ op₁, …` on `n` qubits into the chain
+`((NQubitPauliOperator.identity n).set i₀ op₀).set i₁ op₁ …`, in the written order. This
+is the expansion of `P[n | …]`, and the operator half of the `σ[n | …]` family. -/
+def expandSymbolicString (n : Term) (idxs : Array Term) (letters : Array Ident) :
+    MacroM Term := do
+  let mut ops : Term ← `(Quantum.NQubitPauliOperator.identity $n)
+  for i in idxs, c in letters do
+    let opStx ← pauliOpOfLetter c
+    ops ← `(Quantum.NQubitPauliOperator.set $ops $i $opStx)
+  return ops
+
+/-- Expand a symbolic `σ[n | …]`-family literal with the given `phasePower` into
+`NQubitPauliGroupElement.mk phase ((NQubitPauliOperator.identity n).set i₀ op₀ …)`. -/
+def expandSymbolicSigma (phase : Nat) (n : Term) (idxs : Array Term)
+    (letters : Array Ident) : MacroM Term := do
+  let ops ← expandSymbolicString n idxs letters
+  `(Quantum.NQubitPauliGroupElement.mk $(quote phase) $ops)
+
+macro_rules
+  | `(σ[$n | $[$is ↦ $cs],*]) => expandSymbolicSigma 0 n is cs
+  | `(iσ[$n | $[$is ↦ $cs],*]) => expandSymbolicSigma 1 n is cs
+  | `(-σ[$n | $[$is ↦ $cs],*]) => expandSymbolicSigma 2 n is cs
+  | `(-iσ[$n | $[$is ↦ $cs],*]) => expandSymbolicSigma 3 n is cs
+  | `(P[$n | $[$is ↦ $cs],*]) => expandSymbolicString n is cs
+
+/-!
 ## Delaborator
 
 Displays literal-shaped `NQubitPauliGroupElement.mk` applications back as `σ[…]`, and
-literal-shaped `NQubitPauliOperator.set` chains back as `P[…]`.
+literal-shaped `NQubitPauliOperator.set` chains back as `P[…]`; any other `.set` chain over
+an `identity n` whose operators are `X`/`Y`/`Z` constructors displays in the symbolic form
+`σ[n | i ↦ Z, …]` / `P[n | i ↦ Z, …]`.
 -/
 
 section Delaborator
@@ -188,38 +284,76 @@ def lettersOf? (n : Nat) (sets : List (Nat × Char)) : Option Ident := do
     sets.foldl (fun acc ic => if ic.1 == j then ic.2 else acc) 'I'
   return mkIdent (.mkSimple letters)
 
-/-- Delaborate literal-shaped `NQubitPauliGroupElement.mk` applications back to the
-`σ[…]`/`iσ[…]`/`-σ[…]`/`-iσ[…]` notation. Fires only when the phase is a literal
-`0`–`3`, the operator part is a literal `set`-chain over `identity n` with in-range
-literal indices, and `n > 0`; stays silent otherwise. -/
+/-- The letters identifier of the literal `set`-chain at the current position, if it is
+one over `n > 0` qubits with in-range literal indices. -/
+def literalLetters? (e : Expr) : Option Ident := do
+  let (n, sets) ← setChain? e
+  lettersOf? n sets
+
+/-- Delaborate the symbolic `set`-chain at the current position: a chain
+`((NQubitPauliOperator.identity n).set i₀ op₀).set i₁ op₁ …` whose operators are `X`/`Y`/`Z`
+constructors, with `n` and the indices arbitrary. Returns the delaborated `n` and the
+delaborated indices with their letters, innermost first (the written order of the
+notation); each subterm is delaborated at its own position, so hover and
+`pp.` options behave as usual. Fails on any other shape, including an explicit `I`. -/
+partial def delabSymbolicChain : DelabM (Term × Array Term × Array Ident) := do
+  let e ← getExpr
+  if e.isAppOfArity ``Quantum.NQubitPauliOperator.set 4 then
+    let some c := pauliOpChar? (e.getArg! 3) | failure
+    if c == 'I' then failure
+    let (n, is, cs) ← withNaryArg 1 delabSymbolicChain
+    let i ← withNaryArg 2 delab
+    return (n, is.push i, cs.push (mkIdent (.mkSimple (toString c))))
+  else if e.isAppOfArity ``Quantum.NQubitPauliOperator.identity 1 then
+    let n ← withNaryArg 0 delab
+    return (n, #[], #[])
+  else
+    failure
+
+/-- Delaborate `NQubitPauliGroupElement.mk` applications back to the
+`σ[…]`/`iσ[…]`/`-σ[…]`/`-iσ[…]` notation. Fires only when the phase is a literal `0`–`3`
+and the operator part is a `set`-chain over `identity n`: a literal chain (literal `n > 0`,
+in-range literal indices) displays in the letters form `σ[XIZ]`, any other chain with
+`X`/`Y`/`Z` operators in the symbolic form `σ[n | i ↦ Z, …]`; stays silent otherwise. -/
 @[app_delab Quantum.NQubitPauliGroupElement.mk]
 def delabSigma : Delab :=
   whenPPOption getPPNotation <| whenNotPPOption getPPExplicit do
     let e ← getExpr
     unless e.isAppOfArity ``Quantum.NQubitPauliGroupElement.mk 3 do failure
     let some phase := natLitOf? (e.getArg! 1) | failure
-    let some (n, sets) := setChain? (e.getArg! 2) | failure
-    let some letters := lettersOf? n sets | failure
-    match phase with
-    | 0 => `(σ[$letters])
-    | 1 => `(iσ[$letters])
-    | 2 => `(-σ[$letters])
-    | 3 => `(-iσ[$letters])
-    | _ => failure
+    if let some letters := literalLetters? (e.getArg! 2) then
+      match phase with
+      | 0 => `(σ[$letters])
+      | 1 => `(iσ[$letters])
+      | 2 => `(-σ[$letters])
+      | 3 => `(-iσ[$letters])
+      | _ => failure
+    else
+      let (n, is, cs) ← withNaryArg 2 delabSymbolicChain
+      if is.isEmpty then failure
+      match phase with
+      | 0 => `(σ[$n | $[$is ↦ $cs],*])
+      | 1 => `(iσ[$n | $[$is ↦ $cs],*])
+      | 2 => `(-σ[$n | $[$is ↦ $cs],*])
+      | 3 => `(-iσ[$n | $[$is ↦ $cs],*])
+      | _ => failure
 
-/-- Delaborate literal-shaped `NQubitPauliOperator.set` chains back to the `P[…]`
-notation. Fires only on a `set` application whose whole chain is literal over
-`identity n` with in-range literal indices and `n > 0`; stays silent otherwise (in
-particular a bare `identity n` keeps its name). An over-applied chain — the operator
-string evaluated at a qubit, `P[XIZ] i` — is handled by `withOverApp`, so the extra
-arguments follow the notation. -/
+/-- Delaborate `NQubitPauliOperator.set` chains back to the `P[…]` notation. Fires only on
+a `set` application whose whole chain runs over an `identity n`: a literal chain (literal
+`n > 0`, in-range literal indices) displays as `P[XIZ]`, any other chain with `X`/`Y`/`Z`
+operators as `P[n | i ↦ Z, …]`; stays silent otherwise (in particular a bare `identity n`
+keeps its name). An over-applied chain — the operator string evaluated at a qubit,
+`P[XIZ] i` — is handled by `withOverApp`, so the extra arguments follow the notation. -/
 @[app_delab Quantum.NQubitPauliOperator.set]
 def delabPauliString : Delab :=
   whenPPOption getPPNotation <| whenNotPPOption getPPExplicit <| withOverApp 4 do
     let e ← getExpr
-    let some (n, sets) := setChain? e | failure
-    let some letters := lettersOf? n sets | failure
-    `(P[$letters])
+    if let some letters := literalLetters? e then
+      `(P[$letters])
+    else
+      let (n, is, cs) ← delabSymbolicChain
+      if is.isEmpty then failure
+      `(P[$n | $[$is ↦ $cs],*])
 
 end Delaborator
 
@@ -276,5 +410,40 @@ example : P[XIZ] 2 = PauliOperator.Z := rfl
 example : σ[XIZ].operators = P[XIZ] := rfl
 
 example : (⟨1, P[YY]⟩ : NQubitPauliGroupElement 2) = iσ[YY] := rfl
+
+/-! The symbolic form expands to the same chain with the `.set`s in the written order. -/
+
+example (n : ℕ) (i : Fin (n + 1)) :
+    σ[n + 2 | Fin.castSucc i ↦ Z, Fin.succ i ↦ Z] =
+      ⟨0, ((NQubitPauliOperator.identity (n + 2)).set (Fin.castSucc i) PauliOperator.Z).set
+        (Fin.succ i) PauliOperator.Z⟩ :=
+  rfl
+
+example (n : ℕ) (i j : Fin n) :
+    σ[n | j ↦ X, i ↦ Y] =
+      ⟨0, ((NQubitPauliOperator.identity n).set j PauliOperator.X).set i PauliOperator.Y⟩ :=
+  rfl
+
+example (n : ℕ) (i : Fin n) :
+    iσ[n | i ↦ Z] = ⟨1, (NQubitPauliOperator.identity n).set i PauliOperator.Z⟩ :=
+  rfl
+
+example (n : ℕ) (i : Fin n) :
+    -σ[n | i ↦ Z] = ⟨2, (NQubitPauliOperator.identity n).set i PauliOperator.Z⟩ :=
+  rfl
+
+example (n : ℕ) (i : Fin n) :
+    -iσ[n | i ↦ X] = ⟨3, (NQubitPauliOperator.identity n).set i PauliOperator.X⟩ :=
+  rfl
+
+example (n : ℕ) (i j : Fin n) :
+    P[n | i ↦ X, j ↦ Z] =
+      ((NQubitPauliOperator.identity n).set i PauliOperator.X).set j PauliOperator.Z :=
+  rfl
+
+example (n : ℕ) (i j : Fin n) : σ[n | i ↦ X, j ↦ Z].operators = P[n | i ↦ X, j ↦ Z] := rfl
+
+example (i : Fin 3) : P[3 | i ↦ Z] = (NQubitPauliOperator.identity 3).set i PauliOperator.Z :=
+  rfl
 
 end RoundTrip

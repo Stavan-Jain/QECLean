@@ -36,6 +36,7 @@ both are equivalent via global Hadamard (X ↔ Z on every qubit).
 namespace Quantum
 open scoped BigOperators
 open scoped ToricChain
+open scoped Pauli
 
 namespace StabilizerGroup
 namespace ToricCodeN
@@ -135,17 +136,13 @@ abbrev prev (L : ℕ) [Fact (0 < L)] (i : Fin L) : Fin L := Stabilizer.Lattice.p
 
 /-- Vertex stabilizer at `(x,y)`: Z on the four incident edges. -/
 def vertexStab (L : ℕ) [Fact (0 < L)] (x y : Fin L) : NQubitPauliGroupElement (numQubits L) :=
-  ⟨0, (((NQubitPauliOperator.identity (numQubits L)).set (hEdge L x y) PauliOperator.Z
-    |>.set (hEdge L (prev L x) y) PauliOperator.Z
-    |>.set (vEdge L x y) PauliOperator.Z)
-    |>.set (vEdge L x (prev L y)) PauliOperator.Z)⟩
+  σ[numQubits L | hEdge L x y ↦ Z, hEdge L (prev L x) y ↦ Z,
+    vEdge L x y ↦ Z, vEdge L x (prev L y) ↦ Z]
 
 /-- Face stabilizer at `(x,y)`: X on the four boundary edges. -/
 def faceStab (L : ℕ) [Fact (0 < L)] (x y : Fin L) : NQubitPauliGroupElement (numQubits L) :=
-  ⟨0, (((NQubitPauliOperator.identity (numQubits L)).set (hEdge L x y) PauliOperator.X
-    |>.set (hEdge L x (next L y)) PauliOperator.X
-    |>.set (vEdge L x y) PauliOperator.X)
-    |>.set (vEdge L (next L x) y) PauliOperator.X)⟩
+  σ[numQubits L | hEdge L x y ↦ X, hEdge L x (next L y) ↦ X,
+    vEdge L x y ↦ X, vEdge L (next L x) y ↦ X]
 
 /-- X-type generator family indexed by faces. -/
 def XGenerators (L : ℕ) [Fact (0 < L)] : Set (NQubitPauliGroupElement (numQubits L)) :=
@@ -237,10 +234,14 @@ lemma faceStab_is_XType (L : ℕ) [Fact (0 < L)] (x y : Fin L) :
     NQubitPauliGroupElement.IsXTypeElement (faceStab L x y) := by
   refine ⟨rfl, ?_⟩
   let op0 : NQubitPauliOperator (numQubits L) := NQubitPauliOperator.identity (numQubits L)
-  let op1 : NQubitPauliOperator (numQubits L) := op0.set (hEdge L x y) PauliOperator.X
-  let op2 : NQubitPauliOperator (numQubits L) := op1.set (hEdge L x (next L y)) PauliOperator.X
-  let op3 : NQubitPauliOperator (numQubits L) := op2.set (vEdge L x y) PauliOperator.X
-  let op4 : NQubitPauliOperator (numQubits L) := op3.set (vEdge L (next L x) y) PauliOperator.X
+  let op1 : NQubitPauliOperator (numQubits L) := P[numQubits L | hEdge L x y ↦ X]
+  let op2 : NQubitPauliOperator (numQubits L) :=
+    P[numQubits L | hEdge L x y ↦ X, hEdge L x (next L y) ↦ X]
+  let op3 : NQubitPauliOperator (numQubits L) :=
+    P[numQubits L | hEdge L x y ↦ X, hEdge L x (next L y) ↦ X, vEdge L x y ↦ X]
+  let op4 : NQubitPauliOperator (numQubits L) :=
+    P[numQubits L | hEdge L x y ↦ X, hEdge L x (next L y) ↦ X, vEdge L x y ↦ X,
+      vEdge L (next L x) y ↦ X]
   have h0 : NQubitPauliOperator.IsXType op0 := by
     simpa [op0] using (NQubitPauliOperator.IsXType_identity (n := numQubits L))
   have h1 : NQubitPauliOperator.IsXType op1 := by
@@ -258,10 +259,14 @@ lemma vertexStab_is_ZType (L : ℕ) [Fact (0 < L)] (x y : Fin L) :
     NQubitPauliGroupElement.IsZTypeElement (vertexStab L x y) := by
   refine ⟨rfl, ?_⟩
   let op0 : NQubitPauliOperator (numQubits L) := NQubitPauliOperator.identity (numQubits L)
-  let op1 : NQubitPauliOperator (numQubits L) := op0.set (hEdge L x y) PauliOperator.Z
-  let op2 : NQubitPauliOperator (numQubits L) := op1.set (hEdge L (prev L x) y) PauliOperator.Z
-  let op3 : NQubitPauliOperator (numQubits L) := op2.set (vEdge L x y) PauliOperator.Z
-  let op4 : NQubitPauliOperator (numQubits L) := op3.set (vEdge L x (prev L y)) PauliOperator.Z
+  let op1 : NQubitPauliOperator (numQubits L) := P[numQubits L | hEdge L x y ↦ Z]
+  let op2 : NQubitPauliOperator (numQubits L) :=
+    P[numQubits L | hEdge L x y ↦ Z, hEdge L (prev L x) y ↦ Z]
+  let op3 : NQubitPauliOperator (numQubits L) :=
+    P[numQubits L | hEdge L x y ↦ Z, hEdge L (prev L x) y ↦ Z, vEdge L x y ↦ Z]
+  let op4 : NQubitPauliOperator (numQubits L) :=
+    P[numQubits L | hEdge L x y ↦ Z, hEdge L (prev L x) y ↦ Z, vEdge L x y ↦ Z,
+      vEdge L x (prev L y) ↦ Z]
   have h0 : NQubitPauliOperator.IsZType op0 := by
     simpa [op0] using (NQubitPauliOperator.IsZType_identity (n := numQubits L))
   have h1 : NQubitPauliOperator.IsZType op1 := by
