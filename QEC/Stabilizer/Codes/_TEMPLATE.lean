@@ -120,6 +120,10 @@ Conventions:
   `-σ[…]` = phase `-1`, `-iσ[…]` = phase `-i`.)
 - 0-based qubit indexing: the k-th letter is the operator on qubit k.
 - One `def` per generator. Name them `Z1, Z2, …, X1, X2, …`.
+- The bare Pauli string with no phase (an `NQubitPauliOperator n`) is `P[…]`:
+  `σ[ZZZIZII].operators = P[ZZZIZII]` by `rfl`, and `P[…]` elaborates to exactly
+  the bare `.set` chain. Reach for it in `operators`-level statements (support,
+  check-matrix rows) rather than spelling the chain out.
 
 **Non-CSS variant.** Mixed-Pauli generators use the same notation (e.g., the
 5-qubit perfect code's `σ[XZZXI]`); there is no Z/X partition.
