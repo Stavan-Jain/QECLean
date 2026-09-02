@@ -62,24 +62,24 @@ scoped[ToricChain] notation "∂₁" => Quantum.Stabilizer.Lattice.toricBoundary
 open scoped ToricChain
 
 @[simp] lemma toricBoundary2_singleFace_apply_h (x y x' y' : Fin L) :
-    ∂₂ (L := L) (singleFace (L := L) (x, y)) (EdgeIdx.h x' y') =
+    ∂₂ (L := L) (singleFace (x, y)) (EdgeIdx.h x' y') =
       (if (x', y') = (x, y) then (1 : ZMod 2) else 0) +
       (if (x', prev L y') = (x, y) then (1 : ZMod 2) else 0) := by
   simp [toricBoundary2, singleFace]
 
 @[simp] lemma toricBoundary2_singleFace_apply_v (x y x' y' : Fin L) :
-    ∂₂ (L := L) (singleFace (L := L) (x, y)) (EdgeIdx.v x' y') =
+    ∂₂ (L := L) (singleFace (x, y)) (EdgeIdx.v x' y') =
       (if (x', y') = (x, y) then (1 : ZMod 2) else 0) +
       (if (prev L x', y') = (x, y) then (1 : ZMod 2) else 0) := by
   simp [toricBoundary2, singleFace]
 
 @[simp] lemma toricBoundary1_singleEdge_apply
     (e : EdgeIdx L) (v : VtxIdx L) :
-    ∂₁ (L := L) (singleEdge (L := L) e) v =
-      singleEdge (L := L) e (EdgeIdx.h v.1 v.2) +
-      singleEdge (L := L) e (EdgeIdx.h (prev L v.1) v.2) +
-      singleEdge (L := L) e (EdgeIdx.v v.1 v.2) +
-      singleEdge (L := L) e (EdgeIdx.v v.1 (prev L v.2)) := by
+    ∂₁ (L := L) (singleEdge e) v =
+      singleEdge e (EdgeIdx.h v.1 v.2) +
+      singleEdge e (EdgeIdx.h (prev L v.1) v.2) +
+      singleEdge e (EdgeIdx.v v.1 v.2) +
+      singleEdge e (EdgeIdx.v v.1 (prev L v.2)) := by
   simp [toricBoundary1]
 
 /-- Chain-complex law for toric boundaries. -/

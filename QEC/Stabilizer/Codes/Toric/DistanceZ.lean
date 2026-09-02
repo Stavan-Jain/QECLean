@@ -97,14 +97,14 @@ theorem verticalVRowChain_not_mem_toricDualBoundaries (L : ℕ) [Fact (2 ≤ L)]
 
 /-- The vertical V-row chain has edge-weight `L`. -/
 theorem verticalVRowChain_edgeWeight_eq_L (L : ℕ) [Fact (2 ≤ L)] :
-    Stabilizer.Lattice.edgeWeight (L := L) (verticalVRowChain L) = L := by
+    Stabilizer.Lattice.edgeWeight (verticalVRowChain L) = L := by
   have hL0 : 0 < L := Nat.lt_of_lt_of_le (by decide : 0 < 2) (Fact.out : 2 ≤ L)
   haveI : Fact (0 < L) := ⟨hL0⟩
   let z0 : Fin L := Stabilizer.Lattice.zeroCoord L
   let vertAtZero : Finset (Stabilizer.Lattice.EdgeIdx L) :=
     (Finset.univ.image (fun x : Fin L => Stabilizer.Lattice.EdgeIdx.v x z0))
   have hsupport :
-      Stabilizer.Lattice.edgeSupport (L := L) (verticalVRowChain L) = vertAtZero := by
+      Stabilizer.Lattice.edgeSupport (verticalVRowChain L) = vertAtZero := by
     ext e
     constructor
     · intro he
@@ -142,8 +142,8 @@ theorem verticalVRowChain_edgeWeight_eq_L (L : ℕ) [Fact (2 ≤ L)] :
             exact hinj hab)
       _ = L := by simp
   calc
-    Stabilizer.Lattice.edgeWeight (L := L) (verticalVRowChain L)
-        = (Stabilizer.Lattice.edgeSupport (L := L) (verticalVRowChain L)).card := rfl
+    Stabilizer.Lattice.edgeWeight (verticalVRowChain L)
+        = (Stabilizer.Lattice.edgeSupport (verticalVRowChain L)).card := rfl
     _ = vertAtZero.card := by rw [hsupport]
     _ = L := hcard
 
@@ -274,7 +274,7 @@ theorem nontrivial_z_logical_weight_ge_L (L : ℕ) [Fact (2 ≤ L)]
         c ∉ Stabilizer.Lattice.toricDualBoundaries (L := L) := by
     rw [hc] at hgLogical
     exact (Stabilizer.Lattice.zNontrivialLogical_iff_dualCycle_not_dualBoundary L c).mp hgLogical
-  have h_weight : Stabilizer.Lattice.edgeWeight (L := L) c ≥ L := by
+  have h_weight : Stabilizer.Lattice.edgeWeight c ≥ L := by
     have h_invariant_nonzero :
         Stabilizer.Lattice.hRowAt (L := L) (Stabilizer.Lattice.zeroCoord L) c ≠ 0 ∨
           Stabilizer.Lattice.vColAt (L := L) (Stabilizer.Lattice.zeroCoord L) c ≠ 0 := by
@@ -467,13 +467,13 @@ theorem horizontalHRowChain_not_mem_toricDualBoundaries (L : ℕ) [Fact (2 ≤ L
 
 /-- The horizontal Z-row chain has edge weight `L`. -/
 theorem horizontalHRowChain_edgeWeight_eq_L (L : ℕ) [Fact (2 ≤ L)] :
-    Stabilizer.Lattice.edgeWeight (L := L) (horizontalHRowChain L) = L := by
+    Stabilizer.Lattice.edgeWeight (horizontalHRowChain L) = L := by
   haveI : Fact (0 < L) := ⟨lt_of_lt_of_le (by decide : 0 < 2) Fact.out⟩
   let z0 : Fin L := Stabilizer.Lattice.zeroCoord L
   let horizCol : Finset (Stabilizer.Lattice.EdgeIdx L) :=
     (Finset.univ.image (fun y : Fin L => Stabilizer.Lattice.EdgeIdx.h z0 y))
   have hsupport :
-      Stabilizer.Lattice.edgeSupport (L := L) (horizontalHRowChain L) = horizCol := by
+      Stabilizer.Lattice.edgeSupport (horizontalHRowChain L) = horizCol := by
     ext e
     constructor
     · intro he
@@ -505,8 +505,8 @@ theorem horizontalHRowChain_edgeWeight_eq_L (L : ℕ) [Fact (2 ≤ L)] :
             (by intro a b hab; exact hinj hab)
       _ = L := by simp
   calc
-    Stabilizer.Lattice.edgeWeight (L := L) (horizontalHRowChain L)
-        = (Stabilizer.Lattice.edgeSupport (L := L) (horizontalHRowChain L)).card := rfl
+    Stabilizer.Lattice.edgeWeight (horizontalHRowChain L)
+        = (Stabilizer.Lattice.edgeSupport (horizontalHRowChain L)).card := rfl
     _ = horizCol.card := by rw [hsupport]
     _ = L := hcard
 

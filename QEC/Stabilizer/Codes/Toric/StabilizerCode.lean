@@ -204,7 +204,7 @@ private lemma vertexStab_listProd_eq_chain (L : ℕ) [Fact (2 ≤ L)]
     (lst.map (fun p => vertexStab L p.1 p.2)).prod =
       Stabilizer.Lattice.toricZOperatorOfChain L
         (δ⁰ (L := L)
-          ((lst.map (fun p => Stabilizer.Lattice.singleVtx (L := L) p)).sum)) := by
+          ((lst.map (fun p => Stabilizer.Lattice.singleVtx p)).sum)) := by
   haveI : Fact (0 < L) := ⟨lt_of_lt_of_le (by decide : 0 < 2) Fact.out⟩
   induction lst with
   | nil =>
@@ -222,7 +222,7 @@ private lemma faceStab_listProd_eq_chain (L : ℕ) [Fact (2 ≤ L)]
     (lst.map (fun p => faceStab L p.1 p.2)).prod =
       Stabilizer.Lattice.toricXOperatorOfChain L
         (∂₂ (L := L)
-          ((lst.map (fun p => Stabilizer.Lattice.singleFace (L := L) p)).sum)) := by
+          ((lst.map (fun p => Stabilizer.Lattice.singleFace p)).sum)) := by
   haveI : Fact (0 < L) := ⟨lt_of_lt_of_le (by decide : 0 < 2) Fact.out⟩
   induction lst with
   | nil =>
@@ -236,7 +236,7 @@ private lemma faceStab_listProd_eq_chain (L : ℕ) [Fact (2 ≤ L)]
 /-- The sum (as 0-chains) of `singleVtx p` over all `p ∈ coords L` is the
 constant-1 chain. -/
 private lemma sum_singleVtx_coords (L : ℕ) [Fact (0 < L)] :
-    ((coords L).map (fun p => Stabilizer.Lattice.singleVtx (L := L) p)).sum =
+    ((coords L).map (fun p => Stabilizer.Lattice.singleVtx p)).sum =
       (fun _ => (1 : ZMod 2)) := by
   have h_nodup : (coords L).Nodup := by
     change ((List.finRange L).product (List.finRange L)).Nodup
@@ -244,14 +244,14 @@ private lemma sum_singleVtx_coords (L : ℕ) [Fact (0 < L)] :
   have h_finset_eq : (coords L).toFinset = (Finset.univ : Finset (Fin L × Fin L)) := by
     ext p
     refine ⟨fun _ => Finset.mem_univ _, fun _ => List.mem_toFinset.mpr (mem_coords L p)⟩
-  rw [show ((coords L).map (fun p => Stabilizer.Lattice.singleVtx (L := L) p)).sum =
-      ∑ p ∈ Finset.univ, Stabilizer.Lattice.singleVtx (L := L) p from ?_]
+  rw [show ((coords L).map (fun p => Stabilizer.Lattice.singleVtx p)).sum =
+      ∑ p ∈ Finset.univ, Stabilizer.Lattice.singleVtx p from ?_]
   · ext v
     rw [Finset.sum_apply]
     rw [Finset.sum_eq_single v]
     · simp [Stabilizer.Lattice.singleVtx]
     · intro b _ hbne
-      have : Stabilizer.Lattice.singleVtx (L := L) b v = 0 :=
+      have : Stabilizer.Lattice.singleVtx b v = 0 :=
         Stabilizer.Lattice.singleVtx_apply_ne hbne.symm
       exact this
     · intro hcontra; exact absurd (Finset.mem_univ v) hcontra
@@ -260,7 +260,7 @@ private lemma sum_singleVtx_coords (L : ℕ) [Fact (0 < L)] :
 
 /-- Symmetric: sum of `singleFace p` over `coords L` is the constant-1 2-chain. -/
 private lemma sum_singleFace_coords (L : ℕ) [Fact (0 < L)] :
-    ((coords L).map (fun p => Stabilizer.Lattice.singleFace (L := L) p)).sum =
+    ((coords L).map (fun p => Stabilizer.Lattice.singleFace p)).sum =
       (fun _ => (1 : ZMod 2)) := by
   have h_nodup : (coords L).Nodup := by
     change ((List.finRange L).product (List.finRange L)).Nodup
@@ -268,8 +268,8 @@ private lemma sum_singleFace_coords (L : ℕ) [Fact (0 < L)] :
   have h_finset_eq : (coords L).toFinset = (Finset.univ : Finset (Fin L × Fin L)) := by
     ext p
     refine ⟨fun _ => Finset.mem_univ _, fun _ => List.mem_toFinset.mpr (mem_coords L p)⟩
-  rw [show ((coords L).map (fun p => Stabilizer.Lattice.singleFace (L := L) p)).sum =
-      ∑ p ∈ Finset.univ, Stabilizer.Lattice.singleFace (L := L) p from ?_]
+  rw [show ((coords L).map (fun p => Stabilizer.Lattice.singleFace p)).sum =
+      ∑ p ∈ Finset.univ, Stabilizer.Lattice.singleFace p from ?_]
   · ext v
     rw [Finset.sum_apply]
     rw [Finset.sum_eq_single v]
@@ -282,9 +282,9 @@ private lemma sum_singleFace_coords (L : ℕ) [Fact (0 < L)] :
 
 /-- Decompose `coords L` sum as `coordsTrimmed L` sum plus origin. -/
 private lemma sum_singleVtx_coords_eq_trimmed_add_origin (L : ℕ) [Fact (0 < L)] :
-    ((coords L).map (fun p => Stabilizer.Lattice.singleVtx (L := L) p)).sum =
-      ((coordsTrimmed L).map (fun p => Stabilizer.Lattice.singleVtx (L := L) p)).sum
-        + Stabilizer.Lattice.singleVtx (L := L) (originCoord L) := by
+    ((coords L).map (fun p => Stabilizer.Lattice.singleVtx p)).sum =
+      ((coordsTrimmed L).map (fun p => Stabilizer.Lattice.singleVtx p)).sum
+        + Stabilizer.Lattice.singleVtx (originCoord L) := by
   have h_nodup : (coords L).Nodup := by
     change ((List.finRange L).product (List.finRange L)).Nodup
     exact List.Nodup.product (List.nodup_finRange L) (List.nodup_finRange L)
@@ -302,11 +302,11 @@ private lemma sum_singleVtx_coords_eq_trimmed_add_origin (L : ℕ) [Fact (0 < L)
       (coords L).toFinset = (Finset.univ : Finset (Fin L × Fin L)) from h_finset_eq) ▸
       Finset.mem_univ p), h⟩⟩
   -- Convert both sides to Finset.sum and apply Finset.sum_erase_eq_sub-style.
-  rw [show ((coords L).map (fun p => Stabilizer.Lattice.singleVtx (L := L) p)).sum =
-      ∑ p ∈ Finset.univ, Stabilizer.Lattice.singleVtx (L := L) p from ?_,
-      show ((coordsTrimmed L).map (fun p => Stabilizer.Lattice.singleVtx (L := L) p)).sum =
+  rw [show ((coords L).map (fun p => Stabilizer.Lattice.singleVtx p)).sum =
+      ∑ p ∈ Finset.univ, Stabilizer.Lattice.singleVtx p from ?_,
+      show ((coordsTrimmed L).map (fun p => Stabilizer.Lattice.singleVtx p)).sum =
       ∑ p ∈ (Finset.univ : Finset (Fin L × Fin L)).erase (originCoord L),
-        Stabilizer.Lattice.singleVtx (L := L) p from ?_]
+        Stabilizer.Lattice.singleVtx p from ?_]
   · rw [Finset.sum_erase_add _ _ (Finset.mem_univ (originCoord L))]
   · rw [show ((Finset.univ : Finset (Fin L × Fin L)).erase (originCoord L)) =
         (coordsTrimmed L).toFinset from h_trim_finset.symm]
@@ -316,9 +316,9 @@ private lemma sum_singleVtx_coords_eq_trimmed_add_origin (L : ℕ) [Fact (0 < L)
 
 /-- Symmetric: decompose `coords L` face sum. -/
 private lemma sum_singleFace_coords_eq_trimmed_add_origin (L : ℕ) [Fact (0 < L)] :
-    ((coords L).map (fun p => Stabilizer.Lattice.singleFace (L := L) p)).sum =
-      ((coordsTrimmed L).map (fun p => Stabilizer.Lattice.singleFace (L := L) p)).sum
-        + Stabilizer.Lattice.singleFace (L := L) (originCoord L) := by
+    ((coords L).map (fun p => Stabilizer.Lattice.singleFace p)).sum =
+      ((coordsTrimmed L).map (fun p => Stabilizer.Lattice.singleFace p)).sum
+        + Stabilizer.Lattice.singleFace (originCoord L) := by
   have h_nodup : (coords L).Nodup := by
     change ((List.finRange L).product (List.finRange L)).Nodup
     exact List.Nodup.product (List.nodup_finRange L) (List.nodup_finRange L)
@@ -335,11 +335,11 @@ private lemma sum_singleFace_coords_eq_trimmed_add_origin (L : ℕ) [Fact (0 < L
     refine ⟨fun ⟨_, h⟩ => h, fun h => ⟨List.mem_toFinset.mp ((show
       (coords L).toFinset = (Finset.univ : Finset (Fin L × Fin L)) from h_finset_eq) ▸
       Finset.mem_univ p), h⟩⟩
-  rw [show ((coords L).map (fun p => Stabilizer.Lattice.singleFace (L := L) p)).sum =
-      ∑ p ∈ Finset.univ, Stabilizer.Lattice.singleFace (L := L) p from ?_,
-      show ((coordsTrimmed L).map (fun p => Stabilizer.Lattice.singleFace (L := L) p)).sum =
+  rw [show ((coords L).map (fun p => Stabilizer.Lattice.singleFace p)).sum =
+      ∑ p ∈ Finset.univ, Stabilizer.Lattice.singleFace p from ?_,
+      show ((coordsTrimmed L).map (fun p => Stabilizer.Lattice.singleFace p)).sum =
       ∑ p ∈ (Finset.univ : Finset (Fin L × Fin L)).erase (originCoord L),
-        Stabilizer.Lattice.singleFace (L := L) p from ?_]
+        Stabilizer.Lattice.singleFace p from ?_]
   · rw [Finset.sum_erase_add _ _ (Finset.mem_univ (originCoord L))]
   · rw [show ((Finset.univ : Finset (Fin L × Fin L)).erase (originCoord L)) =
         (coordsTrimmed L).toFinset from h_trim_finset.symm]
@@ -357,14 +357,14 @@ private theorem dropped_vertex_in_closure_remaining (L : ℕ) [Fact (2 ≤ L)] :
   have h_decomp := sum_singleVtx_coords_eq_trimmed_add_origin L
   have h_const := sum_singleVtx_coords L
   have h_trim_plus_origin :
-      ((coordsTrimmed L).map (fun p => Stabilizer.Lattice.singleVtx (L := L) p)).sum
-        + Stabilizer.Lattice.singleVtx (L := L) (originCoord L) =
+      ((coordsTrimmed L).map (fun p => Stabilizer.Lattice.singleVtx p)).sum
+        + Stabilizer.Lattice.singleVtx (originCoord L) =
       (fun _ : Fin L × Fin L => (1 : ZMod 2)) := h_decomp ▸ h_const
   have h_cutMap_trim_eq :
       δ⁰ (L := L)
-          (((coordsTrimmed L).map (fun p => Stabilizer.Lattice.singleVtx (L := L) p)).sum)
+          (((coordsTrimmed L).map (fun p => Stabilizer.Lattice.singleVtx p)).sum)
         = δ⁰ (L := L)
-            (Stabilizer.Lattice.singleVtx (L := L) (originCoord L)) := by
+            (Stabilizer.Lattice.singleVtx (originCoord L)) := by
     have h_apply := congrArg (δ⁰ (L := L)) h_trim_plus_origin
     rw [LinearMap.map_add, toricVertexCutMap_constOne] at h_apply
     -- h_apply : cutMap trim + cutMap (singleVtx origin) = 0.
@@ -375,25 +375,25 @@ private theorem dropped_vertex_in_closure_remaining (L : ℕ) [Fact (2 ≤ L)] :
         _ = 0 := by rw [h2, zero_mul]
     ext e
     have he : (δ⁰ (L := L)
-        (((coordsTrimmed L).map (fun p => Stabilizer.Lattice.singleVtx (L := L) p)).sum)) e +
+        (((coordsTrimmed L).map (fun p => Stabilizer.Lattice.singleVtx p)).sum)) e +
         (δ⁰ (L := L)
-        (Stabilizer.Lattice.singleVtx (L := L) (originCoord L))) e = 0 :=
+        (Stabilizer.Lattice.singleVtx (originCoord L))) e = 0 :=
       congrFun h_apply e
     have heq : (δ⁰ (L := L)
-        (((coordsTrimmed L).map (fun p => Stabilizer.Lattice.singleVtx (L := L) p)).sum)) e =
+        (((coordsTrimmed L).map (fun p => Stabilizer.Lattice.singleVtx p)).sum)) e =
         (δ⁰ (L := L)
-        (Stabilizer.Lattice.singleVtx (L := L) (originCoord L))) e := by
+        (Stabilizer.Lattice.singleVtx (originCoord L))) e := by
       have hself := h_self_zero (δ⁰ (L := L)
-        (Stabilizer.Lattice.singleVtx (L := L) (originCoord L)) e)
+        (Stabilizer.Lattice.singleVtx (originCoord L)) e)
       -- From he and hself, conclude
       have : (δ⁰ (L := L)
-        (((coordsTrimmed L).map (fun p => Stabilizer.Lattice.singleVtx (L := L) p)).sum)) e +
+        (((coordsTrimmed L).map (fun p => Stabilizer.Lattice.singleVtx p)).sum)) e +
         (δ⁰ (L := L)
-        (Stabilizer.Lattice.singleVtx (L := L) (originCoord L))) e =
+        (Stabilizer.Lattice.singleVtx (originCoord L))) e =
         (δ⁰ (L := L)
-        (Stabilizer.Lattice.singleVtx (L := L) (originCoord L))) e +
+        (Stabilizer.Lattice.singleVtx (originCoord L))) e +
         (δ⁰ (L := L)
-        (Stabilizer.Lattice.singleVtx (L := L) (originCoord L))) e := by
+        (Stabilizer.Lattice.singleVtx (originCoord L))) e := by
         rw [he, hself]
       exact add_right_cancel this
     exact heq
@@ -425,14 +425,14 @@ private theorem dropped_face_in_closure_remaining (L : ℕ) [Fact (2 ≤ L)] :
   have h_decomp := sum_singleFace_coords_eq_trimmed_add_origin L
   have h_const := sum_singleFace_coords L
   have h_trim_plus_origin :
-      ((coordsTrimmed L).map (fun p => Stabilizer.Lattice.singleFace (L := L) p)).sum
-        + Stabilizer.Lattice.singleFace (L := L) (originCoord L) =
+      ((coordsTrimmed L).map (fun p => Stabilizer.Lattice.singleFace p)).sum
+        + Stabilizer.Lattice.singleFace (originCoord L) =
       (fun _ : Fin L × Fin L => (1 : ZMod 2)) := h_decomp ▸ h_const
   have h_b2_trim_eq :
       ∂₂ (L := L)
-          (((coordsTrimmed L).map (fun p => Stabilizer.Lattice.singleFace (L := L) p)).sum)
+          (((coordsTrimmed L).map (fun p => Stabilizer.Lattice.singleFace p)).sum)
         = ∂₂ (L := L)
-            (Stabilizer.Lattice.singleFace (L := L) (originCoord L)) := by
+            (Stabilizer.Lattice.singleFace (originCoord L)) := by
     have h_apply := congrArg (∂₂ (L := L)) h_trim_plus_origin
     rw [LinearMap.map_add, toricBoundary2_constOne] at h_apply
     have h_self_zero : ∀ a : ZMod 2, a + a = 0 := fun a => by
@@ -441,20 +441,20 @@ private theorem dropped_face_in_closure_remaining (L : ℕ) [Fact (2 ≤ L)] :
         _ = 0 := by rw [h2, zero_mul]
     ext e
     have he : (∂₂ (L := L)
-        (((coordsTrimmed L).map (fun p => Stabilizer.Lattice.singleFace (L := L) p)).sum)) e +
+        (((coordsTrimmed L).map (fun p => Stabilizer.Lattice.singleFace p)).sum)) e +
         (∂₂ (L := L)
-        (Stabilizer.Lattice.singleFace (L := L) (originCoord L))) e = 0 :=
+        (Stabilizer.Lattice.singleFace (originCoord L))) e = 0 :=
       congrFun h_apply e
     have hself := h_self_zero (∂₂ (L := L)
-      (Stabilizer.Lattice.singleFace (L := L) (originCoord L)) e)
+      (Stabilizer.Lattice.singleFace (originCoord L)) e)
     have : (∂₂ (L := L)
-      (((coordsTrimmed L).map (fun p => Stabilizer.Lattice.singleFace (L := L) p)).sum)) e +
+      (((coordsTrimmed L).map (fun p => Stabilizer.Lattice.singleFace p)).sum)) e +
       (∂₂ (L := L)
-      (Stabilizer.Lattice.singleFace (L := L) (originCoord L))) e =
+      (Stabilizer.Lattice.singleFace (originCoord L))) e =
       (∂₂ (L := L)
-      (Stabilizer.Lattice.singleFace (L := L) (originCoord L))) e +
+      (Stabilizer.Lattice.singleFace (originCoord L))) e +
       (∂₂ (L := L)
-      (Stabilizer.Lattice.singleFace (L := L) (originCoord L))) e := by
+      (Stabilizer.Lattice.singleFace (originCoord L))) e := by
       rw [he, hself]
     exact add_right_cancel this
   have h_prod_eq : (generatorsListXTrimmed L).prod = faceStab L (zeroCoord L) (zeroCoord L) := by
@@ -1123,14 +1123,14 @@ private lemma coordsTrimmed_not_mem_origin (L : ℕ) [Fact (0 < L)] :
 trimmed coords whose `cutMap` is `0` must have all-zero coefficients. -/
 private lemma trimmed_combo_singleVtx_eq_zero (L : ℕ) [Fact (0 < L)]
     (c : Fin (coordsTrimmed L).length → ZMod 2)
-    (hker : (∑ i, c i • Stabilizer.Lattice.singleVtx (L := L) ((coordsTrimmed L).get i)) ∈
+    (hker : (∑ i, c i • Stabilizer.Lattice.singleVtx ((coordsTrimmed L).get i)) ∈
         LinearMap.ker (δ⁰ (L := L))) :
     ∀ i, c i = 0 := by
   classical
   rw [Stabilizer.Lattice.mem_ker_cutMap_iff] at hker
   obtain ⟨k, hk⟩ := hker
   -- Evaluate at origin: sum is 0 (origin ∉ trimmed), so k = 0.
-  have h_orig : (∑ i, c i • Stabilizer.Lattice.singleVtx (L := L)
+  have h_orig : (∑ i, c i • Stabilizer.Lattice.singleVtx
       ((coordsTrimmed L).get i)) (originCoord L) = 0 := by
     rw [Finset.sum_apply]
     apply Finset.sum_eq_zero
@@ -1140,7 +1140,7 @@ private lemma trimmed_combo_singleVtx_eq_zero (L : ℕ) [Fact (0 < L)]
       intro heq
       rw [heq] at this
       exact coordsTrimmed_not_mem_origin L this
-    change c i * Stabilizer.Lattice.singleVtx (L := L) ((coordsTrimmed L).get i)
+    change c i * Stabilizer.Lattice.singleVtx ((coordsTrimmed L).get i)
         (originCoord L) = 0
     rw [Stabilizer.Lattice.singleVtx_apply_ne (Ne.symm h_get_ne)]
     ring
@@ -1149,18 +1149,18 @@ private lemma trimmed_combo_singleVtx_eq_zero (L : ℕ) [Fact (0 < L)]
     rw [h_orig] at this
     exact this.symm
   -- So the sum is identically 0.
-  have h_sum_zero : (∑ i, c i • Stabilizer.Lattice.singleVtx (L := L)
+  have h_sum_zero : (∑ i, c i • Stabilizer.Lattice.singleVtx
       ((coordsTrimmed L).get i)) = 0 := by
     rw [hk]; ext; simp [hk_zero]
   -- Extract each c j = 0 by evaluating at (coordsTrimmed L).get j.
   intro j
-  have h_at_j : (∑ i, c i • Stabilizer.Lattice.singleVtx (L := L)
+  have h_at_j : (∑ i, c i • Stabilizer.Lattice.singleVtx
       ((coordsTrimmed L).get i)) ((coordsTrimmed L).get j) = 0 := by
     rw [h_sum_zero]; rfl
   rw [Finset.sum_apply] at h_at_j
   rw [Finset.sum_eq_single j] at h_at_j
   · change c j = 0
-    have : c j * Stabilizer.Lattice.singleVtx (L := L) ((coordsTrimmed L).get j)
+    have : c j * Stabilizer.Lattice.singleVtx ((coordsTrimmed L).get j)
         ((coordsTrimmed L).get j) = 0 := h_at_j
     rw [Stabilizer.Lattice.singleVtx_apply_self] at this
     simpa using this
@@ -1168,7 +1168,7 @@ private lemma trimmed_combo_singleVtx_eq_zero (L : ℕ) [Fact (0 < L)]
     have hne : (coordsTrimmed L).get i ≠ (coordsTrimmed L).get j := by
       intro heq
       exact hij (List.nodup_iff_injective_get.mp (coordsTrimmed_nodup L) heq)
-    change c i * Stabilizer.Lattice.singleVtx (L := L) ((coordsTrimmed L).get i)
+    change c i * Stabilizer.Lattice.singleVtx ((coordsTrimmed L).get i)
         ((coordsTrimmed L).get j) = 0
     rw [Stabilizer.Lattice.singleVtx_apply_ne (Ne.symm hne)]
     ring
@@ -1177,13 +1177,13 @@ private lemma trimmed_combo_singleVtx_eq_zero (L : ℕ) [Fact (0 < L)]
 /-- Face-side block kernel collapse: same as Z-side but for `singleFace` and `boundary2`. -/
 private lemma trimmed_combo_singleFace_eq_zero (L : ℕ) [Fact (0 < L)]
     (c : Fin (coordsTrimmed L).length → ZMod 2)
-    (hker : (∑ i, c i • Stabilizer.Lattice.singleFace (L := L) ((coordsTrimmed L).get i)) ∈
+    (hker : (∑ i, c i • Stabilizer.Lattice.singleFace ((coordsTrimmed L).get i)) ∈
         LinearMap.ker (∂₂ (L := L))) :
     ∀ i, c i = 0 := by
   classical
   rw [Stabilizer.Lattice.mem_ker_boundary2_iff] at hker
   obtain ⟨k, hk⟩ := hker
-  have h_orig : (∑ i, c i • Stabilizer.Lattice.singleFace (L := L)
+  have h_orig : (∑ i, c i • Stabilizer.Lattice.singleFace
       ((coordsTrimmed L).get i)) (originCoord L) = 0 := by
     rw [Finset.sum_apply]
     apply Finset.sum_eq_zero
@@ -1193,7 +1193,7 @@ private lemma trimmed_combo_singleFace_eq_zero (L : ℕ) [Fact (0 < L)]
       intro heq
       rw [heq] at this
       exact coordsTrimmed_not_mem_origin L this
-    change c i * Stabilizer.Lattice.singleFace (L := L) ((coordsTrimmed L).get i)
+    change c i * Stabilizer.Lattice.singleFace ((coordsTrimmed L).get i)
         (originCoord L) = 0
     rw [Stabilizer.Lattice.singleFace_apply_ne (Ne.symm h_get_ne)]
     ring
@@ -1201,16 +1201,16 @@ private lemma trimmed_combo_singleFace_eq_zero (L : ℕ) [Fact (0 < L)]
     have := congr_fun hk (originCoord L)
     rw [h_orig] at this
     exact this.symm
-  have h_sum_zero : (∑ i, c i • Stabilizer.Lattice.singleFace (L := L)
+  have h_sum_zero : (∑ i, c i • Stabilizer.Lattice.singleFace
       ((coordsTrimmed L).get i)) = 0 := by
     rw [hk]; ext; simp [hk_zero]
   intro j
-  have h_at_j : (∑ i, c i • Stabilizer.Lattice.singleFace (L := L)
+  have h_at_j : (∑ i, c i • Stabilizer.Lattice.singleFace
       ((coordsTrimmed L).get i)) ((coordsTrimmed L).get j) = 0 := by
     rw [h_sum_zero]; rfl
   rw [Finset.sum_apply] at h_at_j
   rw [Finset.sum_eq_single j] at h_at_j
-  · have : c j * Stabilizer.Lattice.singleFace (L := L) ((coordsTrimmed L).get j)
+  · have : c j * Stabilizer.Lattice.singleFace ((coordsTrimmed L).get j)
         ((coordsTrimmed L).get j) = 0 := h_at_j
     rw [Stabilizer.Lattice.singleFace_apply_self] at this
     simpa using this
@@ -1218,7 +1218,7 @@ private lemma trimmed_combo_singleFace_eq_zero (L : ℕ) [Fact (0 < L)]
     have hne : (coordsTrimmed L).get i ≠ (coordsTrimmed L).get j := by
       intro heq
       exact hij (List.nodup_iff_injective_get.mp (coordsTrimmed_nodup L) heq)
-    change c i * Stabilizer.Lattice.singleFace (L := L) ((coordsTrimmed L).get i)
+    change c i * Stabilizer.Lattice.singleFace ((coordsTrimmed L).get i)
         ((coordsTrimmed L).get j) = 0
     rw [Stabilizer.Lattice.singleFace_apply_ne (Ne.symm hne)]
     ring
@@ -1247,7 +1247,7 @@ private theorem rowsLinearIndependent_generatorsListPackaged (L : ℕ) [Fact (2 
         simp [generatorsListZTrimmed]
       omega⟩
   -- The Z-half of the sum at each edge yields the chain combination.
-  have h_chain_Z : (∑ i, cZ i • Stabilizer.Lattice.singleVtx (L := L)
+  have h_chain_Z : (∑ i, cZ i • Stabilizer.Lattice.singleVtx
       ((coordsTrimmed L).get i)) ∈
       LinearMap.ker (δ⁰ (L := L)) := by
     rw [LinearMap.mem_ker]
@@ -1327,14 +1327,14 @@ private theorem rowsLinearIndependent_generatorsListPackaged (L : ℕ) [Fact (2 
           ⟨k.val, by have := k.isLt; omega⟩
           (Fin.natAdd (numQubits L) (Stabilizer.Lattice.edgeToQubitIdx L e)) =
         δ⁰ (L := L)
-          (Stabilizer.Lattice.singleVtx (L := L) ((coordsTrimmed L).get k)) e := by
+          (Stabilizer.Lattice.singleVtx ((coordsTrimmed L).get k)) e := by
       intro k
       have hp_eq := get_packaged_Z L k (by have := k.isLt; omega)
       unfold NQubitPauliGroupElement.checkMatrix
       rw [hp_eq, toSymplectic_vertexStab_Z_eq, qubitToEdgeIdx_edgeToQubitIdx]
     have h_col' : ∑ k : Fin (coordsTrimmed L).length, cZ k *
         δ⁰ (L := L)
-          (Stabilizer.Lattice.singleVtx (L := L) ((coordsTrimmed L).get k)) e = 0 := by
+          (Stabilizer.Lattice.singleVtx ((coordsTrimmed L).get k)) e = 0 := by
       rw [← h_col]
       apply Finset.sum_congr rfl
       intro k _
@@ -1347,9 +1347,9 @@ private theorem rowsLinearIndependent_generatorsListPackaged (L : ℕ) [Fact (2 
     intro k _
     rw [LinearMap.map_smul]
     change cZ k • δ⁰ (L := L)
-        (Stabilizer.Lattice.singleVtx (L := L) ((coordsTrimmed L).get k)) e =
+        (Stabilizer.Lattice.singleVtx ((coordsTrimmed L).get k)) e =
       cZ k * δ⁰ (L := L)
-        (Stabilizer.Lattice.singleVtx (L := L) ((coordsTrimmed L).get k)) e
+        (Stabilizer.Lattice.singleVtx ((coordsTrimmed L).get k)) e
     rw [smul_eq_mul]
   -- Now apply Z-block kernel collapse to get cZ = 0.
   have hZ_zero : ∀ i, cZ i = 0 := trimmed_combo_singleVtx_eq_zero L cZ h_chain_Z
@@ -1363,7 +1363,7 @@ private theorem rowsLinearIndependent_generatorsListPackaged (L : ℕ) [Fact (2 
         simp [generatorsListZTrimmed, generatorsListXTrimmed]
       have := i.isLt
       omega⟩
-  have h_chain_X : (∑ i, cX i • Stabilizer.Lattice.singleFace (L := L)
+  have h_chain_X : (∑ i, cX i • Stabilizer.Lattice.singleFace
       ((coordsTrimmed L).get i)) ∈
       LinearMap.ker (∂₂ (L := L)) := by
     rw [LinearMap.mem_ker]
@@ -1447,7 +1447,7 @@ private theorem rowsLinearIndependent_generatorsListPackaged (L : ℕ) [Fact (2 
           ⟨nZ + k.val, by have := k.isLt; omega⟩
           (Fin.castAdd (numQubits L) (Stabilizer.Lattice.edgeToQubitIdx L e)) =
         ∂₂ (L := L)
-          (Stabilizer.Lattice.singleFace (L := L) ((coordsTrimmed L).get k)) e := by
+          (Stabilizer.Lattice.singleFace ((coordsTrimmed L).get k)) e := by
       intro k
       have hge : nZ ≤ nZ + k.val := Nat.le_add_right _ _
       have hsub : nZ + k.val - nZ < nZ := by
@@ -1467,7 +1467,7 @@ private theorem rowsLinearIndependent_generatorsListPackaged (L : ℕ) [Fact (2 
       rw [hcoord_eq]
     have h_col' : ∑ k : Fin (coordsTrimmed L).length, cX k *
         ∂₂ (L := L)
-          (Stabilizer.Lattice.singleFace (L := L) ((coordsTrimmed L).get k)) e = 0 := by
+          (Stabilizer.Lattice.singleFace ((coordsTrimmed L).get k)) e = 0 := by
       rw [← h_col]
       apply Finset.sum_congr rfl
       intro k _
@@ -1479,9 +1479,9 @@ private theorem rowsLinearIndependent_generatorsListPackaged (L : ℕ) [Fact (2 
     intro k _
     rw [LinearMap.map_smul]
     change cX k • ∂₂ (L := L)
-        (Stabilizer.Lattice.singleFace (L := L) ((coordsTrimmed L).get k)) e =
+        (Stabilizer.Lattice.singleFace ((coordsTrimmed L).get k)) e =
       cX k * ∂₂ (L := L)
-        (Stabilizer.Lattice.singleFace (L := L) ((coordsTrimmed L).get k)) e
+        (Stabilizer.Lattice.singleFace ((coordsTrimmed L).get k)) e
     rw [smul_eq_mul]
   have hX_zero : ∀ i, cX i = 0 := trimmed_combo_singleFace_eq_zero L cX h_chain_X
   -- Combine: f = 0.

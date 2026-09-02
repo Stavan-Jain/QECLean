@@ -61,12 +61,12 @@ theorem horizontalLoopChain_not_mem_toricBoundaries (L : ℕ) [Fact (2 ≤ L)] :
 
 /-- Section-8 witness: canonical horizontal loop chain has edge-weight `L`. -/
 theorem horizontalLoopChain_edgeWeight_eq_L (L : ℕ) [Fact (2 ≤ L)] :
-    Stabilizer.Lattice.edgeWeight (L := L) (horizontalLoopChain L) = L := by
+    Stabilizer.Lattice.edgeWeight (horizontalLoopChain L) = L := by
   let z0 : Fin L := Stabilizer.Lattice.zeroCoord L
   let horizAtZero : Finset (Stabilizer.Lattice.EdgeIdx L) :=
     (Finset.univ.image (fun x : Fin L => Stabilizer.Lattice.EdgeIdx.h x z0))
   have hsupport :
-      Stabilizer.Lattice.edgeSupport (L := L) (horizontalLoopChain L) = horizAtZero := by
+      Stabilizer.Lattice.edgeSupport (horizontalLoopChain L) = horizAtZero := by
     ext e
     constructor
     · intro he
@@ -104,8 +104,8 @@ theorem horizontalLoopChain_edgeWeight_eq_L (L : ℕ) [Fact (2 ≤ L)] :
             exact hinj hab)
       _ = L := by simp
   calc
-    Stabilizer.Lattice.edgeWeight (L := L) (horizontalLoopChain L)
-        = (Stabilizer.Lattice.edgeSupport (L := L) (horizontalLoopChain L)).card := rfl
+    Stabilizer.Lattice.edgeWeight (horizontalLoopChain L)
+        = (Stabilizer.Lattice.edgeSupport (horizontalLoopChain L)).card := rfl
     _ = horizAtZero.card := by rw [hsupport]
     _ = L := hcard
 
@@ -224,7 +224,7 @@ theorem nontrivial_x_logical_weight_ge_L (L : ℕ) [Fact (2 ≤ L)]
         c ∉ Stabilizer.Lattice.toricBoundaries (L := L) := by
     rw [hc] at hgLogical;
     exact (Stabilizer.Lattice.xNontrivialLogical_iff_cycle_not_boundary L c).mp hgLogical;
-  have h_weight : Stabilizer.Lattice.edgeWeight (L := L) c ≥ L := by
+  have h_weight : Stabilizer.Lattice.edgeWeight c ≥ L := by
     have h_weight :
         Stabilizer.Lattice.hWrap (L := L) ⟨c, h_cycle.left⟩ ≠ 0 ∨
           Stabilizer.Lattice.vWrap (L := L) ⟨c, h_cycle.left⟩ ≠ 0 := by
@@ -408,13 +408,13 @@ theorem verticalLoopChain_not_mem_toricBoundaries (L : ℕ) [Fact (2 ≤ L)] :
 
 /-- The vertical X-loop chain has edge weight `L`. -/
 theorem verticalLoopChain_edgeWeight_eq_L (L : ℕ) [Fact (2 ≤ L)] :
-    Stabilizer.Lattice.edgeWeight (L := L) (verticalLoopChain L) = L := by
+    Stabilizer.Lattice.edgeWeight (verticalLoopChain L) = L := by
   haveI : Fact (0 < L) := ⟨lt_of_lt_of_le (by decide : 0 < 2) Fact.out⟩
   let z0 : Fin L := Stabilizer.Lattice.zeroCoord L
   let vertCol : Finset (Stabilizer.Lattice.EdgeIdx L) :=
     (Finset.univ.image (fun y : Fin L => Stabilizer.Lattice.EdgeIdx.v z0 y))
   have hsupport :
-      Stabilizer.Lattice.edgeSupport (L := L) (verticalLoopChain L) = vertCol := by
+      Stabilizer.Lattice.edgeSupport (verticalLoopChain L) = vertCol := by
     ext e
     constructor
     · intro he
@@ -446,8 +446,8 @@ theorem verticalLoopChain_edgeWeight_eq_L (L : ℕ) [Fact (2 ≤ L)] :
             (by intro a b hab; exact hinj hab)
       _ = L := by simp
   calc
-    Stabilizer.Lattice.edgeWeight (L := L) (verticalLoopChain L)
-        = (Stabilizer.Lattice.edgeSupport (L := L) (verticalLoopChain L)).card := rfl
+    Stabilizer.Lattice.edgeWeight (verticalLoopChain L)
+        = (Stabilizer.Lattice.edgeSupport (verticalLoopChain L)).card := rfl
     _ = vertCol.card := by rw [hsupport]
     _ = L := hcard
 
