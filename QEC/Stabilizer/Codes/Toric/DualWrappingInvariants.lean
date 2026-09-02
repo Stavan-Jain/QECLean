@@ -7,6 +7,7 @@ namespace Stabilizer
 namespace Lattice
 
 open scoped BigOperators
+open scoped ToricChain
 
 /-!
 # Dual wrapping invariants for the toric code (Z-type)
@@ -282,20 +283,20 @@ theorem toric_finrank_dualCycles :
   simp_all +decide ;
   have h_dual_boundary_range :
       Module.finrank (ZMod 2) (LinearMap.range (toricDualBoundary L)) =
-        Module.finrank (ZMod 2) (LinearMap.range (toricBoundary2 (L := L))) := by
+        Module.finrank (ZMod 2) (LinearMap.range (∂₂ (L := L))) := by
     have h_dual_boundary :
         LinearMap.rank (toricDualBoundary L) =
-          LinearMap.rank (toricBoundary2 (L := L)) := by
+          LinearMap.rank (∂₂ (L := L)) := by
       have h_dual_boundary :
           (toricDualBoundary L).toMatrix' =
-            (toricBoundary2 (L := L)).toMatrix'.transpose := by
+            (∂₂ (L := L)).toMatrix'.transpose := by
         ext ⟨x, y⟩ e; simp [LinearMap.toMatrix', toricDualBoundary, toricBoundary2];
         cases e <;> simp +decide [ Pi.single_apply ];
         · grind;
         · grind +splitImp
       have h_dual_boundary :
           Matrix.rank (toricDualBoundary L).toMatrix' =
-            Matrix.rank (toricBoundary2 (L := L)).toMatrix' := by
+            Matrix.rank (∂₂ (L := L)).toMatrix' := by
         rw [ h_dual_boundary, Matrix.rank_transpose ];
       convert h_dual_boundary using 1;
       simp +decide [ Matrix.rank, LinearMap.rank ];
@@ -314,10 +315,10 @@ theorem toric_finrank_dualBoundaries :
     Module.finrank (ZMod 2) (toricDualBoundaries (L := L)) = L * L - 1 := by
   -- By definition of `toricDualBoundaries`, we know that it is the range of the vertex cut map.
   have h_dualBoundaries_range :
-      toricDualBoundaries L = LinearMap.range (toricVertexCutMap (L := L)) := by
+      toricDualBoundaries L = LinearMap.range (δ⁰ (L := L)) := by
     exact rfl;
   rw [ h_dualBoundaries_range ];
-  have := LinearMap.finrank_range_add_finrank_ker ( toricVertexCutMap ( L := L ) );
+  have := LinearMap.finrank_range_add_finrank_ker ( δ⁰ ( L := L ) );
   rw [ show Module.finrank ( ZMod 2 ) ( C0 L ) = L * L from ?_ ] at this;
   · refine eq_tsub_of_add_eq ?_;
     convert this;

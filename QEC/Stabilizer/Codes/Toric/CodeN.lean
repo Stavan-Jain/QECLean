@@ -35,6 +35,7 @@ both are equivalent via global Hadamard (X ↔ Z on every qubit).
 
 namespace Quantum
 open scoped BigOperators
+open scoped ToricChain
 
 namespace StabilizerGroup
 namespace ToricCodeN
@@ -615,11 +616,11 @@ of length `numQubits L - 2`. The full `generatorsList L` here has length
 
 /-- Alias for the toric `∂2` boundary map from the lattice chain-complex layer. -/
 abbrev toricBoundary2 (L : ℕ) [Fact (0 < L)] :=
-  Stabilizer.Lattice.toricBoundary2 (L := L)
+  ∂₂ (L := L)
 
 /-- Alias for the toric `∂1` boundary map from the lattice chain-complex layer. -/
 abbrev toricBoundary1 (L : ℕ) [Fact (0 < L)] :=
-  Stabilizer.Lattice.toricBoundary1 (L := L)
+  ∂₁ (L := L)
 
 /-- Alias for toric 1-cycles from the lattice homology layer. -/
 abbrev toricCycles (L : ℕ) [Fact (0 < L)] :=

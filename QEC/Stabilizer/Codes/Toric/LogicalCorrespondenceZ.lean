@@ -10,6 +10,7 @@ namespace Stabilizer
 namespace Lattice
 
 open scoped BigOperators
+open scoped ToricChain
 
 /-!
 # Z-type logical correspondence for the toric code
@@ -50,7 +51,7 @@ def toricDualCycles (L : ℕ) [Fact (0 < L)] : Submodule (ZMod 2) (C1 L) :=
 
 /-- Dual boundaries: Z-chains that are products of vertex stabilizers. -/
 noncomputable def toricDualBoundaries (L : ℕ) [Fact (0 < L)] : Submodule (ZMod 2) (C1 L) :=
-  LinearMap.range (toricVertexCutMap (L := L))
+  LinearMap.range (δ⁰ (L := L))
 
 /-- Every dual boundary is a dual cycle (∂₂ᵀ ∘ ∂₁ᵀ = 0). -/
 theorem toricDualBoundaries_le_toricDualCycles (L : ℕ) [Fact (0 < L)] :
@@ -102,13 +103,13 @@ theorem toricHomologicalCode_dualBoundary_eq :
   -- Strategy: split EdgeIdx into h and v via `edgeIdxEquivSum`, expand
   -- `toricBoundary2 (Pi.single (x, y) 1)` pointwise, and identify the 4 nonzero terms.
   change ∑ e : EdgeIdx L,
-        c e * toricBoundary2 (L := L) (Pi.single (x, y) (1 : ZMod 2)) e
+        c e * ∂₂ (L := L) (Pi.single (x, y) (1 : ZMod 2)) e
     = c (EdgeIdx.h x y) + c (EdgeIdx.h x (StabilizerGroup.ToricCodeN.next L y))
       + c (EdgeIdx.v x y) + c (EdgeIdx.v (StabilizerGroup.ToricCodeN.next L x) y)
   -- Step 1: rewrite the EdgeIdx-sum as a `Sum`-sum via `edgeIdxEquivSum`.
   rw [← Equiv.sum_comp (edgeIdxEquivSum L).symm
         (fun e : EdgeIdx L =>
-          c e * toricBoundary2 (L := L) (Pi.single (x, y) (1 : ZMod 2)) e),
+          c e * ∂₂ (L := L) (Pi.single (x, y) (1 : ZMod 2)) e),
       Fintype.sum_sum_type]
   -- Step 2: reduce each VtxIdx-sum.
   -- h-edges:
@@ -129,7 +130,7 @@ theorem toricHomologicalCode_dualBoundary_eq :
   have hh :
       ∑ p : VtxIdx L,
           (fun e : EdgeIdx L =>
-              c e * toricBoundary2 (L := L) (Pi.single (x, y) (1 : ZMod 2)) e)
+              c e * ∂₂ (L := L) (Pi.single (x, y) (1 : ZMod 2)) e)
             ((edgeIdxEquivSum L).symm (Sum.inl p))
       = c (EdgeIdx.h x y) + c (EdgeIdx.h x (StabilizerGroup.ToricCodeN.next L y)) := by
     -- Rewrite `(edgeIdxEquivSum L).symm (Sum.inl p) = h p.1 p.2`
@@ -138,7 +139,7 @@ theorem toricHomologicalCode_dualBoundary_eq :
       rintro ⟨_, _⟩; rfl]
     -- Unfold `toricBoundary2 (Pi.single (x, y) 1) (h p.1 p.2)`.
     have heval : ∀ p : VtxIdx L,
-        toricBoundary2 (L := L) (Pi.single (x, y) (1 : ZMod 2)) (EdgeIdx.h p.1 p.2)
+        ∂₂ (L := L) (Pi.single (x, y) (1 : ZMod 2)) (EdgeIdx.h p.1 p.2)
           = (if (p.1, p.2) = (x, y) then (1 : ZMod 2) else 0)
             + (if (p.1, StabilizerGroup.ToricCodeN.prev L p.2) = (x, y)
                 then 1 else 0) := by
@@ -183,14 +184,14 @@ theorem toricHomologicalCode_dualBoundary_eq :
   have hv :
       ∑ p : VtxIdx L,
           (fun e : EdgeIdx L =>
-              c e * toricBoundary2 (L := L) (Pi.single (x, y) (1 : ZMod 2)) e)
+              c e * ∂₂ (L := L) (Pi.single (x, y) (1 : ZMod 2)) e)
             ((edgeIdxEquivSum L).symm (Sum.inr p))
       = c (EdgeIdx.v x y) + c (EdgeIdx.v (StabilizerGroup.ToricCodeN.next L x) y) := by
     simp only [show ∀ p : VtxIdx L,
         (edgeIdxEquivSum L).symm (Sum.inr p) = EdgeIdx.v p.1 p.2 by
       rintro ⟨_, _⟩; rfl]
     have heval : ∀ p : VtxIdx L,
-        toricBoundary2 (L := L) (Pi.single (x, y) (1 : ZMod 2)) (EdgeIdx.v p.1 p.2)
+        ∂₂ (L := L) (Pi.single (x, y) (1 : ZMod 2)) (EdgeIdx.v p.1 p.2)
           = (if (p.1, p.2) = (x, y) then (1 : ZMod 2) else 0)
             + (if (StabilizerGroup.ToricCodeN.prev L p.1, p.2) = (x, y)
                 then 1 else 0) := by

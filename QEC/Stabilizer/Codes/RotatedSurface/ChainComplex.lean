@@ -21,6 +21,7 @@ namespace Lattice
 namespace RotatedSurface
 
 open scoped BigOperators
+open scoped RotatedSurfaceChain
 
 /-! ## Lattice-specific cycles / boundaries / `H₁`
 
@@ -32,11 +33,11 @@ variable (L : ℕ)
 
 /-- 1-cycles: kernel of `∂₁`. -/
 def rscCycles [Fact (Odd L)] : Submodule (ZMod 2) (VtxIdx L → ZMod 2) :=
-  LinearMap.ker (rscBoundary1 L)
+  LinearMap.ker (∂₁ L)
 
 /-- 1-boundaries: range of `∂₂`. -/
 def rscBoundaries : Submodule (ZMod 2) (VtxIdx L → ZMod 2) :=
-  LinearMap.range (rscBoundary2 L)
+  LinearMap.range (∂₂ L)
 
 /-- Every boundary is a cycle (`∂₁ ∘ ∂₂ = 0`). -/
 theorem rscBoundaries_le_rscCycles [Fact (Odd L)] :
@@ -104,8 +105,8 @@ noncomputable def rotatedSurfaceHomologicalCode [Fact (Odd L)] [Fact (3 ≤ L)] 
   fin0 := inferInstance
   fin1 := inferInstance
   fin2 := inferInstance
-  boundary1 := rscBoundary1 L
-  boundary2 := rscBoundary2 L
+  boundary1 := ∂₁ L
+  boundary2 := ∂₂ L
   boundary_comp := rscBoundary_comp_zero L
   numQubits := L * L
   numQubits_eq := by simp [Fintype.card_prod, Fintype.card_fin]
@@ -129,10 +130,10 @@ theorem rotatedSurfaceHomologicalCode_C2 :
     (rotatedSurfaceHomologicalCode L).C2 = XFaceIdx L := rfl
 
 theorem rotatedSurfaceHomologicalCode_boundary1 :
-    (rotatedSurfaceHomologicalCode L).boundary1 = rscBoundary1 L := rfl
+    (rotatedSurfaceHomologicalCode L).boundary1 = ∂₁ L := rfl
 
 theorem rotatedSurfaceHomologicalCode_boundary2 :
-    (rotatedSurfaceHomologicalCode L).boundary2 = rscBoundary2 L := rfl
+    (rotatedSurfaceHomologicalCode L).boundary2 = ∂₂ L := rfl
 
 theorem rotatedSurfaceHomologicalCode_numQubits :
     (rotatedSurfaceHomologicalCode L).numQubits = L * L := rfl

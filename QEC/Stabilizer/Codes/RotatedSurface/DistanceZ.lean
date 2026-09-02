@@ -32,6 +32,7 @@ namespace StabilizerGroup
 namespace RotatedSurfaceCodeN
 
 open scoped BigOperators
+open scoped RotatedSurfaceChain
 open NQubitPauliGroupElement
 open Stabilizer.Lattice
 
@@ -194,11 +195,11 @@ private lemma colFilter_zSupport_card_even
 omit [Fact (Odd L)] in
 /-- `colParity (rscZCutMap (Pi.single zf 1)) x = 0`. -/
 private lemma colParity_zCutMap_single (zf : RotatedSurface.ZFaceIdx L) (x : Fin L) :
-    colParity L (RotatedSurface.rscZCutMap L (Pi.single zf 1)) x = 0 := by
+    colParity L (δ⁰ L (Pi.single zf 1)) x = 0 := by
   classical
   unfold colParity
   -- (rscZCutMap (Pi.single zf 1)) v = 1[v ∈ zSupport zf]
-  rw [show (fun y : Fin L => RotatedSurface.rscZCutMap L (Pi.single zf 1) (x, y)) =
+  rw [show (fun y : Fin L => δ⁰ L (Pi.single zf 1) (x, y)) =
       (fun y : Fin L => if (x, y) ∈ RotatedSurface.zSupport zf then (1 : ZMod 2) else 0) by
     funext y
     rw [RotatedSurface.rscZCutMap_apply]
@@ -218,7 +219,7 @@ omit [Fact (Odd L)] in
 /-- `colParity (rscZCutMap s) x = 0` for every Z-face chain `s`. -/
 theorem colParity_rscZCutMap
     (s : RotatedSurface.ZFaceIdx L → ZMod 2) (x : Fin L) :
-    colParity L (RotatedSurface.rscZCutMap L s) x = 0 := by
+    colParity L (δ⁰ L s) x = 0 := by
   classical
   have hs : s = ∑ zf : RotatedSurface.ZFaceIdx L, s zf • (Pi.single zf (1 : ZMod 2)) := by
     funext zf
@@ -228,23 +229,23 @@ theorem colParity_rscZCutMap
   unfold colParity
   rw [show (fun y : Fin L =>
       (∑ zf : RotatedSurface.ZFaceIdx L,
-        RotatedSurface.rscZCutMap L (s zf • Pi.single zf 1)) (x, y)) =
+        δ⁰ L (s zf • Pi.single zf 1)) (x, y)) =
       (fun y : Fin L =>
         ∑ zf : RotatedSurface.ZFaceIdx L,
-          RotatedSurface.rscZCutMap L (s zf • Pi.single zf 1) (x, y)) by
+          δ⁰ L (s zf • Pi.single zf 1) (x, y)) by
     funext y; rw [Finset.sum_apply]]
   rw [Finset.sum_comm]
   apply Finset.sum_eq_zero
   intro zf _
   have h_smul : ∀ y : Fin L,
-      RotatedSurface.rscZCutMap L (s zf • Pi.single zf 1) (x, y) =
-        s zf * RotatedSurface.rscZCutMap L (Pi.single zf 1) (x, y) := fun y => by
+      δ⁰ L (s zf • Pi.single zf 1) (x, y) =
+        s zf * δ⁰ L (Pi.single zf 1) (x, y) := fun y => by
     rw [LinearMap.map_smul]
     simp [Pi.smul_apply, smul_eq_mul]
   rw [Finset.sum_congr rfl (fun y _ => h_smul y)]
   rw [← Finset.mul_sum]
-  rw [show ∑ y : Fin L, RotatedSurface.rscZCutMap L (Pi.single zf 1) (x, y) =
-      colParity L (RotatedSurface.rscZCutMap L (Pi.single zf 1)) x from rfl]
+  rw [show ∑ y : Fin L, δ⁰ L (Pi.single zf 1) (x, y) =
+      colParity L (δ⁰ L (Pi.single zf 1)) x from rfl]
   rw [colParity_zCutMap_single]
   ring
 
@@ -252,7 +253,7 @@ omit [Fact (Odd L)] in
 /-- `colParity` vanishes on the dual-boundaries submodule (range of `rscZCutMap`). -/
 theorem colParity_eq_zero_of_mem_dualBoundaries
     {c : RotatedSurface.VtxIdx L → ZMod 2}
-    (hc : c ∈ LinearMap.range (RotatedSurface.rscZCutMap L)) (x : Fin L) :
+    (hc : c ∈ LinearMap.range (δ⁰ L)) (x : Fin L) :
     colParity L c x = 0 := by
   rcases hc with ⟨s, rfl⟩
   exact colParity_rscZCutMap L s x
@@ -279,7 +280,7 @@ def stabXMatrix : Matrix (RotatedSurface.XFaceIdx L) (RotatedSurface.VtxIdx L) (
 
 omit [Fact (Odd L)] [Fact (3 ≤ L)] in
 lemma rscBoundary2_eq_transpose_mulVecLin :
-    RotatedSurface.rscBoundary2 L = (stabXMatrix L).transpose.mulVecLin := by
+    ∂₂ L = (stabXMatrix L).transpose.mulVecLin := by
   apply LinearMap.ext
   intro c
   funext v
@@ -323,7 +324,7 @@ theorem rsc_rank_dualBoundary :
   have h_eq_rank :
       Module.finrank (ZMod 2)
           (LinearMap.range (RotatedSurface.rotatedSurfaceHomologicalCode L).dualBoundary) =
-        Module.finrank (ZMod 2) (LinearMap.range (RotatedSurface.rscBoundary2 L)) := by
+        Module.finrank (ZMod 2) (LinearMap.range (∂₂ L)) := by
     rw [dualBoundary_eq_mulVecLin, rscBoundary2_eq_transpose_mulVecLin]
     change Matrix.rank (stabXMatrix L) = Matrix.rank (stabXMatrix L).transpose
     rw [Matrix.rank_transpose]
@@ -353,7 +354,7 @@ omit [Fact (Odd L)] [Fact (3 ≤ L)] in
 /-- Helper: `rscBoundary1 (Pi.single v 1) zf = 1[v ∈ zSupport zf]`. -/
 private lemma rscBoundary1_pi_single
     (v : RotatedSurface.VtxIdx L) (zf : RotatedSurface.ZFaceIdx L) :
-    RotatedSurface.rscBoundary1 L (Pi.single v 1) zf =
+    ∂₁ L (Pi.single v 1) zf =
       (if v ∈ RotatedSurface.zSupport zf then (1 : ZMod 2) else 0) := by
   classical
   rw [RotatedSurface.rscBoundary1_apply]
@@ -371,12 +372,12 @@ private lemma rscBoundary1_pi_single
 /-- Bridge: the abstract `cutMap` equals the lattice-side `rscZCutMap`. -/
 lemma cutMap_eq_rscZCutMap :
     (RotatedSurface.rotatedSurfaceHomologicalCode L).cutMap =
-      RotatedSurface.rscZCutMap L := by
+      δ⁰ L := by
   apply LinearMap.ext
   intro s
   funext v
   change ∑ zf : RotatedSurface.ZFaceIdx L,
-      s zf * RotatedSurface.rscBoundary1 L (Pi.single v 1) zf = _
+      s zf * ∂₁ L (Pi.single v 1) zf = _
   change _ = ∑ zf : RotatedSurface.ZFaceIdx L,
       s zf * (if v ∈ RotatedSurface.zSupport zf then (1 : ZMod 2) else 0)
   apply Finset.sum_congr rfl
@@ -475,7 +476,7 @@ theorem middleRowChain_not_mem_dualBoundaries :
     middleRowChain L ∉
       (RotatedSurface.rotatedSurfaceHomologicalCode L).dualBoundaries := by
   intro h
-  have h_rsc : middleRowChain L ∈ LinearMap.range (RotatedSurface.rscZCutMap L) := by
+  have h_rsc : middleRowChain L ∈ LinearMap.range (δ⁰ L) := by
     rw [← cutMap_eq_rscZCutMap]
     exact h
   have h1 : colParity L (middleRowChain L)
@@ -550,7 +551,7 @@ theorem colParity_eq_one_of_nontrivial
   rw [colParity_middleRowChain]
   -- dualBoundaries unfolds to range cutMap; convert h_diff_boundary to range rscZCutMap.
   have h_diff_rsc : c - middleRowChain L ∈
-      LinearMap.range (RotatedSurface.rscZCutMap L) := by
+      LinearMap.range (δ⁰ L) := by
     rw [← cutMap_eq_rscZCutMap]
     exact h_diff_boundary
   rw [colParity_eq_zero_of_mem_dualBoundaries L h_diff_rsc x]

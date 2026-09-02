@@ -8,6 +8,7 @@ namespace Stabilizer
 namespace Lattice
 
 open scoped BigOperators
+open scoped ToricChain
 
 variable (L : ℕ)
 
@@ -83,7 +84,7 @@ theorem hAt_independent_on_cycles (c : toricCycles (L := L)) (x0 x1 : Fin L) :
           c.val (EdgeIdx.h x y) + c.val (EdgeIdx.h (prev L x) y) +
             c.val (EdgeIdx.v x y) + c.val (EdgeIdx.v x (prev L y)) = 0 := by
         intro y
-        have h_cycle : toricBoundary1 (L := L) c.val (x, y) = 0 := by
+        have h_cycle : ∂₁ (L := L) c.val (x, y) = 0 := by
           exact c.2 |> fun h => by simp ;
         convert h_cycle using 1;
       aesop;
@@ -183,7 +184,7 @@ theorem h_boundary_zero (b : toricBoundaries (L := L)) :
             simp [two_mul]
       _ = 0 := by simp [h2]
   change (∑ y : Fin L,
-      toricBoundary2 (L := L) f (EdgeIdx.h z0 y)) = 0
+      ∂₂ (L := L) f (EdgeIdx.h z0 y)) = 0
   simpa [toricBoundary2, Finset.sum_add_distrib, hsum_prev] using hdouble_zero
 
 /-- Boundaries have trivial `v` invariant. -/
@@ -211,7 +212,7 @@ theorem v_boundary_zero (b : toricBoundaries (L := L)) :
             simp [two_mul]
       _ = 0 := by simp [h2]
   change (∑ x : Fin L,
-      toricBoundary2 (L := L) f (EdgeIdx.v x z0)) = 0
+      ∂₂ (L := L) f (EdgeIdx.v x z0)) = 0
   simpa [toricBoundary2, Finset.sum_add_distrib, hsum_prev] using hdouble_zero
 
 /-- Quotient-level `(h,v)` map is well-defined. -/
@@ -258,7 +259,7 @@ theorem phi_surjective :
   obtain ⟨c, hc⟩ : ∃ c : C1 L,
       (∀ x' : Fin L, ∀ y' : Fin L, c (EdgeIdx.h x' y') = if y' = zeroCoord L then x else 0) ∧
       (∀ x' : Fin L, ∀ y' : Fin L, c (EdgeIdx.v x' y') = if x' = zeroCoord L then y else 0) ∧
-      toricBoundary1 (L := L) c = 0 := by
+      ∂₁ (L := L) c = 0 := by
     refine ⟨
       (fun e =>
         match e with

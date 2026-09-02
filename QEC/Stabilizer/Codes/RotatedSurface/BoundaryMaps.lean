@@ -137,14 +137,38 @@ def rscBoundary1 (L : ℕ) :
     funext zf
     simp only [RingHom.id_apply, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
 
+/-!
+## Notation
+
+The scoped `RotatedSurfaceChain` notation renders the rotated-surface boundary
+maps as `∂₂ L c`, `∂₁ L c` (and `δ⁰ L s` for the Z-side cut map, declared next to
+it in `H1Dimension.lean`), mirroring the toric `ToricChain` scope. The lattice size
+stays an explicit argument, exactly as for the underlying constants, so the
+conversion is purely notational: `rscBoundary1` is still the declaration name
+for `simp [rscBoundary1]`, `unfold`, and lemma names. Enable with
+`open scoped RotatedSurfaceChain`.
+-/
+
+/-- `∂₂` is the rotated-surface face-boundary map `rscBoundary2 L`.
+Scoped: `open scoped RotatedSurfaceChain`. -/
+scoped[RotatedSurfaceChain] notation "∂₂" =>
+  Quantum.Stabilizer.Lattice.RotatedSurface.rscBoundary2
+
+/-- `∂₁` is the rotated-surface edge-boundary map `rscBoundary1 L`.
+Scoped: `open scoped RotatedSurfaceChain`. -/
+scoped[RotatedSurfaceChain] notation "∂₁" =>
+  Quantum.Stabilizer.Lattice.RotatedSurface.rscBoundary1
+
+open scoped RotatedSurfaceChain
+
 @[simp] theorem rscBoundary2_apply (L : ℕ) (c : XFaceIdx L → ZMod 2)
     (v : VtxIdx L) :
-    rscBoundary2 L c v =
+    ∂₂ L c v =
       ∑ xf : XFaceIdx L, c xf * (if v ∈ xSupport xf then 1 else 0) := rfl
 
 @[simp] theorem rscBoundary1_apply (L : ℕ) (c : VtxIdx L → ZMod 2)
     (zf : ZFaceIdx L) :
-    rscBoundary1 L c zf = ∑ v ∈ zSupport zf, c v := rfl
+    ∂₁ L c zf = ∑ v ∈ zSupport zf, c v := rfl
 
 /-! ## Intersection-cardinality lemmas -/
 
@@ -551,7 +575,7 @@ private lemma inter_card_even {L : ℕ} [Fact (Odd L)]
 
 /-- Chain-complex law: `∂₁ ∘ ∂₂ = 0`. -/
 theorem rscBoundary_comp_zero (L : ℕ) [Fact (Odd L)] :
-    (rscBoundary1 L).comp (rscBoundary2 L) = 0 := by
+    (∂₁ L).comp (∂₂ L) = 0 := by
   ext c zf
   simp only [LinearMap.comp_apply, rscBoundary1_apply, rscBoundary2_apply,
     LinearMap.zero_apply, Pi.zero_apply]
@@ -563,7 +587,7 @@ theorem rscBoundary_comp_zero (L : ℕ) [Fact (Odd L)] :
 /-- Pointwise corollary of `rscBoundary_comp_zero`. -/
 theorem rscBoundary_comp_zero_apply (L : ℕ) [Fact (Odd L)]
     (c : XFaceIdx L → ZMod 2) :
-    rscBoundary1 L (rscBoundary2 L c) = 0 := by
+    ∂₁ L (∂₂ L c) = 0 := by
   have h := congrArg (fun T => T c) (rscBoundary_comp_zero L)
   simpa using h
 

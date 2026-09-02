@@ -36,6 +36,7 @@ namespace StabilizerGroup
 namespace RotatedSurfaceCodeN
 
 open scoped BigOperators
+open scoped RotatedSurfaceChain
 open NQubitPauliGroupElement
 open Stabilizer.Lattice
 
@@ -208,10 +209,10 @@ private lemma rowFilter_xSupport_card_even
 
 /-- `rowParity (rscBoundary2 (Pi.single xf 1)) y = 0`. -/
 private lemma rowParity_boundary2_single (xf : RotatedSurface.XFaceIdx L) (y : Fin L) :
-    rowParity L (RotatedSurface.rscBoundary2 L (Pi.single xf 1)) y = 0 := by
+    rowParity L (∂₂ L (Pi.single xf 1)) y = 0 := by
   classical
   unfold rowParity
-  rw [show (fun x : Fin L => RotatedSurface.rscBoundary2 L (Pi.single xf 1) (x, y)) =
+  rw [show (fun x : Fin L => ∂₂ L (Pi.single xf 1) (x, y)) =
       (fun x : Fin L => if (x, y) ∈ RotatedSurface.xSupport xf then (1 : ZMod 2) else 0) by
     funext x
     exact boundary2_singleFace_apply L xf (x, y)]
@@ -221,7 +222,7 @@ private lemma rowParity_boundary2_single (xf : RotatedSurface.XFaceIdx L) (y : F
 /-- `rowParity (rscBoundary2 f) y = 0` for every X-face chain `f`. -/
 theorem rowParity_rscBoundary2
     (f : RotatedSurface.XFaceIdx L → ZMod 2) (y : Fin L) :
-    rowParity L (RotatedSurface.rscBoundary2 L f) y = 0 := by
+    rowParity L (∂₂ L f) y = 0 := by
   classical
   have hf : f = ∑ xf : RotatedSurface.XFaceIdx L, f xf • (Pi.single xf (1 : ZMod 2)) := by
     funext xf
@@ -232,23 +233,23 @@ theorem rowParity_rscBoundary2
   -- ∑ x, (∑ xf, ∂₂(f xf • δ_xf))(x, y) = ∑ xf, f xf * (∑ x, ∂₂(δ_xf)(x, y)) = 0
   rw [show (fun x : Fin L =>
       (∑ xf : RotatedSurface.XFaceIdx L,
-        RotatedSurface.rscBoundary2 L (f xf • Pi.single xf 1)) (x, y)) =
+        ∂₂ L (f xf • Pi.single xf 1)) (x, y)) =
       (fun x : Fin L =>
         ∑ xf : RotatedSurface.XFaceIdx L,
-          RotatedSurface.rscBoundary2 L (f xf • Pi.single xf 1) (x, y)) by
+          ∂₂ L (f xf • Pi.single xf 1) (x, y)) by
     funext x; rw [Finset.sum_apply]]
   rw [Finset.sum_comm]
   apply Finset.sum_eq_zero
   intro xf _
   have h_smul : ∀ x : Fin L,
-      RotatedSurface.rscBoundary2 L (f xf • Pi.single xf 1) (x, y) =
-        f xf * RotatedSurface.rscBoundary2 L (Pi.single xf 1) (x, y) := fun x => by
+      ∂₂ L (f xf • Pi.single xf 1) (x, y) =
+        f xf * ∂₂ L (Pi.single xf 1) (x, y) := fun x => by
     rw [LinearMap.map_smul]
     simp [Pi.smul_apply, smul_eq_mul]
   rw [Finset.sum_congr rfl (fun x _ => h_smul x)]
   rw [← Finset.mul_sum]
-  rw [show ∑ x : Fin L, RotatedSurface.rscBoundary2 L (Pi.single xf 1) (x, y) =
-      rowParity L (RotatedSurface.rscBoundary2 L (Pi.single xf 1)) y from rfl]
+  rw [show ∑ x : Fin L, ∂₂ L (Pi.single xf 1) (x, y) =
+      rowParity L (∂₂ L (Pi.single xf 1)) y from rfl]
   rw [rowParity_boundary2_single]
   ring
 

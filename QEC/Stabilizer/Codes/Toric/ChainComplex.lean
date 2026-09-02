@@ -27,6 +27,8 @@ namespace Quantum
 namespace Stabilizer
 namespace Lattice
 
+open scoped ToricChain
+
 /-- The toric edge-to-qubit equiv, built from `edgeToQubitIdx` (which is injective
 between equinumerous finite types). Returns an `EdgeIdx L ≃ Fin (toricNumQubits L)`
 so the abstract chain operator and the existing `toricXOperatorOfChain L` end up
@@ -55,8 +57,8 @@ noncomputable def toricHomologicalCode (L : ℕ) [Fact (0 < L)] :
   fin0 := inferInstance
   fin1 := inferInstance
   fin2 := inferInstance
-  boundary1 := toricBoundary1 (L := L)
-  boundary2 := toricBoundary2 (L := L)
+  boundary1 := ∂₁ (L := L)
+  boundary2 := ∂₂ (L := L)
   boundary_comp := toricBoundary_comp_zero (L := L)
   numQubits := Quantum.Stabilizer.Lattice.toricNumQubits L
   numQubits_eq := card_edgeIdx L
@@ -120,7 +122,7 @@ variable (L : ℕ) [Fact (0 < L)]
 `∑ v, ∂₁(δ_e) v * s v = ∑ e', δ_e e' * cutMap s e'` isolates the value
 at edge `e` on both sides. -/
 theorem toricHomologicalCode_cutMap_eq :
-    (toricHomologicalCode L).cutMap = toricVertexCutMap (L := L) := by
+    (toricHomologicalCode L).cutMap = δ⁰ (L := L) := by
   classical
   refine LinearMap.ext fun s => ?_
   funext e
@@ -146,14 +148,14 @@ theorem toricHomologicalCode_cutMap_eq :
   -- The two RHS sums are equal because the LHS sums are equal (both pair `∂₁ δ` with `s`).
   have hRHS :
       ∑ e' : EdgeIdx L, δ e' * (toricHomologicalCode L).cutMap s e'
-      = ∑ e' : EdgeIdx L, δ e' * toricVertexCutMap (L := L) s e' := by
+      = ∑ e' : EdgeIdx L, δ e' * δ⁰ (L := L) s e' := by
     have hLHS_eq :
         ∑ v : VtxIdx L, (toricHomologicalCode L).boundary1 δ v * s v
-        = ∑ v : VtxIdx L, toricBoundary1 (L := L) δ v * s v := rfl
+        = ∑ v : VtxIdx L, ∂₁ (L := L) δ v * s v := rfl
     exact h1.symm.trans (hLHS_eq.trans h2)
   -- Specialize `hpi` to both maps and chain.
   have hL := hpi ((toricHomologicalCode L).cutMap s)
-  have hR := hpi (toricVertexCutMap (L := L) s)
+  have hR := hpi (δ⁰ (L := L) s)
   exact hL.symm.trans (hRHS.trans hR)
 
 /-- The lattice `singleVtx v` is the abstract `singleVtx v`. -/
