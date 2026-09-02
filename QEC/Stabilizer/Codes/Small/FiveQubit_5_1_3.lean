@@ -6,6 +6,7 @@ import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
 import QEC.Stabilizer.Framework.Core.CSS.CSSDistance
 import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
 import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
+import QEC.Stabilizer.Framework.Core.CodeNotation
 import QEC.Stabilizer.Foundations.PauliGroup.Commutation
 import QEC.Stabilizer.Foundations.PauliGroup.CommutationTactics
 import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
@@ -488,7 +489,7 @@ private def logicalOps5_1_3 : Fin 1 → LogicalQubitOps 5 stabilizerGroup :=
             logicalX_anticommutes_logicalZ⟩
 
 /-- The [[5, 1, 3]] five-qubit perfect code as a `StabilizerCode 5 1`. -/
-noncomputable def stabilizerCode : StabilizerCode 5 1 where
+noncomputable def stabilizerCode : Code[[5, 1]] where
   hk := by decide
   generatorsList := generatorsList
   generators_length := rfl
@@ -750,7 +751,7 @@ theorem code_has_distance_three : HasCodeDistance stabilizerCode 3 := by
       weight_two_anticomm_witness g hg_weight h_cent
 
 /-- The [[5, 1, 3]] perfect code packaged with its distance. -/
-noncomputable def stabilizerCodeWithDistance : StabilizerCodeWithDistance 5 1 3 where
+noncomputable def stabilizerCodeWithDistance : Code[[5, 1, 3]] where
   toStabilizerCode := stabilizerCode
   hasDistance      := code_has_distance_three
 

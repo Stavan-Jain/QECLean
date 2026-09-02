@@ -280,7 +280,10 @@ These are local to this codebase — search here before assuming mathlib has the
   **exactly** the literal `⟨phase, (NQubitPauliOperator.identity n).set i₀ op₀ …⟩`
   normal form (non-identity positions, increasing index order), so
   `rfl`/`decide`/`simp` behavior is identical to a hand-written `.set`-chain; a
-  delaborator displays literal-shaped elements back as `σ[…]` in goals. Concrete
+  delaborator displays literal-shaped elements back as `σ[…]` in goals. The
+  phase-less Pauli string is `P[…]` (`P[XZZXI] : NQubitPauliOperator 5`), which
+  elaborates to exactly the bare `.set` chain and displays back as `P[…]` (an
+  element with a non-literal phase shows as `⟨k, P[…]⟩`). Concrete
   literal codes (`Codes/Small/`, `Repetition/Three.lean`) use it; parametric
   families with symbolic indices (`Repetition/N.lean`, `Iceberg/N.lean`, toric)
   cannot.

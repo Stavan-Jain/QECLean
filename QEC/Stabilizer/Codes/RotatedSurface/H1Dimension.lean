@@ -24,6 +24,7 @@ namespace Lattice
 namespace RotatedSurface
 
 open scoped BigOperators
+open scoped RotatedSurfaceChain
 
 /-! ## Basic ambient facts -/
 
@@ -536,7 +537,7 @@ lemma zAnchorIdx_injective : Function.Injective (zAnchorIdx : ZFaceIdx L → ℕ
 Combining the X-anchor properties, the indicator family of X-stabs is
 linearly independent, so the boundary map `∂₂` is injective. -/
 
-theorem rscBoundary2_injective : Function.Injective (rscBoundary2 L) := by
+theorem rscBoundary2_injective : Function.Injective (∂₂ L) := by
   rw [← LinearMap.ker_eq_bot, Submodule.eq_bot_iff]
   intro f hf
   simp only [LinearMap.mem_ker] at hf
@@ -548,7 +549,7 @@ theorem rscBoundary2_injective : Function.Injective (rscBoundary2 L) := by
     S.exists_min_image xAnchorIdx hS_ne
   have hxf_min_ne : f xf_min ≠ 0 := (Finset.mem_filter.mp hxf_min_mem).2
   obtain ⟨v_min, hv_min_supp, hv_min_idx⟩ := xAnchor_mem_xSupport xf_min
-  have hval : (rscBoundary2 L f) v_min = f xf_min := by
+  have hval : (∂₂ L f) v_min = f xf_min := by
     rw [rscBoundary2_apply, Finset.sum_eq_single xf_min]
     · simp [hv_min_supp]
     · intro xf' _ hne'
@@ -566,22 +567,22 @@ theorem rscBoundary2_injective : Function.Injective (rscBoundary2 L) := by
           omega
         simp [hnotin]
     · intro h; exact absurd (Finset.mem_univ xf_min) h
-  have : (rscBoundary2 L f) v_min = 0 := by rw [hf]; rfl
+  have : (∂₂ L f) v_min = 0 := by rw [hf]; rfl
   rw [hval] at this
   exact hxf_min_ne this
 
 /-- The kernel of `rscBoundary2` is `⊥`. -/
 theorem rscBoundary2_ker_eq_bot :
-    LinearMap.ker (rscBoundary2 L) = ⊥ := by
+    LinearMap.ker (∂₂ L) = ⊥ := by
   rw [LinearMap.ker_eq_bot]
   exact rscBoundary2_injective
 
 /-- `rank(∂₂) = |XFaceIdx L|`. -/
 theorem rsc_rank_boundary2 :
-    Module.finrank (ZMod 2) (LinearMap.range (rscBoundary2 L)) =
+    Module.finrank (ZMod 2) (LinearMap.range (∂₂ L)) =
       Fintype.card (XFaceIdx L) := by
-  have hrn := LinearMap.finrank_range_add_finrank_ker (rscBoundary2 L)
-  rw [show Module.finrank (ZMod 2) (LinearMap.ker (rscBoundary2 L)) = 0 from ?_] at hrn
+  have hrn := LinearMap.finrank_range_add_finrank_ker (∂₂ L)
+  rw [show Module.finrank (ZMod 2) (LinearMap.ker (∂₂ L)) = 0 from ?_] at hrn
   · rw [rsc_finrank_C2] at hrn
     omega
   · rw [rscBoundary2_ker_eq_bot]
@@ -604,11 +605,16 @@ def rscZCutMap (L : ℕ) :
     funext v
     simp only [RingHom.id_apply, Pi.smul_apply, smul_eq_mul, Finset.mul_sum, mul_assoc]
 
+/-- `δ⁰` is the rotated-surface Z-side cut map `rscZCutMap L` (the transpose of `∂₁`,
+i.e. the coboundary `C⁰ → C¹`). Scoped: `open scoped RotatedSurfaceChain`. -/
+scoped[RotatedSurfaceChain] notation "δ⁰" =>
+  Quantum.Stabilizer.Lattice.RotatedSurface.rscZCutMap
+
 @[simp] theorem rscZCutMap_apply (L : ℕ) (s : ZFaceIdx L → ZMod 2) (v : VtxIdx L) :
-    rscZCutMap L s v =
+    δ⁰ L s v =
       ∑ zf : ZFaceIdx L, s zf * (if v ∈ zSupport zf then 1 else 0) := rfl
 
-theorem rscZCutMap_injective : Function.Injective (rscZCutMap L) := by
+theorem rscZCutMap_injective : Function.Injective (δ⁰ L) := by
   rw [← LinearMap.ker_eq_bot, Submodule.eq_bot_iff]
   intro s hs
   simp only [LinearMap.mem_ker] at hs
@@ -620,7 +626,7 @@ theorem rscZCutMap_injective : Function.Injective (rscZCutMap L) := by
     S.exists_min_image zAnchorIdx hS_ne
   have hzf_min_ne : s zf_min ≠ 0 := (Finset.mem_filter.mp hzf_min_mem).2
   obtain ⟨v_min, hv_min_supp, hv_min_idx⟩ := zAnchor_mem_zSupport zf_min
-  have hval : (rscZCutMap L s) v_min = s zf_min := by
+  have hval : (δ⁰ L s) v_min = s zf_min := by
     rw [rscZCutMap_apply, Finset.sum_eq_single zf_min]
     · simp [hv_min_supp]
     · intro zf' _ hne'
@@ -638,19 +644,19 @@ theorem rscZCutMap_injective : Function.Injective (rscZCutMap L) := by
           omega
         simp [hnotin]
     · intro h; exact absurd (Finset.mem_univ zf_min) h
-  have : (rscZCutMap L s) v_min = 0 := by rw [hs]; rfl
+  have : (δ⁰ L s) v_min = 0 := by rw [hs]; rfl
   rw [hval] at this
   exact hzf_min_ne this
 
-theorem rscZCutMap_ker_eq_bot : LinearMap.ker (rscZCutMap L) = ⊥ := by
+theorem rscZCutMap_ker_eq_bot : LinearMap.ker (δ⁰ L) = ⊥ := by
   rw [LinearMap.ker_eq_bot]; exact rscZCutMap_injective
 
 /-- `rank(rscZCutMap) = |ZFaceIdx L|`. -/
 theorem rsc_rank_zCutMap :
-    Module.finrank (ZMod 2) (LinearMap.range (rscZCutMap L)) =
+    Module.finrank (ZMod 2) (LinearMap.range (δ⁰ L)) =
       Fintype.card (ZFaceIdx L) := by
-  have hrn := LinearMap.finrank_range_add_finrank_ker (rscZCutMap L)
-  rw [show Module.finrank (ZMod 2) (LinearMap.ker (rscZCutMap L)) = 0 from ?_] at hrn
+  have hrn := LinearMap.finrank_range_add_finrank_ker (δ⁰ L)
+  rw [show Module.finrank (ZMod 2) (LinearMap.ker (δ⁰ L)) = 0 from ?_] at hrn
   · rw [rsc_finrank_C0] at hrn
     omega
   · rw [rscZCutMap_ker_eq_bot]
@@ -663,8 +669,8 @@ maps as mutual transposes, so they share the same rank. -/
 
 theorem rscBoundary1_rscZCutMap_transpose
     (c : VtxIdx L → ZMod 2) (s : ZFaceIdx L → ZMod 2) :
-    ∑ zf : ZFaceIdx L, rscBoundary1 L c zf * s zf =
-      ∑ v : VtxIdx L, c v * rscZCutMap L s v := by
+    ∑ zf : ZFaceIdx L, ∂₁ L c zf * s zf =
+      ∑ v : VtxIdx L, c v * δ⁰ L s v := by
   simp only [rscBoundary1_apply, rscZCutMap_apply]
   -- Helper: ∑ v ∈ zSupport zf, c v * s zf = ∑ v, if v ∈ zSupport zf then c v * s zf else 0.
   have hsplit : ∀ zf : ZFaceIdx L,
@@ -700,7 +706,7 @@ def stabZMatrix (L : ℕ) : Matrix (ZFaceIdx L) (VtxIdx L) (ZMod 2) :=
   fun zf v => if v ∈ zSupport zf then 1 else 0
 
 lemma rscBoundary1_eq_mulVecLin :
-    rscBoundary1 L = (stabZMatrix L).mulVecLin := by
+    ∂₁ L = (stabZMatrix L).mulVecLin := by
   apply LinearMap.ext
   intro c
   funext zf
@@ -715,7 +721,7 @@ lemma rscBoundary1_eq_mulVecLin :
   ext v; simp
 
 lemma rscZCutMap_eq_transpose_mulVecLin :
-    rscZCutMap L = (stabZMatrix L).transpose.mulVecLin := by
+    δ⁰ L = (stabZMatrix L).transpose.mulVecLin := by
   apply LinearMap.ext
   intro s
   funext v
@@ -727,15 +733,15 @@ lemma rscZCutMap_eq_transpose_mulVecLin :
 
 /-- `rank(∂₁) = rank(rscZCutMap)` via matrix transpose-rank. -/
 theorem rsc_rank_boundary1_eq_rank_zCutMap :
-    Module.finrank (ZMod 2) (LinearMap.range (rscBoundary1 L)) =
-      Module.finrank (ZMod 2) (LinearMap.range (rscZCutMap L)) := by
+    Module.finrank (ZMod 2) (LinearMap.range (∂₁ L)) =
+      Module.finrank (ZMod 2) (LinearMap.range (δ⁰ L)) := by
   rw [rscBoundary1_eq_mulVecLin, rscZCutMap_eq_transpose_mulVecLin]
   show Matrix.rank (stabZMatrix L) = Matrix.rank (stabZMatrix L).transpose
   rw [Matrix.rank_transpose]
 
 /-- `rank(∂₁) = |ZFaceIdx L|`. -/
 theorem rsc_rank_boundary1 :
-    Module.finrank (ZMod 2) (LinearMap.range (rscBoundary1 L)) =
+    Module.finrank (ZMod 2) (LinearMap.range (∂₁ L)) =
       Fintype.card (ZFaceIdx L) := by
   rw [rsc_rank_boundary1_eq_rank_zCutMap, rsc_rank_zCutMap]
 
@@ -745,7 +751,7 @@ theorem rsc_rank_boundary1 :
 theorem rsc_finrank_cycles :
     Module.finrank (ZMod 2) (rscCycles L) =
       L * L - Fintype.card (ZFaceIdx L) := by
-  have hrn := LinearMap.finrank_range_add_finrank_ker (rscBoundary1 L)
+  have hrn := LinearMap.finrank_range_add_finrank_ker (∂₁ L)
   rw [rsc_finrank_C1, rsc_rank_boundary1] at hrn
   -- finrank C1 (= L*L) = rank(∂₁) + dim ker = |ZFaceIdx| + dim ker
   -- dim Z₁ = dim ker (rscBoundary1) = L*L - |ZFaceIdx|
@@ -757,13 +763,13 @@ theorem rsc_finrank_cycles :
     have hLL : 1 ≤ L * L := by nlinarith
     omega
   -- rscCycles = ker rscBoundary1
-  show Module.finrank (ZMod 2) (LinearMap.ker (rscBoundary1 L)) = _
+  show Module.finrank (ZMod 2) (LinearMap.ker (∂₁ L)) = _
   omega
 
 /-- `dim(boundaries) = |XFaceIdx L|`. -/
 theorem rsc_finrank_boundaries :
     Module.finrank (ZMod 2) (rscBoundaries L) = Fintype.card (XFaceIdx L) := by
-  show Module.finrank (ZMod 2) (LinearMap.range (rscBoundary2 L)) = _
+  show Module.finrank (ZMod 2) (LinearMap.range (∂₂ L)) = _
   exact rsc_rank_boundary2
 
 /-- `dim(H₁) = 1` for the rotated surface code. -/

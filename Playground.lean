@@ -26,6 +26,12 @@ open Quantum.StabilizerGroup
 -- proved distance. (It is the repo's first non-CSS code.)
 #check FiveQubit_5_1_3.stabilizerCodeWithDistance
 
+-- The same object through the scoped `[[n, k, d]]` type notation: `Code[[5, 1, 3]]` is
+-- `StabilizerCodeWithDistance 5 1 3` (and `Code[[5, 1]]` is `StabilizerCode 5 1`). The
+-- `open Quantum.StabilizerGroup` above activates it.
+#check (FiveQubit_5_1_3.stabilizerCodeWithDistance : Code[[5, 1, 3]])
+#check (Steane7.stabilizerCode : Code[[7, 1]])
+
 -- The parametric toric code, for every `L ≥ 2`. (It lives under
 -- `Quantum.Stabilizer.Lattice`, not the `Quantum.StabilizerGroup` opened above.)
 #check @Quantum.Stabilizer.Lattice.toricHomologicalCode

@@ -11,6 +11,7 @@ namespace Stabilizer
 namespace Lattice
 
 open scoped BigOperators
+open scoped ToricChain
 
 /-- Support membership of `toricXOperatorOfChain` at an indexed edge qubit. -/
 lemma mem_support_toricXOperatorOfChain_edgeToQubitIdx_iff
@@ -282,7 +283,7 @@ theorem evenIncidentOverlap_iff_boundary1_zero_at
         (if c (EdgeIdx.h (StabilizerGroup.ToricCodeN.prev L xv) yv) = 1 then 1 else 0) +
         (if c (EdgeIdx.v xv yv) = 1 then 1 else 0) +
         (if c (EdgeIdx.v xv (StabilizerGroup.ToricCodeN.prev L yv)) = 1 then 1 else 0)) : ℕ)
-      ↔ toricBoundary1 (L := L) c (xv, yv) = 0 := by
+      ↔ ∂₁ (L := L) c (xv, yv) = 0 := by
   simpa [toricBoundary1] using even_indicator_sum4_iff_zmod2_zero
     (c (EdgeIdx.h xv yv))
     (c (EdgeIdx.h (StabilizerGroup.ToricCodeN.prev L xv) yv))
@@ -295,7 +296,7 @@ theorem vertexCheckCommutes_iff_boundary1_zero_at
     (L : ℕ) [Fact (2 ≤ L)] (c : C1 L) (xv yv : Fin L) :
     StabilizerGroup.ToricCodeN.vertexStab L xv yv * toricXOperatorOfChain L c =
       toricXOperatorOfChain L c * StabilizerGroup.ToricCodeN.vertexStab L xv yv
-      ↔ toricBoundary1 (L := L) c (xv, yv) = 0 := by
+      ↔ ∂₁ (L := L) c (xv, yv) = 0 := by
   exact (vertexCheckCommutes_iff_evenIncidentOverlap L c xv yv).trans
     (evenIncidentOverlap_iff_boundary1_zero_at L c xv yv)
 
@@ -303,7 +304,7 @@ theorem vertexCheckCommutes_iff_boundary1_zero_at
 vanishing of the primal boundary map. -/
 theorem xCommutesWithZChecks_iff_boundary1_pointwise_zero
     (L : ℕ) [Fact (2 ≤ L)] (c : C1 L) :
-    xCommutesWithZChecks L c ↔ ∀ v : VtxIdx L, toricBoundary1 (L := L) c v = 0 := by
+    xCommutesWithZChecks L c ↔ ∀ v : VtxIdx L, ∂₁ (L := L) c v = 0 := by
   constructor
   · intro h v
     rcases v with ⟨xv, yv⟩
@@ -321,10 +322,10 @@ theorem xCommutesWithZChecks_iff_boundary1_pointwise_zero
 i.e. cycle membership. -/
 theorem boundary1_pointwise_zero_iff_mem_toricCycles
     (L : ℕ) [Fact (2 ≤ L)] (c : C1 L) :
-    (∀ v : VtxIdx L, toricBoundary1 (L := L) c v = 0) ↔ c ∈ toricCycles (L := L) := by
+    (∀ v : VtxIdx L, ∂₁ (L := L) c v = 0) ↔ c ∈ toricCycles (L := L) := by
   constructor
   · intro h
-    change toricBoundary1 (L := L) c = 0
+    change ∂₁ (L := L) c = 0
     ext v
     exact h v
   · intro h v

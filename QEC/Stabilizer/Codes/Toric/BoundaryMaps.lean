@@ -39,30 +39,52 @@ def toricBoundary1 : C1 L →ₗ[ZMod 2] C0 L where
     ext v
     simp [mul_add, add_assoc]
 
+/-!
+## Notation
+
+The scoped `ToricChain` notation renders the toric boundary maps the way the
+homological narrative writes them: `∂₂ L f`, `∂₁ L c` (and `δ⁰ L s` for the vertex
+cut map, declared next to it in `H1Dimension.lean`). The lattice size stays an
+explicit argument, exactly as for the underlying constants — `∂₁ L`, `∂₁ (L := L)` —
+so the conversion is purely notational: `toricBoundary1` is still the declaration
+name for `simp [toricBoundary1]`, `unfold`, and lemma names. Enable with
+`open scoped ToricChain`.
+-/
+
+/-- `∂₂` is the toric face-boundary map `toricBoundary2 : C2 L →ₗ[ZMod 2] C1 L`,
+with the lattice size explicit: `∂₂ L f`. Scoped: `open scoped ToricChain`. -/
+scoped[ToricChain] notation "∂₂" => Quantum.Stabilizer.Lattice.toricBoundary2
+
+/-- `∂₁` is the toric edge-boundary map `toricBoundary1 : C1 L →ₗ[ZMod 2] C0 L`,
+with the lattice size explicit: `∂₁ L c`. Scoped: `open scoped ToricChain`. -/
+scoped[ToricChain] notation "∂₁" => Quantum.Stabilizer.Lattice.toricBoundary1
+
+open scoped ToricChain
+
 @[simp] lemma toricBoundary2_singleFace_apply_h (x y x' y' : Fin L) :
-    toricBoundary2 (L := L) (singleFace (L := L) (x, y)) (EdgeIdx.h x' y') =
+    ∂₂ (L := L) (singleFace (x, y)) (EdgeIdx.h x' y') =
       (if (x', y') = (x, y) then (1 : ZMod 2) else 0) +
       (if (x', prev L y') = (x, y) then (1 : ZMod 2) else 0) := by
   simp [toricBoundary2, singleFace]
 
 @[simp] lemma toricBoundary2_singleFace_apply_v (x y x' y' : Fin L) :
-    toricBoundary2 (L := L) (singleFace (L := L) (x, y)) (EdgeIdx.v x' y') =
+    ∂₂ (L := L) (singleFace (x, y)) (EdgeIdx.v x' y') =
       (if (x', y') = (x, y) then (1 : ZMod 2) else 0) +
       (if (prev L x', y') = (x, y) then (1 : ZMod 2) else 0) := by
   simp [toricBoundary2, singleFace]
 
 @[simp] lemma toricBoundary1_singleEdge_apply
     (e : EdgeIdx L) (v : VtxIdx L) :
-    toricBoundary1 (L := L) (singleEdge (L := L) e) v =
-      singleEdge (L := L) e (EdgeIdx.h v.1 v.2) +
-      singleEdge (L := L) e (EdgeIdx.h (prev L v.1) v.2) +
-      singleEdge (L := L) e (EdgeIdx.v v.1 v.2) +
-      singleEdge (L := L) e (EdgeIdx.v v.1 (prev L v.2)) := by
+    ∂₁ (L := L) (singleEdge e) v =
+      singleEdge e (EdgeIdx.h v.1 v.2) +
+      singleEdge e (EdgeIdx.h (prev L v.1) v.2) +
+      singleEdge e (EdgeIdx.v v.1 v.2) +
+      singleEdge e (EdgeIdx.v v.1 (prev L v.2)) := by
   simp [toricBoundary1]
 
 /-- Chain-complex law for toric boundaries. -/
 theorem toricBoundary_comp_zero :
-    (toricBoundary1 (L := L)).comp (toricBoundary2 (L := L)) = 0 := by
+    (∂₁ (L := L)).comp (∂₂ (L := L)) = 0 := by
   ext f v
   simp [LinearMap.comp_apply, toricBoundary1, toricBoundary2,
     add_assoc, add_comm, add_left_comm]
@@ -70,7 +92,7 @@ theorem toricBoundary_comp_zero :
   grind
 /-- Pointwise corollary of `toricBoundary_comp_zero`. -/
 theorem toricBoundary_comp_zero_apply (f : C2 L) :
-    toricBoundary1 (L := L) (toricBoundary2 (L := L) f) = 0 := by
+    ∂₁ (L := L) (∂₂ (L := L) f) = 0 := by
   have h := congrArg (fun T => T f) (toricBoundary_comp_zero (L := L))
   simpa using h
 

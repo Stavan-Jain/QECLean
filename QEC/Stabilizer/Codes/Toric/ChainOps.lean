@@ -31,6 +31,7 @@ namespace Stabilizer
 namespace Lattice
 
 open scoped BigOperators
+open scoped ToricChain
 
 -- ---------------------------------------------------------------------------
 -- Z-operator encoding (mirror of `toricXOperatorOfChain`)
@@ -221,7 +222,7 @@ lemma toricZOperatorOfChain_add (L : ℕ) (c c' : C1 L) :
 /-- `toricXOperatorOfChain` maps the boundary of a single face to the corresponding
 face stabilizer. -/
 lemma toricXOperatorOfChain_boundary_singleFace (L : ℕ) [Fact (2 ≤ L)] (x y : Fin L) :
-    toricXOperatorOfChain L (toricBoundary2 (L := L) (singleFace (x, y))) =
+    toricXOperatorOfChain L (∂₂ (L := L) (singleFace (x, y))) =
       StabilizerGroup.ToricCodeN.faceStab L x y := by
   unfold toricXOperatorOfChain StabilizerGroup.ToricCodeN.faceStab
   congr with q
@@ -268,7 +269,7 @@ set_option maxHeartbeats 800000 in
     equals the vertex stabilizer at `(xv, yv)`. -/
 lemma toricZOperatorOfChain_cutMap_singleVtx (L : ℕ) [Fact (2 ≤ L)]
     (xv yv : Fin L) :
-    toricZOperatorOfChain L (toricVertexCutMap (L := L) (singleVtx (xv, yv))) =
+    toricZOperatorOfChain L (δ⁰ (L := L) (singleVtx (xv, yv))) =
       StabilizerGroup.ToricCodeN.vertexStab L xv yv := by
   have hL0 : 0 < L := Nat.lt_of_lt_of_le (by decide : 0 < 2) (Fact.out : 2 ≤ L)
   haveI : Fact (0 < L) := ⟨hL0⟩

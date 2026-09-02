@@ -5,15 +5,17 @@ namespace Quantum
 namespace Stabilizer
 namespace Lattice
 
+open scoped ToricChain
+
 variable (L : ℕ) [Fact (0 < L)]
 
 /-- 1-cycles: kernel of `∂1`. -/
 def toricCycles : Submodule (ZMod 2) (C1 L) :=
-  LinearMap.ker (toricBoundary1 (L := L))
+  LinearMap.ker (∂₁ (L := L))
 
 /-- 1-boundaries: range of `∂2`. -/
 def toricBoundaries : Submodule (ZMod 2) (C1 L) :=
-  LinearMap.range (toricBoundary2 (L := L))
+  LinearMap.range (∂₂ (L := L))
 
 /-- Every boundary is a cycle (`im ∂2 ≤ ker ∂1`). -/
 theorem toricBoundaries_le_toricCycles :

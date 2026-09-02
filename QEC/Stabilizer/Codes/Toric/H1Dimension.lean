@@ -7,6 +7,7 @@ namespace Stabilizer
 namespace Lattice
 
 open scoped BigOperators
+open scoped ToricChain
 
 variable (L : ℕ) [Fact (0 < L)]
 
@@ -50,17 +51,17 @@ theorem toric_boundaries_le_cycles :
 theorem toric_rank_nullity_boundary1 :
     Module.finrank (ZMod 2) (C1 L) =
       Module.finrank (ZMod 2) (toricCycles (L := L)) +
-        Module.finrank (ZMod 2) (LinearMap.range (toricBoundary1 (L := L))) := by
+        Module.finrank (ZMod 2) (LinearMap.range (∂₁ (L := L))) := by
   simpa [toricCycles, add_comm, add_left_comm, add_assoc] using
-    (LinearMap.finrank_range_add_finrank_ker (toricBoundary1 (L := L))).symm
+    (LinearMap.finrank_range_add_finrank_ker (∂₁ (L := L))).symm
 
 /-- Rank-nullity specialization for `∂₂`. -/
 theorem toric_rank_nullity_boundary2 :
     Module.finrank (ZMod 2) (C2 L) =
-      Module.finrank (ZMod 2) (LinearMap.ker (toricBoundary2 (L := L))) +
+      Module.finrank (ZMod 2) (LinearMap.ker (∂₂ (L := L))) +
         Module.finrank (ZMod 2) (toricBoundaries (L := L)) := by
   simpa [toricBoundaries, add_comm, add_left_comm, add_assoc] using
-    (LinearMap.finrank_range_add_finrank_ker (toricBoundary2 (L := L))).symm
+    (LinearMap.finrank_range_add_finrank_ker (∂₂ (L := L))).symm
 
 /-- The vertex cut map: sends a 0-chain `s` to the 1-chain whose value at edge `e`
 is the parity-difference of `s` at the two endpoints of `e`. This is the transpose
@@ -82,24 +83,29 @@ noncomputable def toricVertexCutMap : C0 L →ₗ[ZMod 2] C1 L := by
     ext e
     cases e <;> simp [mul_add]
 
+/-- `δ⁰` is the toric vertex cut map `toricVertexCutMap : C0 L →ₗ[ZMod 2] C1 L` (the
+transpose of `∂₁`, i.e. the coboundary `C⁰ → C¹`), with the lattice size explicit:
+`δ⁰ L s`. Scoped: `open scoped ToricChain`. -/
+scoped[ToricChain] notation "δ⁰" => Quantum.Stabilizer.Lattice.toricVertexCutMap
+
 /-
 The pairing ⟨∂₁ c, s⟩ = ⟨c, cutMap s⟩, showing ∂₁ and cutMap are transposes.
 -/
 set_option maxHeartbeats 400000 in
 -- This transpose-expansion proof is algebra-heavy and needs extra heartbeats.
 theorem toricBoundary1_cutMap_transpose (c : C1 L) (s : C0 L) :
-    ∑ v : VtxIdx L, toricBoundary1 (L := L) c v * s v =
-    ∑ e : EdgeIdx L, c e * toricVertexCutMap (L := L) s e := by
+    ∑ v : VtxIdx L, ∂₁ (L := L) c v * s v =
+    ∑ e : EdgeIdx L, c e * δ⁰ (L := L) s e := by
   -- Expand both sides using the definitions.
   have h_expand_lhs :
-      ∑ v : Fin L × Fin L, (toricBoundary1 L c v) * s v =
+      ∑ v : Fin L × Fin L, (∂₁ L c v) * s v =
         ∑ v : Fin L × Fin L,
           (c (EdgeIdx.h v.1 v.2) + c (EdgeIdx.h (prev L v.1) v.2) +
             c (EdgeIdx.v v.1 v.2) + c (EdgeIdx.v v.1 (prev L v.2))) * s v := by
     rfl
   generalize_proofs at *; (
   have h_expand_rhs :
-      ∑ e : EdgeIdx L, c e * (toricVertexCutMap L s e) =
+      ∑ e : EdgeIdx L, c e * (δ⁰ L s e) =
         ∑ x : Fin L, ∑ y : Fin L,
           (c (EdgeIdx.h x y) * (s (x, y) + s (next L x, y)) +
             c (EdgeIdx.v x y) * (s (x, y) + s (x, next L y))) := by
@@ -153,8 +159,8 @@ theorem toricBoundary1_cutMap_transpose (c : C1 L) (s : C0 L) :
 
 /-- `∂₁` and `toricVertexCutMap` are mutual transposes, so they have equal rank. -/
 theorem toric_rank_boundary1_eq_rank_cutMap :
-    Module.finrank (ZMod 2) (LinearMap.range (toricBoundary1 (L := L))) =
-      Module.finrank (ZMod 2) (LinearMap.range (toricVertexCutMap (L := L))) := by
+    Module.finrank (ZMod 2) (LinearMap.range (∂₁ (L := L))) =
+      Module.finrank (ZMod 2) (LinearMap.range (δ⁰ (L := L))) := by
   rw [ ← LinearMap.finrank_range_dualMap_eq_finrank_range ];
   fapply LinearEquiv.finrank_eq;
   symm;
@@ -194,7 +200,7 @@ theorem toric_rank_boundary1_eq_rank_cutMap :
 
 /-- The kernel of the toric vertex cut map consists exactly of the constant 0-chains. -/
 theorem mem_ker_cutMap_iff (s : C0 L) :
-    s ∈ LinearMap.ker (toricVertexCutMap (L := L)) ↔ ∃ c : ZMod 2, s = fun _ => c := by
+    s ∈ LinearMap.ker (δ⁰ (L := L)) ↔ ∃ c : ZMod 2, s = fun _ => c := by
   constructor
   · intro hs
     have h_const : ∀ x y : Fin L, s (x, y) = s (next L x, y) ∧ s (x, y) = s (x, next L y) := by
@@ -252,7 +258,7 @@ theorem mem_ker_cutMap_iff (s : C0 L) :
 
 /-- The kernel of the toric vertex cut map equals `span{constant 1}`. -/
 theorem ker_toricVertexCutMap_eq_span_one :
-    LinearMap.ker (toricVertexCutMap (L := L)) =
+    LinearMap.ker (δ⁰ (L := L)) =
       Submodule.span (ZMod 2) ({fun _ => 1} : Set (C0 L)) := by
   ext s
   rw [mem_ker_cutMap_iff, Submodule.mem_span_singleton]
@@ -262,16 +268,16 @@ theorem ker_toricVertexCutMap_eq_span_one :
 
 /-- Kernel-dimension result for the cut-map connectivity argument. -/
 theorem toric_finrank_ker_cutMap_eq_one :
-    Module.finrank (ZMod 2) (LinearMap.ker (toricVertexCutMap (L := L))) = 1 := by
+    Module.finrank (ZMod 2) (LinearMap.ker (δ⁰ (L := L))) = 1 := by
   rw [ker_toricVertexCutMap_eq_span_one, finrank_span_singleton]
   exact fun h => by simpa using congr_fun h (⟨0, Fact.out⟩, ⟨0, Fact.out⟩)
 
 /-- Target rank formula for `∂₁`. -/
 theorem toric_rank_boundary1 :
-    Module.finrank (ZMod 2) (LinearMap.range (toricBoundary1 (L := L))) = L * L - 1 := by
+    Module.finrank (ZMod 2) (LinearMap.range (∂₁ (L := L))) = L * L - 1 := by
   have hcut_rk :
-      Module.finrank (ZMod 2) (LinearMap.range (toricVertexCutMap (L := L))) = L * L - 1 := by
-    have hcut_rn := LinearMap.finrank_range_add_finrank_ker (toricVertexCutMap (L := L))
+      Module.finrank (ZMod 2) (LinearMap.range (δ⁰ (L := L))) = L * L - 1 := by
+    have hcut_rn := LinearMap.finrank_range_add_finrank_ker (δ⁰ (L := L))
     have hC0 := toric_finrank_C0 (L := L)
     have hker := toric_finrank_ker_cutMap_eq_one (L := L)
     omega
@@ -304,7 +310,7 @@ theorem toric_finrank_cycles :
 
 /-- The kernel of `∂₂` consists exactly of the constant 2-chains. -/
 theorem mem_ker_boundary2_iff (f : C2 L) :
-    f ∈ LinearMap.ker (toricBoundary2 (L := L)) ↔ ∃ c : ZMod 2, f = fun _ => c := by
+    f ∈ LinearMap.ker (∂₂ (L := L)) ↔ ∃ c : ZMod 2, f = fun _ => c := by
   constructor
   · intro hf
     have h_const : ∀ x y, f (x, next L y) = f (x, y) := by
@@ -368,7 +374,7 @@ theorem mem_ker_boundary2_iff (f : C2 L) :
 
 /-- The kernel of `∂₂` equals `span{constant 1}`. -/
 theorem ker_toricBoundary2_eq_span_one :
-    LinearMap.ker (toricBoundary2 (L := L)) =
+    LinearMap.ker (∂₂ (L := L)) =
       Submodule.span (ZMod 2) ({fun _ => 1} : Set (C2 L)) := by
   ext f
   rw [mem_ker_boundary2_iff, Submodule.mem_span_singleton]
@@ -378,7 +384,7 @@ theorem ker_toricBoundary2_eq_span_one :
 
 /-- Kernel-dimension result for `∂₂`. -/
 theorem toric_finrank_ker_boundary2_eq_one :
-    Module.finrank (ZMod 2) (LinearMap.ker (toricBoundary2 (L := L))) = 1 := by
+    Module.finrank (ZMod 2) (LinearMap.ker (∂₂ (L := L))) = 1 := by
   rw [ker_toricBoundary2_eq_span_one, finrank_span_singleton]
   exact fun h => by simpa using congr_fun h (⟨0, Fact.out⟩, ⟨0, Fact.out⟩)
 

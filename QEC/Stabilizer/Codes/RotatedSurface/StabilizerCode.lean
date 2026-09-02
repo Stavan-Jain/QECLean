@@ -35,6 +35,7 @@ namespace StabilizerGroup
 namespace RotatedSurfaceCodeN
 
 open scoped BigOperators
+open scoped RotatedSurfaceChain
 open NQubitPauliGroupElement
 open Stabilizer.Lattice
 -- Open `Lattice` to access `RotatedSurface.*` with one less prefix.
@@ -55,7 +56,7 @@ omit [Fact (Odd L)] [Fact (3 ≤ L)] in
 /-- `rscBoundary1 (Pi.single v 1) zf = 1[v ∈ zSupport zf]`. -/
 private lemma boundary1_pi_single (v : RotatedSurface.VtxIdx L)
     (zf : RotatedSurface.ZFaceIdx L) :
-    RotatedSurface.rscBoundary1 L (Pi.single v 1) zf =
+    ∂₁ L (Pi.single v 1) zf =
       (if v ∈ RotatedSurface.zSupport zf then (1 : ZMod 2) else 0) := by
   classical
   rw [RotatedSurface.rscBoundary1_apply]
@@ -81,7 +82,7 @@ lemma cutMap_singleVtx_apply (zf : RotatedSurface.ZFaceIdx L)
         ((RotatedSurface.rotatedSurfaceHomologicalCode L).singleVtx zf) v =
       ∑ zf' : RotatedSurface.ZFaceIdx L,
         (RotatedSurface.rotatedSurfaceHomologicalCode L).singleVtx zf zf' *
-          RotatedSurface.rscBoundary1 L (Pi.single v 1) zf' from rfl]
+          ∂₁ L (Pi.single v 1) zf' from rfl]
   rw [Finset.sum_eq_single zf]
   · -- (singleVtx zf zf) * (boundary1 (δ_v) zf) = (1 : ZMod 2) * _ = boundary1 (δ_v) zf
     have hone : (RotatedSurface.rotatedSurfaceHomologicalCode L).singleVtx zf zf =
@@ -104,7 +105,7 @@ lemma boundary2_singleFace_apply (xf : RotatedSurface.XFaceIdx L)
         ((RotatedSurface.rotatedSurfaceHomologicalCode L).singleFace xf) v =
       (if v ∈ RotatedSurface.xSupport xf then (1 : ZMod 2) else 0) := by
   classical
-  change RotatedSurface.rscBoundary2 L (Pi.single xf 1) v = _
+  change ∂₂ L (Pi.single xf 1) v = _
   rw [RotatedSurface.rscBoundary2_apply]
   by_cases hv : v ∈ RotatedSurface.xSupport xf
   · rw [if_pos hv, Finset.sum_eq_single xf]
@@ -485,7 +486,7 @@ theorem rowsLinearIndependent_generatorsList :
   -- (We work directly with index splits instead of introducing custom Embeddings.)
   --
   -- Z-half kernel: rscZCutMap (coeffsZ f) = 0.
-  have h_cz_ker : RotatedSurface.rscZCutMap L (coeffsZ L f) = 0 := by
+  have h_cz_ker : δ⁰ L (coeffsZ L f) = 0 := by
     funext v
     rw [Pi.zero_apply]
     -- Get the column equation at natAdd (rscQubitEquiv v).
@@ -594,7 +595,7 @@ theorem rowsLinearIndependent_generatorsList :
   -- For each k < nZ, f k = coeffsZ f (zfAt k) = 0.
   -- For each k ≥ nZ, similar via X-block.
   -- X-half kernel: rscBoundary2 (coeffsX f) = 0.
-  have h_cx_ker : RotatedSurface.rscBoundary2 L (coeffsX L f) = 0 := by
+  have h_cx_ker : ∂₂ L (coeffsX L f) = 0 := by
     funext v
     rw [Pi.zero_apply]
     set q := RotatedSurface.rscQubitEquiv L v with hq_def
@@ -768,7 +769,7 @@ def middleRowChain : RotatedSurface.VtxIdx L → ZMod 2 :=
 theorem middleColChain_mem_cycles :
     middleColChain L ∈ RotatedSurface.rscCycles L := by
   classical
-  change RotatedSurface.rscBoundary1 L (middleColChain L) = 0
+  change ∂₁ L (middleColChain L) = 0
   have h3 : 3 ≤ L := Fact.out
   have hmid_pos : 0 < (L - 1) / 2 := by omega
   have hmid_lt : (L - 1) / 2 < L - 1 := by omega

@@ -25,6 +25,7 @@ on the command. The `example`s at the bottom show the in-proof panels.
 namespace QECWidgets.Demo
 
 open Quantum Quantum.StabilizerGroup ProofWidgets
+open scoped Pauli
 
 /-! ## Single terms: generators and logicals of the Steane code -/
 
@@ -42,9 +43,9 @@ open Quantum Quantum.StabilizerGroup ProofWidgets
 
 #pauli_strip (Steane7.X1 * Steane7.Z1)
 
-#pauli_strip (⟨3,
-    (((NQubitPauliOperator.identity 7).set 0 PauliOperator.X).set 2 PauliOperator.X).set 3
-      PauliOperator.X |>.set 6 PauliOperator.X⟩ : NQubitPauliGroupElement 7)
+-- An inline literal with phase −i, written with the scoped `σ[…]` construction
+-- notation (`open scoped Pauli`): `-iσ[…]` is `phasePower = 3`.
+#pauli_strip (-iσ[XIXXIIX])
 
 /-! ## Propositions: commutation views -/
 
