@@ -489,7 +489,7 @@ theorem generatorsIndependent_concat
       [D.Cin.logicalX 0, D.Cin.logicalZ 0]))
     (hout : rowsLinearIndependent (D.outerZ ++ D.outerX)) :
     GeneratorsIndependent (n₁ * n₂) D.concatGeneratorsList :=
-  GeneratorsIndependent_of_rowsLinearIndependent _ _ (D.rowsLinearIndependent_concat hin hout)
+  GeneratorsIndependent_of_rowsLinearIndependent (D.rowsLinearIndependent_concat hin hout)
 
 end ConcatCSSData
 

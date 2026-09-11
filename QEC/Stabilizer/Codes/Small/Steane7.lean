@@ -178,8 +178,7 @@ via symplectic span).
 
 /-- Every element of the generators list has phase power 0. -/
 lemma AllPhaseZero_generatorsList : NQubitPauliGroupElement.AllPhaseZero generatorsList := by
-  simp only [generatorsList, AllPhaseZero_cons, AllPhaseZero_nil, and_true]
-  exact ⟨rfl, rfl, rfl, rfl, rfl, rfl⟩
+  decide
 
 /-- The check-matrix rows of the Steane generators are linearly independent. -/
 theorem rowsLinearIndependent_generatorsList :
@@ -187,8 +186,7 @@ theorem rowsLinearIndependent_generatorsList :
 
 /-- The Steane generator list is an independent generating set. -/
 theorem GeneratorsIndependent_7_generatorsList : GeneratorsIndependent 7 generatorsList :=
-  GeneratorsIndependent_of_rowsLinearIndependent 7 generatorsList
-    rowsLinearIndependent_generatorsList
+  GeneratorsIndependent_of_rowsLinearIndependent rowsLinearIndependent_generatorsList
 
 /-- Logical X: X on all seven qubits. -/
 def logicalX : NQubitPauliGroupElement 7 :=

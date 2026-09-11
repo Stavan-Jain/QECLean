@@ -63,8 +63,7 @@ theorem rowsLinearIndependent_generatorsList :
 
 /-- The repetition-code generator list is an independent generating set. -/
 theorem GeneratorsIndependent_3_generatorsList : GeneratorsIndependent 3 generatorsList :=
-  GeneratorsIndependent_of_rowsLinearIndependent 3 generatorsList
-    rowsLinearIndependent_generatorsList
+  GeneratorsIndependent_of_rowsLinearIndependent rowsLinearIndependent_generatorsList
 
 /-- The generators commute (proved componentwise). -/
 lemma Z1Z2_commutes_Z2Z3 : Z1Z2 * Z2Z3 = Z2Z3 * Z1Z2 := by

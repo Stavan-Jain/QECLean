@@ -1529,8 +1529,8 @@ private theorem rowsLinearIndependent_generatorsListPackaged (L : ℕ) [Fact (2 
 /-- The trimmed generator list is an independent generating set. -/
 private theorem generators_independent_packaged (L : ℕ) [Fact (2 ≤ L)] :
     StabilizerGroup.GeneratorsIndependent (numQubits L) (generatorsListPackaged L) :=
-  StabilizerGroup.GeneratorsIndependent_of_rowsLinearIndependent (numQubits L)
-    (generatorsListPackaged L) (rowsLinearIndependent_generatorsListPackaged L)
+  StabilizerGroup.GeneratorsIndependent_of_rowsLinearIndependent
+    (rowsLinearIndependent_generatorsListPackaged L)
 
 -- ---------------------------------------------------------------------------
 -- Phase 4: Final assembly

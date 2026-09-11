@@ -694,7 +694,7 @@ theorem rowsLinearIndependent_generatorsList :
 /-- The quantum Hamming generator list is an independent generating set. -/
 theorem GeneratorsIndependent_generatorsList :
     GeneratorsIndependent (2 ^ r - 1) (generatorsList r) :=
-  GeneratorsIndependent_of_rowsLinearIndependent _ _ (rowsLinearIndependent_generatorsList r)
+  GeneratorsIndependent_of_rowsLinearIndependent (rowsLinearIndependent_generatorsList r)
 
 /-!
 ## Logical operators

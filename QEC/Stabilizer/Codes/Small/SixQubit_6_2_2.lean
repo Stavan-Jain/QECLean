@@ -293,8 +293,7 @@ theorem rowsLinearIndependent_generatorsList :
 /-- The generator list is an independent generating set. -/
 theorem GeneratorsIndependent_6_generatorsList :
     GeneratorsIndependent 6 generatorsList :=
-  GeneratorsIndependent_of_rowsLinearIndependent 6 generatorsList
-    rowsLinearIndependent_generatorsList
+  GeneratorsIndependent_of_rowsLinearIndependent rowsLinearIndependent_generatorsList
 
 /-! ## §9 — Bundled `StabilizerGroup 6` -/
 

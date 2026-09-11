@@ -352,8 +352,7 @@ theorem rowsLinearIndependent_generatorsList (m : ℕ) [Fact (2 ≤ m)] :
 
 theorem GeneratorsIndependent_generatorsList (m : ℕ) [Fact (2 ≤ m)] :
     GeneratorsIndependent (2 * m) (generatorsList m) :=
-  GeneratorsIndependent_of_rowsLinearIndependent (2 * m) (generatorsList m)
-    (rowsLinearIndependent_generatorsList m)
+  GeneratorsIndependent_of_rowsLinearIndependent (rowsLinearIndependent_generatorsList m)
 
 /-! ## §8 — Bundled `StabilizerGroup (2 * m)` -/
 

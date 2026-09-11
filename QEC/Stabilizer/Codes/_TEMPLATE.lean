@@ -344,18 +344,14 @@ These two facts feed `StabilizerCode.generators_phaseZero` and
 ```lean
 lemma AllPhaseZero_generatorsList :
     NQubitPauliGroupElement.AllPhaseZero generatorsList := by
-  rw [generatorsList, NQubitPauliGroupElement.AllPhaseZero_cons]
-  -- chain of `AllPhaseZero_cons.mpr ⟨rfl, ...⟩` per element
-  exact ⟨rfl, (NQubitPauliGroupElement.AllPhaseZero_cons _ _).mpr
-    ⟨rfl, …⟩⟩
+  decide
 
 theorem rowsLinearIndependent_generatorsList :
     NQubitPauliGroupElement.rowsLinearIndependent generatorsList := by decide
 
 theorem GeneratorsIndependent_n_generatorsList :
     GeneratorsIndependent n generatorsList :=
-  GeneratorsIndependent_of_rowsLinearIndependent n generatorsList
-    rowsLinearIndependent_generatorsList
+  GeneratorsIndependent_of_rowsLinearIndependent rowsLinearIndependent_generatorsList
 ```
 
 `decide` closes this for every small code on `main` (`n ≤ 9` or so); reach for

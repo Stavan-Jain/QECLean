@@ -739,8 +739,8 @@ theorem rowsLinearIndependent_generatorsList :
 /-- The rotated-surface generator list is an independent generating set. -/
 theorem generators_independent :
     StabilizerGroup.GeneratorsIndependent (numQubits L) (generatorsList L) :=
-  StabilizerGroup.GeneratorsIndependent_of_rowsLinearIndependent (numQubits L)
-    (generatorsList L) (rowsLinearIndependent_generatorsList L)
+  StabilizerGroup.GeneratorsIndependent_of_rowsLinearIndependent
+    (rowsLinearIndependent_generatorsList L)
 
 /-! ## §D — Logical operators
 
