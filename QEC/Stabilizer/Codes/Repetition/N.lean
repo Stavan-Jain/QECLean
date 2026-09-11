@@ -246,8 +246,7 @@ theorem rowsLinearIndependent_generatorsList (n : ℕ) :
 set. -/
 theorem GeneratorsIndependent_generatorsList (n : ℕ) :
     GeneratorsIndependent (n + 2) (generatorsList n) :=
-  GeneratorsIndependent_of_rowsLinearIndependent (n + 2) (generatorsList n)
-    (rowsLinearIndependent_generatorsList n)
+  GeneratorsIndependent_of_rowsLinearIndependent (rowsLinearIndependent_generatorsList n)
 
 /-!
 ## Typing: Z-type generators

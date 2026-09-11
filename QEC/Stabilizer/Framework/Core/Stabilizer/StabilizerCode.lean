@@ -54,12 +54,43 @@ def GeneratorsIndependent (n : ℕ) (L : List (NQubitPauliGroupElement n)) : Pro
 
 /-- If the check-matrix rows of `L` are linearly independent, then `L` is an
     independent generating set. Use this to prove `GeneratorsIndependent n L` by
-    proving `NQubitPauliGroupElement.rowsLinearIndependent L`. -/
-theorem GeneratorsIndependent_of_rowsLinearIndependent (n : ℕ)
-    (L : List (NQubitPauliGroupElement n))
+    proving `NQubitPauliGroupElement.rowsLinearIndependent L`; for a literal
+    list that is `GeneratorsIndependent_of_rowsLinearIndependent (by decide)`. -/
+theorem GeneratorsIndependent_of_rowsLinearIndependent
+    {L : List (NQubitPauliGroupElement n)}
     (h : NQubitPauliGroupElement.rowsLinearIndependent L) :
     GeneratorsIndependent n L :=
   NQubitPauliGroupElement.rowsLinearIndependent_implies_independentGenerators L h
+
+/-!
+## Deciding pairwise commutation of a generator list
+
+`StabilizerCode.generators_commute` (below) quantifies over
+`NQubitPauliGroupElement.listToSet generatorsList`. For a literal list the
+statement is a finite conjunction of closed equalities, each of which the
+kernel settles through `instDecidableEq`, so `decide` closes the whole field.
+
+As for `instDecidableAllPhaseZero`, the instances are pinned to
+`List.decidableBAll`: left to `inferInstance`, the bounded quantifier would be
+decided by `Fintype.decidableForallFintype` over all `4 * 4 ^ n` group
+elements. They are `noncomputable` because `*` is; the kernel reduces them
+regardless.
+-/
+
+/-- Pairwise commutation of the elements of a list is decidable. -/
+noncomputable instance instDecidablePairwiseCommute (L : List (NQubitPauliGroupElement n)) :
+    Decidable (∀ g ∈ L, ∀ h ∈ L, g * h = h * g) :=
+  @List.decidableBAll _ (fun g => ∀ h ∈ L, g * h = h * g)
+    (fun _ => List.decidableBAll _ L) L
+
+/-- The same statement over `listToSet L`, the form used by
+`StabilizerCode.generators_commute`; membership in `listToSet L` unfolds to
+membership in `L`. -/
+noncomputable instance instDecidablePairwiseCommuteListToSet
+    (L : List (NQubitPauliGroupElement n)) :
+    Decidable (∀ g ∈ NQubitPauliGroupElement.listToSet L,
+      ∀ h ∈ NQubitPauliGroupElement.listToSet L, g * h = h * g) :=
+  instDecidablePairwiseCommute L
 
 /-!
 ## Stabilizer group from generators

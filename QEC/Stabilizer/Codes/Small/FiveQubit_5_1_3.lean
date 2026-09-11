@@ -256,8 +256,7 @@ theorem rowsLinearIndependent_generatorsList :
 /-- The generator list is an independent generating set. -/
 theorem GeneratorsIndependent_5_generatorsList :
     GeneratorsIndependent 5 generatorsList :=
-  GeneratorsIndependent_of_rowsLinearIndependent 5 generatorsList
-    rowsLinearIndependent_generatorsList
+  GeneratorsIndependent_of_rowsLinearIndependent rowsLinearIndependent_generatorsList
 
 /-! ## §6 — `−I` is not in the stabilizer subgroup
 

@@ -47,6 +47,19 @@ def listToSet (L : List (NQubitPauliGroupElement n)) : Set (NQubitPauliGroupElem
 def AllPhaseZero (L : List (NQubitPauliGroupElement n)) : Prop :=
   ∀ g ∈ L, g.phasePower = 0
 
+/-- `AllPhaseZero L` is a finite conjunction over the list, so it is decidable,
+and `decide` closes it for any literal generator list.
+
+The instance is spelled out as `List.decidableBAll` rather than found by
+`inferInstance`: `NQubitPauliGroupElement n` is a `Fintype`, so instance
+search would otherwise pick mathlib's `Fintype.decidableForallFintype` for the
+bounded quantifier and enumerate all `4 * 4 ^ n` group elements, which does
+not reduce in any useful time. -/
+instance instDecidableAllPhaseZero (L : List (NQubitPauliGroupElement n)) :
+    Decidable (AllPhaseZero L) := by
+  unfold AllPhaseZero
+  exact List.decidableBAll _ L
+
 /-!
 ## Boilerplate reduction for code definitions
 

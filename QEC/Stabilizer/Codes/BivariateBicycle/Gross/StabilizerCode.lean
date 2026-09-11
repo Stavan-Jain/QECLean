@@ -1168,8 +1168,7 @@ theorem rowsLinearIndependent_packaged :
 /-- The trimmed generator list is an independent generating set. -/
 theorem generators_independent_packaged :
     Quantum.StabilizerGroup.GeneratorsIndependent grossComplex.numQubits genListPackaged :=
-  Quantum.StabilizerGroup.GeneratorsIndependent_of_rowsLinearIndependent
-    grossComplex.numQubits genListPackaged rowsLinearIndependent_packaged
+  Quantum.StabilizerGroup.GeneratorsIndependent_of_rowsLinearIndependent rowsLinearIndependent_packaged
 
 /-! ## §6  Packaged stabilizer group, logical operators, the `StabilizerCode` + `HasCodeDistance`
 
