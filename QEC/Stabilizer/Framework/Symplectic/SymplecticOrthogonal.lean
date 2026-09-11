@@ -149,7 +149,7 @@ theorem no_weight_w_logical_of_centralizer_in_span (L : List (NQubitPauliGroupEl
       NQubitPauliOperator.toSymplectic op ∈ sympSpan L)
     (g : NQubitPauliGroupElement n) (hg_weight : weight g = w)
     (hg_nontrivial : StabilizerGroup.IsNontrivialLogicalOperator g S) : False := by
-  obtain ⟨h_cent, _, h_ops_ne⟩ :=
+  obtain ⟨h_cent, h_ops_ne⟩ :=
     (StabilizerGroup.IsNontrivialLogicalOperator_iff g S).mp hg_nontrivial
   rw [StabilizerGroup.mem_centralizer_iff_closure g S (listToSet L) h_closure] at h_cent
   have h_comm' : ∀ g' ∈ L, NQubitPauliOperator.symplecticInner g.operators g'.operators = 0 := by

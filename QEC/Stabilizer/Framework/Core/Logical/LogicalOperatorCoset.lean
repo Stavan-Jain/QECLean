@@ -19,7 +19,9 @@ For **code distance**, we only count cosets that are "nontrivial": not the
 identity coset and not a "phase-only" coset. A phase-only coset is one where
 every representative has the same operator part as some stabilizer element (i.e.
 the coset is φ·S for some phase φ). Excluding these ensures that e.g. -Z for Z ∈
-S does not lower the distance.
+S does not lower the distance. The identity coset is the phase-only coset with
+φ = 1, so a single clause — no stabilizer element shares the operator part of
+the representative — excludes both.
 
 This file defines `RepresentsNontrivialCoset g S` (element-level predicate) and
 relates it to the coset notion. The quotient type (centralizer S) ⧸ S is not
@@ -30,30 +32,32 @@ sites.
 open NQubitPauliGroupElement
 
 /-- A Pauli element g **represents a nontrivial coset** (for code distance) iff
-g is in the
-    centralizer of S, not in S, and no element of S has the same operator part as g.
-    Equivalently: g represents a coset that is not the identity coset and not a phase-only
-    coset (φ·S). -/
+g is in the centralizer of S and no element of S has the same operator part as
+g. Equivalently: g represents a coset that is not the identity coset and not a
+phase-only coset (φ·S). The second conjunct already forces `g ∉ S.toSubgroup`
+(take `s := g`), so that is the derived lemma
+`RepresentsNontrivialCoset.not_mem` rather than a third conjunct. -/
 def RepresentsNontrivialCoset (g : NQubitPauliGroupElement n) (S : StabilizerGroup n) : Prop :=
-  g ∈ centralizer S ∧ g ∉ S.toSubgroup ∧
-  ∀ s ∈ S.toSubgroup, s.operators ≠ g.operators
+  g ∈ centralizer S ∧ ∀ s ∈ S.toSubgroup, s.operators ≠ g.operators
 
 /-- If g represents a nontrivial coset, then g is in the centralizer. -/
 lemma RepresentsNontrivialCoset.mem_centralizer {g : NQubitPauliGroupElement n}
     {S : StabilizerGroup n} (h : RepresentsNontrivialCoset g S) : g ∈ centralizer S :=
   h.1
 
-/-- If g represents a nontrivial coset, then g is not in the stabilizer. -/
+/-- If g represents a nontrivial coset, then g is not in the stabilizer: were
+`g ∈ S`, the distinct-operator clause at `s := g` would demand
+`g.operators ≠ g.operators`. -/
 lemma RepresentsNontrivialCoset.not_mem {g : NQubitPauliGroupElement n} {S : StabilizerGroup n}
     (h : RepresentsNontrivialCoset g S) : g ∉ S.toSubgroup :=
-  h.2.1
+  fun hg => h.2 g hg rfl
 
 /-- If g represents a nontrivial coset, then no stabilizer element has the same
     operator part as g. -/
 lemma RepresentsNontrivialCoset.operators_ne_of_mem {g : NQubitPauliGroupElement n}
     {S : StabilizerGroup n} (h : RepresentsNontrivialCoset g S) (s : NQubitPauliGroupElement n)
     (hs : s ∈ S.toSubgroup) : s.operators ≠ g.operators :=
-  h.2.2 s hs
+  h.2 s hs
 
 /-- RepresentsNontrivialCoset is unchanged when the stabilizer has the same
 subgroup. -/
@@ -72,7 +76,7 @@ lemma not_RepresentsNontrivialCoset_of_same_operators_as_stabilizer
     (s : NQubitPauliGroupElement n) (hs : s ∈ S.toSubgroup) (heq : s.operators = g.operators) :
     ¬RepresentsNontrivialCoset g S := by
   intro h
-  exact h.2.2 s hs heq
+  exact h.2 s hs heq
 
 end StabilizerGroup
 end Quantum

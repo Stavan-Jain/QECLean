@@ -32,9 +32,10 @@ elements represent the same logical operator iff they lie in the same coset
 (`SameLogicalOperator`).
 
 **Nontrivial logical operators (for distance)** are those that represent a coset
-that is not the identity coset and not a phase-only coset (φ·S). The element
-predicate `IsNontrivialLogicalOperator g S` means: g is a Pauli logical operator
-and g represents such a nontrivial coset (i.e. `RepresentsNontrivialCoset g S`).
+that is not the identity coset and not a phase-only coset (φ·S): no stabilizer
+element shares their operator part. The element predicate
+`IsNontrivialLogicalOperator g S` means: g is a Pauli logical operator and g
+represents such a nontrivial coset (i.e. `RepresentsNontrivialCoset g S`).
 -/
 
 /-- A Pauli logical operator is a Pauli whose associated gate maps the codespace
@@ -173,9 +174,9 @@ theorem IsPauliLogicalOperator_of_toSubgroup_eq (g : NQubitPauliGroupElement n)
   exact isLogicalGate_iff_toSubgroup_eq (g.toGate) S T h
 
 /-- A nontrivial logical operator (for code distance) is a Pauli logical
-operator that represents
-    a nontrivial coset: g is in the centralizer, not in S, and no s ∈ S has the same operator
-    part as g (so the coset is not a phase-only coset φ·S). -/
+operator that represents a nontrivial coset: g is in the centralizer, and no
+s ∈ S has the same operator part as g (so the coset is neither the identity
+coset nor a phase-only coset φ·S; in particular g ∉ S). -/
 def IsNontrivialLogicalOperator (g : NQubitPauliGroupElement n) (S : StabilizerGroup n) : Prop :=
   RepresentsNontrivialCoset g S
 
@@ -183,7 +184,7 @@ def IsNontrivialLogicalOperator (g : NQubitPauliGroupElement n) (S : StabilizerG
 coset. -/
 theorem IsNontrivialLogicalOperator_iff (g : NQubitPauliGroupElement n) (S : StabilizerGroup n) :
     IsNontrivialLogicalOperator g S ↔
-      g ∈ centralizer S ∧ g ∉ S.toSubgroup ∧ ∀ s ∈ S.toSubgroup, s.operators ≠ g.operators :=
+      g ∈ centralizer S ∧ ∀ s ∈ S.toSubgroup, s.operators ≠ g.operators :=
   Iff.rfl
 
 /-- Nontrivial logical operator is unchanged when the stabilizer has the same
@@ -194,15 +195,15 @@ theorem IsNontrivialLogicalOperator_of_toSubgroup_eq (g : NQubitPauliGroupElemen
   RepresentsNontrivialCoset_of_toSubgroup_eq g h
 
 /-- A centralizer element that anticommutes with some other centralizer element
-is a nontrivial logical operator. It cannot lie in the stabilizer, which
-commutes with the whole centralizer, and neither can any stabilizer element
-sharing its operator part, since anticommutation only sees operator parts
-(`anticommute_congr_left`). This is how a low-weight representative `X̄·s` (`s`
-a stabilizer) is certified nontrivial: it still anticommutes with `Z̄`. -/
+is a nontrivial logical operator. No stabilizer element can share its operator
+part: the stabilizer commutes with the whole centralizer, and anticommutation
+only sees operator parts (`anticommute_congr_left`). This is how a low-weight
+representative `X̄·s` (`s` a stabilizer) is certified nontrivial: it still
+anticommutes with `Z̄`. -/
 theorem isNontrivialLogicalOperator_of_anticommute_centralizer (S : StabilizerGroup n)
     {g h : NQubitPauliGroupElement n} (hg : g ∈ centralizer S) (hh : h ∈ centralizer S)
     (hgh : NQubitPauliGroupElement.Anticommute g h) : IsNontrivialLogicalOperator g S :=
-  ⟨hg, not_mem_stabilizer_of_anticommutes_centralizer S g h hh hgh, fun s hs h_ops =>
+  ⟨hg, fun s hs h_ops =>
     not_mem_stabilizer_of_anticommutes_centralizer S s h hh
       ((NQubitPauliGroupElement.anticommute_congr_left h_ops).mpr hgh) hs⟩
 
@@ -351,13 +352,13 @@ theorem zOp_operators_ne_of_mem {S : StabilizerGroup n} (ops : LogicalQubitOps n
 nontrivial coset). -/
 theorem xOp_nontrivial {S : StabilizerGroup n} (ops : LogicalQubitOps n S) :
     IsNontrivialLogicalOperator ops.xOp S :=
-  ⟨ops.x_mem_centralizer, ops.xOp_not_mem, fun s hs => xOp_operators_ne_of_mem ops s hs⟩
+  ⟨ops.x_mem_centralizer, fun s hs => xOp_operators_ne_of_mem ops s hs⟩
 
 /-- The logical Z operator is a nontrivial logical operator (represents a
 nontrivial coset). -/
 theorem zOp_nontrivial {S : StabilizerGroup n} (ops : LogicalQubitOps n S) :
     IsNontrivialLogicalOperator ops.zOp S :=
-  ⟨ops.z_mem_centralizer, ops.zOp_not_mem, fun s hs => zOp_operators_ne_of_mem ops s hs⟩
+  ⟨ops.z_mem_centralizer, fun s hs => zOp_operators_ne_of_mem ops s hs⟩
 
 end LogicalQubitOps
 

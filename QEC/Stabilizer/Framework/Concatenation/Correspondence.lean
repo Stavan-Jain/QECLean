@@ -280,7 +280,7 @@ theorem inducedOuter_support_eq (g : NQubitPauliGroupElement (n₁ * n₂))
     · exact hnt
   · intro hnt
     rintro ⟨s, hs, hsop⟩
-    exact ((IsNontrivialLogicalOperator_iff _ _).mp hnt).2.2 s hs hsop
+    exact ((IsNontrivialLogicalOperator_iff _ _).mp hnt).2 s hs hsop
 
 /-! ## Coset injectivity (plan risk R7)
 
@@ -550,24 +550,24 @@ theorem inducedOuter_not_mem_stabilizer (g : NQubitPauliGroupElement (n₁ * n�
   intro hmem
   obtain ⟨S, hS, hSop⟩ :=
     D.inducedOuter_coset_injective g hg.1 hindep (inducedOuter D g) hmem rfl
-  exact ((IsNontrivialLogicalOperator_iff _ _).mp hg).2.2 S hS hSop
+  exact ((IsNontrivialLogicalOperator_iff _ _).mp hg).2 S hS hSop
 
 /-- **(M5, headline correspondence.)** The induced outer operator of a
 nontrivial concatenated logical is a nontrivial outer logical: it centralizes
 the outer stabilizer (`inducedOuter_mem_centralizer`) and its coset is
-nontrivial (coset injectivity, both the not-in-stabilizer and the
-distinct-operator-part clauses). This is the bridge that, with
+nontrivial (coset injectivity gives the distinct-operator-part clause; the
+not-in-stabilizer consequence is `inducedOuter_not_mem_stabilizer`). This is
+the bridge that, with
 `inducedOuter_support_eq` and `weight_eq_sum_restrictBlock`, yields the M6
 distance bound. -/
 theorem inducedOuter_isNontrivialLogical (g : NQubitPauliGroupElement (n₁ * n₂))
     (hg : IsNontrivialLogicalOperator g D.concatStabGroup)
     (hindep : rowsLinearIndependent D.Cin.generatorsList) :
     IsNontrivialLogicalOperator (inducedOuter D g) D.Cout.toStabilizerGroup := by
-  refine (IsNontrivialLogicalOperator_iff _ _).mpr
-    ⟨D.inducedOuter_mem_centralizer g hg.1, D.inducedOuter_not_mem_stabilizer g hg hindep, ?_⟩
+  refine (IsNontrivialLogicalOperator_iff _ _).mpr ⟨D.inducedOuter_mem_centralizer g hg.1, ?_⟩
   intro t ht htop
   obtain ⟨S, hS, hSop⟩ := D.inducedOuter_coset_injective g hg.1 hindep t ht htop
-  exact ((IsNontrivialLogicalOperator_iff _ _).mp hg).2.2 S hS hSop
+  exact ((IsNontrivialLogicalOperator_iff _ _).mp hg).2 S hS hSop
 
 end ConcatCSSData
 

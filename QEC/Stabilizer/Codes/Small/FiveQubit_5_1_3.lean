@@ -570,15 +570,6 @@ private lemma logicalX_w3_mem_centralizer :
     rw [stabilizerCode_toSubgroup_eq]
     exact Subgroup.subset_closure (by simp [generators])
 
-/-- `logicalX_w3 ∉ stabilizerCode.toStabilizerGroup.toSubgroup`. Since it
-anticommutes with `logicalZ` (a centralizer element), it cannot itself be in the
-stabilizer. -/
-private lemma logicalX_w3_not_mem_subgroup :
-    logicalX_w3 ∉ stabilizerCode.toStabilizerGroup.toSubgroup := by
-  apply not_mem_stabilizer_of_anticommutes_centralizer _ logicalX_w3 logicalZ
-  · exact (logicalOps5_1_3 0).z_mem_centralizer
-  · exact logicalX_w3_anticomm_logicalZ
-
 /-- No stabilizer element shares `logicalX_w3`'s operator-part. If one did, that
 element would anticommute with `logicalZ` (anticommutation depends only on
 operators), but it commutes with `logicalZ` by virtue of being in the abelian
@@ -596,8 +587,7 @@ private lemma logicalX_w3_no_stab_same_operators :
 /-- `logicalX_w3` is a non-trivial logical operator of `stabilizerCode`. -/
 private lemma logicalX_w3_isNontrivial :
     IsNontrivialLogicalOperator logicalX_w3 stabilizerCode.toStabilizerGroup :=
-  ⟨logicalX_w3_mem_centralizer, logicalX_w3_not_mem_subgroup,
-   logicalX_w3_no_stab_same_operators⟩
+  ⟨logicalX_w3_mem_centralizer, logicalX_w3_no_stab_same_operators⟩
 
 /-! ### Weight-1 anticomm witness
 
@@ -726,7 +716,7 @@ theorem code_has_distance_three : HasCodeDistance stabilizerCode 3 := by
     ⟨logicalX_w3, logicalX_w3_isNontrivial, by decide⟩ ?_
   intro w hw_pos hw_lt g hg_weight h_nontrivial
   rcases (IsNontrivialLogicalOperator_iff g stabilizerCode.toStabilizerGroup).mp h_nontrivial
-    with ⟨h_cent, _, _⟩
+    with ⟨h_cent, _⟩
   interval_cases w
   · -- w = 1: no weight-1 nontrivial logical operator
     exact no_weight_one_mem_centralizer_of_anticommute_witness

@@ -75,12 +75,12 @@ code's stabilizer group is, in operator-part terms, either *stabilizer-like*
 Proof: split on whether the symplectic vector of `g.operators` lies in the row
 span `sympSpan C.generatorsList`. If it does,
 `exists_mem_closure_of_symp_in_span` realizes the operator part by a closure (=
-stabilizer) element. If it does not, all three clauses of
+stabilizer) element. If it does not, both clauses of
 `IsNontrivialLogicalOperator` hold — centralizer membership is the hypothesis,
-and the "not a stabilizer / operator-part distinct from every stabilizer"
-clauses follow because any stabilizer element's symplectic vector *does* lie in
-`sympSpan` (the generators are phase-0, so `mem_closure_implies_symp_in_span`
-applies). No dimension count, no `k = 1`. -/
+and the "operator-part distinct from every stabilizer" clause follows because
+any stabilizer element's symplectic vector *does* lie in `sympSpan` (the
+generators are phase-0, so `mem_closure_implies_symp_in_span` applies). No
+dimension count, no `k = 1`. -/
 theorem centralizer_classify_of_k1 (C : StabilizerCode n k)
     (g : NQubitPauliGroupElement n) (hg : g ∈ centralizer C.toStabilizerGroup) :
     (∃ s ∈ C.toStabilizerGroup.toSubgroup, s.operators = g.operators) ∨
@@ -88,13 +88,11 @@ theorem centralizer_classify_of_k1 (C : StabilizerCode n k)
   classical
   by_cases hin : NQubitPauliOperator.toSymplectic g.operators ∈ sympSpan C.generatorsList
   · exact Or.inl (exists_mem_closure_of_symp_in_span C.generatorsList g.operators hin)
-  · refine Or.inr ((IsNontrivialLogicalOperator_iff g C.toStabilizerGroup).mpr ⟨hg, ?_, ?_⟩)
-    · intro hmem
-      exact hin (mem_closure_implies_symp_in_span C.generatorsList C.generators_phaseZero g hmem)
-    · intro s hs heq
-      refine hin ?_
-      have hs' := mem_closure_implies_symp_in_span C.generatorsList C.generators_phaseZero s hs
-      rwa [heq] at hs'
+  · refine Or.inr ((IsNontrivialLogicalOperator_iff g C.toStabilizerGroup).mpr ⟨hg, ?_⟩)
+    intro s hs heq
+    refine hin ?_
+    have hs' := mem_closure_implies_symp_in_span C.generatorsList C.generators_phaseZero s hs
+    rwa [heq] at hs'
 
 /-! ## The symplectic form as a nondegenerate `BilinForm` (for the dimension
 count) -/

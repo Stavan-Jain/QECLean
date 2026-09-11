@@ -705,7 +705,7 @@ theorem code_has_distance_three : HasCodeDistance stabilizerCode 3 := by
     ⟨logicalX_w3, logicalX_w3_isNontrivial, by decide⟩ ?_
   intro w hw_pos hw_lt g hg_weight h_nontrivial
   rcases (IsNontrivialLogicalOperator_iff g stabilizerCode.toStabilizerGroup).mp h_nontrivial
-    with ⟨h_cent, _, _⟩
+    with ⟨h_cent, _⟩
   interval_cases w
   · exact no_weight_one_mem_centralizer_of_anticommute_witness
       stabilizerCode.toStabilizerGroup generators stabilizerCode_toSubgroup_eq
