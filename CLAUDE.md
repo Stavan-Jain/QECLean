@@ -348,12 +348,13 @@ These are local to this codebase — search here before assuming mathlib has the
   lemmas are the canonical users.
 - `StabilizerGroup`, `.toSubgroup`, `.is_abelian`, `.one_mem`,
   `.neg_identity_not_mem`, `.codespaceSubmodule`
-- `IsNontrivialLogicalOperator` has **three** conditions (see
-  `IsNontrivialLogicalOperator_iff`): in centralizer, not in subgroup, AND
-  `∀ s ∈ S.toSubgroup, s.operators ≠ g.operators`. The third is easy to forget;
-  it's what makes CSS-bridge arguments like `not_both_boundary_of_nontrivial`
-  work (`g_X * g_Z` has the same operator part as `g`, so it can't be in the
-  stabilizer).
+- `IsNontrivialLogicalOperator` has **two** conditions (see
+  `IsNontrivialLogicalOperator_iff`): in centralizer AND
+  `∀ s ∈ S.toSubgroup, s.operators ≠ g.operators`. The second is deliberately
+  stronger than `g ∉ S.toSubgroup` (which it implies at `s := g`, see
+  `RepresentsNontrivialCoset.not_mem`); it's what makes CSS-bridge arguments
+  like `not_both_boundary_of_nontrivial` work (`g_X * g_Z` has the same
+  operator part as `g`, so it can't be in the stabilizer).
 - `IsNontrivialLogicalOperator_of_toSubgroup_eq` — translates the predicate
   between two stabilizer groups with the same `toSubgroup`. Used to convert
   `HasToricDistance`-style proofs (against `stabilizerGroup L`) into

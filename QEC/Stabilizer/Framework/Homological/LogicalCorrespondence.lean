@@ -369,7 +369,7 @@ theorem chainXOperator_isNontrivialLogical_iff (c : X.C1 → ZMod 2) :
       c ∈ X.cycles ∧ c ∉ X.boundaries := by
   rw [Quantum.StabilizerGroup.IsNontrivialLogicalOperator_iff]
   constructor
-  · rintro ⟨h_centralizer, h_not_stab, _⟩
+  · rintro ⟨h_centralizer, h_ops_ne⟩
     refine ⟨?_, ?_⟩
     · exact (chainXOperator_mem_centralizer_iff_mem_cycles c).mp h_centralizer
     · intro hc_b
@@ -387,12 +387,10 @@ theorem chainXOperator_isNontrivialLogical_iff (c : X.C1 → ZMod 2) :
           exact Subgroup.mul_mem _ hy₁ hy₂
         · intros y _ hy
           exact Subgroup.inv_mem _ hy
-      exact h_not_stab h_in_stab
+      exact h_ops_ne _ h_in_stab rfl
   · rintro ⟨hc_c, hc_nb⟩
-    refine ⟨?_, ?_, ?_⟩
+    refine ⟨?_, ?_⟩
     · exact (chainXOperator_mem_centralizer_iff_mem_cycles c).mpr hc_c
-    · intro hg
-      exact hc_nb (stabilizer_same_ops_implies_boundary c (X.chainXOperator c) hg rfl)
     · intro s hs hEq
       exact hc_nb (stabilizer_same_ops_implies_boundary c s hs hEq)
 
@@ -673,7 +671,7 @@ theorem chainZOperator_isNontrivialLogical_iff (c : X.C1 → ZMod 2) :
       c ∈ X.dualCycles ∧ c ∉ X.dualBoundaries := by
   rw [Quantum.StabilizerGroup.IsNontrivialLogicalOperator_iff]
   constructor
-  · rintro ⟨h_centralizer, h_not_stab, _⟩
+  · rintro ⟨h_centralizer, h_ops_ne⟩
     refine ⟨?_, ?_⟩
     · exact (chainZOperator_mem_centralizer_iff_mem_dualCycles c).mp h_centralizer
     · intro hc_b
@@ -691,12 +689,10 @@ theorem chainZOperator_isNontrivialLogical_iff (c : X.C1 → ZMod 2) :
           exact Subgroup.mul_mem _ hy₁ hy₂
         · intros y _ hy
           exact Subgroup.inv_mem _ hy
-      exact h_not_stab h_in_stab
+      exact h_ops_ne _ h_in_stab rfl
   · rintro ⟨hc_c, hc_nb⟩
-    refine ⟨?_, ?_, ?_⟩
+    refine ⟨?_, ?_⟩
     · exact (chainZOperator_mem_centralizer_iff_mem_dualCycles c).mpr hc_c
-    · intro hg
-      exact hc_nb (stabilizer_same_ops_implies_dualBoundary c (X.chainZOperator c) hg rfl)
     · intro s hs hEq
       exact hc_nb (stabilizer_same_ops_implies_dualBoundary c s hs hEq)
 

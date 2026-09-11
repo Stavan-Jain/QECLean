@@ -328,18 +328,19 @@ attribute [blueprint "thm:logical-iff-generators"
 attribute [blueprint "def:nontrivial-logical"
   (title := /-- Nontrivial logical operator -/)
   (statement := /-- A *nontrivial* logical operator is one that acts on the
-    encoded information rather than fixing it. The predicate has three
-    conditions: $g$ is in the centralizer, $g \notin \mathcal{S}$, and no
-    element of $\mathcal{S}$ has the same operator part as $g$.
+    encoded information rather than fixing it. The predicate has two
+    conditions: $g$ is in the centralizer, and no element of $\mathcal{S}$ has
+    the same operator part as $g$.
 
-    The third condition is easy to overlook and is what makes the CSS bridge
-    arguments work: without it, $g$ could differ from a stabilizer only by a
-    phase, which is not a nontrivial action on the codespace. -/)]
+    The second condition is stronger than the familiar $g \notin \mathcal{S}$
+    (which it implies, at $s = g$) and is what makes the CSS bridge arguments
+    work: with only the weaker condition, $g$ could differ from a stabilizer by
+    a phase, which is not a nontrivial action on the codespace. -/)]
   Quantum.StabilizerGroup.IsNontrivialLogicalOperator
 
 attribute [blueprint "thm:nontrivial-logical-iff"
   (title := /-- Unfolding nontriviality -/)
-  (statement := /-- The three conditions of \cref{def:nontrivial-logical} spelled
+  (statement := /-- The two conditions of \cref{def:nontrivial-logical} spelled
     out as a conjunction, which is the form the concrete distance proofs
     consume. -/)
   (proof := /-- Definitional. -/)]
@@ -349,8 +350,8 @@ attribute [blueprint "thm:nontrivial-logical-transfer"
   (title := /-- Transfer along equal subgroups -/)
   (statement := /-- Nontriviality only depends on the underlying subgroup, so it
     transfers between two stabilizer groups with the same carrier. -/)
-  (proof := /-- All three conditions of \cref{def:nontrivial-logical} are stated
-    in terms of the subgroup alone. This lemma is the glue that lets a distance
+  (proof := /-- Both conditions of \cref{def:nontrivial-logical} are stated in
+    terms of the subgroup alone. This lemma is the glue that lets a distance
     theorem proved against a hand-built stabilizer group be reused for the
     packaged \cref{def:stabilizer-code}, whose generator list is trimmed. -/)]
   Quantum.StabilizerGroup.IsNontrivialLogicalOperator_of_toSubgroup_eq

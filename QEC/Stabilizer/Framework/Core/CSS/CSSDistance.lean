@@ -179,7 +179,7 @@ theorem hasCodeDistance_two_of_anticommute_witness {k : ℕ} (C : StabilizerCode
   interval_cases w
   -- w = 1: g has weight 1; show g cannot lie in the centralizer.
   rcases (IsNontrivialLogicalOperator_iff g C.toStabilizerGroup).mp h_nontrivial
-    with ⟨h_cent, _, _⟩
+    with ⟨h_cent, _⟩
   exact no_weight_one_mem_centralizer_of_anticommute_witness C.toStabilizerGroup
     genSet h_closure h_anticomm g hg_weight h_cent
 
@@ -360,7 +360,7 @@ theorem hasCodeDistance_three_of_columns {k : ℕ} (C : StabilizerCode n k)
   refine hasCodeDistance_of C 3 (by decide) h_witness ?_
   intro w hw_pos hw_lt g hg_weight h_nontrivial
   rcases (IsNontrivialLogicalOperator_iff g C.toStabilizerGroup).mp h_nontrivial
-    with ⟨h_cent, _, _⟩
+    with ⟨h_cent, _⟩
   interval_cases w
   · exact no_weight_one_mem_centralizer_of_anticommute_witness C.toStabilizerGroup genSet
       h_closure (weight_one_anticomm_witness_of_columns zRow xRow genSet hz hx hz_cover hx_cover)

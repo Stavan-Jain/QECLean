@@ -321,10 +321,8 @@ lemma Z_on_qubit2_operators_ne_of_mem (s : NQubitPauliGroupElement 3) (hs : s �
 /-- Z_on_qubit2 is a nontrivial logical operator of weight 1. -/
 lemma Z_on_qubit2_nontrivial_logical :
     IsNontrivialLogicalOperator Z_on_qubit2 stabilizerGroup :=
-  ⟨Z_on_qubit2_mem_centralizer,
-    by rw [stabilizerGroup_toSubgroup_eq]; exact Z_on_qubit2_not_mem_subgroup,
-    fun s hs =>
-      Z_on_qubit2_operators_ne_of_mem s (by rw [← stabilizerGroup_toSubgroup_eq]; exact hs)⟩
+  ⟨Z_on_qubit2_mem_centralizer, fun s hs =>
+    Z_on_qubit2_operators_ne_of_mem s (by rw [← stabilizerGroup_toSubgroup_eq]; exact hs)⟩
 
 /-- The 3-qubit repetition code has code distance 1. -/
 theorem repetitionCode3_has_distance_one : HasCodeDistance stabilizerCode 1 := by

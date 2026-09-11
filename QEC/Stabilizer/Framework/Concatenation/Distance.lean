@@ -41,7 +41,7 @@ lemma weight_pos_of_nontrivial {m : ℕ} {S : StabilizerGroup m} {g : NQubitPaul
   rcases Nat.eq_zero_or_pos (weight g) with h0 | h0
   · exact absurd ((NQubitPauliGroupElement.one_operators_def m).trans
       ((NQubitPauliGroupElement.weight_eq_zero_iff g).mp h0).symm)
-      (((IsNontrivialLogicalOperator_iff g S).mp hg).2.2 1 S.one_mem)
+      (((IsNontrivialLogicalOperator_iff g S).mp hg).2 1 S.one_mem)
   · exact h0
 
 /-- The number of support qubits of `g` lying in block `b` equals the weight of
