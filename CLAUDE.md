@@ -659,12 +659,17 @@ their state in qec-lab.
 ## Canonical CSS code structure (`_TEMPLATE.lean`)
 
 `QEC/Stabilizer/Codes/_TEMPLATE.lean` is the canonical structural reference
-for formalizing a new CSS stabilizer code. It documents the standard
-§1–§14 section breakdown (generators → generator sets → typing → cross-
-commutation → all-pair commutation → −I lemma → generator list →
-`StabilizerGroup` → independence → logical operators → anticommutation →
-centralizer → `StabilizerCode` + `StabilizerCodeWithLogicals` → distance), with
-variant notes for `k ≥ 2` codes, non-CSS codes, and parametric families.
+for formalizing a new stabilizer code. It documents the standard §1–§14
+section breakdown. §1–§6 is the **decide route**, the default for every
+literal code (generators → generator list → pairwise commutation by `decide`
+→ phase-zero + independence by `decide` → −I via
+`negIdentity_not_mem_of_indep_phase_zero_commute` → `StabilizerGroup`);
+§7–§9 is the **CSS route** kept for parametric families whose `List.ofFn`
+generator lists `decide` cannot evaluate (generator sets → Z/X typing →
+cross-commutation → −I via `CSS.negIdentity_not_mem_closure_union` →
+`listToSet` bridge); §10–§14 are logical operators → anticommutation →
+centralizer → `StabilizerCode` + `StabilizerCodeWithLogicals` → distance,
+with variant notes for `k ≥ 2` codes, non-CSS codes, and parametric families.
 
 Before drafting a new code file by hand or via the
 `qec-skeleton-drafter` agent (spec in qec-lab), **read `_TEMPLATE.lean`

@@ -19,7 +19,7 @@ import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrixDecidable
 import QEC.Stabilizer.Framework.Symplectic.IndependentEquiv
 
 /-!
-# Template — standard CSS stabilizer-code formalization
+# Template — standard stabilizer-code formalization (decide route)
 
 This file documents **the canonical structure** for formalizing a CSS stabilizer
 code in this repo. It is *not* a working code — the actual content is in the
@@ -50,29 +50,37 @@ straightforwardly to:
   parametric, and the `StabilizerCode` packaging often requires a *trimmed*
   generator list (see `ToricCodeNStabilizerCode.lean` for the pattern). The
   distance proof typically lives in a *separate file* (`<Code>Distance.lean`).
-- **Non-CSS codes** (Pauli-mixed generators) — see variant notes under §3
-  (typing) and §4 (cross-commutation). The CSS shortcuts (`IsXTypeElement`,
-  `IsZTypeElement`, `CSS.negIdentity_not_mem_closure_union`) don't apply; use
-  the general centralizer machinery instead.
+- **Non-CSS codes** (Pauli-mixed generators) — nothing changes in §2–§6: the
+  decide route never looks at the Z/X split. Only the distance argument (§14)
+  is different, since the CSS closers no longer apply. `FiveQubit_5_1_3.lean`
+  is the reference.
 
 ## Section overview
 
-| § | Content | Required? |
-|---|---|---|
-| §1 | Generator definitions (`Z1`, `Z2`, …, `X1`, `X2`, …) | always |
-| §2 | Generator sets (`ZGenerators`, `XGenerators`, `generators`) and subgroup | always |
-| §3 | Z/X type predicates (`ZGenerators_are_ZType`, `XGenerators_are_XType`) | CSS only |
-| §4 | Cross-commutation (`ZGenerators_commute_XGenerators`) | always |
-| §5 | All-pair commutation (`generators_commute`) | always |
-| §6 | `negIdentity ∉ subgroup` | always |
-| §7 | Generator list + `listToSet` equality | always |
-| §8 | Bundled `StabilizerGroup n` | always |
-| §9 | Phase-zero + generator independence | always |
-| §10 | Logical operators (`logicalX`, `logicalZ`, optional `logicalY`) | when `k ≥ 1` |
-| §11 | Logical anticommutation | when `k ≥ 1` |
-| §12 | Logicals in centralizer | when `k ≥ 1` |
-| §13 | `StabilizerCode n k` (bare) + `StabilizerCodeWithLogicals n k` packaging | always |
-| §14 | `HasCodeDistance` | optional (often in a sibling file for parametric codes) |
+The **decide route** (§2–§6) is the default for every literal code: the
+generators form a literal `List`, and each hypothesis of `StabilizerCode`
+is a closed decidable statement. The **CSS route** (§7–§9) is kept for
+parametric families, whose generator lists are `List.ofFn` terms that
+`decide` cannot evaluate.
+
+- §1 — Generator definitions (`Z1`, `Z2`, …, `X1`, `X2`, …). Always.
+- §2 — Generator list `generatorsList`. Always.
+- §3 — Pairwise commutation `generators_commute`, by `decide`. Literal codes.
+- §4 — Phase-zero + check-matrix independence, by `decide`. Always.
+- §5 — `negIdentity ∉ closure`, from §3–§4. Literal codes.
+- §6 — Bundled `StabilizerGroup n` and its `toSubgroup` equation. Always.
+- §7 — CSS route: generator sets and the Z/X typing lemmas. Parametric only.
+- §8 — CSS route: cross-commutation and `generators_commute`. Parametric only.
+- §9 — CSS route: `negIdentity ∉ closure` and the `listToSet` bridge.
+  Parametric only.
+- §10 — Logical operators (`logicalX`, `logicalZ`, optional `logicalY`).
+  When `k ≥ 1`.
+- §11 — Logical anticommutation. When `k ≥ 1`.
+- §12 — Logicals in centralizer. When `k ≥ 1`.
+- §13 — `StabilizerCode n k` (bare) + `StabilizerCodeWithLogicals n k`
+  packaging. Always.
+- §14 — `HasCodeDistance`. Optional (often in a sibling file for parametric
+  codes).
 
 ## File header pattern
 
@@ -151,238 +159,252 @@ same way. Letters are `X`, `Y`, `Z` only — leave identity qubits out. See
 -/
 
 /-!
-## §2 — Generator sets and subgroup
+## §2 — Generator list
 
-Bundle the generators into `Set`s plus their union, then take the
-`Subgroup.closure`. The subgroup must be `noncomputable` because mathlib's
-`Group` instance on `NQubitPauliGroupElement` is noncomputable as of v4.30 (see
-CLAUDE.md).
-
-Pattern:
+Put the generators in a literal `List`, Z-checks first, then X-checks. The
+list is the **single source of truth**: the bundled `StabilizerGroup` (§6)
+and the `StabilizerCode` (§13) are both built from it, and every downstream
+membership argument is a case split on its elements.
 
 ```lean
-def ZGenerators : Set (NQubitPauliGroupElement 7) := {Z1, Z2, Z3}
-def XGenerators : Set (NQubitPauliGroupElement 7) := {X1, X2, X3}
-def generators : Set (NQubitPauliGroupElement 7) := ZGenerators ∪ XGenerators
-
-noncomputable def subgroup : Subgroup (NQubitPauliGroupElement 7) :=
-  Subgroup.closure generators
-```
-
-**Non-CSS variant.** Skip `ZGenerators`/`XGenerators`; just define
-`generators : Set (NQubitPauliGroupElement n)` directly as the set of all
-mixed-Pauli generators, and `subgroup := Subgroup.closure generators`.
--/
-
-/-!
-## §3 — Z-type and X-type predicates (CSS only)
-
-Prove that every Z-generator is Z-type (operator is `I` or `Z` on every qubit)
-and similarly for X. These predicates feed into the CSS commutation shortcuts of
-§4–6.
-
-Pattern (the trivial direction — case-split on the singleton/finite set):
-
-```lean
-lemma ZGenerators_are_ZType :
-    ∀ g, g ∈ ZGenerators → NQubitPauliGroupElement.IsZTypeElement g := by
-  intro g hg
-  rcases hg with rfl | rfl | rfl
-  all_goals
-    constructor
-    · rfl  -- phase = 0
-    · intro i; fin_cases i <;>
-        simp [Z1, Z2, Z3, NQubitPauliOperator.set, NQubitPauliOperator.identity,
-              PauliOperator.IsZType]
-```
-
-Helpful imports: `Core/CSSPredicates.lean` defines `IsZTypeElement`,
-`IsXTypeElement`, plus the per-qubit `PauliOperator.IsZType` /
-`PauliOperator.IsXType`.
-
-**Non-CSS variant.** Skip this section entirely. The general centralizer
-machinery in §6 / §12 works directly without typing predicates.
--/
-
-/-!
-## §4 — Cross-commutation (CSS: Z-generators commute with X-generators)
-
-For each `(z, x) ∈ ZGenerators × XGenerators`, prove `z * x = x * z`. The shape
-of the proof is:
-
-```lean
-private lemma Z1_comm_X1 : Z1 * X1 = X1 * Z1 := by
-  classical
-  pauli_comm_even_anticommutes
-  -- residual goal: even number of anticommuting qubits between Z1 and X1
-  have hfilter :
-      (Finset.univ.filter
-        (NQubitPauliGroupElement.anticommutesAt Z1.operators X1.operators)) =
-      (<the explicit Finset>) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, Z1, X1,
-            NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
-  rw [hfilter]; decide
-```
-
-Then bundle into a `∀`-statement:
-
-```lean
-lemma ZGenerators_commute_XGenerators :
-    ∀ z ∈ ZGenerators, ∀ x ∈ XGenerators, z * x = x * z := by
-  intro z hz x hx
-  rcases hz with rfl | rfl | rfl <;> rcases hx with rfl | rfl | rfl <;>
-    first
-      | exact Z1_comm_X1
-      | exact Z2_comm_X1
-      | exact Z3_comm_X1
-      | …
-```
-
-The `pauli_comm_even_anticommutes` tactic is in
-`PauliGroup/CommutationTactics.lean`; it converts the commutation goal into a
-parity-of-anticommuting-qubits goal, which is then closed by computing the
-explicit `Finset` and `decide`-ing its cardinality is even.
-
-**Performance note.** For small `n` (≤ 9 with few generators), the whole batch
-may close as a single `by decide` on the symplectic check-matrix product without
-spelling out the per-pair filter Finsets. Try that first. For larger codes, the
-explicit-Finset approach is cleaner and reliably fast.
-
-**Non-CSS variant.** Without Z/X partition, prove pairwise commutation for
-*every* pair of generators (`m * (m-1)/2` cases for `m` generators); fall back
-to the same `pauli_comm_even_anticommutes` machinery.
--/
-
-/-!
-## §5 — All-pair commutation (full stabilizer abelianness)
-
-Combine §3 and §4 via the CSS shortcuts in `Core/CSSCommutationLemmas.lean`:
-
-```lean
-theorem generators_commute :
-    ∀ g h, g ∈ generators → h ∈ generators → g * h = h * g := by
-  intro g h hg hh
-  rcases hg with hgZ | hgX <;> rcases hh with hhZ | hhX
-  · exact ZType_commutes (ZGenerators_are_ZType g hgZ) (ZGenerators_are_ZType h hhZ)
-  · exact ZGenerators_commute_XGenerators _ hgZ _ hhX
-  · exact (ZGenerators_commute_XGenerators _ hhZ _ hgX).symm
-  · exact XType_commutes (XGenerators_are_XType g hgX) (XGenerators_are_XType h hhX)
-```
-
-`ZType_commutes` and `XType_commutes` are the CSS-side trivial commutations: two
-Z-type elements always commute (both contain only `I`s and `Z`s, which commute
-pairwise), same for X-type.
-
-**Non-CSS variant.** No CSS shortcuts; you proved pairwise commutation directly
-in §4, so `generators_commute` is just `rcases` + lookup.
--/
-
-/-!
-## §6 — `−I` is not in the stabilizer subgroup
-
-For CSS codes, the lemma `CSS.negIdentity_not_mem_closure_union` in
-`Core/CSSNoNegI.lean` handles this once you have the Z/X partition and their
-cross-commutation:
-
-```lean
-theorem negIdentity_not_mem :
-    negIdentity n ∉ subgroup := by
-  have hZX : ∀ z ∈ ZGenerators, ∀ x ∈ XGenerators, z * x = x * z :=
-    ZGenerators_commute_XGenerators
-  simpa [subgroup, generators] using
-    (CSS.negIdentity_not_mem_closure_union (n := n) ZGenerators XGenerators
-      ZGenerators_are_ZType XGenerators_are_XType hZX)
-```
-
-This is a one-line proof reusing §3, §4. Don't reprove it.
-
-**Non-CSS variant.** Use the general lemma in `Core/SubgroupLemmas.lean`:
-`negIdentity_not_mem_of_independent_phase_zero` — requires the generator list to
-be phase-0 and have linearly-independent symplectic rows (§9).
--/
-
-/-!
-## §7 — Generator list and `listToSet` equality
-
-A `List` form is needed for symplectic-span / bundled-StabilizerGroup arguments.
-Define the list in a canonical order (Z-generators first, then X-generators,
-matching the `generators` set's union order):
-
-```lean
+/-- The six generators as a list (Z-checks first, then X-checks). -/
 def generatorsList : List (NQubitPauliGroupElement 7) :=
   [Z1, Z2, Z3, X1, X2, X3]
-
-lemma listToSet_generatorsList :
-    NQubitPauliGroupElement.listToSet generatorsList = generators := by
-  simp only [generatorsList, generators, ZGenerators, XGenerators,
-    NQubitPauliGroupElement.listToSet_cons, NQubitPauliGroupElement.listToSet_nil]
-  ext g
-  simp only [Set.mem_insert_iff, Set.mem_union, Set.mem_singleton_iff,
-             Set.mem_empty_iff_false, or_false, or_assoc]
 ```
 
 Length must equal `n - k`; this is enforced by
-`StabilizerCode.generators_length` (§13).
+`StabilizerCode.generators_length` (§13), where it is `rfl`.
 
-**Parametric variant.** For toric / rotated-surface codes with parametric `L`,
-the natural full generator list (e.g., all `2L²` vertex + face stabilizers of
-the toric code) is *redundant* — i.e. its length exceeds `n - k`. In that case,
-define a separate *trimmed* list `generatorsListPackaged` with length exactly
-`n - k`, drop the redundant generators, and prove the closures are equal. See
-`ToricCodeNStabilizerCode.lean` for the canonical pattern. The trimmed list goes
-into `StabilizerCode.generatorsList`; the original full list stays in the bare
-`StabilizerGroup` definition.
+**Parametric variant.** Write the list as `List.ofFn f` and take the CSS
+route (§7–§9). For toric / rotated-surface codes with parametric `L`, the
+natural full generator list (all `2L²` vertex + face stabilizers of the toric
+code) is *redundant* — its length exceeds `n - k` — so define a separate
+*trimmed* list `generatorsListPackaged` of length exactly `n - k` and prove
+the closures equal. See `Toric/StabilizerCode.lean` for the pattern.
 -/
 
 /-!
-## §9 — Phase-zero + generator independence
+## §3 — Pairwise commutation, by `decide`
 
-These two facts feed `StabilizerCode.generators_phaseZero` and
-`StabilizerCode.generators_independent` in §13.
+`StabilizerCode.generators_commute` quantifies over
+`NQubitPauliGroupElement.listToSet generatorsList`. For a literal list that is
+a finite conjunction of closed identities between `σ[…]` literals, and the
+kernel settles each one through the global
+`DecidableEq (NQubitPauliGroupElement n)` instance (the bounded quantifier is
+pinned to `List.decidableBAll` by `instDecidablePairwiseCommuteListToSet` in
+`Core/Stabilizer/StabilizerCode.lean`, so instance search does not wander off
+into `Fintype.decidableForallFintype`):
 
 ```lean
-lemma AllPhaseZero_generatorsList :
-    NQubitPauliGroupElement.AllPhaseZero generatorsList := by
+/-- All six generators pairwise commute. -/
+theorem generators_commute :
+    ∀ g ∈ listToSet generatorsList, ∀ h ∈ listToSet generatorsList, g * h = h * g := by
+  decide
+```
+
+This one `decide` replaces the typing lemmas, the per-pair
+`pauli_comm_even_anticommutes` proofs and the four-way `rcases` of the CSS
+route. It closes in well under a second for every literal code on `main`
+(`n ≤ 9`, up to eight generators). Record the overlap counts in the
+doc-comment anyway — the reader still wants to know *why* the pairs commute.
+
+**Non-CSS variant.** Identical: `decide` does not care whether the
+generators are Z/X-pure.
+-/
+
+/-!
+## §4 — Phase-zero + check-matrix independence
+
+These two facts feed `StabilizerCode.generators_phaseZero` and
+`StabilizerCode.generators_independent` (§13), and together with §3 they are
+the inputs to the `−I` lemma of §5.
+
+```lean
+/-- Every generator has phase power 0. -/
+lemma AllPhaseZero_generatorsList : AllPhaseZero generatorsList := by
   decide
 
+/-- The check-matrix rows of the generators are linearly independent. -/
 theorem rowsLinearIndependent_generatorsList :
-    NQubitPauliGroupElement.rowsLinearIndependent generatorsList := by decide
+    rowsLinearIndependent generatorsList := by decide
 
-theorem GeneratorsIndependent_n_generatorsList :
-    GeneratorsIndependent n generatorsList :=
+/-- The generator list is an independent generating set. -/
+theorem GeneratorsIndependent_n_generatorsList : GeneratorsIndependent n generatorsList :=
   GeneratorsIndependent_of_rowsLinearIndependent rowsLinearIndependent_generatorsList
 ```
 
-`decide` closes this for every small code on `main` (`n ≤ 9` or so); reach for
-`decide +kernel` before anything heavier, never `native_decide` (banned, see
-CLAUDE.md § "Axiom policy"). For parametric codes with `L ≥ 2`, replace `decide`
-with a parametric independence proof — see
+`decide` closes both for every small code on `main`; the one exception is
+`rowsLinearIndependent` for Shor's code (eight rows on nine qubits), where
+plain `decide` runs out of heartbeats and `decide +kernel` is used instead.
+Reach for `decide +kernel` before anything heavier, never `native_decide`
+(banned, see CLAUDE.md § "Axiom policy"). For parametric codes with `L ≥ 2`,
+replace `decide` with a parametric independence proof — see
 `rowsLinearIndependent_generatorsListPackaged` in `Toric/StabilizerCode.lean`.
 -/
 
 /-!
-## §8 — Bundled `StabilizerGroup n`
+## §5 — `−I` is not in the stabilizer subgroup
 
-Define the canonical `StabilizerGroup n` from `generatorsList` using the smart
-constructor `mkStabilizerFromGenerators` (in `Core/StabilizerGroup.lean`):
+Phase-0, pairwise-commuting generators with linearly independent symplectic
+rows never generate `−I`: that is
+`negIdentity_not_mem_of_indep_phase_zero_commute` in
+`Framework/Symplectic/SymplecticSpan.lean`, and §3–§4 are exactly its
+hypotheses.
 
 ```lean
+/-- The closure of the generators does not contain −I. -/
+theorem negIdentity_not_mem : negIdentity n ∉ Subgroup.closure (listToSet generatorsList) :=
+  negIdentity_not_mem_of_indep_phase_zero_commute generatorsList
+    AllPhaseZero_generatorsList rowsLinearIndependent_generatorsList generators_commute
+```
+
+Note the statement is against `Subgroup.closure (listToSet generatorsList)`
+— the same subgroup `mkStabilizerFromGenerators` builds — so §6 and §13 can
+use it directly, with no `listToSet` rewrite.
+-/
+
+/-!
+## §6 — Bundled `StabilizerGroup n`
+
+Define the canonical `StabilizerGroup n` from `generatorsList` using the smart
+constructor `mkStabilizerFromGenerators` (in `Core/Stabilizer/StabilizerCode.lean`).
+Its `toSubgroup` is `Subgroup.closure (listToSet generatorsList)` by
+definition, so the equation lemma is `rfl`:
+
+```lean
+noncomputable def stabilizerGroup : StabilizerGroup n :=
+  mkStabilizerFromGenerators n generatorsList generators_commute negIdentity_not_mem
+
+lemma stabilizerGroup_toSubgroup_eq :
+    stabilizerGroup.toSubgroup = Subgroup.closure (listToSet generatorsList) := rfl
+```
+
+Keep the lemma even though it is `rfl`: `rw [stabilizerGroup_toSubgroup_eq]`
+and `mem_centralizer_iff_closure _ _ _ stabilizerGroup_toSubgroup_eq` are how
+the centralizer proofs (§12), the distance closers (§14) and downstream files
+(`Steane7Distance.lean`, `Steane7TransversalGates.lean`) get from the bundled
+group to an explicit generating set. Membership in `listToSet generatorsList`
+is then a case split:
+
+```lean
+  intro s hs
+  simp only [generatorsList, listToSet_cons, listToSet_nil, Set.mem_insert_iff,
+    Set.mem_empty_iff_false, or_false] at hs
+  rcases hs with rfl | rfl | rfl | rfl | rfl | rfl
+```
+
+and `g ∈ listToSet generatorsList` for a named generator `g` is
+`by simp [generatorsList]`.
+
+**Parametric variant (CSS route).** When `generatorsList` is `List.ofFn f`
+(or the qubit count is symbolic), `decide` has nothing to evaluate. Keep the
+`Set`-valued generator sets and the Z/X typing lemmas of §7, prove
+`generators_commute` from the CSS commutation shortcuts (§8), and get `−I`
+from `CSS.negIdentity_not_mem_closure_union` (§9). `Repetition/N.lean`,
+`Iceberg/N.lean`, `Toric/CodeN.lean`, `RotatedSurface/CodeN.lean` and
+`Small/QuantumHamming.lean` are the codes on this route; every literal code
+under `Codes/Small/` and `Repetition/Three.lean` is on the decide route.
+-/
+
+/-!
+## §7 — CSS route: generator sets and Z/X typing (parametric families)
+
+Bundle the generators into `Set`s plus their union. The subgroup must be
+`noncomputable` because mathlib's `Group` instance on
+`NQubitPauliGroupElement` is noncomputable as of v4.30 (see CLAUDE.md).
+
+```lean
+def ZGenerators : Set (NQubitPauliGroupElement n) := Set.range ZStab
+def XGenerators : Set (NQubitPauliGroupElement n) := Set.range XStab
+def generators : Set (NQubitPauliGroupElement n) := ZGenerators ∪ XGenerators
+
+noncomputable def subgroup : Subgroup (NQubitPauliGroupElement n) :=
+  Subgroup.closure generators
+```
+
+Then prove that every Z-generator is Z-type (operator is `I` or `Z` on every
+qubit) and similarly for X. These predicates feed the CSS shortcuts of §8–§9.
+
+```lean
+lemma ZGenerators_are_ZType :
+    ∀ g, g ∈ ZGenerators → NQubitPauliGroupElement.IsZTypeElement g := by
+  rintro g ⟨i, rfl⟩
+  constructor
+  · rfl  -- phase = 0
+  · intro j; simp [ZStab, NQubitPauliOperator.set, NQubitPauliOperator.identity,
+      PauliOperator.IsZType]; split_ifs <;> simp
+```
+
+Helpful imports: `Core/CSS/CSSPredicates.lean` defines `IsZTypeElement`,
+`IsXTypeElement`, plus the per-qubit `PauliOperator.IsZType` /
+`PauliOperator.IsXType`.
+-/
+
+/-!
+## §8 — CSS route: cross-commutation and `generators_commute`
+
+For each `(z, x) ∈ ZGenerators × XGenerators`, prove `z * x = x * z` with the
+parity characterization: `pauli_comm_even_anticommutes`
+(`PauliGroup/CommutationTactics.lean`) turns the commutation goal into
+"the set of anticommuting qubits has even cardinality", which is closed by
+identifying that `Finset` explicitly.
+
+```lean
+lemma ZGenerators_commute_XGenerators :
+    ∀ z ∈ ZGenerators, ∀ x ∈ XGenerators, z * x = x * z := by
+  rintro z ⟨i, rfl⟩ x ⟨j, rfl⟩
+  pauli_comm_even_anticommutes
+  -- residual goal: even number of anticommuting qubits between ZStab i and XStab j
+  …
+```
+
+Combine with the typing lemmas via `Core/CSS/CSSCommutationLemmas.lean`: two
+Z-type elements always commute, and so do two X-type elements.
+
+```lean
+theorem generators_commute :
+    ∀ g ∈ generators, ∀ h ∈ generators, g * h = h * g := by
+  rintro g (hgZ | hgX) h (hhZ | hhX)
+  · exact CSSCommutationLemmas.ZType_commutes (ZGenerators_are_ZType g hgZ)
+      (ZGenerators_are_ZType h hhZ)
+  · exact ZGenerators_commute_XGenerators g hgZ h hhX
+  · exact (ZGenerators_commute_XGenerators h hhZ g hgX).symm
+  · exact CSSCommutationLemmas.XType_commutes (XGenerators_are_XType g hgX)
+      (XGenerators_are_XType h hhX)
+```
+-/
+
+/-!
+## §9 — CSS route: `−I ∉ subgroup` and the `listToSet` bridge
+
+`CSS.negIdentity_not_mem_closure_union` in `Core/CSS/CSSNoNegI.lean` needs
+only the Z/X partition, the typing lemmas and their cross-commutation:
+
+```lean
+theorem negIdentity_not_mem : negIdentity n ∉ subgroup :=
+  CSS.negIdentity_not_mem_closure_union ZGenerators XGenerators
+    ZGenerators_are_ZType XGenerators_are_XType ZGenerators_commute_XGenerators
+```
+
+The `StabilizerCode` fields (§13) are stated over `listToSet generatorsList`,
+so bridge the two forms once and rewrite with it:
+
+```lean
+lemma listToSet_generatorsList : listToSet generatorsList = generators := by
+  simp only [generatorsList, generators, ZGenerators, XGenerators, listToSet_ofFn,
+    List.map_ofFn]  -- shape depends on how the family indexes its stabilizers
+
 noncomputable def stabilizerGroup : StabilizerGroup n :=
   mkStabilizerFromGenerators n generatorsList
     (by rw [listToSet_generatorsList]; exact generators_commute)
     (by rw [listToSet_generatorsList]; exact negIdentity_not_mem)
 
-lemma stabilizerGroup_toSubgroup_eq : stabilizerGroup.toSubgroup = subgroup := by
-  simp only [stabilizerGroup, mkStabilizerFromGenerators, subgroup]
-  rw [listToSet_generatorsList]
+lemma stabilizerGroup_toSubgroup_eq : stabilizerGroup.toSubgroup = subgroup :=
+  congrArg Subgroup.closure listToSet_generatorsList
 ```
 
-This bridges the `List`-based packaging (used by `StabilizerCode`) with the
-`Set`-based subgroup (used by `IsNontrivialLogicalOperator` and centralizer
-arguments). The equality lemma `stabilizerGroup_toSubgroup_eq` is consumed by
-downstream proofs that need to translate between the two forms — see
-`IsNontrivialLogicalOperator_of_toSubgroup_eq` in `Core/StabilizerCode.lean`.
+`listToSet_ofFn` and `AllPhaseZero_ofFn` (`Framework/Symplectic/IndependentEquiv.lean`)
+are the `List.ofFn` counterparts of the literal-list lemmas.
 -/
 
 /-!
@@ -472,60 +494,48 @@ These feed `StabilizerCode.logical_commute_cross` (see §13).
 ## §12 — Logicals in centralizer
 
 Show that each `logicalX_i` and `logicalZ_i` commutes with every
-stabilizer-group element. The standard pattern is `Subgroup.closure_induction`
-with cases `| mem | one | mul | inv` (note v4.30 naming):
+stabilizer-group element. `mem_centralizer_iff_closure` (`Core/Stabilizer/Centralizer.lean`)
+reduces this to the generators, given the §6 equation; then case-split on the
+list and close each generator by `decide` (the identity is closed) or by a
+prepared per-generator lemma:
 
 ```lean
-theorem logicalX_mem_centralizer :
-    logicalX ∈ centralizer stabilizerGroup := by
-  rw [centralizer, Subgroup.mem_centralizer_iff]
-  rw [stabilizerGroup_toSubgroup_eq]
+theorem logicalX_mem_centralizer : logicalX ∈ centralizer stabilizerGroup := by
+  rw [StabilizerGroup.mem_centralizer_iff_closure _ _ _ stabilizerGroup_toSubgroup_eq]
   intro s hs
-  refine Subgroup.closure_induction
-    (p := fun y _ => y * logicalX = logicalX * y) ?_ ?_ ?_ ?_ hs
-  case mem =>
-    -- show logicalX commutes with each generator
-    intro y hy
-    simp [generators] at hy
-    rcases hy with hgZ | hgX
-    · rcases (by simpa [ZGenerators] using hgZ) with rfl | rfl | rfl
-      · exact logicalX_commutes_Z1.symm
-      · exact logicalX_commutes_Z2.symm
-      · …
-    · …
-  case one =>
-    change (1 : NQubitPauliGroupElement n) * logicalX = logicalX * 1
-    rw [_root_.one_mul, _root_.mul_one]
-  case mul =>
-    intros y₁ y₂ _ _ hy₁ hy₂
-    calc (y₁ * y₂) * logicalX
-        = y₁ * (y₂ * logicalX)         := _root_.mul_assoc _ _ _
-      _ = y₁ * (logicalX * y₂)         := by rw [hy₂]
-      _ = (y₁ * logicalX) * y₂         := (_root_.mul_assoc _ _ _).symm
-      _ = (logicalX * y₁) * y₂         := by rw [hy₁]
-      _ = logicalX * (y₁ * y₂)         := _root_.mul_assoc _ _ _
-  case inv =>
-    intros y _ hy
-    exact (show Commute y logicalX from hy).inv_left.eq
+  simp only [generatorsList, listToSet_cons, listToSet_nil, Set.mem_insert_iff,
+    Set.mem_empty_iff_false, or_false] at hs
+  rcases hs with rfl | rfl | rfl | rfl | rfl | rfl <;> decide
 ```
 
-**Three things that recurrently go wrong here** (per CLAUDE.md):
+Do **not** try to `decide` the whole `∀ s ∈ listToSet generatorsList, …`
+goal in one go: instance search picks `Fintype.decidableForallFintype` for
+that shape and the kernel enumerates all `4 · 4ⁿ` group elements
+("maximum recursion depth has been reached"). The `rcases` first is what
+keeps each `decide` a closed identity.
 
-1. **`one` case fails with `rw [one_mul]`.** The goal is `(fun y _ => …) 1 ⋯`,
-   unreduced. Insert `change (1 : ...) * logicalX = logicalX * 1` before `rw` to
-   beta-reduce.
-2. **Ambiguous `mul_assoc`.** When `open NQubitPauliGroupElement` is in scope,
-   both `_root_.mul_assoc` and `NQubitPauliGroupElement.mul_assoc` resolve.
-   Qualify with `_root_.mul_assoc` (same for `one_mul`, `mul_one`).
-3. **Per-generator commutation lemmas (e.g. `logicalX_commutes_Z1`) need to be
-   separate `private lemma`s** before this theorem — define them with the same
-   `pauli_comm_even_anticommutes` + filter pattern from §4.
+When a per-generator identity is worth a name (it is reused, or the parity
+argument is the point), state it as a `private lemma` with
+`pauli_comm_even_anticommutes` + an explicit anticommutation `Finset`, and
+`exact logicalX_commutes_Z1.symm` in the corresponding case — see
+`CSS_4_1_2.lean`, `FourQubit_4_2_2.lean`, `SixQubit_6_2_2.lean`.
+
+**Parametric variant.** The generating set is `generators` (§7) and the
+equation is `stabilizerGroup_toSubgroup_eq : … = subgroup` (§9); after
+`rw [subgroup]` the membership hypothesis destructures as
+`rintro s (⟨i, rfl⟩ | ⟨i, rfl⟩)`. If you fall back to `Subgroup.closure_induction`
+instead (cases `| mem | one | mul | inv`, v4.30 naming), three things
+recurrently go wrong (per CLAUDE.md): the `one` case needs a `change` before
+`rw [one_mul]` to beta-reduce `(fun y _ => …) 1`; `mul_assoc` / `one_mul` /
+`mul_one` must be qualified `_root_.…` while `open NQubitPauliGroupElement`
+is in scope; and the per-generator commutation lemmas must be separate
+`private lemma`s stated before the theorem.
 -/
 
 /-!
 ## §13 — `StabilizerCode n k` packaging, and the logical basis on top
 
-Two bundled structures. The **bare code** combines §7–§9 only: a stabilizer
+Two bundled structures. The **bare code** combines §2–§5 only: a stabilizer
 code *is* its stabilizer group, presented by `n − k` independent generators.
 The **logical basis** (§10–§12) is derived data and lives in a separate
 `StabilizerCodeWithLogicals n k`, which `extends` the bare code:
@@ -538,10 +548,8 @@ noncomputable def stabilizerCode : StabilizerCode n k where
   generators_length := rfl                 -- length = n - k by construction
   generators_phaseZero := AllPhaseZero_generatorsList
   generators_independent := GeneratorsIndependent_n_generatorsList
-  generators_commute := by
-    rw [listToSet_generatorsList]; exact generators_commute
-  closure_no_neg_identity := by
-    rw [listToSet_generatorsList]; exact negIdentity_not_mem
+  generators_commute := generators_commute          -- §3 (CSS route: rw the bridge first)
+  closure_no_neg_identity := negIdentity_not_mem     -- §5
 
 private def logicalOps_<CodeName> : Fin k → LogicalQubitOps n stabilizerGroup :=
   fun _ => ⟨logicalX, logicalZ, logicalX_mem_centralizer, logicalZ_mem_centralizer,
@@ -611,8 +619,8 @@ two ingredients — the §13 closure equation
 
 ```lean
 lemma stabilizerCode_toSubgroup_eq :
-    stabilizerCode.toStabilizerGroup.toSubgroup = Subgroup.closure generators :=
-  stabilizerGroup_toSubgroup_eq  -- §8, up to unfolding
+    stabilizerCode.toStabilizerGroup.toSubgroup = Subgroup.closure (listToSet generatorsList) :=
+  rfl  -- §6; on the CSS route, `stabilizerGroup_toSubgroup_eq` against `generators`
 ```
 
 and an explicit witness `⟨g, h_nontrivial, by decide⟩`, a nontrivial logical of
@@ -630,24 +638,24 @@ and `FourQubit_4_2_2.lean`.
 ```lean
 private lemma weight_one_anticomm_witness :
     ∀ i : Fin n, ∀ P : PauliOperator, P ≠ PauliOperator.I →
-      ∃ g ∈ generators, NQubitPauliGroupElement.Anticommute
+      ∃ g ∈ listToSet generatorsList, NQubitPauliGroupElement.Anticommute
         (weightOneAt i P) g := by
   intro i P hP
   fin_cases i <;>
     (match P, hP with
     | PauliOperator.X, _ => first
-      | exact ⟨Z1, by simp [generators, ZGenerators], by decide⟩
-      | exact ⟨Z2, by simp [generators, ZGenerators], by decide⟩
+      | exact ⟨Z1, by simp [generatorsList], by decide⟩
+      | exact ⟨Z2, by simp [generatorsList], by decide⟩
     | PauliOperator.Y, _ => first
-      | exact ⟨Z1, by simp [generators, ZGenerators], by decide⟩
-      | exact ⟨Z2, by simp [generators, ZGenerators], by decide⟩
+      | exact ⟨Z1, by simp [generatorsList], by decide⟩
+      | exact ⟨Z2, by simp [generatorsList], by decide⟩
     | PauliOperator.Z, _ => first
-      | exact ⟨X1, by simp [generators, XGenerators], by decide⟩
-      | exact ⟨X2, by simp [generators, XGenerators], by decide⟩
+      | exact ⟨X1, by simp [generatorsList], by decide⟩
+      | exact ⟨X2, by simp [generatorsList], by decide⟩
     | PauliOperator.I, hP => exact (hP rfl).elim)
 
 theorem code_has_distance_two : HasCodeDistance stabilizerCode 2 :=
-  hasCodeDistance_two_of_anticommute_witness stabilizerCode generators
+  hasCodeDistance_two_of_anticommute_witness stabilizerCode (listToSet generatorsList)
     stabilizerCode_toSubgroup_eq weight_one_anticomm_witness
     ⟨logicalX, (logicalOps_<CodeName> 0).xOp_nontrivial, by decide⟩
 ```
@@ -665,8 +673,8 @@ def zRow : Fin 3 → Finset (Fin 7) := ![{0, 1, 2, 4}, {0, 1, 3, 5}, {0, 2, 3, 6
 lemma Z1_eq_zOn : Z1 = zOn {0, 1, 2, 4} :=
   NQubitPauliGroupElement.ext _ _ rfl (funext fun i => by fin_cases i <;> rfl)
 
-lemma zOn_row_mem (r : Fin 3) : zOn (zRow r) ∈ generators := by
-  fin_cases r <;> simp [zRow, generators, ZGenerators, Z1_eq_zOn, Z2_eq_zOn, Z3_eq_zOn]
+lemma zOn_row_mem (r : Fin 3) : zOn (zRow r) ∈ listToSet generatorsList := by
+  fin_cases r <;> simp [zRow, generatorsList, Z1_eq_zOn, Z2_eq_zOn, Z3_eq_zOn]
 
 lemma zRow_cover : ∀ i : Fin 7, ∃ r, i ∈ zRow r := by decide
 
@@ -675,7 +683,7 @@ lemma zRow_separate : ∀ i j : Fin 7, i ≠ j → ∃ r, (i ∈ zRow r ↔ j �
 -- … and the same for `xRow` / `xOn_row_mem` / `xRow_cover` / `xRow_separate`.
 
 theorem code_has_distance_three : HasCodeDistance stabilizerCode 3 :=
-  hasCodeDistance_three_of_columns zRow xRow generators stabilizerCode
+  hasCodeDistance_three_of_columns zRow xRow (listToSet generatorsList) stabilizerCode
     stabilizerCode_toSubgroup_eq zOn_row_mem xOn_row_mem zRow_cover xRow_cover
     zRow_separate xRow_separate ⟨logicalXw3, logicalXw3_isNontrivial, logicalXw3_weight⟩
 ```
@@ -708,10 +716,10 @@ theorem code_has_distance_three : HasCodeDistance stabilizerCode 3 := by
     with ⟨h_cent, _⟩
   interval_cases w
   · exact no_weight_one_mem_centralizer_of_anticommute_witness
-      stabilizerCode.toStabilizerGroup generators stabilizerCode_toSubgroup_eq
+      stabilizerCode.toStabilizerGroup (listToSet generatorsList) stabilizerCode_toSubgroup_eq
       weight_one_anticomm_witness g hg_weight h_cent
   · exact no_weight_two_mem_centralizer_of_anticommute_witness
-      stabilizerCode.toStabilizerGroup generators stabilizerCode_toSubgroup_eq
+      stabilizerCode.toStabilizerGroup (listToSet generatorsList) stabilizerCode_toSubgroup_eq
       weight_two_anticomm_witness g hg_weight h_cent
 ```
 
@@ -746,10 +754,10 @@ Before declaring a CSS-code formalization complete, verify:
 - [ ] `lake build QEC.Stabilizer.Codes.<CodeName>` succeeds (no errors, no
   `sorry` warnings).
 - [ ] No `set_option linter.* false` in the file (project-wide policy).
-- [ ] All sections from §1 through §13 are present (§14 may be in a separate
-  distance file).
-- [ ] `stabilizerCode_toSubgroup_eq_subgroup` lemma exposed if downstream proofs
-  need to translate between the two forms.
+- [ ] §1–§6 and §10–§13 are present (§14 may be in a separate distance
+  file); §7–§9 only for a parametric family on the CSS route.
+- [ ] `stabilizerGroup_toSubgroup_eq` exposed, so downstream files can get
+  from the bundled group to the explicit generating set.
 - [ ] Module imported in `QEC/Stabilizer/Codes.lean` umbrella (otherwise
   orphan-module trap — see CLAUDE.md).
 - [ ] Doc-comment header references the original paper.
@@ -758,8 +766,13 @@ Before declaring a CSS-code formalization complete, verify:
 
 ## See also
 
-- `Steane7.lean` — canonical k = 1 CSS instantiation of this template
-- `Shor9.lean` — alternative k = 1 reference
+- `Steane7.lean` — canonical k = 1 instantiation of this template (decide
+  route); `Steane7Distance.lean` / `Steane7TransversalGates.lean` show how
+  downstream files consume `stabilizerGroup_toSubgroup_eq`
+- `Shor9.lean` — k = 1, n = 9, the largest literal instance
+- `FiveQubit_5_1_3.lean` — non-CSS; same §2–§6, general distance closer
+- `Repetition/N.lean`, `Iceberg/N.lean` — parametric families on the CSS
+  route (§7–§9)
 - `RepetitionCode3.lean`, `RepetitionCodeN.lean` — degenerate small-distance
   cases (d = 1)
 - `RotatedSurfaceCodeN*.lean` — parametric L family

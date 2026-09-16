@@ -58,12 +58,12 @@ lemma X3_eq_xOn : X3 = xOn {0, 2, 3, 6} :=
   NQubitPauliGroupElement.ext _ _ rfl (funext fun i => by fin_cases i <;> rfl)
 
 /-- Each `Z`-check along a Hamming row is a Steane generator. -/
-lemma zOn_row_mem (r : Fin 3) : zOn (row r) ∈ generators := by
-  fin_cases r <;> simp [row, generators, ZGenerators, Z1_eq_zOn, Z2_eq_zOn, Z3_eq_zOn]
+lemma zOn_row_mem (r : Fin 3) : zOn (row r) ∈ listToSet generatorsList := by
+  fin_cases r <;> simp [row, generatorsList, Z1_eq_zOn, Z2_eq_zOn, Z3_eq_zOn]
 
 /-- Each `X`-check along a Hamming row is a Steane generator. -/
-lemma xOn_row_mem (r : Fin 3) : xOn (row r) ∈ generators := by
-  fin_cases r <;> simp [row, generators, XGenerators, X1_eq_xOn, X2_eq_xOn, X3_eq_xOn]
+lemma xOn_row_mem (r : Fin 3) : xOn (row r) ∈ listToSet generatorsList := by
+  fin_cases r <;> simp [row, generatorsList, X1_eq_xOn, X2_eq_xOn, X3_eq_xOn]
 
 /-! ## The Hamming code has distance 3
 
@@ -99,7 +99,7 @@ lemma logicalXw3_anticomm_logicalZ : Anticommute logicalXw3 logicalZ := by
 
 /-- The stabilizer code's subgroup is the closure of the six generators. -/
 lemma stabilizerCode_toSubgroup_eq :
-    stabilizerCode.toStabilizerGroup.toSubgroup = Subgroup.closure generators :=
+    stabilizerCode.toStabilizerGroup.toSubgroup = Subgroup.closure (listToSet generatorsList) :=
   stabilizerGroup_toSubgroup_eq
 
 /-- `X̄ · X₁` commutes with the stabilizer: `X̄` does, and so does the
@@ -108,7 +108,7 @@ lemma logicalXw3_mem_centralizer : logicalXw3 ∈ centralizer stabilizerCode.toS
   rw [logicalXw3_eq_mul]
   refine (centralizer _).mul_mem logicalX_mem_centralizer (stabilizer_le_centralizer _ ?_)
   rw [stabilizerCode_toSubgroup_eq]
-  exact Subgroup.subset_closure (by simp [generators, XGenerators])
+  exact Subgroup.subset_closure (by simp [generatorsList])
 
 /-- `X̄ · X₁` is a nontrivial logical operator: it lies in the centralizer and
 anticommutes with the centralizer element `Z̄`. -/
@@ -123,8 +123,9 @@ lemma logicalXw3_isNontrivial :
 matrix, whose columns are nonzero and pairwise distinct, so no Pauli of weight
 `1` or `2` is a nontrivial logical; `X` on `{3, 5, 6}` is one of weight `3`. -/
 theorem code_has_distance_three : HasCodeDistance stabilizerCode 3 :=
-  hasCodeDistance_three_of_columns row row generators stabilizerCode stabilizerCode_toSubgroup_eq
-    zOn_row_mem xOn_row_mem row_cover row_cover row_separate row_separate
+  hasCodeDistance_three_of_columns row row (listToSet generatorsList) stabilizerCode
+    stabilizerCode_toSubgroup_eq zOn_row_mem xOn_row_mem row_cover row_cover row_separate
+    row_separate
     ⟨logicalXw3, logicalXw3_isNontrivial, logicalXw3_weight⟩
 
 /-- The Steane code as a `[[7, 1, 3]]` code: `stabilizerCode` packaged with its

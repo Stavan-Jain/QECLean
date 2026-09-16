@@ -1,9 +1,10 @@
 import Mathlib.Tactic
 import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
 import QEC.Stabilizer.Framework.Core.Stabilizer.SubgroupLemmas
-import QEC.Stabilizer.Framework.Core.CSS.CSSPredicates
-import QEC.Stabilizer.Framework.Core.CSS.CSSNoNegI
-import QEC.Stabilizer.Framework.Core.CSS.CSSCommutationLemmas
+import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
+import QEC.Stabilizer.Framework.Core.CodeNotation
+import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
+import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrixDecidable
 import QEC.Stabilizer.Foundations.PauliGroup.Commutation
 import QEC.Stabilizer.Foundations.PauliGroup.CommutationTactics
 
@@ -23,11 +24,20 @@ subgroup:
 - Z-type generators `M1`–`M6` (pairwise Z checks within blocks)
 - X-type generators `M7`,`M8` (blockwise X checks)
 
-and proves:
-- the generated subgroup is **abelian**
-- it does **not** contain `negIdentity 9`
+and packages it by the **decide route**: the eight generators form a literal
+list, and pairwise commutation, phase zero and linear independence of the
+check-matrix rows are closed decidable statements settled by `decide`. From
+those, `−I ∉ closure` follows by
+`negIdentity_not_mem_of_indep_phase_zero_commute`, and the code is bundled as
+`stabilizerCode : Code[[9, 1]]`.
 
-The `no_neg_identity` proof uses the generic CSS lemma in `CSSNoNegI.lean`.
+## Outline
+
+- Generators `M1`–`M8` and the list `generatorsList`
+- Decided hypotheses: `generators_commute`, `AllPhaseZero_generatorsList`,
+  `rowsLinearIndependent_generatorsList`
+- `negIdentity_not_mem`, the bundled `stabilizerGroup`
+- `stabilizerCode : Code[[9, 1]]`
 -/
 
 open NQubitPauliGroupElement
@@ -67,280 +77,71 @@ def M7 : NQubitPauliGroupElement 9 := σ[XXXXXXIII]
 blocks). -/
 def M8 : NQubitPauliGroupElement 9 := σ[IIIXXXXXX]
 
-/-- The six Z-type generators `M1`–`M6`. -/
-def ZGenerators : Set (NQubitPauliGroupElement 9) :=
-  {M1, M2, M3, M4, M5, M6}
-
-/-- The two X-type generators `M7`, `M8`. -/
-def XGenerators : Set (NQubitPauliGroupElement 9) :=
-  {M7, M8}
-
-/-- Full generating set: ZGenerators ∪ XGenerators. -/
-def generators : Set (NQubitPauliGroupElement 9) :=
-  ZGenerators ∪ XGenerators
-
-noncomputable def subgroup : Subgroup (NQubitPauliGroupElement 9) :=
-  Subgroup.closure generators
+/-- The eight generators as a list (Z-checks first, then X-checks). -/
+def generatorsList : List (NQubitPauliGroupElement 9) :=
+  [M1, M2, M3, M4, M5, M6, M7, M8]
 
 /-!
-## Typing facts for the generators
+## Decided hypotheses
+
+Each Z-check meets each X-check in either zero or two qubits, and same-type
+generators commute componentwise; `decide` checks all 64 ordered pairs.
 -/
 
-lemma ZGenerators_are_ZType :
-    ∀ g, g ∈ ZGenerators → NQubitPauliGroupElement.IsZTypeElement g := by
-  classical
-  intro g hg
-  rcases (by simpa [ZGenerators] using hg) with rfl | rfl | rfl | rfl | rfl | rfl <;>
-    · constructor
-      · rfl
-      · intro i
-        fin_cases i <;> simp [PauliOperator.IsZType, M1, M2, M3, M4, M5, M6,
-          NQubitPauliOperator.set, NQubitPauliOperator.identity]
-
-lemma XGenerators_are_XType :
-    ∀ g, g ∈ XGenerators → NQubitPauliGroupElement.IsXTypeElement g := by
-  classical
-  intro g hg
-  rcases (by simpa [XGenerators] using hg) with rfl | rfl <;>
-    · constructor
-      · rfl
-      · intro i
-        fin_cases i <;> simp [PauliOperator.IsXType, M7, M8,
-          NQubitPauliOperator.set, NQubitPauliOperator.identity]
-
-/-!
-## Commutation: Z generators commute with X generators
-
-We use the parity characterization from `PauliGroup/Commutation.lean` and
-discharge the finite parity goals by explicitly identifying the anticommute
-positions (n = 9).
--/
-
-private lemma M1_comm_M7 : M1 * M7 = M7 * M1 := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 9) M1.operators M7.operators)) =
-        ({0, 1} : Finset (Fin 9)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, M1, M7,
-        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
-  simp [hfilter]
-
-private lemma M1_comm_M8 : M1 * M8 = M8 * M1 := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 9) M1.operators M8.operators)) =
-        (∅ : Finset (Fin 9)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, M1, M8,
-        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
-  simp [hfilter]
-
-private lemma M2_comm_M7 : M2 * M7 = M7 * M2 := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 9) M2.operators M7.operators)) =
-        ({1, 2} : Finset (Fin 9)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, M2, M7,
-        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
-  simp [hfilter]
-
-private lemma M2_comm_M8 : M2 * M8 = M8 * M2 := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 9) M2.operators M8.operators)) =
-        (∅ : Finset (Fin 9)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, M2, M8,
-        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
-  simp [hfilter]
-
-private lemma M3_comm_M7 : M3 * M7 = M7 * M3 := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 9) M3.operators M7.operators)) =
-        ({3, 4} : Finset (Fin 9)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, M3, M7,
-        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
-  simp [hfilter]
-
-private lemma M3_comm_M8 : M3 * M8 = M8 * M3 := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 9) M3.operators M8.operators)) =
-        ({3, 4} : Finset (Fin 9)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, M3, M8,
-        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
-  simp [hfilter]
-
-private lemma M4_comm_M7 : M4 * M7 = M7 * M4 := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 9) M4.operators M7.operators)) =
-        ({4, 5} : Finset (Fin 9)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, M4, M7,
-        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
-  simp [hfilter]
-
-private lemma M4_comm_M8 : M4 * M8 = M8 * M4 := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 9) M4.operators M8.operators)) =
-        ({4, 5} : Finset (Fin 9)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, M4, M8,
-        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
-  simp [hfilter]
-
-private lemma M5_comm_M7 : M5 * M7 = M7 * M5 := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 9) M5.operators M7.operators)) =
-        (∅ : Finset (Fin 9)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, M5, M7,
-        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
-  simp [hfilter]
-
-private lemma M5_comm_M8 : M5 * M8 = M8 * M5 := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 9) M5.operators M8.operators)) =
-        ({6, 7} : Finset (Fin 9)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, M5, M8,
-        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
-  simp [hfilter]
-
-private lemma M6_comm_M7 : M6 * M7 = M7 * M6 := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 9) M6.operators M7.operators)) =
-        (∅ : Finset (Fin 9)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, M6, M7,
-        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
-  simp [hfilter]
-
-private lemma M6_comm_M8 : M6 * M8 = M8 * M6 := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (n := 9) M6.operators M8.operators)) =
-        ({7, 8} : Finset (Fin 9)) := by
-    ext i; fin_cases i <;>
-      simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt, M6, M8,
-        NQubitPauliOperator.set, NQubitPauliOperator.identity, PauliOperator.mulOp]
-  simp [hfilter]
-
-lemma ZGenerators_commute_XGenerators :
-    ∀ z ∈ ZGenerators, ∀ x ∈ XGenerators, z * x = x * z := by
-  classical
-  intro z hz x hx
-  rcases (by simpa [ZGenerators] using hz) with rfl | rfl | rfl | rfl | rfl | rfl <;>
-    rcases (by simpa [XGenerators] using hx) with rfl | rfl
-  · exact M1_comm_M7
-  · exact M1_comm_M8
-  · exact M2_comm_M7
-  · exact M2_comm_M8
-  · exact M3_comm_M7
-  · exact M3_comm_M8
-  · exact M4_comm_M7
-  · exact M4_comm_M8
-  · exact M5_comm_M7
-  · exact M5_comm_M8
-  · exact M6_comm_M7
-  · exact M6_comm_M8
-
-/-!
-## Commutation: generators commute pairwise
-
-We organize this by cases:
-- Z/Z commute (componentwise, since only I/Z appear)
-- X/X commute (componentwise, since only I/X appear)
-- Z/X commute (lemma above)
--/
-
-private lemma ZType_commutes {g h : NQubitPauliGroupElement 9}
-    (hg : NQubitPauliGroupElement.IsZTypeElement g)
-    (hh : NQubitPauliGroupElement.IsZTypeElement h) :
-    g * h = h * g := by
-  exact CSSCommutationLemmas.ZType_commutes hg hh
-
-private lemma XType_commutes {g h : NQubitPauliGroupElement 9}
-    (hg : NQubitPauliGroupElement.IsXTypeElement g)
-    (hh : NQubitPauliGroupElement.IsXTypeElement h) :
-    g * h = h * g := by
-  exact CSSCommutationLemmas.XType_commutes hg hh
-
+/-- All eight generators pairwise commute. -/
 theorem generators_commute :
-    ∀ g ∈ generators, ∀ h ∈ generators, g * h = h * g := by
-  classical
-  intro g hg h hh
-  have hg' : g ∈ ZGenerators ∨ g ∈ XGenerators := by simpa [generators] using hg
-  have hh' : h ∈ ZGenerators ∨ h ∈ XGenerators := by simpa [generators] using hh
-  rcases hg' with hgZ | hgX <;> rcases hh' with hhZ | hhX
-  · exact ZType_commutes (ZGenerators_are_ZType g hgZ) (ZGenerators_are_ZType h hhZ)
-  · exact ZGenerators_commute_XGenerators g hgZ h hhX
-  · simpa using (ZGenerators_commute_XGenerators h hhZ g hgX).symm
-  · exact XType_commutes (XGenerators_are_XType g hgX) (XGenerators_are_XType h hhX)
+    ∀ g ∈ listToSet generatorsList, ∀ h ∈ listToSet generatorsList, g * h = h * g := by
+  decide
+
+/-- Every generator has phase power 0. -/
+lemma AllPhaseZero_generatorsList : AllPhaseZero generatorsList := by
+  decide
+
+/-- The check-matrix rows of the eight generators are linearly independent.
+Eight rows on nine qubits is the largest instance among the small codes, and
+plain `decide` runs out of heartbeats on it, so the check is handed straight to
+the kernel. -/
+theorem rowsLinearIndependent_generatorsList :
+    rowsLinearIndependent generatorsList := by decide +kernel
+
+/-- The Shor generator list is an independent generating set. -/
+theorem GeneratorsIndependent_9_generatorsList : GeneratorsIndependent 9 generatorsList :=
+  GeneratorsIndependent_of_rowsLinearIndependent rowsLinearIndependent_generatorsList
 
 /-!
 ## `-I` is not in the Shor-9 stabilizer subgroup
 -/
 
+/-- The closure of the eight generators does not contain −I. -/
 theorem negIdentity_not_mem :
-    negIdentity 9 ∉ subgroup := by
-  have hZX : ∀ z ∈ ZGenerators, ∀ x ∈ XGenerators, z * x = x * z :=
-    ZGenerators_commute_XGenerators
-  simpa [subgroup, generators] using
-    (CSS.negIdentity_not_mem_closure_union (n := 9) ZGenerators XGenerators
-      ZGenerators_are_ZType XGenerators_are_XType hZX)
+    negIdentity 9 ∉ Subgroup.closure (listToSet generatorsList) :=
+  negIdentity_not_mem_of_indep_phase_zero_commute generatorsList
+    AllPhaseZero_generatorsList rowsLinearIndependent_generatorsList generators_commute
 
 /-!
-## Bundled `StabilizerGroup 9`
+## Bundled `StabilizerGroup 9` and `Code[[9, 1]]`
 -/
 
+/-- Shor's code as `StabilizerGroup 9` (canonical: from generator list). -/
 noncomputable def stabilizerGroup : StabilizerGroup 9 :=
-{ toSubgroup := subgroup
-, is_abelian := by
-    intro g h hg hh
-    have hcomm :=
-      Subgroup.abelian_closure_of_pairwise_commute (G := NQubitPauliGroupElement 9)
-        generators generators_commute
-    simpa [subgroup] using hcomm g (by simpa [subgroup] using hg) h (by simpa [subgroup] using hh)
-, no_neg_identity := by
-    simpa using negIdentity_not_mem }
+  mkStabilizerFromGenerators 9 generatorsList generators_commute negIdentity_not_mem
+
+/-- The stabilizer subgroup is the closure of the generator list. -/
+lemma stabilizerGroup_toSubgroup_eq :
+    stabilizerGroup.toSubgroup = Subgroup.closure (listToSet generatorsList) := rfl
+
+/-- Shor's code as a stabilizer code [[9, 1]]: eight independent generators on
+nine qubits, hence one logical qubit. -/
+noncomputable def stabilizerCode : Code[[9, 1]] where
+  hk := by decide
+  generatorsList := generatorsList
+  generators_length := rfl
+  generators_phaseZero := AllPhaseZero_generatorsList
+  generators_independent := GeneratorsIndependent_9_generatorsList
+  generators_commute := generators_commute
+  closure_no_neg_identity := negIdentity_not_mem
 
 end Shor9
 end StabilizerGroup
 
 end Quantum
-

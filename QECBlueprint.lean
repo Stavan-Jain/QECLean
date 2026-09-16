@@ -819,10 +819,10 @@ attribute [blueprint "def:steane7"
 
 attribute [blueprint "def:shor9"
   (title := /-- The Shor $[[9,1,3]]$ code -/)
-  (statement := /-- The stabilizer group of the nine-qubit Shor code, a
+  (statement := /-- The nine-qubit Shor code as a $[[9,1]]$ stabilizer code, a
     repetition code of cat states — historically the first quantum
     error-correcting code. -/)]
-  Quantum.StabilizerGroup.Shor9.subgroup
+  Quantum.StabilizerGroup.Shor9.stabilizerCode
 
 attribute [blueprint "def:five-qubit"
   (title := /-- The $[[5,1,3]]$ code -/)
