@@ -74,15 +74,15 @@ subgroup. -/
 lemma transversalSwapXZ_mem_subgroup
     (g : NQubitPauliGroupElement 7) (hg : g ∈ generatorsList) :
     (⟨g.phasePower, NQubitPauliOperator.transversalSwapXZ g.operators⟩ :
-      NQubitPauliGroupElement 7) ∈ subgroup := by
+      NQubitPauliGroupElement 7) ∈ stabilizerGroup.toSubgroup := by
   obtain ⟨hZ1, hZ2, hZ3, hX1, hX2, hX3⟩ := swapXZ_element_swaps_generators
-  change swapXZ_element g ∈ subgroup
+  change swapXZ_element g ∈ stabilizerGroup.toSubgroup
+  rw [stabilizerGroup_toSubgroup_eq]
   rcases (by simpa [generatorsList] using hg) with
     (rfl | rfl | rfl | rfl | rfl | rfl)
   all_goals
-    unfold subgroup
     refine Subgroup.subset_closure ?_
-    simp [generators, ZGenerators, XGenerators, hZ1, hZ2, hZ3, hX1, hX2, hX3]
+    simp [generatorsList, hZ1, hZ2, hZ3, hX1, hX2, hX3]
 
 /-- Conjugating a Pauli group element (no Y) by transversal H gives the swapXZ
 element (U P U†). -/
@@ -102,8 +102,8 @@ lemma transversalH_conjugates_stabilizer_to_stabilizer (g : NQubitPauliGroupElem
       transversalH_Steane7.val * g.toMatrix * star transversalH_Steane7.val = g'.toMatrix := by
   have hS :
       stabilizerGroup.toSubgroup =
-        Subgroup.closure (NQubitPauliGroupElement.listToSet generatorsList) := by
-    simp [stabilizerGroup_toSubgroup_eq, subgroup, listToSet_generatorsList]
+        Subgroup.closure (NQubitPauliGroupElement.listToSet generatorsList) :=
+    stabilizerGroup_toSubgroup_eq
   have hgen :
       ∀ x ∈ NQubitPauliGroupElement.listToSet generatorsList,
         ∃ x' ∈ stabilizerGroup.toSubgroup, conjByGate transversalH_Steane7 x.gate = x'.gate := by
@@ -111,7 +111,7 @@ lemma transversalH_conjugates_stabilizer_to_stabilizer (g : NQubitPauliGroupElem
     have hxList : x ∈ generatorsList := by
       simpa [NQubitPauliGroupElement.listToSet] using hx
     refine ⟨swapXZ_element x, ?_, ?_⟩
-    · simpa [stabilizerGroup_toSubgroup_eq] using transversalSwapXZ_mem_subgroup x hxList
+    · exact transversalSwapXZ_mem_subgroup x hxList
     · apply Subtype.ext
       simpa [conjByGate_val, NQubitPauliGroupElement.gate_val] using
         transversalH_conjugates_element x (generators_no_Y x hxList)
@@ -130,15 +130,15 @@ theorem transversalH_Steane7_isLogicalGate :
     IsLogicalGate transversalH_Steane7 stabilizerGroup := by
   have hS :
       stabilizerGroup.toSubgroup =
-        Subgroup.closure (NQubitPauliGroupElement.listToSet generatorsList) := by
-    simp [stabilizerGroup_toSubgroup_eq, subgroup, listToSet_generatorsList]
+        Subgroup.closure (NQubitPauliGroupElement.listToSet generatorsList) :=
+    stabilizerGroup_toSubgroup_eq
   refine isLogicalGate_of_generator_set_conjugation transversalH_Steane7 stabilizerGroup
     (NQubitPauliGroupElement.listToSet generatorsList) hS ?_
   intro x hx
   have hxList : x ∈ generatorsList := by
     simpa [NQubitPauliGroupElement.listToSet] using hx
   refine ⟨swapXZ_element x, ?_, ?_⟩
-  · simpa [stabilizerGroup_toSubgroup_eq] using transversalSwapXZ_mem_subgroup x hxList
+  · exact transversalSwapXZ_mem_subgroup x hxList
   · apply Subtype.ext
     simpa [conjByGate_val, NQubitPauliGroupElement.gate_val] using
       transversalH_conjugates_element x (generators_no_Y x hxList)
@@ -190,7 +190,8 @@ Conjugation is U P U† (adjoint on the right). S† on each qubit fixes Z and s
 X to Y. Z-generators are fixed; X-generators go to X*Z (in the stabilizer).
 -/
 
-lemma transversalS_conjugates_Z_generator (g : NQubitPauliGroupElement 7) (hg : g ∈ ZGenerators) :
+lemma transversalS_conjugates_Z_generator (g : NQubitPauliGroupElement 7)
+    (hg : g ∈ ({Z1, Z2, Z3} : Set (NQubitPauliGroupElement 7))) :
     transversalS_Steane7.val * g.toMatrix * star transversalS_Steane7.val = g.toMatrix := by
   have hZ : ∀ i, g.operators i = .Z ∨ g.operators i = .I := by
     rcases hg with rfl | rfl | rfl <;> intro i <;> fin_cases i <;> decide
@@ -202,7 +203,7 @@ lemma transversalS_conjugates_Z_generator (g : NQubitPauliGroupElement 7) (hg : 
 
 /-- Gate-level version: transversal `inv_S` fixes each Steane Z-generator. -/
 lemma transversalS_conjugates_Z_generator_gate
-    (g : NQubitPauliGroupElement 7) (hg : g ∈ ZGenerators) :
+    (g : NQubitPauliGroupElement 7) (hg : g ∈ ({Z1, Z2, Z3} : Set (NQubitPauliGroupElement 7))) :
     conjByGate transversalS_Steane7 g.gate = g.gate := by
   apply Subtype.ext
   simpa [conjByGate_val, NQubitPauliGroupElement.gate_val] using
@@ -286,8 +287,8 @@ theorem transversalS_Steane7_isLogicalGate :
     IsLogicalGate transversalS_Steane7 stabilizerGroup := by
   have hS :
       stabilizerGroup.toSubgroup =
-        Subgroup.closure (NQubitPauliGroupElement.listToSet generatorsList) := by
-    simp [stabilizerGroup_toSubgroup_eq, subgroup, listToSet_generatorsList]
+        Subgroup.closure (NQubitPauliGroupElement.listToSet generatorsList) :=
+    stabilizerGroup_toSubgroup_eq
   have hmemGen : ∀ x ∈ generatorsList, x ∈ stabilizerGroup.toSubgroup := fun x hx =>
     hS ▸ Subgroup.subset_closure (by simpa [NQubitPauliGroupElement.listToSet] using hx)
   refine isLogicalGate_of_generator_set_conjugation transversalS_Steane7 stabilizerGroup
@@ -301,13 +302,13 @@ theorem transversalS_Steane7_isLogicalGate :
   rcases hxCases with (rfl | rfl | rfl | rfl | rfl | rfl)
   · refine ⟨Z1, hmemGen Z1 (by simp [generatorsList]), ?_⟩
     simpa [transversalS_Steane7] using
-      transversalS_conjugates_Z_generator_gate Z1 (by simp [ZGenerators])
+      transversalS_conjugates_Z_generator_gate Z1 (by simp)
   · refine ⟨Z2, hmemGen Z2 (by simp [generatorsList]), ?_⟩
     simpa [transversalS_Steane7] using
-      transversalS_conjugates_Z_generator_gate Z2 (by simp [ZGenerators])
+      transversalS_conjugates_Z_generator_gate Z2 (by simp)
   · refine ⟨Z3, hmemGen Z3 (by simp [generatorsList]), ?_⟩
     simpa [transversalS_Steane7] using
-      transversalS_conjugates_Z_generator_gate Z3 (by simp [ZGenerators])
+      transversalS_conjugates_Z_generator_gate Z3 (by simp)
   · refine ⟨X1 * Z1, ?_, ?_⟩
     · exact Subgroup.mul_mem _ (hmemGen X1 (by simp [generatorsList]))
         (hmemGen Z1 (by simp [generatorsList]))

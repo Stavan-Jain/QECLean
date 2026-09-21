@@ -1,14 +1,12 @@
 import Mathlib.Tactic
 import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
 import QEC.Stabilizer.Framework.Core.Stabilizer.SubgroupLemmas
-import QEC.Stabilizer.Framework.Core.CSS.CSSPredicates
-import QEC.Stabilizer.Framework.Core.CSS.CSSNoNegI
 import QEC.Stabilizer.Framework.Core.Stabilizer.Centralizer
-import QEC.Stabilizer.Framework.Core.CSS.CSSCommutationLemmas
 import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
 import QEC.Stabilizer.Framework.Core.CSS.CSSDistance
 import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
 import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
+import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
 import QEC.Stabilizer.Foundations.PauliGroup.Commutation
 import QEC.Stabilizer.Foundations.PauliGroup.CommutationTactics
 import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
@@ -46,9 +44,18 @@ giving logical operators
 X̄₁ = IXIX,  X̄₂ = IIXX,  Z̄₁ = IIZZ,  Z̄₂ = IZIZ.
 ```
 
-This file is a **Stage-2 skeleton**: every theorem ends in a `sorry` tagged
-`TODO(stab_4_2_2-T<n>): …`. Stage 4 closes them following the Steane7 template,
-scaled down to 4 qubits and adapted for k = 2.
+The code is packaged by the **decide route**: the two generators form a literal
+list, and pairwise commutation, phase zero and check-matrix independence are
+closed statements settled by `decide`; `−I ∉ closure` follows by
+`negIdentity_not_mem_of_indep_phase_zero_commute`.
+
+## Outline
+
+- Generators `Z1`, `X1` and the list `generatorsList`
+- Decided hypotheses, `negIdentity_not_mem`, the bundled `stabilizerGroup`
+- The four logical operators, their (anti)commutation, centralizer membership
+- `StabilizerCode 4 2` + `StabilizerCodeWithLogicals 4 2`
+- Distance 2 (weight-1 anti-witness against `ZZZZ` / `XXXX`)
 -/
 
 open NQubitPauliGroupElement
@@ -61,153 +68,52 @@ def Z1 : NQubitPauliGroupElement 4 := σ[ZZZZ]
 /-- X-check stabilizer: `XXXX` (X on every qubit). -/
 def X1 : NQubitPauliGroupElement 4 := σ[XXXX]
 
-/-- The single Z-check generator. -/
-def ZGenerators : Set (NQubitPauliGroupElement 4) :=
-  {Z1}
-
-/-- The single X-check generator. -/
-def XGenerators : Set (NQubitPauliGroupElement 4) :=
-  {X1}
-
-/-- The full generator set: one Z-check and one X-check. -/
-def generators : Set (NQubitPauliGroupElement 4) :=
-  ZGenerators ∪ XGenerators
-
-/-- The [[4, 2, 2]] stabilizer subgroup: closure of `{ZZZZ, XXXX}`. -/
-noncomputable def subgroup : Subgroup (NQubitPauliGroupElement 4) :=
-  Subgroup.closure generators
-
-/-! ## Typing facts: Z-type / X-type generators -/
-
-/-- The Z-generator is Z-type (I or Z on every qubit). -/
-lemma ZGenerators_are_ZType :
-    ∀ g, g ∈ ZGenerators → NQubitPauliGroupElement.IsZTypeElement g := by
-  classical
-  intro g hg
-  rcases (by simpa [ZGenerators] using hg) with rfl
-  refine ⟨rfl, ?_⟩
-  intro i
-  fin_cases i <;>
-    simp [PauliOperator.IsZType, Z1, NQubitPauliOperator.set]
-
-/-- The X-generator is X-type (I or X on every qubit). -/
-lemma XGenerators_are_XType :
-    ∀ g, g ∈ XGenerators → NQubitPauliGroupElement.IsXTypeElement g := by
-  classical
-  intro g hg
-  rcases (by simpa [XGenerators] using hg) with rfl
-  refine ⟨rfl, ?_⟩
-  intro i
-  fin_cases i <;>
-    simp [PauliOperator.IsXType, X1, NQubitPauliOperator.set]
-
-/-! ## Cross-commutation: Z generators commute with X generators
-
-`ZZZZ` and `XXXX` overlap at all 4 qubits, so they anticommute pairwise at all 4
-positions — count is 4 (even) ⇒ commute. -/
-
-private lemma Z1_comm_X1 : Z1 * X1 = X1 * Z1 := by
-  classical
-  pauli_comm_even_anticommutes
-  let p := NQubitPauliGroupElement.anticommutesAt (n := 4) Z1.operators X1.operators
-  have hfilter : (Finset.univ.filter p) = ({0, 1, 2, 3} : Finset (Fin 4)) := by
-    ext i; fin_cases i <;>
-      simp [p, NQubitPauliGroupElement.anticommutesAt, Z1, X1, NQubitPauliOperator.set,
-        PauliOperator.mulOp]
-  rw [hfilter]; decide
-
-/-- The unique Z-generator commutes with the unique X-generator (the only cross
-case for this CSS code). -/
-lemma ZGenerators_commute_XGenerators :
-    ∀ z ∈ ZGenerators, ∀ x ∈ XGenerators, z * x = x * z := by
-  classical
-  intro z hz x hx
-  rcases (by simpa [ZGenerators] using hz) with rfl
-  rcases (by simpa [XGenerators] using hx) with rfl
-  exact Z1_comm_X1
-
-/-! ## Pairwise commutation of all generators -/
-
-private lemma ZType_commutes {g h : NQubitPauliGroupElement 4}
-    (hg : NQubitPauliGroupElement.IsZTypeElement g)
-    (hh : NQubitPauliGroupElement.IsZTypeElement h) :
-    g * h = h * g :=
-  CSSCommutationLemmas.ZType_commutes hg hh
-
-private lemma XType_commutes {g h : NQubitPauliGroupElement 4}
-    (hg : NQubitPauliGroupElement.IsXTypeElement g)
-    (hh : NQubitPauliGroupElement.IsXTypeElement h) :
-    g * h = h * g :=
-  CSSCommutationLemmas.XType_commutes hg hh
-
-/-- All generators of the [[4, 2, 2]] code pairwise commute. -/
-theorem generators_commute :
-    ∀ g ∈ generators, ∀ h ∈ generators, g * h = h * g := by
-  classical
-  intro g hg h hh
-  have hg' : g ∈ ZGenerators ∨ g ∈ XGenerators := by simpa [generators] using hg
-  have hh' : h ∈ ZGenerators ∨ h ∈ XGenerators := by simpa [generators] using hh
-  rcases hg' with hgZ | hgX <;> rcases hh' with hhZ | hhX
-  · exact ZType_commutes (ZGenerators_are_ZType g hgZ) (ZGenerators_are_ZType h hhZ)
-  · exact ZGenerators_commute_XGenerators g hgZ h hhX
-  · simpa using (ZGenerators_commute_XGenerators h hhZ g hgX).symm
-  · exact XType_commutes (XGenerators_are_XType g hgX) (XGenerators_are_XType h hhX)
-
-/-! ## No `-I` in the stabilizer subgroup -/
-
-/-- The [[4, 2, 2]] stabilizer subgroup does not contain `-I` (CSS argument). -/
-theorem negIdentity_not_mem :
-    negIdentity 4 ∉ subgroup := by
-  have hZX : ∀ z ∈ ZGenerators, ∀ x ∈ XGenerators, z * x = x * z :=
-    ZGenerators_commute_XGenerators
-  simpa [subgroup, generators] using
-    (CSS.negIdentity_not_mem_closure_union (n := 4) ZGenerators XGenerators
-      ZGenerators_are_ZType XGenerators_are_XType hZX)
-
-/-! ## Generator list & symplectic-side independence -/
-
 /-- The generator list (canonical order: Z-check first, then X-check). -/
 def generatorsList : List (NQubitPauliGroupElement 4) :=
   [Z1, X1]
 
-/-- The generator list and the generator set agree. -/
-lemma listToSet_generatorsList :
-    NQubitPauliGroupElement.listToSet generatorsList = generators := by
-  simp only [generatorsList, generators, ZGenerators, XGenerators,
-    NQubitPauliGroupElement.listToSet_cons, NQubitPauliGroupElement.listToSet_nil]
-  ext g
-  simp only [Set.mem_insert_iff, Set.mem_union, Set.mem_singleton_iff, Set.mem_empty_iff_false,
-    or_false]
+/-! ## Decided hypotheses
+
+`ZZZZ` and `XXXX` overlap at all 4 qubits, so they anticommute pairwise at all 4
+positions — count is 4 (even) ⇒ commute. `decide` checks the four ordered
+pairs, the phases, and the check-matrix rank. -/
+
+/-- All generators of the [[4, 2, 2]] code pairwise commute. -/
+theorem generators_commute :
+    ∀ g ∈ listToSet generatorsList, ∀ h ∈ listToSet generatorsList, g * h = h * g := by
+  decide
 
 /-- All generators have phase 0 (no `i` or `−1` factor). -/
-lemma AllPhaseZero_generatorsList :
-    NQubitPauliGroupElement.AllPhaseZero generatorsList := by
-  rw [generatorsList, NQubitPauliGroupElement.AllPhaseZero_cons]
-  exact ⟨rfl, (NQubitPauliGroupElement.AllPhaseZero_cons _ _).mpr
-    ⟨rfl, NQubitPauliGroupElement.AllPhaseZero_nil⟩⟩
+lemma AllPhaseZero_generatorsList : AllPhaseZero generatorsList := by
+  decide
 
 /-- The check-matrix rows of the two generators are linearly independent over
 ℤ/2. -/
 theorem rowsLinearIndependent_generatorsList :
-    NQubitPauliGroupElement.rowsLinearIndependent generatorsList := by decide
+    rowsLinearIndependent generatorsList := by decide
 
 /-- The generator list is an independent generating set. -/
 theorem GeneratorsIndependent_4_generatorsList :
     GeneratorsIndependent 4 generatorsList :=
   GeneratorsIndependent_of_rowsLinearIndependent rowsLinearIndependent_generatorsList
 
+/-! ## No `-I` in the stabilizer subgroup -/
+
+/-- The closure of the two generators does not contain `-I`. -/
+theorem negIdentity_not_mem :
+    negIdentity 4 ∉ Subgroup.closure (listToSet generatorsList) :=
+  negIdentity_not_mem_of_indep_phase_zero_commute generatorsList
+    AllPhaseZero_generatorsList rowsLinearIndependent_generatorsList generators_commute
+
 /-! ## Bundled `StabilizerGroup 4` -/
 
 /-- The [[4, 2, 2]] stabilizer group, from the generator list. -/
 noncomputable def stabilizerGroup : StabilizerGroup 4 :=
-  mkStabilizerFromGenerators 4 generatorsList
-    (by rw [listToSet_generatorsList]; exact generators_commute)
-    (by rw [listToSet_generatorsList]; exact negIdentity_not_mem)
+  mkStabilizerFromGenerators 4 generatorsList generators_commute negIdentity_not_mem
 
+/-- The stabilizer subgroup is the closure of the generator list. -/
 lemma stabilizerGroup_toSubgroup_eq :
-    stabilizerGroup.toSubgroup = subgroup := by
-  simp only [stabilizerGroup, mkStabilizerFromGenerators, subgroup]
-  rw [listToSet_generatorsList]
+    stabilizerGroup.toSubgroup = Subgroup.closure (listToSet generatorsList) := rfl
 
 /-! ## Logical operators
 
@@ -374,54 +280,46 @@ private lemma logicalZ_2_commutes_X1 : logicalZ_2 * X1 = X1 * logicalZ_2 := by
 overlap at qubits 1, 3; vs. `XXXX` all X — both commute). -/
 theorem logicalX_1_mem_centralizer :
     logicalX_1 ∈ centralizer stabilizerGroup := by
-  rw [StabilizerGroup.mem_centralizer_iff, stabilizerGroup_toSubgroup_eq, subgroup]
-  rw [Subgroup.forall_comm_closure_iff]
+  rw [StabilizerGroup.mem_centralizer_iff_closure _ _ _ stabilizerGroup_toSubgroup_eq]
   intro s hs
-  simp only [generators, Set.mem_union] at hs
-  rcases hs with hgZ | hgX
-  · rcases (by simpa [ZGenerators] using hgZ) with rfl
-    exact logicalX_1_commutes_Z1.symm
-  · rcases (by simpa [XGenerators] using hgX) with rfl
-    exact logicalX_1_commutes_X1.symm
+  simp only [generatorsList, listToSet_cons, listToSet_nil, Set.mem_insert_iff,
+    Set.mem_empty_iff_false, or_false] at hs
+  rcases hs with rfl | rfl
+  · exact logicalX_1_commutes_Z1.symm
+  · exact logicalX_1_commutes_X1.symm
 
 /-- `X̄₂ = IIXX` commutes with every element of the stabilizer. -/
 theorem logicalX_2_mem_centralizer :
     logicalX_2 ∈ centralizer stabilizerGroup := by
-  rw [StabilizerGroup.mem_centralizer_iff, stabilizerGroup_toSubgroup_eq, subgroup]
-  rw [Subgroup.forall_comm_closure_iff]
+  rw [StabilizerGroup.mem_centralizer_iff_closure _ _ _ stabilizerGroup_toSubgroup_eq]
   intro s hs
-  simp only [generators, Set.mem_union] at hs
-  rcases hs with hgZ | hgX
-  · rcases (by simpa [ZGenerators] using hgZ) with rfl
-    exact logicalX_2_commutes_Z1.symm
-  · rcases (by simpa [XGenerators] using hgX) with rfl
-    exact logicalX_2_commutes_X1.symm
+  simp only [generatorsList, listToSet_cons, listToSet_nil, Set.mem_insert_iff,
+    Set.mem_empty_iff_false, or_false] at hs
+  rcases hs with rfl | rfl
+  · exact logicalX_2_commutes_Z1.symm
+  · exact logicalX_2_commutes_X1.symm
 
 /-- `Z̄₁ = IIZZ` commutes with every element of the stabilizer. -/
 theorem logicalZ_1_mem_centralizer :
     logicalZ_1 ∈ centralizer stabilizerGroup := by
-  rw [StabilizerGroup.mem_centralizer_iff, stabilizerGroup_toSubgroup_eq, subgroup]
-  rw [Subgroup.forall_comm_closure_iff]
+  rw [StabilizerGroup.mem_centralizer_iff_closure _ _ _ stabilizerGroup_toSubgroup_eq]
   intro s hs
-  simp only [generators, Set.mem_union] at hs
-  rcases hs with hgZ | hgX
-  · rcases (by simpa [ZGenerators] using hgZ) with rfl
-    exact logicalZ_1_commutes_Z1.symm
-  · rcases (by simpa [XGenerators] using hgX) with rfl
-    exact logicalZ_1_commutes_X1.symm
+  simp only [generatorsList, listToSet_cons, listToSet_nil, Set.mem_insert_iff,
+    Set.mem_empty_iff_false, or_false] at hs
+  rcases hs with rfl | rfl
+  · exact logicalZ_1_commutes_Z1.symm
+  · exact logicalZ_1_commutes_X1.symm
 
 /-- `Z̄₂ = IZIZ` commutes with every element of the stabilizer. -/
 theorem logicalZ_2_mem_centralizer :
     logicalZ_2 ∈ centralizer stabilizerGroup := by
-  rw [StabilizerGroup.mem_centralizer_iff, stabilizerGroup_toSubgroup_eq, subgroup]
-  rw [Subgroup.forall_comm_closure_iff]
+  rw [StabilizerGroup.mem_centralizer_iff_closure _ _ _ stabilizerGroup_toSubgroup_eq]
   intro s hs
-  simp only [generators, Set.mem_union] at hs
-  rcases hs with hgZ | hgX
-  · rcases (by simpa [ZGenerators] using hgZ) with rfl
-    exact logicalZ_2_commutes_Z1.symm
-  · rcases (by simpa [XGenerators] using hgX) with rfl
-    exact logicalZ_2_commutes_X1.symm
+  simp only [generatorsList, listToSet_cons, listToSet_nil, Set.mem_insert_iff,
+    Set.mem_empty_iff_false, or_false] at hs
+  rcases hs with rfl | rfl
+  · exact logicalZ_2_commutes_Z1.symm
+  · exact logicalZ_2_commutes_X1.symm
 
 /-! ## StabilizerCode packaging [[4, 2]] -/
 
@@ -443,8 +341,8 @@ noncomputable def stabilizerCode : StabilizerCode 4 2 where
   generators_length := rfl
   generators_phaseZero := AllPhaseZero_generatorsList
   generators_independent := GeneratorsIndependent_4_generatorsList
-  generators_commute := by rw [listToSet_generatorsList]; exact generators_commute
-  closure_no_neg_identity := by rw [listToSet_generatorsList]; exact negIdentity_not_mem
+  generators_commute := generators_commute
+  closure_no_neg_identity := negIdentity_not_mem
 
 /-- The [[4, 2, 2]] code packaged with its logical basis `(X̄₁, Z̄₁)`,
 `(X̄₂, Z̄₂)` (`logicalX_1`/`logicalZ_1`, `logicalX_2`/`logicalZ_2`). -/
@@ -465,12 +363,10 @@ noncomputable def stabilizerCodeWithLogicals : StabilizerCodeWithLogicals 4 2 wh
 
 /-! ## Code distance = 2 -/
 
-/-- The stabilizer code subgroup is the closure of the (set-form) generators. -/
+/-- The stabilizer-code subgroup equals the closure of the generator list. -/
 private lemma stabilizerCode_toSubgroup_eq :
-    stabilizerCode.toStabilizerGroup.toSubgroup = Subgroup.closure generators := by
-  change (Subgroup.closure (NQubitPauliGroupElement.listToSet generatorsList) : _) =
-    Subgroup.closure generators
-  rw [listToSet_generatorsList]
+    stabilizerCode.toStabilizerGroup.toSubgroup = Subgroup.closure (listToSet generatorsList) :=
+  rfl
 
 /-- Helper: a weight-1 Pauli with local Pauli `P` at qubit `i` anticommutes with
 the all-Z stabilizer `Z1` provided `P ∈ {X, Y}` (the cases where Z anticommutes
@@ -514,23 +410,23 @@ anticommutes with either `ZZZZ` (when the local Pauli is X or Y) or `XXXX` (when
 the local Pauli is Z). -/
 private lemma weight_one_anticomm_witness :
     ∀ i : Fin 4, ∀ P : PauliOperator, P ≠ PauliOperator.I →
-      ∃ g ∈ generators, NQubitPauliGroupElement.Anticommute
+      ∃ g ∈ listToSet generatorsList, NQubitPauliGroupElement.Anticommute
         (weightOneAt i P) g := by
   intro i P hP
   match P, hP with
   | PauliOperator.X, _ =>
-    exact ⟨Z1, by simp [generators, ZGenerators], weightOneAt_anticomm_Z1 i _ (Or.inl rfl)⟩
+    exact ⟨Z1, by simp [generatorsList], weightOneAt_anticomm_Z1 i _ (Or.inl rfl)⟩
   | PauliOperator.Y, _ =>
-    exact ⟨Z1, by simp [generators, ZGenerators], weightOneAt_anticomm_Z1 i _ (Or.inr rfl)⟩
+    exact ⟨Z1, by simp [generatorsList], weightOneAt_anticomm_Z1 i _ (Or.inr rfl)⟩
   | PauliOperator.Z, _ =>
-    exact ⟨X1, by simp [generators, XGenerators], weightOneAt_Z_anticomm_X1 i⟩
+    exact ⟨X1, by simp [generatorsList], weightOneAt_Z_anticomm_X1 i⟩
   | PauliOperator.I, hP => exact (hP rfl).elim
 
 /-- The [[4, 2, 2]] code has distance 2: every weight-1 single-qubit Pauli
 anticommutes with at least one of `ZZZZ` or `XXXX`, and `X̄₁ = IXIX` is a
 nontrivial logical operator of weight exactly 2. -/
 theorem code_has_distance_two : HasCodeDistance stabilizerCode 2 :=
-  hasCodeDistance_two_of_anticommute_witness stabilizerCode generators
+  hasCodeDistance_two_of_anticommute_witness stabilizerCode (listToSet generatorsList)
     stabilizerCode_toSubgroup_eq weight_one_anticomm_witness
     ⟨logicalX_1, (logicalOps4_2_2 0).xOp_nontrivial, by decide⟩
 
