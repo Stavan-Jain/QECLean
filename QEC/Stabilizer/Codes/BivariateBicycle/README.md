@@ -12,12 +12,18 @@ per-module one-liner maps live in the umbrella docstrings (`Gross.lean`,
 
 | Dir | Code | Distance status |
 |---|---|---|
+| `Fractal/` | `[[2(4^s-1)^2, 2·4^s, d_s]]`, `s ≥ 1` | **Weight-six generating set; exact attained seed distance; `3^s ≤ 2s d_s`; strictly increasing and unbounded actual `kd²/n` on `s=16·4^t`, all kernel-proved** |
 | `Gross/` | gross `[[144,12,12]]` (base `[[72,12,6]]`) | **d = 12 unconditional, kernel-only** — axioms are exactly `propext`, `Classical.choice`, `Quot.sound`; no `native_decide`, no `sorry` (also re-derived through the parametric layer in `Gross/LayerInstance.lean`) |
 | `Z5Z15F2A6/` | `[[150,8,8]] → [[300,8,16]]` two-tier | in progress (A17 line; minimal starting skeleton to copy) |
 | `BaseFloors/` | class-member base floors (BB90, BB108, Z6Z14) | d ≥ 6 kernel-checked via `BBSmallCycle` (A15/A16 class theorem) |
 
 ## Task router
 
+- **Understand the unbounded weight-six family**: start with `Fractal.lean`,
+  then `Fractal/Family.lean` for the packaged growing family and
+  `Fractal/Code.lean` for exact code parameters. `d_s` is the actual attained
+  minimum of an explicit cyclic seed; the conjectural formula `3^s-1` is not
+  assumed. `Fractal/LowerBound.lean` supplies the proved exponential bound.
 - **Understand the gross d = 12 proof**: read `Gross.lean`'s docstring, then
   the spine in umbrella order (Defs → CRTFrame/CoverTransfer → DeckHomotopy →
   Witness → Assembly → BaseDistance → DangerousSector → SafeSector →
@@ -72,7 +78,7 @@ light orbits. The old confined-floor engine (`MImFloor`, `MImFloorData`,
 modules are deleted, not merely unused. Status changes belong HERE, not in
 module names.
 
-`Gross/` is now the only BB instance in this tree, and the whole tree is
+`Gross/` and the parametric `Fractal/` family are the active BB instances in this tree, and the whole tree is
 `native_decide`-free: the other instances (`Z5Z15F2A6/`, `BaseFloors/`) were
 the last `native_decide` holders here and have been parked — see below.
 
@@ -139,8 +145,10 @@ details (env, clobber guards, stale generators): `qec-lab:experiments/bb_lab/GEN
 
 ## Adding an instance
 
-Copy the shape of `Gross/` (complete, kernel-only) — the only instance in this
-tree; the parked `Z3Z6/` and `Z5Z15F2A6/` (branch `claude/z3z6-parked`) are
+For doubling arguments, copy the shape of `Gross/` (complete, kernel-only).
+For separable families, `Fractal/` demonstrates the direct dimension and
+distance route through `Framework/Homological/SeparableBB*` and automatic
+stabilizer packaging. The parked `Z3Z6/` and `Z5Z15F2A6/` (branch `claude/z3z6-parked`) are
 further worked examples:
 
 1. `mkdir <Name>/` + sibling `<Name>.lean` umbrella. Name = base group +
