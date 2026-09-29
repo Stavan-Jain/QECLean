@@ -22,17 +22,13 @@ floor (`chainWeight_lower_bound_transfers`), the stabilizer-weight floor,
 and the doubling-template bridge
 (`XDoubleCoverData.strongBaseFloor_of_smallCycle`).
 
-## Two discharge grades (A15 §T2 design)
+## Kernel-checked instance inputs
 
-The obligations are plain `Prop`s, so an instance can discharge them
-either by `native_decide` (engineering grade — what the generated
-`BaseFloors/` instances did before they were parked on branch
-`claude/z3z6-parked`; provenance
-`qec-lab:experiments/bb_lab/scripts/gen_base_floor_lean.py`) or, eventually, by
-the analytic class small-cycle theorem (A16 write-up of record), whose
-hypotheses (D1 ∧ D2 ∧ (iii) ∧ (a), floor-bearing frame) imply exactly
-these statements.  Both routes fit the same fields, so upgrading a member
-from engineering to analytic grade is invisible downstream.
+The obligations are plain `Prop`s. Discharge them with analytic proofs,
+`decide`, `decide +kernel`, or explicit certificates checked by a proved
+checker. Gross supplies its sparse and packed-mask certificates through
+`baseSmallCycleData`; the generic proof then supplies its base floor.
+The axiom audit enforces the same kernel-only requirement for every instance.
 
 ## Convention bridge (lab notes → repo)
 
@@ -55,7 +51,7 @@ open scoped BigOperators
 
 For an indicator chain `χ_S`, the boundary `∂₁(χ_S)(h)` is the `|S|`-term sum
 `syndAt A B S h` — far cheaper to evaluate than the convolution form during a
-`native_decide` sweep. The `SmallCycle` namespace keeps these generic helpers
+kernel-checked finite sweep. The `SmallCycle` namespace keeps these generic helpers
 clear of the instance-specific machinery of
 `Codes/BivariateBicycle/BaseDistance.lean` (which predates this layer). -/
 

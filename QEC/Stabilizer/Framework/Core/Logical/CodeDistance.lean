@@ -65,6 +65,23 @@ theorem hasCodeDistance_of (C : StabilizerCode n k) (d : ℕ)
     exact absurd hg_nontrivial (h_min (weight g) h1 h g rfl)
   · omega
 
+/-- A least logical weight transfers to a packaged code with the same
+stabilizer subgroup. This connects homological distance assemblies to
+`HasCodeDistance` without repeating the subgroup transport in each instance.
+-/
+theorem has_code_distance_of_isLeast (C : StabilizerCode n k)
+    {S : StabilizerGroup n} {d : ℕ}
+    (hS : C.toStabilizerGroup.toSubgroup = S.toSubgroup) (hd : 1 ≤ d)
+    (hleast : IsLeast {w : ℕ | ∃ g : NQubitPauliGroupElement n,
+      IsNontrivialLogicalOperator g S ∧ weight g = w} d) :
+    HasCodeDistance C d := by
+  refine ⟨hd, ?_, ?_⟩
+  · intro g hg _
+    exact hleast.2 ⟨g,
+      (IsNontrivialLogicalOperator_of_toSubgroup_eq g hS).mp hg, rfl⟩
+  · obtain ⟨g, hg, hw⟩ := hleast.1
+    exact ⟨g, (IsNontrivialLogicalOperator_of_toSubgroup_eq g hS).mpr hg, hw⟩
+
 /-!
 ## `StabilizerCodeWithDistance`: full `[[n, k, d]]` packaging
 

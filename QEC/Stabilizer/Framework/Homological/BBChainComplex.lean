@@ -238,6 +238,15 @@ lemma conv_comm (a b : G → ZMod 2) : a ⋆ b = b ⋆ a := by
     have : g - (g - h) = h := by simp
     rw [this, mul_comm]
 
+/-- Convolution with the zero chain on the left vanishes. -/
+lemma conv_zero_left (a : G → ZMod 2) : (0 : G → ZMod 2) ⋆ a = 0 := by
+  funext g
+  simp only [conv_apply, Pi.zero_apply, zero_mul, Finset.sum_const_zero]
+
+/-- Convolution with the zero chain on the right vanishes. -/
+lemma conv_zero_right (a : G → ZMod 2) : a ⋆ (0 : G → ZMod 2) = 0 := by
+  rw [conv_comm, conv_zero_left]
+
 /-- Convolution is associative. -/
 lemma conv_assoc (a b c : G → ZMod 2) : (a ⋆ b) ⋆ c = a ⋆ (b ⋆ c) := by
   funext g

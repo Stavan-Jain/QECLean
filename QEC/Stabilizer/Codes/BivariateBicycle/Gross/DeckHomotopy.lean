@@ -7,9 +7,10 @@ on homology.  The explicit homotopy chain is
 
   `z := (1 + x²) ⋆ B ⋆ v_R`
 
-and the computation `∂₂ z = v + σv` rests on two machine-certified polynomial
-identities, `B⋆B = 1 + x² + x⁴` and `(1 + x²)(1 + x² + x⁴) = 1 + x⁶`, plus the
-cycle condition.
+The generic `deckTrivial_of_bezout` theorem supplies the homotopy using
+`P = 0`, `Q = (1 + x²) ⋆ B`. Its certificate rests on two kernel-checked
+polynomial identities, `B⋆B = 1 + x² + x⁴` and
+`(1 + x²)(1 + x² + x⁴) = 1 + x⁶`, plus the cycle condition.
 
 ## Convention bridge (lab notes → repo)
 
@@ -24,6 +25,7 @@ so `∂₂ z = (1+x⁶)⋆v = v + σv` blockwise.
 -/
 
 import QEC.Stabilizer.Codes.BivariateBicycle.Gross.CoverTransfer
+import QEC.Stabilizer.Framework.Homological.BBDoubling
 
 namespace Quantum
 namespace Stabilizer
@@ -47,10 +49,20 @@ theorem onePlusX6_eq :
 
 theorem conv_onePlusX6 (v : GrossGroup → ZMod 2) :
     onePlusX6 ⋆ v = v + deckShift0 v := by
-  rw [onePlusX6_eq, conv_add_left, conv_single_left, conv_single_left]
-  funext g
-  simp only [Pi.add_apply, sub_zero, deckShift0_apply]
-  rw [sub_eq_add_neg, neg_deckS]
+  rw [onePlusX6_eq]
+  exact grossCoverData.conv_deckPoly_eq v
+
+/-- Gross's polynomial certificate for the generic Bézout homotopy. -/
+theorem gross_bezout :
+    (0 : GrossGroup → ZMod 2) ⋆ grossA
+      + (onePlusX2 ⋆ grossB) ⋆ grossB = grossCoverData.deckPoly := by
+  rw [conv_zero_left, zero_add, conv_assoc, gross_conv_B_B,
+    gross_conv_onePlusX2_Bsq, onePlusX6_eq]
+  rfl
+
+/-- The deck acts trivially on Gross homology by the generic Bézout theorem. -/
+theorem grossCoverData_deckTrivial : grossCoverData.DeckTrivialOnH1 :=
+  grossCoverData.deckTrivial_of_bezout 0 (onePlusX2 ⋆ grossB) gross_bezout
 
 /-! ## The homotopy chain -/
 
@@ -75,52 +87,26 @@ lemma cycle_conv_eq {v : GrossGroup × Fin 2 → ZMod 2}
 lemma conv_grossA_homotopyChain {v : GrossGroup × Fin 2 → ZMod 2}
     (hv : v ∈ grossComplex.cycles) :
     grossA ⋆ homotopyChain v = leftHalf v + deckShift0 (leftHalf v) := by
-  unfold homotopyChain
-  calc (grossA ⋆ (onePlusX2 ⋆ (grossB ⋆ rightHalf v)))
-      = (grossA ⋆ onePlusX2) ⋆ (grossB ⋆ rightHalf v) :=
-        (conv_assoc _ _ _).symm
-    _ = (onePlusX2 ⋆ grossA) ⋆ (grossB ⋆ rightHalf v) := by
-        rw [conv_comm grossA]
-    _ = onePlusX2 ⋆ (grossA ⋆ (grossB ⋆ rightHalf v)) :=
-        conv_assoc _ _ _
-    _ = onePlusX2 ⋆ ((grossA ⋆ grossB) ⋆ rightHalf v) := by
-        rw [conv_assoc]
-    _ = onePlusX2 ⋆ ((grossB ⋆ grossA) ⋆ rightHalf v) := by
-        rw [conv_comm grossA grossB]
-    _ = onePlusX2 ⋆ (grossB ⋆ (grossA ⋆ rightHalf v)) := by
-        rw [conv_assoc]
-    _ = onePlusX2 ⋆ (grossB ⋆ (grossB ⋆ leftHalf v)) := by
-        rw [cycle_conv_eq hv]
-    _ = onePlusX2 ⋆ ((grossB ⋆ grossB) ⋆ leftHalf v) := by
-        rw [conv_assoc]
-    _ = onePlusX2 ⋆ (bSquaredPoly ⋆ leftHalf v) := by
-        rw [gross_conv_B_B]
-    _ = (onePlusX2 ⋆ bSquaredPoly) ⋆ leftHalf v :=
-        (conv_assoc _ _ _).symm
-    _ = onePlusX6 ⋆ leftHalf v := by
-        rw [gross_conv_onePlusX2_Bsq]
-    _ = leftHalf v + deckShift0 (leftHalf v) := conv_onePlusX6 _
+  have h := grossCoverData.bezout_blockL 0 (onePlusX2 ⋆ grossB) gross_bezout
+    (leftHalf v) (rightHalf v)
+  have hcyc : grossB ⋆ leftHalf v + grossA ⋆ rightHalf v = 0 := hv
+  change leftHalf v + deckShift0 (leftHalf v)
+      + (onePlusX2 ⋆ grossB) ⋆ (grossB ⋆ leftHalf v + grossA ⋆ rightHalf v)
+    = grossA ⋆ ((0 : GrossGroup → ZMod 2) ⋆ leftHalf v
+      + (onePlusX2 ⋆ grossB) ⋆ rightHalf v) at h
+  simpa only [hcyc, conv_zero_right, add_zero, conv_zero_left, zero_add,
+    conv_assoc] using h.symm
 
 /-- `B ⋆ z = v_R + σ v_R`. -/
 lemma conv_grossB_homotopyChain (v : GrossGroup × Fin 2 → ZMod 2) :
     grossB ⋆ homotopyChain v = rightHalf v + deckShift0 (rightHalf v) := by
-  unfold homotopyChain
-  calc (grossB ⋆ (onePlusX2 ⋆ (grossB ⋆ rightHalf v)))
-      = (grossB ⋆ onePlusX2) ⋆ (grossB ⋆ rightHalf v) :=
-        (conv_assoc _ _ _).symm
-    _ = (onePlusX2 ⋆ grossB) ⋆ (grossB ⋆ rightHalf v) := by
-        rw [conv_comm grossB]
-    _ = onePlusX2 ⋆ (grossB ⋆ (grossB ⋆ rightHalf v)) :=
-        conv_assoc _ _ _
-    _ = onePlusX2 ⋆ ((grossB ⋆ grossB) ⋆ rightHalf v) := by
-        rw [conv_assoc]
-    _ = onePlusX2 ⋆ (bSquaredPoly ⋆ rightHalf v) := by
-        rw [gross_conv_B_B]
-    _ = (onePlusX2 ⋆ bSquaredPoly) ⋆ rightHalf v :=
-        (conv_assoc _ _ _).symm
-    _ = onePlusX6 ⋆ rightHalf v := by
-        rw [gross_conv_onePlusX2_Bsq]
-    _ = rightHalf v + deckShift0 (rightHalf v) := conv_onePlusX6 _
+  have h := grossCoverData.bezout_blockR 0 (onePlusX2 ⋆ grossB) gross_bezout
+    (leftHalf v) (rightHalf v)
+  change rightHalf v + deckShift0 (rightHalf v)
+      + (0 : GrossGroup → ZMod 2) ⋆ (grossB ⋆ leftHalf v + grossA ⋆ rightHalf v)
+    = grossB ⋆ ((0 : GrossGroup → ZMod 2) ⋆ leftHalf v
+      + (onePlusX2 ⋆ grossB) ⋆ rightHalf v) at h
+  simpa only [conv_zero_left, add_zero, zero_add, conv_assoc] using h.symm
 
 /-- `∂₂ z = v + σv` for any cycle `v`. -/
 theorem bbBoundary2Fn_homotopyChain {v : GrossGroup × Fin 2 → ZMod 2}
@@ -140,10 +126,8 @@ theorem bbBoundary2Fn_homotopyChain {v : GrossGroup × Fin 2 → ZMod 2}
 differs from `v` by a boundary; i.e. `σ` acts trivially on `H₁`. -/
 theorem deck_add_mem_boundaries {v : GrossGroup × Fin 2 → ZMod 2}
     (hv : v ∈ grossComplex.cycles) :
-    v + deckShift1 v ∈ grossComplex.boundaries := by
-  refine ⟨homotopyChain v, ?_⟩
-  change bbBoundary2Fn grossA grossB (homotopyChain v) = v + deckShift1 v
-  exact bbBoundary2Fn_homotopyChain hv
+    v + deckShift1 v ∈ grossComplex.boundaries :=
+  grossCoverData_deckTrivial v hv
 
 end BB
 end Homological
