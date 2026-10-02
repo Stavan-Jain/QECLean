@@ -6,11 +6,12 @@ hand-written file (every instance keeps its
 results in `Distance.lean` / `StabilizerCode.lean`). The inputs are
 discharged upstream: `MImBound` by `SafeFloor/MImAssembly.lean`
 (`LightStab.mimBound_holds`), `LightStabilizerClassification` by
-`LightStabClassify.lean`. See also `LayerInstance.lean` for the same
-distance re-derived through the parametric doubling layer.
+`LightStabClassify.lean`. `LayerInstance.lean` derives the distance through
+the parametric doubling layer; the results here transport that proof to the
+packaged stabilizer code.
 -/
 
-import QEC.Stabilizer.Codes.BivariateBicycle.Gross.SafeFloor.MImAssembly
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.LayerInstance
 
 namespace Quantum.Stabilizer.Homological.BB
 
@@ -19,11 +20,13 @@ namespace Quantum.Stabilizer.Homological.BB
 remaining assumed hypotheses. The last analytic input `MImBound` is discharged
 by `LightStab.mimBound_holds`; the `LightStabilizerClassification` input was
 discharged earlier by `LightStab.lightStabilizerClassification_holds`.
+The distance proof is `gross_pauli_distance_eq_12` from the generic layer.
 **Kernel-only**: the axioms are exactly `propext`, `Classical.choice` and
 `Quot.sound` — no `native_decide`, no `sorry`. -/
 theorem grossStabilizerCode_hasCodeDistance_12_uncond :
     Quantum.StabilizerGroup.HasCodeDistance grossStabilizerCode 12 :=
-  grossStabilizerCode_hasCodeDistance_12 LightStab.mimBound_holds
+  Quantum.StabilizerGroup.has_code_distance_of_isLeast grossStabilizerCode
+    grossStabilizerCode_toSubgroup_eq (by decide) gross_pauli_distance_eq_12
 
 /-- **The Gross `[[144, 12, 12]]` code as a fully-parametrized object.** Bundles
 the stabilizer code (`StabilizerCode 144 12`) with its now-unconditional

@@ -12,8 +12,8 @@ import QEC.Stabilizer.Codes.BivariateBicycle.Gross.StabilizerCode
 import QEC.Stabilizer.Codes.BivariateBicycle.Gross.LightStab
 import QEC.Stabilizer.Codes.BivariateBicycle.Gross.LightStabClassify
 import QEC.Stabilizer.Codes.BivariateBicycle.Gross.SafeFloor
-import QEC.Stabilizer.Codes.BivariateBicycle.Gross.Distance
 import QEC.Stabilizer.Codes.BivariateBicycle.Gross.LayerInstance
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.Distance
 
 /-!
 # The gross `[[144,12,12]]` code — instance umbrella (proof spine)
@@ -24,16 +24,19 @@ Chain-level formalization of the gross bivariate-bicycle code and its
 - `Defs` — groups, polynomials, chain complexes, covering data
 - `CRTFrame` — the CRT layer frame (A4 §3): computable F₄, the group algebra
   `F₄[Z₂²]`, layer/torus coordinates, and the engine support-shape lemma
-- `CoverTransfer` — pushforward/pullback chain maps, exactness, weight identity
-- `DeckHomotopy` — the deck homotopy (R): `v + σv` bounds for every cycle `v`
+- `CoverTransfer` — `grossCoverData`, with transfer maps, exactness, and
+  weight identities from `BBCover`
+- `DeckHomotopy` — the Gross polynomial certificate for the generic Bézout
+  homotopy: `v + σv` bounds for every cycle `v`
 - `Witness` — the explicit weight-12 nontrivial cycle `τ(u*)`
 - `Assembly` — the conditional `d(gross) = 12`: sector dichotomy with the three
   analytic inputs (`BaseDistanceGe6`, `DangerousSectorGe12`, `SafeSectorGe12`)
-  as named hypotheses, the `b = 0` rung discharged, and the Pauli-level
-  corollaries
-- `BaseDistance` — `BaseDistanceGe6` discharged (small-cycle theorem,
-  verified-finite leaf) ⟹ **unconditional d(gross) ≥ 6**
-- `DangerousSector` — the slice identity, the m-rungs, and (M) modulo the
+  as aliases of the generic inputs; all assemblies use the logical-floor
+  doubling theorems
+- `BaseDistance` — `BaseDistanceGe6` discharged through `SmallCycleData`
+  with kernel-checked finite certificates ⟹ **unconditional d(gross) ≥ 6**
+- `DangerousSector` — generic slice and logical-floor rung applications,
+  Gross shape certificates, and (M) modulo the
   `LightStabilizerClassification` hypothesis
 - `SafeSector` — the Smith-coset reduction (from the deck homotopy (R)) of the
   safe sector to the single `MImBound` hypothesis; final assembly
@@ -46,14 +49,10 @@ Chain-level formalization of the gross bivariate-bicycle code and its
   classification, making `DangerousSectorGe12` unconditional
 - `SafeFloor/` — everything discharging `MImBound` (the safe-sector floor), all
   of it Tier-3 analytic; see `SafeFloor.lean`
+- `LayerInstance` — the unconditional chain and Pauli distances from the
+  generic logical-floor doubling assembly, with both sector inputs discharged
 - `Distance` — the capstones (`grossStabilizerCode_hasCodeDistance_12_uncond`,
-  `grossStabilizerCodeWithDistance`) in one hand-written file
-- `LayerInstance` — the gross ↔ bb72 cover packaged as
-  `grossCoverData : XDoubleCoverData`, and the unconditional `d(gross) = 12`
-  re-derived through the parametric doubling layer
-  (`gross_chain_distance_eq_12`, `gross_pauli_distance_eq_12`) with every layer
-  input discharged by the existing gross theorems — no `native_decide` leaf
-  re-run
+  `grossStabilizerCodeWithDistance`), packaging that same generic result
 
 Both CRT-engine inputs — `LightStabilizerClassification` (`LightStabClassify`)
 and `MImBound` (`SafeFloor/MImAssembly`) — are discharged, so the distance of

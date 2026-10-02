@@ -1520,35 +1520,13 @@ theorem grossStabilizerCode_logical_weight_ge_6
 `LightStab.lightStabilizerClassification_holds`; everything else — the packaging
 and the chain-level distance — is unconditional. `MImBound` itself is discharged
 in `MImAssembly` (`LightStab.mimBound_holds`); for the fully unconditional
-statement see `grossStabilizerCode_hasCodeDistance_12_uncond` there. -/
+statement see `grossStabilizerCode_hasCodeDistance_12_uncond` in
+`Distance.lean`. -/
 theorem grossStabilizerCode_hasCodeDistance_12 (hMim : MImBound) :
-    HasCodeDistance grossStabilizerCode 12 := by
-  have hleast := gross_pauli_distance_eq_12_of_engine
-    LightStab.lightStabilizerClassification_holds hMim
-  refine ⟨by norm_num, ?_, ?_⟩
-  · intro g hg _
-    exact hleast.2 ⟨g, (IsNontrivialLogicalOperator_of_toSubgroup_eq g
-      grossStabilizerCode_toSubgroup_eq).mp hg, rfl⟩
-  · obtain ⟨g, hg, hw⟩ := hleast.1
-    exact ⟨g, (IsNontrivialLogicalOperator_of_toSubgroup_eq g
-      grossStabilizerCode_toSubgroup_eq).mpr hg, hw⟩
-
-
--- TEMP AXIOM AUDIT (removed after check)
-#print axioms decoder_identity_X
-#print axioms decoder_identity_Z
-#print axioms cover
-#print axioms faceStabOf_mem_closure
-#print axioms vertexStabOf_mem_closure
-#print axioms keptCoords_nodup
-#print axioms keptCoords_get_not_dropSet
-#print axioms logXchain_cycle
-#print axioms logZchain_dualCycle
-#print axioms logChain_inner
-#print axioms closure_packaged_eq
-#print axioms rowsLinearIndependent_packaged
-#print axioms grossStabilizerCode
-#print axioms grossStabilizerCode_logical_weight_ge_6
-#print axioms grossStabilizerCode_hasCodeDistance_12
+    HasCodeDistance grossStabilizerCode 12 :=
+  has_code_distance_of_isLeast grossStabilizerCode
+    grossStabilizerCode_toSubgroup_eq (by decide)
+    (gross_pauli_distance_eq_12_of_engine
+      LightStab.lightStabilizerClassification_holds hMim)
 
 end Quantum.Stabilizer.Homological.BB

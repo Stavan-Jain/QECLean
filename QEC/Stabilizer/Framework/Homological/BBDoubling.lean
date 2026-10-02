@@ -195,7 +195,7 @@ lemma logicalFloor_of_strongBaseFloor {d : ℕ}
 /-! ## The homotopy (R) from a finite matrix certificate
 
 A chain homotopy `1 + σ = ∂₂ ∘ C + E ∘ ∂₁` certifies `DeckTrivialOnH1`. The
-hypothesis `hbasis` is a finite (`native_decide`-able) statement: the identity
+hypothesis `hbasis` is a finite, kernel-checkable statement: the identity
 on the `δ`-basis of 1-chains. The gross polynomial route
 (`homotopyChain v = (1+x²)⋆B⋆v_R` with `(1+x²)·B² = 1+x⁶`) is one concrete way
 to build such a homotopy; the matrix form also covers instances where no short

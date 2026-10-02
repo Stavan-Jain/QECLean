@@ -1,45 +1,24 @@
 /-
-# Phase 2 (tier 1): d(base) ≥ 6 — discharging `BaseDistanceGe6`
+# The bb72 base floor through the parametric small-cycle theorem
 
-The small-cycle theorem for the bb72 base complex, in its strong form:
-**every nonzero 1-cycle has weight ≥ 6** (A4 Theorem A).  Consequences
-assembled here:
+`baseSmallCycleData` supplies the finite obligations of `BBSmallCycle.lean`:
+odd polynomial augmentations and exclusion of normalized weight-two and
+weight-four cycles. The weight-four certificate uses the existing packed-Nat
+syndrome masks and perfect-hash membership refuter. All checks are verified
+by the kernel.
 
-* `base_distance_ge_6 : BaseDistanceGe6` — the Phase-1 hypothesis (A) is a
-  theorem;
-* `base_chain_distance_eq_6` — chain-level d(base) = 6 (Corollary A′; the
-  weight-6 witness is `u*` from `Witness.lean`);
-* **unconditional d(gross) ≥ 6** at the chain, dual-chain, and Pauli levels
-  (A4 Theorem B): the safe and nonzero-dangerous sectors bound by 6 via the
-  strong small-cycle theorem applied to `p(v)`, and the `b = 0` sector by 12
-  via the Phase-1 rung.
+Translation normalization, parity, and the deduction that every nonzero cycle
+has weight at least six are the generic `SmallCycleData` theorems. Gross's
+legacy helper names are compatibility wrappers. The generic cover theorem
+then gives the unconditional Gross floor of six; the tight base witness gives
+base distance exactly six.
 
-## Proof shape (tier 1: verified-finite leaf, analytic frame)
-
-Two analytic inputs are formalized here: the translation symmetry (`∂₁` is
-translation-equivariant, so any small cycle can be normalized to put a
-support point at group-origin) and **the parity lemma (PAR)** of A4 §4 —
-cycles have even weight, by applying the augmentation `ε` to the cycle
-condition (`ε(A) = ε(B) = 1`).  Parity kills all odd-weight supports, so
-the normalized finite sweep only covers `((0,0), b)` plus exactly 1 or 3
-further qubits — `2·(C(71,1) + C(71,3)) ≈ 1.2·10⁵` cases, swept by kernel
-`decide` (`smallCycleCheck_*`) with the boundary evaluated
-through the sparse syndrome form `syndAt` (the hand-proven bridge
-`bbBoundary1Fn_indicator` turns `∂₁(χ_S) = 0` into 36 few-term sums; the
-weight-4 sweep runs on packed-`Nat` syndrome masks with a perfect-hash
-membership refuter, bridged back through `termAt_eq_testBit`).
-Replacing this finite leaf with the per-split CRT-engine analysis of
-A4 §§3–4 (the fully analytic Theorem A) is the tier-2 upgrade; the
-statement `base_distance_ge_6` is already in its final form, so the
-upgrade is invisible downstream.
-
-## Convention bridge (lab notes → repo)
-
-Repo convention: `∂₂ f = (A⋆f | B⋆f)`, `∂₁ c = B⋆c_L + A⋆c_R`; cycle
-condition `B⋆v_L = A⋆v_R`.  **Repo-left = lab-right.**
+Repo convention: `∂₂ f = (A⋆f | B⋆f)`, `∂₁ c = B⋆c_L + A⋆c_R`.
+Repo-left is lab-right.
 -/
 
 import QEC.Stabilizer.Codes.BivariateBicycle.Gross.Assembly
+import QEC.Stabilizer.Framework.Homological.BBSmallCycle
 
 namespace Quantum
 namespace Stabilizer
@@ -53,19 +32,14 @@ open scoped BigOperators
 /-- A `ZMod 2` chain is the indicator function of its support. -/
 lemma eq_indicator_support {I : Type} [Fintype I] [DecidableEq I]
     (u : I → ZMod 2) :
-    u = fun p => if p ∈ (Finset.univ.filter fun q => u q ≠ 0) then 1 else 0 := by
-  have hdichot : ∀ a : ZMod 2, a ≠ 0 → a = 1 := by decide
-  funext p
-  by_cases h : u p = 0
-  · simp [h]
-  · simp [hdichot _ h]
+    u = fun p => if p ∈ (Finset.univ.filter fun q => u q ≠ 0) then 1 else 0 :=
+  SmallCycle.eq_indicator_support u
 
 /-- Translation preserves support size (1-chains over the base group). -/
 lemma card_support_translate1 (c : BaseGroup) (u : BaseGroup × Fin 2 → ZMod 2) :
     (Finset.univ.filter fun p => translate1 c u p ≠ 0).card
       = (Finset.univ.filter fun p => u p ≠ 0).card :=
-  card_filter_comp_equiv ((Equiv.addRight c).prodCongr (Equiv.refl (Fin 2)))
-    (fun p => u p ≠ 0)
+  SmallCycle.card_support_translate1 c u
 
 /-! ## The sparse syndrome form
 
@@ -83,110 +57,28 @@ def syndAt (S : Finset (BaseGroup × Fin 2)) (h : BaseGroup) : ZMod 2 :=
 
 /-- `∂₁` of a point mass, in either block. -/
 lemma bbBoundary1Fn_single_point (q : BaseGroup × Fin 2) (h : BaseGroup) :
-    bbBoundary1Fn baseA baseB (Pi.single q 1) h = termAt q h := by
-  obtain ⟨g, j⟩ := q
-  by_cases hj : j = 0
-  · subst hj
-    exact bbBoundary1Fn_single_left baseA baseB g h
-  · have hj1 : j = 1 := by omega
-    subst hj1
-    exact bbBoundary1Fn_single_right baseA baseB g h
+    bbBoundary1Fn baseA baseB (Pi.single q 1) h = termAt q h :=
+  SmallCycle.bbBoundary1Fn_single_point baseA baseB q h
 
 /-- Indicator of `insert` decomposes as indicator plus a point mass. -/
 lemma indicator_insert {I : Type} [DecidableEq I] (a : I) (S : Finset I)
     (ha : a ∉ S) :
     (fun p => if p ∈ insert a S then (1 : ZMod 2) else 0)
-      = (fun p => if p ∈ S then 1 else 0) + Pi.single a 1 := by
-  funext p
-  by_cases hp : p = a
-  · subst hp
-    simp [Finset.mem_insert, ha]
-  · simp [Finset.mem_insert, hp]
+      = (fun p => if p ∈ S then 1 else 0) + Pi.single a 1 :=
+  SmallCycle.indicator_insert a S ha
 
 /-- **The sparse-syndrome bridge**: on indicator chains, `∂₁` evaluates to
 `syndAt`. -/
 lemma bbBoundary1Fn_indicator (S : Finset (BaseGroup × Fin 2)) :
     ∀ h : BaseGroup,
       bbBoundary1Fn baseA baseB (fun q => if q ∈ S then 1 else 0) h
-        = syndAt S h := by
-  classical
-  induction S using Finset.induction with
-  | empty =>
-      intro h
-      have hzero : (fun q : BaseGroup × Fin 2 =>
-          if q ∈ (∅ : Finset (BaseGroup × Fin 2)) then (1 : ZMod 2) else 0)
-          = 0 := by
-        funext q
-        simp
-      rw [hzero]
-      simp [bbBoundary1Fn, leftHalf, rightHalf, conv_apply, syndAt]
-  | insert a S ha ih =>
-      intro h
-      rw [indicator_insert a S ha, bbBoundary1Fn_add, Pi.add_apply, ih h,
-        bbBoundary1Fn_single_point]
-      simp only [syndAt]
-      rw [Finset.sum_insert ha]
-      ring
-
-/-! ## The parity lemma (PAR)
-
-Every cycle has even weight: applying the augmentation `ε(w) = Σ_g w(g)` to
-`B⋆u_L + A⋆u_R = 0` gives `ε(u_L) + ε(u_R) = 0` since `ε(A) = ε(B) = 1`. This
-kills all odd-weight supports analytically, so the finite sweep below only needs
-the (normalized) weight-2 and weight-4 configurations. -/
+        = syndAt S h :=
+  SmallCycle.bbBoundary1Fn_indicator baseA baseB S
 
 /-- The augmentation is multiplicative on convolutions. -/
 lemma sum_conv {G : Type} [Fintype G] [AddCommGroup G] (a b : G → ZMod 2) :
-    ∑ g : G, (a ⋆ b) g = (∑ h : G, a h) * (∑ g : G, b g) := by
-  simp only [conv_apply]
-  rw [Finset.sum_comm]
-  rw [Finset.sum_mul]
-  refine Finset.sum_congr rfl fun h _ => ?_
-  rw [← Finset.mul_sum]
-  congr 1
-  exact Equiv.sum_comp (Equiv.subRight h) b
-
-/-- **(PAR)**: cycles of the base complex have zero total parity. -/
-lemma cycle_total_parity (u : BaseGroup × Fin 2 → ZMod 2)
-    (hcyc : bbBoundary1Fn baseA baseB u = 0) :
-    ∑ p : BaseGroup × Fin 2, u p = 0 := by
-  have h0 : ∑ g : BaseGroup, bbBoundary1Fn baseA baseB u g = 0 := by
-    rw [hcyc]
-    simp
-  have hexp : ∑ g : BaseGroup, bbBoundary1Fn baseA baseB u g
-      = (∑ h : BaseGroup, baseB h) * (∑ g : BaseGroup, leftHalf u g)
-        + (∑ h : BaseGroup, baseA h) * (∑ g : BaseGroup, rightHalf u g) := by
-    rw [show (fun g => bbBoundary1Fn baseA baseB u g)
-        = fun g => (baseB ⋆ leftHalf u) g + (baseA ⋆ rightHalf u) g
-      from rfl]
-    rw [Finset.sum_add_distrib, sum_conv, sum_conv]
-  have hA : (∑ h : BaseGroup, baseA h) = 1 := by decide +kernel
-  have hB : (∑ h : BaseGroup, baseB h) = 1 := by decide +kernel
-  rw [hexp, hA, hB, one_mul, one_mul] at h0
-  rw [Fintype.sum_prod_type]
-  calc ∑ g : BaseGroup, ∑ j : Fin 2, u (g, j)
-      = ∑ g : BaseGroup, (u (g, 0) + u (g, 1)) := by
-        refine Finset.sum_congr rfl fun g _ => ?_
-        exact Fin.sum_univ_two _
-    _ = (∑ g : BaseGroup, leftHalf u g) + (∑ g : BaseGroup, rightHalf u g) :=
-        Finset.sum_add_distrib
-    _ = 0 := h0
-
-/-- Cycles have even weight. -/
-lemma cycle_weight_even (u : BaseGroup × Fin 2 → ZMod 2)
-    (hcyc : bbBoundary1Fn baseA baseB u = 0) :
-    (Finset.univ.filter fun p => u p ≠ 0).card % 2 = 0 := by
-  have hdichot : ∀ a : ZMod 2, a ≠ 0 → a = 1 := by decide
-  have hcast : (((Finset.univ.filter fun p => u p ≠ 0).card : ℕ) : ZMod 2)
-      = ∑ p : BaseGroup × Fin 2, u p := by
-    rw [← Finset.sum_filter_ne_zero Finset.univ]
-    rw [Finset.sum_congr rfl fun p hp => hdichot (u p)
-      (Finset.mem_filter.mp hp).2]
-    rw [Finset.sum_const, nsmul_eq_mul, mul_one]
-  have h0 := cycle_total_parity u hcyc
-  rw [← hcast] at h0
-  have heven := ZMod.natCast_eq_zero_iff_even.mp h0
-  exact Nat.even_iff.mp heven
+    ∑ g : G, (a ⋆ b) g = (∑ h : G, a h) * (∑ g : G, b g) :=
+  SmallCycle.sum_conv a b
 
 /-! ## The normalized finite check
 
@@ -404,6 +296,46 @@ lemma smallCycleCheck_four : ∀ b : Fin 2, ∀ q₁ q₂ q₃ : BaseGroup × Fi
     apply sum_ne_zero_of_xor
     simpa only [Nat.testBit_xor] using hbit
 
+/-! ## The base as an instance of the small-cycle theorem -/
+
+/-- The bb72 base's kernel-checked inputs to the generic small-cycle theorem.
+The normalized checks reuse the existing sparse and packed-mask certificates.
+-/
+def baseSmallCycleData : SmallCycleData BaseGroup where
+  A := baseA
+  B := baseB
+  epsA := by decide +kernel
+  epsB := by decide +kernel
+  check_two := smallCycleCheck_two
+  check_four := smallCycleCheck_four
+
+/-- The generic small-cycle theorem supplies the strong base floor. -/
+theorem grossCoverData_strongBaseFloor : grossCoverData.StrongBaseFloor 6 :=
+  grossCoverData.strongBaseFloor_of_smallCycle baseSmallCycleData rfl rfl
+
+/-- The logical base floor used by the generic doubling arguments. -/
+theorem grossCoverData_logicalFloor : grossCoverData.LogicalFloor 6 :=
+  grossCoverData.logicalFloor_of_strongBaseFloor grossCoverData_strongBaseFloor
+
+/-! ## The parity lemma (PAR)
+
+Every cycle has even weight: applying the augmentation `ε(w) = Σ_g w(g)` to
+`B⋆u_L + A⋆u_R = 0` gives `ε(u_L) + ε(u_R) = 0` since `ε(A) = ε(B) = 1`. This
+kills all odd-weight supports analytically, so the finite certificates only need
+the (normalized) weight-2 and weight-4 configurations. -/
+
+/-- Cycles of the base complex have zero total parity. -/
+lemma cycle_total_parity (u : BaseGroup × Fin 2 → ZMod 2)
+    (hcyc : bbBoundary1Fn baseA baseB u = 0) :
+    ∑ p : BaseGroup × Fin 2, u p = 0 :=
+  baseSmallCycleData.cycle_total_parity u hcyc
+
+/-- Cycles of the base complex have even weight. -/
+lemma cycle_weight_even (u : BaseGroup × Fin 2 → ZMod 2)
+    (hcyc : bbBoundary1Fn baseA baseB u = 0) :
+    (Finset.univ.filter fun p => u p ≠ 0).card % 2 = 0 :=
+  baseSmallCycleData.cycle_weight_even u hcyc
+
 /-! ## The small-cycle theorem (strong form) -/
 
 /-- **Small-cycle theorem** (A4 Theorem A, repo form): every nonzero 1-cycle of
@@ -411,112 +343,14 @@ the bb72 base complex has weight ≥ 6 — boundaries included. -/
 theorem base_cycle_weight_ge_6
     (u : BaseGroup × Fin 2 → ZMod 2)
     (hcyc : bbBoundary1Fn baseA baseB u = 0) (hne : u ≠ 0) :
-    6 ≤ (Finset.univ.filter fun p => u p ≠ 0).card := by
-  by_contra hlt
-  push Not at hlt
-  -- a support point
-  have hex : ∃ p, u p ≠ 0 := by
-    by_contra hall
-    push Not at hall
-    exact hne (funext hall)
-  obtain ⟨p, hp⟩ := hex
-  -- normalize its group coordinate to the origin
-  have hp' : translate1 p.1 u ((0, 0), p.2) ≠ 0 := by
-    change u ((0 : BaseGroup) + p.1, p.2) ≠ 0
-    rw [zero_add]
-    exact hp
-  have hcyc' : bbBoundary1Fn baseA baseB (translate1 p.1 u) = 0 := by
-    rw [bbBoundary1Fn_translate1, hcyc]
-    rfl
-  have hcard' :
-      (Finset.univ.filter fun q => translate1 p.1 u q ≠ 0).card ≤ 5 := by
-    rw [card_support_translate1]
-    omega
-  -- decompose the normalized support
-  have hxS : (((0, 0) : BaseGroup), p.2)
-      ∈ Finset.univ.filter fun q => translate1 p.1 u q ≠ 0 :=
-    Finset.mem_filter.mpr ⟨Finset.mem_univ _, hp'⟩
-  have hxs : (((0, 0) : BaseGroup), p.2)
-      ∉ (Finset.univ.filter fun q => translate1 p.1 u q ≠ 0).erase
-          (((0, 0) : BaseGroup), p.2) :=
-    Finset.notMem_erase _ _
-  have hins : insert ((((0, 0) : BaseGroup)), p.2)
-      ((Finset.univ.filter fun q => translate1 p.1 u q ≠ 0).erase
-        (((0, 0) : BaseGroup), p.2))
-      = Finset.univ.filter fun q => translate1 p.1 u q ≠ 0 :=
-    Finset.insert_erase hxS
-  -- (PAR): the normalized support has even size, and it is nonempty
-  have hpar := cycle_weight_even (translate1 p.1 u) hcyc'
-  have hpos : 0 < (Finset.univ.filter fun q => translate1 p.1 u q ≠ 0).card :=
-    Finset.card_pos.mpr ⟨_, hxS⟩
-  have hscard :
-      ((Finset.univ.filter fun q => translate1 p.1 u q ≠ 0).erase
-        (((0, 0) : BaseGroup), p.2)).card = 1
-      ∨ ((Finset.univ.filter fun q => translate1 p.1 u q ≠ 0).erase
-        (((0, 0) : BaseGroup), p.2)).card = 3 := by
-    rw [Finset.card_erase_of_mem hxS]
-    omega
-  -- the normalized chain is the indicator of `insert x s`
-  have hind : translate1 p.1 u
-      = fun q => if q ∈ insert ((((0, 0) : BaseGroup)), p.2)
-          ((Finset.univ.filter fun q => translate1 p.1 u q ≠ 0).erase
-            (((0, 0) : BaseGroup), p.2)) then 1 else 0 := by
-    rw [hins]
-    exact eq_indicator_support (translate1 p.1 u)
-  -- contradict the finite check
-  have hcheck : ∃ h : BaseGroup, syndAt (insert ((((0, 0) : BaseGroup)), p.2)
-      ((Finset.univ.filter fun q => translate1 p.1 u q ≠ 0).erase
-        (((0, 0) : BaseGroup), p.2))) h ≠ 0 := by
-    rcases hscard with hk | hk
-    · obtain ⟨q, hq⟩ := Finset.card_eq_one.mp hk
-      rw [hq] at hxs
-      rw [Finset.mem_singleton] at hxs
-      obtain ⟨h, hh⟩ := smallCycleCheck_two p.2 q (Ne.symm hxs)
-      refine ⟨h, ?_⟩
-      rw [hq, syndAt,
-        Finset.sum_insert (by rw [Finset.mem_singleton]; exact hxs),
-        Finset.sum_singleton]
-      exact hh
-    · obtain ⟨q₁, q₂, q₃, h12, h13, h23, hs3⟩ := Finset.card_eq_three.mp hk
-      rw [hs3, Finset.mem_insert, Finset.mem_insert,
-        Finset.mem_singleton] at hxs
-      push Not at hxs
-      obtain ⟨hx1, hx2, hx3⟩ := hxs
-      have hfour := smallCycleCheck_four p.2 q₁ q₂ q₃
-      rcases hfour with hc | hc | hc | ⟨h, hh⟩
-      · exact absurd hc.symm hx1
-      · exact absurd hc.symm hx2
-      · exact absurd hc.symm hx3
-      refine ⟨h, ?_⟩
-      rw [hs3, syndAt,
-        Finset.sum_insert (by
-          rw [Finset.mem_insert, Finset.mem_insert, Finset.mem_singleton]
-          push Not
-          exact ⟨hx1, hx2, hx3⟩),
-        Finset.sum_insert (by
-          rw [Finset.mem_insert, Finset.mem_singleton]
-          push Not
-          exact ⟨h12, h13⟩),
-        Finset.sum_insert (by rw [Finset.mem_singleton]; exact h23),
-        Finset.sum_singleton, ← add_assoc, ← add_assoc]
-      exact hh
-  obtain ⟨h, hsynd⟩ := hcheck
-  apply hsynd
-  rw [← bbBoundary1Fn_indicator, ← hind]
-  exact congrFun hcyc' h
+    6 ≤ (Finset.univ.filter fun p => u p ≠ 0).card :=
+  baseSmallCycleData.cycle_weight_ge_6 u hcyc hne
 
 /-! ## `BaseDistanceGe6` is a theorem -/
 
 /-- The Phase-1 hypothesis (A): chain-level d(base) ≥ 6. -/
-theorem base_distance_ge_6 : BaseDistanceGe6 := by
-  intro u hu hnb
-  have hne : u ≠ 0 := by
-    rintro rfl
-    exact hnb ⟨0, map_zero _⟩
-  have hcyc : bbBoundary1Fn baseA baseB u = 0 := hu
-  have h6 := base_cycle_weight_ge_6 u hcyc hne
-  rw [bb72Complex_chainWeight_eq]
-  exact h6
+theorem base_distance_ge_6 : BaseDistanceGe6 :=
+  grossCoverData_logicalFloor
 
 /-- `u*` is not a base boundary (else its pullback `τ(u*)` would be a gross
 boundary, contradicting the Phase-0 dual-witness certificate). -/
@@ -546,18 +380,8 @@ Sector split on `b := p(v)`: if `b ≠ 0` then `b` is a nonzero base *cycle*
 theorem gross_chainWeight_ge_6 :
     ∀ v : GrossGroup × Fin 2 → ZMod 2,
       v ∈ grossComplex.cycles → v ∉ grossComplex.boundaries →
-      6 ≤ grossComplex.chainWeight v := by
-  intro v hv hnb
-  by_cases h0 : coverPush1 v = 0
-  · have h12 := gross_chainWeight_ge_12_of_coverPush_eq_zero
-      base_distance_ge_6 hv hnb h0
-    omega
-  · have hcyc : bbBoundary1Fn baseA baseB (coverPush1 v) = 0 :=
-      coverPush1_mem_cycles hv
-    have h6 := base_cycle_weight_ge_6 (coverPush1 v) hcyc h0
-    have hle := chainWeight_coverPush_le v
-    rw [bb72Complex_chainWeight_eq] at hle
-    omega
+      6 ≤ grossComplex.chainWeight v :=
+  grossCoverData.chainWeight_ge_of_strongBaseFloor grossCoverData_strongBaseFloor
 
 /-- Dual-side mirror, via the Φ duality. -/
 theorem gross_dual_chainWeight_ge_6 :

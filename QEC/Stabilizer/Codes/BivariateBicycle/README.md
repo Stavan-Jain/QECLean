@@ -12,7 +12,7 @@ per-module one-liner maps live in the umbrella docstrings (`Gross.lean`,
 
 | Dir | Code | Distance status |
 |---|---|---|
-| `Gross/` | gross `[[144,12,12]]` (base `[[72,12,6]]`) | **d = 12 unconditional, kernel-only** — axioms are exactly `propext`, `Classical.choice`, `Quot.sound`; no `native_decide`, no `sorry` (also re-derived through the parametric layer in `Gross/LayerInstance.lean`) |
+| `Gross/` | gross `[[144,12,12]]` (base `[[72,12,6]]`) | **d = 12 unconditional, kernel-only** — axioms are exactly `propext`, `Classical.choice`, `Quot.sound`; no `native_decide`, no `sorry` (proved through the generic doubling layer and packaged by `Gross/Distance.lean`) |
 | `Z5Z15F2A6/` | `[[150,8,8]] → [[300,8,16]]` two-tier | in progress (A17 line; minimal starting skeleton to copy) |
 | `BaseFloors/` | class-member base floors (BB90, BB108, Z6Z14) | d ≥ 6 kernel-checked via `BBSmallCycle` (A15/A16 class theorem) |
 
@@ -32,14 +32,29 @@ per-module one-liner maps live in the umbrella docstrings (`Gross.lean`,
 - **Change the doubling layer itself**: `Framework/Homological/BBDoubling.lean`
   (not this directory); its per-instance inputs are documented there.
 
+## Generic doubling route
+
+`CoverTransfer.lean` defines the canonical `grossCoverData` before the distance
+proofs. `BaseDistance` instantiates `SmallCycleData`; `DeckHomotopy` supplies
+`P = 0`, `Q = (1 + x²) ⋆ B` to the generic Bézout theorem; `DangerousSector`
+uses the generic single/pair logical-floor rungs with Gross shape certificates;
+`SafeSector` identifies `MImBound` with `SeamCosetFloor 12` and invokes the
+generic reduction. `Assembly` retains the old conditional names as wrappers.
+`LayerInstance` discharges the remaining inputs, and `Distance` packages its
+Pauli-distance result through `has_code_distance_of_isLeast`.
+
+After building, `lake env lean scripts/BBDoublingCheck.lean` verifies a separate
+four-qubit cover and checks that both conditional and unconditional Gross
+capstones depend on the generic base, homotopy, rung, and sector theorems.
+
 ## Hypothesis-discharge map (gross)
 
 | Named hypothesis | Discharged by | Grade |
 |---|---|---|
-| `BaseDistanceGe6` | `Gross/BaseDistance.lean` (small-cycle theorem) | kernel `decide` + analytic |
+| `BaseDistanceGe6` | `Gross/BaseDistance.lean` (`SmallCycleData` instance) | kernel `decide` + analytic |
 | `LightStabilizerClassification` | `Gross/LightStabClassify.lean` (`lightStabilizerClassification_holds`) | kernel `decide` |
-| `DangerousSectorGe12` | `Gross/DangerousSector.lean` ((M), m-rungs) | analytic + kernel `decide` |
-| `SafeSectorGe12` → `MImBound` | `Gross/SafeSector.lean` (Smith-coset reduction) | analytic |
+| `DangerousSectorGe12` | `Gross/DangerousSector.lean` ((M), generic logical-floor rungs) | analytic + kernel `decide` |
+| `SafeSectorGe12` → `MImBound` | `Gross/SafeSector.lean` (generic Smith-coset reduction) | analytic |
 | `MImBound` | `Gross/SafeFloor/MImAssembly.lean` (`mimBound_holds`, 64-case dispatch → 5 orbit reps) | analytic (see per-orbit rows) |
 | — orbit Y0/Y1/Y4 (wt 16/18) | `SafeFloor/MImFloorY{0,1,4}.lean` via `LightFloor.floor_of_killOK` (the coupled spine certificate: Prop 30 `min_L + min_R ≥ 10` on all 1024 cells + Prop 31 ρ-link kill of the 10-tight cells) | **analytic** (kernel `decide`) |
 | — orbit Y11/Y12 (wt 24) | `SafeFloor/MImFloorY{11,12}.lean` via `WtFloor24Bridge.costFromComps_ge_12_of_blocks` | **analytic** (kernel `decide`) |
@@ -132,7 +147,9 @@ details (env, clobber guards, stale generators): `qec-lab:experiments/bb_lab/GEN
    `Gross/SafeFloor.lean`, `<Instance>.lean`) — then run
    `bash scripts/check-umbrellas.sh` (orphan modules silently don't build).
 2. Class-G files: regenerate, never edit (banner at the top of each).
-3. `native_decide` is allowed (repo policy); no `set_option linter.* false`.
+3. `native_decide`, `sorry`, and custom axioms are forbidden on `main`;
+   validate with `lake env lean scripts/AxiomCheck.lean`. No
+   `set_option linter.* false` suppressions.
 4. Heavy files carry `maxRecDepth`/`maxHeartbeats` headers — don't copy them
    into new files without need.
 5. One lake process at a time (see CLAUDE.md).
@@ -154,8 +171,13 @@ further worked examples:
    sweep) → `Distance.lean` (capstone) → `StabilizerCodeData.lean` +
    `StabilizerCode.lean` (via a generator clone with validation gate +
    `--force` guard).
-3. Discharge the five `BBDoubling` inputs by name: `StrongBaseFloor`,
-   `DeckTrivialOnH1`, `DangerousFloorNZ`, `SeamCosetFloor`, tight witness.
+3. Discharge the `BBDoubling` inputs by name: `LogicalFloor` (or derive it
+   from `StrongBaseFloor`), `DeckTrivialOnH1`, `DangerousFloorNZ`,
+   `SeamCosetFloor`, and a tight witness whose pullback is not a boundary.
+   Use the generic rungs and `safeFloor_of_seamCosetFloor` for the sector
+   reductions; finish with the `..._of_logicalFloor` assemblies.
+   `StrongBaseFloor` is unsuitable for weight-six-generator codes with base
+   distance above six.
 4. Wire umbrellas (rule 1); add the instance row to the table above and, if
    generators are involved, rows in the generated-files table + GENERATORS.md.
 

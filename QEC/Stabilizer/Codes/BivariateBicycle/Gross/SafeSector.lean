@@ -6,7 +6,8 @@ named hypothesis, `MImBound` ((M-im), A4 §8/Theorem D: every chain in a
 seam-coset `C(ζ) + im ∂₂`, `ζ ∈ ker ∂₂`, that is not itself a boundary has
 weight ≥ 12).  The reduction — the lab's "safe sector sees exactly the Smith
 classes" (`im pr_* ⊆ im Δ`, Entry 16; only this inclusion is load-bearing,
-per the Entry-27 review) — is **proven here from the deck homotopy (R)**:
+per the Entry-27 review) — uses the generic `safeFloor_of_seamCosetFloor`
+theorem with the Gross Bézout certificate and `MImBound` as its inputs:
 
 For a safe cycle `v` with `w := p(v)`, (R) gives `v + σv = ∂₂(z)` for the
 explicit homotopy 2-chain `z`.  Splitting `z` into its two sheets
@@ -50,69 +51,25 @@ def sheetC2_0 (z : GrossGroup → ZMod 2) : BaseGroup → ZMod 2 :=
 def sheetC2_1 (z : GrossGroup → ZMod 2) : BaseGroup → ZMod 2 :=
   fun j => z (coverSec j + deckS)
 
-lemma deckS_add_deckS : deckS + deckS = 0 := by decide
+lemma deckS_add_deckS : deckS + deckS = 0 :=
+  grossCoverData.deckS_add_deckS
 
 lemma coverPi_add_deckS (g : GrossGroup) : coverPi (g + deckS) = coverPi g :=
-  (coverPi_fiber g (g + deckS)).mpr (Or.inr rfl)
+  grossCoverData.proj_add_deckS g
 
 /-- Every cover point is the section point of its fiber or its deck partner. -/
 lemma cover_point_dichotomy (g : GrossGroup) :
     g = coverSec (coverPi g) ∨ g = coverSec (coverPi g) + deckS :=
-  (coverPi_fiber (coverSec (coverPi g)) g).mp (coverPi_coverSec (coverPi g)).symm
+  grossCoverData.point_dichotomy g
 
 /-- A cover 2-chain is the sum of the lifts of its two sheets. -/
 lemma liftC2_decomp (z : GrossGroup → ZMod 2) :
-    z = liftC2 (sheetC2_0 z) + deckShift0 (liftC2 (sheetC2_1 z)) := by
-  funext g
-  rw [Pi.add_apply]
-  rcases cover_point_dichotomy g with hg | hg
-  · have h1 : liftC2 (sheetC2_0 z) g = z g := by
-      change (if g = coverSec (coverPi g) then sheetC2_0 z (coverPi g) else 0)
-        = z g
-      rw [if_pos hg]
-      change z (coverSec (coverPi g)) = z g
-      rw [← hg]
-    have h2 : deckShift0 (liftC2 (sheetC2_1 z)) g = 0 := by
-      change (if g + deckS = coverSec (coverPi (g + deckS)) then
-        sheetC2_1 z (coverPi (g + deckS)) else 0) = 0
-      rw [if_neg ?_]
-      intro hcon
-      rw [coverPi_add_deckS, ← hg] at hcon
-      apply deckS_ne_zero
-      have hcon' : g + deckS = g + 0 := by rw [add_zero]; exact hcon
-      exact add_left_cancel hcon'
-    rw [h1, h2, add_zero]
-  · have h1 : liftC2 (sheetC2_0 z) g = 0 := by
-      change (if g = coverSec (coverPi g) then sheetC2_0 z (coverPi g) else 0)
-        = 0
-      rw [if_neg ?_]
-      intro hcon
-      have hcontra := hcon.symm.trans hg
-      apply deckS_ne_zero
-      have hg' : coverSec (coverPi g) + 0 = coverSec (coverPi g) + deckS := by
-        rw [add_zero]; exact hcontra
-      exact (add_left_cancel hg').symm
-    have h2 : deckShift0 (liftC2 (sheetC2_1 z)) g = z g := by
-      have hgd : g + deckS = coverSec (coverPi g) := by
-        rw [hg, add_assoc, deckS_add_deckS, add_zero, coverPi_add_deckS,
-          coverPi_coverSec]
-      change (if g + deckS = coverSec (coverPi (g + deckS)) then
-        sheetC2_1 z (coverPi (g + deckS)) else 0) = z g
-      rw [coverPi_add_deckS, if_pos hgd]
-      change z (coverSec (coverPi g) + deckS) = z g
-      rw [← hg]
-    rw [h1, h2, zero_add]
+    z = liftC2 (sheetC2_0 z) + deckShift0 (liftC2 (sheetC2_1 z)) :=
+  grossCoverData.liftC2_decomp z
 
 lemma liftC2_add (ξ η : BaseGroup → ZMod 2) :
-    liftC2 (ξ + η) = liftC2 ξ + liftC2 η := by
-  funext g
-  change (if g = coverSec (coverPi g) then (ξ + η) (coverPi g) else 0)
-    = (if g = coverSec (coverPi g) then ξ (coverPi g) else 0)
-      + (if g = coverSec (coverPi g) then η (coverPi g) else 0)
-  by_cases hg : g = coverSec (coverPi g)
-  · rw [if_pos hg, if_pos hg, if_pos hg]
-    rfl
-  · rw [if_neg hg, if_neg hg, if_neg hg, add_zero]
+    liftC2 (ξ + η) = liftC2 ξ + liftC2 η :=
+  grossCoverData.liftC2_add ξ η
 
 /-! ## The seam decomposition `∂₂ = N + C` -/
 
@@ -127,24 +84,25 @@ lab's `d2c`). The Smith connecting map at chain level is `ζ ↦ seamC ζ` on
 def seamC (ξ : BaseGroup → ZMod 2) : BaseGroup × Fin 2 → ZMod 2 :=
   sheet1 (liftStab ξ)
 
+/-- The generic seam-crossing map is the Gross seam used by the certificates.
+-/
+lemma grossCoverData_seamC : grossCoverData.seamC = seamC := rfl
+
 /-- The seam split sums to the base boundary. -/
 lemma seamN_add_seamC (ξ : BaseGroup → ZMod 2) (j : BaseGroup × Fin 2) :
-    seamN ξ j + seamC ξ j = bbBoundary2Fn baseA baseB ξ j := by
-  have h := sheet0_add_sheet1 (liftStab ξ) j
-  rw [coverPush1_liftStab] at h
-  exact h
+    seamN ξ j + seamC ξ j = bbBoundary2Fn baseA baseB ξ j :=
+  grossCoverData.seamN_add_seamC ξ j
 
 lemma seamC_add (ξ η : BaseGroup → ZMod 2) :
-    seamC (ξ + η) = seamC ξ + seamC η := by
-  unfold seamC liftStab
-  rw [liftC2_add, bbBoundary2Fn_add, sheet1_add]
+    seamC (ξ + η) = seamC ξ + seamC η :=
+  grossCoverData.seamC_add ξ η
 
 /-! ## Deck-shift bookkeeping -/
 
 lemma liftStab_deckShift (ξ : BaseGroup → ZMod 2) :
     bbBoundary2Fn grossA grossB (deckShift0 (liftC2 ξ))
       = deckShift1 (liftStab ξ) :=
-  bbBoundary2Fn_translate grossA grossB deckS (liftC2 ξ)
+  grossCoverData.liftStab_deckShift ξ
 
 lemma sheet0_deckShift1 (s : GrossGroup × Fin 2 → ZMod 2) :
     sheet0 (deckShift1 s) = sheet1 s := rfl
@@ -158,16 +116,14 @@ lemma sheet1_deckShift1 (s : GrossGroup × Fin 2 → ZMod 2) :
 /-- Sheet 0 of `v + σv` is the pushforward. -/
 lemma sheet0_self_add_deck (v : GrossGroup × Fin 2 → ZMod 2)
     (j : BaseGroup × Fin 2) :
-    sheet0 (v + deckShift1 v) j = coverPush1 v j := by
-  rw [sheet0_add, Pi.add_apply, sheet0_deckShift1]
-  exact sheet0_add_sheet1 v j
+    sheet0 (v + deckShift1 v) j = coverPush1 v j :=
+  grossCoverData.sheet0_self_add_deck v j
 
 /-- Sheet 1 of `v + σv` is also the pushforward. -/
 lemma sheet1_self_add_deck (v : GrossGroup × Fin 2 → ZMod 2)
     (j : BaseGroup × Fin 2) :
-    sheet1 (v + deckShift1 v) j = coverPush1 v j := by
-  rw [sheet1_add, Pi.add_apply, sheet1_deckShift1, add_comm]
-  exact sheet0_add_sheet1 v j
+    sheet1 (v + deckShift1 v) j = coverPush1 v j :=
+  grossCoverData.sheet1_self_add_deck v j
 
 /-! ## The (M-im) hypothesis and the reduction -/
 
@@ -176,81 +132,16 @@ lemma sheet1_self_add_deck (v : GrossGroup × Fin 2 → ZMod 2)
 12. This is the single remaining analytic input for the safe sector; its paper
 proof is the confined-floor program of A4 §§9–13. -/
 def MImBound : Prop :=
-  ∀ ζ : BaseGroup → ZMod 2, bbBoundary2Fn baseA baseB ζ = 0 →
-    ∀ f : BaseGroup → ZMod 2,
-      seamC ζ + bbBoundary2Fn baseA baseB f ∉ bb72Complex.boundaries →
-      12 ≤ bb72Complex.chainWeight (seamC ζ + bbBoundary2Fn baseA baseB f)
+  grossCoverData.SeamCosetFloor 12
+
+/-- The Gross confined-floor proposition is the generic seam-coset floor. -/
+theorem grossCoverData_seamCosetFloor_iff :
+    grossCoverData.SeamCosetFloor 12 ↔ MImBound := Iff.rfl
 
 /-- **The safe-sector reduction**: (M-im) implies `SafeSectorGe12`. The
 Smith-coset membership of `p(v)` is derived from the deck homotopy (R). -/
-theorem safe_sector_of_mim (hMim : MImBound) : SafeSectorGe12 := by
-  intro v hv hb
-  -- (R): v + σv = ∂₂(homotopyChain v)
-  have hR : bbBoundary2Fn grossA grossB (homotopyChain v) = v + deckShift1 v :=
-    bbBoundary2Fn_homotopyChain hv
-  -- split the homotopy 2-chain into sheets
-  have hsplit : v + deckShift1 v
-      = liftStab (sheetC2_0 (homotopyChain v))
-        + deckShift1 (liftStab (sheetC2_1 (homotopyChain v))) := by
-    rw [← hR]
-    conv_lhs => rw [liftC2_decomp (homotopyChain v)]
-    rw [bbBoundary2Fn_add, liftStab_deckShift]
-    rfl
-  -- read the two sheet components: both equal w := p(v)
-  have hw0 : ∀ j, coverPush1 v j
-      = seamN (sheetC2_0 (homotopyChain v)) j
-        + seamC (sheetC2_1 (homotopyChain v)) j := by
-    intro j
-    calc coverPush1 v j
-        = sheet0 (v + deckShift1 v) j := (sheet0_self_add_deck v j).symm
-      _ = sheet0 (liftStab (sheetC2_0 (homotopyChain v))
-            + deckShift1 (liftStab (sheetC2_1 (homotopyChain v)))) j := by
-          rw [hsplit]
-      _ = seamN (sheetC2_0 (homotopyChain v)) j
-            + seamC (sheetC2_1 (homotopyChain v)) j := by
-          rw [sheet0_add, Pi.add_apply, sheet0_deckShift1]
-          rfl
-  have hw1 : ∀ j, coverPush1 v j
-      = seamC (sheetC2_0 (homotopyChain v)) j
-        + seamN (sheetC2_1 (homotopyChain v)) j := by
-    intro j
-    calc coverPush1 v j
-        = sheet1 (v + deckShift1 v) j := (sheet1_self_add_deck v j).symm
-      _ = sheet1 (liftStab (sheetC2_0 (homotopyChain v))
-            + deckShift1 (liftStab (sheetC2_1 (homotopyChain v)))) j := by
-          rw [hsplit]
-      _ = seamC (sheetC2_0 (homotopyChain v)) j
-            + seamN (sheetC2_1 (homotopyChain v)) j := by
-          rw [sheet1_add, Pi.add_apply, sheet1_deckShift1]
-          rfl
-  -- the sheet sum is a 2-cycle
-  have hker : bbBoundary2Fn baseA baseB
-      (sheetC2_0 (homotopyChain v) + sheetC2_1 (homotopyChain v)) = 0 := by
-    funext j
-    rw [bbBoundary2Fn_add, Pi.add_apply, Pi.zero_apply]
-    have hkey : ∀ n0 c0 n1 c1 w b0 b1 : ZMod 2,
-        w = n0 + c1 → w = c0 + n1 → n0 + c0 = b0 → n1 + c1 = b1 →
-        b0 + b1 = 0 := by decide
-    exact hkey _ _ _ _ _ _ _ (hw0 j) (hw1 j)
-      (seamN_add_seamC (sheetC2_0 (homotopyChain v)) j)
-      (seamN_add_seamC (sheetC2_1 (homotopyChain v)) j)
-  -- the Smith-coset form of w
-  have hwform : coverPush1 v
-      = seamC (sheetC2_0 (homotopyChain v) + sheetC2_1 (homotopyChain v))
-        + bbBoundary2Fn baseA baseB (sheetC2_0 (homotopyChain v)) := by
-    funext j
-    rw [Pi.add_apply, seamC_add, Pi.add_apply]
-    have hkey : ∀ n0 c0 c1 w b0 : ZMod 2,
-        w = n0 + c1 → n0 + c0 = b0 → w = (c0 + c1) + b0 := by decide
-    exact hkey _ _ _ _ _ (hw0 j)
-      (seamN_add_seamC (sheetC2_0 (homotopyChain v)) j)
-  -- conclude via (M-im)
-  have h12 : 12 ≤ bb72Complex.chainWeight (coverPush1 v) := by
-    rw [hwform]
-    refine hMim _ hker _ ?_
-    rw [← hwform]
-    exact hb
-  exact le_trans h12 (chainWeight_coverPush_le v)
+theorem safe_sector_of_mim (hMim : MImBound) : SafeSectorGe12 :=
+  grossCoverData.safeFloor_of_seamCosetFloor grossCoverData_deckTrivial hMim
 
 /-! ## Warm-up: the connecting map lands in cycles, and the ≥ 6 floor
 
@@ -275,37 +166,8 @@ a gross 1-cycle (a gross boundary) that pushes forward to `∂₂ ζ = 0`, so by
 applied to `seamN ζ + seamC ζ = ∂₂ ζ = 0`). -/
 theorem seamC_mem_cycles {ζ : BaseGroup → ZMod 2}
     (hζ : bbBoundary2Fn baseA baseB ζ = 0) :
-    seamC ζ ∈ bb72Complex.cycles := by
-  -- `liftStab ζ` is a gross cycle (it is a gross boundary)
-  have hgross_cyc : liftStab ζ ∈ grossComplex.cycles :=
-    grossComplex.boundaries_le_cycles (liftStab_mem_boundaries ζ)
-  -- it pushes forward to `∂₂ ζ = 0`
-  have hpush : coverPush1 (liftStab ζ) = 0 := by
-    rw [coverPush1_liftStab]; exact hζ
-  -- exactness `ker p = im τ`: `liftStab ζ = coverPull1 u` for some base 1-chain
-  obtain ⟨u, hu⟩ := (coverPush1_eq_zero_iff _).mp hpush
-  -- `u` is a base 1-cycle (pull the gross-cycle condition back along `τ`)
-  have hu_cyc : u ∈ bb72Complex.cycles := by
-    have h1 : grossComplex.boundary1 (coverPull1 u) = 0 := by
-      rw [← hu]; exact hgross_cyc
-    rw [coverPull_boundary1_comm] at h1
-    have h2 : bb72Complex.boundary1 u = 0 := by
-      apply coverPull0_injective
-      rw [h1]
-      exact (map_zero coverPull0).symm
-    exact h2
-  -- `seamN ζ = sheet0 (liftStab ζ) = sheet0 (coverPull1 u) = u`
-  have hseamN : seamN ζ = u := by
-    change sheet0 (liftStab ζ) = u
-    rw [hu, sheet0_coverPull1]
-  -- char 2: `seamN ζ + seamC ζ = ∂₂ ζ = 0`, hence `seamC ζ = seamN ζ = u`
-  have hseamC : seamC ζ = u := by
-    have hkey : ∀ a b : ZMod 2, a + b = 0 → b = a := by decide
-    funext j
-    have hsum := seamN_add_seamC ζ j
-    rw [hseamN, hζ, Pi.zero_apply] at hsum
-    exact hkey _ _ hsum
-  rw [hseamC]; exact hu_cyc
+    seamC ζ ∈ bb72Complex.cycles :=
+  grossCoverData.seamC_mem_cycles hζ
 
 /-- **(M-im) warm-up: the ≥ 6 floor on the safe sector.** Every element of a
 Smith seam-coset `seamC ζ + im ∂₂` (`ζ ∈ ker ∂₂`) that is not itself a base
