@@ -48,23 +48,24 @@ and other foundations. Import everything via `QEC`.
 
 ### Codes
 
-Distances listed in the table below are proved. "—" means the code is packaged
-but its distance has not been formalized yet.
+When the parameters include a distance `d`, that distance is proved. Codes
+listed as `[[n, k]]` are packaged, but their distance has not been formalized
+yet.
 
-| Code | Parameters | Distance | Where |
-|---|---|---|---|
-| Gross (bivariate bicycle) | `[[144, 12, 12]]` | 12 | `Codes/BivariateBicycle/Gross/` |
-| Toric code, `L ≥ 2` | `[[2L², 2, L]]` | `L` | `Codes/Toric/` |
-| Rotated surface code, odd `L ≥ 3` | `[[L², 1, L]]` | `L` | `Codes/RotatedSurface/` |
-| Iceberg family, `m ≥ 2` | `[[2m, 2m − 2, 2]]` | 2 | `Codes/Iceberg/N.lean` |
-| Five-qubit perfect code (non-CSS) | `[[5, 1, 3]]` | 3 | `Codes/Small/FiveQubit_5_1_3.lean` |
-| Steane code | `[[7, 1, 3]]` | 3 | `Codes/Small/Steane7*.lean` |
-| `C_6` (Knill) | `[[6, 2, 2]]` | 2 | `Codes/Small/SixQubit_6_2_2.lean` |
-| `[[4, 2, 2]]` | `[[4, 2, 2]]` | 2 | `Codes/Small/FourQubit_4_2_2.lean` |
-| LNCY code | `[[4, 1, 2]]` | 2 | `Codes/Small/CSS_4_1_2.lean` |
-| 3-qubit repetition | `[[3, 1, 1]]` | 1 | `Codes/Repetition/Three.lean` |
-| n-qubit repetition, `n ≥ 2` | `[[n, 1]]` | — | `Codes/Repetition/N.lean` |
-| Shor code | `[[9, 1]]` | — | `Codes/Small/Shor9.lean` |
+| Code | Parameters | Where |
+|---|---|---|
+| Gross (bivariate bicycle) | `[[144, 12, 12]]` | `Codes/BivariateBicycle/Gross/` |
+| Toric code, `L ≥ 2` | `[[2L², 2, L]]` | `Codes/Toric/` |
+| Rotated surface code, odd `L ≥ 3` | `[[L², 1, L]]` | `Codes/RotatedSurface/` |
+| Iceberg family, `m ≥ 2` | `[[2m, 2m − 2, 2]]` | `Codes/Iceberg/N.lean` |
+| Five-qubit perfect code (non-CSS) | `[[5, 1, 3]]` | `Codes/Small/FiveQubit_5_1_3.lean` |
+| Steane code | `[[7, 1, 3]]` | `Codes/Small/Steane7*.lean` |
+| `C_6` (Knill) | `[[6, 2, 2]]` | `Codes/Small/SixQubit_6_2_2.lean` |
+| `[[4, 2, 2]]` | `[[4, 2, 2]]` | `Codes/Small/FourQubit_4_2_2.lean` |
+| LNCY code | `[[4, 1, 2]]` | `Codes/Small/CSS_4_1_2.lean` |
+| 3-qubit repetition | `[[3, 1, 1]]` | `Codes/Repetition/Three.lean` |
+| n-qubit repetition, `n ≥ 2` | `[[n, 1]]` | `Codes/Repetition/N.lean` |
+| Shor code | `[[9, 1]]` | `Codes/Small/Shor9.lean` |
 
 Each code is packaged as a `StabilizerCode`. The proved obligations are
 generator count, independence, pairwise commutation, and exclusion of `-I`.
