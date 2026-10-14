@@ -64,6 +64,7 @@ Every distance `d` listed in the parameters below is proved.
 | 3-qubit repetition | `[[3, 1, 1]]` | `Codes/Repetition/Three*.lean` |
 | n-qubit repetition, `n ≥ 2` | `[[n, 1, 1]]` | `Codes/Repetition/N*.lean` |
 | Shor code | `[[9, 1, 3]]` | `Codes/Small/Shor9*.lean` |
+| Quantum Hamming, `r ≥ 3` | `[[2^r − 1, 2^r − 1 − 2r, 3]]` | `Codes/Small/QuantumHamming*.lean` |
 
 Each code is packaged as a `StabilizerCode`. The proved obligations are
 generator count, independence, pairwise commutation, and exclusion of `-I`.
