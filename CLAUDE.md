@@ -89,17 +89,21 @@ QEC/
         │                        # LogicalCorrespondence{X,Z}, ChainComplex,
         │                        # Distance{,X,Z}, StabilizerCode (16 files)
         ├── RotatedSurface/      # parametric N (9 files, same shape as Toric)
-        ├── Repetition/          # Three.lean (3-qubit) + N.lean (parametric)
-        └── Small/               # Single-instance codes: Shor9, Steane7,
-                                 # Steane7TransversalGates, FourQubit_4_2_2,
-                                 # QuantumHamming, FiveQubit_5_1_3 (first non-CSS)
+        ├── Repetition/          # Three.lean (3-qubit) + N.lean (parametric),
+        │                        # each + <Code>Logicals.lean (as in Small/)
+        └── Small/               # Single-instance codes: Shor9, Steane7
+                                 # (+ TransversalGates), FourQubit_4_2_2,
+                                 # CSS_4_1_2, SixQubit_6_2_2, QuantumHamming,
+                                 # FiveQubit_5_1_3 (first non-CSS); each split
+                                 # into <Code>.lean (→ WithDistance) and
+                                 # <Code>Logicals.lean (→ WithLogicals)
 ```
 
 Everything under `Codes/` is `native_decide`-free. The instances that carried
 one are parked on branch `claude/z3z6-parked`:
 `BivariateBicycle/{Z3Z6,Z5Z15F2A6,BaseFloors}/`, `Codes/Concat/` (both Steane
-concatenations), and `RotatedSurface/Three.lean`. (`Small/Steane7Distance.lean` was
-de-nativized and is back on `main`.)
+concatenations), and `RotatedSurface/Three.lean`. (The Steane distance proof,
+now in `Small/Steane7.lean`, was de-nativized and is back on `main`.)
 `Framework/` keeps the abstract machinery they exercised — notably
 `Framework/Concatenation/`, which now has no concrete instance in this tree.
 
@@ -688,9 +692,12 @@ after `closure_induction`).
 
 Concrete instantiations of the template:
 
-- `Steane7.lean` — k = 1, n = 7, fully-supported all-X / all-Z logicals
+- `Steane7.lean` + `Steane7Logicals.lean` — k = 1, n = 7, fully-supported
+  all-X / all-Z logicals; every `Codes/Small/` code has the same
+  code-file / logicals-file split (see `_TEMPLATE.lean` § "Two files per code")
 - `Shor9.lean` — k = 1, n = 9, repetition-of-cat encoding
-- `RepetitionCode{3,N}.lean` — degenerate distance-1 cases
+- `Repetition/{Three,N}.lean` (+ `…Logicals.lean`) — degenerate distance-1
+  cases
 - `RotatedSurfaceCodeN*.lean` — parametric family; distance proof
   in sibling files using the homological framework
 - `ToricCodeN*.lean` — parametric family with trimmed-generator packaging

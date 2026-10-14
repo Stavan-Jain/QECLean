@@ -1,7 +1,7 @@
 import Mathlib.Tactic
 import Mathlib.LinearAlgebra.Matrix.Defs
 import Mathlib.Data.Complex.Basic
-import QEC.Stabilizer.Codes.Small.Steane7
+import QEC.Stabilizer.Codes.Small.Steane7Logicals
 import QEC.Foundations.Gates
 import QEC.Foundations.GateConjugation
 import QEC.Stabilizer.Framework.Core.Logical.LogicalGates

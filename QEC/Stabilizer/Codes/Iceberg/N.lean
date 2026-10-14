@@ -81,7 +81,8 @@ This convention makes the (anti)commutation table clean:
 ## Relation to `Codes/Small/FourQubit_4_2_2.lean`
 
 This parametric family at `m = 2` is the **same code** as the existing
-`FourQubit_4_2_2.lean`, but uses a **different** logical-operator basis (see
+`FourQubit_4_2_2.lean`, but uses a **different** logical-operator basis from
+the one in `FourQubit_4_2_2Logicals.lean` (see
 `qec-lab:pipeline/attempts/iceberg/informal_spec.md` § "Relation to
 FourQubit_4_2_2.lean"). Both formalizations coexist as separate Lean objects,
 mirroring the `RepetitionCode3.lean` / `RepetitionCodeN.lean` pattern: we do NOT

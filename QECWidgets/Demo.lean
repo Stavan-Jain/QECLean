@@ -3,7 +3,7 @@ Copyright (c) 2026 Stavan Jain. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Stavan Jain
 -/
-import QEC.Stabilizer.Codes.Small.Steane7
+import QEC.Stabilizer.Codes.Small.Steane7Logicals
 import QECWidgets.PauliStrip
 import QECWidgets.PauliGoalPanel
 import QECWidgets.ToricLattice

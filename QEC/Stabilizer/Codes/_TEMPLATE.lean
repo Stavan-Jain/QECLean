@@ -55,6 +55,22 @@ straightforwardly to:
   is different, since the CSS closers no longer apply. `FiveQubit_5_1_3.lean`
   is the reference.
 
+## Two files per code
+
+Each code is split across two modules, both in the code's namespace (every
+code under `Codes/Small/` and `Codes/Repetition/` follows this layout):
+
+- `<Code>.lean` — the code and its distance: §1–§9 (whichever route applies),
+  the bare `StabilizerCode` of §13, and §14, ending in
+  `stabilizerCodeWithDistance`. It never mentions the logical basis: the §14
+  distance witness carries its own nontriviality proof.
+- `<Code>Logicals.lean` — imports `<Code>.lean` and adds the chosen logical
+  basis: §10–§12 and the `StabilizerCodeWithLogicals` of §13, ending in
+  `stabilizerCodeWithLogicals`.
+
+Anything that needs the logical basis (transversal gates, logical Clifford
+actions, …) imports the logicals file; see `Steane7TransversalGates.lean`.
+
 ## Section overview
 
 The **decide route** (§2–§6) is the default for every literal code: the
@@ -74,13 +90,14 @@ parametric families, whose generator lists are `List.ofFn` terms that
 - §9 — CSS route: `negIdentity ∉ closure` and the `listToSet` bridge.
   Parametric only.
 - §10 — Logical operators (`logicalX`, `logicalZ`, optional `logicalY`).
-  When `k ≥ 1`.
-- §11 — Logical anticommutation. When `k ≥ 1`.
-- §12 — Logicals in centralizer. When `k ≥ 1`.
-- §13 — `StabilizerCode n k` (bare) + `StabilizerCodeWithLogicals n k`
-  packaging. Always.
-- §14 — `HasCodeDistance`. Optional (often in a sibling file for parametric
-  codes).
+  When `k ≥ 1`. Logicals file.
+- §11 — Logical anticommutation. When `k ≥ 1`. Logicals file.
+- §12 — Logicals in centralizer. When `k ≥ 1`. Logicals file.
+- §13 — `StabilizerCode n k` (bare; code file) + `StabilizerCodeWithLogicals
+  n k` (logicals file) packaging. Always.
+- §14 — `HasCodeDistance` and `stabilizerCodeWithDistance`. Code file (for
+  parametric families with long distance arguments, often a set of dedicated
+  distance files instead).
 
 ## File header pattern
 
@@ -282,7 +299,7 @@ lemma stabilizerGroup_toSubgroup_eq :
 Keep the lemma even though it is `rfl`: `rw [stabilizerGroup_toSubgroup_eq]`
 and `mem_centralizer_iff_closure _ _ _ stabilizerGroup_toSubgroup_eq` are how
 the centralizer proofs (§12), the distance closers (§14) and downstream files
-(`Steane7Distance.lean`, `Steane7TransversalGates.lean`) get from the bundled
+(`Steane7Logicals.lean`, `Steane7TransversalGates.lean`) get from the bundled
 group to an explicit generating set. Membership in `listToSet generatorsList`
 is then a case split:
 
@@ -408,7 +425,11 @@ are the `List.ofFn` counterparts of the literal-list lemmas.
 -/
 
 /-!
-## §10 — Logical operators
+## §10 — Logical operators (logicals file)
+
+Sections §10–§12 and the second half of §13 go in `<Code>Logicals.lean`, which
+opens with `import QEC.Stabilizer.Codes.<Family>.<Code>` and re-enters the
+code's namespace.
 
 For an `[[n, k, d]]` code, define `k` `logicalX_i` and `k` `logicalZ_i`. For
 `k = 1`, names are simply `logicalX` / `logicalZ`. For `k ≥ 2`, index them
@@ -452,23 +473,22 @@ index. The (anti)commutation pattern in §11 expands to *pairwise* relations
 /-!
 ## §11 — Logical anticommutation
 
-For `k = 1`, prove that `logicalX` anticommutes with `logicalZ`. When both are
-all-X / all-Z, the dedicated lemma `NQubitPauliOperator.allX_allZ_anticommute`
-closes this in one line:
+For `k = 1`, prove that `logicalX` anticommutes with `logicalZ`. For literal
+logicals this is a closed statement, and `decide` settles it through the global
+`Decidable (Anticommute p q)` instance (`PauliGroup/Commutation.lean`):
 
 ```lean
-theorem logicalX_anticommutes_logicalZ :
-    NQubitPauliGroupElement.Anticommute logicalX logicalZ :=
-  NQubitPauliOperator.allX_allZ_anticommute n (by decide)
+theorem logicalX_anticommutes_logicalZ : Anticommute logicalX logicalZ := by
+  decide
 ```
 
-The `(by decide)` discharges `Odd n` (anticommutation requires odd `n` for the
-all-X/all-Z pair to anticommute — true for Steane7 (n=7), false for [[4,2,2]]
-(n=4)).
+State the overlap in the doc-comment (one shared qubit, or all `n` of an odd
+`n` for the all-X/all-Z pair) — the reader still wants to know *why*.
 
-**Non-all-X variant.** For partial-support logicals, use
-`pauli_comm_even_anticommutes` like in §4 and compute the anticommute filter
-explicitly.
+**Parametric variant.** When the qubit count is symbolic, `decide` has nothing
+to evaluate. For all-X / all-Z logicals the dedicated lemma
+`NQubitPauliOperator.allX_allZ_anticommute n hn` needs only `Odd n` — see
+`QuantumHammingLogicals.lean`.
 
 **`k ≥ 2` variant.** You need *four* relations per logical qubit *pair*:
 
@@ -495,30 +515,25 @@ These feed `StabilizerCode.logical_commute_cross` (see §13).
 
 Show that each `logicalX_i` and `logicalZ_i` commutes with every
 stabilizer-group element. `mem_centralizer_iff_closure` (`Core/Stabilizer/Centralizer.lean`)
-reduces this to the generators, given the §6 equation; then case-split on the
-list and close each generator by `decide` (the identity is closed) or by a
-prepared per-generator lemma:
+reduces this to the generators, given the §6 equation; `simp only` then unrolls
+the list into a closed conjunction, one identity per generator, and `decide`
+settles it. The proof text is the same for every literal code, whatever the
+number of generators:
 
 ```lean
 theorem logicalX_mem_centralizer : logicalX ∈ centralizer stabilizerGroup := by
   rw [StabilizerGroup.mem_centralizer_iff_closure _ _ _ stabilizerGroup_toSubgroup_eq]
-  intro s hs
   simp only [generatorsList, listToSet_cons, listToSet_nil, Set.mem_insert_iff,
-    Set.mem_empty_iff_false, or_false] at hs
-  rcases hs with rfl | rfl | rfl | rfl | rfl | rfl <;> decide
+    Set.mem_empty_iff_false, or_false, forall_eq_or_imp, forall_eq]
+  decide
 ```
 
-Do **not** try to `decide` the whole `∀ s ∈ listToSet generatorsList, …`
-goal in one go: instance search picks `Fintype.decidableForallFintype` for
+Do **not** try to `decide` the `∀ s ∈ listToSet generatorsList, …` goal
+before unrolling it: instance search picks `Fintype.decidableForallFintype` for
 that shape and the kernel enumerates all `4 · 4ⁿ` group elements
-("maximum recursion depth has been reached"). The `rcases` first is what
-keeps each `decide` a closed identity.
-
-When a per-generator identity is worth a name (it is reused, or the parity
-argument is the point), state it as a `private lemma` with
-`pauli_comm_even_anticommutes` + an explicit anticommutation `Finset`, and
-`exact logicalX_commutes_Z1.symm` in the corresponding case — see
-`CSS_4_1_2.lean`, `FourQubit_4_2_2.lean`, `SixQubit_6_2_2.lean`.
+("maximum recursion depth has been reached"). The `simp only` first is what
+leaves `decide` a conjunction of closed identities. The same block proves
+centralizer membership of the §14 distance witness and its partner.
 
 **Parametric variant.** The generating set is `generators` (§7) and the
 equation is `stabilizerGroup_toSubgroup_eq : … = subgroup` (§9); after
@@ -537,13 +552,12 @@ is in scope; and the per-generator commutation lemmas must be separate
 
 Two bundled structures. The **bare code** combines §2–§5 only: a stabilizer
 code *is* its stabilizer group, presented by `n − k` independent generators.
-The **logical basis** (§10–§12) is derived data and lives in a separate
-`StabilizerCodeWithLogicals n k`, which `extends` the bare code:
+It goes in the code file, followed by its closure equation (consumed by §14):
 
 ```lean
 /-- The bare `[[n, k]]` code. No logical operators are bundled here. -/
 noncomputable def stabilizerCode : StabilizerCode n k where
-  hk := by decide                          -- 0 < k ≤ n; trivial for fixed values
+  hk := by decide                          -- k ≤ n; trivial for fixed values
   generatorsList := generatorsList
   generators_length := rfl                 -- length = n - k by construction
   generators_phaseZero := AllPhaseZero_generatorsList
@@ -551,14 +565,24 @@ noncomputable def stabilizerCode : StabilizerCode n k where
   generators_commute := generators_commute          -- §3 (CSS route: rw the bridge first)
   closure_no_neg_identity := negIdentity_not_mem     -- §5
 
-private def logicalOps_<CodeName> : Fin k → LogicalQubitOps n stabilizerGroup :=
+lemma stabilizerCode_toSubgroup_eq :
+    stabilizerCode.toStabilizerGroup.toSubgroup = Subgroup.closure (listToSet generatorsList) :=
+  rfl  -- on the CSS route, `stabilizerGroup_toSubgroup_eq` against `subgroup`
+```
+
+The **logical basis** (§10–§12) is derived data and lives in a separate
+`StabilizerCodeWithLogicals n k`, which `extends` the bare code. It goes in
+the logicals file:
+
+```lean
+private def logicalOps<CodeName> : Fin k → LogicalQubitOps n stabilizerGroup :=
   fun _ => ⟨logicalX, logicalZ, logicalX_mem_centralizer, logicalZ_mem_centralizer,
             logicalX_anticommutes_logicalZ⟩
 
 /-- The code with its chosen logical basis. -/
 noncomputable def stabilizerCodeWithLogicals : StabilizerCodeWithLogicals n k where
   toStabilizerCode := stabilizerCode
-  logicalOps := logicalOps_<CodeName>
+  logicalOps := logicalOps<CodeName>
   logical_commute_cross := fun ℓ ℓ' h => (h (Subsingleton.elim ℓ ℓ')).elim
 ```
 
@@ -579,7 +603,7 @@ the cross-commutation by case-split on `Fin k × Fin k` (the bare
 `stabilizerCode` is unchanged):
 
 ```lean
-private def logicalOps_<CodeName> : Fin k → LogicalQubitOps n stabilizerGroup
+private def logicalOps<CodeName> : Fin k → LogicalQubitOps n stabilizerGroup
   | 0 => ⟨logicalX_1, logicalZ_1, logicalX_1_mem_centralizer,
            logicalZ_1_mem_centralizer, logicalX_1_anticommutes_logicalZ_1⟩
   | 1 => ⟨logicalX_2, logicalZ_2, logicalX_2_mem_centralizer,
@@ -588,7 +612,7 @@ private def logicalOps_<CodeName> : Fin k → LogicalQubitOps n stabilizerGroup
 
 noncomputable def stabilizerCodeWithLogicals : StabilizerCodeWithLogicals n k where
   toStabilizerCode := stabilizerCode
-  logicalOps := logicalOps_<CodeName>
+  logicalOps := logicalOps<CodeName>
   logical_commute_cross := fun ℓ ℓ' h => by
     fin_cases ℓ <;> fin_cases ℓ' <;> first
       | exact absurd rfl h
@@ -605,41 +629,66 @@ clean this up.
 -/
 
 /-!
-## §14 — `HasCodeDistance` (optional)
+## §14 — `HasCodeDistance` (code file)
 
 Every distance proof on `main` is kernel-only. `native_decide` is banned
 repo-wide (CLAUDE.md § "Axiom policy"), so there is no "decide the whole
 `HasCodeDistance` predicate" shortcut, and no `sorry` placeholder either: pick
 the closer that matches the code's shape. All of them are stated on the bare
 `stabilizerCode` of §13 — `HasCodeDistance` depends only on the stabilizer
-group, and only the witness's nontriviality proof touches the logical basis.
-The two CSS closers live in `Framework/Core/CSS/CSSDistance.lean`, the general
-one in `Framework/Core/Logical/CodeDistance.lean`. All three consume the same
-two ingredients — the §13 closure equation
+group. The two CSS closers live in `Framework/Core/CSS/CSSDistance.lean`, the
+general one in `Framework/Core/Logical/CodeDistance.lean`. All three consume the
+same two ingredients — the §13 closure equation `stabilizerCode_toSubgroup_eq`
+and an explicit witness, a nontrivial logical of weight exactly `d` — and every
+finite side condition closes with `decide` (`Decidable (Anticommute p q)` is a
+global instance, see `PauliGroup/Commutation.lean`).
+
+**The witness.** §14 lives in the code file, so the witness cannot borrow its
+nontriviality from the logical basis of §10–§13. Give it its own *partner*: a
+centralizer element it anticommutes with. Then
+`isNontrivialLogicalOperator_of_anticommute_centralizer`
+(`Core/Logical/LogicalOperators.lean`) does the rest, and every other fact is a
+closed statement (centralizer membership by the §12 block):
 
 ```lean
-lemma stabilizerCode_toSubgroup_eq :
-    stabilizerCode.toStabilizerGroup.toSubgroup = Subgroup.closure (listToSet generatorsList) :=
-  rfl  -- §6; on the CSS route, `stabilizerGroup_toSubgroup_eq` against `generators`
+/-- A nontrivial logical of weight `d`. -/
+def minWeightLogical : NQubitPauliGroupElement n := σ[…]
+
+/-- A centralizer element anticommuting with `minWeightLogical`. -/
+def minWeightPartner : NQubitPauliGroupElement n := σ[…]
+
+lemma minWeightLogical_weight : weight minWeightLogical = d := by decide
+
+lemma minWeightLogical_mem_centralizer : minWeightLogical ∈ centralizer stabilizerGroup := by
+  -- the §12 block
+lemma minWeightPartner_mem_centralizer : minWeightPartner ∈ centralizer stabilizerGroup := by
+  -- the §12 block
+
+lemma minWeightLogical_anticommutes_minWeightPartner :
+    Anticommute minWeightLogical minWeightPartner := by decide
+
+lemma minWeightLogical_isNontrivial :
+    IsNontrivialLogicalOperator minWeightLogical stabilizerCode.toStabilizerGroup :=
+  isNontrivialLogicalOperator_of_anticommute_centralizer _ minWeightLogical_mem_centralizer
+    minWeightPartner_mem_centralizer minWeightLogical_anticommutes_minWeightPartner
 ```
 
-and an explicit witness `⟨g, h_nontrivial, by decide⟩`, a nontrivial logical of
-weight exactly `d` — and every finite side condition closes with `decide`
-(`Decidable (Anticommute p q)` is a global instance, see
-`PauliGroup/Commutation.lean`).
+The witness is usually a stabilizer multiple of a basis logical (`X̄ · X₁` for
+Steane, `X` on `{3, 5, 6}`), and the partner its conjugate (`Z̄ · Z₁`). The
+membership lemmas are stated against `stabilizerGroup` and used against
+`stabilizerCode.toStabilizerGroup`: the two are definitionally equal.
 
 **Distance 2, CSS** — `hasCodeDistance_two_of_anticommute_witness`. Supply a
 witness function: for every qubit `i` and non-identity Pauli `P`, a generator
 anticommuting with `weightOneAt i P`. `fin_cases` on `i`, `match` on `P`, and
 let `first` backtrack over the generators of the right type (`Z`-generators
-detect `X`/`Y`, `X`-generators detect `Z`). See `Codes/Small/CSS_4_1_2.lean`
-and `FourQubit_4_2_2.lean`.
+detect `X`/`Y`, `X`-generators detect `Z`). See `Codes/Small/CSS_4_1_2.lean`,
+`FourQubit_4_2_2.lean` and `SixQubit_6_2_2.lean`.
 
 ```lean
 private lemma weight_one_anticomm_witness :
     ∀ i : Fin n, ∀ P : PauliOperator, P ≠ PauliOperator.I →
-      ∃ g ∈ listToSet generatorsList, NQubitPauliGroupElement.Anticommute
-        (weightOneAt i P) g := by
+      ∃ g ∈ listToSet generatorsList, Anticommute (weightOneAt i P) g := by
   intro i P hP
   fin_cases i <;>
     (match P, hP with
@@ -657,21 +706,33 @@ private lemma weight_one_anticomm_witness :
 theorem code_has_distance_two : HasCodeDistance stabilizerCode 2 :=
   hasCodeDistance_two_of_anticommute_witness stabilizerCode (listToSet generatorsList)
     stabilizerCode_toSubgroup_eq weight_one_anticomm_witness
-    ⟨logicalX, (logicalOps_<CodeName> 0).xOp_nontrivial, by decide⟩
+    ⟨minWeightLogical, minWeightLogical_isNontrivial, minWeightLogical_weight⟩
 ```
+
+A `first` alternative that no case ever uses trips `linter.unusedTactic`, so
+list only the generators the table needs (with a single generator of a type,
+drop the `first`: `exact ⟨Z1, …⟩`).
 
 **Distance 3, CSS** — `hasCodeDistance_three_of_columns`. Present each check
 as the `Finset` of qubits it acts on (`zOn S` / `xOn S` are `Z` / `X` on `S`);
 the closer then needs only the classical column conditions on both check
 matrices — no column is zero, no two columns coincide — each a closed
-statement over `Fin n` that `decide` settles. See
-`Codes/Small/Steane7Distance.lean` (self-dual, so one `row` serves both sides).
+statement over `Fin n` that `decide` settles. See `Codes/Small/Steane7.lean`
+(self-dual, so one `row` serves both sides). In a parametric family the column
+conditions are no longer closed, so prove them from the shape of the columns:
+`Codes/Small/QuantumHamming.lean` does this for every `r`, its columns being
+the binary expansions of `k + 1`.
+For a *degenerate* code, whose checks leave some pair of qubits unseparated,
+use `hasCodeDistance_three_of_columns_degenerate` instead. It replaces each
+`_separate` hypothesis by a pair condition: `X` (resp. `Z`) on every pair the
+`Z`-rows (resp. `X`-rows) leave unseparated is a stabilizer. See
+`Codes/Small/Shor9.lean`: the `X`-checks cannot separate two qubits of one
+block, and `Z_i Z_j` within a block is a stabilizer.
 
 ```lean
 def zRow : Fin 3 → Finset (Fin 7) := ![{0, 1, 2, 4}, {0, 1, 3, 5}, {0, 2, 3, 6}]
 
-lemma Z1_eq_zOn : Z1 = zOn {0, 1, 2, 4} :=
-  NQubitPauliGroupElement.ext _ _ rfl (funext fun i => by fin_cases i <;> rfl)
+lemma Z1_eq_zOn : Z1 = zOn {0, 1, 2, 4} := by decide
 
 lemma zOn_row_mem (r : Fin 3) : zOn (zRow r) ∈ listToSet generatorsList := by
   fin_cases r <;> simp [zRow, generatorsList, Z1_eq_zOn, Z2_eq_zOn, Z3_eq_zOn]
@@ -685,14 +746,9 @@ lemma zRow_separate : ∀ i j : Fin 7, i ≠ j → ∃ r, (i ∈ zRow r ↔ j �
 theorem code_has_distance_three : HasCodeDistance stabilizerCode 3 :=
   hasCodeDistance_three_of_columns zRow xRow (listToSet generatorsList) stabilizerCode
     stabilizerCode_toSubgroup_eq zOn_row_mem xOn_row_mem zRow_cover xRow_cover
-    zRow_separate xRow_separate ⟨logicalXw3, logicalXw3_isNontrivial, logicalXw3_weight⟩
+    zRow_separate xRow_separate
+    ⟨minWeightLogical, minWeightLogical_isNontrivial, minWeightLogical_weight⟩
 ```
-
-The weight-3 witness is usually a stabilizer multiple of `logicalX` (`X̄ · X₁`
-for Steane); its weight is `by decide`, and its nontriviality comes from
-`isNontrivialLogicalOperator_of_anticommute_centralizer`
-(`Core/Logical/LogicalOperators.lean`): it lies in the centralizer and
-anticommutes with the centralizer element `Z̄`.
 
 **General case** (non-CSS, or no closer fits) — `hasCodeDistance_of`. It asks
 for `d ≥ 1`, the weight-`d` witness, and, for every `1 ≤ w < d`, that no
@@ -710,7 +766,7 @@ backtracking over `exact absurd rfl hij` (the diagonal) and the generators. See
 ```lean
 theorem code_has_distance_three : HasCodeDistance stabilizerCode 3 := by
   refine hasCodeDistance_of stabilizerCode 3 (by decide)
-    ⟨logicalX_w3, logicalX_w3_isNontrivial, by decide⟩ ?_
+    ⟨minWeightLogical, minWeightLogical_isNontrivial, minWeightLogical_weight⟩ ?_
   intro w hw_pos hw_lt g hg_weight h_nontrivial
   rcases (IsNontrivialLogicalOperator_iff g stabilizerCode.toStabilizerGroup).mp h_nontrivial
     with ⟨h_cent, _⟩
@@ -754,27 +810,36 @@ Before declaring a CSS-code formalization complete, verify:
 - [ ] `lake build QEC.Stabilizer.Codes.<CodeName>` succeeds (no errors, no
   `sorry` warnings).
 - [ ] No `set_option linter.* false` in the file (project-wide policy).
-- [ ] §1–§6 and §10–§13 are present (§14 may be in a separate distance
-  file); §7–§9 only for a parametric family on the CSS route.
+- [ ] `<Code>.lean` has §1–§6, the bare §13 and §14, ending in
+  `stabilizerCodeWithDistance`; §7–§9 only for a parametric family on the
+  CSS route.
+- [ ] `<Code>Logicals.lean` has §10–§12 and the rest of §13, ending in
+  `stabilizerCodeWithLogicals`; nothing in `<Code>.lean` refers to it.
 - [ ] `stabilizerGroup_toSubgroup_eq` exposed, so downstream files can get
   from the bundled group to the explicit generating set.
-- [ ] Module imported in `QEC/Stabilizer/Codes.lean` umbrella (otherwise
-  orphan-module trap — see CLAUDE.md).
+- [ ] Both modules imported in the family umbrella (e.g.
+  `QEC/Stabilizer/Codes/Small.lean`; otherwise orphan-module trap — see
+  CLAUDE.md).
 - [ ] Doc-comment header references the original paper.
 - [ ] Logical-operator (anti)commutation pattern matches the codeword basis from
   the original paper (Stage-3 review point).
 
 ## See also
 
-- `Steane7.lean` — canonical k = 1 instantiation of this template (decide
-  route); `Steane7Distance.lean` / `Steane7TransversalGates.lean` show how
-  downstream files consume `stabilizerGroup_toSubgroup_eq`
-- `Shor9.lean` — k = 1, n = 9, the largest literal instance
+- `Steane7.lean` / `Steane7Logicals.lean` — canonical k = 1 instantiation of
+  this template (decide route, column-condition distance);
+  `Steane7TransversalGates.lean` shows how downstream files consume the
+  logicals file and `stabilizerGroup_toSubgroup_eq`
+- `FourQubit_4_2_2.lean` / `FourQubit_4_2_2Logicals.lean` — k = 2
+- `Shor9.lean` — k = 1, n = 9, the largest literal instance; its distance is
+  the degenerate distance-3 closer in action
 - `FiveQubit_5_1_3.lean` — non-CSS; same §2–§6, general distance closer
 - `Repetition/N.lean`, `Iceberg/N.lean` — parametric families on the CSS
   route (§7–§9)
-- `RepetitionCode3.lean`, `RepetitionCodeN.lean` — degenerate small-distance
-  cases (d = 1)
+- `Small/QuantumHamming.lean` — parametric family on the CSS route whose
+  column-condition distance is proved for every `r`
+- `Repetition/Three.lean`, `Repetition/N.lean` (+ their `…Logicals.lean`) —
+  degenerate distance-1 cases
 - `RotatedSurfaceCodeN*.lean` — parametric L family
 - `ToricCodeN*.lean` — parametric family with trimmed-generator packaging
 - `.claude/agents/qec-skeleton-drafter.md` — Stage-2 agent that uses this

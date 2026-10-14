@@ -48,9 +48,7 @@ and other foundations. Import everything via `QEC`.
 
 ### Codes
 
-When the parameters include a distance `d`, that distance is proved. Codes
-listed as `[[n, k]]` are packaged, but their distance has not been formalized
-yet.
+Every distance `d` listed in the parameters below is proved.
 
 | Code | Parameters | Where |
 |---|---|---|
@@ -58,14 +56,15 @@ yet.
 | Toric code, `L ≥ 2` | `[[2L², 2, L]]` | `Codes/Toric/` |
 | Rotated surface code, odd `L ≥ 3` | `[[L², 1, L]]` | `Codes/RotatedSurface/` |
 | Iceberg family, `m ≥ 2` | `[[2m, 2m − 2, 2]]` | `Codes/Iceberg/N.lean` |
-| Five-qubit perfect code (non-CSS) | `[[5, 1, 3]]` | `Codes/Small/FiveQubit_5_1_3.lean` |
+| Five-qubit perfect code (non-CSS) | `[[5, 1, 3]]` | `Codes/Small/FiveQubit_5_1_3*.lean` |
 | Steane code | `[[7, 1, 3]]` | `Codes/Small/Steane7*.lean` |
-| `C_6` (Knill) | `[[6, 2, 2]]` | `Codes/Small/SixQubit_6_2_2.lean` |
-| `[[4, 2, 2]]` | `[[4, 2, 2]]` | `Codes/Small/FourQubit_4_2_2.lean` |
-| LNCY code | `[[4, 1, 2]]` | `Codes/Small/CSS_4_1_2.lean` |
-| 3-qubit repetition | `[[3, 1, 1]]` | `Codes/Repetition/Three.lean` |
-| n-qubit repetition, `n ≥ 2` | `[[n, 1]]` | `Codes/Repetition/N.lean` |
-| Shor code | `[[9, 1]]` | `Codes/Small/Shor9.lean` |
+| `C_6` (Knill) | `[[6, 2, 2]]` | `Codes/Small/SixQubit_6_2_2*.lean` |
+| `[[4, 2, 2]]` | `[[4, 2, 2]]` | `Codes/Small/FourQubit_4_2_2*.lean` |
+| LNCY code | `[[4, 1, 2]]` | `Codes/Small/CSS_4_1_2*.lean` |
+| 3-qubit repetition | `[[3, 1, 1]]` | `Codes/Repetition/Three*.lean` |
+| n-qubit repetition, `n ≥ 2` | `[[n, 1, 1]]` | `Codes/Repetition/N*.lean` |
+| Shor code | `[[9, 1, 3]]` | `Codes/Small/Shor9*.lean` |
+| Quantum Hamming, `r ≥ 3` | `[[2^r − 1, 2^r − 1 − 2r, 3]]` | `Codes/Small/QuantumHamming*.lean` |
 
 Each code is packaged as a `StabilizerCode`. The proved obligations are
 generator count, independence, pairwise commutation, and exclusion of `-I`.
@@ -73,6 +72,12 @@ Most codes also provide a `StabilizerCodeWithLogicals` (logical operators in the
 centralizer, with the required anticommutation) and, where the distance is
 proved, a `StabilizerCodeWithDistance`. In addition, for the Steane code,
 transversal `H` and `S` are verified as the logical Hadamard and phase gates.
+
+The single-instance and repetition codes (`Codes/Small/`, `Codes/Repetition/`)
+share one layout: `<Code>.lean` runs from the generators to the distance proof
+and `stabilizerCodeWithDistance`, and `<Code>Logicals.lean` adds the chosen
+logical basis and `stabilizerCodeWithLogicals`. The distance proof does not
+depend on the logical basis.
 
 ## Headline results
 
@@ -198,7 +203,8 @@ lake env lean scripts/AxiomCheck.lean   # axiom policy, needs a completed build
   with lean4-mode).
 - Start with [`Playground.lean`](Playground.lean), or with
   [`QEC/Stabilizer/Codes/_TEMPLATE.lean`](QEC/Stabilizer/Codes/_TEMPLATE.lean),
-  the canonical structure for a new code.
+  the canonical structure for a new code (including the code-file /
+  logicals-file split).
 - Use `#check` and `#print axioms` to explore definitions and results.
 
 #### Claude Code users (optional)

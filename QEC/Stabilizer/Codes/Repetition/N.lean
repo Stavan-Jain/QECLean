@@ -4,6 +4,9 @@ import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
 import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
 import QEC.Stabilizer.Framework.Core.Stabilizer.SubgroupLemmas
 import QEC.Stabilizer.Framework.Core.CSS.CSSNoNegI
+import QEC.Stabilizer.Framework.Core.CSS.CSSDistance
+import QEC.Stabilizer.Framework.Core.CodeNotation
+import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
 import QEC.Stabilizer.Framework.Core.Stabilizer.Centralizer
 import QEC.Stabilizer.Foundations.PauliGroup.Commutation
 import QEC.Stabilizer.Foundations.PauliGroup.CommutationTactics
@@ -22,17 +25,35 @@ namespace StabilizerGroup
 namespace RepetitionCodeN
 
 /-!
-# Parametric repetition code (Z-only CSS) on `n+2` qubits
+# The repetition code on `n + 2` qubits `[[n+2, 1, 1]]`
 
-This is a parametric version of `RepetitionCode3`, defined on **`n+2` qubits**
-to make the adjacent-pair indexing clean.
+The parametric version of `RepetitionCode3`, defined on **`n + 2` qubits** to
+make the adjacent-pair indexing clean. The generators are the `Z`-checks
+`Z_i Z_{i+1}` for `i : Fin (n+1)`, acting on qubits `i` and `i+1`; there are no
+`X`-checks.
 
-Generators (Z-checks): `Z_i Z_{i+1}` for `i : Fin (n+1)`, acting on qubits `i`
-and `i+1`.
+Being parametric, the family takes the **CSS route** rather than the decide
+route: the generator list is a `List.ofFn` that `decide` cannot evaluate, so
+the generators commute because they are all Z-type, `−I ∉ closure` comes from
+`CSS.negIdentity_not_mem_closure_union` with no `X`-generators, and
+independence from a column-by-column induction on the check matrix.
 
-We show the generated subgroup is a `StabilizerGroup (n+2)`:
-- **abelian**: all generators are Z-type
-- **no `-I`**: apply the reusable CSS lemma with `XGenerators = ∅`
+As a *quantum* code it has distance 1 for every `n`: `Z` on qubit `0` commutes
+with every check but anticommutes with `X⊗ⁿ⁺²`, which also commutes with every
+check, so it is a weight-one nontrivial logical.
+
+The logical basis `X̄ = X⊗ⁿ⁺²`, `Z̄ = Z⊗ⁿ⁺²` (for odd `n + 2`) is in
+`NLogicals.lean`.
+
+## Outline
+
+- Generators `ZPair` and the list `generatorsList`; check-matrix independence
+  `rowsLinearIndependent_generatorsList`
+- Z-typing and `generators_commute`
+- `negIdentity_not_mem`, the bundled `stabilizerGroup`
+- `stabilizerCode : Code[[n+2, 1]]`
+- Distance 1 (weight-1 witness): `code_has_distance_one`,
+  `stabilizerCodeWithDistance : Code[[n+2, 1, 1]]`
 -/
 
 open NQubitPauliGroupElement
@@ -295,7 +316,9 @@ theorem generators_commute (n : ℕ) :
   exact ZType_commutes (ZGenerators_are_ZType n g hg) (ZGenerators_are_ZType n h hh)
 
 /-!
-## No `-I` in the generated subgroup (CSS lemma with empty X-generators)
+## No `−I` in the stabilizer subgroup
+
+`CSS.negIdentity_not_mem_closure_union` with an empty set of X-generators.
 -/
 
 theorem negIdentity_not_mem (n : ℕ) :
@@ -317,38 +340,96 @@ lemma listToSet_generators_eq (n : ℕ) :
   rw [listToSet_generatorsList, generators, XGenerators, Set.union_empty]
 
 /-!
-## Logical operators (one logical qubit when `n+2` is odd)
-
-Logical X = X on all `n+2` qubits, logical Z = Z on all `n+2` qubits. They
-commute with every stabilizer (each ZPair has exactly two qubits where X and Z
-meet, so even anticommutes) and anticommute with each other when `n+2` is odd.
+## Bundled `StabilizerGroup (n+2)`
 -/
 
-/-- Logical X: X on all `n+2` qubits. -/
-def logicalX (n : ℕ) : NQubitPauliGroupElement (n + 2) :=
+/-- The repetition code as a stabilizer group (canonical: from generator list).
+-/
+noncomputable def stabilizerGroup (n : ℕ) : StabilizerGroup (n + 2) :=
+  mkStabilizerFromGenerators (n + 2) (generatorsList n)
+    (by rw [listToSet_generators_eq]; exact generators_commute n)
+    (by rw [listToSet_generators_eq]; exact negIdentity_not_mem n)
+
+/-- The stabilizer subgroup is the closure of the generator set. -/
+lemma stabilizerGroup_toSubgroup_eq (n : ℕ) : (stabilizerGroup n).toSubgroup = subgroup n := by
+  simp only [stabilizerGroup, mkStabilizerFromGenerators, subgroup]
+  rw [listToSet_generators_eq]
+
+/-!
+## The bare code `Code[[n+2, 1]]`
+
+The `n + 1` nearest-neighbour `ZZ` generators are independent and commute, on
+`n + 2` qubits: one logical qubit, for every `n`.
+-/
+
+/-- The repetition code on `n + 2` qubits as a stabilizer code `[[n+2, 1]]`. -/
+noncomputable def stabilizerCode (n : ℕ) : Code[[n + 2, 1]] where
+  hk := Nat.succ_le_succ (Nat.zero_le (n + 1))
+  generatorsList := generatorsList n
+  generators_length := by rw [generatorsList_length]; omega
+  generators_phaseZero := AllPhaseZero_generatorsList n
+  generators_independent := GeneratorsIndependent_generatorsList n
+  generators_commute := by rw [listToSet_generators_eq]; exact generators_commute n
+  closure_no_neg_identity := by rw [listToSet_generators_eq]; exact negIdentity_not_mem n
+
+/-- The stabilizer code's subgroup is the closure of the generator set. -/
+lemma stabilizerCode_toSubgroup_eq (n : ℕ) :
+    (stabilizerCode n).toStabilizerGroup.toSubgroup = subgroup n :=
+  stabilizerGroup_toSubgroup_eq n
+
+/-!
+## Distance 1
+
+Every nontrivial logical of positive weight trivially has weight at least 1,
+so there is no lower bound to prove: only a weight-1 witness.
+
+### A nontrivial logical of weight 1
+
+The repetition code protects against bit flips only: a single phase flip `Z` on
+qubit `0` commutes with every `ZZ` check, yet it is not a stabilizer, since it
+anticommutes with `X⊗ⁿ⁺²`, which meets each check on two qubits and so also
+commutes with every check. Unlike the logical basis, this needs no parity
+assumption on `n`.
+-/
+
+/-- `Z` on qubit `0`: a nontrivial logical of weight 1 (for odd `n + 2`, it is
+`Z̄ = Z⊗ⁿ⁺²` times a stabilizer). -/
+def minWeightLogical (n : ℕ) : NQubitPauliGroupElement (n + 2) :=
+  weightOneAt 0 PauliOperator.Z
+
+/-- `X` on all `n + 2` qubits: a centralizer element anticommuting with
+`minWeightLogical`. -/
+def minWeightPartner (n : ℕ) : NQubitPauliGroupElement (n + 2) :=
   ⟨0, NQubitPauliOperator.X (n + 2)⟩
 
-/-- Logical Z: Z on all `n+2` qubits. -/
-def logicalZ (n : ℕ) : NQubitPauliGroupElement (n + 2) :=
-  ⟨0, NQubitPauliOperator.Z (n + 2)⟩
+lemma minWeightLogical_weight (n : ℕ) : weight (minWeightLogical n) = 1 := by
+  rw [weight, NQubitPauliOperator.weight, Finset.card_eq_one]
+  refine ⟨0, Finset.ext fun k => ?_⟩
+  by_cases hk : k = 0 <;>
+    simp [minWeightLogical, weightOneAt, NQubitPauliOperator.mem_support, hk]
 
-/-- Logical X and logical Z anticommute when the number of physical qubits `n+2`
-is odd. -/
-theorem logicalX_anticommutes_logicalZ (n : ℕ) (hn : Odd (n + 2)) :
-    NQubitPauliGroupElement.Anticommute (logicalX n) (logicalZ n) :=
-  NQubitPauliOperator.allX_allZ_anticommute (n + 2) hn
+/-- `Z` on qubit `0` is Z-type, so it commutes with every (Z-type) check. -/
+lemma minWeightLogical_mem_centralizer (n : ℕ) :
+    minWeightLogical n ∈ centralizer (stabilizerGroup n) := by
+  rw [StabilizerGroup.mem_centralizer_iff_closure _ _ (generators n)
+    (stabilizerGroup_toSubgroup_eq n)]
+  intro s hs
+  simp only [generators, XGenerators, Set.union_empty] at hs
+  refine ZType_commutes (ZGenerators_are_ZType n s hs) ⟨rfl, fun k => ?_⟩
+  by_cases hk : k = 0 <;> simp [minWeightLogical, weightOneAt, hk, PauliOperator.IsZType]
 
-private lemma logicalX_commutes_ZPair (n : ℕ) (i : Fin (n + 1)) :
-    logicalX n * ZPair n i = ZPair n i * logicalX n := by
+/-- `X⊗ⁿ⁺²` meets each check `Z_i Z_{i+1}` on exactly two qubits. -/
+private lemma minWeightPartner_commutes_ZPair (n : ℕ) (i : Fin (n + 1)) :
+    minWeightPartner n * ZPair n i = ZPair n i * minWeightPartner n := by
   classical
   pauli_comm_even_anticommutes
   have hfilter :
       (Finset.univ.filter
-            (NQubitPauliGroupElement.anticommutesAt (logicalX n).operators (ZPair n i).operators)) =
+            (anticommutesAt (minWeightPartner n).operators (ZPair n i).operators)) =
         ({Fin.castSucc i, Fin.succ i} : Finset (Fin (n + 2))) := by
     ext j
     simp only [Finset.mem_filter, Finset.mem_insert, Finset.mem_singleton, Finset.mem_univ,
-      true_and, logicalX, ZPair, NQubitPauliOperator.X, NQubitPauliOperator.set,
+      true_and, minWeightPartner, ZPair, NQubitPauliOperator.X, NQubitPauliOperator.set,
       NQubitPauliOperator.identity, NQubitPauliGroupElement.anticommutesAt]
     by_cases hj1 : j = Fin.castSucc i <;> by_cases hj2 : j = Fin.succ i
     · subst hj1
@@ -368,93 +449,42 @@ private lemma logicalX_commutes_ZPair (n : ℕ) (i : Fin (n + 1)) :
   rw [Finset.card_insert_of_notMem hne, Finset.card_singleton]
   exact even_two
 
-private lemma logicalZ_commutes_ZPair (n : ℕ) (i : Fin (n + 1)) :
-    logicalZ n * ZPair n i = ZPair n i * logicalZ n := by
-  apply NQubitPauliGroupElement.commutes_of_componentwise_commutes
-  intro j
-  by_cases hj1 : j = Fin.castSucc i <;> by_cases hj2 : j = Fin.succ i
-  · subst hj1; grind
-  · subst hj1
-    simp only [logicalZ, NQubitPauliOperator.Z, ZPair, NQubitPauliOperator.set,
-      ↓reduceIte, ite_self]
-  · subst hj2
-    simp only [logicalZ, NQubitPauliOperator.Z, ZPair, NQubitPauliOperator.set,
-      ↓reduceIte]
-  · simp only [logicalZ, NQubitPauliOperator.Z, ZPair, NQubitPauliOperator.set,
-    NQubitPauliOperator.identity, if_neg hj1, if_neg hj2, PauliOperator.mulOp_Z_I,
-    PauliOperator.mulOp_I_Z]
-
-/-!
-## Bundled `StabilizerGroup (n+2)`
--/
-
-/-- The repetition code as a stabilizer group (canonical: from generator list).
--/
-noncomputable def stabilizerGroup (n : ℕ) : StabilizerGroup (n + 2) :=
-  mkStabilizerFromGenerators (n + 2) (generatorsList n)
-    (by rw [listToSet_generators_eq]; exact generators_commute n)
-    (by rw [listToSet_generators_eq]; exact negIdentity_not_mem n)
-
-lemma stabilizerGroup_toSubgroup_eq (n : ℕ) : (stabilizerGroup n).toSubgroup = subgroup n := by
-  simp only [stabilizerGroup, mkStabilizerFromGenerators, subgroup]
-  rw [listToSet_generators_eq]
-
-/-- Logical X commutes with every element of the stabilizer. -/
-theorem logicalX_mem_centralizer (n : ℕ) :
-    logicalX n ∈ centralizer (stabilizerGroup n) := by
-  rw [StabilizerGroup.mem_centralizer_iff_closure (logicalX n) (stabilizerGroup n) (generators n)
+/-- `X⊗ⁿ⁺²` commutes with every element of the stabilizer. -/
+lemma minWeightPartner_mem_centralizer (n : ℕ) :
+    minWeightPartner n ∈ centralizer (stabilizerGroup n) := by
+  rw [StabilizerGroup.mem_centralizer_iff_closure _ _ (generators n)
     (stabilizerGroup_toSubgroup_eq n)]
   intro s hs
   simp only [generators, XGenerators, Set.mem_union, Set.mem_empty_iff_false] at hs
   rcases hs with ⟨i, rfl⟩ | hEmp
-  · exact (logicalX_commutes_ZPair n i).symm
+  · exact (minWeightPartner_commutes_ZPair n i).symm
   · exact False.elim hEmp
 
-/-- Logical Z commutes with every element of the stabilizer. -/
-theorem logicalZ_mem_centralizer (n : ℕ) :
-    logicalZ n ∈ centralizer (stabilizerGroup n) := by
-  rw [StabilizerGroup.mem_centralizer_iff_closure (logicalZ n) (stabilizerGroup n) (generators n)
-    (stabilizerGroup_toSubgroup_eq n)]
-  intro s hs
-  simp only [generators, XGenerators, Set.mem_union, Set.mem_empty_iff_false] at hs
-  rcases hs with ⟨i, rfl⟩ | hEmp
-  · exact (logicalZ_commutes_ZPair n i).symm
-  · exact False.elim hEmp
+/-- `Z` on qubit `0` meets `X⊗ⁿ⁺²` on a single qubit, so they anticommute. -/
+lemma minWeightLogical_anticommutes_minWeightPartner (n : ℕ) :
+    Anticommute (minWeightLogical n) (minWeightPartner n) := by
+  rw [minWeightLogical, anticommute_weightOneAt_iff]
+  simp [minWeightPartner, NQubitPauliOperator.X]
 
-/-!
-## StabilizerCode [[n+2, 1]], and its logical basis for odd n
+/-- `Z` on qubit `0` is a nontrivial logical operator: it lies in the
+centralizer and anticommutes with the centralizer element `minWeightPartner`. -/
+lemma minWeightLogical_isNontrivial (n : ℕ) :
+    IsNontrivialLogicalOperator (minWeightLogical n) (stabilizerCode n).toStabilizerGroup :=
+  isNontrivialLogicalOperator_of_anticommute_centralizer _ (minWeightLogical_mem_centralizer n)
+    (minWeightPartner_mem_centralizer n) (minWeightLogical_anticommutes_minWeightPartner n)
 
-The repetition code encodes one logical qubit, for every `n`: the bare
-`stabilizerCode n` is just the `n + 1` nearest-neighbour `ZZ` generators.
-Logical X̄ = X on all qubits and Z̄ = Z on all qubits anticommute only when the
-number of physical qubits `n+2` is odd, so the logical basis
-(`stabilizerCodeWithLogicals`) is defined only for odd `n` (i.e. `Odd (n + 2)`).
--/
+/-! ### The code with its distance `Code[[n+2, 1, 1]]` -/
 
-private def logicalOpsRepN (n : ℕ) (hn : Odd (n + 2)) :
-    Fin 1 → LogicalQubitOps (n + 2) (stabilizerGroup n) :=
-  fun _ => ⟨logicalX n, logicalZ n, logicalX_mem_centralizer n, logicalZ_mem_centralizer n,
-    logicalX_anticommutes_logicalZ n hn⟩
+/-- **The repetition code has distance 1.** Every nontrivial logical of
+positive weight has weight at least 1, and `Z` on qubit `0` attains it. -/
+theorem code_has_distance_one (n : ℕ) : HasCodeDistance (stabilizerCode n) 1 :=
+  ⟨le_rfl, fun _ _ hw => hw, minWeightLogical n, minWeightLogical_isNontrivial n,
+    minWeightLogical_weight n⟩
 
-/-- The parametric repetition code as a stabilizer code [[n+2, 1]]. The bare
-code exists for every `n`; only the logical basis bundled in
-`stabilizerCodeWithLogicals` needs `n + 2` odd. -/
-noncomputable def stabilizerCode (n : ℕ) : StabilizerCode (n + 2) 1 where
-  hk := Nat.succ_le_succ (Nat.zero_le (n + 1))
-  generatorsList := generatorsList n
-  generators_length := by rw [generatorsList_length]; omega
-  generators_phaseZero := AllPhaseZero_generatorsList n
-  generators_independent := GeneratorsIndependent_generatorsList n
-  generators_commute := by rw [listToSet_generators_eq]; exact generators_commute n
-  closure_no_neg_identity := by rw [listToSet_generators_eq]; exact negIdentity_not_mem n
-
-/-- The parametric repetition code with its logical pair `X̄ = X` on all qubits,
-`Z̄ = Z` on all qubits, which anticommute exactly when `n + 2` is odd. -/
-noncomputable def stabilizerCodeWithLogicals (n : ℕ) (hn : Odd (n + 2)) :
-    StabilizerCodeWithLogicals (n + 2) 1 where
+/-- The repetition code on `n + 2` qubits packaged with its distance. -/
+noncomputable def stabilizerCodeWithDistance (n : ℕ) : Code[[n + 2, 1, 1]] where
   toStabilizerCode := stabilizerCode n
-  logicalOps := logicalOpsRepN n hn
-  logical_commute_cross := fun ℓ ℓ' h => (h (Subsingleton.elim ℓ ℓ')).elim
+  hasDistance := code_has_distance_one n
 
 end RepetitionCodeN
 end StabilizerGroup
