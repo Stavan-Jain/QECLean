@@ -125,18 +125,23 @@ run_cmd do
     ``XDoubleCoverData.dangerous_bound_of_pair_shape_of_logicalFloor,
     ``XDoubleCoverData.safeFloor_of_seamCosetFloor,
     ``XDoubleCoverData.chainWeight_ge_double_of_logicalFloor]
+  -- Both certificate inputs must come from the generic Brouwer–Zimmermann layer.
+  let bz := #[``XDoubleCoverData.SeamBZCertificate.seamCosetFloor,
+    ``XDoubleCoverData.SeamBZCertificate.boundary_census,
+    ``F2Mask.bz_ok_of_xorSpan, ``F2Mask.kernel_eq_sum_of_peel]
   let targets := #[
     (``gross_chain_distance_eq_12,
-      #[``XDoubleCoverData.chain_distance_eq_double_of_logicalFloor]),
+      #[``XDoubleCoverData.chain_distance_eq_double_of_logicalFloor] ++ bz),
     (``gross_pauli_distance_eq_12,
-      #[``XDoubleCoverData.pauli_distance_eq_double_of_logicalFloor]),
+      #[``XDoubleCoverData.pauli_distance_eq_double_of_logicalFloor] ++ bz),
     (``grossStabilizerCode_hasCodeDistance_12_uncond,
-      #[``gross_pauli_distance_eq_12, ``StabilizerGroup.has_code_distance_of_isLeast]),
+      #[``gross_pauli_distance_eq_12, ``StabilizerGroup.has_code_distance_of_isLeast] ++ bz),
     (``grossStabilizerCodeWithDistance,
-      #[``gross_pauli_distance_eq_12, ``StabilizerGroup.has_code_distance_of_isLeast]),
+      #[``gross_pauli_distance_eq_12, ``StabilizerGroup.has_code_distance_of_isLeast] ++ bz),
     (``grossStabilizerCode_hasCodeDistance_12,
       #[``XDoubleCoverData.pauli_distance_eq_double_of_logicalFloor,
-        ``StabilizerGroup.has_code_distance_of_isLeast])]
+        ``StabilizerGroup.has_code_distance_of_isLeast,
+        ``XDoubleCoverData.SeamBZCertificate.boundary_census])]
   for (root, endpoints) in targets do
     let mut pending := #[root]
     let mut visited : NameSet := {}
@@ -152,6 +157,6 @@ run_cmd do
     for dependency in required ++ endpoints do
       unless visited.contains dependency do
         throwError "{root} no longer uses the generic theorem {dependency}"
-  logInfo "doubling checks OK — independent cover and Gross generic proof dependencies"
+  logInfo "doubling checks OK — independent cover and Gross generic proof dependencies (incl. BZ)"
 
 end QEC.DoublingCheck

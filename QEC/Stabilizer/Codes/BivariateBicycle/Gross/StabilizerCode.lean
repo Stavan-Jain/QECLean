@@ -24,16 +24,13 @@ Status: complete. `grossStabilizerCode : StabilizerCode 144 12` is built (all
 four packaging obligations — closure equality, generator independence via the
 decoder identities, the 12 logical qubits, and assembly), the 12 logical qubit
 pairs are bundled on top of it as `grossStabilizerCodeWithLogicals`, and the
-chain-level distance theorems are transported to
-`grossStabilizerCode_logical_weight_ge_6`
-(unconditional `≥ 6`) and `grossStabilizerCode_hasCodeDistance_12` (`= 12`,
-conditional only on `MImBound`; the `LightStabilizerClassification` input is
-discharged by `LightStab.lightStabilizerClassification_holds`).
+unconditional `≥ 6` floor is transported to
+`grossStabilizerCode_logical_weight_ge_6`. The `= 12` results, which need the
+safe-sector and light-boundary certificates, live in `Distance.lean`.
 -/
 
 import QEC.Stabilizer.Codes.BivariateBicycle.Gross.BaseDistance
 import QEC.Stabilizer.Codes.BivariateBicycle.Gross.SafeSector
-import QEC.Stabilizer.Codes.BivariateBicycle.Gross.LightStabClassify
 import QEC.Stabilizer.Codes.BivariateBicycle.Gross.StabilizerCodeData
 import QEC.Stabilizer.Framework.Homological.LogicalCorrespondence
 import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
@@ -1514,19 +1511,5 @@ theorem grossStabilizerCode_logical_weight_ge_6
     6 ≤ NQubitPauliGroupElement.weight g :=
   gross_logical_weight_ge_6 g
     ((IsNontrivialLogicalOperator_of_toSubgroup_eq g grossStabilizerCode_toSubgroup_eq).mp hg)
-
-/-- **`HasCodeDistance grossStabilizerCode 12`**, conditional only on
-`MImBound`. The `LightStabilizerClassification` input (`hC`) is discharged by
-`LightStab.lightStabilizerClassification_holds`; everything else — the packaging
-and the chain-level distance — is unconditional. `MImBound` itself is discharged
-in `MImAssembly` (`LightStab.mimBound_holds`); for the fully unconditional
-statement see `grossStabilizerCode_hasCodeDistance_12_uncond` in
-`Distance.lean`. -/
-theorem grossStabilizerCode_hasCodeDistance_12 (hMim : MImBound) :
-    HasCodeDistance grossStabilizerCode 12 :=
-  has_code_distance_of_isLeast grossStabilizerCode
-    grossStabilizerCode_toSubgroup_eq (by decide)
-    (gross_pauli_distance_eq_12_of_engine
-      LightStab.lightStabilizerClassification_holds hMim)
 
 end Quantum.Stabilizer.Homological.BB

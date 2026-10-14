@@ -81,7 +81,7 @@ QEC/
     └── Codes/               # Concrete codes, organized by family:
         ├── _TEMPLATE.lean       # Canonical structural reference for new CSS codes
         ├── BivariateBicycle/    # BB family, one subdir per instance:
-        │                        # Gross/ (+ Gross/SafeFloor/). READ ITS
+        │                        # Gross/. READ ITS
         │                        # README.md BEFORE EDITING — task router,
         │                        # discharge map, generated-file rules
         ├── Toric/               # Parametric L×L toric code: CodeN, Chains,
@@ -502,21 +502,29 @@ then symlink as above.
 
 **Cold-build memory cliff (16 GB machines).** The worktree's own
 `.lake/build/` starts empty, so the first `lake build` compiles all of
-`QEC/` — and its tail runs the three BB safe-floor kernel-`decide` leaves
-(`Gross/SafeFloor/MImFloorY{0,1,4}`, ~3.75 GB peak each) concurrently.
-On a 16 GB machine this can OOM-kill the build (and the session driving
-it); CI adds 12 GB of swap for exactly this (see the comment in
-`lean_action_ci.yml`). Locally, build the three leaves sequentially
-first, then the rest:
+`QEC/`, and at Lake's default parallelism (one job per core) the heavy kernel
+`decide` modules run side by side. On a 16 GB machine this can exhaust memory
+and take the session — or the machine — down with it; CI adds 12 GB of swap
+(see `lean_action_ci.yml`). Lake 5 has no `-j` flag: cap the job count with
+`LEAN_NUM_THREADS` (`3` for incremental builds, `2` or `1` after a change that
+invalidates most of the tree), and run one Lean process at a time:
 
 ```bash
-for m in Y0 Y1 Y4; do
-  lake build QEC.Stabilizer.Codes.BivariateBicycle.Gross.SafeFloor.MImFloor$m
-done
-lake build
+LEAN_NUM_THREADS=2 lake build
 ```
 
-Quit or idle the Lean LSP first — its file workers hold gigabytes too.
+The heaviest gross modules are `Gross/SeamBZWalk` (the Brouwer–Zimmermann
+walks, ~80 s, ~0.5 GB above the import baseline) and `Gross/StabilizerCode`
+(~60 s). Quit or idle the Lean LSP first — its file workers hold gigabytes too,
+and a worker still elaborating a heavy file keeps doing so after an MCP request
+times out.
+
+**`decide` over a list of `Fintype`-typed elements.** `decide` on
+`∀ b ∈ l, P b` picks `Fintype.decidableForallFintype` whenever the element type
+is a `Fintype` — e.g. `(BaseGroup → ZMod 2) × BaseGroup` — and the kernel then
+enumerates the whole type (`2³⁶ · 36` elements) instead of the list, exhausting
+memory within seconds. State such checks over data whose element type is not a
+`Fintype` (lists, `ℕ`), as `Gross/SeamBZ.lean` does with `kbSupports.zip kbFree`.
 
 ## Agent tooling: lean-lsp MCP
 

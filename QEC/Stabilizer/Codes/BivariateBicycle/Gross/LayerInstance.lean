@@ -9,11 +9,11 @@ remaining classification and confined-floor inputs, then applies the generic
 chain and Pauli assemblies. `Distance.lean` packages this same result.
 
 Gross-specific inputs remain the kernel-checked polynomial, support-shape,
-CRT/coset, and tight-witness certificates. All geometric reductions are shared
-with other `XDoubleCoverData` instances.
+Brouwer–Zimmermann (`SeamBZ`), and tight-witness certificates. All geometric
+reductions are shared with other `XDoubleCoverData` instances.
 -/
 
-import QEC.Stabilizer.Codes.BivariateBicycle.Gross.SafeFloor.MImAssembly
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.SeamBZ
 import QEC.Stabilizer.Framework.Homological.BBDoubling
 
 namespace Quantum
@@ -30,14 +30,15 @@ set_option maxRecDepth 4096
 /-! ## The remaining layer inputs -/
 
 /-- **`DangerousFloorNZ 12`** — (M) on the `b ≠ 0` rungs, unconditional via the
-light-stabilizer classification. -/
+light-boundary census of the Brouwer–Zimmermann certificate. -/
 theorem grossCoverData_dangerousFloorNZ : grossCoverData.DangerousFloorNZ 12 :=
-  LightStab.dangerous_sector_unconditional
+  GrossBZ.dangerousSector_bz
 
-/-- **`SafeFloor 12`** — (M-im), unconditional via `mimBound_holds`. -/
+/-- **`SafeFloor 12`** — (M-im), unconditional via the Brouwer–Zimmermann
+seam-coset floor. -/
 theorem grossCoverData_safeFloor : grossCoverData.SafeFloor 12 :=
   grossCoverData.safeFloor_of_seamCosetFloor
-    grossCoverData_deckTrivial LightStab.mimBound_holds
+    grossCoverData_deckTrivial GrossBZ.mimBound_bz
 
 /-! ## Interface identities (documentation-grade: the layer's sector `Prop`s
 are definitionally the `Assembly.lean` ones) -/

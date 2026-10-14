@@ -24,15 +24,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      # The gross BB safe-sector floor leaves (MImFloorY0/Y1/Y4) are memory-hungry
-      # kernel `decide` checks. lake has no `-j`/parallelism flag, so it builds all
-      # three concurrently at the tail and exhausts the runner's 16 GB → the job is
-      # killed (exit 143). Add swap so the peak spills to disk instead of OOM-ing.
-      # NOTE: these are no longer `native_decide` (that was retired in PR #66) — the
-      # cost is kernel reduction, so this swap is still required. Symptom to watch
-      # for locally: an apparent hang on MImFloorY{0,1,4} with workers at 4-10% CPU
-      # is this same contention, not a proof regression. Built alone each takes ~40s.
-      - name: Add swap space (BB safe-floor kernel-decide memory peaks)
+      # The heavy kernel `decide` modules (the gross BZ walks in Gross/SeamBZWalk,
+      # Gross/StabilizerCode) run side by side at lake's default parallelism (lake
+      # has no `-j` flag), which can exhaust the runner's 16 GB → the job is killed
+      # (exit 143). Add swap so a peak spills to disk instead of OOM-ing. Symptom to
+      # watch for locally: an apparent hang with workers at 4-10% CPU is this same
+      # contention, not a proof regression.
+      - name: Add swap space (kernel-decide memory peaks)
         # The runner already has an active /swapfile, so add an extra one on the
         # large /mnt ephemeral disk rather than touching the existing swap.
         run: |
