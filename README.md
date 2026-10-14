@@ -4,81 +4,201 @@
 [![Blueprint](https://img.shields.io/badge/blueprint-live-success)](https://stavan-jain.github.io/QECLean/)
 [![Dashboard](https://img.shields.io/badge/pipeline%20dashboard-live-success)](https://stavan-jain.github.io/qec-lab/)
 [![Research: qec-lab](https://img.shields.io/badge/research-qec--lab-informational)](https://github.com/Stavan-Jain/qec-lab)
+[![Open in Codespaces](https://img.shields.io/badge/Codespaces-open-blue?logo=github)](https://codespaces.new/Stavan-Jain/QECLean)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
-This project formalizes foundational concepts in quantum error correction using the Lean 4 proof assistant, with the long-term goal of a broad formalization of Stabilizer Codes.
+This project formalizes the stabilizer formalism for quantum error correction in
+the Lean 4 proof assistant, with the long-term goal of a broad formalization of
+stabilizer codes.
 
-Along the way, it develops definitions and lemmas for reasoning about qubits, quantum states, and unitary operations, contributing toward a verified foundation for quantum computing and fault tolerance in Lean.
+Along the way, it develops definitions and lemmas for reasoning about qubits,
+quantum states, and unitary operations, contributing toward a verified
+foundation for quantum computing and fault tolerance in Lean.
 
 ## Overview
 
-Modules are written in Lean 4 and rely on [mathlib](https://github.com/leanprover-community/mathlib4) for linear algebra and other foundations. Import everything via `QEC`, or use `QEC.Foundations.Foundations` or `QEC.Stabilizer.Stabilizer` for a subset. Everything on `main` depends on the three standard axioms — `propext`, `Classical.choice`, `Quot.sound`. Verify any result with `#print axioms Your.Theorem`.
+Modules are written in Lean 4 and rely on
+[mathlib](https://github.com/leanprover-community/mathlib4) for linear algebra
+and other foundations. Import everything via `QEC`.
 
 ### Features
 
-- **Foundational Quantum Computing**: Core definitions for qubits, quantum states, vectors, and norms
-- **Quantum Gates**: Formalized implementations of single-qubit gates (Pauli matrices, Hadamard, phase gates, etc.)
-- **Tensor Products**: Utilities and proofs for composite quantum systems
-- **Stabilizer Formalism**: Single-qubit and n-qubit Pauli groups, commutation (including tactics), matrix representations, stabilizer groups, CSS structure, and logical operators
-- **Binary Symplectic Representation**: Check matrices, symplectic inner product, symplectic span, and equivalence with independent generators
-- **Finite Codes**: 3-qubit repetition code, Steane 7-qubit code, Shor 9-qubit code, and many others
-- **Toric Code**: For every `L ≥ 2`, the `L × L` toric code is verified as a `StabilizerCode (2L²) 2` with **distance exactly `L`**. The chain complex, `H₁ ≅ 𝔽₂²` isomorphism, `(h, v)` wrapping invariants, and CSS distance bridge are all mechanized — see the [interactive write-up](https://stavan-jain.github.io/DistanceBlog/) (or the [in-repo version in qec-lab](https://github.com/Stavan-Jain/qec-lab/blob/main/docs/distance_proof.md)) for the math, and `QEC/Stabilizer/Codes/Toric/` (code, lattice geometry, chain complex, distance) for the Lean.
-- **Gross code**: IBM's `[[144,12,12]]` gross code is verified with **distance exactly 12**, alongside its `[[72,12,6]]` base, the `[[72,4,8]]` pair, and a parametric free-ℤ₂ **doubling framework** (`Framework/Homological/BB*`) with cover-transfer, deck-homotopy, deck-tower, Bockstein-rank, and class base-floor (`SmallCycleData`) layers.
-- **CSS concatenation**: parametric `[[n₁n₂, k₂, ≥ d₁d₂]]` concatenation with unconditional `[[49,1,9]]` (Steane ⊗ Steane) and `[[28,2,6]]` (Steane ⊗ [[4,2,2]]) instances.
-- **Verified Properties**: Mechanized proofs of key properties, including the obligations used to instantiate `StabilizerCode` instances (generator count/independence/commutation, exclusion of `-I`) and the `StabilizerCodeWithLogicals` bundles layered on them (logical-operator centralizer + anticommutation conditions), along with distance theorems.
+- **Quantum computing foundations**: qubits, state vectors, norms, ket
+  notation, single- and two-qubit gates (Paulis, Hadamard, phase, CNOT), tensor
+  products, and the Clifford conjugation tableau.
+- **Pauli groups**: single- and n-qubit Pauli groups, matrix representations,
+  commutation theory (including tactics), and the `σ[XZZXI]` notation for
+  literal Pauli strings.
+- **Binary symplectic representation**: check matrices, the symplectic inner
+  product, symplectic span, and the equivalence between independent generators
+  and linearly independent check-matrix rows.
+- **Stabilizer framework**: stabilizer groups, codespaces, centralizers,
+  logical operators, logical gates, code distance, and CSS structure. Codes come
+  in three layers: `StabilizerCode n k` (`Code[[n, k]]`, generators only),
+  `StabilizerCodeWithLogicals n k` (`Code[[n, k]]ₗ`, adding a chosen logical
+  basis), and `StabilizerCodeWithDistance n k d` (`Code[[n, k, d]]`, adding a
+  distance proof).
+- **Homological framework**: chain-complex (CSS) codes, the
+  logical-operator-to-homology correspondence, and the bivariate-bicycle
+  doubling layer (`Framework/Homological/BB*`): cover transfer, deck homotopy,
+  deck towers, Bockstein rank, and small-cycle base floors.
+- **CSS concatenation framework**: a parametric `[[n₁n₂, k₂, ≥ d₁d₂]]`
+  concatenation construction (`Framework/Concatenation/`).
+- **Concrete codes**: see the list below.
+
+### Codes
+
+Distances listed in the table below are proved. "—" means the code is packaged
+but its distance has not been formalized yet.
+
+| Code | Parameters | Distance | Where |
+|---|---|---|---|
+| Gross (bivariate bicycle) | `[[144, 12, 12]]` | 12 | `Codes/BivariateBicycle/Gross/` |
+| Toric code, `L ≥ 2` | `[[2L², 2, L]]` | `L` | `Codes/Toric/` |
+| Rotated surface code, odd `L ≥ 3` | `[[L², 1, L]]` | `L` | `Codes/RotatedSurface/` |
+| Iceberg family, `m ≥ 2` | `[[2m, 2m − 2, 2]]` | 2 | `Codes/Iceberg/N.lean` |
+| Five-qubit perfect code (non-CSS) | `[[5, 1, 3]]` | 3 | `Codes/Small/FiveQubit_5_1_3.lean` |
+| Steane code | `[[7, 1, 3]]` | 3 | `Codes/Small/Steane7*.lean` |
+| `C_6` (Knill) | `[[6, 2, 2]]` | 2 | `Codes/Small/SixQubit_6_2_2.lean` |
+| `[[4, 2, 2]]` | `[[4, 2, 2]]` | 2 | `Codes/Small/FourQubit_4_2_2.lean` |
+| LNCY code | `[[4, 1, 2]]` | 2 | `Codes/Small/CSS_4_1_2.lean` |
+| 3-qubit repetition | `[[3, 1, 1]]` | 1 | `Codes/Repetition/Three.lean` |
+| n-qubit repetition, `n ≥ 2` | `[[n, 1]]` | — | `Codes/Repetition/N.lean` |
+| Shor code | `[[9, 1]]` | — | `Codes/Small/Shor9.lean` |
+
+Each code is packaged as a `StabilizerCode`. The proved obligations are
+generator count, independence, pairwise commutation, and exclusion of `-I`.
+Most codes also provide a `StabilizerCodeWithLogicals` (logical operators in the
+centralizer, with the required anticommutation) and, where the distance is
+proved, a `StabilizerCodeWithDistance`. In addition, for the Steane code,
+transversal `H` and `S` are verified as the logical Hadamard and phase gates.
 
 ## Headline results
 
-**The gross code.** IBM's `[[144,12,12]]` bivariate-bicycle code is a verified `StabilizerCodeWithDistance 144 12 12`:
+**The gross code.** IBM's `[[144,12,12]]` bivariate-bicycle code is a verified
+`StabilizerCodeWithDistance 144 12 12`, along with its `[[72,12,6]]` base code.
 
 ```lean
 grossStabilizerCodeWithDistance : StabilizerCodeWithDistance 144 12 12
 ```
 
-**The toric family.** For every `L ≥ 2`, the `L × L` toric code is a verified `[[2L², 2, L]]` stabilizer code:
+See
+[`Codes/BivariateBicycle/README.md`](QEC/Stabilizer/Codes/BivariateBicycle/README.md)
+for the proof spine.
+
+**The toric family.** For every `L ≥ 2`, the toric code defined on a `L × L` grid is a verified
+`[[2L², 2, L]]` stabilizer code:
 
 ```lean
 theorem toricCodeN_distance_eq_L (L : ℕ) [Fact (2 ≤ L)] :
     HasCodeDistance (toricStabilizerCode L) L
+
+toricStabilizerCodeWithDistance L : StabilizerCodeWithDistance (2 * L * L) 2 L
 ```
 
-Here `toricStabilizerCode L : StabilizerCode (numQubits L) 2` carries `n = 2L²` and `k = 2` in its type (`numQubits L` unfolds to `2 * L * L`); the theorem above supplies `d = L`.
-
-Every step of the homological distance argument is mechanized:
+The homological distance argument is mechanized:
 
 - **Chain complex.** `∂₁ ∘ ∂₂ = 0` over `𝔽₂`.
 - **Homology.** `dim(H₁) = 2` via rank-nullity on `∂₁` and `∂₂`.
-- **Wrapping invariants.** `h(c)`, `v(c)` are well-defined on cycles, vanish on boundaries, and give an isomorphism `H₁ ≅ 𝔽₂²`.
-- **Distance lower bound.** Any non-trivial cycle has weight `≥ L` (one of `h`, `v` is `1`, forcing one edge per slice across `L` disjoint slices).
-- **CSS bridge.** `d = min(d_X, d_Z)`; both equal `L` by symmetry.
+- **Wrapping invariants.** `h(c)` and `v(c)` are well defined on cycles, vanish
+  on boundaries, and give an isomorphism `H₁ ≅ 𝔽₂²`.
+- **Distance lower bound.** Any nontrivial cycle has weight `≥ L`. One of `h`
+  and `v` is `1`, which forces at least one edge in each of `L` disjoint slices.
+- **CSS bridge.** `d = min(d_X, d_Z)`, and both equal `L` by symmetry.
 
-## Project Structure
+**The rotated surface family.** For every odd `L ≥ 3`, the rotated surface code
+is a verified `[[L², 1, L]]` code (`rotatedSurfaceCodeN_distance_eq_L`). It is
+built on the same homological framework as the toric code.
 
-Import the whole development via `QEC` (or `QEC.Foundations.Foundations`, `QEC.Stabilizer.Stabilizer`). The code is organized as:
+## Project structure
 
-- **`QEC/Foundations/`** — Qubits, quantum states, gates (including CNOT), and tensor products.
-- **`QEC/Stabilizer/`** — Pauli groups (single- and n-qubit), binary symplectic representation (check matrices, symplectic span), stabilizer core (groups, CSS, centralizer, codespace/distance/logical-operator tools), homological/chain-complex framework incl. the BB doubling layer, lattice and toric-homology infrastructure, and concrete codes: repetition (3- and n-qubit), rotated surface code, toric code families, bivariate-bicycle instances (gross and siblings), CSS concatenation instances, quantum Hamming, Steane 7, Shor 9, `[[5,1,3]]`, `[[4,2,2]]`, `[[6,2,2]]`, and the iceberg family.
+```
+QEC/
+├── Foundations/        # Qubits, states, gates, tensor products, Clifford tableau
+└── Stabilizer/
+    ├── Foundations/    # Pauli groups + binary-symplectic algebra
+    ├── Framework/      # Core (stabilizer / logical / CSS), Symplectic,
+    │                   # Homological (incl. BB doubling), Concatenation
+    ├── Geometry/       # Lattice-family-agnostic primitives
+    └── Codes/          # BivariateBicycle, Toric, RotatedSurface, Iceberg,
+                        # Repetition, Small
+```
 
-## Getting Started
+Lower layers never import higher ones:
+`Foundations < {Geometry, Framework.Core} < Framework.{Symplectic, Homological} < Codes`.
+
+The repo also contains these companion libraries, all outside the default
+`lake build` target:
+
+- **`QECLight`**: the library without the bivariate-bicycle family, for
+  memory-constrained environments. [`Playground.lean`](Playground.lean) imports
+  it.
+
+- **`QECWidgets`**: ProofWidgets-based infoview widgets (`#pauli_strip`,
+  `#toric_chain`, `#check_matrix`, and the `pauli_strip?` suggestion tactic).
+  See [`QECWidgets/README.md`](QECWidgets/README.md).
+
+The research program behind the library lives in the sibling repo
+[qec-lab](https://github.com/Stavan-Jain/qec-lab). It holds the bivariate-bicycle
+distance lab, the catalog-driven formalization pipeline, and the narrative
+write-ups.
+
+## Axiom policy
+
+Everything on `main` is sorry-free and depends on exactly
+mathlib's three standard axioms: `propext`, `Classical.choice`, and
+`Quot.sound`. There is no `native_decide` and there are no custom `axiom`s;
+finite checks go through the kernel (`decide`, `decide +kernel`, or explicit
+certificates). CI enforces this over every declaration under `QEC/` with
+[`scripts/AxiomCheck.lean`](scripts/AxiomCheck.lean). You can check any result
+yourself with `#print axioms Your.Theorem`.
+
+## Getting started
+
+### Try it without installing
+
+Open the repo in
+[GitHub Codespaces](https://codespaces.new/Stavan-Jain/QECLean). The container
+installs the toolchain, fetches mathlib's cache, builds `QECLight`, and opens on
+[`Playground.lean`](Playground.lean). See [`deploy/README.md`](deploy/README.md)
+for this setup and for self-hosting a lean4web instance.
 
 ### Prerequisites
 
-- [Lean 4](https://lean-lang.org/) (this repo uses `leanprover/lean4:v4.30.0-rc2`; see `lean-toolchain`)
-- [Lake](https://github.com/leanprover/lake) (bundled with Lean) and mathlib (pulled automatically by Lake)
+- [Lean 4](https://lean-lang.org/) (this repo uses
+  `leanprover/lean4:v4.30.0-rc2`; see `lean-toolchain`)
+- [Lake](https://github.com/leanprover/lake), which ships with Lean, and
+  mathlib, which Lake pulls in automatically
 
 ### Building
 
 ```bash
 git clone https://github.com/Stavan-Jain/QECLean
 cd QECLean
+lake exe cache get   # prebuilt mathlib
 lake build
 ```
 
-### Working with the Code
+A full build includes the gross code's kernel-checked leaves, which peak at
+several GB of memory each. On a <=16 GB machine, limit parallelism (for example
+`LEAN_NUM_THREADS=3 lake build`), or build `QECLight` instead.
 
-- Open files in your Lean 4 editor (VS Code with the Lean extension, or Emacs with lean4-mode)
-- Use `#check` and `#eval` commands in Lean to explore definitions
-- Run `lake build` after making changes to verify your code compiles
+The companion targets and checks that CI runs are:
+
+```bash
+lake build QECLight && lake build QECBlueprint && lake build QECWidgets
+lake env lean Playground.lean
+lake env lean scripts/AxiomCheck.lean   # axiom policy, needs a completed build
+```
+
+### Working with the code
+
+- Open files in your Lean 4 editor (VS Code with the Lean extension, or Emacs
+  with lean4-mode).
+- Start with [`Playground.lean`](Playground.lean), or with
+  [`QEC/Stabilizer/Codes/_TEMPLATE.lean`](QEC/Stabilizer/Codes/_TEMPLATE.lean),
+  the canonical structure for a new code.
+- Use `#check` and `#print axioms` to explore definitions and results.
 
 #### Claude Code users (optional)
 
@@ -96,15 +216,23 @@ local-search tool. See [`CLAUDE.md`](CLAUDE.md) for the agent-side workflow.
 
 Contributions are welcome! If you add new modules or definitions, please:
 
-1. **Expose modules** through `lakefile.toml` or the umbrella module (`QEC.lean`)
-2. **Update this README** if you add or rename top-level modules
-3. **Follow Lean's [style guide](https://leanprover-community.github.io/style-guide.html)** and document key definitions with docstrings
-4. **Add proofs** for important properties and lemmas
-5. **Ensure code compiles** with `lake build`
+1. **Import new modules in their umbrella file** (for example
+   `QEC/Stabilizer/Codes/Small.lean`). Run `bash scripts/check-umbrellas.sh` to
+   catch orphaned modules.
+2. **Keep the axiom policy.** Don't use `native_decide`, `sorry`, or custom
+   `axiom`s on `main`. If you need an unproven input, make it a named hypothesis
+   on the theorem.
+3. **Follow Lean's [style guide](https://leanprover-community.github.io/style-guide.html)**
+   and the conventions in [`CLAUDE.md`](CLAUDE.md), and document key
+   definitions with docstrings.
+4. **Run the full check list** under "Building" above, not just `lake build`.
+5. **Update this README** if you add a code family or rename top-level
+   modules.
 
 ## Acknowledgments
 
-Built using [Lean 4](https://lean-lang.org/) and [mathlib](https://github.com/leanprover-community/mathlib4).
+Built using [Lean 4](https://lean-lang.org/) and
+[mathlib](https://github.com/leanprover-community/mathlib4).
 
 ## License
 
