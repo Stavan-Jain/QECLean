@@ -4,6 +4,7 @@ import Mathlib.Data.Nat.Bits
 import Mathlib.Data.Nat.Bitwise
 import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
 import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
+import QEC.Stabilizer.Framework.Core.CodeNotation
 import QEC.Stabilizer.Framework.Core.Stabilizer.SubgroupLemmas
 import QEC.Stabilizer.Framework.Core.CSS.CSSNoNegI
 import QEC.Stabilizer.Framework.Core.Stabilizer.Centralizer
@@ -24,12 +25,11 @@ namespace StabilizerGroup
 namespace QuantumHamming
 
 /-!
-# Quantum Hamming codes [[2^r − 1, 2^r − 1 − 2r, 3]]
+# Quantum Hamming codes `[[2^r − 1, 2^r − 1 − 2r, 3]]`
 
 The quantum Hamming code family is a CSS construction based on the classical
-[2^r − 1, 2^r − 1 − r, 3] Hamming code.
-
-For parameter `r ≥ 3`:
+`[2^r − 1, 2^r − 1 − r, 3]` Hamming code [Steane 1996,
+`arxiv:quant-ph/9601029`]. For a parameter `r ≥ 3`:
 - Physical qubits: `n = 2^r − 1`
 - Z-generators: for each row `a : Fin r` of the Hamming parity-check matrix,
   apply Z to qubits in the support of that row (r generators)
@@ -44,7 +44,26 @@ Cross-commutation holds because any two rows of the Hamming parity-check matrix
 overlap in an even number of positions: specifically `2^(r−2)` for distinct rows
 and `2^(r−1)` for equal rows, both even when `r ≥ 3`.
 
-The Steane [[7, 1, 3]] code is the special case `r = 3`.
+The Steane `[[7, 1, 3]]` code is the special case `r = 3`.
+
+Being parametric, the family takes the **CSS route** rather than the decide
+route: the generator list is a `List.ofFn` that `decide` cannot evaluate, so
+commutation comes from the Z/X typing and the even row overlaps, `−I ∉ closure`
+from `CSS.negIdentity_not_mem_closure_union`, and independence from a pivot
+column per row.
+
+The distance-3 proof is not formalized yet, so the file stops at the bare
+code. The transversal logical pair `X̄ = X⊗ⁿ`, `Z̄ = Z⊗ⁿ` is in
+`QuantumHammingLogicals.lean`.
+
+## Outline
+
+- The Hamming parity-check matrix and `hammingRowDot_eq_zero`
+- Generators `ZGen`, `XGen` and the list `generatorsList`
+- Z/X typing, cross-commutation, `generators_commute`
+- Check-matrix independence `rowsLinearIndependent_generatorsList`
+- `negIdentity_not_mem`, the bundled `stabilizerGroup`
+- `stabilizerCode : Code[[2^r − 1, 2^r − 1 − 2r]]`
 -/
 
 open NQubitPauliGroupElement
@@ -409,32 +428,6 @@ theorem generators_commute (hr : 3 ≤ r) :
   · exact XType_commutes (XGenerators_are_XType r g hgX) (XGenerators_are_XType r h hhX)
 
 /-!
-## No `−I` in the stabilizer (CSS lemma)
--/
-
-/-- The quantum Hamming stabilizer does not contain −I. -/
-theorem negIdentity_not_mem (hr : 3 ≤ r) :
-    negIdentity (2 ^ r - 1) ∉ subgroup r := by
-  simpa [subgroup, generators] using
-    CSS.negIdentity_not_mem_closure_union (ZGenerators r) (XGenerators r)
-      (ZGenerators_are_ZType r) (XGenerators_are_XType r) (ZGenerators_commute_XGenerators r hr)
-
-/-!
-## Bundled `StabilizerGroup`
--/
-
-/-- The quantum Hamming code as a `StabilizerGroup (2^r − 1)`. -/
-noncomputable def stabilizerGroup (hr : 3 ≤ r) : StabilizerGroup (2 ^ r - 1) :=
-  mkStabilizerFromGenerators (2 ^ r - 1) (generatorsList r)
-    (by rw [listToSet_generatorsList]; exact generators_commute r hr)
-    (by rw [listToSet_generatorsList]; exact negIdentity_not_mem r hr)
-
-lemma stabilizerGroup_toSubgroup_eq (hr : 3 ≤ r) :
-    (stabilizerGroup r hr).toSubgroup = subgroup r := by
-  simp only [stabilizerGroup, mkStabilizerFromGenerators, subgroup]
-  rw [listToSet_generatorsList]
-
-/-!
 ## Linear independence of generators
 
 The check-matrix rows of the 2r generators are linearly independent over ZMod 2.
@@ -537,7 +530,6 @@ private lemma checkMatrix_XGen_Z_part (a : Fin r) (k : Fin (2 ^ r - 1)) :
   split_ifs with h
   · simp [PauliOperator.toSymplecticSingle]
   · simp [PauliOperator.toSymplecticSingle]
-
 
 /-- The check matrix entry for the Z-component column of a generatorsList entry.
 -/
@@ -691,115 +683,73 @@ theorem rowsLinearIndependent_generatorsList :
     have := hfX ⟨idx.val - r, h_idx⟩
     convert this using 2
     simp [Fin.ext_iff]; omega
+
 /-- The quantum Hamming generator list is an independent generating set. -/
 theorem GeneratorsIndependent_generatorsList :
     GeneratorsIndependent (2 ^ r - 1) (generatorsList r) :=
   GeneratorsIndependent_of_rowsLinearIndependent (rowsLinearIndependent_generatorsList r)
 
 /-!
-## Logical operators
+## No `−I` in the stabilizer subgroup
 
-Logical X̄ = X on all qubits, logical Z̄ = Z on all qubits. These commute with
-every stabilizer and anticommute with each other (since `2^r − 1` is odd).
-
-These define one logical qubit pair. The full set of `2^r − 1 − 2r` logical
-qubit pairs requires the codeword structure of the underlying Hamming code.
+`CSS.negIdentity_not_mem_closure_union` needs only the Z/X split, the typing
+lemmas and the cross-commutation.
 -/
 
-/-- Logical X: X on all `2^r − 1` qubits. -/
-def logicalX : NQubitPauliGroupElement (2 ^ r - 1) :=
-  ⟨0, NQubitPauliOperator.X (2 ^ r - 1)⟩
-
-/-- Logical Z: Z on all `2^r − 1` qubits. -/
-def logicalZ : NQubitPauliGroupElement (2 ^ r - 1) :=
-  ⟨0, NQubitPauliOperator.Z (2 ^ r - 1)⟩
-
-/-- `2^r − 1` is odd for `r ≥ 1`. -/
-lemma two_pow_sub_one_odd (hr1 : 1 ≤ r) : Odd (2 ^ r - 1) := by
-  rw [Nat.odd_sub (Nat.one_le_two_pow)]
-  simp [Nat.even_pow]
-  omega
-
-/-- Logical X and logical Z anticommute (`2^r − 1` is odd). -/
-theorem logicalX_anticommutes_logicalZ (hr1 : 1 ≤ r) :
-    NQubitPauliGroupElement.Anticommute (logicalX r) (logicalZ r) :=
-  NQubitPauliOperator.allX_allZ_anticommute (2 ^ r - 1) (two_pow_sub_one_odd r hr1)
-
-/-- Logical X commutes with every Z-generator (each Z-row has `2^(r−1)` ones,
-which is even).
-    Since X commutes with X trivially, logical X is in the centralizer. -/
-private lemma logicalX_commutes_ZGen (hr : 3 ≤ r) (a : Fin r) :
-    logicalX r * ZGen r a = ZGen r a * logicalX r := by
-  rw [NQubitPauliOperator.commutes_iff_symplectic_inner_zero]
-  have key : (logicalX r).operators.symplecticInner
-      (ZGen r a).operators = hammingRowDot r a a := by
-    simp only [NQubitPauliOperator.symplecticInner, logicalX, ZGen,
-      NQubitPauliOperator.X, hammingRowDot, hammingEntry,
-      PauliOperator.symplecticProductSingle, PauliOperator.toSymplecticSingle]
-    congr 1; ext k; split_ifs <;> simp
-  rw [key]; exact hammingRowDot_eq_zero r hr a a
-
-/-- Logical Z commutes with every X-generator (same even-overlap argument).
-    Since Z commutes with Z trivially, logical Z is in the centralizer. -/
-private lemma logicalZ_commutes_XGen (hr : 3 ≤ r) (a : Fin r) :
-    logicalZ r * XGen r a = XGen r a * logicalZ r := by
-  rw [NQubitPauliOperator.commutes_iff_symplectic_inner_zero]
-  have key : (logicalZ r).operators.symplecticInner
-      (XGen r a).operators = hammingRowDot r a a := by
-    simp only [NQubitPauliOperator.symplecticInner, logicalZ, XGen,
-      NQubitPauliOperator.Z, hammingRowDot, hammingEntry,
-      PauliOperator.symplecticProductSingle, PauliOperator.toSymplecticSingle]
-    congr 1; ext k; split_ifs <;> simp
-  rw [key]; exact hammingRowDot_eq_zero r hr a a
-
-private lemma logicalX_commutes_XGen (a : Fin r) :
-    logicalX r * XGen r a = XGen r a * logicalX r := by
-  apply NQubitPauliGroupElement.commutes_of_componentwise_commutes
-  intro k
-  simp only [logicalX, XGen, NQubitPauliOperator.X]
-  split_ifs
-  · simp [PauliOperator.mulOp]
-  · simp [PauliOperator.mulOp]
-
-private lemma logicalZ_commutes_ZGen (a : Fin r) :
-    logicalZ r * ZGen r a = ZGen r a * logicalZ r := by
-  apply NQubitPauliGroupElement.commutes_of_componentwise_commutes
-  intro k
-  simp only [logicalZ, ZGen, NQubitPauliOperator.Z]
-  split_ifs
-  · simp [PauliOperator.mulOp]
-  · simp [PauliOperator.mulOp]
-
-/-- Logical X commutes with every element of the stabilizer. -/
-theorem logicalX_mem_centralizer (hr : 3 ≤ r) :
-    logicalX r ∈ centralizer (stabilizerGroup r hr) := by
-  rw [StabilizerGroup.mem_centralizer_iff_closure (logicalX r) (stabilizerGroup r hr)
-    (generators r) (stabilizerGroup_toSubgroup_eq r hr)]
-  intro s hs
-  simp only [generators, ZGenerators, XGenerators, Set.mem_union, Set.mem_range] at hs
-  rcases hs with ⟨a, rfl⟩ | ⟨a, rfl⟩
-  · exact (logicalX_commutes_ZGen r hr a).symm
-  · exact (logicalX_commutes_XGen r a).symm
-
-/-- Logical Z commutes with every element of the stabilizer. -/
-theorem logicalZ_mem_centralizer (hr : 3 ≤ r) :
-    logicalZ r ∈ centralizer (stabilizerGroup r hr) := by
-  rw [StabilizerGroup.mem_centralizer_iff_closure (logicalZ r) (stabilizerGroup r hr)
-    (generators r) (stabilizerGroup_toSubgroup_eq r hr)]
-  intro s hs
-  simp only [generators, ZGenerators, XGenerators, Set.mem_union, Set.mem_range] at hs
-  rcases hs with ⟨a, rfl⟩ | ⟨a, rfl⟩
-  · exact (logicalZ_commutes_ZGen r a).symm
-  · exact (logicalZ_commutes_XGen r hr a).symm
+/-- The quantum Hamming stabilizer does not contain −I. -/
+theorem negIdentity_not_mem (hr : 3 ≤ r) :
+    negIdentity (2 ^ r - 1) ∉ subgroup r := by
+  simpa [subgroup, generators] using
+    CSS.negIdentity_not_mem_closure_union (ZGenerators r) (XGenerators r)
+      (ZGenerators_are_ZType r) (XGenerators_are_XType r) (ZGenerators_commute_XGenerators r hr)
 
 /-!
-## Steane code as special case
-
-When `r = 3`, the quantum Hamming code has `2^3 − 1 = 7` qubits and `2 × 3 = 6`
-generators, recovering the Steane [[7, 1, 3]] code.
+## Bundled `StabilizerGroup (2^r − 1)`
 -/
 
--- TODO: prove that QuantumHamming with r = 3 generates the same stabilizer as Steane7
+/-- The quantum Hamming code as a `StabilizerGroup (2^r − 1)`. -/
+noncomputable def stabilizerGroup (hr : 3 ≤ r) : StabilizerGroup (2 ^ r - 1) :=
+  mkStabilizerFromGenerators (2 ^ r - 1) (generatorsList r)
+    (by rw [listToSet_generatorsList]; exact generators_commute r hr)
+    (by rw [listToSet_generatorsList]; exact negIdentity_not_mem r hr)
+
+/-- The stabilizer subgroup is the closure of the generator set. -/
+lemma stabilizerGroup_toSubgroup_eq (hr : 3 ≤ r) :
+    (stabilizerGroup r hr).toSubgroup = subgroup r := by
+  simp only [stabilizerGroup, mkStabilizerFromGenerators, subgroup]
+  rw [listToSet_generatorsList]
+
+/-!
+## The bare code `Code[[2^r − 1, 2^r − 1 − 2r]]`
+
+`2r` independent, pairwise commuting generators on `2^r − 1` qubits:
+`2^r − 1 − 2r` logical qubits, at least one since `2r + 1 ≤ 2^r` for `r ≥ 3`.
+-/
+
+/-- `2r + 1 ≤ 2^r` for `r ≥ 3`, so the `2r` generators fit on `2^r − 1`
+qubits. -/
+lemma two_mul_add_one_le_two_pow (hr : 3 ≤ r) : 2 * r + 1 ≤ 2 ^ r := by
+  induction r, hr using Nat.le_induction with
+  | base => decide
+  | succ m _ ih => rw [pow_succ]; omega
+
+/-- The quantum Hamming code as a stabilizer code
+`[[2^r − 1, 2^r − 1 − 2r]]`. -/
+noncomputable def stabilizerCode (hr : 3 ≤ r) : Code[[2 ^ r - 1, 2 ^ r - 1 - 2 * r]] where
+  hk := Nat.sub_le _ _
+  generatorsList := generatorsList r
+  generators_length := by
+    have := two_mul_add_one_le_two_pow r hr
+    rw [generatorsList_length]; omega
+  generators_phaseZero := AllPhaseZero_generatorsList r
+  generators_independent := GeneratorsIndependent_generatorsList r
+  generators_commute := by rw [listToSet_generatorsList]; exact generators_commute r hr
+  closure_no_neg_identity := by rw [listToSet_generatorsList]; exact negIdentity_not_mem r hr
+
+/-- The stabilizer code's subgroup is the closure of the generator set. -/
+lemma stabilizerCode_toSubgroup_eq (hr : 3 ≤ r) :
+    (stabilizerCode r hr).toStabilizerGroup.toSubgroup = subgroup r :=
+  stabilizerGroup_toSubgroup_eq r hr
 
 end QuantumHamming
 end StabilizerGroup

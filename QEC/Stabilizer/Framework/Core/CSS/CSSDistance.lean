@@ -286,7 +286,7 @@ anticommute witness functions consumed by
 `no_weight_one_mem_centralizer_of_anticommute_witness` and
 `no_weight_two_mem_centralizer_of_anticommute_witness`;
 `hasCodeDistance_three_of_columns` packages them with a weight-3 witness. First
-exerciser: the Steane `[[7,1,3]]` code (`Codes/Small/Steane7Distance.lean`),
+exerciser: the Steane `[[7,1,3]]` code (`Codes/Small/Steane7.lean`),
 whose Hamming check matrix has exactly the seven nonzero columns of length
 three. -/
 
