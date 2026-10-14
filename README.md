@@ -52,8 +52,6 @@ Every step of the homological distance argument is mechanized:
 - **Distance lower bound.** Any non-trivial cycle has weight `≥ L` (one of `h`, `v` is `1`, forcing one edge per slice across `L` disjoint slices).
 - **CSS bridge.** `d = min(d_X, d_Z)`; both equal `L` by symmetry.
 
-An in-progress accompanying expository proof is available as an [interactive write-up](https://stavan-jain.github.io/DistanceBlog/) with diagrams (or the [in-repo version in qec-lab](https://github.com/Stavan-Jain/qec-lab/blob/main/docs/distance_proof.md)).
-
 ## Project Structure
 
 Import the whole development via `QEC` (or `QEC.Foundations.Foundations`, `QEC.Stabilizer.Stabilizer`). The code is organized as:
