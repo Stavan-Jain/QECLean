@@ -476,6 +476,24 @@ attribute [blueprint "thm:css-distance-three"
     \cref{def:has-code-distance}. -/)]
   Quantum.StabilizerGroup.hasCodeDistance_three_of_columns
 
+attribute [blueprint "thm:css-distance-three-degenerate"
+  (title := /-- A distance-three closer for degenerate CSS codes -/)
+  (statement := /-- As \cref{thm:css-distance-three}, except that the checks
+    need not separate every pair of qubits. Suppose both check matrices have
+    nonzero columns; that whenever no $Z$-row separates qubits $i \ne j$, the
+    operator $X_i X_j$ is a stabilizer; and that whenever no $X$-row separates
+    them, $Z_i Z_j$ is. Then a nontrivial logical operator of weight $3$ makes
+    the distance exactly $3$. -/)
+  (proof := /-- Weight one is ruled out as in \cref{thm:css-distance-three}. A
+    weight-two Pauli on qubits $i \ne j$ whose $X$-components sit on only one
+    of them is detected by a $Z$-row through that qubit, and likewise for
+    $Z$-components and $X$-rows. What is left is $X_i X_j$, $Z_i Z_j$ or
+    $Y_i Y_j$. Each is detected by a row separating $i$ from $j$ on the
+    relevant side; if no such row exists, its operator part is that of the
+    stabilizer $X_i X_j$, $Z_i Z_j$ or their product, so it is not a nontrivial
+    logical either. -/)]
+  Quantum.StabilizerGroup.hasCodeDistance_three_of_columns_degenerate
+
 /-! ## Chapter 6 — The homological framework -/
 
 attribute [blueprint "def:homological-code"
@@ -819,10 +837,14 @@ attribute [blueprint "def:steane7"
 
 attribute [blueprint "def:shor9"
   (title := /-- The Shor $[[9,1,3]]$ code -/)
-  (statement := /-- The nine-qubit Shor code as a $[[9,1]]$ stabilizer code, a
-    repetition code of cat states — historically the first quantum
-    error-correcting code. -/)]
-  Quantum.StabilizerGroup.Shor9.stabilizerCode
+  (statement := /-- The nine-qubit Shor code, a repetition code of cat states —
+    historically the first quantum error-correcting code — packaged with its
+    distance. It is degenerate: the two $X$-checks cannot tell the three qubits
+    of a block apart, so $Z_i Z_j$ within a block commutes with every check.
+    It is a stabilizer, though, which is exactly what
+    \cref{thm:css-distance-three-degenerate} asks; $X$ on the first block is
+    the weight-three logical. -/)]
+  Quantum.StabilizerGroup.Shor9.stabilizerCodeWithDistance
 
 attribute [blueprint "def:five-qubit"
   (title := /-- The $[[5,1,3]]$ code -/)
@@ -857,7 +879,8 @@ attribute [blueprint "def:rotated-surface"
 attribute [blueprint "def:repetition-n"
   (title := /-- The $n$-qubit repetition code -/)
   (statement := /-- The bit-flip repetition code as a stabilizer code, with
-    $Z_i Z_{i+1}$ generators. It has distance one as a *quantum* code — phase
-    errors are undetectable — which is why it appears here as a degenerate
-    reference point rather than as a usable code. -/)]
-  Quantum.StabilizerGroup.RepetitionCodeN.stabilizerCode
+    $Z_i Z_{i+1}$ generators, packaged with its distance. It has distance one
+    as a *quantum* code — a single phase error $Z_0$ commutes with every check
+    but anticommutes with the logical $X^{\otimes n}$ — which is why it appears
+    here as a degenerate reference point rather than as a usable code. -/)]
+  Quantum.StabilizerGroup.RepetitionCodeN.stabilizerCodeWithDistance

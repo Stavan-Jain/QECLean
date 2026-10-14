@@ -89,7 +89,8 @@ QEC/
         │                        # LogicalCorrespondence{X,Z}, ChainComplex,
         │                        # Distance{,X,Z}, StabilizerCode (16 files)
         ├── RotatedSurface/      # parametric N (9 files, same shape as Toric)
-        ├── Repetition/          # Three.lean (3-qubit) + N.lean (parametric)
+        ├── Repetition/          # Three.lean (3-qubit) + N.lean (parametric),
+        │                        # each + <Code>Logicals.lean (as in Small/)
         └── Small/               # Single-instance codes: Shor9, Steane7
                                  # (+ TransversalGates), FourQubit_4_2_2,
                                  # CSS_4_1_2, SixQubit_6_2_2, QuantumHamming,
@@ -687,7 +688,8 @@ Concrete instantiations of the template:
   all-X / all-Z logicals; every `Codes/Small/` code has the same
   code-file / logicals-file split (see `_TEMPLATE.lean` § "Two files per code")
 - `Shor9.lean` — k = 1, n = 9, repetition-of-cat encoding
-- `RepetitionCode{3,N}.lean` — degenerate distance-1 cases
+- `Repetition/{Three,N}.lean` (+ `…Logicals.lean`) — degenerate distance-1
+  cases
 - `RotatedSurfaceCodeN*.lean` — parametric family; distance proof
   in sibling files using the homological framework
 - `ToricCodeN*.lean` — parametric family with trimmed-generator packaging

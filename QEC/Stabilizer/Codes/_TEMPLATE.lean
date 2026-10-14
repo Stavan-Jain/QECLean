@@ -58,7 +58,7 @@ straightforwardly to:
 ## Two files per code
 
 Each code is split across two modules, both in the code's namespace (every
-code under `Codes/Small/` follows this layout):
+code under `Codes/Small/` and `Codes/Repetition/` follows this layout):
 
 - `<Code>.lean` — the code and its distance: §1–§9 (whichever route applies),
   the bare `StabilizerCode` of §13, and §14, ending in
@@ -719,12 +719,17 @@ the closer then needs only the classical column conditions on both check
 matrices — no column is zero, no two columns coincide — each a closed
 statement over `Fin n` that `decide` settles. See `Codes/Small/Steane7.lean`
 (self-dual, so one `row` serves both sides).
+For a *degenerate* code, whose checks leave some pair of qubits unseparated,
+use `hasCodeDistance_three_of_columns_degenerate` instead. It replaces each
+`_separate` hypothesis by a pair condition: `X` (resp. `Z`) on every pair the
+`Z`-rows (resp. `X`-rows) leave unseparated is a stabilizer. See
+`Codes/Small/Shor9.lean`: the `X`-checks cannot separate two qubits of one
+block, and `Z_i Z_j` within a block is a stabilizer.
 
 ```lean
 def zRow : Fin 3 → Finset (Fin 7) := ![{0, 1, 2, 4}, {0, 1, 3, 5}, {0, 2, 3, 6}]
 
-lemma Z1_eq_zOn : Z1 = zOn {0, 1, 2, 4} :=
-  NQubitPauliGroupElement.ext _ _ rfl (funext fun i => by fin_cases i <;> rfl)
+lemma Z1_eq_zOn : Z1 = zOn {0, 1, 2, 4} := by decide
 
 lemma zOn_row_mem (r : Fin 3) : zOn (zRow r) ∈ listToSet generatorsList := by
   fin_cases r <;> simp [zRow, generatorsList, Z1_eq_zOn, Z2_eq_zOn, Z3_eq_zOn]
@@ -823,12 +828,13 @@ Before declaring a CSS-code formalization complete, verify:
   `Steane7TransversalGates.lean` shows how downstream files consume the
   logicals file and `stabilizerGroup_toSubgroup_eq`
 - `FourQubit_4_2_2.lean` / `FourQubit_4_2_2Logicals.lean` — k = 2
-- `Shor9.lean` — k = 1, n = 9, the largest literal instance
+- `Shor9.lean` — k = 1, n = 9, the largest literal instance; its distance is
+  the degenerate distance-3 closer in action
 - `FiveQubit_5_1_3.lean` — non-CSS; same §2–§6, general distance closer
 - `Repetition/N.lean`, `Iceberg/N.lean` — parametric families on the CSS
   route (§7–§9)
-- `RepetitionCode3.lean`, `RepetitionCodeN.lean` — degenerate small-distance
-  cases (d = 1)
+- `Repetition/Three.lean`, `Repetition/N.lean` (+ their `…Logicals.lean`) —
+  degenerate distance-1 cases
 - `RotatedSurfaceCodeN*.lean` — parametric L family
 - `ToricCodeN*.lean` — parametric family with trimmed-generator packaging
 - `.claude/agents/qec-skeleton-drafter.md` — Stage-2 agent that uses this

@@ -160,24 +160,18 @@ and no two columns coincide. -/
 def row : Fin 3 → Finset (Fin 7) := ![{0, 1, 2, 4}, {0, 1, 3, 5}, {0, 2, 3, 6}]
 
 /-- The `Z`-checks are `Z` along the Hamming rows. -/
-lemma Z1_eq_zOn : Z1 = zOn {0, 1, 2, 4} :=
-  NQubitPauliGroupElement.ext _ _ rfl (funext fun i => by fin_cases i <;> rfl)
+lemma Z1_eq_zOn : Z1 = zOn {0, 1, 2, 4} := by decide
 
-lemma Z2_eq_zOn : Z2 = zOn {0, 1, 3, 5} :=
-  NQubitPauliGroupElement.ext _ _ rfl (funext fun i => by fin_cases i <;> rfl)
+lemma Z2_eq_zOn : Z2 = zOn {0, 1, 3, 5} := by decide
 
-lemma Z3_eq_zOn : Z3 = zOn {0, 2, 3, 6} :=
-  NQubitPauliGroupElement.ext _ _ rfl (funext fun i => by fin_cases i <;> rfl)
+lemma Z3_eq_zOn : Z3 = zOn {0, 2, 3, 6} := by decide
 
 /-- The `X`-checks are `X` along the same rows. -/
-lemma X1_eq_xOn : X1 = xOn {0, 1, 2, 4} :=
-  NQubitPauliGroupElement.ext _ _ rfl (funext fun i => by fin_cases i <;> rfl)
+lemma X1_eq_xOn : X1 = xOn {0, 1, 2, 4} := by decide
 
-lemma X2_eq_xOn : X2 = xOn {0, 1, 3, 5} :=
-  NQubitPauliGroupElement.ext _ _ rfl (funext fun i => by fin_cases i <;> rfl)
+lemma X2_eq_xOn : X2 = xOn {0, 1, 3, 5} := by decide
 
-lemma X3_eq_xOn : X3 = xOn {0, 2, 3, 6} :=
-  NQubitPauliGroupElement.ext _ _ rfl (funext fun i => by fin_cases i <;> rfl)
+lemma X3_eq_xOn : X3 = xOn {0, 2, 3, 6} := by decide
 
 /-- Each `Z`-check along a Hamming row is a generator. -/
 lemma zOn_row_mem (r : Fin 3) : zOn (row r) ∈ listToSet generatorsList := by

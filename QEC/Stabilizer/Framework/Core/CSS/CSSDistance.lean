@@ -91,6 +91,27 @@ qubit `i` and `Q` at qubit `j` (phase 0). -/
 def weightTwoAt (i j : Fin n) (P Q : PauliOperator) : NQubitPauliGroupElement n :=
   ofOperator (fun k => if k = i then P else if k = j then Q else .I)
 
+/-- A weight-two Pauli has the operator part of `weightTwoAt i j P Q`, where
+`i ≠ j` are its two support qubits and `P`, `Q` its (non-identity) Paulis
+there. -/
+lemma exists_operators_eq_weightTwoAt (g : NQubitPauliGroupElement n) (hg : weight g = 2) :
+    ∃ i j, i ≠ j ∧ g.operators i ≠ .I ∧ g.operators j ≠ .I ∧
+      g.operators = (weightTwoAt i j (g.operators i) (g.operators j)).operators := by
+  have h_supp_card : (support g).card = 2 := by
+    rw [support, ← NQubitPauliOperator.weight, ← weight]; exact hg
+  obtain ⟨i, j, hij, hsupp⟩ := Finset.card_eq_two.mp h_supp_card
+  refine ⟨i, j, hij, (mem_support g i).mp (by simp [hsupp]),
+    (mem_support g j).mp (by simp [hsupp]), funext fun k => ?_⟩
+  by_cases hki : k = i
+  · subst hki; simp [weightTwoAt]
+  · by_cases hkj : k = j
+    · subst hkj; simp [weightTwoAt, hki]
+    · have h_op_k : g.operators k = .I := by
+        by_contra h
+        have := (mem_support g k).mpr h
+        simp [hsupp, hki, hkj] at this
+      simp [weightTwoAt, hki, hkj, h_op_k]
+
 /-- If for every pair of distinct qubits `i ≠ j` and every pair of non-identity
 single-qubit Paulis `P, Q` there exists a generator in `genSet` that
 anticommutes with the corresponding weight-2 element, then no weight-2 Pauli is
@@ -102,47 +123,34 @@ theorem no_weight_two_mem_centralizer_of_anticommute_witness (S : StabilizerGrou
       ∃ g ∈ genSet, Anticommute (weightTwoAt i j P Q) g)
     (g : NQubitPauliGroupElement n) (hg : weight g = 2)
     (h_cent : g ∈ centralizer S) : False := by
-  rw [mem_centralizer_iff_closure g S genSet h_closure] at h_cent
-  have h_supp_card : (support g).card = 2 := by
-    rw [support, ← NQubitPauliOperator.weight, ← weight]; exact hg
-  obtain ⟨i, j, hij, hsupp⟩ := Finset.card_eq_two.mp h_supp_card
-  -- g.operators are non-identity at i and j, identity elsewhere
-  have hi_ne_I : g.operators i ≠ .I := by
-    have : i ∈ support g := by rw [hsupp]; exact Finset.mem_insert_self i {j}
-    exact (mem_support g i).mp this
-  have hj_ne_I : g.operators j ≠ .I := by
-    have : j ∈ support g := by rw [hsupp]; simp
-    exact (mem_support g j).mp this
-  have hop : g.operators =
-      fun k => if k = i then g.operators i else if k = j then g.operators j else .I := by
-    ext k
-    by_cases hki : k = i
-    · subst hki; simp
-    · by_cases hkj : k = j
-      · subst hkj; simp [hki]
-      · have hk' : k ∉ support g := by
-          rw [hsupp]; simp [hki, hkj]
-        have h_op_k : g.operators k = .I := by
-          by_contra h; exact hk' ((mem_support g k).mpr h)
-        simp [hki, hkj, h_op_k]
-  obtain ⟨s, hs_mem, h_anti⟩ := h_anticomm i j hij (g.operators i) (g.operators j) hi_ne_I hj_ne_I
-  have heq : g.operators = (weightTwoAt i j (g.operators i) (g.operators j)).operators := by
-    simp only [weightTwoAt, ofOperator_operators]; exact hop
-  have h_anti_g : Anticommute g s := by
-    rw [anticommutes_iff_mulOp_phasePower] at h_anti
-    rw [anticommutes_iff_mulOp_phasePower]; rw [heq]; exact h_anti
-  have h_comm : s * g = g * s := h_cent s hs_mem
-  unfold Anticommute at h_anti_g
-  rw [← h_comm, ← negIdentity_eq_minusOne n] at h_anti_g
-  have h_neg : negIdentity n = 1 := by
-    have H : (s * g) = negIdentity n * (s * g) := h_anti_g
-    calc negIdentity n = negIdentity n * 1 := (NQubitPauliGroupElement.mul_one _).symm
-      _ = negIdentity n * ((s * g) * (s * g)⁻¹) := by rw [mul_inv_cancel]
-      _ = (negIdentity n * (s * g)) * (s * g)⁻¹ := by
-          rw [NQubitPauliGroupElement.mul_assoc (negIdentity n) (s * g) (s * g)⁻¹]
-      _ = (s * g) * (s * g)⁻¹ := by rw [← H]
-      _ = 1 := by rw [mul_inv_cancel]
-  exact negIdentity_ne_one n h_neg
+  obtain ⟨i, j, hij, hi, hj, hop⟩ := exists_operators_eq_weightTwoAt g hg
+  obtain ⟨s, hs, h_anti⟩ := h_anticomm i j hij _ _ hi hj
+  exact not_mem_stabilizer_of_anticommutes_centralizer S s g h_cent
+    (anticommute_symm _ _ ((anticommute_congr_left hop).mpr h_anti))
+    (h_closure ▸ Subgroup.subset_closure hs)
+
+/-- The degenerate counterpart of
+`no_weight_two_mem_centralizer_of_anticommute_witness`. A weight-two pattern no
+generator detects does lie in the centralizer, but it is harmless if it is a
+stabilizer up to phase. So it suffices that every pattern is detected *or* has
+the operator part of a stabilizer element: then no weight-two Pauli is a
+nontrivial logical. -/
+theorem no_weight_two_logical_of_anticommute_or_stabilizer (S : StabilizerGroup n)
+    (genSet : Set (NQubitPauliGroupElement n))
+    (h_closure : S.toSubgroup = Subgroup.closure genSet)
+    (h_cases : ∀ i j : Fin n, i ≠ j → ∀ P Q : PauliOperator, P ≠ .I → Q ≠ .I →
+      (∃ g ∈ genSet, Anticommute (weightTwoAt i j P Q) g) ∨
+        ∃ s ∈ S.toSubgroup, s.operators = (weightTwoAt i j P Q).operators)
+    (g : NQubitPauliGroupElement n) (hg : weight g = 2) :
+    ¬IsNontrivialLogicalOperator g S := by
+  rw [IsNontrivialLogicalOperator_iff]
+  rintro ⟨h_cent, h_ne⟩
+  obtain ⟨i, j, hij, hi, hj, hop⟩ := exists_operators_eq_weightTwoAt g hg
+  rcases h_cases i j hij _ _ hi hj with ⟨s, hs, h_anti⟩ | ⟨s, hs, hs_op⟩
+  · exact not_mem_stabilizer_of_anticommutes_centralizer S s g h_cent
+      (anticommute_symm _ _ ((anticommute_congr_left hop).mpr h_anti))
+      (h_closure ▸ Subgroup.subset_closure hs)
+  · exact h_ne s hs (hs_op.trans hop.symm)
 
 /-! ## Distance-2 packaging
 
@@ -268,6 +276,23 @@ lemma anticommute_weightTwoAt_xOn_iff {i j : Fin n} (hij : i ≠ j) (P Q : Pauli
   rw [anticommute_weightTwoAt_iff hij]
   by_cases hi : i ∈ S <;> by_cases hj : j ∈ S <;> simp [hi, hj]
 
+/-- `X` on a pair is `weightTwoAt` with `X` at both qubits. -/
+lemma xOn_pair_operators (i j : Fin n) :
+    (xOn {i, j}).operators = (weightTwoAt i j .X .X).operators := by
+  funext k; by_cases hki : k = i <;> by_cases hkj : k = j <;> simp [weightTwoAt, hki, hkj]
+
+/-- `Z` on a pair is `weightTwoAt` with `Z` at both qubits. -/
+lemma zOn_pair_operators (i j : Fin n) :
+    (zOn {i, j}).operators = (weightTwoAt i j .Z .Z).operators := by
+  funext k; by_cases hki : k = i <;> by_cases hkj : k = j <;> simp [weightTwoAt, hki, hkj]
+
+/-- `X` times `Z` on a pair is `Y` on the pair, up to phase. -/
+lemma xOn_mul_zOn_pair_operators (i j : Fin n) :
+    (xOn {i, j} * zOn {i, j}).operators = (weightTwoAt i j .Y .Y).operators := by
+  funext k
+  change (((xOn {i, j}).operators k).mulOp ((zOn {i, j}).operators k)).operator = _
+  by_cases hki : k = i <;> by_cases hkj : k = j <;> simp [weightTwoAt, hki, hkj]
+
 /-! ## Distance-3 packaging for CSS codes: the column condition
 
 The classical picture. Write a Pauli `E` as an `X`-support `A` (the qubits
@@ -368,6 +393,118 @@ theorem hasCodeDistance_three_of_columns {k : ℕ} (C : StabilizerCode n k)
   · exact no_weight_two_mem_centralizer_of_anticommute_witness C.toStabilizerGroup genSet
       h_closure (weight_two_anticomm_witness_of_columns zRow xRow genSet hz hx hz_cover hz_sep
         hx_sep) g hg_weight h_cent
+
+/-! ### Degenerate codes: pairs the checks cannot separate
+
+`hasCodeDistance_three_of_columns` needs both check matrices to have pairwise
+distinct columns. A degenerate code can fail that and still have distance `3`.
+In Shor's `[[9,1,3]]` code the two `X`-checks see the three qubits of a block
+identically, so `Z₀Z₁` commutes with every check — but `Z₀Z₁` is itself a
+stabilizer, not a logical.
+
+The variant below trades each separation hypothesis for exactly that escape.
+When the `Z`-rows do not separate `i` from `j`, `X` on `{i, j}` must be a
+stabilizer (`hz_pair`); when the `X`-rows do not, `Z` on `{i, j}` must be
+(`hx_pair`). An undetected weight-two Pauli is then `X X`, `Z Z` or `Y Y` on
+such a pair, with the operator part of `xOn {i, j}`, `zOn {i, j}` or their
+product. For a non-degenerate code the premises of `hz_pair` and `hx_pair`
+never hold, so this generalizes `hasCodeDistance_three_of_columns`. -/
+
+/-- With nonzero columns, a weight-two Pauli on `{i, j}` is either detected by
+some check, or `X X`, `Z Z` or `Y Y` on a pair the corresponding rows do not
+separate — and then, by `hz_pair` / `hx_pair`, it has the operator part of a
+stabilizer element. -/
+theorem weight_two_anticomm_or_stabilizer_of_columns
+    (hz : ∀ r, zOn (zRow r) ∈ genSet) (hx : ∀ c, xOn (xRow c) ∈ genSet)
+    (hz_cover : ∀ i, ∃ r, i ∈ zRow r) (hx_cover : ∀ i, ∃ c, i ∈ xRow c)
+    (hz_pair : ∀ i j, i ≠ j → (∀ r, i ∈ zRow r ↔ j ∈ zRow r) →
+      xOn {i, j} ∈ Subgroup.closure genSet)
+    (hx_pair : ∀ i j, i ≠ j → (∀ c, i ∈ xRow c ↔ j ∈ xRow c) →
+      zOn {i, j} ∈ Subgroup.closure genSet) :
+    ∀ i j : Fin n, i ≠ j → ∀ P Q : PauliOperator, P ≠ .I → Q ≠ .I →
+      (∃ g ∈ genSet, Anticommute (weightTwoAt i j P Q) g) ∨
+        ∃ s ∈ Subgroup.closure genSet, s.operators = (weightTwoAt i j P Q).operators := by
+  intro i j hij P Q hP hQ
+  -- A `Z`-row detects the pair iff it sees an odd number of `X`-components, an
+  -- `X`-row iff it sees an odd number of `Z`-components.
+  have zDet : ∀ r, (if i ∈ zRow r then P.toSymplecticSingle.1 else 0) +
+      (if j ∈ zRow r then Q.toSymplecticSingle.1 else 0) = 1 →
+      ∃ g ∈ genSet, Anticommute (weightTwoAt i j P Q) g :=
+    fun r h => ⟨_, hz r, (anticommute_weightTwoAt_zOn_iff hij P Q _).mpr h⟩
+  have xDet : ∀ c, (if i ∈ xRow c then P.toSymplecticSingle.2 else 0) +
+      (if j ∈ xRow c then Q.toSymplecticSingle.2 else 0) = 1 →
+      ∃ g ∈ genSet, Anticommute (weightTwoAt i j P Q) g :=
+    fun c h => ⟨_, hx c, (anticommute_weightTwoAt_xOn_iff hij P Q _).mpr h⟩
+  have hP' : P = .X ∨ P = .Y ∨ P = .Z := by cases P <;> first | exact absurd rfl hP | simp
+  have hQ' : Q = .X ∨ Q = .Y ∨ Q = .Z := by cases Q <;> first | exact absurd rfl hQ | simp
+  rcases hP' with rfl | rfl | rfl <;> rcases hQ' with rfl | rfl | rfl
+  · -- `X X`: detected by a `Z`-row separating `i` from `j`, else `X` on the pair.
+    by_cases h : ∀ r, i ∈ zRow r ↔ j ∈ zRow r
+    · exact .inr ⟨_, hz_pair i j hij h, xOn_pair_operators i j⟩
+    · obtain ⟨r, hr⟩ := not_forall.mp h
+      exact .inl (zDet r (by
+        by_cases hi : i ∈ zRow r <;> by_cases hj : j ∈ zRow r <;> simp [hi, hj] at hr ⊢))
+  · -- `X Y`: only `j` has a `Z`-component; an `X`-row through `j` sees it.
+    obtain ⟨c, hc⟩ := hx_cover j
+    exact .inl (xDet c (by simp [hc]))
+  · -- `X Z`: only `i` has an `X`-component; a `Z`-row through `i` sees it.
+    obtain ⟨r, hr⟩ := hz_cover i
+    exact .inl (zDet r (by simp [hr]))
+  · -- `Y X`: only `i` has a `Z`-component.
+    obtain ⟨c, hc⟩ := hx_cover i
+    exact .inl (xDet c (by simp [hc]))
+  · -- `Y Y`: detected unless neither row family separates the pair, and then it
+    -- is `X` times `Z` on the pair.
+    by_cases hzs : ∀ r, i ∈ zRow r ↔ j ∈ zRow r
+    · by_cases hxs : ∀ c, i ∈ xRow c ↔ j ∈ xRow c
+      · exact .inr ⟨_, Subgroup.mul_mem _ (hz_pair i j hij hzs) (hx_pair i j hij hxs),
+          xOn_mul_zOn_pair_operators i j⟩
+      · obtain ⟨c, hc⟩ := not_forall.mp hxs
+        exact .inl (xDet c (by
+          by_cases hi : i ∈ xRow c <;> by_cases hj : j ∈ xRow c <;> simp [hi, hj] at hc ⊢))
+    · obtain ⟨r, hr⟩ := not_forall.mp hzs
+      exact .inl (zDet r (by
+        by_cases hi : i ∈ zRow r <;> by_cases hj : j ∈ zRow r <;> simp [hi, hj] at hr ⊢))
+  · -- `Y Z`: only `i` has an `X`-component.
+    obtain ⟨r, hr⟩ := hz_cover i
+    exact .inl (zDet r (by simp [hr]))
+  · -- `Z X`: only `j` has an `X`-component.
+    obtain ⟨r, hr⟩ := hz_cover j
+    exact .inl (zDet r (by simp [hr]))
+  · -- `Z Y`: only `j` has an `X`-component.
+    obtain ⟨r, hr⟩ := hz_cover j
+    exact .inl (zDet r (by simp [hr]))
+  · -- `Z Z`: detected by an `X`-row separating `i` from `j`, else `Z` on the pair.
+    by_cases h : ∀ c, i ∈ xRow c ↔ j ∈ xRow c
+    · exact .inr ⟨_, hx_pair i j hij h, zOn_pair_operators i j⟩
+    · obtain ⟨c, hc⟩ := not_forall.mp h
+      exact .inl (xDet c (by
+        by_cases hi : i ∈ xRow c <;> by_cases hj : j ∈ xRow c <;> simp [hi, hj] at hc ⊢))
+
+/-- **Distance 3 from the column condition, degenerate version.** As
+`hasCodeDistance_three_of_columns`, but a pair of qubits need not be separated
+by the checks: if no `Z`-row separates `i` from `j` it suffices that `X` on
+`{i, j}` is a stabilizer, and if no `X`-row does, that `Z` on `{i, j}` is.
+First exerciser: Shor's `[[9,1,3]]` code (`Codes/Small/Shor9.lean`). -/
+theorem hasCodeDistance_three_of_columns_degenerate {k : ℕ} (C : StabilizerCode n k)
+    (h_closure : C.toStabilizerGroup.toSubgroup = Subgroup.closure genSet)
+    (hz : ∀ r, zOn (zRow r) ∈ genSet) (hx : ∀ c, xOn (xRow c) ∈ genSet)
+    (hz_cover : ∀ i, ∃ r, i ∈ zRow r) (hx_cover : ∀ i, ∃ c, i ∈ xRow c)
+    (hz_pair : ∀ i j, i ≠ j → (∀ r, i ∈ zRow r ↔ j ∈ zRow r) →
+      xOn {i, j} ∈ Subgroup.closure genSet)
+    (hx_pair : ∀ i j, i ≠ j → (∀ c, i ∈ xRow c ↔ j ∈ xRow c) →
+      zOn {i, j} ∈ Subgroup.closure genSet)
+    (h_witness : ∃ g, IsNontrivialLogicalOperator g C.toStabilizerGroup ∧ weight g = 3) :
+    HasCodeDistance C 3 := by
+  refine hasCodeDistance_of C 3 (by decide) h_witness ?_
+  intro w hw_pos hw_lt g hg_weight h_nontrivial
+  interval_cases w
+  · exact no_weight_one_mem_centralizer_of_anticommute_witness C.toStabilizerGroup genSet
+      h_closure (weight_one_anticomm_witness_of_columns zRow xRow genSet hz hx hz_cover hx_cover)
+      g hg_weight ((IsNontrivialLogicalOperator_iff g _).mp h_nontrivial).1
+  · exact no_weight_two_logical_of_anticommute_or_stabilizer C.toStabilizerGroup genSet h_closure
+      (h_closure ▸ weight_two_anticomm_or_stabilizer_of_columns zRow xRow genSet hz hx hz_cover
+        hx_cover hz_pair hx_pair) g hg_weight h_nontrivial
 
 end Columns
 

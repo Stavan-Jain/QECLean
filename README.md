@@ -48,9 +48,7 @@ and other foundations. Import everything via `QEC`.
 
 ### Codes
 
-When the parameters include a distance `d`, that distance is proved. Codes
-listed as `[[n, k]]` are packaged, but their distance has not been formalized
-yet.
+Every distance `d` listed in the parameters below is proved.
 
 | Code | Parameters | Where |
 |---|---|---|
@@ -64,8 +62,8 @@ yet.
 | `[[4, 2, 2]]` | `[[4, 2, 2]]` | `Codes/Small/FourQubit_4_2_2.lean` |
 | LNCY code | `[[4, 1, 2]]` | `Codes/Small/CSS_4_1_2.lean` |
 | 3-qubit repetition | `[[3, 1, 1]]` | `Codes/Repetition/Three.lean` |
-| n-qubit repetition, `n ≥ 2` | `[[n, 1]]` | `Codes/Repetition/N.lean` |
-| Shor code | `[[9, 1]]` | `Codes/Small/Shor9.lean` |
+| n-qubit repetition, `n ≥ 2` | `[[n, 1, 1]]` | `Codes/Repetition/N.lean` |
+| Shor code | `[[9, 1, 3]]` | `Codes/Small/Shor9*.lean` |
 
 Each code is packaged as a `StabilizerCode`. The proved obligations are
 generator count, independence, pairwise commutation, and exclusion of `-I`.

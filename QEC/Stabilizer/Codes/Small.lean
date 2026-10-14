@@ -1,4 +1,5 @@
 import QEC.Stabilizer.Codes.Small.Shor9
+import QEC.Stabilizer.Codes.Small.Shor9Logicals
 import QEC.Stabilizer.Codes.Small.Steane7
 import QEC.Stabilizer.Codes.Small.Steane7Logicals
 import QEC.Stabilizer.Codes.Small.Steane7TransversalGates
@@ -29,8 +30,7 @@ Every code has the same two-file layout:
 - `<Code>Logicals.lean` — the chosen logical basis, its (anti)commutation and
   centralizer membership, ending in `stabilizerCodeWithLogicals`.
 
-Shor's code has no logical basis formalized yet, and quantum Hamming (a
-parametric family) has neither its distance nor a full logical basis, so their
-files stop earlier. Code-specific extras, such as
+Quantum Hamming, a parametric family, has neither its distance nor a full
+logical basis yet, so its files stop earlier. Code-specific extras, such as
 `Steane7TransversalGates.lean`, build on the logicals file.
 -/
