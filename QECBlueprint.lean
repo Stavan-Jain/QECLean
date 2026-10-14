@@ -835,6 +835,17 @@ attribute [blueprint "def:steane7"
     logical. -/)]
   Quantum.StabilizerGroup.Steane7.stabilizerCodeWithDistance
 
+attribute [blueprint "def:quantum-hamming"
+  (title := /-- The quantum Hamming family $[[2^r-1, 2^r-1-2r, 3]]$ -/)
+  (statement := /-- For every $r \ge 3$, the CSS code built from the classical
+    $[2^r-1, 2^r-1-r, 3]$ Hamming code, packaged with its distance; the Steane
+    code (\cref{def:steane7}) is the case $r = 3$. The columns of the check
+    matrix are the nonzero vectors of $\F_2^r$, so
+    \cref{thm:css-distance-three} applies uniformly in $r$. $X$ on the first
+    three qubits (columns $1, 2, 3$, with $1 \oplus 2 = 3$) is the weight-three
+    logical. -/)]
+  Quantum.StabilizerGroup.QuantumHamming.stabilizerCodeWithDistance
+
 attribute [blueprint "def:shor9"
   (title := /-- The Shor $[[9,1,3]]$ code -/)
   (statement := /-- The nine-qubit Shor code, a repetition code of cat states —

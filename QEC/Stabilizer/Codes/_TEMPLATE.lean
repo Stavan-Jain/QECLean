@@ -718,7 +718,10 @@ as the `Finset` of qubits it acts on (`zOn S` / `xOn S` are `Z` / `X` on `S`);
 the closer then needs only the classical column conditions on both check
 matrices — no column is zero, no two columns coincide — each a closed
 statement over `Fin n` that `decide` settles. See `Codes/Small/Steane7.lean`
-(self-dual, so one `row` serves both sides).
+(self-dual, so one `row` serves both sides). In a parametric family the column
+conditions are no longer closed, so prove them from the shape of the columns:
+`Codes/Small/QuantumHamming.lean` does this for every `r`, its columns being
+the binary expansions of `k + 1`.
 For a *degenerate* code, whose checks leave some pair of qubits unseparated,
 use `hasCodeDistance_three_of_columns_degenerate` instead. It replaces each
 `_separate` hypothesis by a pair condition: `X` (resp. `Z`) on every pair the
@@ -833,6 +836,8 @@ Before declaring a CSS-code formalization complete, verify:
 - `FiveQubit_5_1_3.lean` — non-CSS; same §2–§6, general distance closer
 - `Repetition/N.lean`, `Iceberg/N.lean` — parametric families on the CSS
   route (§7–§9)
+- `Small/QuantumHamming.lean` — parametric family on the CSS route whose
+  column-condition distance is proved for every `r`
 - `Repetition/Three.lean`, `Repetition/N.lean` (+ their `…Logicals.lean`) —
   degenerate distance-1 cases
 - `RotatedSurfaceCodeN*.lean` — parametric L family

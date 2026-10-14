@@ -9,6 +9,9 @@ import QEC.Stabilizer.Framework.Core.Stabilizer.SubgroupLemmas
 import QEC.Stabilizer.Framework.Core.CSS.CSSNoNegI
 import QEC.Stabilizer.Framework.Core.Stabilizer.Centralizer
 import QEC.Stabilizer.Framework.Core.CSS.CSSCommutationLemmas
+import QEC.Stabilizer.Framework.Core.CSS.CSSDistance
+import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
+import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
 import QEC.Stabilizer.Foundations.PauliGroup.Commutation
 import QEC.Stabilizer.Foundations.PauliGroup.CommutationTactics
 import QEC.Stabilizer.Foundations.BinarySymplectic.SymplecticInner
@@ -52,8 +55,13 @@ commutation comes from the Z/X typing and the even row overlaps, `−I ∉ closu
 from `CSS.negIdentity_not_mem_closure_union`, and independence from a pivot
 column per row.
 
-The distance-3 proof is not formalized yet, so the file stops at the bare
-code. The transversal logical pair `X̄ = X⊗ⁿ`, `Z̄ = Z⊗ⁿ` is in
+The distance argument is the Steane one, for every `r`: the columns of the
+Hamming check matrix are the nonzero vectors of `𝔽₂ʳ`, so no column is zero and
+no two coincide, and `hasCodeDistance_three_of_columns` rules out nontrivial
+logicals of weight `1` and `2`. `X` on qubits `{0, 1, 2}` (columns `1, 2, 3`,
+with `1 ⊕ 2 = 3`) is a nontrivial logical of weight `3`.
+
+The transversal logical pair `X̄ = X⊗ⁿ`, `Z̄ = Z⊗ⁿ` is in
 `QuantumHammingLogicals.lean`.
 
 ## Outline
@@ -64,6 +72,9 @@ code. The transversal logical pair `X̄ = X⊗ⁿ`, `Z̄ = Z⊗ⁿ` is in
 - Check-matrix independence `rowsLinearIndependent_generatorsList`
 - `negIdentity_not_mem`, the bundled `stabilizerGroup`
 - `stabilizerCode : Code[[2^r − 1, 2^r − 1 − 2r]]`
+- Distance 3 (Hamming column condition, weight-3 witness):
+  `code_has_distance_three`,
+  `stabilizerCodeWithDistance : Code[[2^r − 1, 2^r − 1 − 2r, 3]]`
 -/
 
 open NQubitPauliGroupElement
@@ -750,6 +761,218 @@ noncomputable def stabilizerCode (hr : 3 ≤ r) : Code[[2 ^ r - 1, 2 ^ r - 1 - 2
 lemma stabilizerCode_toSubgroup_eq (hr : 3 ≤ r) :
     (stabilizerCode r hr).toStabilizerGroup.toSubgroup = subgroup r :=
   stabilizerGroup_toSubgroup_eq r hr
+
+/-! ## Distance 3
+
+### No nontrivial logical of weight 1 or 2
+
+Row `a` of the Hamming check matrix, read as a set of qubits, is the support of
+both the `Z`-check `ZGen a` and the `X`-check `XGen a` (the code is self-dual
+CSS). Column `k` of the check matrix is the binary expansion of `k + 1`, a
+nonzero number below `2^r`. So no column is zero, and two distinct columns
+differ in some bit, which lies below `r`. -/
+
+/-- Row `a` of the Hamming check matrix as a support: the qubits `k` with bit
+`a` of `k + 1` set. -/
+def row (a : Fin r) : Finset (Fin (2 ^ r - 1)) :=
+  Finset.univ.filter fun k => (k.val + 1).testBit a.val
+
+lemma mem_row {a : Fin r} {k : Fin (2 ^ r - 1)} :
+    k ∈ row r a ↔ (k.val + 1).testBit a.val = true := by
+  simp [row]
+
+/-- The `Z`-checks are `Z` along the Hamming rows. -/
+lemma ZGen_eq_zOn (a : Fin r) : ZGen r a = zOn (row r a) := by
+  simp [ZGen, zOn, ofOperator, row]
+
+/-- The `X`-checks are `X` along the same rows. -/
+lemma XGen_eq_xOn (a : Fin r) : XGen r a = xOn (row r a) := by
+  simp [XGen, xOn, ofOperator, row]
+
+/-- Each `Z`-check along a Hamming row is a generator. -/
+lemma zOn_row_mem (a : Fin r) : zOn (row r a) ∈ generators r :=
+  Set.mem_union_left _ ⟨a, ZGen_eq_zOn r a⟩
+
+/-- Each `X`-check along a Hamming row is a generator. -/
+lemma xOn_row_mem (a : Fin r) : xOn (row r a) ∈ generators r :=
+  Set.mem_union_right _ ⟨a, XGen_eq_xOn r a⟩
+
+/-- A bit set in a column `k + 1 < 2^r` lies below `r`. -/
+private lemma lt_of_testBit {k : Fin (2 ^ r - 1)} {b : ℕ}
+    (hb : (k.val + 1).testBit b = true) : b < r := by
+  by_contra h
+  have hk : k.val + 1 < 2 ^ b :=
+    calc k.val + 1 < 2 ^ r := by have := k.isLt; omega
+      _ ≤ 2 ^ b := Nat.pow_le_pow_right (by norm_num) (not_lt.mp h)
+  rw [Nat.testBit_lt_two_pow hk] at hb
+  exact Bool.false_ne_true hb
+
+/-- Every qubit lies on some Hamming row (no zero column): `k + 1 ≠ 0` has a
+set bit. -/
+lemma row_cover : ∀ k : Fin (2 ^ r - 1), ∃ a, k ∈ row r a := by
+  intro k
+  obtain ⟨b, hb⟩ := Nat.exists_testBit_of_ne_zero (Nat.succ_ne_zero k.val)
+  exact ⟨⟨b, lt_of_testBit r hb⟩, (mem_row r).mpr hb⟩
+
+/-- Any two distinct qubits are separated by some Hamming row (distinct
+columns): `k + 1` and `j + 1` differ in some bit. -/
+lemma row_separate :
+    ∀ k j : Fin (2 ^ r - 1), k ≠ j → ∃ a, (k ∈ row r a ↔ j ∉ row r a) := by
+  intro k j hkj
+  obtain ⟨b, hb⟩ := Nat.exists_testBit_ne_of_ne
+    (fun h : k.val + 1 = j.val + 1 => hkj (Fin.ext (by omega)))
+  have key : ∀ x y : Bool, x ≠ y → (x = true ↔ ¬y = true) := by decide
+  refine ⟨⟨b, ?_⟩, by simpa only [mem_row] using key _ _ hb⟩
+  cases hk : (k.val + 1).testBit b
+  · exact lt_of_testBit r (k := j) (by simpa [hk] using hb.symm)
+  · exact lt_of_testBit r hk
+
+/-! ### A nontrivial logical of weight 3
+
+Qubits `0, 1, 2` are the columns `1, 2, 3`, and `1 ⊕ 2 = 3`: a weight-3
+codeword of the classical Hamming code. So `X` on `{0, 1, 2}` meets every row
+in an even number of qubits (row 0 in `{0, 2}`, row 1 in `{1, 2}`, the others
+not at all) and commutes with every check. So does `Z` on `{0, 1, 2}`, and the
+two meet on three qubits, so they anticommute. -/
+
+/-- The qubits `{0, 1, 2}`. -/
+def minWeightSupport : Finset (Fin (2 ^ r - 1)) :=
+  Finset.univ.filter fun k => k.val < 3
+
+/-- `X` on qubits `{0, 1, 2}`: a nontrivial logical of weight 3. -/
+def minWeightLogical : NQubitPauliGroupElement (2 ^ r - 1) :=
+  xOn (minWeightSupport r)
+
+/-- `Z` on qubits `{0, 1, 2}`: a centralizer element anticommuting with
+`minWeightLogical`. -/
+def minWeightPartner : NQubitPauliGroupElement (2 ^ r - 1) :=
+  zOn (minWeightSupport r)
+
+/-- `X` on `S` and `Z` on `T` meet on `S ∩ T`, which decides commutation. -/
+private lemma symplecticInner_xOn_zOn {m : ℕ} (S T : Finset (Fin m)) :
+    NQubitPauliOperator.symplecticInner (xOn S).operators (zOn T).operators =
+      ((S ∩ T).card : ZMod 2) := by
+  have h : ∀ k, PauliOperator.symplecticProductSingle ((xOn S).operators k)
+      ((zOn T).operators k) = if k ∈ S ∩ T then 1 else 0 := by
+    intro k
+    by_cases hS : k ∈ S <;> by_cases hT : k ∈ T <;>
+      simp [hS, hT, PauliOperator.symplecticProductSingle, PauliOperator.toSymplecticSingle]
+  rw [NQubitPauliOperator.symplecticInner, Finset.sum_congr rfl fun k _ => h k,
+    Finset.sum_boole, Finset.filter_mem_eq_inter, Finset.univ_inter]
+
+/-- `X` on `S` has weight `|S|`. -/
+private lemma weight_xOn {m : ℕ} (S : Finset (Fin m)) : weight (xOn S) = S.card := by
+  simp [xOn, NQubitPauliOperator.weight, NQubitPauliOperator.support]
+
+/-- `X` on a support is X-type. -/
+private lemma xOn_isXType {m : ℕ} (S : Finset (Fin m)) : IsXTypeElement (xOn S) := by
+  refine ⟨rfl, fun k => ?_⟩
+  by_cases hk : k ∈ S <;> simp [hk, PauliOperator.IsXType]
+
+/-- `Z` on a support is Z-type. -/
+private lemma zOn_isZType {m : ℕ} (S : Finset (Fin m)) : IsZTypeElement (zOn S) := by
+  refine ⟨rfl, fun k => ?_⟩
+  by_cases hk : k ∈ S <;> simp [hk, PauliOperator.IsZType]
+
+/-- There are more than three qubits (`2^r − 1 ≥ 7`). -/
+private lemma three_lt (hr : 3 ≤ r) : 3 < 2 ^ r - 1 := by
+  have := two_mul_add_one_le_two_pow r hr
+  omega
+
+/-- `{0, 1, 2}` has three qubits. -/
+lemma card_minWeightSupport (hr : 3 ≤ r) : (minWeightSupport r).card = 3 := by
+  have h : minWeightSupport r = Finset.Iio ⟨3, three_lt r hr⟩ := by
+    ext k
+    simp [minWeightSupport, Fin.lt_def]
+  rw [h, Fin.card_Iio]
+
+/-- `{0, 1, 2}` meets every Hamming row in an even number of qubits. Read off
+in `ℕ`, the meet is `{m < 3 | bit a of m + 1}`: `{0, 2}` for `a = 0`, `{1, 2}`
+for `a = 1`, and empty for `a ≥ 2`, since `m + 1 < 4`. -/
+lemma even_card_minWeightSupport_inter_row (hr : 3 ≤ r) (a : Fin r) :
+    Even (minWeightSupport r ∩ row r a).card := by
+  have h3 := three_lt r hr
+  have hmap : (minWeightSupport r ∩ row r a).map Fin.valEmbedding =
+      (Finset.range 3).filter fun m => (m + 1).testBit a.val = true := by
+    ext m
+    simp only [Finset.mem_map, Finset.mem_inter, minWeightSupport, row, Finset.mem_filter,
+      Finset.mem_univ, true_and, Fin.valEmbedding_apply, Finset.mem_range]
+    constructor
+    · rintro ⟨k, ⟨hk3, hka⟩, rfl⟩
+      exact ⟨hk3, hka⟩
+    · rintro ⟨hm3, hma⟩
+      exact ⟨⟨m, by omega⟩, ⟨hm3, hma⟩, rfl⟩
+  rw [← Finset.card_map Fin.valEmbedding, hmap]
+  obtain h | h | h : a.val = 0 ∨ a.val = 1 ∨ 2 ≤ a.val := by omega
+  · rw [h]; decide
+  · rw [h]; decide
+  · rw [Finset.filter_false_of_mem fun m hm => ?_]
+    · simp
+    · have hm4 : m + 1 < 2 ^ a.val :=
+        calc m + 1 < 2 ^ 2 := by rw [Finset.mem_range] at hm; omega
+          _ ≤ 2 ^ a.val := Nat.pow_le_pow_right (by norm_num) h
+      simp [Nat.testBit_lt_two_pow hm4]
+
+lemma minWeightLogical_weight (hr : 3 ≤ r) : weight (minWeightLogical r) = 3 := by
+  rw [minWeightLogical, weight_xOn, card_minWeightSupport r hr]
+
+lemma minWeightLogical_mem_centralizer (hr : 3 ≤ r) :
+    minWeightLogical r ∈ centralizer (stabilizerGroup r hr) := by
+  rw [StabilizerGroup.mem_centralizer_iff_closure _ _ (generators r)
+    (stabilizerGroup_toSubgroup_eq r hr)]
+  intro s hs
+  simp only [generators, ZGenerators, XGenerators, Set.mem_union, Set.mem_range] at hs
+  rcases hs with ⟨a, rfl⟩ | ⟨a, rfl⟩
+  · refine ((NQubitPauliOperator.commutes_iff_symplectic_inner_zero _ _).mpr ?_).symm
+    rw [ZGen_eq_zOn, minWeightLogical, symplecticInner_xOn_zOn,
+      ZMod.natCast_eq_zero_iff_even]
+    exact even_card_minWeightSupport_inter_row r hr a
+  · exact XType_commutes (XGenerators_are_XType r _ ⟨a, rfl⟩) (xOn_isXType _)
+
+lemma minWeightPartner_mem_centralizer (hr : 3 ≤ r) :
+    minWeightPartner r ∈ centralizer (stabilizerGroup r hr) := by
+  rw [StabilizerGroup.mem_centralizer_iff_closure _ _ (generators r)
+    (stabilizerGroup_toSubgroup_eq r hr)]
+  intro s hs
+  simp only [generators, ZGenerators, XGenerators, Set.mem_union, Set.mem_range] at hs
+  rcases hs with ⟨a, rfl⟩ | ⟨a, rfl⟩
+  · exact ZType_commutes (ZGenerators_are_ZType r _ ⟨a, rfl⟩) (zOn_isZType _)
+  · refine (NQubitPauliOperator.commutes_iff_symplectic_inner_zero _ _).mpr ?_
+    rw [XGen_eq_xOn, minWeightPartner, symplecticInner_xOn_zOn, Finset.inter_comm,
+      ZMod.natCast_eq_zero_iff_even]
+    exact even_card_minWeightSupport_inter_row r hr a
+
+/-- `X` and `Z` on `{0, 1, 2}` meet on three qubits, an odd number. -/
+lemma minWeightLogical_anticommutes_minWeightPartner (hr : 3 ≤ r) :
+    Anticommute (minWeightLogical r) (minWeightPartner r) := by
+  rw [NQubitPauliOperator.anticommutes_iff_symplectic_inner_one, minWeightLogical,
+    minWeightPartner, symplecticInner_xOn_zOn, Finset.inter_self, card_minWeightSupport r hr]
+  decide
+
+/-- `X` on `{0, 1, 2}` is a nontrivial logical operator: it lies in the
+centralizer and anticommutes with the centralizer element `minWeightPartner`. -/
+lemma minWeightLogical_isNontrivial (hr : 3 ≤ r) :
+    IsNontrivialLogicalOperator (minWeightLogical r) (stabilizerCode r hr).toStabilizerGroup :=
+  isNontrivialLogicalOperator_of_anticommute_centralizer _ (minWeightLogical_mem_centralizer r hr)
+    (minWeightPartner_mem_centralizer r hr) (minWeightLogical_anticommutes_minWeightPartner r hr)
+
+/-! ### The code with its distance `Code[[2^r − 1, 2^r − 1 − 2r, 3]]` -/
+
+/-- **Every quantum Hamming code has distance 3.** Both check matrices are the
+Hamming matrix, whose columns are nonzero and pairwise distinct, so no Pauli of
+weight `1` or `2` is a nontrivial logical; `X` on `{0, 1, 2}` is one of weight
+`3`. -/
+theorem code_has_distance_three (hr : 3 ≤ r) : HasCodeDistance (stabilizerCode r hr) 3 :=
+  hasCodeDistance_three_of_columns (row r) (row r) (generators r) (stabilizerCode r hr)
+    (stabilizerCode_toSubgroup_eq r hr) (zOn_row_mem r) (xOn_row_mem r) (row_cover r)
+    (row_cover r) (row_separate r) (row_separate r)
+    ⟨minWeightLogical r, minWeightLogical_isNontrivial r hr, minWeightLogical_weight r hr⟩
+
+/-- The quantum Hamming code packaged with its distance. -/
+noncomputable def stabilizerCodeWithDistance (hr : 3 ≤ r) :
+    Code[[2 ^ r - 1, 2 ^ r - 1 - 2 * r, 3]] where
+  toStabilizerCode := stabilizerCode r hr
+  hasDistance := code_has_distance_three r hr
 
 end QuantumHamming
 end StabilizerGroup

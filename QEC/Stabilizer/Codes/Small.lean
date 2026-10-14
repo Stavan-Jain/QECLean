@@ -30,7 +30,7 @@ Every code has the same two-file layout:
 - `<Code>Logicals.lean` — the chosen logical basis, its (anti)commutation and
   centralizer membership, ending in `stabilizerCodeWithLogicals`.
 
-Quantum Hamming, a parametric family, has neither its distance nor a full
-logical basis yet, so its files stop earlier. Code-specific extras, such as
-`Steane7TransversalGates.lean`, build on the logicals file.
+Quantum Hamming, a parametric family, has no full logical basis yet, so its
+logicals file stops short of `stabilizerCodeWithLogicals`. Code-specific
+extras, such as `Steane7TransversalGates.lean`, build on the logicals file.
 -/
