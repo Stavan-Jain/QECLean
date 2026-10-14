@@ -4,27 +4,30 @@ Every bivariate-bicycle **instance** lives in its own subdirectory with a
 sibling umbrella `.lean`; the shared theory lives in
 `Framework/Homological/BB*` (`BBChainComplex`, `BBCover`, `BBDoubling`,
 `BBDeckTower`, `BBBocksteinRank`, `BBEpsFree*`, `BBSmallCycle`,
-`BBDeficitWall`). This README is the task router and status board; the
-per-module one-liner maps live in the umbrella docstrings (`Gross.lean`,
-`Gross/SafeFloor.lean`, `Z5Z15F2A6.lean`, …).
+`BBDeficitWall`, `BBSeamBZ`) together with the instance-agnostic certificate
+layer `F2Mask` + `BZCertificate`. This README is the task router and status
+board; the per-module one-liner map lives in the umbrella docstring
+(`Gross.lean`).
 
 ## Instances
 
 | Dir | Code | Distance status |
 |---|---|---|
 | `Gross/` | gross `[[144,12,12]]` (base `[[72,12,6]]`) | **d = 12 unconditional, kernel-only** — axioms are exactly `propext`, `Classical.choice`, `Quot.sound`; no `native_decide`, no `sorry` (proved through the generic doubling layer and packaged by `Gross/Distance.lean`) |
-| `Z5Z15F2A6/` | `[[150,8,8]] → [[300,8,16]]` two-tier | in progress (A17 line; minimal starting skeleton to copy) |
-| `BaseFloors/` | class-member base floors (BB90, BB108, Z6Z14) | d ≥ 6 kernel-checked via `BBSmallCycle` (A15/A16 class theorem) |
+
+The other instances (`Z3Z6/`, `Z5Z15F2A6/`, `BaseFloors/`) are parked — see
+"Parked instances" below.
 
 ## Task router
 
 - **Understand the gross d = 12 proof**: read `Gross.lean`'s docstring, then
-  the spine in umbrella order (Defs → CRTFrame/CoverTransfer → DeckHomotopy →
-  Witness → Assembly → BaseDistance → DangerousSector → SafeSector →
-  LightStab → LightStabClassify → StabilizerCode). Paper version:
-  `qec-lab:docs/gross-distance-proof.md`.
-- **Tier-3 analytic work** (retiring `native_decide` leaves; A7 Props 30–31):
-  `Gross/SafeFloor/WtFloor1618.lean` + `WtFloor24Bridge.lean`.
+  the spine in umbrella order (Defs → CoverTransfer → DeckHomotopy → Witness →
+  Assembly → BaseDistance → DangerousSector → SafeSector → StabilizerCode →
+  SeamBZ → LayerInstance → Distance). Paper version (whose safe floor is the
+  older CRT-engine argument): `qec-lab:docs/gross-distance-proof.md`.
+- **The certificate layer** (safe floor + light-boundary census by
+  Brouwer–Zimmermann): `Framework/Homological/BBSeamBZ.lean` (generic
+  statement), `Gross/SeamBZ.lean` (the gross certificate).
 - **Regenerate a table / change generated data**: see the generated-files
   table below and `qec-lab:experiments/bb_lab/GENERATORS.md`. Never hand-edit a
   Class-G file.
@@ -39,25 +42,26 @@ proofs. `BaseDistance` instantiates `SmallCycleData`; `DeckHomotopy` supplies
 `P = 0`, `Q = (1 + x²) ⋆ B` to the generic Bézout theorem; `DangerousSector`
 uses the generic single/pair logical-floor rungs with Gross shape certificates;
 `SafeSector` identifies `MImBound` with `SeamCosetFloor 12` and invokes the
-generic reduction. `Assembly` retains the old conditional names as wrappers.
+generic reduction; `SeamBZ` discharges `MImBound` and the light-boundary
+classification from one generic `SeamBZCertificate`. `Assembly` retains the old
+conditional names as wrappers.
 `LayerInstance` discharges the remaining inputs, and `Distance` packages its
 Pauli-distance result through `has_code_distance_of_isLeast`.
 
 After building, `lake env lean scripts/BBDoublingCheck.lean` verifies a separate
 four-qubit cover and checks that both conditional and unconditional Gross
-capstones depend on the generic base, homotopy, rung, and sector theorems.
+capstones depend on the generic base, homotopy, rung, sector, and
+Brouwer–Zimmermann certificate theorems.
 
 ## Hypothesis-discharge map (gross)
 
 | Named hypothesis | Discharged by | Grade |
 |---|---|---|
 | `BaseDistanceGe6` | `Gross/BaseDistance.lean` (`SmallCycleData` instance) | kernel `decide` + analytic |
-| `LightStabilizerClassification` | `Gross/LightStabClassify.lean` (`lightStabilizerClassification_holds`) | kernel `decide` |
+| `LightStabilizerClassification` | `Gross/SeamBZ.lean` (`GrossBZ.lightStabilizerClassification_bz`: the certificate's light-boundary census, 252 boundaries = 36 hexagons + 216 D-pairs) | kernel `decide` |
 | `DangerousSectorGe12` | `Gross/DangerousSector.lean` ((M), generic logical-floor rungs) | analytic + kernel `decide` |
 | `SafeSectorGe12` → `MImBound` | `Gross/SafeSector.lean` (generic Smith-coset reduction) | analytic |
-| `MImBound` | `Gross/SafeFloor/MImAssembly.lean` (`mimBound_holds`, 64-case dispatch → 5 orbit reps) | analytic (see per-orbit rows) |
-| — orbit Y0/Y1/Y4 (wt 16/18) | `SafeFloor/MImFloorY{0,1,4}.lean` via `LightFloor.floor_of_killOK` (the coupled spine certificate: Prop 30 `min_L + min_R ≥ 10` on all 1024 cells + Prop 31 ρ-link kill of the 10-tight cells) | **analytic** (kernel `decide`) |
-| — orbit Y11/Y12 (wt 24) | `SafeFloor/MImFloorY{11,12}.lean` via `WtFloor24Bridge.costFromComps_ge_12_of_blocks` | **analytic** (kernel `decide`) |
+| `MImBound` | `Gross/SeamBZ.lean` (`GrossBZ.mimBound_bz`: `SeamBZCertificate.seamCosetFloor` at 11 over all 63 Smith classes at once, lifted to 12 by parity) | kernel `decide` (two BZ walks, 510 414 words) |
 | capstones | `Gross/Distance.lean` (`grossStabilizerCode_hasCodeDistance_12_uncond`, `grossStabilizerCodeWithDistance`) + `Gross/LayerInstance.lean` (`gross_chain/pauli_distance_eq_12` through the layer) | — |
 
 The Z3Z6 (pair72, `[[36,4,4]] → [[72,4,8]]`) and Z5Z15F2A6
@@ -65,31 +69,37 @@ The Z3Z6 (pair72, `[[36,4,4]] → [[72,4,8]]`) and Z5Z15F2A6
 **parked on branch `claude/z3z6-parked`** pending de-nativization — see
 "Parked instances" below.
 
-## Engine vs analytic (2026-08-20)
+## How the certificates are checked (2026-10-14)
 
 The gross `d = 12` cone contains **zero `native_decide`**: every leaf is a kernel
 `decide` (mostly `decide +kernel`) or an analytic proof, so the capstones carry
 only mathlib's three axioms. This is not an achievement local to `Gross/` — it is
 the repo-wide bar: everything on `main` must print exactly
 `[propext, Classical.choice, Quot.sound]`. See CLAUDE.md § "Axiom policy", and
-park rather than merge anything that cannot meet it. The techniques, in the order they matter: packed-`Nat`
-tables instead of `Array`/`List` lookups (an `Array.getD` is an O(n) list walk in
-the kernel); quantifier bridges (`mkRing`, `mkTorus`, `chainOfMask`) that let the
-kernel enumerate concrete lambdas rather than whnf a pi-`Fintype`; sparse rewrites
-of `conv`/`∂₂`/`seamC` in place of `Finset.sum`s over the group; and Gaussian-style
-certificates (the `ker ∂₂` peeling in `MImClassify.kerBasis_spans`) where a sweep
-would otherwise be needed.
+park rather than merge anything that cannot meet it.
 
-The Tier-3 track is complete: `SlotFrame` → `WtFloor24` → `WtFloor24Bridge`
-closes the weight-24 orbits, and `WtFloor1618` → `LightFloor` closes the coupled
-light orbits. The old confined-floor engine (`MImFloor`, `MImFloorData`,
-`MImMembership` and their `2³⁰` `floorOK` walk) has been **retired** — those
-modules are deleted, not merely unused. Status changes belong HERE, not in
-module names.
+Both per-instance floors come from **one Brouwer–Zimmermann certificate** of the
+generic shape `XDoubleCoverData.SeamBZCertificate` (`BBSeamBZ.lean`). The coset
+code `K = seamC (ker ∂₂) + im ∂₂` (dimension 36 in `𝔽₂⁷²`) is given by 42
+generator words packed into `Nat` masks, the seam generators tagged above bit 72
+by their `ker ∂₂` coordinates. Two disjoint information sets of `K` are walked
+to depth 5 and 4; since every word of weight `≤ 10` has at most 5 (resp. 4)
+pivots set in one of them, the walks visit every such word and check that it is
+heavy, or untagged and a listed light boundary. That single check yields both
+`SeamCosetFloor 11` (hence `12` by parity) and the light-boundary census. The
+`ker ∂₂` basis is certified by a 30-step peeling order (`kernel_eq_sum_of_peel`).
 
-`Gross/` is now the only BB instance in this tree, and the whole tree is
-`native_decide`-free: the other instances (`Z5Z15F2A6/`, `BaseFloors/`) were
-the last `native_decide` holders here and have been parked — see below.
+Kernel-cost notes that mattered: the walk predicates use raw `Nat.*` functions
+rather than `>>>`/`&&&`/`decide (· ≤ ·)` (the notation's instance unfolding
+was 4× the GMP work), the popcount is a byte table, and `xor_walk_decide₂` splits
+each walk into one `decide +kernel` per pair of first rows so each kernel cache
+stays small. The walks take ~80 s; nothing in the gross cone needs more than
+~0.7 GB above the import baseline. The retired CRT-engine route (`CRTFrame`,
+`LightStab`, `LightStabClassify`, `SafeFloor/`, ~6.5k lines) is in git history.
+
+The certificate statement is instance-agnostic; a new cover instance supplies
+only its mask encoding, `ker ∂₂` basis, generator words, windows and walks
+(generated data), plus the sparse forms of its `∂₂` and `seamC`.
 
 ## Parked instances
 
@@ -124,17 +134,10 @@ concrete instance here besides `Gross/`.
 | File | Generator (`qec-lab:experiments/bb_lab/`) | Data |
 |---|---|---|
 | `Gross/StabilizerCodeData.lean` | `phase5/gen_file.py` (`--force` guard; emits data only) | `phase5/data.json` |
-| `Gross/SafeFloor/MImFloorY{0,1,4}.lean` | **hand-maintained since the kernel-only conversion** (analytic Tier-3 form; formerly `gen_yrep_module.py`, which must be taught to refuse args 0/1/4) | — |
-| `Gross/SafeFloor/MImFloorY{11,12}.lean` | **hand-maintained since PR #58** (analytic Tier-3 form; formerly `gen_yrep_module.py`, which now refuses args 11/12) | — |
+| `Gross/SeamBZData.lean` | `scripts/gen_gross_bz.py` (`--emit [--force]`; validates every certificate, including both walks, in Python before writing) | computed from the code |
 
-**qec-lab follow-up owed**: `gen_floor_lean.py` now has no target in this repo
-(`MImFloorData.lean` is deleted) and `gen_yrep_module.py` must refuse args 0/1/4
-as it already refuses 11/12; both changes belong in a companion qec-lab PR.
-| `BaseFloors/*.lean` | `scripts/gen_base_floor_lean.py` | per-instance |
-
-Class F (generated fragments between `-- BEGIN/END GENERATED` markers,
-hand-curated shell): `Gross/SafeFloor/MImAssembly.lean`
-(`scripts/gen_assembly_2d.py`). Everything else is Class H (hand-maintained;
+There are no Class F files (generated fragments between
+`-- BEGIN/END GENERATED` markers) left in this tree. Everything else is Class H (hand-maintained;
 may embed machine-*validated* data). Rule: **a hand-edit to a Class-G file is
 a bug — change the generator (in the qec-lab companion repo) and regenerate,
 landing both repos' changes together.** Generators run from a sibling qec-lab
@@ -144,7 +147,7 @@ details (env, clobber guards, stale generators): `qec-lab:experiments/bb_lab/GEN
 ## Edit rules
 
 1. New module ⟹ `import` line in the NEAREST umbrella (`Gross.lean`,
-   `Gross/SafeFloor.lean`, `<Instance>.lean`) — then run
+   `<Instance>.lean`) — then run
    `bash scripts/check-umbrellas.sh` (orphan modules silently don't build).
 2. Class-G files: regenerate, never edit (banner at the top of each).
 3. `native_decide`, `sorry`, and custom axioms are forbidden on `main`;
@@ -167,15 +170,20 @@ further worked examples:
    `DeckHomotopy.lean` (Bezout witness via `deckTrivial_of_bezout`) →
    `Witness.lean` → `BaseDistance.lean` (`StrongBaseFloor d`, or a
    `BaseFloors/` bundle via `BBSmallCycle`) → `Dangerous.lean` →
-   `SafeFloor.lean` (+ `MaskDefs`/`SeamTables`/`Sweep*` leaves, one file per
-   sweep) → `Distance.lean` (capstone) → `StabilizerCodeData.lean` +
+   `SeamBZData.lean` + `SeamBZWalk.lean` + `SeamBZ.lean` (a
+   `SeamBZCertificate`, generated by a clone of `gen_gross_bz.py`) →
+   `Distance.lean` (capstone) → `StabilizerCodeData.lean` +
    `StabilizerCode.lean` (via a generator clone with validation gate +
    `--force` guard).
 3. Discharge the `BBDoubling` inputs by name: `LogicalFloor` (or derive it
    from `StrongBaseFloor`), `DeckTrivialOnH1`, `DangerousFloorNZ`,
    `SeamCosetFloor`, and a tight witness whose pullback is not a boundary.
-   Use the generic rungs and `safeFloor_of_seamCosetFloor` for the sector
-   reductions; finish with the `..._of_logicalFloor` assemblies.
+   `SeamBZCertificate.seamCosetFloor` gives `SeamCosetFloor`, and
+   `SeamBZCertificate.boundary_census` the light-boundary list the dangerous
+   rungs dispatch over — the walk size is what limits this to small bases
+   (gross: 510 414 words; the A28 notes price larger bases at 10⁹+). Use the
+   generic rungs and `safeFloor_of_seamCosetFloor` for the sector reductions;
+   finish with the `..._of_logicalFloor` assemblies.
    `StrongBaseFloor` is unsuitable for weight-six-generator codes with base
    distance above six.
 4. Wire umbrellas (rule 1); add the instance row to the table above and, if
@@ -183,7 +191,7 @@ further worked examples:
 
 ## Staleness contract
 
-Any PR that adds/moves/renames a module here, flips a leaf engine→analytic,
-changes a generator, or adds an instance MUST update this README (the tables
+Any PR that adds/moves/renames a module here, changes how a floor is
+certified, changes a generator, or adds an instance MUST update this README (the tables
 are keyed by stable names — that is the anti-staleness design). A PR touching
 `BivariateBicycle/**` structure without touching this file is suspect.

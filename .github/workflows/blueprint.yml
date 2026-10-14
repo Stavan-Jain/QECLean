@@ -66,11 +66,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Same reason as in `lean_action_ci.yml`: the gross BB safe-sector floor
-      # leaves are memory-hungry kernel `decide` checks, and `QECBlueprint`
-      # imports all of `QEC`. Blueprint extraction then loads that whole
-      # environment into one process, so the peak is if anything higher.
-      - name: Add swap space (BB safe-floor kernel-decide memory peaks)
+      # Same reason as in `lean_action_ci.yml`: the gross BB modules carry
+      # memory-hungry kernel `decide` checks, and `QECBlueprint` imports all of
+      # `QEC`. Blueprint extraction then loads that whole environment into one
+      # process, so the peak is if anything higher.
+      - name: Add swap space (kernel-decide memory peaks)
         run: |
           sudo fallocate -l 12G /mnt/swapfile
           sudo chmod 600 /mnt/swapfile

@@ -63,9 +63,8 @@ set_option maxRecDepth 4096
 
 Generic form of the `funLift` pattern used throughout the gross development: an
 additive identity between two maps out of a finite `𝔽₂`-function space holds
-everywhere once it holds on the `δ`-basis. (Named `funLiftF2`/`indF2` to avoid
-clashing with the `BaseGroup`-specific `funLift`/`ind` in
-`Codes/BivariateBicycle/LightStabClassify.lean`.) -/
+everywhere once it holds on the `δ`-basis. (Named `funLiftF2`/`indF2` to keep
+them distinct from instance-specific helpers.) -/
 
 section FunLift
 
