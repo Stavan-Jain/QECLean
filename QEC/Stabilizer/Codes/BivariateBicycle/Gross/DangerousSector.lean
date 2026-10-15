@@ -21,10 +21,9 @@ to Gross:
     descended cycle lives in the 11-qubit union; its four translates by
     `{0, b₁, b₂, b₁+b₂}` have total weight `2·11 = 22 < 4·6`, so one of them
     is a small cycle, again trivializing `v`;
-* the assembly `dangerous_sector_of_classification`, and the same result
-  through the generic admissible dispatch
-  (`lightBoundaryAdmissible_of_classification`,
-  `dangerous_sector_of_classification_admissible`).
+* the assembly `dangerous_sector_of_classification`, and the classification
+  read as admissibility for the generic dispatch
+  (`lightBoundaryAdmissible_of_classification`).
 
 ## Convention bridge (lab notes → repo)
 
@@ -407,8 +406,8 @@ theorem dangerous_sector_of_classification
 
 /-! ## The classification as generic admissibility
 
-The same dispatch, routed through the generic
-`XDoubleCoverData.dangerousFloorNZ_of_admissible`: the classification makes
+The input of the generic `XDoubleCoverData.dangerousFloorNZ_of_admissible`
+(which the capstones in `LayerInstance.lean` use): the classification makes
 every light base boundary admissible, a hexagon being case (a) with `t = 3`
 and a D-pair case (b) with `t = 1`. The shape certificates are the ones the
 hexagon and D-pair rungs above use. -/
@@ -450,14 +449,6 @@ theorem lightBoundaryAdmissible_of_classification
       rw [hgd, bbBoundary2Fn_add]
     · simpa only [Nat.sub_self, Nat.mul_zero, Nat.add_zero] using
         dpair_union_card g d hd
-
-/-- **The dangerous sector through the generic dispatch**: the classification
-gives `DangerousSectorGe12` by `dangerousFloorNZ_of_admissible`, with no
-Gross-specific case split. -/
-theorem dangerous_sector_of_classification_admissible
-    (hC : LightStabilizerClassification) : DangerousSectorGe12 :=
-  grossCoverData.dangerousFloorNZ_of_admissible grossCoverData_logicalFloor
-    (lightBoundaryAdmissible_of_classification hC)
 
 end BB
 end Homological

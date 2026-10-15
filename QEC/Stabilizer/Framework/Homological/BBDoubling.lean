@@ -50,7 +50,7 @@ alone, composing the dispatch with `safeFloor_of_seamCosetFloor`.
 | `dangerous_zero_rung`                   | `gross_chainWeight_ge_12_of_coverPush_eq_zero` |
 | `dangerous_bound_of_single_shape`       | `dangerous_hexagon_bound`              |
 | `dangerous_bound_of_pair_shape`         | `dangerous_dpair_bound`                |
-| `dangerousFloorNZ_of_admissible`        | `dangerous_sector_of_classification_admissible` |
+| `dangerousFloorNZ_of_admissible`        | `dangerous_sector_of_classification`   |
 | `safeFloor_of_seamCosetFloor`           | `safe_sector_of_mim`                   |
 | `chain_distance_eq_double`              | `gross_chain_distance_eq_12_of_sectors`|
 | `pauli_distance_eq_double`              | `gross_pauli_distance_eq_12_of_sectors`|

@@ -67,7 +67,7 @@ per-instance `dangerous_sector_of_classification`.
 |---|---|---|
 | `BaseDistanceGe6` | `Gross/BaseDistance.lean` (`SmallCycleData` instance) | kernel `decide` + analytic |
 | `LightStabilizerClassification` | `Gross/SeamBZ.lean` (`GrossBZ.lightStabilizerClassification_bz`: the certificate's light-boundary census, 252 boundaries = 36 hexagons + 216 D-pairs) | kernel `decide` |
-| `DangerousSectorGe12` | `Gross/DangerousSector.lean` ((M), generic logical-floor rungs: the capstones take it from the generic admissible dispatch via `lightBoundaryAdmissible_of_classification`; standalone forms `dangerous_sector_of_classification_admissible` and the per-instance `dangerous_sector_of_classification`) | analytic + kernel `decide` |
+| `DangerousSectorGe12` | `Gross/DangerousSector.lean` ((M), generic logical-floor rungs: the capstones take it from the generic admissible dispatch via `lightBoundaryAdmissible_of_classification`; the per-instance assembly `dangerous_sector_of_classification` remains for the conditional engine route) | analytic + kernel `decide` |
 | `SafeSectorGe12` → `MImBound` | `Gross/SafeSector.lean` (generic Smith-coset reduction) | analytic |
 | `MImBound` | `Gross/SeamBZ.lean` (`GrossBZ.mimBound_bz`: `SeamBZCertificate.seamCosetFloor` at 11 over all 63 Smith classes at once, lifted to 12 by parity) | kernel `decide` (two BZ walks, 510 414 words) |
 | capstones | `Gross/Distance.lean` (`grossStabilizerCode_hasCodeDistance_12_uncond`, `grossStabilizerCodeWithDistance`) + `Gross/LayerInstance.lean` (`gross_chain/pauli_distance_eq_12`, one application each of the packaged Doubling theorem `chain/pauli_distance_eq_double_of_admissible`) | — |
