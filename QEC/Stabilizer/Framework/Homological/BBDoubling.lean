@@ -20,16 +20,23 @@ here once, parametrically; what remains per instance are the five *inputs*:
   identities — gross's `(1+x²)B² = 1+x⁶`, pair72's `p⋆B = 1+x³` — are its
   `P = 0` case), or from a raw finite matrix certificate
   (`deckTrivial_of_homotopy_certificate`);
-* `DangerousFloorNZ (2d)` — assembled per instance from the generic rungs
-  (`dangerous_bound_of_single_shape`, `dangerous_bound_of_pair_shape`)
-  dispatched over that code's light-boundary classification;
+* `DangerousFloorNZ (2d)` — from the generic dispatch
+  `dangerousFloorNZ_of_admissible`, once every nonzero base boundary of
+  weight `< 2d` is shown `LightBoundaryAdmissible` (a single shape, a pair
+  shape, or a `t = 1` window — exactly the side conditions of the rungs
+  `dangerous_bound_of_{single,pair}_shape_of_logicalFloor` and
+  `dangerous_bound_of_window`); per instance this is a light-boundary census;
 * `SeamCosetFloor (2d)` — the (M-im) analog, per-class coset sweeps;
 * the tight witness `u*` with `pull1 u* ∉ boundaries`.
 
 Given those, `chain_distance_eq_double` and `pauli_distance_eq_double`
 deliver `d(cover) = 2·d(base)` at the chain and Pauli levels, and
 `chainWeight_ge_of_strongBaseFloor` delivers the unconditional Theorem-B
-floor `d(cover) ≥ d(base)` from the base floor alone.
+floor `d(cover) ≥ d(base)` from the base floor alone. The packaged Doubling
+theorem `pauli_distance_eq_double_of_admissible` (chain level:
+`chain_distance_eq_double_of_admissible`) states `d(cover) = 2d` from the
+logical floor, the witness, (R), `SeamCosetFloor (2d)` and admissibility
+alone, composing the dispatch with `safeFloor_of_seamCosetFloor`.
 
 ## Name map (parametric ↔ gross instantiation)
 
@@ -43,9 +50,11 @@ floor `d(cover) ≥ d(base)` from the base floor alone.
 | `dangerous_zero_rung`                   | `gross_chainWeight_ge_12_of_coverPush_eq_zero` |
 | `dangerous_bound_of_single_shape`       | `dangerous_hexagon_bound`              |
 | `dangerous_bound_of_pair_shape`         | `dangerous_dpair_bound`                |
+| `dangerousFloorNZ_of_admissible`        | `dangerous_sector_of_classification`   |
 | `safeFloor_of_seamCosetFloor`           | `safe_sector_of_mim`                   |
 | `chain_distance_eq_double`              | `gross_chain_distance_eq_12_of_sectors`|
 | `pauli_distance_eq_double`              | `gross_pauli_distance_eq_12_of_sectors`|
+| `pauli_distance_eq_double_of_admissible`| `gross_pauli_distance_eq_12`            |
 -/
 
 import QEC.Stabilizer.Framework.Homological.BBCover
@@ -1267,6 +1276,74 @@ theorem dangerous_bound_of_window {d : ℕ}
     rw [hvform]
     exact add_mem (D.pull1_mem_boundaries hu_bd) (D.liftStab_mem_boundaries _)
 
+/-! ## The admissible-light-boundary dispatch
+
+Each rung above bounds the dangerous cycles over one *shape* of light base
+boundary. `LightBoundaryAdmissible d b` says that `b` has one of those shapes,
+with exactly the side conditions the matching rung consumes, and
+`dangerousFloorNZ_of_admissible` dispatches over it: once every nonzero base
+boundary of weight `< 2d` is admissible, `DangerousFloorNZ (2d)` holds. This
+is the generic form of the per-instance assembly over a light-boundary
+classification (for Gross, hexagons are single shapes with `t = 3` and D-pairs
+are pair shapes with `t = 1`). -/
+
+/-- **Admissible light boundary.** A base 1-chain `b` with `|b| = 2d − 2t` for
+some `t ≥ 1` is *admissible* if one of the following holds, writing
+`N(f) = seamN f = sheet0 (liftStab f)` for the sheet-0 seam of a lifted base
+2-chain `f`:
+
+* (a) *single shape*: `b = ∂₂ f` and `supp N(f) ⊆ supp b`;
+* (b) *pair shape*: `b = ∂₂ f₁ + ∂₂ f₂` and, with
+  `U = supp ∂₂ f₁ ∪ supp ∂₂ f₂`, both `|U| + 2(t − 1) ≤ 2d − 1` and
+  `supp N(f₁ + f₂) ⊆ U`;
+* (c) *window*: `t = 1`, `b = ∂₂ f`, and every base 1-cycle supported in
+  `supp b ∪ supp N(f)` is a boundary.
+
+Each case implies `b ∈ im ∂₂`, and carries exactly the hypotheses of its rung:
+`dangerous_bound_of_single_shape_of_logicalFloor`,
+`dangerous_bound_of_pair_shape_of_logicalFloor` and `dangerous_bound_of_window`
+respectively. -/
+def LightBoundaryAdmissible (d : ℕ) (b : H × Fin 2 → ZMod 2) : Prop :=
+  ∃ t : ℕ, 1 ≤ t ∧ D.baseComplex.chainWeight b + 2 * t = 2 * d ∧
+    -- (a) single shape
+    ((∃ f : H → ZMod 2, b = bbBoundary2Fn D.Ab D.Bb f ∧
+        ∀ j : H × Fin 2, D.seamN f j ≠ 0 → b j ≠ 0) ∨
+    -- (b) pair shape
+     (∃ f₁ f₂ : H → ZMod 2,
+        b = bbBoundary2Fn D.Ab D.Bb f₁ + bbBoundary2Fn D.Ab D.Bb f₂ ∧
+        (Finset.univ.filter fun j : H × Fin 2 =>
+            bbBoundary2Fn D.Ab D.Bb f₁ j ≠ 0 ∨
+            bbBoundary2Fn D.Ab D.Bb f₂ j ≠ 0).card + 2 * (t - 1) ≤ 2 * d - 1 ∧
+        ∀ j : H × Fin 2, D.seamN (f₁ + f₂) j ≠ 0 →
+          (bbBoundary2Fn D.Ab D.Bb f₁ j ≠ 0 ∨ bbBoundary2Fn D.Ab D.Bb f₂ j ≠ 0)) ∨
+    -- (c) window
+     (t = 1 ∧ ∃ f : H → ZMod 2, b = bbBoundary2Fn D.Ab D.Bb f ∧
+        ∀ u : H × Fin 2 → ZMod 2, bbBoundary1Fn D.Ab D.Bb u = 0 →
+          (∀ j : H × Fin 2, u j ≠ 0 → b j ≠ 0 ∨ D.seamN f j ≠ 0) →
+          u ∈ D.baseComplex.boundaries))
+
+/-- **The generic dangerous dispatch.** If every nonzero base boundary of weight
+`< 2d` is admissible, then `DangerousFloorNZ (2d)` holds. A dangerous cycle over
+a heavy boundary (`|b| ≥ 2d`) is heavy because pushing forward does not increase
+weight; one over a light boundary is bounded by the rung that its admissibility
+case names. -/
+theorem dangerousFloorNZ_of_admissible {d : ℕ} (hbase : D.LogicalFloor d)
+    (hadm : ∀ b : H × Fin 2 → ZMod 2, b ∈ D.baseComplex.boundaries → b ≠ 0 →
+      D.baseComplex.chainWeight b < 2 * d → D.LightBoundaryAdmissible d b) :
+    D.DangerousFloorNZ (2 * d) := by
+  intro v hv hnb hbd hne
+  by_cases hw : 2 * d ≤ D.baseComplex.chainWeight (D.push1 v)
+  · exact le_trans hw (D.chainWeight_push_le v)
+  · obtain ⟨t, ht, hwb, hcase⟩ := hadm (D.push1 v) hbd hne (by omega)
+    generalize hb : D.push1 v = b at hwb hcase
+    rcases hcase with ⟨f, rfl, hseam⟩ | ⟨f₁, f₂, rfl, hU, hseam⟩ |
+      ⟨rfl, f, rfl, hW⟩
+    · exact D.dangerous_bound_of_single_shape_of_logicalFloor hbase ht f hwb
+        hseam hv hnb hb
+    · exact D.dangerous_bound_of_pair_shape_of_logicalFloor hbase ht f₁ f₂ hwb
+        hU hseam hv hnb hb
+    · exact D.dangerous_bound_of_window f hwb hW hv hnb hb
+
 /-! ## The safe-sector reduction -/
 
 /-- **The safe-sector reduction**: the homotopy (R) confines safe projections to
@@ -1511,6 +1588,67 @@ theorem pauli_distance_eq_double_of_logicalFloor {d : ℕ}
     · rw [HomologicalCode.weight_chainXOperator, D.chainWeight_pull1, hu_w]
   · rintro w ⟨g, hg, rfl⟩
     exact D.logical_weight_ge_double_of_logicalFloor hbase hM hS g hg
+
+/-! ## The Doubling theorem, packaged
+
+The logical-floor assembly with both sector floors replaced by their generic
+reductions: `dangerousFloorNZ_of_admissible` for the dangerous sector and
+`safeFloor_of_seamCosetFloor` for the safe one. What remains are five inputs:
+
+* (H1) the base logical floor `LogicalFloor d`;
+* (H2) a tight witness `uStar`: a base cycle of weight `d` whose pullback is
+  not a cover boundary;
+* (H3) the deck homotopy `DeckTrivialOnH1`;
+* (H4) the seam-coset floor `SeamCosetFloor (2d)`;
+* (H5) every nonzero base boundary of weight `< 2d` is admissible
+  (`LightBoundaryAdmissible d`).
+
+No separate hypothesis `d ≥ 1` is needed: it follows from (H2), since a
+weight-`0` witness is `0`, whose pullback is a boundary. -/
+
+/-- **Chain-level Doubling theorem**: under (H1)–(H5), `2d` is the least weight
+of a nontrivial cycle of the cover complex. -/
+theorem chain_distance_eq_double_of_admissible {d : ℕ}
+    (hbase : D.LogicalFloor d)
+    (uStar : H × Fin 2 → ZMod 2)
+    (hu_cyc : uStar ∈ D.baseComplex.cycles)
+    (hu_w : D.baseComplex.chainWeight uStar = d)
+    (hτnb : D.pull1 uStar ∉ D.coverComplex.boundaries)
+    (hR : D.DeckTrivialOnH1)
+    (hMim : D.SeamCosetFloor (2 * d))
+    (hadm : ∀ b : H × Fin 2 → ZMod 2, b ∈ D.baseComplex.boundaries → b ≠ 0 →
+      D.baseComplex.chainWeight b < 2 * d → D.LightBoundaryAdmissible d b) :
+    IsLeast {w : ℕ | ∃ v : G × Fin 2 → ZMod 2,
+      v ∈ D.coverComplex.cycles ∧ v ∉ D.coverComplex.boundaries ∧
+      D.coverComplex.chainWeight v = w} (2 * d) :=
+  D.chain_distance_eq_double_of_logicalFloor hbase
+    (D.dangerousFloorNZ_of_admissible hbase hadm)
+    (D.safeFloor_of_seamCosetFloor hR hMim) uStar hu_cyc hu_w hτnb
+
+/-- **The Doubling theorem.** For a free double cover `D`, assume (H1) the base
+logical floor `LogicalFloor d`; (H2) a base cycle `uStar` of weight `d` whose
+pullback is not a cover boundary; (H3) the deck acts trivially on `H₁(cover)`;
+(H4) the seam-coset floor `SeamCosetFloor (2d)`; and (H5) every nonzero base
+boundary of weight `< 2d` is admissible. Then `2d` is the least weight of a
+nontrivial logical operator of the cover's homological stabilizer group: the
+cover code has distance exactly `2d`. -/
+theorem pauli_distance_eq_double_of_admissible {d : ℕ}
+    (hbase : D.LogicalFloor d)
+    (uStar : H × Fin 2 → ZMod 2)
+    (hu_cyc : uStar ∈ D.baseComplex.cycles)
+    (hu_w : D.baseComplex.chainWeight uStar = d)
+    (hτnb : D.pull1 uStar ∉ D.coverComplex.boundaries)
+    (hR : D.DeckTrivialOnH1)
+    (hMim : D.SeamCosetFloor (2 * d))
+    (hadm : ∀ b : H × Fin 2 → ZMod 2, b ∈ D.baseComplex.boundaries → b ≠ 0 →
+      D.baseComplex.chainWeight b < 2 * d → D.LightBoundaryAdmissible d b) :
+    IsLeast {w : ℕ | ∃ g : NQubitPauliGroupElement D.coverComplex.numQubits,
+      Quantum.StabilizerGroup.IsNontrivialLogicalOperator g
+        D.coverComplex.homologicalStabilizerGroup ∧
+      NQubitPauliGroupElement.weight g = w} (2 * d) :=
+  D.pauli_distance_eq_double_of_logicalFloor hbase
+    (D.dangerousFloorNZ_of_admissible hbase hadm)
+    (D.safeFloor_of_seamCosetFloor hR hMim) uStar hu_cyc hu_w hτnb
 
 end XDoubleCoverData
 

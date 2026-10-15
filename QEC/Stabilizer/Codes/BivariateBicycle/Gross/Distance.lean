@@ -6,8 +6,8 @@ hand-written file (every instance keeps its
 results in `Distance.lean` / `StabilizerCode.lean`). Both certificate inputs —
 `MImBound` and `LightStabilizerClassification` — are discharged by one
 Brouwer–Zimmermann certificate (`SeamBZ.lean`). `LayerInstance.lean` derives the
-distance through the parametric doubling layer; the results here transport that
-proof to the packaged stabilizer code.
+distance through the packaged Doubling theorem of the parametric layer; the
+results here transport that proof to the packaged stabilizer code.
 -/
 
 import QEC.Stabilizer.Codes.BivariateBicycle.Gross.LayerInstance
@@ -29,7 +29,8 @@ theorem grossStabilizerCode_hasCodeDistance_12 (hMim : MImBound) :
 `[[144,12,12]]` bivariate-bicycle code has distance exactly 12, with NO
 remaining assumed hypotheses: both certificate inputs come from the
 Brouwer–Zimmermann certificate `GrossBZ.grossSeamBZ`.
-The distance proof is `gross_pauli_distance_eq_12` from the generic layer.
+The distance proof is `gross_pauli_distance_eq_12`, one application of the
+generic Doubling theorem `pauli_distance_eq_double_of_admissible`.
 **Kernel-only**: the axioms are exactly `propext`, `Classical.choice` and
 `Quot.sound` — no `native_decide`, no `sorry`. -/
 theorem grossStabilizerCode_hasCodeDistance_12_uncond :
