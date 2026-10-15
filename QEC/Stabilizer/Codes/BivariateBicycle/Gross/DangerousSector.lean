@@ -21,7 +21,10 @@ to Gross:
     descended cycle lives in the 11-qubit union; its four translates by
     `{0, b₁, b₂, b₁+b₂}` have total weight `2·11 = 22 < 4·6`, so one of them
     is a small cycle, again trivializing `v`;
-* the assembly `dangerous_sector_of_classification`.
+* the assembly `dangerous_sector_of_classification`, and the same result
+  through the generic admissible dispatch
+  (`lightBoundaryAdmissible_of_classification`,
+  `dangerous_sector_of_classification_admissible`).
 
 ## Convention bridge (lab notes → repo)
 
@@ -401,6 +404,60 @@ theorem dangerous_sector_of_classification
     rcases hC f hne hle with ⟨g, hg⟩ | ⟨g, d, hd, hgd⟩
     · exact dangerous_hexagon_bound g hv hnb (by rw [← hf', hg])
     · exact dangerous_dpair_bound g d hd hv hnb (by rw [← hf', hgd])
+
+/-! ## The classification as generic admissibility
+
+The same dispatch, routed through the generic
+`XDoubleCoverData.dangerousFloorNZ_of_admissible`: the classification makes
+every light base boundary admissible, a hexagon being case (a) with `t = 3`
+and a D-pair case (b) with `t = 1`. The shape certificates are the ones the
+hexagon and D-pair rungs above use. -/
+
+/-- **Every light base boundary is admissible**, given the classification:
+hexagons are single shapes with `t = 3` (`6 + 2·3 = 12`), D-pairs are pair
+shapes with `t = 1` (`10 + 2·1 = 12`, union `11 ≤ 11`). -/
+theorem lightBoundaryAdmissible_of_classification
+    (hC : LightStabilizerClassification) :
+    ∀ b : BaseGroup × Fin 2 → ZMod 2, b ∈ grossCoverData.baseComplex.boundaries →
+      b ≠ 0 → grossCoverData.baseComplex.chainWeight b < 2 * 6 →
+      grossCoverData.LightBoundaryAdmissible 6 b := by
+  rintro b ⟨f, hf⟩ hne hw
+  have hf' : bbBoundary2Fn baseA baseB f = b := hf
+  subst hf'
+  have hle : (Finset.univ.filter fun j : BaseGroup × Fin 2 =>
+      bbBoundary2Fn baseA baseB f j ≠ 0).card ≤ 11 := by
+    change (Finset.univ.filter fun j : BaseGroup × Fin 2 =>
+      bbBoundary2Fn baseA baseB f j ≠ 0).card < 2 * 6 at hw
+    omega
+  rcases hC f hne hle with ⟨g, hg⟩ | ⟨g, d, hd, hgd⟩
+  · -- a hexagon: case (a) with `t = 3`
+    refine ⟨3, by decide, ?_, Or.inl ⟨Pi.single g 1, hg, ?_⟩⟩
+    · change (Finset.univ.filter fun j : BaseGroup × Fin 2 =>
+        bbBoundary2Fn baseA baseB f j ≠ 0).card + 2 * 3 = 2 * 6
+      rw [hg, hexagon_weight]
+    · intro j hj
+      rw [hg]
+      exact hexagon_seam_subset g j hj
+  · -- a D-pair: case (b) with `t = 1`
+    refine ⟨1, le_rfl, ?_, Or.inr (Or.inl ⟨Pi.single g 1, Pi.single (g + d) 1,
+      ?_, ?_, dpair_seam_subset g d hd⟩)⟩
+    · change (Finset.univ.filter fun j : BaseGroup × Fin 2 =>
+        bbBoundary2Fn baseA baseB f j ≠ 0).card + 2 * 1 = 2 * 6
+      rw [hgd, dpair_weight g d hd]
+    · change bbBoundary2Fn baseA baseB f
+        = bbBoundary2Fn baseA baseB (Pi.single g 1)
+          + bbBoundary2Fn baseA baseB (Pi.single (g + d) 1)
+      rw [hgd, bbBoundary2Fn_add]
+    · simpa only [Nat.sub_self, Nat.mul_zero, Nat.add_zero] using
+        dpair_union_card g d hd
+
+/-- **The dangerous sector through the generic dispatch**: the classification
+gives `DangerousSectorGe12` by `dangerousFloorNZ_of_admissible`, with no
+Gross-specific case split. -/
+theorem dangerous_sector_of_classification_admissible
+    (hC : LightStabilizerClassification) : DangerousSectorGe12 :=
+  grossCoverData.dangerousFloorNZ_of_admissible grossCoverData_logicalFloor
+    (lightBoundaryAdmissible_of_classification hC)
 
 end BB
 end Homological

@@ -110,10 +110,31 @@ theorem small_pauli_distance :
     (smallCover.safeFloor_of_seamCosetFloor small_deck_trivial small_seam_floor)
     smallWitness small_witness_cycle small_witness_weight small_witness_survives
 
+/-- No base boundary is nonzero, so light-boundary admissibility is vacuous. -/
+lemma small_admissible : ∀ b : ZMod 1 × Fin 2 → ZMod 2,
+    b ∈ smallCover.baseComplex.boundaries → b ≠ 0 →
+    smallCover.baseComplex.chainWeight b < 2 * 1 →
+    smallCover.LightBoundaryAdmissible 1 b := by
+  have hzero : ∀ f : ZMod 1 → ZMod 2,
+      bbBoundary2Fn smallCover.Ab smallCover.Bb f = 0 := by decide +kernel
+  rintro b ⟨f, hf⟩ hne _
+  exact (hne (hf.symm.trans (hzero f))).elim
+
+/-- The packaged Doubling theorem gives the same distance from (H1)–(H5). -/
+theorem small_pauli_distance_of_admissible :
+    IsLeast {w : ℕ | ∃ g : NQubitPauliGroupElement smallCover.coverComplex.numQubits,
+      StabilizerGroup.IsNontrivialLogicalOperator g
+        smallCover.coverComplex.homologicalStabilizerGroup ∧
+      NQubitPauliGroupElement.weight g = w} 2 :=
+  smallCover.pauli_distance_eq_double_of_admissible small_logical_floor
+    smallWitness small_witness_cycle small_witness_weight small_witness_survives
+    small_deck_trivial small_seam_floor small_admissible
+
 open Lean in
 run_cmd do
   let allowed : NameSet := .ofList [``propext, ``Classical.choice, ``Quot.sound]
-  for root in [``small_chain_distance, ``small_pauli_distance] do
+  for root in [``small_chain_distance, ``small_pauli_distance,
+      ``small_pauli_distance_of_admissible] do
     let extra := (← collectAxioms root).filter (fun n => !allowed.contains n)
     unless extra.isEmpty do
       throwError "{root} uses forbidden axioms: {extra}"
@@ -134,6 +155,10 @@ run_cmd do
       #[``XDoubleCoverData.chain_distance_eq_double_of_logicalFloor] ++ bz),
     (``gross_pauli_distance_eq_12,
       #[``XDoubleCoverData.pauli_distance_eq_double_of_logicalFloor] ++ bz),
+    -- The packaged Doubling theorem, with (M) from the generic dispatch.
+    (``gross_pauli_distance_eq_12_via_admissible,
+      #[``XDoubleCoverData.pauli_distance_eq_double_of_admissible,
+        ``XDoubleCoverData.dangerousFloorNZ_of_admissible] ++ bz),
     (``grossStabilizerCode_hasCodeDistance_12_uncond,
       #[``gross_pauli_distance_eq_12, ``StabilizerGroup.has_code_distance_of_isLeast] ++ bz),
     (``grossStabilizerCodeWithDistance,

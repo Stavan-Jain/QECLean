@@ -47,6 +47,13 @@ classification from one generic `SeamBZCertificate`. `Assembly` retains the old
 conditional names as wrappers.
 `LayerInstance` discharges the remaining inputs, and `Distance` packages its
 Pauli-distance result through `has_code_distance_of_isLeast`.
+`LayerInstance` also re-derives the distance as one application of the packaged
+Doubling theorem `pauli_distance_eq_double_of_admissible`
+(`gross_{chain,pauli}_distance_eq_12_via_admissible`), whose dangerous-sector
+input is the generic dispatch `dangerousFloorNZ_of_admissible`: the census
+makes every light boundary `LightBoundaryAdmissible` (hexagons: single shape,
+`t = 3`; D-pairs: pair shape, `t = 1`;
+`lightBoundaryAdmissible_of_classification` in `DangerousSector`).
 
 After building, `lake env lean scripts/BBDoublingCheck.lean` verifies a separate
 four-qubit cover and checks that both conditional and unconditional Gross
@@ -59,7 +66,7 @@ Brouwer–Zimmermann certificate theorems.
 |---|---|---|
 | `BaseDistanceGe6` | `Gross/BaseDistance.lean` (`SmallCycleData` instance) | kernel `decide` + analytic |
 | `LightStabilizerClassification` | `Gross/SeamBZ.lean` (`GrossBZ.lightStabilizerClassification_bz`: the certificate's light-boundary census, 252 boundaries = 36 hexagons + 216 D-pairs) | kernel `decide` |
-| `DangerousSectorGe12` | `Gross/DangerousSector.lean` ((M), generic logical-floor rungs) | analytic + kernel `decide` |
+| `DangerousSectorGe12` | `Gross/DangerousSector.lean` ((M), generic logical-floor rungs; also via the generic admissible dispatch, `dangerous_sector_of_classification_admissible`) | analytic + kernel `decide` |
 | `SafeSectorGe12` → `MImBound` | `Gross/SafeSector.lean` (generic Smith-coset reduction) | analytic |
 | `MImBound` | `Gross/SeamBZ.lean` (`GrossBZ.mimBound_bz`: `SeamBZCertificate.seamCosetFloor` at 11 over all 63 Smith classes at once, lifted to 12 by parity) | kernel `decide` (two BZ walks, 510 414 words) |
 | capstones | `Gross/Distance.lean` (`grossStabilizerCode_hasCodeDistance_12_uncond`, `grossStabilizerCodeWithDistance`) + `Gross/LayerInstance.lean` (`gross_chain/pauli_distance_eq_12` through the layer) | — |
@@ -181,9 +188,13 @@ further worked examples:
    `SeamBZCertificate.seamCosetFloor` gives `SeamCosetFloor`, and
    `SeamBZCertificate.boundary_census` the light-boundary list the dangerous
    rungs dispatch over — the walk size is what limits this to small bases
-   (gross: 510 414 words; the A28 notes price larger bases at 10⁹+). Use the
-   generic rungs and `safeFloor_of_seamCosetFloor` for the sector reductions;
-   finish with the `..._of_logicalFloor` assemblies.
+   (gross: 510 414 words; the A28 notes price larger bases at 10⁹+). Show
+   each light boundary of the census `LightBoundaryAdmissible` (single shape,
+   pair shape, or `t = 1` window) and conclude with the packaged Doubling
+   theorem `pauli_distance_eq_double_of_admissible`, which runs
+   `dangerousFloorNZ_of_admissible` and `safeFloor_of_seamCosetFloor` for the
+   sector reductions (the `..._of_logicalFloor` assemblies remain available
+   for floors proved some other way).
    `StrongBaseFloor` is unsuitable for weight-six-generator codes with base
    distance above six.
 4. Wire umbrellas (rule 1); add the instance row to the table above and, if
