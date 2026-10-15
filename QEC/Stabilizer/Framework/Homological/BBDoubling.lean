@@ -54,7 +54,7 @@ alone, composing the dispatch with `safeFloor_of_seamCosetFloor`.
 | `safeFloor_of_seamCosetFloor`           | `safe_sector_of_mim`                   |
 | `chain_distance_eq_double`              | `gross_chain_distance_eq_12_of_sectors`|
 | `pauli_distance_eq_double`              | `gross_pauli_distance_eq_12_of_sectors`|
-| `pauli_distance_eq_double_of_admissible`| `gross_pauli_distance_eq_12_via_admissible` |
+| `pauli_distance_eq_double_of_admissible`| `gross_pauli_distance_eq_12`            |
 -/
 
 import QEC.Stabilizer.Framework.Homological.BBCover

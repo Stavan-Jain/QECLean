@@ -8,6 +8,9 @@ a second library definition of the existing four-qubit stabilizer code.
 
 The final checks inspect proof dependencies, so replacing Gross's generic
 route with a bespoke proof fails even if the distance statement is unchanged.
+The unconditional Gross capstones must go through the packaged Doubling theorem
+(`pauli_distance_eq_double_of_admissible`) and the generic admissible dispatch,
+and must not use Gross's own case split `dangerous_sector_of_classification`.
 Run after building QEC: `lake env lean scripts/BBDoublingCheck.lean`.
 -/
 import QEC.Stabilizer.Codes.BivariateBicycle.Gross.Distance
@@ -150,24 +153,30 @@ run_cmd do
   let bz := #[``XDoubleCoverData.SeamBZCertificate.seamCosetFloor,
     ``XDoubleCoverData.SeamBZCertificate.boundary_census,
     ``F2Mask.bz_ok_of_xorSpan, ``F2Mask.kernel_eq_sum_of_peel]
+  -- The unconditional capstones go through the packaged Doubling theorem, whose
+  -- dangerous floor is the generic admissible dispatch.
+  let packaged := #[``XDoubleCoverData.pauli_distance_eq_double_of_admissible,
+    ``XDoubleCoverData.pauli_distance_eq_double_of_logicalFloor,
+    ``XDoubleCoverData.dangerousFloorNZ_of_admissible]
+  -- ... and therefore no longer through Gross's own case split over the census.
+  let perInstance := #[``dangerous_sector_of_classification]
   let targets := #[
     (``gross_chain_distance_eq_12,
-      #[``XDoubleCoverData.chain_distance_eq_double_of_logicalFloor] ++ bz),
-    (``gross_pauli_distance_eq_12,
-      #[``XDoubleCoverData.pauli_distance_eq_double_of_logicalFloor] ++ bz),
-    -- The packaged Doubling theorem, with (M) from the generic dispatch.
-    (``gross_pauli_distance_eq_12_via_admissible,
-      #[``XDoubleCoverData.pauli_distance_eq_double_of_admissible,
-        ``XDoubleCoverData.dangerousFloorNZ_of_admissible] ++ bz),
+      #[``XDoubleCoverData.chain_distance_eq_double_of_admissible,
+        ``XDoubleCoverData.chain_distance_eq_double_of_logicalFloor,
+        ``XDoubleCoverData.dangerousFloorNZ_of_admissible] ++ bz, perInstance),
+    (``gross_pauli_distance_eq_12, packaged ++ bz, perInstance),
     (``grossStabilizerCode_hasCodeDistance_12_uncond,
-      #[``gross_pauli_distance_eq_12, ``StabilizerGroup.has_code_distance_of_isLeast] ++ bz),
+      #[``gross_pauli_distance_eq_12, ``StabilizerGroup.has_code_distance_of_isLeast]
+        ++ packaged ++ bz, perInstance),
     (``grossStabilizerCodeWithDistance,
-      #[``gross_pauli_distance_eq_12, ``StabilizerGroup.has_code_distance_of_isLeast] ++ bz),
+      #[``gross_pauli_distance_eq_12, ``StabilizerGroup.has_code_distance_of_isLeast]
+        ++ packaged ++ bz, perInstance),
     (``grossStabilizerCode_hasCodeDistance_12,
       #[``XDoubleCoverData.pauli_distance_eq_double_of_logicalFloor,
         ``StabilizerGroup.has_code_distance_of_isLeast,
-        ``XDoubleCoverData.SeamBZCertificate.boundary_census])]
-  for (root, endpoints) in targets do
+        ``XDoubleCoverData.SeamBZCertificate.boundary_census], #[])]
+  for (root, endpoints, forbidden) in targets do
     let mut pending := #[root]
     let mut visited : NameSet := {}
     while !pending.isEmpty do
@@ -182,6 +191,9 @@ run_cmd do
     for dependency in required ++ endpoints do
       unless visited.contains dependency do
         throwError "{root} no longer uses the generic theorem {dependency}"
+    for dependency in forbidden do
+      if visited.contains dependency then
+        throwError "{root} uses the per-instance assembly {dependency}"
   logInfo "doubling checks OK — independent cover and Gross generic proof dependencies (incl. BZ)"
 
 end QEC.DoublingCheck

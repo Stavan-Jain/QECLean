@@ -42,8 +42,10 @@ Chain-level formalization of the gross bivariate-bicycle code and its
   (`Framework/Homological/BBSeamBZ.lean`) that discharges both `MImBound`
   (`GrossBZ.mimBound_bz`) and `LightStabilizerClassification`
   (`GrossBZ.lightStabilizerClassification_bz`)
-- `LayerInstance` — the unconditional chain and Pauli distances from the
-  generic logical-floor doubling assembly, with both sector inputs discharged
+- `LayerInstance` — the unconditional chain and Pauli distances, each one
+  application of the packaged Doubling theorem
+  (`pauli_distance_eq_double_of_admissible`), with the light-boundary census
+  as its admissibility input
 - `Distance` — the capstones (`grossStabilizerCode_hasCodeDistance_12_uncond`,
   `grossStabilizerCodeWithDistance`), packaging that same generic result
 

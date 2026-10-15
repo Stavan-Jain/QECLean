@@ -45,20 +45,21 @@ uses the generic single/pair logical-floor rungs with Gross shape certificates;
 generic reduction; `SeamBZ` discharges `MImBound` and the light-boundary
 classification from one generic `SeamBZCertificate`. `Assembly` retains the old
 conditional names as wrappers.
-`LayerInstance` discharges the remaining inputs, and `Distance` packages its
-Pauli-distance result through `has_code_distance_of_isLeast`.
-`LayerInstance` also re-derives the distance as one application of the packaged
-Doubling theorem `pauli_distance_eq_double_of_admissible`
-(`gross_{chain,pauli}_distance_eq_12_via_admissible`), whose dangerous-sector
-input is the generic dispatch `dangerousFloorNZ_of_admissible`: the census
-makes every light boundary `LightBoundaryAdmissible` (hexagons: single shape,
-`t = 3`; D-pairs: pair shape, `t = 1`;
-`lightBoundaryAdmissible_of_classification` in `DangerousSector`).
+`LayerInstance` proves the unconditional distances
+(`gross_{chain,pauli}_distance_eq_12`) as one application each of the packaged
+Doubling theorem (`chain/pauli_distance_eq_double_of_admissible`), whose
+dangerous-sector input is the generic dispatch `dangerousFloorNZ_of_admissible`:
+the census makes every light boundary `LightBoundaryAdmissible` (hexagons:
+single shape, `t = 3`; D-pairs: pair shape, `t = 1`;
+`lightBoundaryAdmissible_of_classification` in `DangerousSector`). `Distance`
+packages the Pauli-distance result through `has_code_distance_of_isLeast`.
 
 After building, `lake env lean scripts/BBDoublingCheck.lean` verifies a separate
 four-qubit cover and checks that both conditional and unconditional Gross
 capstones depend on the generic base, homotopy, rung, sector, and
-Brouwer–Zimmermann certificate theorems.
+Brouwer–Zimmermann certificate theorems — the unconditional ones through the
+packaged Doubling theorem and the admissible dispatch, not through the
+per-instance `dangerous_sector_of_classification`.
 
 ## Hypothesis-discharge map (gross)
 
@@ -66,10 +67,10 @@ Brouwer–Zimmermann certificate theorems.
 |---|---|---|
 | `BaseDistanceGe6` | `Gross/BaseDistance.lean` (`SmallCycleData` instance) | kernel `decide` + analytic |
 | `LightStabilizerClassification` | `Gross/SeamBZ.lean` (`GrossBZ.lightStabilizerClassification_bz`: the certificate's light-boundary census, 252 boundaries = 36 hexagons + 216 D-pairs) | kernel `decide` |
-| `DangerousSectorGe12` | `Gross/DangerousSector.lean` ((M), generic logical-floor rungs; also via the generic admissible dispatch, `dangerous_sector_of_classification_admissible`) | analytic + kernel `decide` |
+| `DangerousSectorGe12` | `Gross/DangerousSector.lean` ((M), generic logical-floor rungs: the capstones take it from the generic admissible dispatch via `lightBoundaryAdmissible_of_classification`; standalone forms `dangerous_sector_of_classification_admissible` and the per-instance `dangerous_sector_of_classification`) | analytic + kernel `decide` |
 | `SafeSectorGe12` → `MImBound` | `Gross/SafeSector.lean` (generic Smith-coset reduction) | analytic |
 | `MImBound` | `Gross/SeamBZ.lean` (`GrossBZ.mimBound_bz`: `SeamBZCertificate.seamCosetFloor` at 11 over all 63 Smith classes at once, lifted to 12 by parity) | kernel `decide` (two BZ walks, 510 414 words) |
-| capstones | `Gross/Distance.lean` (`grossStabilizerCode_hasCodeDistance_12_uncond`, `grossStabilizerCodeWithDistance`) + `Gross/LayerInstance.lean` (`gross_chain/pauli_distance_eq_12` through the layer) | — |
+| capstones | `Gross/Distance.lean` (`grossStabilizerCode_hasCodeDistance_12_uncond`, `grossStabilizerCodeWithDistance`) + `Gross/LayerInstance.lean` (`gross_chain/pauli_distance_eq_12`, one application each of the packaged Doubling theorem `chain/pauli_distance_eq_double_of_admissible`) | — |
 
 The Z3Z6 (pair72, `[[36,4,4]] → [[72,4,8]]`) and Z5Z15F2A6
 (`[[150,8,8]] → [[300,8,16]]`) instances, which used to mirror this map, are
