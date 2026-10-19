@@ -183,14 +183,30 @@ would fail.
 
 \inputleannode{def:generators-independent}
 \inputleannode{thm:independent-of-check-matrix}
+\inputleannode{thm:stabilizer-card-rank}
 \inputleannode{def:stabilizer-code}
+\inputleannode{thm:code-k-determined}
 
-Instantiating \cref{def:stabilizer-code} for a concrete family \emph{is} the
-theorem that the family encodes $k$ qubits into $n$: the type carries $n$ and
-$k$, and the obligations --- generator count, independence, pairwise
-commutation, and exclusion of $-I$ --- must all be discharged to build an
-inhabitant. Nothing about logical operators enters the definition: a
-stabilizer code is its stabilizer group.
+A stabilizer code is a stabilizer group of the right size, and nothing else.
+\Cref{def:stabilizer-code} mentions no generators, so the number $k$ of
+encoded qubits is read off the group itself (\cref{thm:code-k-determined}),
+and nothing about logical operators enters the definition either.
+
+\inputleannode{def:stabilizer-code-presentation}
+\inputleannode{thm:presentation-card}
+\inputleannode{def:presentation-to-code}
+
+Concrete codes are written down by their generators. Instantiating
+\cref{def:stabilizer-code-presentation} for a concrete family and applying
+\cref{def:presentation-to-code} \emph{is} the theorem that the family encodes
+$k$ qubits into $n$: the obligations --- generator count, row independence,
+pairwise commutation, and exclusion of $-I$ --- must all be discharged, and
+\cref{thm:presentation-card} turns them into the size of the group. The
+independence obligation is row independence of the check matrix rather than
+\cref{def:generators-independent}. The latter is a condition on the set of
+generators, so a list that repeats a generator satisfies it while overstating
+$n - k$; independent rows are pairwise distinct, so the length of a
+presentation is an honest count.
 
 \inputleannode{def:stabilizer-code-with-logicals}
 
@@ -287,10 +303,12 @@ homology classes.
 \inputleannode{def:toric-code}
 
 The natural generating set of the toric code has $2L^2$ elements, two more than
-the $n - k = 2L^2 - 2$ that \cref{def:stabilizer-code} demands: the vertex
-checks multiply to the identity, and so do the face checks. The packaging
-therefore uses a trimmed generator list, and the homological identities are
-what prove the trimmed list generates the same subgroup. Distance proofs stated
+the $n - k = 2L^2 - 2$ that a presentation
+(\cref{def:stabilizer-code-presentation}) demands: the vertex checks multiply
+to the identity, and so do the face checks, so the full list has dependent
+rows. The packaging therefore uses a trimmed generator list, and the
+homological identities are what prove the trimmed list generates the same
+subgroup. Distance proofs stated
 against the untrimmed stabilizer group are carried across by
 \cref{thm:nontrivial-logical-transfer}.
 

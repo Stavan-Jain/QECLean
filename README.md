@@ -34,10 +34,12 @@ and other foundations. Import everything via `QEC`.
   and linearly independent check-matrix rows.
 - **Stabilizer framework**: stabilizer groups, codespaces, centralizers,
   logical operators, logical gates, code distance, and CSS structure. Codes come
-  in three layers: `StabilizerCode n k` (`Code[[n, k]]`, generators only),
+  in three layers: `StabilizerCode n k` (`Code[[n, k]]`, a stabilizer group
+  with exactly `2^(n−k)` elements, so `k` is determined by the group),
   `StabilizerCodeWithLogicals n k` (`Code[[n, k]]ₗ`, adding a chosen logical
   basis), and `StabilizerCodeWithDistance n k d` (`Code[[n, k, d]]`, adding a
-  distance proof).
+  distance proof). Concrete codes are built from a generator list through
+  `StabilizerCode.Presentation`.
 - **Homological framework**: chain-complex (CSS) codes, the
   logical-operator-to-homology correspondence, and the bivariate-bicycle
   doubling layer (`Framework/Homological/BB*`): cover transfer, deck homotopy,
@@ -66,8 +68,11 @@ Every distance `d` listed in the parameters below is proved.
 | Shor code | `[[9, 1, 3]]` | `Codes/Small/Shor9*.lean` |
 | Quantum Hamming, `r ≥ 3` | `[[2^r − 1, 2^r − 1 − 2r, 3]]` | `Codes/Small/QuantumHamming*.lean` |
 
-Each code is packaged as a `StabilizerCode`. The proved obligations are
-generator count, independence, pairwise commutation, and exclusion of `-I`.
+Each code is presented by a generator list (`StabilizerCode.Presentation`) whose
+proved obligations are generator count, linear independence of the check-matrix
+rows, pairwise commutation, and exclusion of `-I`; `Presentation.toCode` turns
+it into a `StabilizerCode`, whose stabilizer group provably has `2^(n−k)`
+elements.
 Most codes also provide a `StabilizerCodeWithLogicals` (logical operators in the
 centralizer, with the required anticommutation) and, where the distance is
 proved, a `StabilizerCodeWithDistance`. In addition, for the Steane code,

@@ -15,6 +15,7 @@ import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrix
 import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrixDecidable
 import QEC.Stabilizer.Foundations.BinarySymplectic.Core
 import QEC.Stabilizer.Framework.Symplectic.IndependentEquiv
+import QEC.Stabilizer.Framework.Symplectic.Presentation
 import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
 import QEC.Stabilizer.Foundations.PauliGroupSingle.Operator
 
@@ -362,15 +363,19 @@ The `n + 1` nearest-neighbour `ZZ` generators are independent and commute, on
 `n + 2` qubits: one logical qubit, for every `n`.
 -/
 
-/-- The repetition code on `n + 2` qubits as a stabilizer code `[[n+2, 1]]`. -/
-noncomputable def stabilizerCode (n : ℕ) : Code[[n + 2, 1]] where
+/-- The `n + 1` nearest-neighbour `ZZ` checks as a presentation of an
+`[[n+2, 1]]` code. -/
+def presentation (n : ℕ) : StabilizerCode.Presentation (n + 2) 1 where
   hk := Nat.succ_le_succ (Nat.zero_le (n + 1))
   generatorsList := generatorsList n
   generators_length := by rw [generatorsList_length]; omega
   generators_phaseZero := AllPhaseZero_generatorsList n
-  generators_independent := GeneratorsIndependent_generatorsList n
+  generators_independent := rowsLinearIndependent_generatorsList n
   generators_commute := by rw [listToSet_generators_eq]; exact generators_commute n
   closure_no_neg_identity := by rw [listToSet_generators_eq]; exact negIdentity_not_mem n
+
+/-- The repetition code on `n + 2` qubits as a stabilizer code `[[n+2, 1]]`. -/
+noncomputable def stabilizerCode (n : ℕ) : Code[[n + 2, 1]] := (presentation n).toCode
 
 /-- The stabilizer code's subgroup is the closure of the generator set. -/
 lemma stabilizerCode_toSubgroup_eq (n : ℕ) :

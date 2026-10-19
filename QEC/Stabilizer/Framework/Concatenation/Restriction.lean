@@ -177,7 +177,7 @@ variable (D : ConcatCSSData n₁ n₂ k₂)
 
 /-- An embedded inner generator is one of the concatenated generators. -/
 lemma embedBlock_mem_concatGeneratorsList (b : Fin n₂) (s : NQubitPauliGroupElement n₁)
-    (hs : s ∈ NQubitPauliGroupElement.listToSet D.Cin.generatorsList) :
+    (hs : s ∈ NQubitPauliGroupElement.listToSet D.Pin.generatorsList) :
     embedBlock b s ∈ NQubitPauliGroupElement.listToSet D.concatGeneratorsList := by
   simp only [NQubitPauliGroupElement.listToSet, Set.mem_setOf_eq] at hs ⊢
   simp only [ConcatCSSData.concatGeneratorsList, ConcatCSSData.s1PerBlockList, List.mem_append,
@@ -187,17 +187,17 @@ lemma embedBlock_mem_concatGeneratorsList (b : Fin n₂) (s : NQubitPauliGroupEl
 open NQubitPauliOperator in
 /-- **(M5 kernel infra.)** Embedding into block `b` sends the inner symplectic
 span into the concatenated span: if
-`toSymplectic s ∈ sympSpan Cin.generatorsList`, then
+`toSymplectic s ∈ sympSpan Pin.generatorsList`, then
 `toSymplectic (embedBlock b s) ∈ sympSpan concatGeneratorsList`. Proven by
 realizing `s`'s operator part with a closure element
 (`exists_mem_closure_of_symp_in_span`) and inducting over the closure (embedding
 is operator-multiplicative via `mulOp_embedBlockOp_operators`, so its symplectic
 vector is additive). -/
 lemma toSymplectic_embedBlock_mem_concatSpan (b : Fin n₂) (s : NQubitPauliGroupElement n₁)
-    (hs : toSymplectic s.operators ∈ sympSpan D.Cin.generatorsList) :
+    (hs : toSymplectic s.operators ∈ sympSpan D.Pin.generatorsList) :
     toSymplectic (embedBlock b s).operators ∈ sympSpan D.concatGeneratorsList := by
   obtain ⟨s', hs'mem, hs'op⟩ :=
-    exists_mem_closure_of_symp_in_span D.Cin.generatorsList s.operators hs
+    exists_mem_closure_of_symp_in_span D.Pin.generatorsList s.operators hs
   have hss' : (embedBlock b s).operators = (embedBlock b s').operators := by
     simp only [embedBlock_operators, hs'op]
   rw [hss']
@@ -229,7 +229,8 @@ restriction centralizes the inner stabilizer. The hinge that lets M4's
 lemma restrictBlock_mem_centralizer (g : NQubitPauliGroupElement (n₁ * n₂))
     (hg : g ∈ centralizer D.concatStabGroup) (b : Fin n₂) :
     restrictBlock b g ∈ centralizer D.Cin.toStabilizerGroup := by
-  apply CentralizerLemmas.mem_centralizer_of_commutes_list _ _ D.Cin.generatorsList rfl
+  apply CentralizerLemmas.mem_centralizer_of_commutes_list _ _ D.Pin.generatorsList
+    D.Cin_toSubgroup
   intro s hs
   -- `embedBlock b s` is a concatenated generator, hence centralized by `g`.
   have hmem : embedBlock b s ∈ D.concatStabGroup.toSubgroup :=

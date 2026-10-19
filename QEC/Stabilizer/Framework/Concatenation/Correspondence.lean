@@ -210,7 +210,8 @@ transports that commutation. -/
 theorem inducedOuter_mem_centralizer (g : NQubitPauliGroupElement (n₁ * n₂))
     (hg : g ∈ centralizer D.concatStabGroup) :
     inducedOuter D g ∈ centralizer D.Cout.toStabilizerGroup := by
-  apply CentralizerLemmas.mem_centralizer_of_commutes_list _ _ D.Cout.generatorsList rfl
+  apply CentralizerLemmas.mem_centralizer_of_commutes_list _ _ D.Pout.generatorsList
+    D.Cout_toSubgroup
   intro y hy
   have hymem : y ∈ D.outerZ ++ D.outerX := D.outer_split.mem_iff.mp hy
   have hyY : ∀ b, y.operators b ≠ PauliOperator.Y := D.outer_gen_noY y hymem
@@ -236,8 +237,7 @@ kernel; backward is operator-part commutation (the restriction and the matching
 stabilizer share an operator part, and the logicals centralise the stabilizer).
 -/
 lemma restrict_commutes_both_iff_stab (g : NQubitPauliGroupElement (n₁ * n₂))
-    (hg : g ∈ centralizer D.concatStabGroup)
-    (hindep : rowsLinearIndependent D.Cin.generatorsList) (b : Fin n₂) :
+    (hg : g ∈ centralizer D.concatStabGroup) (b : Fin n₂) :
     (¬ Anticommute (restrictBlock b g) (D.Cin.logicalZ 0)
       ∧ ¬ Anticommute (restrictBlock b g) (D.Cin.logicalX 0))
     ↔ ∃ s ∈ D.Cin.toStabilizerGroup.toSubgroup, s.operators = (restrictBlock b g).operators := by
@@ -249,7 +249,7 @@ lemma restrict_commutes_both_iff_stab (g : NQubitPauliGroupElement (n₁ * n₂)
     have hcomm_z : restrictBlock b g * D.Cin.logicalZ 0
         = D.Cin.logicalZ 0 * restrictBlock b g :=
       (commute_or_anticommute _ _).resolve_right hZ
-    exact operators_eq_stab_of_commutes_both_logicals D.Cin hindep (restrictBlock b g)
+    exact operators_eq_stab_of_commutes_both_logicals D.Cin (restrictBlock b g)
       (D.restrictBlock_mem_centralizer g hg b) hcomm_x hcomm_z
   · rintro ⟨s, hs, hsop⟩
     refine ⟨commute_not_anticommute ?_, commute_not_anticommute ?_⟩
@@ -266,12 +266,11 @@ This is what turns the per-block weight bound (`weight_ge_of_blocks_ge`) into a
 count of nontrivial blocks. Uses M4 (`centralizer_classify_of_k1` and the
 decisive kernel via `restrict_commutes_both_iff_stab`). -/
 theorem inducedOuter_support_eq (g : NQubitPauliGroupElement (n₁ * n₂))
-    (hg : g ∈ centralizer D.concatStabGroup)
-    (hindep : rowsLinearIndependent D.Cin.generatorsList) (b : Fin n₂) :
+    (hg : g ∈ centralizer D.concatStabGroup) (b : Fin n₂) :
     b ∈ (inducedOuter D g).support
       ↔ IsNontrivialLogicalOperator (restrictBlock b g) D.Cin.toStabilizerGroup := by
   rw [NQubitPauliGroupElement.mem_support, inducedOuter_operators, ne_eq,
-    D.inducedOuterOp_eq_I_iff g b, D.restrict_commutes_both_iff_stab g hg hindep b]
+    D.inducedOuterOp_eq_I_iff g b, D.restrict_commutes_both_iff_stab g hg b]
   constructor
   · intro hns
     rcases centralizer_classify_of_k1 D.Cin.toStabilizerCode (restrictBlock b g)
@@ -402,7 +401,8 @@ lemma exists_concatStab_matching_induced (g : NQubitPauliGroupElement (n₁ * n�
   have hZZ : ⟪(D.Cin.logicalZ 0), (D.Cin.logicalZ 0)⟫ₛ
       = 0 := (commutes_iff_symplectic_inner_zero _ _).mp rfl
   -- Step 1: build a class-matching concatenated stabilizer `u` with `inducedOuterOp u = t`.
-  have ht' : t ∈ Subgroup.closure (NQubitPauliGroupElement.listToSet D.Cout.generatorsList) := ht
+  have ht' : t ∈ Subgroup.closure (NQubitPauliGroupElement.listToSet D.Pout.generatorsList) := by
+    rw [← D.Cout_toSubgroup]; exact ht
   obtain ⟨u, hu_mem, hu_sig⟩ : ∃ u ∈ D.concatStabGroup.toSubgroup, ∀ b : Fin n₂,
       ((⟪restrictBlock b u, (D.Cin.logicalZ 0)⟫ₛ,
         ⟪restrictBlock b u, (D.Cin.logicalX 0)⟫ₛ)
@@ -502,7 +502,6 @@ kernel: `g * u` restricts per block to an inner-stabilizer-like operator, so
 `ZMod 2` `toSymplectic g = toSymplectic (g * u) + toSymplectic u`. -/
 lemma inducedOuter_symp_in_span (g : NQubitPauliGroupElement (n₁ * n₂))
     (hg : g ∈ centralizer D.concatStabGroup)
-    (hindep : rowsLinearIndependent D.Cin.generatorsList)
     (t : NQubitPauliGroupElement n₂) (ht : t ∈ D.Cout.toStabilizerGroup.toSubgroup)
     (htop : t.operators = (inducedOuter D g).operators) :
     toSymplectic g.operators ∈ sympSpan D.concatGeneratorsList := by
@@ -513,11 +512,12 @@ lemma inducedOuter_symp_in_span (g : NQubitPauliGroupElement (n₁ * n₂))
     rw [toSymplectic_eq_sum_embed_restrictBlock (g * u)]
     refine Submodule.sum_mem _ (fun b _ => ?_)
     refine D.toSymplectic_embedBlock_mem_concatSpan b (restrictBlock b (g * u)) ?_
-    obtain ⟨s, hs_mem, hs_op⟩ := operators_eq_stab_of_commutes_both_logicals D.Cin hindep
+    obtain ⟨s, hs_mem, hs_op⟩ := operators_eq_stab_of_commutes_both_logicals D.Cin
       (restrictBlock b (g * u)) (D.restrictBlock_mem_centralizer (g * u) hgu_cent b)
       (hu_comm b).1 (hu_comm b).2
+    rw [D.Cin_toSubgroup] at hs_mem
     rw [← hs_op]
-    exact mem_closure_implies_symp_in_span D.Cin.generatorsList D.Cin.generators_phaseZero s hs_mem
+    exact mem_closure_implies_symp_in_span D.Pin.generatorsList D.Pin.generators_phaseZero s hs_mem
   have hu_span : toSymplectic u.operators ∈ sympSpan D.concatGeneratorsList :=
     mem_closure_implies_symp_in_span D.concatGeneratorsList
       D.concatGeneratorsList_phaseZero u hu_mem
@@ -532,24 +532,22 @@ lemma inducedOuter_symp_in_span (g : NQubitPauliGroupElement (n₁ * n₂))
 operator part forces `g` to be concatenated-stabilizer-like. -/
 lemma inducedOuter_coset_injective (g : NQubitPauliGroupElement (n₁ * n₂))
     (hg : g ∈ centralizer D.concatStabGroup)
-    (hindep : rowsLinearIndependent D.Cin.generatorsList)
     (t : NQubitPauliGroupElement n₂) (ht : t ∈ D.Cout.toStabilizerGroup.toSubgroup)
     (htop : t.operators = (inducedOuter D g).operators) :
     ∃ S ∈ D.concatStabGroup.toSubgroup, S.operators = g.operators :=
   exists_mem_closure_of_symp_in_span D.concatGeneratorsList g.operators
-    (D.inducedOuter_symp_in_span g hg hindep t ht htop)
+    (D.inducedOuter_symp_in_span g hg t ht htop)
 
 /-- **(M5.)** The induced outer operator of a *nontrivial* concatenated logical
 is not an outer stabilizer (else `g` would be concatenated-stabilizer-like,
 contradicting nontriviality).
 -/
 theorem inducedOuter_not_mem_stabilizer (g : NQubitPauliGroupElement (n₁ * n₂))
-    (hg : IsNontrivialLogicalOperator g D.concatStabGroup)
-    (hindep : rowsLinearIndependent D.Cin.generatorsList) :
+    (hg : IsNontrivialLogicalOperator g D.concatStabGroup) :
     inducedOuter D g ∉ D.Cout.toStabilizerGroup.toSubgroup := by
   intro hmem
   obtain ⟨S, hS, hSop⟩ :=
-    D.inducedOuter_coset_injective g hg.1 hindep (inducedOuter D g) hmem rfl
+    D.inducedOuter_coset_injective g hg.1 (inducedOuter D g) hmem rfl
   exact ((IsNontrivialLogicalOperator_iff _ _).mp hg).2 S hS hSop
 
 /-- **(M5, headline correspondence.)** The induced outer operator of a
@@ -561,12 +559,11 @@ the bridge that, with
 `inducedOuter_support_eq` and `weight_eq_sum_restrictBlock`, yields the M6
 distance bound. -/
 theorem inducedOuter_isNontrivialLogical (g : NQubitPauliGroupElement (n₁ * n₂))
-    (hg : IsNontrivialLogicalOperator g D.concatStabGroup)
-    (hindep : rowsLinearIndependent D.Cin.generatorsList) :
+    (hg : IsNontrivialLogicalOperator g D.concatStabGroup) :
     IsNontrivialLogicalOperator (inducedOuter D g) D.Cout.toStabilizerGroup := by
   refine (IsNontrivialLogicalOperator_iff _ _).mpr ⟨D.inducedOuter_mem_centralizer g hg.1, ?_⟩
   intro t ht htop
-  obtain ⟨S, hS, hSop⟩ := D.inducedOuter_coset_injective g hg.1 hindep t ht htop
+  obtain ⟨S, hS, hSop⟩ := D.inducedOuter_coset_injective g hg.1 t ht htop
   exact ((IsNontrivialLogicalOperator_iff _ _).mp hg).2 S hS hSop
 
 end ConcatCSSData

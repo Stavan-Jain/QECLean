@@ -71,6 +71,6 @@ example (n k : ℕ) : Code[[n, k]]ₗ = StabilizerCodeWithLogicals n k := rfl
 
 example (C : Code[[7, 1]]ₗ) : Code[[7, 1]] := C.toStabilizerCode
 
-example (C : Code[[7, 1]]ₗ) : List (Quantum.NQubitPauliGroupElement 7) := C.generatorsList
+example (C : Code[[7, 1]]ₗ) : Quantum.StabilizerGroup 7 := C.toStabilizerGroup
 
 end RoundTrip

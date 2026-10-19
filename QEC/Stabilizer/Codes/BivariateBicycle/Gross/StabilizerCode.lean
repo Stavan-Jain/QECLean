@@ -34,6 +34,7 @@ import QEC.Stabilizer.Codes.BivariateBicycle.Gross.SafeSector
 import QEC.Stabilizer.Codes.BivariateBicycle.Gross.StabilizerCodeData
 import QEC.Stabilizer.Framework.Homological.LogicalCorrespondence
 import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
+import QEC.Stabilizer.Framework.Symplectic.Presentation
 import Mathlib.Data.List.GetD
 
 namespace Quantum.Stabilizer.Homological.BB
@@ -1467,8 +1468,10 @@ theorem logical_commute_cross : ∀ ℓ ℓ' : Fin 12, ℓ ≠ ℓ' →
       (HomologicalCode.chainZOperator_isZType _) (HomologicalCode.chainZOperator_isZType _)
 
 set_option maxRecDepth 4096 in
-/-- The gross `[[144, 12, 12]]` bivariate-bicycle code as a `StabilizerCode`. -/
-noncomputable def grossStabilizerCode : StabilizerCode grossComplex.numQubits 12 where
+/-- The 132 trimmed gross checks as a presentation of a `[[144, 12]]` code: the
+decoder identities make their check-matrix rows independent. -/
+noncomputable def grossPresentation :
+    StabilizerCode.Presentation grossComplex.numQubits 12 where
   hk := by rw [grossComplex_numQubits]; omega
   generatorsList := genListPackaged
   generators_length := by
@@ -1482,9 +1485,13 @@ noncomputable def grossStabilizerCode : StabilizerCode grossComplex.numQubits 12
       exact (HomologicalCode.vertexStabOf_isZType v).1
     · obtain ⟨f, _, rfl⟩ := List.mem_map.mp hx
       exact (HomologicalCode.faceStabOf_isXType f).1
-  generators_independent := generators_independent_packaged
+  generators_independent := rowsLinearIndependent_packaged
   generators_commute := gens_commute_packaged
   closure_no_neg_identity := gens_no_neg_packaged
+
+/-- The gross `[[144, 12, 12]]` bivariate-bicycle code as a `StabilizerCode`. -/
+noncomputable def grossStabilizerCode : StabilizerCode grossComplex.numQubits 12 :=
+  grossPresentation.toCode
 
 set_option maxRecDepth 4096 in
 /-- The gross code packaged with its 12 logical qubit pairs (`logicalQubit`):

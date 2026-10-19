@@ -7,6 +7,7 @@ import QEC.Stabilizer.Framework.Core.CSS.CSSDistance
 import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
 import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
 import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
+import QEC.Stabilizer.Framework.Symplectic.Presentation
 import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
 
 namespace Quantum
@@ -103,15 +104,19 @@ lemma stabilizerGroup_toSubgroup_eq :
 
 Two independent, commuting generators on three qubits: one logical qubit. -/
 
-/-- The 3-qubit repetition code as a stabilizer code `[[3, 1]]`. -/
-noncomputable def stabilizerCode : Code[[3, 1]] where
+/-- The generator list as a presentation of a `[[3, 1]]` code: its 2
+check-matrix rows are linearly independent. -/
+def presentation : StabilizerCode.Presentation 3 1 where
   hk := by decide
   generatorsList := generatorsList
   generators_length := rfl
   generators_phaseZero := AllPhaseZero_generatorsList
-  generators_independent := GeneratorsIndependent_3_generatorsList
+  generators_independent := rowsLinearIndependent_generatorsList
   generators_commute := generators_commute
   closure_no_neg_identity := negIdentity_not_mem
+
+/-- The 3-qubit repetition code as a stabilizer code `[[3, 1]]`. -/
+noncomputable def stabilizerCode : Code[[3, 1]] := presentation.toCode
 
 /-- The stabilizer code's subgroup is the closure of the generator list. -/
 lemma stabilizerCode_toSubgroup_eq :

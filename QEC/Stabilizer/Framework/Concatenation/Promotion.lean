@@ -111,20 +111,34 @@ lemma noY_of_isZType {n : ℕ} {op : NQubitPauliOperator n}
 /-- Input data for concatenating a `k₁ = 1` CSS inner code with a CSS outer
 code. Both codes come with a chosen logical basis
 (`StabilizerCodeWithLogicals`): promotion sends outer Paulis to the inner
-logicals, and the concatenated logicals are the promoted outer ones. Carries the
-typed (Z/X) splits of both generator lists and the CSS-typed, phase-0 inner
-logical representatives `X̄₁ = (Cin.logicalX 0)`, `Z̄₁ = (Cin.logicalZ 0)`. -/
+logicals, and the concatenated logicals are the promoted outer ones. Both also
+come with a generator-list presentation (`StabilizerCode.Presentation`) whose
+closure is the code's stabilizer subgroup: the concatenated generator list is
+built from those lists. Carries the typed (Z/X) splits of both generator lists
+and the CSS-typed, phase-0 inner logical representatives
+`X̄₁ = (Cin.logicalX 0)`, `Z̄₁ = (Cin.logicalZ 0)`. -/
 structure ConcatCSSData (n₁ n₂ k₂ : ℕ) [NeZero n₁] where
   Cin : StabilizerCodeWithLogicals n₁ 1
   Cout : StabilizerCodeWithLogicals n₂ k₂
+  /-- A generator-list presentation of the inner code. -/
+  Pin : StabilizerCode.Presentation n₁ 1
+  /-- A generator-list presentation of the outer code. -/
+  Pout : StabilizerCode.Presentation n₂ k₂
+  /-- `Pin` presents `Cin`: the inner stabilizer is the closure of its list (by
+  `rfl` when `Cin` is built on `Pin.toCode`). -/
+  Cin_toSubgroup :
+    Cin.toStabilizerGroup.toSubgroup = Subgroup.closure (listToSet Pin.generatorsList)
+  /-- `Pout` presents `Cout`. -/
+  Cout_toSubgroup :
+    Cout.toStabilizerGroup.toSubgroup = Subgroup.closure (listToSet Pout.generatorsList)
   innerZ : List (NQubitPauliGroupElement n₁)
   innerX : List (NQubitPauliGroupElement n₁)
-  inner_split : List.Perm Cin.generatorsList (innerZ ++ innerX)
+  inner_split : List.Perm Pin.generatorsList (innerZ ++ innerX)
   innerZ_isZ : ∀ g ∈ innerZ, IsZTypeElement g
   innerX_isX : ∀ g ∈ innerX, IsXTypeElement g
   outerZ : List (NQubitPauliGroupElement n₂)
   outerX : List (NQubitPauliGroupElement n₂)
-  outer_split : List.Perm Cout.generatorsList (outerZ ++ outerX)
+  outer_split : List.Perm Pout.generatorsList (outerZ ++ outerX)
   outerZ_isZ : ∀ g ∈ outerZ, IsZTypeElement g
   outerX_isX : ∀ g ∈ outerX, IsXTypeElement g
   innerLogX_isX : NQubitPauliOperator.IsXType (Cin.logicalX 0).operators
@@ -148,11 +162,23 @@ def Xbar : NQubitPauliOperator n₁ := (D.Cin.logicalX 0).operators
 /-- The inner logical-`Z` operator used as the `Z ↦ Z̄₁` promotion target. -/
 def Zbar : NQubitPauliOperator n₁ := (D.Cin.logicalZ 0).operators
 
+/-- An inner generator lies in the inner stabilizer. -/
+lemma mem_Cin_of_mem_gens {g : NQubitPauliGroupElement n₁}
+    (hg : g ∈ listToSet D.Pin.generatorsList) : g ∈ D.Cin.toStabilizerGroup.toSubgroup := by
+  rw [D.Cin_toSubgroup]
+  exact Subgroup.subset_closure hg
+
+/-- An outer generator lies in the outer stabilizer. -/
+lemma mem_Cout_of_mem_gens {g : NQubitPauliGroupElement n₂}
+    (hg : g ∈ listToSet D.Pout.generatorsList) : g ∈ D.Cout.toStabilizerGroup.toSubgroup := by
+  rw [D.Cout_toSubgroup]
+  exact Subgroup.subset_closure hg
+
 /-! ## The concatenated generator list -/
 
 /-- Inner stabilizers replicated across every block. -/
 def s1PerBlockList : List (NQubitPauliGroupElement (n₁ * n₂)) :=
-  (List.finRange n₂).flatMap (fun b => D.Cin.generatorsList.map (embedBlock b))
+  (List.finRange n₂).flatMap (fun b => D.Pin.generatorsList.map (embedBlock b))
 
 /-- Promoted outer stabilizers (routed through the typed sublists, so the
 `promoteSingle` `Y` branch is provably unreachable). -/
@@ -168,12 +194,12 @@ def concatGeneratorsList : List (NQubitPauliGroupElement (n₁ * n₂)) :=
 lemma s1PerBlockList_length :
     D.s1PerBlockList.length = n₂ * (n₁ - 1) := by
   simp [ConcatCSSData.s1PerBlockList, List.length_flatMap, List.length_map,
-    D.Cin.generators_length]
+    D.Pin.generators_length]
 
 lemma promotedOuterList_length :
     D.promotedOuterList.length = n₂ - k₂ := by
   rw [ConcatCSSData.promotedOuterList, List.length_map]
-  rw [← D.outer_split.length_eq, D.Cout.generators_length]
+  rw [← D.outer_split.length_eq, D.Pout.generators_length]
 
 lemma concatGeneratorsList_length :
     D.concatGeneratorsList.length = n₁ * n₂ - k₂ := by

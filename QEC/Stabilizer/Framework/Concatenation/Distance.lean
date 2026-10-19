@@ -64,8 +64,7 @@ correspondence: `inducedOuter_support_eq` (nontrivial blocks = support of
 `inducedOuter`), `inducedOuter_isNontrivialLogical` (so `≥ d₂` of them),
 `HasCodeDistance.min_weight` on both codes, and `weight_ge_of_blocks_ge` (M1).
 -/
-theorem weight_ge_d1_mul_d2 (hindep : rowsLinearIndependent D.Cin.generatorsList)
-    {d₁ d₂ : ℕ} (h1 : HasCodeDistance D.Cin.toStabilizerCode d₁)
+theorem weight_ge_d1_mul_d2 {d₁ d₂ : ℕ} (h1 : HasCodeDistance D.Cin.toStabilizerCode d₁)
     (h2 : HasCodeDistance D.Cout.toStabilizerCode d₂)
     (g : NQubitPauliGroupElement (n₁ * n₂))
     (hg : IsNontrivialLogicalOperator g D.concatStabGroup) (_hw : 0 < weight g) :
@@ -77,7 +76,7 @@ theorem weight_ge_d1_mul_d2 (hindep : rowsLinearIndependent D.Cin.generatorsList
       d₁ ≤ (g.support.filter (fun q => blockOf q = b)).card := by
     intro b hbB
     have hnt : IsNontrivialLogicalOperator (restrictBlock b g) D.Cin.toStabilizerGroup :=
-      (D.inducedOuter_support_eq g hgc hindep b).mp hbB
+      (D.inducedOuter_support_eq g hgc b).mp hbB
     rw [card_block_filter_eq_restrictBlock_weight]
     exact HasCodeDistance.min_weight D.Cin.toStabilizerCode d₁ h1 _ hnt
       (weight_pos_of_nontrivial hnt)
@@ -85,7 +84,7 @@ theorem weight_ge_d1_mul_d2 (hindep : rowsLinearIndependent D.Cin.generatorsList
     weight_ge_of_blocks_ge d₁ g (inducedOuter D g).support hblock
   -- The induced outer operator is a nontrivial outer logical: ≥ `d₂` nontrivial blocks.
   have hntO : IsNontrivialLogicalOperator (inducedOuter D g) D.Cout.toStabilizerGroup :=
-    D.inducedOuter_isNontrivialLogical g hg hindep
+    D.inducedOuter_isNontrivialLogical g hg
   have hd2 : d₂ ≤ (inducedOuter D g).support.card :=
     HasCodeDistance.min_weight D.Cout.toStabilizerCode d₂ h2 _ hntO
       (weight_pos_of_nontrivial hntO)
@@ -97,31 +96,29 @@ bound is `weight_ge_d1_mul_d2`, and a weight-`d₁·d₂` nontrivial logical wit
 (which depends on the codes' minimum-weight representatives) is supplied as
 `hwit` — discharged concretely for Steane⊗Steane in M7. -/
 theorem concat_hasCodeDistance
-    (hindep : GeneratorsIndependent (n₁ * n₂) D.concatGeneratorsList)
-    (hindepCin : rowsLinearIndependent D.Cin.generatorsList)
+    (hindep : rowsLinearIndependent D.concatGeneratorsList)
     {d₁ d₂ : ℕ} (h1 : HasCodeDistance D.Cin.toStabilizerCode d₁)
     (h2 : HasCodeDistance D.Cout.toStabilizerCode d₂)
     (hwit : ∃ g, IsNontrivialLogicalOperator g D.concatStabGroup ∧ weight g = d₁ * d₂) :
     HasCodeDistance (D.concatenate hindep) (d₁ * d₂) := by
   refine ⟨Nat.mul_pos h1.1 h2.1, ?_, hwit⟩
   intro g hg hw
-  exact D.weight_ge_d1_mul_d2 hindepCin h1 h2 g hg hw
+  exact D.weight_ge_d1_mul_d2 h1 h2 g hg hw
 
 /-- **(M6, packaged.)** The concatenated code as a `StabilizerCodeWithDistance`
 — one object carrying all three `[[n₁ n₂, k₂, d₁ d₂]]` parameters in its type,
 combining `concatenate` with `concat_hasCodeDistance`. With this, any
-inner⊗outer instance becomes a first-class `[[n, k, d]]` code once its five
-inputs (independence, inner-row independence, inner/outer distances, and a
+inner⊗outer instance becomes a first-class `[[n, k, d]]` code once its four
+inputs (row independence of the concatenated list, inner/outer distances, and a
 `d₁·d₂`-weight witness) are discharged. -/
 noncomputable def concatenateWithDistance
-    (hindep : GeneratorsIndependent (n₁ * n₂) D.concatGeneratorsList)
-    (hindepCin : rowsLinearIndependent D.Cin.generatorsList)
+    (hindep : rowsLinearIndependent D.concatGeneratorsList)
     {d₁ d₂ : ℕ} (h1 : HasCodeDistance D.Cin.toStabilizerCode d₁)
     (h2 : HasCodeDistance D.Cout.toStabilizerCode d₂)
     (hwit : ∃ g, IsNontrivialLogicalOperator g D.concatStabGroup ∧ weight g = d₁ * d₂) :
     StabilizerCodeWithDistance (n₁ * n₂) k₂ (d₁ * d₂) where
   toStabilizerCode := D.concatenate hindep
-  hasDistance := D.concat_hasCodeDistance hindep hindepCin h1 h2 hwit
+  hasDistance := D.concat_hasCodeDistance hindep h1 h2 hwit
 
 end ConcatCSSData
 

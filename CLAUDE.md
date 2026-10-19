@@ -131,7 +131,11 @@ content there. Same convention for the sub-umbrellas
   `Subgroup.closure` or transitively goes through `NQubitPauliGroupElement.instGroup`
   (mathlib's `Group` instance on this type is noncomputable as of v4.30).
   Common pattern: every concrete code's `def subgroup` and
-  `mkStabilizerFromGenerators` / `toStabilizerGroup` in `StabilizerCode.lean`.
+  `stabilizerCode := presentation.toCode`, which go through
+  `mkStabilizerFromGenerators` (`StabilizerCode.lean`) and
+  `StabilizerCode.Presentation.toCode` (`Symplectic/Presentation.lean`). The
+  `presentation` itself is computable unless its generator list is not
+  (rotated surface, gross).
 - **Tactics**:
   - `simp +decide` is preferred over hand-written `decide` (and avoids the
     "expected type must not contain free variables" trap).
@@ -328,8 +332,17 @@ These are local to this codebase — search here before assuming mathlib has the
   `Z₁`/`B₁`/`H₁` for `rscCycles`/`rscBoundaries`/`rscH1` (scope `RotatedSurfaceChain` —
   the two scopes bind the same tokens, so open one per file).
 - `StabilizerCode n k` (`Core/Stabilizer/StabilizerCode.lean`; notation `Code[[n, k]]`) is the
-  *bare* code — generators only, no logical operators; `HasCodeDistance` and `Code[[n, k, d]]`
-  live on it. A chosen logical basis is the separate `StabilizerCodeWithLogicals n k`
+  *specification*: it `extends StabilizerGroup n` with `hk : k ≤ n` and
+  `card_eq : Nat.card toSubgroup = 2 ^ (n - k)` — no generators and no logical operators, so
+  `k` is determined by the group (`StabilizerCode.k_eq_of_toSubgroup_eq`). Concrete codes are
+  built from a `StabilizerCode.Presentation n k` (`Symplectic/Presentation.lean`): the generator
+  list plus `generators_length`, phase-zero, `rowsLinearIndependent` (which forces `Nodup`),
+  commutation and −I fields, all `decide`-able for literal lists, and `P.toCode` derives
+  `card_eq` from them. Anything that needs the generators (logicality via generators, `decide`
+  sweeps) goes through the presentation; `Presentation.toCode_toSubgroup` (`rfl`, `@[simp]`)
+  rewrites the code's subgroup to `Subgroup.closure (listToSet P.generatorsList)`.
+  `HasCodeDistance` and `Code[[n, k, d]]` live on the specification. A chosen logical basis is
+  the separate `StabilizerCodeWithLogicals n k`
   (`Code[[n, k]]ₗ`, `extends StabilizerCode n k`) with the fields `logicalOps` /
   `logical_commute_cross`; every concrete code provides both a `stabilizerCode` and a
   `stabilizerCodeWithLogicals`. `C.logicalX ℓ`/`C.logicalZ ℓ` are reducible abbreviations of
@@ -680,7 +693,8 @@ literal code (generators → generator list → pairwise commutation by `decide`
 generator lists `decide` cannot evaluate (generator sets → Z/X typing →
 cross-commutation → −I via `CSS.negIdentity_not_mem_closure_union` →
 `listToSet` bridge); §10–§14 are logical operators → anticommutation →
-centralizer → `StabilizerCode` + `StabilizerCodeWithLogicals` → distance,
+centralizer → `StabilizerCode.Presentation` → `StabilizerCode` +
+`StabilizerCodeWithLogicals` → distance,
 with variant notes for `k ≥ 2` codes, non-CSS codes, and parametric families.
 
 Before drafting a new code file by hand or via the
@@ -704,27 +718,29 @@ Concrete instantiations of the template:
 
 ## Stabilizer-code packaging (trimmed generator lists)
 
-`StabilizerCode n k` requires `generatorsList.length = n - k` via its
-`generators_length` field, i.e. an **independent** generator list.
-Concrete codes whose natural generator list has redundancies (toric,
+A `StabilizerCode.Presentation n k` requires `generatorsList.length = n - k`
+(`generators_length`) and `rowsLinearIndependent generatorsList`
+(`generators_independent`), i.e. an **independent**, duplicate-free generator
+list. Concrete codes whose natural generator list has redundancies (toric,
 color codes, etc.) need a *trimmed* list to populate it.
 
-For the toric code, the natural `generatorsList L` in `ToricCodeN.lean`
-has length `2L²` (all vertex + face stabs), but `StabilizerCode.generators_length`
-needs `numQubits L - 2 = 2L² - 2`. The packaging is therefore built
-separately in `ToricCodeNStabilizerCode.lean` with a trimmed list — see
-the comment at `ToricCodeN.lean:613` for the cross-reference.
+For the toric code, the natural `generatorsList L` in `Toric/CodeN.lean`
+has length `2L²` (all vertex + face stabs) and dependent rows, but the
+presentation needs `numQubits L - 2 = 2L² - 2` independent ones. The
+packaging is therefore built separately in `Toric/StabilizerCode.lean` with a
+trimmed list — see the note in `Toric/CodeN.lean` §6 for the cross-reference.
 
-**Pattern for new packagings** (see `ToricCodeNStabilizerCode.lean`):
+**Pattern for new packagings** (see `Toric/StabilizerCode.lean`):
 
 1. Define a trimmed list `generatorsListPackaged L` whose closure equals
-   the existing `(stabilizerGroup L).toSubgroup`. Closure equality requires
-   showing each *dropped* generator is in the closure of the kept ones —
-   i.e. the homological identities.
-2. Build the `StabilizerCode n k` directly with the trimmed list as
-   `generatorsList`.
+   the existing `(stabilizerGroup L).toSubgroup` (`closure_packaged_eq_full`).
+   Closure equality requires showing each *dropped* generator is in the
+   closure of the kept ones — i.e. the homological identities.
+2. Build a `StabilizerCode.Presentation n k` (`toricPresentation L`) with the
+   trimmed list as `generatorsList`, and take the code to be its `toCode`.
 3. Expose `(toricStabilizerCode L).toStabilizerGroup.toSubgroup =
-   (stabilizerGroup L).toSubgroup` as a public lemma; use it to translate
+   (stabilizerGroup L).toSubgroup` as a public lemma
+   (`toricStabilizerCode_subgroup_eq`); use it to translate
    stabilizer-group-based proofs to stabilizer-code-based proofs via
    `IsNontrivialLogicalOperator_of_toSubgroup_eq`.
 

@@ -24,8 +24,8 @@ anticommuting-position count, and the underlying outer generators commute.
   `inner_split`/`outer_split`) and apply `negIdentity_not_mem_closure_union`.
 - the concat logicals' centralizer membership, anticommutation, and
   cross-commutation.
-Generator independence is an explicit hypothesis of `concatenate` (see its
-doc-comment for why it is assumed rather than derived).
+Generator independence is an explicit hypothesis of `concatPresentation` (see
+its doc-comment for why it is assumed rather than derived).
 -/
 
 namespace Quantum.Concatenation
@@ -206,23 +206,23 @@ lemma promote_anticommute_parity (h₁ h₂ : NQubitPauliGroupElement n₂)
 /-- An inner generator commutes with the inner logical `X` (it lies in `Cin`'s
 stabilizer, which the logical centralizes). -/
 lemma inner_gen_comm_logicalX (g : NQubitPauliGroupElement n₁)
-    (hg : g ∈ NQubitPauliGroupElement.listToSet D.Cin.generatorsList) :
+    (hg : g ∈ NQubitPauliGroupElement.listToSet D.Pin.generatorsList) :
     g * D.Cin.logicalX 0 = D.Cin.logicalX 0 * g :=
   (mem_centralizer_iff _ _).mp (D.Cin.logicalOps 0).x_mem_centralizer g
-    (Subgroup.subset_closure hg)
+    (D.mem_Cin_of_mem_gens hg)
 
 /-- An inner generator commutes with the inner logical `Z`. -/
 lemma inner_gen_comm_logicalZ (g : NQubitPauliGroupElement n₁)
-    (hg : g ∈ NQubitPauliGroupElement.listToSet D.Cin.generatorsList) :
+    (hg : g ∈ NQubitPauliGroupElement.listToSet D.Pin.generatorsList) :
     g * D.Cin.logicalZ 0 = D.Cin.logicalZ 0 * g :=
   (mem_centralizer_iff _ _).mp (D.Cin.logicalOps 0).z_mem_centralizer g
-    (Subgroup.subset_closure hg)
+    (D.mem_Cin_of_mem_gens hg)
 
 /-- An inner generator commutes with the zero-phase embedding of any
 single-qubit promotion `I ↦ 1`, `X ↦ X̄`, `Z ↦ Z̄` (the `Y` branch is excluded).
 -/
 lemma inner_gen_comm_promoteSingle (g : NQubitPauliGroupElement n₁)
-    (hg : g ∈ NQubitPauliGroupElement.listToSet D.Cin.generatorsList)
+    (hg : g ∈ NQubitPauliGroupElement.listToSet D.Pin.generatorsList)
     (P : PauliOperator) (hPY : P ≠ PauliOperator.Y) :
     g * ofOperator (promoteSingle D.Xbar D.Zbar P)
       = ofOperator (promoteSingle D.Xbar D.Zbar P) * g := by
@@ -239,7 +239,7 @@ lemma inner_gen_comm_promoteSingle (g : NQubitPauliGroupElement n₁)
 operator: they agree where the inner operator is non-`I` (block `b`), reducing
 to the inner generator commuting with the inner logical there. -/
 lemma embedBlock_promoteE_commute (b : Fin n₂) (g : NQubitPauliGroupElement n₁)
-    (hg : g ∈ NQubitPauliGroupElement.listToSet D.Cin.generatorsList)
+    (hg : g ∈ NQubitPauliGroupElement.listToSet D.Pin.generatorsList)
     (h : NQubitPauliGroupElement n₂) (hhY : ∀ b', h.operators b' ≠ PauliOperator.Y) :
     embedBlock b g * promoteE D.Xbar D.Zbar h
       = promoteE D.Xbar D.Zbar h * embedBlock b g := by
@@ -276,7 +276,7 @@ lemma outer_gen_noY (y : NQubitPauliGroupElement n₂) (hy : y ∈ D.outerZ ++ D
 inner generator or a promoted (typed) outer generator. -/
 lemma mem_concatGeneratorsList (x : NQubitPauliGroupElement (n₁ * n₂))
     (hx : x ∈ NQubitPauliGroupElement.listToSet D.concatGeneratorsList) :
-    (∃ b z, z ∈ NQubitPauliGroupElement.listToSet D.Cin.generatorsList ∧ embedBlock b z = x) ∨
+    (∃ b z, z ∈ NQubitPauliGroupElement.listToSet D.Pin.generatorsList ∧ embedBlock b z = x) ∨
       (∃ y, y ∈ D.outerZ ++ D.outerX ∧ promoteE D.Xbar D.Zbar y = x) := by
   simp only [NQubitPauliGroupElement.listToSet, Set.mem_setOf_eq,
     ConcatCSSData.concatGeneratorsList, ConcatCSSData.s1PerBlockList,
@@ -295,14 +295,14 @@ lemma concat_generators_commute :
   · by_cases hbb : b₁ = b₂
     · subst hbb
       rw [embedBlock_commute_iff]
-      exact D.Cin.generators_commute z₁ hz₁ z₂ hz₂
+      exact D.Pin.generators_commute z₁ hz₁ z₂ hz₂
     · exact embedBlock_cross_commute hbb z₁ z₂
   · exact D.embedBlock_promoteE_commute b₁ z₁ hz₁ y₂ (D.outer_gen_noY y₂ hy₂)
   · exact (D.embedBlock_promoteE_commute b₂ z₂ hz₂ y₁ (D.outer_gen_noY y₁ hy₁)).symm
   · rw [commutes_iff_even_anticommutes,
       D.promote_anticommute_parity y₁ y₂ (D.outer_gen_noY y₁ hy₁) (D.outer_gen_noY y₂ hy₂),
       ← commutes_iff_even_anticommutes]
-    exact D.Cout.generators_commute y₁ (D.outer_split.mem_iff.mpr hy₁)
+    exact D.Pout.generators_commute y₁ (D.outer_split.mem_iff.mpr hy₁)
       y₂ (D.outer_split.mem_iff.mpr hy₂)
 
 /-! ## No `-I`, independence -/
@@ -377,10 +377,10 @@ lemma concatLogicalX_mem_centralizer (ℓ : Fin k₂) :
       D.promote_anticommute_parity y (D.Cout.logicalX ℓ)
         (D.outer_gen_noY y hy) (noY_of_isXType (D.outerLogX_isX ℓ)),
       ← commutes_iff_even_anticommutes]
-    have hy_mem : y ∈ NQubitPauliGroupElement.listToSet D.Cout.generatorsList :=
+    have hy_mem : y ∈ NQubitPauliGroupElement.listToSet D.Pout.generatorsList :=
       D.outer_split.mem_iff.mpr hy
     exact (mem_centralizer_iff _ _).mp (D.Cout.logicalOps ℓ).x_mem_centralizer y
-      (Subgroup.subset_closure hy_mem)
+      (D.mem_Cout_of_mem_gens hy_mem)
 
 /-- The promoted outer logical `Z` centralizes the concatenated stabilizer
 (symmetric to `concatLogicalX_mem_centralizer`). -/
@@ -398,10 +398,10 @@ lemma concatLogicalZ_mem_centralizer (ℓ : Fin k₂) :
       D.promote_anticommute_parity y (D.Cout.logicalZ ℓ)
         (D.outer_gen_noY y hy) (noY_of_isZType (D.outerLogZ_isZ ℓ)),
       ← commutes_iff_even_anticommutes]
-    have hy_mem : y ∈ NQubitPauliGroupElement.listToSet D.Cout.generatorsList :=
+    have hy_mem : y ∈ NQubitPauliGroupElement.listToSet D.Pout.generatorsList :=
       D.outer_split.mem_iff.mpr hy
     exact (mem_centralizer_iff _ _).mp (D.Cout.logicalOps ℓ).z_mem_centralizer y
-      (Subgroup.subset_closure hy_mem)
+      (D.mem_Cout_of_mem_gens hy_mem)
 
 /-- The concatenated logicals `X̄_ℓ`, `Z̄_ℓ` anticommute: the outer logical pair
 anticommutes (odd outer count), and `promote_anticommute_parity` preserves the
@@ -455,20 +455,18 @@ lemma concat_logical_commute_cross (ℓ ℓ' : Fin k₂) (hne : ℓ ≠ ℓ') :
 
 /-! ## The constructor -/
 
-/-- Concatenate a `k₁ = 1` CSS inner code with a CSS outer code into a
-`StabilizerCode (n₁ * n₂) k₂`. The headline of M3.
+/-- The generator-list presentation of the concatenated code: the inner
+generators replicated per block followed by the promoted outer generators.
 
-Generator independence is an explicit hypothesis rather than a derived fact: the
-only available route to `GeneratorsIndependent` is `rowsLinearIndependent`
-(check-matrix row independence over `ZMod 2`), which is strictly stronger than
-the subgroup-independence `Cin`/`Cout` carry and is *not* recoverable from it
-(the reverse implication is false in general). For a concrete instance it is
-discharged by `decide` via `GeneratorsIndependent_of_rowsLinearIndependent`,
-exactly as the small CSS codes do — see `rowsLinearIndependent_generatorsList`
-in `Codes/Small/Steane7.lean`. -/
-noncomputable def concatenate (D : ConcatCSSData n₁ n₂ k₂)
-    (hindep : GeneratorsIndependent (n₁ * n₂) D.concatGeneratorsList) :
-    StabilizerCode (n₁ * n₂) k₂ where
+Generator independence (`rowsLinearIndependent` of the concatenated list) is an
+explicit hypothesis rather than a derived fact: it is the one presentation
+field that does not follow from the inner and outer presentations alone, since
+it also needs the inner logicals to be independent of the inner generators.
+`rowsLinearIndependent_concat` (`Independence.lean`) reduces it to two small
+checks that close by `decide` for a concrete instance. -/
+def concatPresentation (D : ConcatCSSData n₁ n₂ k₂)
+    (hindep : rowsLinearIndependent D.concatGeneratorsList) :
+    StabilizerCode.Presentation (n₁ * n₂) k₂ where
   hk := by
     have hk := D.Cout.hk
     have hle : n₂ ≤ n₁ * n₂ := Nat.le_mul_of_pos_left n₂ (Nat.pos_of_ne_zero (NeZero.ne n₁))
@@ -480,10 +478,18 @@ noncomputable def concatenate (D : ConcatCSSData n₁ n₂ k₂)
   generators_commute := concat_generators_commute D
   closure_no_neg_identity := concat_closure_no_neg_identity D
 
+/-- Concatenate a `k₁ = 1` CSS inner code with a CSS outer code into a
+`StabilizerCode (n₁ * n₂) k₂`: the code presented by `concatPresentation`. The
+headline of M3. -/
+noncomputable def concatenate (D : ConcatCSSData n₁ n₂ k₂)
+    (hindep : rowsLinearIndependent D.concatGeneratorsList) :
+    StabilizerCode (n₁ * n₂) k₂ :=
+  (D.concatPresentation hindep).toCode
+
 /-- `concatenate` together with the concatenated logical basis: the promoted
 outer logicals `concatLogicalOps`. -/
 noncomputable def concatenateWithLogicals (D : ConcatCSSData n₁ n₂ k₂)
-    (hindep : GeneratorsIndependent (n₁ * n₂) D.concatGeneratorsList) :
+    (hindep : rowsLinearIndependent D.concatGeneratorsList) :
     StabilizerCodeWithLogicals (n₁ * n₂) k₂ where
   toStabilizerCode := D.concatenate hindep
   logicalOps := concatLogicalOps D
