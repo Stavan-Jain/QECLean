@@ -208,14 +208,17 @@ the closures equal. See `Toric/StabilizerCode.lean` for the pattern.
 /-!
 ## §3 — Pairwise commutation, by `decide`
 
-`StabilizerCode.Presentation.generators_commute` quantifies over
-`NQubitPauliGroupElement.listToSet generatorsList`. For a literal list that is
-a finite conjunction of closed identities between `σ[…]` literals, and the
-kernel settles each one through the global
+`StabilizerCode.Presentation.generators_commute` quantifies over membership
+in `generatorsList`; `mkStabilizerFromGenerators` (§6) and the `−I` lemma
+(§5) take the same statement over `listToSet generatorsList`. The two forms
+are definitionally equal, so one lemma in the set form below serves all
+three. For a literal list it is a finite conjunction of closed identities
+between `σ[…]` literals, and the kernel settles each one through the global
 `DecidableEq (NQubitPauliGroupElement n)` instance (the bounded quantifier is
 pinned to `List.decidableBAll` by `instDecidablePairwiseCommuteListToSet` in
-`Core/Stabilizer/StabilizerCode.lean`, so instance search does not wander off
-into `Fintype.decidableForallFintype`):
+`Core/Stabilizer/StabilizerCode.lean`, and by `instDecidablePairwiseCommute`
+for the list form, so instance search does not wander off into
+`Fintype.decidableForallFintype`):
 
 ```lean
 /-- All six generators pairwise commute. -/
@@ -413,8 +416,9 @@ theorem negIdentity_not_mem : negIdentity n ∉ subgroup :=
     ZGenerators_are_ZType XGenerators_are_XType ZGenerators_commute_XGenerators
 ```
 
-The `StabilizerCode` fields (§13) are stated over `listToSet generatorsList`,
-so bridge the two forms once and rewrite with it:
+`mkStabilizerFromGenerators` and the presentation's `closure_no_neg_identity`
+(§13) are stated over `listToSet generatorsList`, so bridge the two forms
+once and rewrite with it:
 
 ```lean
 lemma listToSet_generatorsList : listToSet generatorsList = generators := by
@@ -428,6 +432,17 @@ noncomputable def stabilizerGroup : StabilizerGroup n :=
 
 lemma stabilizerGroup_toSubgroup_eq : stabilizerGroup.toSubgroup = subgroup :=
   congrArg Subgroup.closure listToSet_generatorsList
+```
+
+The presentation's `generators_commute` (§13) quantifies over list
+membership, which no longer mentions `listToSet`, so rewrite the bridge
+backwards into the hypothesis instead:
+
+```lean
+  generators_commute := by
+    have h := generators_commute
+    rw [← listToSet_generatorsList] at h
+    exact h
 ```
 
 `listToSet_ofFn` and `AllPhaseZero_ofFn` (`Framework/Symplectic/IndependentEquiv.lean`)
@@ -577,7 +592,7 @@ def presentation : StabilizerCode.Presentation n k where
   generators_length := rfl                 -- length = n - k by construction
   generators_phaseZero := AllPhaseZero_generatorsList
   generators_independent := rowsLinearIndependent_generatorsList   -- §4
-  generators_commute := generators_commute          -- §3 (CSS route: rw the bridge first)
+  generators_commute := generators_commute          -- §3 (CSS route: see §9)
   closure_no_neg_identity := negIdentity_not_mem     -- §5 (optional: the default)
 
 /-- The bare `[[n, k]]` code. No logical operators are bundled here. -/

@@ -619,7 +619,9 @@ def presentation (m : ℕ) [Fact (2 ≤ m)] :
   generators_phaseZero := AllPhaseZero_generatorsList m
   generators_independent := rowsLinearIndependent_generatorsList m
   generators_commute := by
-    rw [listToSet_generatorsList]; exact generators_commute m
+    have h := generators_commute m
+    rw [← listToSet_generatorsList] at h
+    exact h
   closure_no_neg_identity := by
     rw [listToSet_generatorsList]; exact negIdentity_not_mem m
 
