@@ -1080,7 +1080,9 @@ noncomputable def rotatedSurfacePresentation :
   generators_phaseZero := allPhaseZero_generatorsList L
   generators_independent := rowsLinearIndependent_generatorsList L
   generators_commute := by
-    rw [listToSet_generatorsList]; exact generators_commute L
+    have h := generators_commute L
+    rw [← listToSet_generatorsList] at h
+    exact h
   closure_no_neg_identity := by
     rw [listToSet_generatorsList]; exact negIdentity_not_mem L
 

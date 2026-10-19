@@ -78,10 +78,12 @@ theorem GeneratorsIndependent_of_rowsLinearIndependent
 /-!
 ## Deciding pairwise commutation of a generator list
 
-`StabilizerCode.Presentation.generators_commute` quantifies over
-`NQubitPauliGroupElement.listToSet generatorsList`. For a literal list the
-statement is a finite conjunction of closed equalities, each of which the
-kernel settles through `instDecidableEq`, so `decide` closes the whole field.
+`StabilizerCode.Presentation.generators_commute` quantifies over membership
+in `generatorsList`; `mkStabilizerFromGenerators` and the `−I` lemmas take the
+same statement over `NQubitPauliGroupElement.listToSet generatorsList`, which
+is definitionally equal. For a literal list either form is a finite
+conjunction of closed equalities, each of which the kernel settles through
+`instDecidableEq`, so `decide` closes it.
 
 As for `instDecidableAllPhaseZero`, the instances are pinned to
 `List.decidableBAll`: left to `inferInstance`, the bounded quantifier would be
@@ -96,8 +98,8 @@ noncomputable instance instDecidablePairwiseCommute (L : List (NQubitPauliGroupE
   @List.decidableBAll _ (fun g => ∀ h ∈ L, g * h = h * g)
     (fun _ => List.decidableBAll _ L) L
 
-/-- The same statement over `listToSet L`, the form used by
-`StabilizerCode.Presentation.generators_commute`; membership in `listToSet L`
+/-- The same statement over `listToSet L`, the form taken by
+`mkStabilizerFromGenerators`; membership in `listToSet L`
 unfolds to membership in `L`. -/
 noncomputable instance instDecidablePairwiseCommuteListToSet
     (L : List (NQubitPauliGroupElement n)) :

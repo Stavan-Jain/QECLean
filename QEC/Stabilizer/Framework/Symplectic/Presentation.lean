@@ -84,8 +84,7 @@ structure StabilizerCode.Presentation (n k : ℕ) where
   no generator is repeated: `Presentation.nodup`). -/
   generators_independent : rowsLinearIndependent generatorsList
   /-- The generators pairwise commute. -/
-  generators_commute : ∀ g ∈ listToSet generatorsList, ∀ h ∈ listToSet generatorsList,
-    g * h = h * g
+  generators_commute : ∀ g ∈ generatorsList, ∀ h ∈ generatorsList, g * h = h * g
   /-- The closure of the generators does not contain `−I`. -/
   closure_no_neg_identity : negIdentity n ∉ Subgroup.closure (listToSet generatorsList) :=
     negIdentity_not_mem_of_indep_phase_zero_commute generatorsList generators_phaseZero

@@ -371,7 +371,10 @@ def presentation (n : ℕ) : StabilizerCode.Presentation (n + 2) 1 where
   generators_length := by rw [generatorsList_length]; omega
   generators_phaseZero := AllPhaseZero_generatorsList n
   generators_independent := rowsLinearIndependent_generatorsList n
-  generators_commute := by rw [listToSet_generators_eq]; exact generators_commute n
+  generators_commute := by
+    have h := generators_commute n
+    rw [← listToSet_generators_eq] at h
+    exact h
   closure_no_neg_identity := by rw [listToSet_generators_eq]; exact negIdentity_not_mem n
 
 /-- The repetition code on `n + 2` qubits as a stabilizer code `[[n+2, 1]]`. -/

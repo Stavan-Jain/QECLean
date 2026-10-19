@@ -756,7 +756,10 @@ def presentation (hr : 3 ≤ r) :
     rw [generatorsList_length]; omega
   generators_phaseZero := AllPhaseZero_generatorsList r
   generators_independent := rowsLinearIndependent_generatorsList r
-  generators_commute := by rw [listToSet_generatorsList]; exact generators_commute r hr
+  generators_commute := by
+    have h := generators_commute r hr
+    rw [← listToSet_generatorsList] at h
+    exact h
   closure_no_neg_identity := by rw [listToSet_generatorsList]; exact negIdentity_not_mem r hr
 
 /-- The quantum Hamming code as a stabilizer code
