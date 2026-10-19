@@ -19,6 +19,7 @@ import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrix
 import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrixDecidable
 import QEC.Stabilizer.Foundations.BinarySymplectic.Core
 import QEC.Stabilizer.Framework.Symplectic.IndependentEquiv
+import QEC.Stabilizer.Framework.Symplectic.Presentation
 import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
 
 namespace Quantum
@@ -744,18 +745,24 @@ lemma two_mul_add_one_le_two_pow (hr : 3 ≤ r) : 2 * r + 1 ≤ 2 ^ r := by
   | base => decide
   | succ m _ ih => rw [pow_succ]; omega
 
-/-- The quantum Hamming code as a stabilizer code
-`[[2^r − 1, 2^r − 1 − 2r]]`. -/
-noncomputable def stabilizerCode (hr : 3 ≤ r) : Code[[2 ^ r - 1, 2 ^ r - 1 - 2 * r]] where
+/-- The `2r` Hamming checks as a presentation of a
+`[[2^r − 1, 2^r − 1 − 2r]]` code. -/
+def presentation (hr : 3 ≤ r) :
+    StabilizerCode.Presentation (2 ^ r - 1) (2 ^ r - 1 - 2 * r) where
   hk := Nat.sub_le _ _
   generatorsList := generatorsList r
   generators_length := by
     have := two_mul_add_one_le_two_pow r hr
     rw [generatorsList_length]; omega
   generators_phaseZero := AllPhaseZero_generatorsList r
-  generators_independent := GeneratorsIndependent_generatorsList r
+  generators_independent := rowsLinearIndependent_generatorsList r
   generators_commute := by rw [listToSet_generatorsList]; exact generators_commute r hr
   closure_no_neg_identity := by rw [listToSet_generatorsList]; exact negIdentity_not_mem r hr
+
+/-- The quantum Hamming code as a stabilizer code
+`[[2^r − 1, 2^r − 1 − 2r]]`. -/
+noncomputable def stabilizerCode (hr : 3 ≤ r) : Code[[2 ^ r - 1, 2 ^ r - 1 - 2 * r]] :=
+  (presentation r hr).toCode
 
 /-- The stabilizer code's subgroup is the closure of the generator set. -/
 lemma stabilizerCode_toSubgroup_eq (hr : 3 ≤ r) :

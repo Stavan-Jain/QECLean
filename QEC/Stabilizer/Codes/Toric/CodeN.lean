@@ -608,9 +608,10 @@ lemma stabilizerGroup_toSubgroup_eq (L : ℕ) [Fact (2 ≤ L)] :
 ## 6. Chain complex and homology aliases
 
 (The full `StabilizerCode (numQubits L) 2` packaging is built in
-`ToricCodeNStabilizerCode.lean`, which uses a *trimmed* generator list of length
-`numQubits L - 2`. The full `generatorsList L` here has length `2L²`, so it
-cannot directly populate `StabilizerCode.generators_length`.)
+`Toric/StabilizerCode.lean`, whose presentation uses a *trimmed* generator list
+of length `numQubits L - 2`. The full `generatorsList L` here has length `2L²`,
+and its rows are dependent, so it cannot populate
+`StabilizerCode.Presentation.generators_length` or `generators_independent`.)
 -/
 
 /-- Alias for the toric `∂2` boundary map from the lattice chain-complex layer.

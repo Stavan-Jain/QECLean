@@ -2,6 +2,7 @@ import QEC.Stabilizer.Codes.RotatedSurface.N
 import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
 import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
 import QEC.Stabilizer.Framework.Symplectic.IndependentEquiv
+import QEC.Stabilizer.Framework.Symplectic.Presentation
 import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrix
 import QEC.Stabilizer.Codes.RotatedSurface.H1Dimension
 
@@ -1066,9 +1067,10 @@ noncomputable def logicalOps :
 
 /-! ### Final assembly — `StabilizerCode (L * L) 1` -/
 
-/-- The rotated surface code packaged as a `StabilizerCode (L * L) 1`. -/
-noncomputable def rotatedSurfaceStabilizerCode :
-    StabilizerGroup.StabilizerCode (numQubits L) 1 where
+/-- The trimmed `L² − 1` plaquette checks as a presentation of an
+`[[L², 1]]` code. -/
+noncomputable def rotatedSurfacePresentation :
+    StabilizerGroup.StabilizerCode.Presentation (numQubits L) 1 where
   hk := by
     have h3 : 3 ≤ L := Fact.out
     have : 1 ≤ L * L := by nlinarith
@@ -1076,11 +1078,16 @@ noncomputable def rotatedSurfaceStabilizerCode :
   generatorsList := generatorsList L
   generators_length := generatorsList_length L
   generators_phaseZero := allPhaseZero_generatorsList L
-  generators_independent := generators_independent L
+  generators_independent := rowsLinearIndependent_generatorsList L
   generators_commute := by
     rw [listToSet_generatorsList]; exact generators_commute L
   closure_no_neg_identity := by
     rw [listToSet_generatorsList]; exact negIdentity_not_mem L
+
+/-- The rotated surface code packaged as a `StabilizerCode (L * L) 1`. -/
+noncomputable def rotatedSurfaceStabilizerCode :
+    StabilizerGroup.StabilizerCode (numQubits L) 1 :=
+  (rotatedSurfacePresentation L).toCode
 
 /-- The rotated surface code packaged with its logical pair: the middle-column
 `X`-string and the middle-row `Z`-string (`logicalOps L`). -/

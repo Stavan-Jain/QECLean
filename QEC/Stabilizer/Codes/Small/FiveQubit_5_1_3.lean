@@ -7,6 +7,7 @@ import QEC.Stabilizer.Framework.Core.CSS.CSSDistance
 import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
 import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
 import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
+import QEC.Stabilizer.Framework.Symplectic.Presentation
 import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
 
 namespace Quantum
@@ -126,15 +127,19 @@ lemma stabilizerGroup_toSubgroup_eq :
 Four independent, pairwise commuting generators on five qubits: one logical
 qubit. -/
 
-/-- The five-qubit perfect code as a stabilizer code `[[5, 1]]`. -/
-noncomputable def stabilizerCode : Code[[5, 1]] where
+/-- The generator list as a presentation of a `[[5, 1]]` code: its 4
+check-matrix rows are linearly independent. -/
+def presentation : StabilizerCode.Presentation 5 1 where
   hk := by decide
   generatorsList := generatorsList
   generators_length := rfl
   generators_phaseZero := AllPhaseZero_generatorsList
-  generators_independent := GeneratorsIndependent_5_generatorsList
+  generators_independent := rowsLinearIndependent_generatorsList
   generators_commute := generators_commute
   closure_no_neg_identity := negIdentity_not_mem
+
+/-- The five-qubit perfect code as a stabilizer code `[[5, 1]]`. -/
+noncomputable def stabilizerCode : Code[[5, 1]] := presentation.toCode
 
 /-- The stabilizer code's subgroup is the closure of the generator list. -/
 lemma stabilizerCode_toSubgroup_eq :

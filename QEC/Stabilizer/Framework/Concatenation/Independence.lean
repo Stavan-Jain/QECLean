@@ -5,8 +5,9 @@ import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrixDecidable
 # Concatenation: structural generator independence
 
 The constructor `concatenate` (M3) takes generator independence
-(`GeneratorsIndependent (n₁ * n₂) concatGeneratorsList`) as a hypothesis,
-because the only available decision procedure —
+(`rowsLinearIndependent concatGeneratorsList`, the `generators_independent`
+field of its `StabilizerCode.Presentation`) as a hypothesis, because the only
+available decision procedure —
 `Decidable (rowsLinearIndependent L)` — enumerates all `2 ^ L.length`
 coefficient vectors, which is infeasible for the `n₁ * n₂ - k₂` concatenated
 generators (e.g. `2 ^ 48` for Steane ⊗ Steane).
@@ -16,12 +17,12 @@ linear independence of the concatenated generators from
 
 * `hin` — the inner generators *together with the two inner logical
   representatives* `X̄₁, Z̄₁` are symplectically independent
-  (`rowsLinearIndependent (Cin.generatorsList ++ [X̄₁, Z̄₁])`), and
+  (`rowsLinearIndependent (Pin.generatorsList ++ [X̄₁, Z̄₁])`), and
 * `hout` — the outer generators are symplectically independent
   (`rowsLinearIndependent (outerZ ++ outerX)`).
 
 Both inputs are *small* (Steane: `2 ^ 8` and `2 ^ 6`), so they are
-`decide`/`native_decide`-able per instance, unlike the `2 ^ 48` direct check.
+`decide`-able per instance, unlike the `2 ^ 48` direct check.
 
 ## Architecture
 
@@ -394,10 +395,10 @@ lemma rowsLinearIndependent_promotedOuterList
 
 /-- The inner stabilizers replicated across all blocks are symplectically
 independent, given the inner generators are. -/
-lemma rowsLinearIndependent_s1PerBlockList (hCin : rowsLinearIndependent D.Cin.generatorsList) :
+lemma rowsLinearIndependent_s1PerBlockList (hCin : rowsLinearIndependent D.Pin.generatorsList) :
     rowsLinearIndependent D.s1PerBlockList := by
   rw [ConcatCSSData.s1PerBlockList]
-  exact rowsLinearIndependent_flatMap_embedBlock D.Cin.generatorsList hCin
+  exact rowsLinearIndependent_flatMap_embedBlock D.Pin.generatorsList hCin
     (List.finRange n₂) (List.nodup_finRange n₂)
 
 /-! ## Disjointness of the inner and promoted spans -/
@@ -406,9 +407,9 @@ lemma rowsLinearIndependent_s1PerBlockList (hCin : rowsLinearIndependent D.Cin.g
 span. -/
 lemma blockRestrictSymp_mem_sympSpan_inner (b : Fin n₂)
     {v : Fin (n₁ * n₂ + n₁ * n₂) → ZMod 2} (hv : v ∈ sympSpan D.s1PerBlockList) :
-    blockRestrictSymp b v ∈ sympSpan D.Cin.generatorsList := by
+    blockRestrictSymp b v ∈ sympSpan D.Pin.generatorsList := by
   have hle : sympSpan D.s1PerBlockList
-      ≤ Submodule.comap (blockRestrictSymp b) (sympSpan D.Cin.generatorsList) := by
+      ≤ Submodule.comap (blockRestrictSymp b) (sympSpan D.Pin.generatorsList) := by
     rw [sympSpan_eq_span_listToSet, Submodule.span_le]
     rintro x ⟨e, he, rfl⟩
     simp only [listToSet, Set.mem_setOf_eq, ConcatCSSData.s1PerBlockList] at he
@@ -445,9 +446,9 @@ lemma blockRestrictSymp_mem_span_logicals (b : Fin n₂)
 /-- The inner-stabilizer span and the promoted-stabilizer span are disjoint,
 given the inner generators are independent from the two inner logicals
 (`hdisj`). Every block restriction of a shared vector lies in
-`sympSpan Cin.gens ⊓ span{X̄₁, Z̄₁} = 0`, so the vector itself is `0`. -/
+`sympSpan Pin.gens ⊓ span{X̄₁, Z̄₁} = 0`, so the vector itself is `0`. -/
 lemma disjoint_s1_promoted
-    (hdisj : Disjoint (sympSpan D.Cin.generatorsList)
+    (hdisj : Disjoint (sympSpan D.Pin.generatorsList)
       (sympSpan [D.Cin.logicalX 0, D.Cin.logicalZ 0])) :
     Disjoint (sympSpan D.s1PerBlockList) (sympSpan D.promotedOuterList) := by
   rw [Submodule.disjoint_def]
@@ -472,7 +473,7 @@ Both inputs are small (Steane: `2 ^ 8` and `2 ^ 6`), hence
 `decide`/`native_decide`-able per instance — unlike the `2 ^ (n₁ n₂ - k₂)`
 direct check on the concatenated list. -/
 theorem rowsLinearIndependent_concat
-    (hin : rowsLinearIndependent (D.Cin.generatorsList ++
+    (hin : rowsLinearIndependent (D.Pin.generatorsList ++
       [D.Cin.logicalX 0, D.Cin.logicalZ 0]))
     (hout : rowsLinearIndependent (D.outerZ ++ D.outerX)) :
     rowsLinearIndependent D.concatGeneratorsList := by
@@ -482,10 +483,10 @@ theorem rowsLinearIndependent_concat
     D.rowsLinearIndependent_promotedOuterList hlog hout,
     D.disjoint_s1_promoted hdisj⟩
 
-/-- The `GeneratorsIndependent` corollary, ready to feed `concatenate` and the
-M7 instances. -/
+/-- The subgroup-level `GeneratorsIndependent` corollary of
+`rowsLinearIndependent_concat` (which itself is what `concatenate` consumes). -/
 theorem generatorsIndependent_concat
-    (hin : rowsLinearIndependent (D.Cin.generatorsList ++
+    (hin : rowsLinearIndependent (D.Pin.generatorsList ++
       [D.Cin.logicalX 0, D.Cin.logicalZ 0]))
     (hout : rowsLinearIndependent (D.outerZ ++ D.outerX)) :
     GeneratorsIndependent (n₁ * n₂) D.concatGeneratorsList :=

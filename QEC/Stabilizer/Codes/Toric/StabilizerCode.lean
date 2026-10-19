@@ -8,6 +8,7 @@ import QEC.Stabilizer.Codes.Toric.LogicalCorrespondenceX
 import QEC.Stabilizer.Codes.Toric.LogicalCorrespondenceZ
 import QEC.Stabilizer.Codes.Toric.ChainComplex
 import QEC.Stabilizer.Framework.Homological.StabGroup
+import QEC.Stabilizer.Framework.Symplectic.Presentation
 
 /-!
 # Toric code as `StabilizerCode (2L², 2)`
@@ -22,8 +23,9 @@ Status: **All sub-lemmas proven.**
   * `closure_packaged_eq_full` — closure equality.
   * `toric_logicalOps`, `toric_logical_commute_cross` — the four logical loop
     operators and their commutation matrix.
-  * `generators_independent_packaged` — symplectic linear independence of the
-    `2L² - 2` trimmed rows (the toric rank theorem). Proven via
+  * `rowsLinearIndependent_generatorsListPackaged` — symplectic linear
+    independence of the `2L² - 2` trimmed rows (the toric rank theorem), the
+    `generators_independent` field of `toricPresentation`. Proven via
     block-anti-diagonal structure of the check matrix and the kernel
     characterizations `mem_ker_cutMap_iff` / `mem_ker_boundary2_iff`.
 -/
@@ -1526,19 +1528,14 @@ private theorem rowsLinearIndependent_generatorsListPackaged (L : ℕ) [Fact (2 
     rw [← hj_eq]
     exact hxj
 
-/-- The trimmed generator list is an independent generating set. -/
-private theorem generators_independent_packaged (L : ℕ) [Fact (2 ≤ L)] :
-    StabilizerGroup.GeneratorsIndependent (numQubits L) (generatorsListPackaged L) :=
-  StabilizerGroup.GeneratorsIndependent_of_rowsLinearIndependent
-    (rowsLinearIndependent_generatorsListPackaged L)
-
 -- ---------------------------------------------------------------------------
 -- Phase 4: Final assembly
 -- ---------------------------------------------------------------------------
 
-/-- The toric code as a `StabilizerCode [[2L², 2]]`. -/
-noncomputable def toricStabilizerCode (L : ℕ) [Fact (2 ≤ L)] :
-    StabilizerCode (2 * L * L) 2 where
+/-- The trimmed `2L² − 2` vertex and face checks as a presentation of a
+`[[2L², 2]]` code. -/
+def toricPresentation (L : ℕ) [Fact (2 ≤ L)] :
+    StabilizerCode.Presentation (2 * L * L) 2 where
   hk := by
     have hL : 2 ≤ L := Fact.out
     have hq : 2 ≤ numQubits L := by
@@ -1551,9 +1548,14 @@ noncomputable def toricStabilizerCode (L : ℕ) [Fact (2 ≤ L)] :
   generators_phaseZero := by
     haveI : Fact (0 < L) := ⟨lt_of_lt_of_le (by decide : 0 < 2) Fact.out⟩
     exact allPhaseZero_generatorsListPackaged L
-  generators_independent := generators_independent_packaged L
+  generators_independent := rowsLinearIndependent_generatorsListPackaged L
   generators_commute := generators_commute_packaged L
   closure_no_neg_identity := negIdentity_not_mem_packaged L
+
+/-- The toric code as a `StabilizerCode [[2L², 2]]`. -/
+noncomputable def toricStabilizerCode (L : ℕ) [Fact (2 ≤ L)] :
+    StabilizerCode (2 * L * L) 2 :=
+  (toricPresentation L).toCode
 
 /-- The toric code packaged with its two logical pairs, the horizontal and
 vertical non-contractible loop operators (`toric_logicalOps`). -/

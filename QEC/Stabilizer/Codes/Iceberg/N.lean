@@ -18,6 +18,7 @@ import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrix
 import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrixDecidable
 import QEC.Stabilizer.Foundations.BinarySymplectic.SymplecticInner
 import QEC.Stabilizer.Framework.Symplectic.IndependentEquiv
+import QEC.Stabilizer.Framework.Symplectic.Presentation
 
 namespace Quantum
 open scoped BigOperators
@@ -605,9 +606,9 @@ private def logicalOpsIceberg (m : ℕ) [Fact (2 ≤ m)] :
     logicalX_mem_centralizer m i, logicalZ_mem_centralizer m i,
     logicalX_anticommutes_logicalZ_diag m i⟩
 
-/-- T15: the iceberg code as a stabilizer code `[[2m, 2m-2]]`. -/
-noncomputable def stabilizerCode (m : ℕ) [Fact (2 ≤ m)] :
-    StabilizerCode (2 * m) (2 * m - 2) where
+/-- The two iceberg checks as a presentation of a `[[2m, 2m-2]]` code. -/
+def presentation (m : ℕ) [Fact (2 ≤ m)] :
+    StabilizerCode.Presentation (2 * m) (2 * m - 2) where
   hk := by have h : 2 ≤ m := Fact.out; omega
   generatorsList := generatorsList m
   generators_length := by
@@ -616,11 +617,16 @@ noncomputable def stabilizerCode (m : ℕ) [Fact (2 ≤ m)] :
     simp [generatorsList]
     omega
   generators_phaseZero := AllPhaseZero_generatorsList m
-  generators_independent := GeneratorsIndependent_generatorsList m
+  generators_independent := rowsLinearIndependent_generatorsList m
   generators_commute := by
     rw [listToSet_generatorsList]; exact generators_commute m
   closure_no_neg_identity := by
     rw [listToSet_generatorsList]; exact negIdentity_not_mem m
+
+/-- T15: the iceberg code as a stabilizer code `[[2m, 2m-2]]`. -/
+noncomputable def stabilizerCode (m : ℕ) [Fact (2 ≤ m)] :
+    StabilizerCode (2 * m) (2 * m - 2) :=
+  (presentation m).toCode
 
 /-- The iceberg code packaged with its `2m − 2` logical pairs
 `(logicalX m i, logicalZ m i)`. -/

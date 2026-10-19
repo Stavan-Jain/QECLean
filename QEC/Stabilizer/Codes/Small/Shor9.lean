@@ -7,6 +7,7 @@ import QEC.Stabilizer.Framework.Core.CSS.CSSDistance
 import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
 import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
 import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
+import QEC.Stabilizer.Framework.Symplectic.Presentation
 import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
 
 namespace Quantum
@@ -139,15 +140,19 @@ lemma stabilizerGroup_toSubgroup_eq :
 Eight independent, pairwise commuting generators on nine qubits: one logical
 qubit. -/
 
-/-- Shor's code as a stabilizer code `[[9, 1]]`. -/
-noncomputable def stabilizerCode : Code[[9, 1]] where
+/-- The generator list as a presentation of a `[[9, 1]]` code: its 8
+check-matrix rows are linearly independent. -/
+def presentation : StabilizerCode.Presentation 9 1 where
   hk := by decide
   generatorsList := generatorsList
   generators_length := rfl
   generators_phaseZero := AllPhaseZero_generatorsList
-  generators_independent := GeneratorsIndependent_9_generatorsList
+  generators_independent := rowsLinearIndependent_generatorsList
   generators_commute := generators_commute
   closure_no_neg_identity := negIdentity_not_mem
+
+/-- Shor's code as a stabilizer code `[[9, 1]]`. -/
+noncomputable def stabilizerCode : Code[[9, 1]] := presentation.toCode
 
 /-- The stabilizer code's subgroup is the closure of the generator list. -/
 lemma stabilizerCode_toSubgroup_eq :

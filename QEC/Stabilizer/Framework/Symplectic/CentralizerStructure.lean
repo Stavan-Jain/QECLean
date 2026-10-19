@@ -7,6 +7,7 @@ import QEC.Stabilizer.Foundations.BinarySymplectic.Core
 import QEC.Stabilizer.Foundations.BinarySymplectic.SymplecticInner
 import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrix
 import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
+import QEC.Stabilizer.Framework.Symplectic.SymplecticImage
 import QEC.Stabilizer.Framework.Symplectic.SymplecticOrthogonal
 import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
 import QEC.Stabilizer.Framework.Core.Stabilizer.Centralizer
@@ -24,14 +25,16 @@ stabilizer is `stabilizer ⊔ ⟨X̄₁, Z̄₁⟩`; the distance proof needs to
 per block, whether a centralizing operator is "stabilizer-like" or a genuine
 logical.
 
-This module assembles the `SymplecticSpan` bridge into two results. Both are
-proven; they differ in what they ask of the code:
+This module proves two results about the code itself — its stabilizer group
+and, for the second, its logical pair — with no reference to a generator list.
+They differ in what they ask of the code:
 
 - **`centralizer_classify_of_k1`** (the *weak dichotomy*) — stated for a bare
   `StabilizerCode n k`, any `k`, and never touching the logical operators: every
   centralizing element either has its operator part realized by a stabilizer
   element, or is a nontrivial logical. This is the per-block split the distance
-  argument applies to each `restrictBlock b L`.
+  argument applies to each `restrictBlock b L`; it is the definition of
+  `IsNontrivialLogicalOperator` read as a case split.
 
   **Note on the statement.** The plan's draft phrased the "trivial" branch as
   `g ∈ stabilizer`. That over-claims: `g` may differ from a stabilizer element
@@ -45,21 +48,23 @@ proven; they differ in what they ask of the code:
 
 - **`operators_eq_stab_of_commutes_both_logicals`** (the *decisive direction*)
   — stated for a `StabilizerCodeWithLogicals n 1`, since it consumes the
-  bundled logical pair `C.logicalX 0`, `C.logicalZ 0`, plus an explicit
-  `rowsLinearIndependent` hypothesis on the generator list: a centralizing
-  element that commutes with *both* inner logicals has its operator part
-  realized by a stabilizer element. This is the genuine content of M4 and the
-  one place the weak dichotomy is insufficient — the `k = 1` "dimension-2
-  quotient" fact `sympOrthogonal(span{stab rows, X̄, Z̄}) = span{stab rows}`.
-  The proof is a dimension count in `F₂^{2n}`: with `V` the row span,
+  bundled logical pair `C.logicalX 0`, `C.logicalZ 0`: a centralizing element
+  that commutes with *both* inner logicals has its operator part realized by a
+  stabilizer element. This is the genuine content of M4 and the one place the
+  weak dichotomy is insufficient — the `k = 1` "dimension-2 quotient" fact
+  `sympOrthogonal(span{V, X̄, Z̄}) = V` for `V` the symplectic image of the
+  stabilizer. The proof is a dimension count in `F₂^{2n}`: with
   `U = span{X̄, Z̄}` and `W = V ⊔ U`, the hypotheses put `symp(g)` in `Wᗮ`; the
   form is nondegenerate (`sympBilinForm_nondegenerate`), so
   `LinearMap.BilinForm.finrank_orthogonal` gives
   `dim Wᗮ = 2n − dim W = n − 1 = dim V`, and `V ≤ Wᗮ` (the stabilizer is
-  isotropic and commutes with the logicals) forces `V = Wᗮ`. The `BilinForm`
-  section below packages the symplectic form as a mathlib `BilinForm` for
-  exactly this step; `exists_mem_closure_of_symp_in_span` then turns
-  `symp(g) ∈ V` back into a stabilizer element.
+  isotropic and commutes with the logicals) forces `V = Wᗮ`. The rank
+  `dim V = n − 1` is the code's own `k = 1`
+  (`StabilizerCode.finrank_sympImage`), so no generator list or row
+  independence hypothesis is needed. The `BilinForm` section below packages
+  the symplectic form as a mathlib `BilinForm` for exactly this step;
+  `mem_sympImage_iff` then turns `symp(g) ∈ V` back into a stabilizer
+  element.
 -/
 
 namespace Quantum.StabilizerGroup
@@ -72,27 +77,20 @@ variable {n k : ℕ}
 code's stabilizer group is, in operator-part terms, either *stabilizer-like*
 (some stabilizer element shares its operator part) or a *nontrivial logical*.
 
-Proof: split on whether the symplectic vector of `g.operators` lies in the row
-span `sympSpan C.generatorsList`. If it does,
-`exists_mem_closure_of_symp_in_span` realizes the operator part by a closure (=
-stabilizer) element. If it does not, both clauses of
-`IsNontrivialLogicalOperator` hold — centralizer membership is the hypothesis,
-and the "operator-part distinct from every stabilizer" clause follows because
-any stabilizer element's symplectic vector *does* lie in `sympSpan` (the
-generators are phase-0, so `mem_closure_implies_symp_in_span` applies). No
-dimension count, no `k = 1`. -/
+Proof: split on whether some stabilizer element shares the operator part of
+`g`. If none does, both clauses of `IsNontrivialLogicalOperator` hold —
+centralizer membership is the hypothesis, and the "operator part distinct from
+every stabilizer" clause is the case assumption. No generators, no dimension
+count, no `k = 1`. -/
 theorem centralizer_classify_of_k1 (C : StabilizerCode n k)
     (g : NQubitPauliGroupElement n) (hg : g ∈ centralizer C.toStabilizerGroup) :
     (∃ s ∈ C.toStabilizerGroup.toSubgroup, s.operators = g.operators) ∨
       IsNontrivialLogicalOperator g C.toStabilizerGroup := by
-  classical
-  by_cases hin : NQubitPauliOperator.toSymplectic g.operators ∈ sympSpan C.generatorsList
-  · exact Or.inl (exists_mem_closure_of_symp_in_span C.generatorsList g.operators hin)
+  by_cases hin : ∃ s ∈ C.toStabilizerGroup.toSubgroup, s.operators = g.operators
+  · exact Or.inl hin
   · refine Or.inr ((IsNontrivialLogicalOperator_iff g C.toStabilizerGroup).mpr ⟨hg, ?_⟩)
     intro s hs heq
-    refine hin ?_
-    have hs' := mem_closure_implies_symp_in_span C.generatorsList C.generators_phaseZero s hs
-    rwa [heq] at hs'
+    exact hin ⟨s, hs, heq⟩
 
 /-! ## The symplectic form as a nondegenerate `BilinForm` (for the dimension
 count) -/
@@ -208,35 +206,32 @@ section Kernel
 
 open NQubitPauliOperator Module
 
-/-- **(M4, decisive direction — the long pole.)** For a `k = 1` code with
-linearly-independent check-matrix rows, a centralizing element that commutes
-with *both* inner logicals `X̄₁`, `Z̄₁` has its operator part realized by a
-stabilizer element.
+/-- **(M4, decisive direction — the long pole.)** For a `k = 1` code, a
+centralizing element that commutes with *both* inner logicals `X̄₁`, `Z̄₁` has
+its operator part realized by a stabilizer element.
 
-The proof reduces (via `exists_mem_closure_of_symp_in_span`) to the symplectic
-core `toSymplectic g.operators ∈ sympSpan C.generatorsList`, the `k = 1`
-*dimension-2 quotient* fact. Writing `V = sympSpan L` (row span),
-`U = span{X̄, Z̄}`, and `W = V ⊔ U`: `g ∈ centralizer` and commuting with
+The proof reduces (via `mem_sympImage_iff` and the injectivity of
+`toSymplectic` on operators) to the symplectic core
+`toSymplectic g.operators ∈ V` for `V = sympImage S` the symplectic image of
+the stabilizer — the `k = 1` *dimension-2 quotient* fact. Writing
+`U = span{X̄, Z̄}` and `W = V ⊔ U`: `g ∈ centralizer` and commuting with
 `X̄, Z̄` put `symp(g) ∈ Wᗮ`. The form is nondegenerate, so
-`dim Wᗮ = 2n − dim W`. The rows are independent (`dim V = n − 1`); `X̄, Z̄` are
-independent (anticommuting pair, `dim U = 2`) and meet `V` trivially
-(`X̄, Z̄ ⊥ V`), so `dim W = n + 1` and `dim Wᗮ = n − 1 = dim V`. Since `V ⊆ Wᗮ`
-(the stabilizer is isotropic and commutes with the logicals), `V = Wᗮ`, whence
-`symp(g) ∈ V`.
-
-Row-independence (`rowsLinearIndependent`) is an explicit hypothesis:
-`StabilizerCode` carries only the weaker subgroup `GeneratorsIndependent`. For a
-concrete code it closes by `decide`, as the small CSS codes do
-(`rowsLinearIndependent_generatorsList` in `Codes/Small/Steane7.lean`). -/
+`dim Wᗮ = 2n − dim W`. The code has `k = 1`, so `dim V = n − 1`
+(`StabilizerCode.finrank_sympImage`); `X̄, Z̄` are independent (anticommuting
+pair, `dim U = 2`) and meet `V` trivially (`X̄, Z̄ ⊥ V`), so `dim W = n + 1` and
+`dim Wᗮ = n − 1 = dim V`. Since `V ⊆ Wᗮ` (the stabilizer is isotropic and
+commutes with the logicals), `V = Wᗮ`, whence `symp(g) ∈ V`. -/
 theorem operators_eq_stab_of_commutes_both_logicals (C : StabilizerCodeWithLogicals n 1)
-    (hindep : rowsLinearIndependent C.generatorsList)
     (g : NQubitPauliGroupElement n) (hg : g ∈ centralizer C.toStabilizerGroup)
     (hX : g * C.logicalX 0 = C.logicalX 0 * g)
     (hZ : g * C.logicalZ 0 = C.logicalZ 0 * g) :
     ∃ s ∈ C.toStabilizerGroup.toSubgroup, s.operators = g.operators := by
   classical
-  apply exists_mem_closure_of_symp_in_span C.generatorsList g.operators
+  suffices h : toSymplectic g.operators ∈ C.toStabilizerGroup.sympImage by
+    obtain ⟨s, hs, hsg⟩ := (mem_sympImage_iff C.toStabilizerGroup _).mp h
+    exact ⟨s, hs, toSymplectic_injective hsg⟩
   have hn1 : 1 ≤ n := C.hk
+  set V := C.toStabilizerGroup.sympImage with hV
   set xv := toSymplectic (C.logicalX 0).operators with hxv
   set zv := toSymplectic (C.logicalZ 0).operators with hzv
   set U : Submodule (ZMod 2) (Fin (n + n) → ZMod 2) := Submodule.span (ZMod 2) {xv, zv} with hU
@@ -253,31 +248,25 @@ theorem operators_eq_stab_of_commutes_both_logicals (C : StabilizerCodeWithLogic
   have hZZ : sympBilinForm n zv zv = 0 := by
     rw [hzv, sympBilinForm_apply, symplecticBilinear_toSymplectic]
     exact (commutes_iff_symplectic_inner_zero _ _).mp rfl
-  -- Any centralizing element is symplectically orthogonal to every generator row.
+  -- Any centralizing element is symplectically orthogonal to every stabilizer element.
   have hcomm : ∀ p : NQubitPauliGroupElement n, p ∈ centralizer C.toStabilizerGroup →
-      ∀ i : Fin C.generatorsList.length,
-      symplecticBilinear (checkMatrix C.generatorsList i) (toSymplectic p.operators) = 0 := by
-    intro p hp i
-    rw [show checkMatrix C.generatorsList i
-          = toSymplectic (C.generatorsList.get i).operators from by ext j; rfl,
-        symplecticBilinear_toSymplectic]
+      ∀ s ∈ C.toStabilizerGroup.toSubgroup,
+      symplecticBilinear (toSymplectic s.operators) (toSymplectic p.operators) = 0 := by
+    intro p hp s hs
+    rw [symplecticBilinear_toSymplectic]
     exact (commutes_iff_symplectic_inner_zero _ _).mp
-      ((mem_centralizer_iff p C.toStabilizerGroup).mp hp (C.generatorsList.get i)
-        (Subgroup.subset_closure (List.get_mem _ _)))
-  -- The logicals lie in `Vᗮ` (they commute with every generator).
-  have hxv_V : xv ∈ LinearMap.BilinForm.orthogonal (sympBilinForm n)
-      (sympSpan C.generatorsList) := by
-    rw [sympSpan, mem_sympBilinForm_orthogonal_span_iff]
-    rintro _ ⟨i, rfl⟩; rw [hxv]; exact hcomm _ (C.logicalOps 0).x_mem_centralizer i
-  have hzv_V : zv ∈ LinearMap.BilinForm.orthogonal (sympBilinForm n)
-      (sympSpan C.generatorsList) := by
-    rw [sympSpan, mem_sympBilinForm_orthogonal_span_iff]
-    rintro _ ⟨i, rfl⟩; rw [hzv]; exact hcomm _ (C.logicalOps 0).z_mem_centralizer i
+      ((mem_centralizer_iff p C.toStabilizerGroup).mp hp s hs)
+  -- The logicals lie in `Vᗮ` (they commute with every stabilizer element).
+  have hxv_V : xv ∈ LinearMap.BilinForm.orthogonal (sympBilinForm n) V := by
+    rw [hV, sympImage, mem_sympBilinForm_orthogonal_span_iff]
+    rintro _ ⟨s, hs, rfl⟩; rw [hxv]; exact hcomm _ (C.logicalOps 0).x_mem_centralizer s hs
+  have hzv_V : zv ∈ LinearMap.BilinForm.orthogonal (sympBilinForm n) V := by
+    rw [hV, sympImage, mem_sympBilinForm_orthogonal_span_iff]
+    rintro _ ⟨s, hs, rfl⟩; rw [hzv]; exact hcomm _ (C.logicalOps 0).z_mem_centralizer s hs
   -- `g ∈ Vᗮ` and `g ∈ Uᗮ`.
-  have hgv_V : toSymplectic g.operators ∈ LinearMap.BilinForm.orthogonal (sympBilinForm n)
-      (sympSpan C.generatorsList) := by
-    rw [sympSpan, mem_sympBilinForm_orthogonal_span_iff]
-    rintro _ ⟨i, rfl⟩; exact hcomm _ hg i
+  have hgv_V : toSymplectic g.operators ∈ LinearMap.BilinForm.orthogonal (sympBilinForm n) V := by
+    rw [hV, sympImage, mem_sympBilinForm_orthogonal_span_iff]
+    rintro _ ⟨s, hs, rfl⟩; exact hcomm _ hg s hs
   have hgv_U : toSymplectic g.operators ∈ LinearMap.BilinForm.orthogonal (sympBilinForm n) U := by
     rw [hU, mem_sympBilinForm_orthogonal_span_iff]
     intro s hs
@@ -289,14 +278,10 @@ theorem operators_eq_stab_of_commutes_both_logicals (C : StabilizerCodeWithLogic
       exact (commutes_iff_symplectic_inner_zero _ _).mp hZ.symm
   -- `g ∈ Wᗮ`.
   have hgv_W : toSymplectic g.operators ∈ LinearMap.BilinForm.orthogonal (sympBilinForm n)
-      (sympSpan C.generatorsList ⊔ U) := by
+      (V ⊔ U) := by
     rw [sympBilinForm_orthogonal_sup]; exact ⟨hgv_V, hgv_U⟩
   -- Dimensions.
-  have hfinV : finrank (ZMod 2) (sympSpan C.generatorsList) = n - 1 := by
-    have h := finrank_span_eq_card hindep
-    rw [Fintype.card_fin] at h
-    rw [sympSpan, show n - 1 = C.generatorsList.length from C.generators_length.symm]
-    exact h
+  have hfinV : finrank (ZMod 2) V = n - 1 := C.toStabilizerCode.finrank_sympImage
   have hind : LinearIndependent (ZMod 2) ![xv, zv] := by
     rw [LinearIndependent.pair_iff]
     intro s t hst
@@ -315,7 +300,7 @@ theorem operators_eq_stab_of_commutes_both_logicals (C : StabilizerCodeWithLogic
         simp only [Set.mem_insert_iff, Set.mem_singleton_iff, Set.mem_range, Fin.exists_fin_two,
           Matrix.cons_val_zero, Matrix.cons_val_one, eq_comm],
       finrank_span_eq_card hind, Fintype.card_fin]
-  have hinf : sympSpan C.generatorsList ⊓ U = ⊥ := by
+  have hinf : V ⊓ U = ⊥ := by
     rw [Submodule.eq_bot_iff]
     intro w hw
     rw [Submodule.mem_inf] at hw
@@ -339,34 +324,34 @@ theorem operators_eq_stab_of_commutes_both_logicals (C : StabilizerCodeWithLogic
           hXX, hZX, _root_.mul_one, mul_zero, zero_add]
       rw [hwx] at e; exact e.symm
     rw [← hab, ha, hb]; simp
-  have hfinW : finrank (ZMod 2) ↥(sympSpan C.generatorsList ⊔ U) = n + 1 := by
-    have h := Submodule.finrank_sup_add_finrank_inf_eq (sympSpan C.generatorsList) U
+  have hfinW : finrank (ZMod 2) ↥(V ⊔ U) = n + 1 := by
+    have h := Submodule.finrank_sup_add_finrank_inf_eq V U
     rw [hinf, finrank_bot, add_zero, hfinV, hfinU] at h
     omega
   have hfinOrth : finrank (ZMod 2) (LinearMap.BilinForm.orthogonal (sympBilinForm n)
-      (sympSpan C.generatorsList ⊔ U)) = n - 1 := by
+      (V ⊔ U)) = n - 1 := by
     rw [LinearMap.BilinForm.finrank_orthogonal sympBilinForm_nondegenerate,
       Module.finrank_fintype_fun_eq_card, Fintype.card_fin, hfinW]
     omega
   -- `V ⊆ Wᗮ`: the stabilizer is isotropic and commutes with the logicals.
-  have hV_le : sympSpan C.generatorsList ≤ LinearMap.BilinForm.orthogonal (sympBilinForm n)
-      (sympSpan C.generatorsList ⊔ U) := by
+  have hV_le : V ≤ LinearMap.BilinForm.orthogonal (sympBilinForm n) (V ⊔ U) := by
     rw [sympBilinForm_orthogonal_sup]
     refine le_inf ?_ ?_
-    · rw [sympSpan, Submodule.span_le]
-      rintro _ ⟨i, rfl⟩
+    · rw [hV, sympImage, Submodule.span_le]
+      rintro _ ⟨s, hs, rfl⟩
       rw [SetLike.mem_coe, mem_sympBilinForm_orthogonal_span_iff]
-      rintro _ ⟨j, rfl⟩
-      exact hcomm _ (stabilizer_le_centralizer C.toStabilizerGroup
-        (Subgroup.subset_closure (List.get_mem _ _))) j
-    · rw [sympSpan, Submodule.span_le]
-      rintro _ ⟨i, rfl⟩
+      rintro _ ⟨t, ht, rfl⟩
+      exact hcomm _ (stabilizer_le_centralizer C.toStabilizerGroup hs) t ht
+    · rw [hV, sympImage, Submodule.span_le]
+      rintro _ ⟨s, hs, rfl⟩
       rw [SetLike.mem_coe, hU, mem_sympBilinForm_orthogonal_span_iff]
-      intro s hs
-      simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
-      rcases hs with rfl | rfl
-      · rw [hxv, symplecticBilinear_comm]; exact hcomm _ (C.logicalOps 0).x_mem_centralizer i
-      · rw [hzv, symplecticBilinear_comm]; exact hcomm _ (C.logicalOps 0).z_mem_centralizer i
+      intro v hv
+      simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hv
+      rcases hv with rfl | rfl
+      · rw [hxv, symplecticBilinear_comm]
+        exact hcomm _ (C.logicalOps 0).x_mem_centralizer s hs
+      · rw [hzv, symplecticBilinear_comm]
+        exact hcomm _ (C.logicalOps 0).z_mem_centralizer s hs
   -- `V = Wᗮ` (containment + equal finrank), so `symp(g) ∈ V`.
   rw [Submodule.eq_of_le_of_finrank_eq hV_le (by rw [hfinV, hfinOrth])]
   exact hgv_W
