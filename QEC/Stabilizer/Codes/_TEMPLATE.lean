@@ -17,6 +17,7 @@ import QEC.Stabilizer.Foundations.BinarySymplectic.Core
 import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrix
 import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrixDecidable
 import QEC.Stabilizer.Framework.Symplectic.IndependentEquiv
+import QEC.Stabilizer.Framework.Symplectic.Presentation
 
 /-!
 # Template — standard stabilizer-code formalization (decide route)
@@ -74,10 +75,10 @@ actions, …) imports the logicals file; see `Steane7TransversalGates.lean`.
 ## Section overview
 
 The **decide route** (§2–§6) is the default for every literal code: the
-generators form a literal `List`, and each hypothesis of `StabilizerCode`
-is a closed decidable statement. The **CSS route** (§7–§9) is kept for
-parametric families, whose generator lists are `List.ofFn` terms that
-`decide` cannot evaluate.
+generators form a literal `List`, and each field of the code's
+`StabilizerCode.Presentation` is a closed decidable statement. The **CSS
+route** (§7–§9) is kept for parametric families, whose generator lists are
+`List.ofFn` terms that `decide` cannot evaluate.
 
 - §1 — Generator definitions (`Z1`, `Z2`, …, `X1`, `X2`, …). Always.
 - §2 — Generator list `generatorsList`. Always.
@@ -93,8 +94,9 @@ parametric families, whose generator lists are `List.ofFn` terms that
   When `k ≥ 1`. Logicals file.
 - §11 — Logical anticommutation. When `k ≥ 1`. Logicals file.
 - §12 — Logicals in centralizer. When `k ≥ 1`. Logicals file.
-- §13 — `StabilizerCode n k` (bare; code file) + `StabilizerCodeWithLogicals
-  n k` (logicals file) packaging. Always.
+- §13 — `StabilizerCode.Presentation n k` and the bare `StabilizerCode n k`
+  it presents (code file) + `StabilizerCodeWithLogicals n k` (logicals file)
+  packaging. Always.
 - §14 — `HasCodeDistance` and `stabilizerCodeWithDistance`. Code file (for
   parametric families with long distance arguments, often a set of dedicated
   distance files instead).
@@ -180,8 +182,8 @@ same way. Letters are `X`, `Y`, `Z` only — leave identity qubits out. See
 
 Put the generators in a literal `List`, Z-checks first, then X-checks. The
 list is the **single source of truth**: the bundled `StabilizerGroup` (§6)
-and the `StabilizerCode` (§13) are both built from it, and every downstream
-membership argument is a case split on its elements.
+and the `StabilizerCode.Presentation` (§13) are both built from it, and every
+downstream membership argument is a case split on its elements.
 
 ```lean
 /-- The six generators as a list (Z-checks first, then X-checks). -/
@@ -190,7 +192,10 @@ def generatorsList : List (NQubitPauliGroupElement 7) :=
 ```
 
 Length must equal `n - k`; this is enforced by
-`StabilizerCode.generators_length` (§13), where it is `rfl`.
+`StabilizerCode.Presentation.generators_length` (§13), where it is `rfl`. The
+length only means something because the rows are independent (§4): a
+repeated generator would make them dependent, so a presentation cannot pad its
+list.
 
 **Parametric variant.** Write the list as `List.ofFn f` and take the CSS
 route (§7–§9). For toric / rotated-surface codes with parametric `L`, the
@@ -203,7 +208,7 @@ the closures equal. See `Toric/StabilizerCode.lean` for the pattern.
 /-!
 ## §3 — Pairwise commutation, by `decide`
 
-`StabilizerCode.generators_commute` quantifies over
+`StabilizerCode.Presentation.generators_commute` quantifies over
 `NQubitPauliGroupElement.listToSet generatorsList`. For a literal list that is
 a finite conjunction of closed identities between `σ[…]` literals, and the
 kernel settles each one through the global
@@ -232,9 +237,9 @@ generators are Z/X-pure.
 /-!
 ## §4 — Phase-zero + check-matrix independence
 
-These two facts feed `StabilizerCode.generators_phaseZero` and
-`StabilizerCode.generators_independent` (§13), and together with §3 they are
-the inputs to the `−I` lemma of §5.
+These two facts feed `StabilizerCode.Presentation.generators_phaseZero` and
+`StabilizerCode.Presentation.generators_independent` (§13), and together with
+§3 they are the inputs to the `−I` lemma of §5.
 
 ```lean
 /-- Every generator has phase power 0. -/
@@ -244,11 +249,14 @@ lemma AllPhaseZero_generatorsList : AllPhaseZero generatorsList := by
 /-- The check-matrix rows of the generators are linearly independent. -/
 theorem rowsLinearIndependent_generatorsList :
     rowsLinearIndependent generatorsList := by decide
-
-/-- The generator list is an independent generating set. -/
-theorem GeneratorsIndependent_n_generatorsList : GeneratorsIndependent n generatorsList :=
-  GeneratorsIndependent_of_rowsLinearIndependent rowsLinearIndependent_generatorsList
 ```
+
+The presentation field is the row-independence statement itself. The weaker
+subgroup-level `GeneratorsIndependent n generatorsList` (no generator in the
+closure of the others) follows from it by
+`GeneratorsIndependent_of_rowsLinearIndependent` if a proof needs it, but it
+cannot serve as the field: it is a condition on the *set* of generators, so it
+does not see a repeated one.
 
 `decide` closes both for every small code on `main`; the one exception is
 `rowsLinearIndependent` for Shor's code (eight rows on nine qubits), where
@@ -277,7 +285,9 @@ theorem negIdentity_not_mem : negIdentity n ∉ Subgroup.closure (listToSet gene
 
 Note the statement is against `Subgroup.closure (listToSet generatorsList)`
 — the same subgroup `mkStabilizerFromGenerators` builds — so §6 and §13 can
-use it directly, with no `listToSet` rewrite.
+use it directly, with no `listToSet` rewrite. In §13 the field may also be
+omitted: `StabilizerCode.Presentation.closure_no_neg_identity` defaults to
+exactly this lemma applied to the other fields.
 -/
 
 /-!
@@ -550,25 +560,39 @@ is in scope; and the per-generator commutation lemmas must be separate
 /-!
 ## §13 — `StabilizerCode n k` packaging, and the logical basis on top
 
-Two bundled structures. The **bare code** combines §2–§5 only: a stabilizer
-code *is* its stabilizer group, presented by `n − k` independent generators.
-It goes in the code file, followed by its closure equation (consumed by §14):
+Two bundled structures. The **bare code** combines §2–§5 only. A stabilizer
+code *is* its stabilizer group: `StabilizerCode n k` is a `StabilizerGroup n`
+with `k ≤ n` and exactly `2 ^ (n - k)` elements, and says nothing about
+generators. A concrete code is written down through a
+`StabilizerCode.Presentation n k` — the generator list with §2–§5 as its
+fields — and its soundness map `toCode` proves the cardinality from row
+independence. Both go in the code file, followed by the closure equation
+(consumed by §14):
 
 ```lean
-/-- The bare `[[n, k]]` code. No logical operators are bundled here. -/
-noncomputable def stabilizerCode : StabilizerCode n k where
+/-- The generator list as a presentation of an `[[n, k]]` code. -/
+def presentation : StabilizerCode.Presentation n k where
   hk := by decide                          -- k ≤ n; trivial for fixed values
   generatorsList := generatorsList
   generators_length := rfl                 -- length = n - k by construction
   generators_phaseZero := AllPhaseZero_generatorsList
-  generators_independent := GeneratorsIndependent_n_generatorsList
+  generators_independent := rowsLinearIndependent_generatorsList   -- §4
   generators_commute := generators_commute          -- §3 (CSS route: rw the bridge first)
-  closure_no_neg_identity := negIdentity_not_mem     -- §5
+  closure_no_neg_identity := negIdentity_not_mem     -- §5 (optional: the default)
+
+/-- The bare `[[n, k]]` code. No logical operators are bundled here. -/
+noncomputable def stabilizerCode : StabilizerCode n k := presentation.toCode
 
 lemma stabilizerCode_toSubgroup_eq :
     stabilizerCode.toStabilizerGroup.toSubgroup = Subgroup.closure (listToSet generatorsList) :=
   rfl  -- on the CSS route, `stabilizerGroup_toSubgroup_eq` against `subgroup`
 ```
+
+`presentation.toCode` unfolds definitionally to
+`mkStabilizerFromGenerators n generatorsList …`, so the equation above is
+`rfl`, and the logical basis below can be typed against the §6
+`stabilizerGroup`. A family whose generator list is `noncomputable` (the
+rotated surface and gross codes) marks its presentation `noncomputable` too.
 
 The **logical basis** (§10–§12) is derived data and lives in a separate
 `StabilizerCodeWithLogicals n k`, which `extends` the bare code. It goes in

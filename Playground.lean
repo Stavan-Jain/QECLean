@@ -16,13 +16,20 @@ Put your cursor at the end of a line to see the goal state in the InfoView.
 
 open Quantum.StabilizerGroup
 
--- The central definitions: an `[[n, k]]` stabilizer code (its stabilizer group,
--- presented by `n - k` independent generators — nothing else), the same code with
--- a chosen logical basis on top, and one whose distance has been proved.
+-- The central definitions: an `[[n, k]]` stabilizer code (a stabilizer group with
+-- exactly `2 ^ (n - k)` elements — nothing else), the same code with a chosen
+-- logical basis on top, and one whose distance has been proved.
 #check @StabilizerCode
 #check @StabilizerCodeWithLogicals
 #check @StabilizerCodeWithDistance
 #check @HasCodeDistance
+
+-- Concrete codes are written down as a presentation — `n - k` generators with
+-- linearly independent check-matrix rows — and `toCode` proves the group has
+-- `2 ^ (n - k)` elements. `k` is then a property of the group alone.
+#check @StabilizerCode.Presentation
+#check @StabilizerCode.Presentation.toCode
+#check @StabilizerCode.k_eq_of_toSubgroup_eq
 
 -- A worked result to inspect: the `[[5, 1, 3]]` perfect code, packaged with its
 -- proved distance. (It is the repo's first non-CSS code.)
