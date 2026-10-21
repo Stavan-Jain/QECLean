@@ -1,6 +1,7 @@
 import QEC.Stabilizer.Codes._TEMPLATE
 import QEC.Stabilizer.Codes.Toric
 import QEC.Stabilizer.Codes.RotatedSurface
+import QEC.Stabilizer.Codes.Color
 import QEC.Stabilizer.Codes.Repetition
 import QEC.Stabilizer.Codes.Iceberg
 import QEC.Stabilizer.Codes.BivariateBicycle
