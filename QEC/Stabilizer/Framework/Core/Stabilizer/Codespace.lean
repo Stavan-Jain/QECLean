@@ -38,6 +38,19 @@ noncomputable instance : Fintype (NQubitPauliGroupElement n) :=
     left_inv := by intro p; simp
     right_inv := by intro p; cases p; simp }
 
+/-- The codespace of S as a submodule of the n-qubit state space. -/
+def codespaceSubmodule (S : StabilizerGroup n) : Submodule ℂ (NQubitVec n) where
+  carrier := { v | ∀ g ∈ S.toSubgroup, Matrix.mulVec g.toMatrix v = v }
+  add_mem' := by intro a b ha hb g hg; rw [Matrix.mulVec_add, ha g hg, hb g hg]
+  zero_mem' := by intro g hg; rw [Matrix.mulVec_zero]
+  smul_mem' := by intro c x hx g hg; rw [Matrix.mulVec_smul, hx g hg]
+
+/-- A state is in the codespace iff its vector lies in `codespaceSubmodule S`.
+-/
+lemma mem_codespace_iff_mem_submodule (ψ : NQubitState n) (S : StabilizerGroup n) :
+  IsInCodespace ψ S ↔ ψ.val ∈ codespaceSubmodule S := by
+  simp [IsInCodespace, IsStabilizedBy, IsStabilizedVec, codespaceSubmodule]
+
 /-- The sum of matrix representations of all elements in the stabilizer group.
 -/
 noncomputable def stabilizerSum (S : StabilizerGroup n) :

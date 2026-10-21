@@ -5,6 +5,7 @@ import QEC.Stabilizer.Framework.Core.Stabilizer.CentralizerLemmas
 import QEC.Stabilizer.Framework.Core.Stabilizer.SubgroupLemmas
 import QEC.Stabilizer.Framework.Core.Stabilizer.GeneratorListLemmas
 import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
+import QEC.Stabilizer.Framework.Core.Stabilizer.CodespaceDimension
 
 /-!
 # Core: stabilizer-formalism primitives

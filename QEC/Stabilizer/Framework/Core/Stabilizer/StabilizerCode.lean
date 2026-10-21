@@ -17,7 +17,8 @@ variable {n k : ℕ}
 
 A **stabilizer code** encoding k logical qubits on n physical qubits *is* its
 stabilizer group S (abelian, no −I), and S has exactly 2^(n − k) elements, so
-the code space has dimension 2^k. That is the whole definition:
+the code space has dimension 2^k (proved by
+`StabilizerCode.finrank_codespace` in `CodespaceDimension.lean`). The definition:
 `StabilizerCode n k` extends `StabilizerGroup n` with `k ≤ n` and
 `Nat.card S = 2 ^ (n - k)`. Nothing in it mentions generators, so `k` is a
 property of the group: two codes with the same stabilizer subgroup encode the
