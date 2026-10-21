@@ -2,7 +2,7 @@ import Mathlib.LinearAlgebra.Matrix.Defs
 import Mathlib.LinearAlgebra.Matrix.Notation
 import Mathlib.Algebra.Group.Subgroup.Basic
 import QEC.Foundations.Foundations
-import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
+import QEC.Stabilizer.Framework.Core.Stabilizer.Codespace
 import QEC.Stabilizer.Foundations.PauliGroup
 
 namespace Quantum
@@ -33,19 +33,6 @@ stabilizes every codespace state. -/
 private def PreservesCodespaceConjugationGate (U : NQubitGate n) (S : StabilizerGroup n) : Prop :=
   ∀ g ∈ S.toSubgroup, ∀ ψ : NQubitState n,
     IsInCodespace ψ S → ((conjByGate U g.gate).val).mulVec ψ.val = ψ.val
-
-/-- The codespace of S as a submodule of the n-qubit state space. -/
-def codespaceSubmodule (S : StabilizerGroup n) : Submodule ℂ (NQubitVec n) where
-  carrier := { v | ∀ g ∈ S.toSubgroup, Matrix.mulVec g.toMatrix v = v }
-  add_mem' := by intro a b ha hb g hg; rw [Matrix.mulVec_add, ha g hg, hb g hg]
-  zero_mem' := by intro g hg; rw [Matrix.mulVec_zero]
-  smul_mem' := by intro c x hx g hg; rw [Matrix.mulVec_smul, hx g hg]
-
-/-- A state is in the codespace iff its vector lies in `codespaceSubmodule S`.
--/
-lemma mem_codespace_iff_mem_submodule (ψ : NQubitState n) (S : StabilizerGroup n) :
-  IsInCodespace ψ S ↔ ψ.val ∈ codespaceSubmodule S := by
-  simp [IsInCodespace, IsStabilizedBy, IsStabilizedVec, codespaceSubmodule]
 
 /-- Helper: if a property holds for all normalized vectors in codespace,
     it holds for all vectors by linearity. -/
