@@ -1,5 +1,6 @@
 import Mathlib.Tactic
 import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrixDecidable
+import QEC.Stabilizer.Foundations.BinarySymplectic.RankCertificate
 import QEC.Stabilizer.Foundations.PauliGroup.Commutation
 import QEC.Stabilizer.Foundations.PauliGroup.Notation
 import QEC.Stabilizer.Framework.Core.CodeNotation
@@ -48,7 +49,7 @@ The logical basis `X̄ = Z⊗⁹`, `Z̄ = X⊗⁹` is in `Shor9Logicals.lean`.
 
 - Generators `Z1`–`Z6`, `X1`, `X2` and the list `generatorsList`
 - Decided hypotheses: `generators_commute`, `AllPhaseZero_generatorsList`,
-  `rowsLinearIndependent_generatorsList`
+  `rowsLinearIndependent_generatorsList` (from the rank certificate `rankCert`)
 - `negIdentity_not_mem`, the bundled `stabilizerGroup`
 - `stabilizerCode : Code[[9, 1]]`
 - Distance 3 (degenerate column condition, weight-3 witness):
@@ -106,12 +107,19 @@ theorem generators_commute :
 lemma AllPhaseZero_generatorsList : AllPhaseZero generatorsList := by
   decide
 
+/-- Rank certificate: the columns of a right inverse of the check matrix, as
+bitmasks over the `9 + 9` symplectic columns (emitted by
+`scripts/RankCertificateGen.lean`). -/
+def rankCert : List ℕ :=
+  [0x200, 0x600, 0x1000, 0x3000, 0x8000, 0x18000, 0x1, 0x9]
+
 /-- The check-matrix rows of the eight generators are linearly independent.
-Eight rows on nine qubits is the largest instance among the small codes, and
-plain `decide` runs out of heartbeats on it, so the check is handed straight to
-the kernel. -/
+Plain `decide` on the `2 ^ 8`-vector search of the `Decidable` instance runs
+out of heartbeats here, so independence is certified by a right inverse of the
+check matrix (`rankCert`) instead. -/
 theorem rowsLinearIndependent_generatorsList :
-    rowsLinearIndependent generatorsList := by decide +kernel
+    rowsLinearIndependent generatorsList :=
+  rowsLinearIndependent_of_rankCertCheck _ rankCert (by decide +kernel)
 
 /-- The generator list is an independent generating set. -/
 theorem GeneratorsIndependent_9_generatorsList : GeneratorsIndependent 9 generatorsList :=

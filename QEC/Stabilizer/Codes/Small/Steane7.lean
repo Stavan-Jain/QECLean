@@ -1,5 +1,6 @@
 import Mathlib.Tactic
 import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrixDecidable
+import QEC.Stabilizer.Foundations.BinarySymplectic.RankCertificate
 import QEC.Stabilizer.Foundations.PauliGroup.Commutation
 import QEC.Stabilizer.Foundations.PauliGroup.Notation
 import QEC.Stabilizer.Framework.Core.CodeNotation
@@ -47,7 +48,7 @@ The logical basis `X̄ = X⊗⁷`, `Z̄ = Z⊗⁷` is in `Steane7Logicals.lean`.
 
 - Generators `Z1`–`Z3`, `X1`–`X3` and the list `generatorsList`
 - Decided hypotheses: `generators_commute`, `AllPhaseZero_generatorsList`,
-  `rowsLinearIndependent_generatorsList`
+  `rowsLinearIndependent_generatorsList` (from the rank certificate `rankCert`)
 - `negIdentity_not_mem`, the bundled `stabilizerGroup`
 - `stabilizerCode : Code[[7, 1]]`
 - Distance 3 (Hamming column condition, weight-3 witness):
@@ -99,9 +100,18 @@ theorem generators_commute :
 lemma AllPhaseZero_generatorsList : AllPhaseZero generatorsList := by
   decide
 
-/-- The check-matrix rows of the six generators are linearly independent. -/
+/-- Rank certificate: the columns of a right inverse of the check matrix, as
+bitmasks over the `7 + 7` symplectic columns (emitted by
+`scripts/RankCertificateGen.lean`). -/
+def rankCert : List ℕ :=
+  [0x380, 0x280, 0x180, 0x7, 0x5, 0x3]
+
+/-- The check-matrix rows of the six generators are linearly independent,
+certified by a right inverse of the check matrix (`rankCert`) rather than the
+`2 ^ 6`-vector search of the `Decidable` instance. -/
 theorem rowsLinearIndependent_generatorsList :
-    rowsLinearIndependent generatorsList := by decide
+    rowsLinearIndependent generatorsList :=
+  rowsLinearIndependent_of_rankCertCheck _ rankCert (by decide +kernel)
 
 /-- The generator list is an independent generating set. -/
 theorem GeneratorsIndependent_7_generatorsList : GeneratorsIndependent 7 generatorsList :=
