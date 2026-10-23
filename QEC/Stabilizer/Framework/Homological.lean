@@ -8,6 +8,7 @@ import QEC.Stabilizer.Framework.Homological.Presentation
 import QEC.Stabilizer.Framework.Homological.SelfDual
 import QEC.Stabilizer.Framework.Homological.SelfDualLogical
 import QEC.Stabilizer.Framework.Homological.BBChainComplex
+import QEC.Stabilizer.Framework.Homological.LiftedProduct
 import QEC.Stabilizer.Framework.Homological.Covering
 import QEC.Stabilizer.Framework.Homological.BBDuality
 import QEC.Stabilizer.Framework.Homological.BBCover
