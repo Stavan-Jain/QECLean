@@ -18,6 +18,11 @@ For a list `L` of n-qubit Pauli group elements, `rowsLinearIndependent L` is
 equivalent to: the only F₂-coefficient combination of the check-matrix rows that
 equals zero is the zero combination. We decide this by checking all
 `f : Fin L.length → ZMod 2` (finitely many).
+
+That is `2 ^ L.length` cases: the default for small codes, but out of reach
+for large ones (roughly more than 20 rows). There, use the polynomial-time
+certificate of `RankCertificate.lean` (`rowsLinearIndependent_of_rankCertCheck`)
+instead.
 -/
 
 /-- Rows are linearly independent iff the only coefficient vector giving the

@@ -268,6 +268,16 @@ Reach for `decide +kernel` before anything heavier, never `native_decide`
 (banned, see CLAUDE.md § "Axiom policy"). For parametric codes with `L ≥ 2`,
 replace `decide` with a parametric independence proof — see
 `rowsLinearIndependent_generatorsListPackaged` in `Toric/StabilizerCode.lean`.
+
+For independence, `decide` enumerates all `2 ^ m` coefficient vectors (`m`
+generators), so it does not reach large literal codes (roughly `m > 20`).
+There, use a **rank certificate**: print `rankCert` with
+`lake env lean --run scripts/RankCertificateGen.lean <code>` (untrusted
+Gaussian elimination; register the code in the script first) and close the
+goal with
+`rowsLinearIndependent_of_rankCertCheck _ rankCert (by decide +kernel)`,
+which the kernel checks in polynomial time. `Toric/RankCertificate.lean` does
+this for the concrete toric codes at `L = 4, 5, 6` (up to 70 rows).
 -/
 
 /-!
