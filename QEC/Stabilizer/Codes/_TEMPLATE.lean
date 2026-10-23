@@ -83,8 +83,7 @@ route** (§7–§9) is kept for parametric families, whose generator lists are
 - §1 — Generator definitions (`Z1`, `Z2`, …, `X1`, `X2`, …). Always.
 - §2 — Generator list `generatorsList`. Always.
 - §3 — Pairwise commutation `generators_commute`, by `decide`. Literal codes.
-- §4 — Phase-zero + check-matrix independence, by `decide` (independence by
-  a rank certificate past a few rows). Always.
+- §4 — Phase-zero + check-matrix independence, by `decide`. Always.
 - §5 — `negIdentity ∉ closure`, from §3–§4. Literal codes.
 - §6 — Bundled `StabilizerGroup n` and its `toSubgroup` equation. Always.
 - §7 — CSS route: generator sets and the Z/X typing lemmas. Parametric only.
@@ -262,20 +261,23 @@ closure of the others) follows from it by
 cannot serve as the field: it is a condition on the *set* of generators, so it
 does not see a repeated one.
 
-`decide` on `rowsLinearIndependent` enumerates all `2 ^ m` coefficient
-vectors (`m` generators), so it only scales to a handful of rows; plain
-`decide` already runs out of heartbeats on Shor's eight. Past that, use a
-**rank certificate**: print `rankCert` with
+`decide` closes both for every small code on `main`; the one exception is
+`rowsLinearIndependent` for Shor's code (eight rows on nine qubits), where
+plain `decide` runs out of heartbeats and `decide +kernel` is used instead.
+Reach for `decide +kernel` before anything heavier, never `native_decide`
+(banned, see CLAUDE.md § "Axiom policy"). For parametric codes with `L ≥ 2`,
+replace `decide` with a parametric independence proof — see
+`rowsLinearIndependent_generatorsListPackaged` in `Toric/StabilizerCode.lean`.
+
+For independence, `decide` enumerates all `2 ^ m` coefficient vectors (`m`
+generators), so it does not reach large literal codes (roughly `m > 20`).
+There, use a **rank certificate**: print `rankCert` with
 `lake env lean --run scripts/RankCertificateGen.lean <code>` (untrusted
 Gaussian elimination; register the code in the script first) and close the
 goal with
 `rowsLinearIndependent_of_rankCertCheck _ rankCert (by decide +kernel)`,
-which the kernel checks in polynomial time. `Steane7.lean` and `Shor9.lean`
-do this, and `Toric/RankCertificate.lean` does it for up to 70 rows. Never
-`native_decide` (banned, see CLAUDE.md § "Axiom policy"). For parametric
-codes with `L ≥ 2`,
-replace `decide` with a parametric independence proof — see
-`rowsLinearIndependent_generatorsListPackaged` in `Toric/StabilizerCode.lean`.
+which the kernel checks in polynomial time. `Toric/RankCertificate.lean` does
+this for the concrete toric codes at `L = 4, 5, 6` (up to 70 rows).
 -/
 
 /-!
