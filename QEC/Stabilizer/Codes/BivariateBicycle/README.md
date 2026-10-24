@@ -14,11 +14,14 @@ board; the per-module one-liner map lives in the umbrella docstring
 | Dir | Code | Distance status |
 |---|---|---|
 | `Gross/` | gross `[[144,12,12]]` (base `[[72,12,6]]`) | **d = 12 unconditional, kernel-only** — axioms are exactly `propext`, `Classical.choice`, `Quot.sound`; no `native_decide`, no `sorry` (proved through the generic doubling layer and packaged by `Gross/Distance.lean`) |
+| `Bravyi360/` | `[[360,12,24]]` on `Z30 × Z6` | Two-quotient certificate proof in `Bravyi360/Distance.lean`; proof structure and validation measurements in `Bravyi360/README.md` |
 
 The other instances (`Z3Z6/`, `Z5Z15F2A6/`, `BaseFloors/`) are parked — see
 "Parked instances" below.
 
 ## Task router
+
+- **Understand the 360-qubit proof**: read `Bravyi360/README.md`, then `Defs`, `Packaging`, `Witness`, and `Distance`. The reusable finite-certificate layer is `Framework/Homological/Certificate/`.
 
 - **Understand the gross d = 12 proof**: read `Gross.lean`'s docstring, then
   the spine in umbrella order (Defs → CoverTransfer → DeckHomotopy → Witness →
@@ -134,8 +137,8 @@ re-adding the directory, its sibling umbrella, the import line in
 
 The abstract machinery they exercised stays in this tree:
 `Framework/Homological/BBSmallCycle.lean` (the A15/A16 class small-cycle
-theorem) and `BBDoubling`/`BBCover` are untouched — they simply have no
-concrete instance here besides `Gross/`.
+theorem) and `BBDoubling`/`BBCover` remain available. `Gross/` and
+`Bravyi360/` contain the active concrete instances.
 
 ## Generated files (Class G: fully generated — NEVER hand-edit)
 
@@ -143,6 +146,7 @@ concrete instance here besides `Gross/`.
 |---|---|---|
 | `Gross/StabilizerCodeData.lean` | `phase5/gen_file.py` (`--force` guard; emits data only) | `phase5/data.json` |
 | `Gross/SeamBZData.lean` | `scripts/gen_gross_bz.py` (`--emit [--force]`; validates every certificate, including both walks, in Python before writing) | computed from the code |
+| `Bravyi360/` files carrying a generated-file banner | `scripts/bravyi360_kernel/generate.py` (`--force` guard, `--verify` comparison); `module_map.json` and the four manifests enumerate the files | Hashed compressed candidate certificates in `scripts/bravyi360_kernel/certificates/` |
 
 There are no Class F files (generated fragments between
 `-- BEGIN/END GENERATED` markers) left in this tree. Everything else is Class H (hand-maintained;
@@ -167,9 +171,9 @@ details (env, clobber guards, stale generators): `qec-lab:experiments/bb_lab/GEN
 
 ## Adding an instance
 
-Copy the shape of `Gross/` (complete, kernel-only) — the only instance in this
-tree; the parked `Z3Z6/` and `Z5Z15F2A6/` (branch `claude/z3z6-parked`) are
-further worked examples:
+Copy the structural shape of `Gross/` (complete, kernel-only). The parked
+`Z3Z6/` and `Z5Z15F2A6/` (branch `claude/z3z6-parked`) are further worked
+examples:
 
 1. `mkdir <Name>/` + sibling `<Name>.lean` umbrella. Name = base group +
    disambiguating tag (`Z5Z15F2A6`, `Z3Z6` precedent).
