@@ -1,4 +1,5 @@
 import QEC.Stabilizer.Codes.BivariateBicycle.Gross
+import QEC.Stabilizer.Codes.BivariateBicycle.Bravyi360
 
 /-!
 # Bivariate bicycle codes — family umbrella
@@ -11,8 +12,10 @@ shared parametric theory lives in `Framework/Homological/BB*` (`BBChainComplex`,
 - `Gross/` — the gross `[[144,12,12]]` code over its `[[72,12,6]]` base: **d =
   12 unconditional and kernel-only** (spine at `Gross/` root, the `MImBound`
   safe-floor machinery in `Gross/SafeFloor/`); the complete instance to copy
-`Gross/` is currently the only instance in this tree. Three further instances
-are **parked on branch `claude/z3z6-parked`** pending de-nativization (see the
+- `Bravyi360/` — the `[[360,12,24]]` code on `Z30 × Z6`, with an
+  unconditional distance proof through the `360 → 180 → 90` quotient tower.
+
+Three further instances are **parked on branch `claude/z3z6-parked`** pending de-nativization (see the
 README's "Parked instances"):
 
 - `Z3Z6/` — the pair72 `[[36,4,4]] → [[72,4,8]]` instance, d = 8
