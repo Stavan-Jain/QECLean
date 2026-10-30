@@ -121,6 +121,26 @@ The homological distance argument is mechanized:
 is a verified `[[L², 1, L]]` code (`rotatedSurfaceCodeN_distance_eq_L`). It is
 built on the same homological framework as the toric code.
 
+## Weighted packing and logical coverage
+
+`Framework/Homological/WeightedPacking.lean` bounds chain weight from
+weighted families of logical representatives. Supply each representative's
+class, its natural weight, a per-qubit overlap capacity, and the strict
+threshold `(D - 1) * cap < totalWeight`.
+
+`LogicalCoverage.lean` supplies `CoverageCertificate S B k`. Paired witnesses,
+vanishing coordinates on boundaries, and a dimension bound prove that the
+coordinates detect every nonboundary cycle for arbitrary `k`. The X and Z
+certificate theorems produce the two inputs to
+`HomologicalCode.chainWeight_lower_bound_transfers` or its asymmetric variant.
+
+`Codes/Small/FourQubitPacking.lean` gives a separate homological example for
+checks `XXXX` and `ZZZZ`. It proves two logical dimensions, both chain-weight
+bounds of two, and an attained Pauli-weight bound of two. Its nonuniform
+weights exercise integer rounding. The existing four-qubit presentation
+remains the bundled code. The overlap argument follows Audoux–Couvreur,
+Corollary 2.11, and Bostanci–Kubica, Theorem 5.
+
 ## Project structure
 
 ```
