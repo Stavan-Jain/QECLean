@@ -2,6 +2,7 @@ import QEC.Stabilizer.Framework.FoldDouble.Basic
 import QEC.Stabilizer.Framework.FoldDouble.OperatorImage
 import QEC.Stabilizer.Framework.FoldDouble.Groups
 import QEC.Stabilizer.Framework.FoldDouble.Distance
+import QEC.Stabilizer.Framework.FoldDouble.Certificates
 import QEC.Stabilizer.Framework.FoldDouble.BBCover
 
 /-!
@@ -21,6 +22,8 @@ paired code is exactly twice the distance of the folded code.
   the folded code and the floors `d_K`, `d_P`
 - `FoldDouble.Distance` — the two kinds of nontrivial logical operator, the
   residual `m_b`, and the distance theorem in its general and symmetric forms
+- `FoldDouble.Certificates` — the averaging argument and the single-type
+  certificates (one or two clean checks) for condition (J)
 - `FoldDouble.BBCover` — the pairing of a free double cover of
   bivariate-bicycle codes by its deck translation, the dictionary
   `fold = push1`, `double = pull1` on chain operators, and the hypotheses of
