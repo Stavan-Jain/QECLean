@@ -73,9 +73,13 @@ QEC/
     │   ├── Symplectic/          # Stabilizer ↔ symplectic bridge: IndependentEquiv,
     │   │                        # SymplecticOrthogonal, SupportLemmas (these import
     │   │                        # Core; they are NOT in Foundations)
-    │   └── Homological/         # Abstract chain-complex / CSS framework:
-    │                            # Code, CSS, Generators, StabGroup,
-    │                            # LogicalCorrespondence, Distance, BBChainComplex
+    │   ├── Homological/         # Abstract chain-complex / CSS framework:
+    │   │                        # Code, CSS, Generators, StabGroup,
+    │   │                        # LogicalCorrespondence, Distance, BBChainComplex
+    │   └── FoldDouble/          # Qubit pairings: the phase-free Pauli group,
+    │                            # fold/double, the folded code, the code-agnostic
+    │                            # fold-and-double distance theorem, and its BB
+    │                            # instance (BBCover: fold = push1, double = pull1)
     ├── Geometry/            # Lattice-family-agnostic primitives:
     │                        # FinPeriodic, GridIndexing, CellComplexTypes
     └── Codes/               # Concrete codes, organized by family:
@@ -110,7 +114,8 @@ now in `Small/Steane7.lean`, was de-nativized and is back on `main`.)
 **Layering** (lower can be imported by higher; not the reverse):
 
 ```
-Foundations  <  {Geometry, Framework.Core}  <  Framework.{Symplectic, Homological}  <  Codes
+Foundations  <  {Geometry, Framework.Core}  <  Framework.{Symplectic, Homological}
+            <  Framework.FoldDouble  <  Codes
 ```
 
 Top-level umbrella `.lean` files at the *sibling* level of each directory
