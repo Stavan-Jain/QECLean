@@ -520,6 +520,33 @@ theorem commute_iff_of_operators_eq {g g' h : NQubitPauliGroupElement n}
     g * h = h * g ↔ g' * h = h * g' := by
   rw [commutes_iff_symplectic_inner_zero, commutes_iff_symplectic_inner_zero, hg]
 
+/-! ### X-type operators form a sector
+
+The X-type operators (every entry `I` or `X`) are closed under products,
+sheets, fold and double; the same holds for Z-type operators. This is what lets
+the distance theorem be applied one Pauli type at a time to a CSS code. -/
+
+lemma isXType_one : IsXType (1 : NQubitPauliOperator m) :=
+  fun _ => PauliOperator.IsXType_I
+
+lemma isXType_mul {x y : NQubitPauliOperator m} (hx : IsXType x) (hy : IsXType y) :
+    IsXType (x * y) := by
+  intro j
+  rw [mul_apply]
+  exact PauliOperator.mulOp_operator_IsXType_of_IsXType (hx j) (hy j)
+
+lemma isXType_sheet (s : Fin 2) {P : NQubitPauliOperator n} (hP : IsXType P) :
+    IsXType (sheet e s P) :=
+  fun j => hP (e.symm (j, s))
+
+lemma isXType_fold {P : NQubitPauliOperator n} (hP : IsXType P) : IsXType (fold e P) := by
+  intro j
+  rw [fold_apply]
+  exact PauliOperator.mulOp_operator_IsXType_of_IsXType (hP _) (hP _)
+
+lemma isXType_double {u : NQubitPauliOperator m} (hu : IsXType u) : IsXType (double e u) :=
+  fun i => hu (e i).1
+
 end FoldDouble
 end Stabilizer
 end Quantum

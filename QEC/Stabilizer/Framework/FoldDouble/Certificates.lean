@@ -107,19 +107,6 @@ lemma mulOp_operator_ne_I_iff_of_isXType {a b : PauliOperator} (ha : a.IsXType) 
     (a.mulOp b).operator ≠ PauliOperator.I ↔ a ≠ b := by
   rcases ha with rfl | rfl <;> rcases hb with rfl | rfl <;> decide
 
-lemma isXType_mul {x y : NQubitPauliOperator m} (hx : IsXType x) (hy : IsXType y) :
-    IsXType (x * y) := by
-  intro j
-  rw [mul_apply]
-  exact PauliOperator.mulOp_operator_IsXType_of_IsXType (hx j) (hy j)
-
-lemma isXType_sheet (s : Fin 2) {P : NQubitPauliOperator n} (hP : IsXType P) :
-    IsXType (sheet e s P) :=
-  fun j => hP (e.symm (j, s))
-
-lemma isXType_one : IsXType (1 : NQubitPauliOperator m) :=
-  fun _ => PauliOperator.IsXType_I
-
 lemma eq_X_of_isXType_of_ne_I {a : PauliOperator} (ha : a.IsXType) (h : a ≠ PauliOperator.I) :
     a = PauliOperator.X := by
   rcases ha with rfl | rfl

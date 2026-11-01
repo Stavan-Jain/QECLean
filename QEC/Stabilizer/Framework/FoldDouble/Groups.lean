@@ -4,7 +4,8 @@ import QEC.Stabilizer.Framework.FoldDouble.OperatorImage
 # The four groups of a paired stabilizer code
 
 Fix a stabilizer group `S` on `n` qubits and a pairing
-`e : Fin n ≃ Fin m × Fin 2` of its qubits. Writing `G` for the phase-free image of `S` and `C(G)` for that
+`e : Fin n ≃ Fin m × Fin 2` of its qubits. Writing `G` for the phase-free image
+of `S` and `C(G)` for that
 of its centralizer, the fold and the double cut out four subgroups of the
 phase-free Pauli group on the `m` pairs:
 

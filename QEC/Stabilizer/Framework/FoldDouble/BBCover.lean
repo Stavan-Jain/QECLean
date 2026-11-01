@@ -34,19 +34,28 @@ maps of `BBCover.lean`:
   gives condition (F) for the X-type seam logicals
   (`condition_F_of_seamCosetFloor`).
 
-## What remains to recover `pauli_distance_eq_double_of_admissible`
+## The doubling theorem as an instance
 
 Conditions (F) and (S) of `isLeast_logicalWeight_two_mul_of_symmetric`
-quantify over *all* seam logicals and *all* nontrivial logical operators,
-whatever their Pauli type, while the inputs of the doubling theorem of
-`BBDoubling.lean` only control the X sector: its Z sector is handled by the
-duality `bb_cycle_bound_iff_dual_bound`, and mixed operators by the CSS
-bridge `chainWeight_lower_bound_transfers`. The X-sector statements proved
-here are exactly the dangerous and safe floors of that development, so the
-missing piece is a sector version of Theorem 5.1 for CSS codes (hypotheses
-on the X-type operators only, conclusion on the X-type logicals), after which
-the Z sector follows by duality and the mixed operators by the CSS bridge as
-in `pauli_distance_eq_double_of_logicalFloor`.
+quantify over all Pauli types, while the inputs of the doubling theorem of
+`BBDoubling.lean` only control the X sector; the general theorem is therefore
+applied in its sector form `isLeast_logicalWeight_two_mul_of_floors_sector`,
+to the X-type operators:
+
+* the least weight of an X-type doubling logical is the base distance `d`,
+  from the logical floor and the tight witness
+  (`isLeast_xType_doublingLogical`);
+* (P) on the X sector follows from (R) and `SeamCosetFloor (2 d)`
+  (`condition_P_xType`), and (J) on the X sector from `DangerousFloorNZ (2 d)`
+  (`condition_J_xType`), which `dangerousFloorNZ_of_admissible` derives from
+  the light-boundary census.
+
+The sector theorem then bounds the X-type logicals, the duality
+`bb_cycle_bound_iff_dual_bound` transfers the bound to the Z-type ones, and
+the CSS bridge `chainWeight_lower_bound_transfers` to every logical operator:
+`isLeast_logicalWeight_two_mul_of_foldDouble` has exactly the hypotheses and
+the conclusion of `pauli_distance_eq_double_of_admissible`, now obtained from
+the code-agnostic theorem.
 -/
 
 namespace Quantum
@@ -118,6 +127,17 @@ lemma exists_mem_dualBoundaries_of_mem_closure_ZGenerators
       by rw [chainZOperator_add, mul_operators, mul_operators, h₁, h₂]⟩
   · rintro y _ ⟨c, hc, h⟩
     exact ⟨c, hc, by rw [inv_operators, h]⟩
+
+/-- Every X-type operator is the operator part of the X-type chain operator of
+its X-support. -/
+lemma exists_chainXOperator_operators_eq {u : NQubitPauliOperator X.numQubits}
+    (hu : IsXType u) : ∃ c : X.C1 → ZMod 2, (X.chainXOperator c).operators = u := by
+  refine ⟨fun q => if u (X.edgeEquiv q) = PauliOperator.X then 1 else 0, ?_⟩
+  apply NQubitPauliOperator.ext
+  intro i
+  obtain ⟨q, rfl⟩ := X.edgeEquiv.surjective i
+  simp only [chainXOperator_operators_edgeEquiv]
+  rcases hu (X.edgeEquiv q) with h | h <;> simp [h]
 
 /-- CSS decomposition of a stabilizer element on operator parts: a Z-type chain
 operator of a dual boundary times an X-type chain operator of a boundary. -/
@@ -579,6 +599,124 @@ theorem condition_F_of_seamCosetFloor {d : ℕ} (hMim : D.SeamCosetFloor (2 * d)
     exact hnb
   rw [weight_chainXOperator_operators]
   exact hm
+
+/-! ## The X sector, and the doubling theorem as an instance -/
+
+/-- X-type doubling logicals are the base chains whose pullback is a nontrivial
+cover cycle. -/
+theorem isDoublingLogical_chainXOperator_iff (c : H × Fin 2 → ZMod 2) :
+    IsDoublingLogical D.pairing D.coverComplex.homologicalStabilizerGroup
+        (D.baseComplex.chainXOperator c).operators ↔
+      D.pull1 c ∈ D.coverComplex.cycles ∧ D.pull1 c ∉ D.coverComplex.boundaries := by
+  have h1 := chainXOperator_isNontrivialLogical_iff (X := D.coverComplex) (D.pull1 c)
+  rw [isNontrivialLogicalOperator_iff_operators, mem_centralizer_iff_operators_mem] at h1
+  rw [IsDoublingLogical, mem_doublingGroup, mem_seamGroup, double_chainXOperator]
+  exact h1
+
+/-- The least weight of an X-type doubling logical is the base distance `d`:
+the logical floor bounds every one of them from below, and the tight witness
+attains the bound. -/
+theorem isLeast_xType_doublingLogical {d : ℕ} (hbase : D.LogicalFloor d)
+    (uStar : H × Fin 2 → ZMod 2) (hu_cyc : uStar ∈ D.baseComplex.cycles)
+    (hu_w : D.baseComplex.chainWeight uStar = d)
+    (hτnb : D.pull1 uStar ∉ D.coverComplex.boundaries) :
+    IsLeast {w | ∃ u, IsDoublingLogical D.pairing D.coverComplex.homologicalStabilizerGroup u ∧
+      IsXType u ∧ weight u = w} d := by
+  constructor
+  · refine ⟨(D.baseComplex.chainXOperator uStar).operators,
+      D.isDoublingLogical_chainXOperator_of_witness uStar hu_cyc hτnb,
+      (chainXOperator_isXType (X := D.baseComplex) uStar).2, ?_⟩
+    rw [weight_chainXOperator_operators, hu_w]
+  · rintro w ⟨u, hu, huX, rfl⟩
+    obtain ⟨c, rfl⟩ := exists_chainXOperator_operators_eq (X := D.baseComplex) huX
+    rw [isDoublingLogical_chainXOperator_iff] at hu
+    have hcyc : bbBoundary1Fn D.Ab D.Bb c = 0 := D.descend_cycle hu.1
+    have hnb : c ∉ D.baseComplex.boundaries := fun h => hu.2 (D.pull1_mem_boundaries h)
+    rw [weight_chainXOperator_operators]
+    exact hbase c hcyc hnb
+
+/-- Condition (P) on the X sector: from (R) and `SeamCosetFloor (2d)`, every
+X-type logical fold has weight `≥ 2d`. -/
+theorem condition_P_xType {d : ℕ} (hR : D.DeckTrivialOnH1) (hMim : D.SeamCosetFloor (2 * d)) :
+    ∀ b, IsLogicalFold D.pairing D.coverComplex.homologicalStabilizerGroup b → IsXType b →
+      2 * d ≤ weight b := by
+  intro b hb hbX
+  obtain ⟨ζ, rfl⟩ := exists_chainXOperator_operators_eq (X := D.baseComplex) hbX
+  exact D.condition_F_of_seamCosetFloor hMim ζ
+    ⟨D.logicalFoldImage_le_seamGroup_of_deckTrivialOnH1 hR hb.1, hb.2⟩
+
+/-- Condition (J) on the X sector, for every X-type logical operator: from
+`DangerousFloorNZ (2d)`. -/
+theorem condition_J_xType {d : ℕ} (hM : D.DangerousFloorNZ (2 * d)) :
+    ∀ b ∈ foldImage D.pairing D.coverComplex.homologicalStabilizerGroup, b ≠ 1 →
+      weight b < 2 * d →
+      ∀ v, IsNontrivialLogicalOperator v D.coverComplex.homologicalStabilizerGroup →
+        IsXType v.operators → fold D.pairing v.operators = b →
+        2 * d ≤ weight b + 2 * residualWeight D.pairing v := by
+  intro b hbJ hb1 _ v hv hvX hvb
+  obtain ⟨c, hc⟩ := exists_chainXOperator_operators_eq (X := D.coverComplex) hvX
+  have hv' : IsNontrivialLogicalOperator (D.coverComplex.chainXOperator c)
+      D.coverComplex.homologicalStabilizerGroup :=
+    (isNontrivialLogicalOperator_iff_of_operators_eq _ hc).mpr hv
+  have hres : residualWeight D.pairing v =
+      residualWeight D.pairing (D.coverComplex.chainXOperator c) := by
+    unfold residualWeight
+    rw [hc]
+  rw [hres]
+  exact D.condition_S_of_dangerousFloorNZ hM b hbJ hb1 c hv' (by rw [hc]; exact hvb)
+
+/-- **The doubling theorem through fold-and-double.** Under the inputs of
+`pauli_distance_eq_double_of_admissible` — the base logical floor, a tight
+witness, the deck homotopy, the seam-coset floor and the light-boundary
+census — `2d` is the least weight of a nontrivial logical operator of the
+cover code. The X-type logicals are bounded by the sector form of the general
+fold-and-double theorem, the Z-type ones by duality, and all of them by the
+CSS bridge. -/
+theorem isLeast_logicalWeight_two_mul_of_foldDouble {d : ℕ}
+    (hbase : D.LogicalFloor d)
+    (uStar : H × Fin 2 → ZMod 2)
+    (hu_cyc : uStar ∈ D.baseComplex.cycles)
+    (hu_w : D.baseComplex.chainWeight uStar = d)
+    (hτnb : D.pull1 uStar ∉ D.coverComplex.boundaries)
+    (hR : D.DeckTrivialOnH1)
+    (hMim : D.SeamCosetFloor (2 * d))
+    (hadm : ∀ b : H × Fin 2 → ZMod 2, b ∈ D.baseComplex.boundaries → b ≠ 0 →
+      D.baseComplex.chainWeight b < 2 * d → D.LightBoundaryAdmissible d b) :
+    IsLeast {w : ℕ | ∃ g : NQubitPauliGroupElement D.coverComplex.numQubits,
+      IsNontrivialLogicalOperator g D.coverComplex.homologicalStabilizerGroup ∧
+      NQubitPauliGroupElement.weight g = w} (2 * d) := by
+  -- the X sector, by the general theorem
+  have hX := isLeast_logicalWeight_two_mul_of_floors_sector D.pairing
+    D.coverComplex.homologicalStabilizerGroup IsXType IsXType
+    (fun _ hP => isXType_fold D.pairing hP) (fun _ hP => isXType_sheet D.pairing 0 hP)
+    (fun _ hu => isXType_double D.pairing hu)
+    (D.isLeast_xType_doublingLogical hbase uStar hu_cyc hu_w hτnb)
+    (D.condition_P_xType hR hMim)
+    (D.condition_J_xType (D.dangerousFloorNZ_of_admissible hbase hadm))
+  -- the chain-level bound on the X sector
+  have hXc : ∀ c ∈ (bbChainComplex D.Ac D.Bc).cycles,
+      c ∉ (bbChainComplex D.Ac D.Bc).boundaries →
+      2 * d ≤ (bbChainComplex D.Ac D.Bc).chainWeight c := by
+    intro c hc hnb
+    have h := hX.2 ⟨D.coverComplex.chainXOperator c,
+      (chainXOperator_isNontrivialLogical_iff (X := D.coverComplex) c).mpr ⟨hc, hnb⟩,
+      (chainXOperator_isXType (X := D.coverComplex) c).2, rfl⟩
+    rwa [weight_chainXOperator (X := D.coverComplex)] at h
+  -- the Z sector by duality, and every logical operator by the CSS bridge
+  have hZc := (bb_cycle_bound_iff_dual_bound D.Ac D.Bc (2 * d)).mp hXc
+  constructor
+  · refine ⟨D.coverComplex.chainXOperator (D.pull1 uStar), ?_, ?_⟩
+    · exact (chainXOperator_isNontrivialLogical_iff (X := D.coverComplex) (D.pull1 uStar)).mpr
+        ⟨D.pull1_mem_cycles hu_cyc, hτnb⟩
+    · rw [weight_chainXOperator (X := D.coverComplex), D.chainWeight_pull1, hu_w]
+  · rintro w ⟨g, hg, rfl⟩
+    exact HomologicalCode.chainWeight_lower_bound_transfers D.coverComplex (2 * d) hXc hZc g hg
+
+/-- The theorem has exactly the statement of
+`pauli_distance_eq_double_of_admissible`. -/
+example : @XDoubleCoverData.isLeast_logicalWeight_two_mul_of_foldDouble G H _ _ _ _ _ _ D =
+    @XDoubleCoverData.pauli_distance_eq_double_of_admissible G H _ _ _ _ _ _ D :=
+  rfl
 
 end XDoubleCoverData
 end BB

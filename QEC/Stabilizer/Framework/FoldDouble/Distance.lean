@@ -489,6 +489,73 @@ theorem two_mul_le_weight_of_clean {b : NQubitPauliOperator m} {s : NQubitPauliG
   have h2 := hdK _ hub
   omega
 
+/-! ## Theorem 5.1 restricted to a sector
+
+For a CSS code one wants the theorem one Pauli type at a time: hypotheses on
+the X-type operators only, and a conclusion on the X-type nontrivial logical
+operators. The proof of Theorem 5.1 only ever passes from a logical operator
+`v` to its fold and to its sheet-`0` part, and from a doubling logical to its
+double, so it goes through verbatim for any pair of predicates `Q` (on the
+paired code) and `Qm` (on the pairs) with `Q P → Qm (fold P)`,
+`Q P → Qm (sheet 0 P)` and `Qm u → Q (double u)`. Theorem 5.1 itself is the
+case where both predicates are trivial. -/
+
+/-- The `b = 1` rung within a sector: a nontrivial logical operator folding to
+the identity has weight `≥ 2 d_K` as soon as `d_K` bounds the doubling
+logicals of the sector containing its sheet-`0` part. -/
+theorem two_mul_le_weight_of_fold_eq_one_of {Qm : NQubitPauliOperator m → Prop}
+    {v : NQubitPauliGroupElement n} (hv : IsNontrivialLogicalOperator v S)
+    (h : fold e v.operators = 1) {dK : ℕ}
+    (hdK : ∀ u, IsDoublingLogical e S u → Qm u → dK ≤ weight u)
+    (hQ : Qm (sheet e 0 v.operators)) :
+    2 * dK ≤ NQubitPauliGroupElement.weight v := by
+  have hu := hdK _ (isDoublingLogical_sheet_of_fold_eq_one e S hv h) hQ
+  have hw : NQubitPauliGroupElement.weight v = 2 * weight (sheet e 0 v.operators) := by
+    rw [weight_eq_weight_operators]
+    conv_lhs => rw [(fold_eq_one_iff e _).mp h]
+    rw [weight_double]
+  omega
+
+/-- **Theorem 5.1 in a sector.** Let `Q`, `Qm` be predicates on the operators of
+the paired code and of the pairs, with `Q P → Qm (fold P)`,
+`Q P → Qm (sheet 0 P)` and `Qm u → Q (double u)`. Let `d_K` be the least weight
+of a doubling logical satisfying `Qm`. Suppose (P) every logical fold
+satisfying `Qm` has weight `≥ 2 d_K`, and (J) for every stabilizer fold `b ≠ 1`
+of weight `< 2 d_K`, every nontrivial logical operator `v` satisfying `Q` and
+folding to `b` has `wt b + 2 · (residual weight of v) ≥ 2 d_K`. Then `2 d_K` is
+the least weight of a nontrivial logical operator of `S` satisfying `Q`. -/
+theorem isLeast_logicalWeight_two_mul_of_floors_sector
+    (Q : NQubitPauliOperator n → Prop) (Qm : NQubitPauliOperator m → Prop)
+    (hQfold : ∀ P, Q P → Qm (fold e P)) (hQsheet : ∀ P, Q P → Qm (sheet e 0 P))
+    (hQdouble : ∀ u, Qm u → Q (double e u))
+    {dK : ℕ} (hdK : IsLeast {w | ∃ u, IsDoublingLogical e S u ∧ Qm u ∧ weight u = w} dK)
+    (hP : ∀ b, IsLogicalFold e S b → Qm b → 2 * dK ≤ weight b)
+    (hJ : ∀ b ∈ foldImage e S, b ≠ 1 → weight b < 2 * dK →
+      ∀ v, IsNontrivialLogicalOperator v S → Q v.operators → fold e v.operators = b →
+        2 * dK ≤ weight b + 2 * residualWeight e v) :
+    IsLeast {w | ∃ g, IsNontrivialLogicalOperator g S ∧ Q g.operators ∧
+      NQubitPauliGroupElement.weight g = w} (2 * dK) := by
+  constructor
+  · obtain ⟨u, hu, hQu, hw⟩ := hdK.1
+    exact ⟨ofOperator (double e u), isNontrivialLogicalOperator_ofOperator_double e S hu,
+      hQdouble u hQu, by rw [weight_ofOperator_double, hw]⟩
+  · rintro w ⟨v, hv, hQv, rfl⟩
+    have hvc : v ∈ centralizer S := ((isNontrivialLogicalOperator_iff_operators S v).mp hv).1
+    by_cases hbJ : fold e v.operators ∈ foldImage e S
+    · by_cases hb1 : fold e v.operators = 1
+      · exact two_mul_le_weight_of_fold_eq_one_of e S hv hb1
+          (fun u hu hQu => hdK.2 ⟨u, hu, hQu, rfl⟩) (hQsheet _ hQv)
+      · by_cases hlt : weight (fold e v.operators) < 2 * dK
+        · have h1 := hJ _ hbJ hb1 hlt v hv hQv rfl
+          have h2 := weight_fold_add_two_mul_weight_outsideSupport_le e v.operators
+          rw [weight_eq_weight_operators]
+          unfold residualWeight at h1
+          omega
+        · push Not at hlt
+          exact hlt.trans (weight_fold_le e _)
+    · exact (hP _ ⟨fold_operators_mem_logicalFoldImage e S hvc, hbJ⟩ (hQfold _ hQv)).trans
+        (weight_fold_le e _)
+
 end FoldDouble
 end Stabilizer
 end Quantum
