@@ -47,8 +47,12 @@ classification from one generic `SeamBZCertificate`. `Assembly` retains the old
 conditional names as wrappers.
 `LayerInstance` proves the unconditional distances
 (`gross_{chain,pauli}_distance_eq_12`) as one application each of the packaged
-Doubling theorem (`chain/pauli_distance_eq_double_of_admissible`), whose
-dangerous-sector input is the generic dispatch `dangerousFloorNZ_of_admissible`:
+Doubling theorem (`chain_distance_eq_double_of_admissible` at the chain level;
+at the Pauli level its fold-and-double form
+`isLeast_logicalWeight_two_mul_of_foldDouble`, `Framework/FoldDouble/BBCover.lean`,
+which pairs the cover qubits by the deck translation and applies the
+code-agnostic fold-and-double distance theorem of `Framework/FoldDouble/`),
+whose dangerous-sector input is the generic dispatch `dangerousFloorNZ_of_admissible`:
 the census makes every light boundary `LightBoundaryAdmissible` (hexagons:
 single shape, `t = 3`; D-pairs: pair shape, `t = 1`;
 `lightBoundaryAdmissible_of_classification` in `DangerousSector`). `Distance`
@@ -58,8 +62,9 @@ After building, `lake env lean scripts/BBDoublingCheck.lean` verifies a separate
 four-qubit cover and checks that both conditional and unconditional Gross
 capstones depend on the generic base, homotopy, rung, sector, and
 Brouwer–Zimmermann certificate theorems — the unconditional ones through the
-packaged Doubling theorem and the admissible dispatch, not through the
-per-instance `dangerous_sector_of_classification`.
+packaged Doubling theorem (the Pauli-level one through its fold-and-double
+form) and the admissible dispatch, not through the per-instance
+`dangerous_sector_of_classification`.
 
 ## Hypothesis-discharge map (gross)
 
@@ -70,7 +75,7 @@ per-instance `dangerous_sector_of_classification`.
 | `DangerousSectorGe12` | `Gross/DangerousSector.lean` ((M), generic logical-floor rungs: the capstones take it from the generic admissible dispatch via `lightBoundaryAdmissible_of_classification`; the per-instance assembly `dangerous_sector_of_classification` remains for the conditional engine route) | analytic + kernel `decide` |
 | `SafeSectorGe12` → `MImBound` | `Gross/SafeSector.lean` (generic Smith-coset reduction) | analytic |
 | `MImBound` | `Gross/SeamBZ.lean` (`GrossBZ.mimBound_bz`: `SeamBZCertificate.seamCosetFloor` at 11 over all 63 Smith classes at once, lifted to 12 by parity) | kernel `decide` (two BZ walks, 510 414 words) |
-| capstones | `Gross/Distance.lean` (`grossStabilizerCode_hasCodeDistance_12_uncond`, `grossStabilizerCodeWithDistance`) + `Gross/LayerInstance.lean` (`gross_chain/pauli_distance_eq_12`, one application each of the packaged Doubling theorem `chain/pauli_distance_eq_double_of_admissible`) | — |
+| capstones | `Gross/Distance.lean` (`grossStabilizerCode_hasCodeDistance_12_uncond`, `grossStabilizerCodeWithDistance`) + `Gross/LayerInstance.lean` (`gross_chain_distance_eq_12`, one application of the packaged Doubling theorem `chain_distance_eq_double_of_admissible`; `gross_pauli_distance_eq_12`, one application of its fold-and-double form `isLeast_logicalWeight_two_mul_of_foldDouble`) | — |
 
 The Z3Z6 (pair72, `[[36,4,4]] → [[72,4,8]]`) and Z5Z15F2A6
 (`[[150,8,8]] → [[300,8,16]]`) instances, which used to mirror this map, are
@@ -192,7 +197,9 @@ further worked examples:
    (gross: 510 414 words; the A28 notes price larger bases at 10⁹+). Show
    each light boundary of the census `LightBoundaryAdmissible` (single shape,
    pair shape, or `t = 1` window) and conclude with the packaged Doubling
-   theorem `pauli_distance_eq_double_of_admissible`, which runs
+   theorem `pauli_distance_eq_double_of_admissible` (or its fold-and-double
+   form `isLeast_logicalWeight_two_mul_of_foldDouble`, which takes the same
+   inputs), which runs
    `dangerousFloorNZ_of_admissible` and `safeFloor_of_seamCosetFloor` for the
    sector reductions (the `..._of_logicalFloor` assemblies remain available
    for floors proved some other way).
