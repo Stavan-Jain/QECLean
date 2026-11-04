@@ -21,15 +21,14 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # Bound concurrent kernel checking on hosted runners. Concrete BB
+      # certificate proofs now build separately in bb-distance-lean.
+      LEAN_NUM_THREADS: "1"
 
     steps:
       - uses: actions/checkout@v4
-      # The heavy kernel `decide` modules (the gross BZ walks in Gross/SeamBZWalk,
-      # Gross/StabilizerCode) run side by side at lake's default parallelism (lake
-      # has no `-j` flag), which can exhaust the runner's 16 GB → the job is killed
-      # (exit 143). Add swap so a peak spills to disk instead of OOM-ing. Symptom to
-      # watch for locally: an apparent hang with workers at 4-10% CPU is this same
-      # contention, not a proof regression.
+      # Leave headroom for kernel-decide checks in cold builds.
       - name: Add swap space (kernel-decide memory peaks)
         # The runner already has an active /swapfile, so add an extra one on the
         # large /mnt ephemeral disk rather than touching the existing swap.

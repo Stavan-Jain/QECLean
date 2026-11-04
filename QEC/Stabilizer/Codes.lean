@@ -16,7 +16,7 @@ Concrete stabilizer codes, organized by family:
 - `Repetition` — classical repetition codes
 - `Iceberg` — parametric `[[2m, 2m−2, 2]]` iceberg / generalized parity code
   family
-- `BivariateBicycle` — chain-level gross `[[144,12,12]]` code + bb72 base
+- `BivariateBicycle` — BB foundations; concrete proofs live in `bb-distance-lean`
 - `Small` — single-instance codes (Shor9, Steane7, [[5,1,3]], …)
 
 The concrete concatenated codes (`Concat/`: Steane⊗Steane `[[49,1,9]]` and
