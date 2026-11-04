@@ -27,10 +27,8 @@ rev = "v4.30.0-rc2"
 [[lean_lib]]
 name = "QEC"
 
-# Light import surface for memory-constrained environments; excludes the
-# BivariateBicycle leaves, which need more than a 4-core container or a shared
-# web-editor session has. Deliberately not in `defaultTargets` — `lake build`
-# still means the full library. See `QECLight.lean`.
+# Compatibility import surface for existing hosted-editor configurations.
+# The heavy BB case studies now live in bb-distance-lean; see QECLight.lean.
 [[lean_lib]]
 name = "QECLight"
 

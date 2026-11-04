@@ -64,16 +64,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      # QECBlueprint builds all of QEC, including the Bravyi360 certificates.
+      # QECBlueprint builds the general QECLean library.
       # Match lean_action_ci.yml: swap alone cannot bound concurrent memory use.
       LEAN_NUM_THREADS: "1"
     steps:
       - uses: actions/checkout@v4
 
-      # Same reason as in `lean_action_ci.yml`: the gross BB modules carry
-      # memory-hungry kernel `decide` checks, and `QECBlueprint` imports all of
-      # `QEC`. Blueprint extraction then loads that whole environment into one
-      # process, so the peak is if anything higher.
+      # Blueprint extraction loads the general library into one process.
+      # Leave memory headroom on hosted runners, as in lean_action_ci.yml.
       - name: Add swap space (kernel-decide memory peaks)
         run: |
           sudo fallocate -l 12G /mnt/swapfile

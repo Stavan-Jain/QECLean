@@ -227,8 +227,8 @@ instead of `Array`/`List` lookups (an `Array.getD` is an O(n) list walk under
 kernel reduction), quantifier bridges so the kernel enumerates concrete
 lambdas rather than whnf-ing a pi-`Fintype`, sparse rewrites in place of
 `Finset.sum`s, and Gaussian-style certificates where a sweep would otherwise
-be needed. The gross `[[144,12,12]]` proof under `Codes/BivariateBicycle/Gross/`
-is the reference: it was converted from 135 native leaves to kernel-only, and
+be needed. The gross `[[144,12,12]]` proof in
+[bb-distance-lean](https://github.com/Stavan-Jain/bb-distance-lean) is the reference: it was converted from 135 native leaves to kernel-only, and
 its capstones print the standard three. Read it before concluding a check
 "has to" be native.
 
