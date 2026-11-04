@@ -43,9 +43,10 @@ Chain-level formalization of the gross bivariate-bicycle code and its
   (`GrossBZ.mimBound_bz`) and `LightStabilizerClassification`
   (`GrossBZ.lightStabilizerClassification_bz`)
 - `LayerInstance` — the unconditional chain and Pauli distances, each one
-  application of the packaged Doubling theorem
-  (`pauli_distance_eq_double_of_admissible`), with the light-boundary census
-  as its admissibility input
+  application of the packaged Doubling theorem (at the Pauli level, its
+  fold-and-double form `isLeast_logicalWeight_two_mul_of_foldDouble` from
+  `Framework/FoldDouble/`), with the light-boundary census as its
+  admissibility input
 - `Distance` — the capstones (`grossStabilizerCode_hasCodeDistance_12_uncond`,
   `grossStabilizerCodeWithDistance`), packaging that same generic result
 

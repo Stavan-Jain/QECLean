@@ -5,6 +5,7 @@ import QEC.Stabilizer.Framework.Homological.StabGroup
 import QEC.Stabilizer.Framework.Homological.LogicalCorrespondence
 import QEC.Stabilizer.Framework.Homological.Distance
 import QEC.Stabilizer.Framework.Homological.Presentation
+import QEC.Stabilizer.Framework.Homological.ToCode
 import QEC.Stabilizer.Framework.Homological.SelfDual
 import QEC.Stabilizer.Framework.Homological.SelfDualLogical
 import QEC.Stabilizer.Framework.Homological.BBChainComplex
@@ -26,7 +27,4 @@ import QEC.Stabilizer.Framework.Homological.F2Mask
 import QEC.Stabilizer.Framework.Homological.BZCertificate
 import QEC.Stabilizer.Framework.Homological.BBSeamBZ
 import QEC.Stabilizer.Framework.Homological.BBFlatLift
-import QEC.Stabilizer.Framework.Homological.AffineFiberCertificate
-import QEC.Stabilizer.Framework.Homological.Trellis
-import QEC.Stabilizer.Framework.Homological.WeightCensus
 import QEC.Stabilizer.Framework.Homological.Certificate

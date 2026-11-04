@@ -14,14 +14,11 @@ board; the per-module one-liner map lives in the umbrella docstring
 | Dir | Code | Distance status |
 |---|---|---|
 | `Gross/` | gross `[[144,12,12]]` (base `[[72,12,6]]`) | **d = 12 unconditional, kernel-only** — axioms are exactly `propext`, `Classical.choice`, `Quot.sound`; no `native_decide`, no `sorry` (proved through the generic doubling layer and packaged by `Gross/Distance.lean`) |
-| `Bravyi360/` | `[[360,12,24]]` on `Z30 × Z6` | Two-quotient certificate proof in `Bravyi360/Distance.lean`; proof structure and validation measurements in `Bravyi360/README.md` |
 
 The other instances (`Z3Z6/`, `Z5Z15F2A6/`, `BaseFloors/`) are parked — see
 "Parked instances" below.
 
 ## Task router
-
-- **Understand the 360-qubit proof**: read `Bravyi360/README.md`, then `Defs`, `Packaging`, `Witness`, and `Distance`. The reusable finite-certificate layer is `Framework/Homological/Certificate/`.
 
 - **Understand the gross d = 12 proof**: read `Gross.lean`'s docstring, then
   the spine in umbrella order (Defs → CoverTransfer → DeckHomotopy → Witness →
@@ -50,8 +47,12 @@ classification from one generic `SeamBZCertificate`. `Assembly` retains the old
 conditional names as wrappers.
 `LayerInstance` proves the unconditional distances
 (`gross_{chain,pauli}_distance_eq_12`) as one application each of the packaged
-Doubling theorem (`chain/pauli_distance_eq_double_of_admissible`), whose
-dangerous-sector input is the generic dispatch `dangerousFloorNZ_of_admissible`:
+Doubling theorem (`chain_distance_eq_double_of_admissible` at the chain level;
+at the Pauli level its fold-and-double form
+`isLeast_logicalWeight_two_mul_of_foldDouble`, `Framework/FoldDouble/BBCover.lean`,
+which pairs the cover qubits by the deck translation and applies the
+code-agnostic fold-and-double distance theorem of `Framework/FoldDouble/`),
+whose dangerous-sector input is the generic dispatch `dangerousFloorNZ_of_admissible`:
 the census makes every light boundary `LightBoundaryAdmissible` (hexagons:
 single shape, `t = 3`; D-pairs: pair shape, `t = 1`;
 `lightBoundaryAdmissible_of_classification` in `DangerousSector`). `Distance`
@@ -61,8 +62,9 @@ After building, `lake env lean scripts/BBDoublingCheck.lean` verifies a separate
 four-qubit cover and checks that both conditional and unconditional Gross
 capstones depend on the generic base, homotopy, rung, sector, and
 Brouwer–Zimmermann certificate theorems — the unconditional ones through the
-packaged Doubling theorem and the admissible dispatch, not through the
-per-instance `dangerous_sector_of_classification`.
+packaged Doubling theorem (the Pauli-level one through its fold-and-double
+form) and the admissible dispatch, not through the per-instance
+`dangerous_sector_of_classification`.
 
 ## Hypothesis-discharge map (gross)
 
@@ -73,7 +75,7 @@ per-instance `dangerous_sector_of_classification`.
 | `DangerousSectorGe12` | `Gross/DangerousSector.lean` ((M), generic logical-floor rungs: the capstones take it from the generic admissible dispatch via `lightBoundaryAdmissible_of_classification`; the per-instance assembly `dangerous_sector_of_classification` remains for the conditional engine route) | analytic + kernel `decide` |
 | `SafeSectorGe12` → `MImBound` | `Gross/SafeSector.lean` (generic Smith-coset reduction) | analytic |
 | `MImBound` | `Gross/SeamBZ.lean` (`GrossBZ.mimBound_bz`: `SeamBZCertificate.seamCosetFloor` at 11 over all 63 Smith classes at once, lifted to 12 by parity) | kernel `decide` (two BZ walks, 510 414 words) |
-| capstones | `Gross/Distance.lean` (`grossStabilizerCode_hasCodeDistance_12_uncond`, `grossStabilizerCodeWithDistance`) + `Gross/LayerInstance.lean` (`gross_chain/pauli_distance_eq_12`, one application each of the packaged Doubling theorem `chain/pauli_distance_eq_double_of_admissible`) | — |
+| capstones | `Gross/Distance.lean` (`grossStabilizerCode_hasCodeDistance_12_uncond`, `grossStabilizerCodeWithDistance`) + `Gross/LayerInstance.lean` (`gross_chain_distance_eq_12`, one application of the packaged Doubling theorem `chain_distance_eq_double_of_admissible`; `gross_pauli_distance_eq_12`, one application of its fold-and-double form `isLeast_logicalWeight_two_mul_of_foldDouble`) | — |
 
 The Z3Z6 (pair72, `[[36,4,4]] → [[72,4,8]]`) and Z5Z15F2A6
 (`[[150,8,8]] → [[300,8,16]]`) instances, which used to mirror this map, are
@@ -137,8 +139,8 @@ re-adding the directory, its sibling umbrella, the import line in
 
 The abstract machinery they exercised stays in this tree:
 `Framework/Homological/BBSmallCycle.lean` (the A15/A16 class small-cycle
-theorem) and `BBDoubling`/`BBCover` remain available. `Gross/` and
-`Bravyi360/` contain the active concrete instances.
+theorem) and `BBDoubling`/`BBCover` are untouched — they simply have no
+concrete instance here besides `Gross/`.
 
 ## Generated files (Class G: fully generated — NEVER hand-edit)
 
@@ -146,7 +148,6 @@ theorem) and `BBDoubling`/`BBCover` remain available. `Gross/` and
 |---|---|---|
 | `Gross/StabilizerCodeData.lean` | `phase5/gen_file.py` (`--force` guard; emits data only) | `phase5/data.json` |
 | `Gross/SeamBZData.lean` | `scripts/gen_gross_bz.py` (`--emit [--force]`; validates every certificate, including both walks, in Python before writing) | computed from the code |
-| `Bravyi360/` files carrying a generated-file banner | `scripts/bravyi360_kernel/generate.py` (`--force` guard, `--verify` comparison); `module_map.json` and the four manifests enumerate the files | Hashed compressed candidate certificates in `scripts/bravyi360_kernel/certificates/` |
 
 There are no Class F files (generated fragments between
 `-- BEGIN/END GENERATED` markers) left in this tree. Everything else is Class H (hand-maintained;
@@ -171,9 +172,9 @@ details (env, clobber guards, stale generators): `qec-lab:experiments/bb_lab/GEN
 
 ## Adding an instance
 
-Copy the structural shape of `Gross/` (complete, kernel-only). The parked
-`Z3Z6/` and `Z5Z15F2A6/` (branch `claude/z3z6-parked`) are further worked
-examples:
+Copy the shape of `Gross/` (complete, kernel-only) — the only instance in this
+tree; the parked `Z3Z6/` and `Z5Z15F2A6/` (branch `claude/z3z6-parked`) are
+further worked examples:
 
 1. `mkdir <Name>/` + sibling `<Name>.lean` umbrella. Name = base group +
    disambiguating tag (`Z5Z15F2A6`, `Z3Z6` precedent).
@@ -196,7 +197,9 @@ examples:
    (gross: 510 414 words; the A28 notes price larger bases at 10⁹+). Show
    each light boundary of the census `LightBoundaryAdmissible` (single shape,
    pair shape, or `t = 1` window) and conclude with the packaged Doubling
-   theorem `pauli_distance_eq_double_of_admissible`, which runs
+   theorem `pauli_distance_eq_double_of_admissible` (or its fold-and-double
+   form `isLeast_logicalWeight_two_mul_of_foldDouble`, which takes the same
+   inputs), which runs
    `dangerousFloorNZ_of_admissible` and `safeFloor_of_seamCosetFloor` for the
    sector reductions (the `..._of_logicalFloor` assemblies remain available
    for floors proved some other way).
@@ -211,3 +214,12 @@ Any PR that adds/moves/renames a module here, changes how a floor is
 certified, changes a generator, or adds an instance MUST update this README (the tables
 are keyed by stable names — that is the anti-staleness design). A PR touching
 `BivariateBicycle/**` structure without touching this file is suspect.
+
+## Downstream distance proofs
+
+The `[[360,12,24]]` Bravyi360 development lives in
+[bb-distance-lean](https://github.com/Stavan-Jain/bb-distance-lean),
+which pins QECLean to an exact commit. Its concrete proof, generated
+certificates, and deterministic generators are maintained together there.
+QECLean retains the general flat-lift reductions, check trimming, dual
+witness soundness, and finite-orbit census principles.

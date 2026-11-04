@@ -14,6 +14,7 @@ import QEC.Stabilizer.Codes.Toric.Distance
 import QEC.Stabilizer.Codes.Toric.DistanceX
 import QEC.Stabilizer.Codes.Toric.DistanceZ
 import QEC.Stabilizer.Codes.Toric.StabilizerCode
+import QEC.Stabilizer.Codes.Toric.HomologicalToCode
 import QEC.Stabilizer.Codes.Toric.RankCertificate
 
 /-!

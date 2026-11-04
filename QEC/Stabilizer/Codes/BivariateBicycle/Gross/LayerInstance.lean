@@ -7,10 +7,13 @@ light base boundaries are admissible for the generic logical-floor rungs
 (hexagons and D-pairs), and its seam-coset floor comes from the
 Brouwer–Zimmermann certificate. This file reads the light-boundary census as
 admissibility and proves the unconditional distances as single applications of
-the packaged Doubling theorem (`chain_distance_eq_double_of_admissible`,
-`pauli_distance_eq_double_of_admissible`). `Distance.lean` packages the
-Pauli-level result. The two sector floors are also kept as standalone
-theorems (`grossCoverData_dangerousFloorNZ`, `grossCoverData_safeFloor`).
+the packaged Doubling theorem: the chain-level one through
+`chain_distance_eq_double_of_admissible`, the Pauli-level one through the
+code-agnostic fold-and-double theorem
+(`isLeast_logicalWeight_two_mul_of_foldDouble`, `Framework/FoldDouble/`),
+which takes the same five inputs. `Distance.lean` packages the Pauli-level
+result. The two sector floors are also kept as standalone theorems
+(`grossCoverData_dangerousFloorNZ`, `grossCoverData_safeFloor`).
 
 Gross-specific inputs remain the kernel-checked polynomial, support-shape,
 Brouwer–Zimmermann (`SeamBZ`), and tight-witness certificates. All geometric
@@ -19,6 +22,7 @@ reductions are shared with other `XDoubleCoverData` instances.
 
 import QEC.Stabilizer.Codes.BivariateBicycle.Gross.SeamBZ
 import QEC.Stabilizer.Framework.Homological.BBDoubling
+import QEC.Stabilizer.Framework.FoldDouble.BBCover
 
 namespace Quantum
 namespace Stabilizer
@@ -75,8 +79,9 @@ theorem grossCoverData_lightBoundaryAdmissible :
 
 /-! ## The unconditional endpoints, by the packaged Doubling theorem
 
-Each endpoint is one application of the generic Doubling theorem, whose five
-inputs are: (H1) `grossCoverData_logicalFloor`, (H2) the witness `uStar`,
+Each endpoint is one application of the generic Doubling theorem — at the
+Pauli level, of its fold-and-double form — whose five inputs are:
+(H1) `grossCoverData_logicalFloor`, (H2) the witness `uStar`,
 (H3) `grossCoverData_deckTrivial`, (H4) `GrossBZ.mimBound_bz`, and (H5)
 `grossCoverData_lightBoundaryAdmissible`. -/
 
@@ -97,14 +102,17 @@ theorem gross_chain_distance_eq_12 :
 /-- **Unconditional Pauli-level `d(gross) = 12`, by the Doubling theorem**:
 12 is the least weight of a nontrivial logical operator of the gross homological
 stabilizer group. Statement-identical to `gross_pauli_distance_eq_12_of_sectors`
-with the sector hypotheses discharged; proved as one application of
+with the sector hypotheses discharged; proved as one application of the
+code-agnostic fold-and-double theorem
+`isLeast_logicalWeight_two_mul_of_foldDouble`, which pairs the gross qubits by
+the deck translation and has exactly the statement of
 `pauli_distance_eq_double_of_admissible`. -/
 theorem gross_pauli_distance_eq_12 :
     IsLeast {w : ℕ | ∃ g : NQubitPauliGroupElement grossComplex.numQubits,
       Quantum.StabilizerGroup.IsNontrivialLogicalOperator g
         grossComplex.homologicalStabilizerGroup ∧
       NQubitPauliGroupElement.weight g = w} 12 :=
-  grossCoverData.pauli_distance_eq_double_of_admissible
+  grossCoverData.isLeast_logicalWeight_two_mul_of_foldDouble
     grossCoverData_logicalFloor uStar uStar_mem_cycles chainWeight_uStar
     tauUStar_not_mem_boundaries grossCoverData_deckTrivial GrossBZ.mimBound_bz
     grossCoverData_lightBoundaryAdmissible

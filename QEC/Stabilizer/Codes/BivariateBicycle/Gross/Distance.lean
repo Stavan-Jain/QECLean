@@ -30,7 +30,8 @@ theorem grossStabilizerCode_hasCodeDistance_12 (hMim : MImBound) :
 remaining assumed hypotheses: both certificate inputs come from the
 Brouwer–Zimmermann certificate `GrossBZ.grossSeamBZ`.
 The distance proof is `gross_pauli_distance_eq_12`, one application of the
-generic Doubling theorem `pauli_distance_eq_double_of_admissible`.
+generic Doubling theorem in its fold-and-double form
+`isLeast_logicalWeight_two_mul_of_foldDouble`.
 **Kernel-only**: the axioms are exactly `propext`, `Classical.choice` and
 `Quot.sound` — no `native_decide`, no `sorry`. -/
 theorem grossStabilizerCode_hasCodeDistance_12_uncond :
