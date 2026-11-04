@@ -21,6 +21,11 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # The Bravyi360 certificate modules each load a large import environment.
+      # Limit concurrent Lean work so cold builds leave memory for the runner;
+      # swap alone did not prevent lost communication / exit 143 on PR #97.
+      LEAN_NUM_THREADS: "1"
 
     steps:
       - uses: actions/checkout@v4

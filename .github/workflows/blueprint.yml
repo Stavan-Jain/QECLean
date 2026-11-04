@@ -63,6 +63,10 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # QECBlueprint builds all of QEC, including the Bravyi360 certificates.
+      # Match lean_action_ci.yml: swap alone cannot bound concurrent memory use.
+      LEAN_NUM_THREADS: "1"
     steps:
       - uses: actions/checkout@v4
 
