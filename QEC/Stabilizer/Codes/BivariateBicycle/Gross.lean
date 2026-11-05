@@ -40,7 +40,7 @@ Chain-level formalization of the gross bivariate-bicycle code and its
   generators, decoder identities, independence, closure equality)
 - `HomologicalToCode` — the generic route: `grossComplex.toStabilizerCode`
   shares its stabilizer subgroup with the packaged code, so `dim H₁ = 12` and
-  `dim (ker A ∩ ker B) = 6`; the family constructor
+  `dim (ker A ⊓ ker B) = 6`; the family constructor
   `bbStabilizerCode 12 6 grossA grossB` is the gross code as a
   `StabilizerCode 144 12` (`grossStabilizerCodeOfBB`)
 - `SeamBZData` + `SeamBZWalk` + `SeamBZ` — **one Brouwer–Zimmermann

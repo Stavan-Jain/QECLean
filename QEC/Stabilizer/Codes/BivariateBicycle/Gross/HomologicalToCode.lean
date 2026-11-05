@@ -8,15 +8,15 @@ symplectic basis of 12 logical pairs. The generic
 a code from `grossComplex` with no such data, encoding `dim H₁` logical qubits,
 and the family constructor `bbStabilizerCode 12 6 grossA grossB`
 (`Framework/Homological/BBStabilizerCode.lean`) writes that count as
-`2 · dim (ker A ∩ ker B)`.
+`2 · dim (ker A ⊓ ker B)`.
 
 This file links the three. The packaged code and the generic code have the same
 stabilizer subgroup (`grossStabilizerCode_toSubgroup_eq`), and `k` is a
 function of the subgroup (`StabilizerCode.k_eq_of_toSubgroup_eq`), so
 
 * `grossComplex_finrank_H1_eq_12`: `dim H₁(grossComplex) = 12`;
-* `finrank_commonKernel_gross`: `dim (ker grossA ∩ ker grossB) = 6`, by the
-  generic count `dim H₁ = 2 · dim (ker A ∩ ker B)`;
+* `finrank_ker_inf_ker_gross`: `dim (ker grossA ⊓ ker grossB) = 6`, by the
+  generic count `dim H₁ = 2 · dim (ker A ⊓ ker B)`;
 * `grossStabilizerCodeOfBB : StabilizerCode 144 12`, the family constructor's
   code with its parameters read off.
 
@@ -50,10 +50,10 @@ theorem grossComplex_finrank_H1_eq_12 :
   StabilizerCode.k_eq_of_toSubgroup_eq grossComplex.toStabilizerCode grossStabilizerCode
     grossComplex_toStabilizerCode_subgroup_eq
 
-/-- `dim (ker A ∩ ker B) = 6` for the gross polynomials, from
-`dim H₁ = 2 · dim (ker A ∩ ker B)` and `dim H₁ = 12`. -/
-theorem finrank_commonKernel_gross :
-    Module.finrank (ZMod 2) (commonKernel grossA grossB) = 6 := by
+/-- `dim (ker A ⊓ ker B) = 6` for the gross polynomials, from
+`dim H₁ = 2 · dim (ker A ⊓ ker B)` and `dim H₁ = 12`. -/
+theorem finrank_ker_inf_ker_gross :
+    Module.finrank (ZMod 2) ↥(ker grossA ⊓ ker grossB) = 6 := by
   have h := finrank_H1_bbChainComplex grossA grossB
   rw [show bbChainComplex grossA grossB = grossComplex from rfl,
     grossComplex_finrank_H1_eq_12] at h
@@ -62,12 +62,12 @@ theorem finrank_commonKernel_gross :
 /-- The gross code as the family constructor's code `bbStabilizerCode 12 6 A B`
 with `A = x³ + y + y²`, `B = y³ + x + x²`, and its parameters `[[144, 12]]`
 read off: `2 · 12 · 6 = 144` definitionally, and `k = 2 · 6 = 12` by
-`finrank_commonKernel_gross`. -/
+`finrank_ker_inf_ker_gross`. -/
 noncomputable def grossStabilizerCodeOfBB : StabilizerCode 144 12 where
   toStabilizerGroup := (bbStabilizerCode 12 6 grossA grossB).toStabilizerGroup
   hk := by norm_num
   card_eq :=
     (bbStabilizerCode 12 6 grossA grossB).card_eq.trans
-      (congrArg (2 ^ ·) (by rw [finrank_commonKernel_gross]))
+      (congrArg (2 ^ ·) (by rw [finrank_ker_inf_ker_gross]))
 
 end Quantum.Stabilizer.Homological.BB

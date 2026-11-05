@@ -19,7 +19,7 @@ This file names the composite, with the logical-qubit count of
 
 ```
 bbStabilizerCode ℓ m A B :
-    StabilizerCode (2 * (ℓ * m)) (2 * Module.finrank (ZMod 2) (commonKernel A B))
+    StabilizerCode (2 * (ℓ * m)) (2 * Module.finrank (ZMod 2) ↥(ker A ⊓ ker B))
 ```
 
 `bbChainComplex` counts its qubits as `bbNumQubits G = 2 * Fintype.card G`,
@@ -31,10 +31,11 @@ stabilizer code lives on `2ℓm` qubits definitionally. The `rfl` lemmas
 identify its stabilizer group with the closure of the face checks `[A | B]`
 and vertex checks `[Bᵀ | Aᵀ]`.
 
-The number of logical qubits is `2 · dim (ker A ∩ ker B)`, where `A` and `B`
-act on `ZMod ℓ × ZMod m → ZMod 2` by convolution (`commonKernel`): the
+The number of logical qubits is `2 · dim (ker A ⊓ ker B)`, where `A` and `B`
+act on `ZMod ℓ × ZMod m → ZMod 2` by convolution and `ker a` is the scoped
+notation for the kernel of convolution by `a` (`BBLogicalQubits.lean`): the
 generic code has `dim H₁` logical qubits, and `finrank_H1_bbChainComplex`
-(`BBLogicalQubits.lean`) is `dim H₁ = 2 · dim (ker A ∩ ker B)`. A numeral `k`
+is `dim H₁ = 2 · dim (ker A ⊓ ker B)`. A numeral `k`
 is then a kernel computation for the particular `A, B`; for the gross code it
 is `12` (`Codes/BivariateBicycle/Gross/HomologicalToCode.lean`, read off the
 hand-built `grossStabilizerCode`).
@@ -96,13 +97,13 @@ noncomputable def bbHomologicalCode (ℓ m : ℕ) [NeZero ℓ] [NeZero m]
 
 /-- **The bivariate bicycle code** with cycle lengths `ℓ, m` and polynomials
 `A, B` on `ZMod ℓ × ZMod m`: the stabilizer code of the BB chain complex, on
-`2ℓm` qubits, with `2 · dim (ker A ∩ ker B)` logical qubits
+`2ℓm` qubits, with `2 · dim (ker A ⊓ ker B)` logical qubits
 (`finrank_H1_bbChainComplex`). Its stabilizer group is the closure of all
 face and vertex checks, with no independence hypothesis on them. -/
 noncomputable def bbStabilizerCode (ℓ m : ℕ) [NeZero ℓ] [NeZero m]
     (A B : ZMod ℓ × ZMod m → ZMod 2) :
     StabilizerGroup.StabilizerCode (2 * (ℓ * m))
-      (2 * Module.finrank (ZMod 2) (commonKernel A B)) where
+      (2 * Module.finrank (ZMod 2) ↥(ker A ⊓ ker B)) where
   toStabilizerGroup := (bbHomologicalCode ℓ m A B).homologicalStabilizerGroup
   hk := by
     have h : Module.finrank (ZMod 2) (bbChainComplex A B).H1 ≤ 2 * (ℓ * m) :=
@@ -134,7 +135,7 @@ variable {ℓ m : ℕ} [NeZero ℓ] [NeZero m] (A B : ZMod ℓ × ZMod m → ZMo
 complex: it has the stabilizer group of `toStabilizerCode` of the chain
 complex, and differs from it only in how `k` is written. -/
 theorem bbStabilizerCode_k_eq_finrank_H1 :
-    2 * Module.finrank (ZMod 2) (commonKernel A B) =
+    2 * Module.finrank (ZMod 2) ↥(ker A ⊓ ker B) =
       Module.finrank (ZMod 2) (bbChainComplex A B).H1 :=
   (finrank_H1_bbChainComplex A B).symm
 
@@ -162,8 +163,8 @@ logical count is `12`. -/
 noncomputable example :
     StabilizerGroup.StabilizerCode 144
       (2 * Module.finrank (ZMod 2)
-        (commonKernel (poly[x^3 + y + y^2] : ZMod 12 × ZMod 6 → ZMod 2)
-          (poly[y^3 + x + x^2] : ZMod 12 × ZMod 6 → ZMod 2))) :=
+        ↥(ker (poly[x^3 + y + y^2] : ZMod 12 × ZMod 6 → ZMod 2) ⊓
+          ker (poly[y^3 + x + x^2] : ZMod 12 × ZMod 6 → ZMod 2))) :=
   bbStabilizerCode 12 6 poly[x^3 + y + y^2] poly[y^3 + x + x^2]
 
 end BB
