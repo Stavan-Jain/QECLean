@@ -36,9 +36,8 @@ act on `ZMod ℓ × ZMod m → ZMod 2` by convolution and `ker a` is the scoped
 notation for the kernel of convolution by `a` (`BBLogicalQubits.lean`): the
 generic code has `dim H₁` logical qubits, and `finrank_H1_bbChainComplex`
 is `dim H₁ = 2 · dim (ker A ⊓ ker B)`. A numeral `k`
-is then a kernel computation for the particular `A, B`; for the gross code it
-is `12` (`Codes/BivariateBicycle/Gross/HomologicalToCode.lean`, read off the
-hand-built `grossStabilizerCode`).
+is then a kernel computation for the particular `A, B` (for the gross code,
+`12`; its proof lives downstream in `bb-distance-lean`, which pins QECLean).
 -/
 
 namespace Quantum
@@ -157,8 +156,7 @@ of `[Bᵀ | Aᵀ]`). -/
 /-! ## Example: the gross code parameters
 
 `ℓ = 12`, `m = 6`, `A = x³ + y + y²`, `B = y³ + x + x²` give a code on
-`144` qubits, definitionally; `Gross/HomologicalToCode.lean` shows that the
-logical count is `12`. -/
+`144` qubits, definitionally. -/
 
 noncomputable example :
     StabilizerGroup.StabilizerCode 144

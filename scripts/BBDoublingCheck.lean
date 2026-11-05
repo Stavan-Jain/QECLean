@@ -6,14 +6,11 @@ its own certificates and derives distance two with the same logical-floor,
 Bézout, seam-coset, and assembly APIs used by Gross. It is a test fixture, not
 a second library definition of the existing four-qubit stabilizer code.
 
-The final checks inspect proof dependencies, so replacing Gross's generic
-route with a bespoke proof fails even if the distance statement is unchanged.
-The unconditional Gross capstones must go through the packaged Doubling theorem
-(`pauli_distance_eq_double_of_admissible`) and the generic admissible dispatch,
-and must not use Gross's own case split `dangerous_sector_of_classification`.
+Gross-specific proof-dependency regressions live in the downstream
+bb-distance-lean repository alongside the Gross proof.
 Run after building QEC: `lake env lean scripts/BBDoublingCheck.lean`.
 -/
-import QEC.Stabilizer.Codes.BivariateBicycle.Gross.Distance
+import QEC.Stabilizer.Framework.FoldDouble.BBCover
 
 open Quantum Quantum.Stabilizer.Homological Quantum.Stabilizer.Homological.BB
 open scoped Quantum.Stabilizer.Homological.BB
@@ -133,67 +130,26 @@ theorem small_pauli_distance_of_admissible :
     smallWitness small_witness_cycle small_witness_weight small_witness_survives
     small_deck_trivial small_seam_floor small_admissible
 
+/-- The fold-and-double theorem gives the same distance from (H1)–(H5): the
+small cover's qubits paired by the deck translation, through the code-agnostic
+distance theorem. -/
+theorem small_pauli_distance_of_foldDouble :
+    IsLeast {w : ℕ | ∃ g : NQubitPauliGroupElement smallCover.coverComplex.numQubits,
+      StabilizerGroup.IsNontrivialLogicalOperator g
+        smallCover.coverComplex.homologicalStabilizerGroup ∧
+      NQubitPauliGroupElement.weight g = w} 2 :=
+  smallCover.isLeast_logicalWeight_two_mul_of_foldDouble small_logical_floor
+    smallWitness small_witness_cycle small_witness_weight small_witness_survives
+    small_deck_trivial small_seam_floor small_admissible
+
 open Lean in
 run_cmd do
   let allowed : NameSet := .ofList [``propext, ``Classical.choice, ``Quot.sound]
   for root in [``small_chain_distance, ``small_pauli_distance,
-      ``small_pauli_distance_of_admissible] do
+      ``small_pauli_distance_of_admissible, ``small_pauli_distance_of_foldDouble] do
     let extra := (← collectAxioms root).filter (fun n => !allowed.contains n)
     unless extra.isEmpty do
       throwError "{root} uses forbidden axioms: {extra}"
-  let env ← getEnv
-  let required := #[
-    ``SmallCycleData.cycle_weight_ge_6,
-    ``XDoubleCoverData.deckTrivial_of_bezout,
-    ``XDoubleCoverData.dangerous_bound_of_single_shape_of_logicalFloor,
-    ``XDoubleCoverData.dangerous_bound_of_pair_shape_of_logicalFloor,
-    ``XDoubleCoverData.safeFloor_of_seamCosetFloor,
-    ``XDoubleCoverData.chainWeight_ge_double_of_logicalFloor]
-  -- Both certificate inputs must come from the generic Brouwer–Zimmermann layer.
-  let bz := #[``XDoubleCoverData.SeamBZCertificate.seamCosetFloor,
-    ``XDoubleCoverData.SeamBZCertificate.boundary_census,
-    ``F2Mask.bz_ok_of_xorSpan, ``F2Mask.kernel_eq_sum_of_peel]
-  -- The unconditional capstones go through the packaged Doubling theorem, whose
-  -- dangerous floor is the generic admissible dispatch.
-  let packaged := #[``XDoubleCoverData.pauli_distance_eq_double_of_admissible,
-    ``XDoubleCoverData.pauli_distance_eq_double_of_logicalFloor,
-    ``XDoubleCoverData.dangerousFloorNZ_of_admissible]
-  -- ... and therefore no longer through Gross's own case split over the census.
-  let perInstance := #[``dangerous_sector_of_classification]
-  let targets := #[
-    (``gross_chain_distance_eq_12,
-      #[``XDoubleCoverData.chain_distance_eq_double_of_admissible,
-        ``XDoubleCoverData.chain_distance_eq_double_of_logicalFloor,
-        ``XDoubleCoverData.dangerousFloorNZ_of_admissible] ++ bz, perInstance),
-    (``gross_pauli_distance_eq_12, packaged ++ bz, perInstance),
-    (``grossStabilizerCode_hasCodeDistance_12_uncond,
-      #[``gross_pauli_distance_eq_12, ``StabilizerGroup.has_code_distance_of_isLeast]
-        ++ packaged ++ bz, perInstance),
-    (``grossStabilizerCodeWithDistance,
-      #[``gross_pauli_distance_eq_12, ``StabilizerGroup.has_code_distance_of_isLeast]
-        ++ packaged ++ bz, perInstance),
-    (``grossStabilizerCode_hasCodeDistance_12,
-      #[``XDoubleCoverData.pauli_distance_eq_double_of_logicalFloor,
-        ``StabilizerGroup.has_code_distance_of_isLeast,
-        ``XDoubleCoverData.SeamBZCertificate.boundary_census], #[])]
-  for (root, endpoints, forbidden) in targets do
-    let mut pending := #[root]
-    let mut visited : NameSet := {}
-    while !pending.isEmpty do
-      let name := pending.back!
-      pending := pending.pop
-      if visited.contains name then continue
-      visited := visited.insert name
-      if let some info := env.find? name then
-        if let some value := info.value? (allowOpaque := true) then
-          pending := pending ++ value.getUsedConstants.filter (fun n =>
-            n.toString.startsWith "Quantum." || n.toString.startsWith "_private.QEC.")
-    for dependency in required ++ endpoints do
-      unless visited.contains dependency do
-        throwError "{root} no longer uses the generic theorem {dependency}"
-    for dependency in forbidden do
-      if visited.contains dependency then
-        throwError "{root} uses the per-instance assembly {dependency}"
-  logInfo "doubling checks OK — independent cover and Gross generic proof dependencies (incl. BZ)"
+  logInfo "doubling checks OK — independent four-qubit cover and standard axioms"
 
 end QEC.DoublingCheck

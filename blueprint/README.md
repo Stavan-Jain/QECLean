@@ -180,7 +180,7 @@ Clicking a node opens its statement, as before, and that panel now carries a
 A focused view is a URL, so it can be linked from a discussion or an issue:
 
 ```
-dep_graph_document.html?focus=thm:gross-distance&dir=up
+dep_graph_document.html?focus=thm:toric-distance&dir=up
 dep_graph_document.html?focus=def:steane7&dir=up&depth=2
 ```
 

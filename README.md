@@ -54,7 +54,8 @@ Every distance `d` listed in the parameters below is proved.
 
 | Code | Parameters | Where |
 |---|---|---|
-| Gross (bivariate bicycle) | `[[144, 12, 12]]` | `Codes/BivariateBicycle/Gross/` |
+| Gross (downstream) | `[[144, 12, 12]]` | [bb-distance-lean](https://github.com/Stavan-Jain/bb-distance-lean) |
+| Bravyi360 (downstream) | `[[360, 12, 24]]` | [bb-distance-lean](https://github.com/Stavan-Jain/bb-distance-lean) |
 | Toric code, `L ≥ 2` | `[[2L², 2, L]]` | `Codes/Toric/` |
 | Rotated surface code, odd `L ≥ 3` | `[[L², 1, L]]` | `Codes/RotatedSurface/` |
 | Iceberg family, `m ≥ 2` | `[[2m, 2m − 2, 2]]` | `Codes/Iceberg/N.lean` |
@@ -86,16 +87,12 @@ depend on the logical basis.
 
 ## Headline results
 
-**The gross code.** IBM's `[[144,12,12]]` bivariate-bicycle code is a verified
-`StabilizerCodeWithDistance 144 12 12`, along with its `[[72,12,6]]` base code.
-
-```lean
-grossStabilizerCodeWithDistance : StabilizerCodeWithDistance 144 12 12
-```
-
-See
-[`Codes/BivariateBicycle/README.md`](QEC/Stabilizer/Codes/BivariateBicycle/README.md)
-for the proof spine.
+**Bivariate-bicycle distances.** The Gross `[[144,12,12]]` and Bravyi360
+`[[360,12,24]]` proofs now live in
+[bb-distance-lean](https://github.com/Stavan-Jain/bb-distance-lean), together with
+their certificates and generators. That repository pins QECLean and uses its
+general homological, cover, and doubling theory. See the
+[BB foundations overview](QEC/Stabilizer/Codes/BivariateBicycle/README.md).
 
 **The toric family.** For every `L ≥ 2`, the toric code defined on a `L × L` grid is a verified
 `[[2L², 2, L]]` stabilizer code:

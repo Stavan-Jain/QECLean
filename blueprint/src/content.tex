@@ -25,7 +25,7 @@ to-do list.
 
 \section{What is proved}
 
-Two results anchor the development.
+The toric family and the downstream BB developments illustrate the framework.
 
 \begin{itemize}
   \item \textbf{The toric family.} For every $L \ge 2$, the $L \times L$ toric
@@ -34,7 +34,9 @@ Two results anchor the development.
     (\cref{thm:toric-distance}).
   \item \textbf{The gross code.} IBM's $[[144,12,12]]$ bivariate-bicycle code
     --- the flagship qLDPC code of Bravyi et al. --- is verified with distance
-    exactly $12$, unconditionally (\cref{thm:gross-distance}).
+    exactly $12$, unconditionally, in the downstream
+    \href{https://github.com/Stavan-Jain/bb-distance-lean}{bb-distance-lean}
+    repository. Its general cover and doubling theory remains in QECLean.
 \end{itemize}
 
 Alongside these sit the rotated surface family, the repetition codes, the
@@ -317,40 +319,22 @@ against the untrimmed stabilizer group are carried across by
 \inputleannode{thm:toric-distance}
 \inputleannode{def:toric-code-with-distance}
 
-\chapter{Bivariate-bicycle codes and the gross code}
+\chapter{Bivariate-bicycle foundations}
 \label{chap:bb}
 
 Bivariate-bicycle codes are qLDPC codes built from two commuting polynomial
-shift operators on an abelian group. The gross code is the $[[144,12,12]]$
-member of the family; the argument here derives its distance from that of its
-$[[72,12,6]]$ base by exhibiting the gross complex as a free $\Z_2$ cover of
-the base and showing the distance doubles.
+shift operators on an abelian group. QECLean provides the general cover,
+doubling, small-cycle, and certificate soundness theorems.
 
 \inputleannode{def:x-double-cover}
-
-\section{The base floor}
-
-The base contributes a floor of six, established by ruling out every light
-cycle with a finite certificate that the kernel checks directly.
-
 \inputleannode{def:small-cycle-data}
 \inputleannode{thm:small-cycle-floor}
-\inputleannode{thm:base-distance}
-\inputleannode{thm:gross-logical-weight}
 
-\section{Doubling}
-
-Pushing a gross logical down to the base gives weight at least six. Getting to
-twelve requires knowing when the two sheets of the cover contribute
-independently. They do outside a \emph{dangerous} sector, where the deck
-transformation acts trivially on homology; there the light stabilizers are
-classified explicitly and the surviving classes are confined to Smith cosets
-whose floor is again twelve.
-
-\inputleannode{thm:gross-sector-dichotomy}
-\inputleannode{def:gross-stabilizer-code}
-\inputleannode{thm:gross-distance}
-\inputleannode{def:gross-code-with-distance}
+The concrete Gross $[[144,12,12]]$ and Bravyi360 $[[360,12,24]]$ proofs,
+including their generated certificates, now live in
+\href{https://github.com/Stavan-Jain/bb-distance-lean}{bb-distance-lean}.
+That repository pins QECLean and retains the Gross blueprint annotations in
+\texttt{BBDistanceBlueprint.lean}.
 
 \chapter{Code instances}
 \label{chap:codes}
