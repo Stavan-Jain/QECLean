@@ -8,6 +8,7 @@ import QEC.Stabilizer.Codes.BivariateBicycle.Gross.DangerousSector
 import QEC.Stabilizer.Codes.BivariateBicycle.Gross.SafeSector
 import QEC.Stabilizer.Codes.BivariateBicycle.Gross.StabilizerCodeData
 import QEC.Stabilizer.Codes.BivariateBicycle.Gross.StabilizerCode
+import QEC.Stabilizer.Codes.BivariateBicycle.Gross.HomologicalToCode
 import QEC.Stabilizer.Codes.BivariateBicycle.Gross.SeamBZData
 import QEC.Stabilizer.Codes.BivariateBicycle.Gross.SeamBZWalk
 import QEC.Stabilizer.Codes.BivariateBicycle.Gross.SeamBZ
@@ -37,6 +38,11 @@ Chain-level formalization of the gross bivariate-bicycle code and its
   safe sector to `MImBound`, and the sparse form of `seamC`
 - `StabilizerCodeData` + `StabilizerCode` — the `[[144,12]]` packaging (trimmed
   generators, decoder identities, independence, closure equality)
+- `HomologicalToCode` — the generic route: `grossComplex.toStabilizerCode`
+  shares its stabilizer subgroup with the packaged code, so `dim H₁ = 12` and
+  `dim (ker A ∩ ker B) = 6`; the family constructor
+  `bbStabilizerCode 12 6 grossA grossB` is the gross code as a
+  `StabilizerCode 144 12` (`grossStabilizerCodeOfBB`)
 - `SeamBZData` + `SeamBZWalk` + `SeamBZ` — **one Brouwer–Zimmermann
   certificate** for the generic `SeamBZCertificate`
   (`Framework/Homological/BBSeamBZ.lean`) that discharges both `MImBound`

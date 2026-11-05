@@ -25,6 +25,11 @@ The other instances (`Z3Z6/`, `Z5Z15F2A6/`, `BaseFloors/`) are parked — see
   Assembly → BaseDistance → DangerousSector → SafeSector → StabilizerCode →
   SeamBZ → LayerInstance → Distance). Paper version (whose safe floor is the
   older CRT-engine argument): `qec-lab:docs/gross-distance-proof.md`.
+- **The gross code from the family constructor** (`bbStabilizerCode 12 6
+  grossA grossB`, with `k = 2·dim(ker A ∩ ker B)` from
+  `Framework/Homological/BBLogicalQubits.lean`): `Gross/HomologicalToCode.lean`
+  reads `dim H₁ = 12` and `dim (ker A ∩ ker B) = 6` off the packaged code and
+  packages `grossStabilizerCodeOfBB : StabilizerCode 144 12`.
 - **The certificate layer** (safe floor + light-boundary census by
   Brouwer–Zimmermann): `Framework/Homological/BBSeamBZ.lean` (generic
   statement), `Gross/SeamBZ.lean` (the gross certificate).
