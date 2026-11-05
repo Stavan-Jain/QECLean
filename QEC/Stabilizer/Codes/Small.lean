@@ -1,3 +1,4 @@
+import QEC.Stabilizer.Codes.Small.FourQubitPacking
 import QEC.Stabilizer.Codes.Small.Shor9
 import QEC.Stabilizer.Codes.Small.Shor9Logicals
 import QEC.Stabilizer.Codes.Small.Steane7
@@ -33,4 +34,8 @@ Every code has the same two-file layout:
 Quantum Hamming, a parametric family, has no full logical basis yet, so its
 logicals file stops short of `stabilizerCodeWithLogicals`. Code-specific
 extras, such as `Steane7TransversalGates.lean`, build on the logicals file.
+
+`FourQubitPacking.lean` is an additional homological example of the four-qubit
+code. It demonstrates weighted packing and complete logical coverage without
+changing the existing generator-presentation code or its chosen logical basis.
 -/

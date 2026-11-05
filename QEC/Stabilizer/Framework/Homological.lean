@@ -4,6 +4,8 @@ import QEC.Stabilizer.Framework.Homological.Generators
 import QEC.Stabilizer.Framework.Homological.StabGroup
 import QEC.Stabilizer.Framework.Homological.LogicalCorrespondence
 import QEC.Stabilizer.Framework.Homological.Distance
+import QEC.Stabilizer.Framework.Homological.WeightedPacking
+import QEC.Stabilizer.Framework.Homological.LogicalCoverage
 import QEC.Stabilizer.Framework.Homological.Presentation
 import QEC.Stabilizer.Framework.Homological.ToCode
 import QEC.Stabilizer.Framework.Homological.SelfDual
