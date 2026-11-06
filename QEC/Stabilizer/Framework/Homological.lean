@@ -28,3 +28,4 @@ import QEC.Stabilizer.Framework.Homological.BZCertificate
 import QEC.Stabilizer.Framework.Homological.BBSeamBZ
 import QEC.Stabilizer.Framework.Homological.BBFlatLift
 import QEC.Stabilizer.Framework.Homological.Certificate
+import QEC.Stabilizer.Framework.Homological.LiftedProduct
