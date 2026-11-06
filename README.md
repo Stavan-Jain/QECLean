@@ -54,6 +54,7 @@ Every distance `d` listed in the parameters below is proved.
 
 | Code | Parameters | Where |
 |---|---|---|
+| Mitten (lifted product) | `[[150, 30, 10]]` | `Codes/Mitten/M150/` |
 | Gross (bivariate bicycle) | `[[144, 12, 12]]` | `Codes/BivariateBicycle/Gross/` |
 | Toric code, `L ≥ 2` | `[[2L², 2, L]]` | `Codes/Toric/` |
 | Rotated surface code, odd `L ≥ 3` | `[[L², 1, L]]` | `Codes/RotatedSurface/` |

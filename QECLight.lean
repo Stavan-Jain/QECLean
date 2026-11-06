@@ -55,3 +55,7 @@ reflected here.
 
 If a new code family turns out to be similarly expensive, exclude it here too.
 -/
+
+/-! The mitten family is excluded from this light import surface because
+its exhaustive certificates require more memory. Its symbolic lifted-product
+framework remains available through `Framework`. -/

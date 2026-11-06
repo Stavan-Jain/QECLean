@@ -1,3 +1,4 @@
+import QEC.Stabilizer.Codes.Mitten
 import QEC.Stabilizer.Codes._TEMPLATE
 import QEC.Stabilizer.Codes.Toric
 import QEC.Stabilizer.Codes.RotatedSurface
