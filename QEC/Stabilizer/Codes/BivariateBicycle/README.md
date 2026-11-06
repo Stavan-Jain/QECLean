@@ -19,6 +19,10 @@ The reusable theory remains under `QEC/Stabilizer/Framework/`:
 
 - `Homological/BBChainComplex`, `BBCover`, `BBDuality`: complexes, free double
   covers, chain maps, weights, and X/Z duality.
+- `Homological/BBStabilizerCode` and `BBLogicalQubits`: the bivariate bicycle
+  code from its data, `bbStabilizerCode ℓ m A B : StabilizerCode (2ℓm)
+  (2·dim(ker A ⊓ ker B))`, and the logical-qubit count
+  `dim H₁ = 2·dim(ker A ⊓ ker B)` behind it.
 - `Homological/BBDoubling` and `FoldDouble/BBCover`: parametric distance
   doubling and its connection to the code-agnostic fold-and-double theorem.
 - `Homological/BBSmallCycle`, `BBSeamBZ`, and `F2Mask*`: certificate soundness
