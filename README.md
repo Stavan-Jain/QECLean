@@ -54,7 +54,7 @@ Every distance `d` listed in the parameters below is proved.
 
 | Code | Parameters | Where |
 |---|---|---|
-| Mitten (lifted product) | `[[150, 30, 10]]` | `Codes/Mitten/M150/` |
+| Mitten (downstream) | `[[150, 30, 10]]` | [mitten-distance-lean](https://github.com/Stavan-Jain/mitten-distance-lean) |
 | Gross (downstream) | `[[144, 12, 12]]` | [bb-distance-lean](https://github.com/Stavan-Jain/bb-distance-lean) |
 | Bravyi360 (downstream) | `[[360, 12, 24]]` | [bb-distance-lean](https://github.com/Stavan-Jain/bb-distance-lean) |
 | Toric code, `L ≥ 2` | `[[2L², 2, L]]` | `Codes/Toric/` |

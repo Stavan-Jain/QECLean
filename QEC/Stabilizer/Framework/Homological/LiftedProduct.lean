@@ -29,7 +29,8 @@ This file provides:
 * `mittenChainComplex A B : HomologicalCode` — the packaged complex
 
 Instantiated for the `[[150,30,10]]` mitten code (`G = C₅×S₃`) under
-`QEC/Stabilizer/Codes/Mitten/` (attempt state:
+`MittenDistance/M150/` in the downstream `mitten-distance-lean` repository
+(attempt state:
 `qec-lab:pipeline/attempts/mitten_150_30_10/`).  When `G` is abelian and
 the blocks are collapsed this recovers the usual hypergraph/lifted
 product; no claims beyond the 1×2 shape are made here.

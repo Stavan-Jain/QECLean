@@ -18,7 +18,3 @@ hosted-editor configurations. Both `QECLight` and `QEC` now leave those
 concrete distance proofs to the downstream package; the general BB foundations
 remain part of `Framework`.
 -/
-
-/-! The mitten family is excluded from this light import surface because
-its exhaustive certificates require more memory. Its symbolic lifted-product
-framework remains available through `Framework`. -/
