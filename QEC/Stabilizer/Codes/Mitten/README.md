@@ -25,8 +25,18 @@ nontrivial logical operator of weight ten.
   `PackedGridSweep.lean` checks rectangular batches of mask pairs through
   the shared `PackedGrid` broadcasting identities. The shared
   `PackedPopcount32` specialization counts each thirty-bit mask in its
-  own thirty-two-bit lane using five pair-summing stages. Generated
-  `MaskChunks`, `SweepMaps`, and classifier modules supply instance data.
+  own thirty-two-bit lane using five pair-summing stages. `MaskEnumeration`
+  combines small mask-enumeration certificates into a symbolic coverage
+  tree. Generated `MaskChunks`, `SweepMaps`, and `ClassifierParts` modules
+  supply instance data. Independent parts and synchronous elaboration
+  limit the amount of proof state retained during certificate checking.
+  `CensusTables` checks ninety-bit packed copies of the four census lists,
+  allowing direct bit lookups for the exceptional pairs.
+  Elaboration assembles their limbs into numerals; separate kernel proofs
+  check those numerals against the original lists. List packing uses
+  shifts with a proved equivalence to `Nat.ofDigits`. The checker also
+  packs input masks for direct lookup, preserving the lists' zero default
+  outside their bounds, and skips these lookups for empty certificates.
   `GroupedJoin.lean` groups matching shared blocks; `JoinX.lean` and
   `JoinZ.lean` connect the resulting pairs to physical stabilizer rows.
 - `FloorXSide.lean` and `FloorZSide.lean` expose the classification inputs as
@@ -34,9 +44,11 @@ nontrivial logical operator of weight ten.
   `floorZ_of_certificates`. `Distance.lean` transfers chain floors to code
   distance and combines them with the explicit witness.
 
-The generated classifier files must pass kernel checking before their
-classification obligations are discharged. Their presence alone does not
-establish the unconditional distance theorem.
+All four classification sweeps are kernel-checked. `Distance.lean` exposes
+the unconditional `m150StabilizerCode_hasCodeDistance_10` and
+`mitten150StabilizerCodeWithDistance : StabilizerCodeWithDistance 150 30 10`.
+`Logicals.lean` supplies the thirty logical-operator pairs for the same
+canonical stabilizer code.
 
 ## Provenance
 
@@ -67,6 +79,36 @@ also reads the exported `FloorData.lean`. Generated Lean files carry a
 banner naming their generator. Change the generator and regenerate those
 files rather than editing the emitted declarations. Keep generator and
 library changes together across the two repositories.
+
+## Building with bounded memory
+
+From qec-lab, run the standard-library-only launcher:
+
+```sh
+python3 experiments/bb_lab/scripts/mitten_kernel/build_bounded.py \
+  --root ../QECLean build
+python3 experiments/bb_lab/scripts/mitten_kernel/build_bounded.py \
+  --root ../QECLean env lean scripts/AxiomCheck.lean
+```
+
+It serializes Lean processes and defaults to one worker and a 4608 MB
+Lean allocation guard. The guard is not a hard limit on resident memory.
+Timing and peak resident-memory measurements are recorded under
+`.lake/mitten-bounded/lean-processes.jsonl` in the library checkout. Avoid
+running another build or an editor-triggered Lean check alongside it.
+
+The 2026-11-06 validation rebuilt all 76 added Lean modules from source:
+479.65 seconds of serial Lean checking, with 4.47 GiB peak resident memory.
+This misses the five-minute target but is below the ten-minute fallback
+for the added modules. The whole affected-repository rebuild reached a
+600-second runner timeout after completing the port; the remaining existing
+imports completed in a 21.93-second continuation. These are separate
+measurements, not a claim that a fresh whole-repository build takes eight
+minutes.
+
+The full library, `QECLight`, `QECBlueprint`, `QECWidgets`, `Playground.lean`,
+and umbrella checks passed. The repository-wide axiom audit checked 17,494
+declarations across 272 modules and found only the three standard axioms.
 
 ## Trust policy
 

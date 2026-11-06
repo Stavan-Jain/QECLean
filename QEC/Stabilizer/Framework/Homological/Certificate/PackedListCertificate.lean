@@ -3,15 +3,27 @@ import QEC.Stabilizer.Framework.Homological.Certificate.BatchLinear
 namespace PackedDigits
 open Quantum.Stabilizer.Homological.F2Mask
 
-/-- Pack an explicit short list without any indexed lookups during
-evaluation. -/
-def packList (width : Nat) (values : List Nat) : Nat := Nat.ofDigits (2^width) values
+/-- Pack an explicit list by shifts without indexed lookups or large-base multiplication. -/
+def packList (width : Nat) : List Nat → Nat
+  | [] => 0
+  | value :: rest => value + (packList width rest <<< width)
+
+/-- Shift-based packing agrees with the base-power digit representation. -/
+theorem packList_eq_ofDigits (width : Nat) (values : List Nat) :
+    packList width values = Nat.ofDigits (2 ^ width) values := by
+  induction values with
+  | nil => rfl
+  | cons value rest ih =>
+    change value + (packList width rest <<< width) =
+      value + 2 ^ width * Nat.ofDigits (2 ^ width) rest
+    rw [ih, Nat.shiftLeft_eq, Nat.mul_comm]
 
 /-- Packing list entries agrees with the functional packed-table
 specification. -/
 theorem packList_eq_packF (width : Nat) (values : List Nat) :
     packList width values = packF width values.length (fun i => values.getD i 0) := by
-  unfold packList packF
+  rw [packList_eq_ofDigits]
+  unfold packF
   congr 1
   apply List.ext_getElem
   · simp
@@ -28,7 +40,8 @@ theorem reconstruction_list_sound (width : Nat) (pairs : List (Nat × Nat))
       (packList width (pairs.map Prod.fst)) rows = packList width (pairs.map Prod.snd)) :
     ∀ p ∈ pairs, reconX rows p.1 = p.2 := by
   have hone : packList width (pairs.map fun _ => 1) = packF width pairs.length (fun _ => 1) := by
-    unfold packList packF
+    rw [packList_eq_ofDigits]
+    unfold packF
     congr 1
     simp
   rw [hone,packList_eq_packF,packList_eq_packF] at hcheck
@@ -53,5 +66,6 @@ theorem reconstruction_list_sound (width : Nat) (pairs : List (Nat × Nat))
   simpa only [List.getElem_map,hp] using he
 
 
+#print axioms packList_eq_ofDigits
 #print axioms reconstruction_list_sound
 end PackedDigits

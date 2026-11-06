@@ -97,21 +97,26 @@ def packedOnes (xs : List Nat) : Nat := packList 32 (xs.map fun _ => 1)
 /-- The concrete unit markers agree with the functional lane specification. -/
 theorem packedOnes_eq (xs : List Nat) :
     packedOnes xs = packF 32 xs.length (fun _ => 1) := by
-  unfold packedOnes packList packF
+  unfold packedOnes
+  rw [packList_eq_ofDigits]
+  unfold packF
   congr 1
   simp
 
 /-- Apply a certified binary map to all masks in a block simultaneously. -/
 def packedImages (xs : List Nat) (columns : List (Nat × Nat)) : Nat :=
-  batchRecon (packedOnes xs) (packList 32 xs) columns
+  forceNat (packedOnes xs) fun rep =>
+  forceNat (packList 32 xs) fun input =>
+    batchRecon rep input columns
 
 /-- The concrete packed images represent the corresponding linear map. -/
 theorem packedImages_eq (xs : List Nat) (columns : List (Nat × Nat)) (f : Nat → Nat)
     (hxs : ∀ x ∈ xs, x < 2 ^ 30)
     (hcols : ∀ p ∈ columns, p.1 < 32 ∧ p.2 < 2 ^ 32)
     (hf : ∀ x < 2 ^ 30, reconX columns x = f x) :
-    packedImages xs columns = packF 32 xs.length (fun i => f (xs.getD i 0)) :=
-  packedImages_spec xs (packList 32 xs) (packedOnes xs) columns f
-    hxs rfl (packedOnes_eq xs) hcols hf
+    packedImages xs columns = packF 32 xs.length (fun i => f (xs.getD i 0)) := by
+  simpa only [packedImages, forceNat_eq] using
+    packedImages_spec xs (packList 32 xs) (packedOnes xs) columns f
+      hxs rfl (packedOnes_eq xs) hcols hf
 
 end Quantum.Stabilizer.Homological.LP.M150

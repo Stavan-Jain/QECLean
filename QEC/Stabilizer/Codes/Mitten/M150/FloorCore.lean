@@ -19,7 +19,9 @@ packed batch certificates provide the interface for larger sweeps.
 -/
 
 import QEC.Stabilizer.Framework.Homological.F2Mask
-import Mathlib.Tactic
+import Mathlib.Tactic.Push
+import Mathlib.Tactic.IntervalCases
+import Mathlib.Algebra.BigOperators.Group.Finset.Piecewise
 import Mathlib.Data.Nat.Bitwise
 
 namespace Quantum

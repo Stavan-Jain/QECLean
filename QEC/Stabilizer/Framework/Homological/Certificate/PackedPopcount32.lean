@@ -12,18 +12,21 @@ namespace PackedDigits
 
 open Quantum.Stabilizer.Homological.F2Mask
 
+universe u
+
 /-- The five masks used by the thirty-two-bit parallel popcount. -/
 def popcountMask32 (k : Fin 5) : Nat :=
   packF (2 ^ (k.val + 1)) (2 ^ (4 - k.val)) (fun _ => 2 ^ (2 ^ k.val) - 1)
 
 /-- Evaluate a natural before reusing it in a kernel computation. -/
-def forceNat (value : Nat) (f : Nat → Nat) : Nat :=
+def forceNat {α : Sort u} (value : Nat) (f : Nat → α) : α :=
   match value with
   | 0 => f 0
   | n + 1 => f (n + 1)
 
-/-- Forcing evaluation preserves the value of an arithmetic expression. -/
-theorem forceNat_eq (value : Nat) (f : Nat → Nat) : forceNat value f = f value := by
+/-- Forcing evaluation before a function application preserves its result. -/
+theorem forceNat_eq {α : Sort u} (value : Nat) (f : Nat → α) :
+    forceNat value f = f value := by
   cases value <;> rfl
 
 /-- One executable pair-summing stage on thirty-two-bit lanes. -/

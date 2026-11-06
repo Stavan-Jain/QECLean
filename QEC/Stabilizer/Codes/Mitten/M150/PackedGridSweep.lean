@@ -14,7 +14,9 @@ def gridRep (xs ys : List Nat) : Nat := gridRowMarkers xs ys * packedOnes ys
 /-- Unit row markers have the functional packing specification. -/
 theorem gridRowMarkers_eq (xs ys : List Nat) :
     gridRowMarkers xs ys = packF (32 * ys.length) xs.length (fun _ => 1) := by
-  unfold gridRowMarkers packList packF
+  unfold gridRowMarkers
+  rw [packList_eq_ofDigits]
+  unfold packF
   congr 1
   simp
 
@@ -25,7 +27,9 @@ theorem gridRep_eq (xs ys : List Nat) :
 
 /-- Reconstruct all outer images with enough spacing for one entire row. -/
 def gridLeftImages (xs ys : List Nat) (columns : List (Nat × Nat)) : Nat :=
-  batchRecon (gridRowMarkers xs ys) (packList (32 * ys.length) xs) columns
+  forceNat (gridRowMarkers xs ys) fun rep =>
+  forceNat (packList (32 * ys.length) xs) fun input =>
+    batchRecon rep input columns
 
 /-- The row-spaced reconstruction agrees with the outer split map. -/
 theorem gridLeftImages_eq (T : SweepTables) (mode : Nat) (xs ys : List Nat)
@@ -39,6 +43,7 @@ theorem gridLeftImages_eq (T : SweepTables) (mode : Nat) (xs ys : List Nat)
   have hpow : 2 ^ 32 ≤ 2 ^ (32 * ys.length) :=
     Nat.pow_le_pow_right (by decide) hw
   unfold gridLeftImages
+  simp only [forceNat_eq]
   rw [gridRowMarkers_eq, packList_eq_packF, batchRecon_packF]
   · apply packF_congr
     intro i hi
@@ -88,24 +93,61 @@ theorem gridWords_eq (T : SweepTables) (mode : Nat) (xs ys : List Nat)
     rw [List.getD_eq_getElem _ _ hi']
     exact lt_of_lt_of_le (hr _ (List.getElem_mem hi')) (by decide : 2 ^ 30 ≤ 2 ^ 32)
 
+/-- Validate exceptional pairs using packed input and census lookups. -/
+def checkGridExceptions (T : SweepTables) (census : PackedCensus)
+    (mode ann : Nat) (xs ys : List Nat) (certs : List (Nat × Nat)) : Bool :=
+  match certs with
+  | [] => true
+  | _ :: _ =>
+      forceNat census.data fun data =>
+      forceNat (packList 32 xs) fun packedXs =>
+      forceNat (packList 32 ys) fun packedYs =>
+      forceNat ys.length fun width =>
+        certs.all (fun p => sweepAcceptAt T { census with data := data } mode
+          (lane 32 (p.1 / width) packedXs) (lane 32 (p.1 % width) packedYs) ann p.2)
+
+/-- Packed input lookups preserve list lookup, including its out-of-range
+zero default. -/
+theorem checkGridExceptions_eq (T : SweepTables) (census : PackedCensus)
+    (mode ann : Nat) (xs ys : List Nat) (certs : List (Nat × Nat))
+    (hxMasks : ∀ v ∈ xs, v < 2 ^ 30) (hyMasks : ∀ v ∈ ys, v < 2 ^ 30) :
+    checkGridExceptions T census mode ann xs ys certs =
+      certs.all (fun p => sweepAcceptAt T census mode
+        (xs.getD (p.1 / ys.length) 0) (ys.getD (p.1 % ys.length) 0) ann p.2) := by
+  have hxLane (i : Nat) : lane 32 i (packList 32 xs) = xs.getD i 0 := by
+    rw [packList_eq_ofDigits]
+    exact lane_ofDigits 32 i xs fun v hv =>
+      lt_of_lt_of_le (hxMasks v hv) (by decide : 2 ^ 30 ≤ 2 ^ 32)
+  have hyLane (i : Nat) : lane 32 i (packList 32 ys) = ys.getD i 0 := by
+    rw [packList_eq_ofDigits]
+    exact lane_ofDigits 32 i ys fun v hv =>
+      lt_of_lt_of_le (hyMasks v hv) (by decide : 2 ^ 30 ≤ 2 ^ 32)
+  cases certs with
+  | nil => rfl
+  | cons p ps => simp only [checkGridExceptions, forceNat_eq, hxLane, hyLane]
+
 /-- Check all weights in a grid and validate only its sparse exceptional pairs. -/
-def checkGrid (T : SweepTables) (mode ann target : Nat) (xs ys : List Nat)
+def checkGrid (T : SweepTables) (census : PackedCensus)
+    (mode ann target : Nat) (xs ys : List Nat)
     (words : Nat) (certs : List (Nat × Nat)) : Bool :=
-  Nat.beq (weightFlags (gridRep xs ys) (words ^^^ gridRep xs ys * ann) target)
+  Nat.beq (forceNat (gridRep xs ys) fun rep =>
+      weightFlags rep (words ^^^ rep * ann) target)
     (indexFlags (certs.map Prod.fst)) &&
-  certs.all (fun p => sweepAcceptAt T mode
-    (xs.getD (p.1 / ys.length) 0) (ys.getD (p.1 % ys.length) 0) ann p.2)
+  checkGridExceptions T census mode ann xs ys certs
 
 /-- A checked grid covers every pair of its outer and inner masks. -/
-theorem checkGrid_sound (T : SweepTables) (mode ann target : Nat) (xs ys : List Nat)
+theorem checkGrid_sound (T : SweepTables) (census : PackedCensus)
+    (mode ann target : Nat) (xs ys : List Nat)
     (words : Nat) (certs : List (Nat × Nat))
+    (hcensus : PackedCensus.Valid T.cls census)
     (hy : 0 < ys.length) (ha : ann < 2 ^ 30) (ht : target < 32)
+    (hxMasks : ∀ v ∈ xs, v < 2 ^ 30) (hyMasks : ∀ v ∈ ys, v < 2 ^ 30)
     (hl : ∀ x ∈ xs, sweepLeft T mode x < 2 ^ 30)
     (hr : ∀ y ∈ ys, sweepRight T mode y < 2 ^ 30)
     (hwords : words = packF 32 (xs.length * ys.length) (fun i =>
       sweepLeft T mode (xs.getD (i / ys.length) 0) ^^^
         sweepRight T mode (ys.getD (i % ys.length) 0)))
-    (hcheck : checkGrid T mode ann target xs ys words certs = true) :
+    (hcheck : checkGrid T census mode ann target xs ys words certs = true) :
     ∀ x ∈ xs, ∀ y ∈ ys, popCntGo 30 (sweepOutput T mode x y ann) = target →
       sweepAccept T mode x y ann = true := by
   intro x hx y hy' hweight
@@ -141,7 +183,8 @@ theorem checkGrid_sound (T : SweepTables) (mode ann target : Nat) (xs ys : List 
     · decide
     · exact fun j hj => lt_of_lt_of_le (hf j hj) (by decide : 2 ^ 30 ≤ 2 ^ 32)
     · exact fun _ _ => lt_of_lt_of_le ha (by decide : 2 ^ 30 ≤ 2 ^ 32)
-  simp only [checkGrid, Bool.and_eq_true, Nat.beq_eq, gridRep_eq] at hcheck
+  simp only [checkGrid, checkGridExceptions_eq T census mode ann xs ys certs hxMasks hyMasks,
+    forceNat_eq, Bool.and_eq_true, Nat.beq_eq, gridRep_eq] at hcheck
   have hm : i ∈ certs.map Prod.fst := weightFlags_sound (xs.length * ys.length)
     target (words ^^^ gridRep xs ys * ann) (fun j => f j ^^^ ann)
     (fun j hj => Nat.xor_lt_two_pow (hf j hj) ha) ht hpacked _
@@ -149,7 +192,11 @@ theorem checkGrid_sound (T : SweepTables) (mode ann target : Nat) (xs ys : List 
       rw [← popCntGo_eq_bitCount]
       simpa only [f, hxget, hyget, sweepOutput] using hweight)
   obtain ⟨p, hp, he⟩ := List.mem_map.mp hm
-  have hv := sweepAcceptAt_sound T mode _ _ ann p.2 (List.all_eq_true.mp hcheck.2 p hp)
+  have hv := sweepAcceptAt_sound T census mode _ _ ann p.2 hcensus
+    (List.all_eq_true.mp hcheck.2 p hp)
   simpa only [he, hxget, hyget] using hv
 
 end Quantum.Stabilizer.Homological.LP.M150
+
+#print axioms Quantum.Stabilizer.Homological.LP.M150.checkGrid_sound
+#print axioms Quantum.Stabilizer.Homological.LP.M150.checkGridExceptions_eq

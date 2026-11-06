@@ -4,6 +4,7 @@ Generator: qec-lab:experiments/bb_lab/scripts/mitten_kernel/generate_sweeps.py
 Data source: QEC/Stabilizer/Codes/Mitten/M150/FloorData.lean
 Regenerate: python3 experiments/bb_lab/scripts/mitten_kernel/generate_sweeps.py
   --root /path/to/QECLean --all --force
+  --splits-per-module 16
 All candidate coverage and packed computations are checked by Lean's kernel.
 -/
 
@@ -12,10 +13,13 @@ import QEC.Stabilizer.Codes.Mitten.M150.PackedClassification
 
 namespace Quantum.Stabilizer.Homological.LP.M150
 open PackedDigits F2Mask
+-- Synchronous certificate elaboration bounds live proof state.
+set_option Elab.async false
 set_option maxRecDepth 100000
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Columns of the split reconstruction map. -/
 def X0M0LeftColumns : List (Nat × Nat) := [
   (0, 470161665),
@@ -51,20 +55,23 @@ def X0M0LeftColumns : List (Nat × Nat) := [
 ]
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X0M0Left_columns_bound. -/
 theorem X0M0Left_columns_bound : ∀ p ∈ X0M0LeftColumns, p.1 < 32 ∧ p.2 < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X0M0Left_eq. -/
 theorem X0M0Left_eq : ∀ x < 2 ^ 30, reconX X0M0LeftColumns x = sweepLeft m4TX0 0 x := by
   apply sweepLeft_eq_recon
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X0M0Left_bound. -/
 theorem X0M0Left_bound : ∀ x < 2 ^ 30, sweepLeft m4TX0 0 x < 2 ^ 30 := by
   intro x hx
@@ -72,7 +79,8 @@ theorem X0M0Left_bound : ∀ x < 2 ^ 30, sweepLeft m4TX0 0 x < 2 ^ 30 := by
   exact reconX_lt _ _ _ (fun p hp => (X0M0Left_columns_bound p hp).2)
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Columns of the split reconstruction map. -/
 def X0M0RightColumns : List (Nat × Nat) := [
   (0, 19424040),
@@ -108,20 +116,23 @@ def X0M0RightColumns : List (Nat × Nat) := [
 ]
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X0M0Right_columns_bound. -/
 theorem X0M0Right_columns_bound : ∀ p ∈ X0M0RightColumns, p.1 < 32 ∧ p.2 < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X0M0Right_eq. -/
 theorem X0M0Right_eq : ∀ x < 2 ^ 30, reconX X0M0RightColumns x = sweepRight m4TX0 0 x := by
   apply sweepRight_eq_recon
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X0M0Right_bound. -/
 theorem X0M0Right_bound : ∀ x < 2 ^ 30, sweepRight m4TX0 0 x < 2 ^ 30 := by
   intro x hx
@@ -129,13 +140,15 @@ theorem X0M0Right_bound : ∀ x < 2 ^ 30, sweepRight m4TX0 0 x < 2 ^ 30 := by
   exact reconX_lt _ _ _ (fun p hp => (X0M0Right_columns_bound p hp).2)
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X0M0_ann_bound. -/
 theorem X0M0_ann_bound : ∀ a ∈ sweepAnn m4TX0 0, a < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Columns of the split reconstruction map. -/
 def X0M1LeftColumns : List (Nat × Nat) := [
   (0, 945677631),
@@ -171,20 +184,23 @@ def X0M1LeftColumns : List (Nat × Nat) := [
 ]
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X0M1Left_columns_bound. -/
 theorem X0M1Left_columns_bound : ∀ p ∈ X0M1LeftColumns, p.1 < 32 ∧ p.2 < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X0M1Left_eq. -/
 theorem X0M1Left_eq : ∀ x < 2 ^ 30, reconX X0M1LeftColumns x = sweepLeft m4TX0 1 x := by
   apply sweepLeft_eq_recon
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X0M1Left_bound. -/
 theorem X0M1Left_bound : ∀ x < 2 ^ 30, sweepLeft m4TX0 1 x < 2 ^ 30 := by
   intro x hx
@@ -192,7 +208,8 @@ theorem X0M1Left_bound : ∀ x < 2 ^ 30, sweepLeft m4TX0 1 x < 2 ^ 30 := by
   exact reconX_lt _ _ _ (fun p hp => (X0M1Left_columns_bound p hp).2)
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Columns of the split reconstruction map. -/
 def X0M1RightColumns : List (Nat × Nat) := [
   (0, 117093564),
@@ -228,20 +245,23 @@ def X0M1RightColumns : List (Nat × Nat) := [
 ]
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X0M1Right_columns_bound. -/
 theorem X0M1Right_columns_bound : ∀ p ∈ X0M1RightColumns, p.1 < 32 ∧ p.2 < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X0M1Right_eq. -/
 theorem X0M1Right_eq : ∀ x < 2 ^ 30, reconX X0M1RightColumns x = sweepRight m4TX0 1 x := by
   apply sweepRight_eq_recon
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X0M1Right_bound. -/
 theorem X0M1Right_bound : ∀ x < 2 ^ 30, sweepRight m4TX0 1 x < 2 ^ 30 := by
   intro x hx
@@ -249,13 +269,15 @@ theorem X0M1Right_bound : ∀ x < 2 ^ 30, sweepRight m4TX0 1 x < 2 ^ 30 := by
   exact reconX_lt _ _ _ (fun p hp => (X0M1Right_columns_bound p hp).2)
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X0M1_ann_bound. -/
 theorem X0M1_ann_bound : ∀ a ∈ sweepAnn m4TX0 1, a < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Columns of the split reconstruction map. -/
 def X0M2LeftColumns : List (Nat × Nat) := [
   (0, 181022646),
@@ -291,20 +313,23 @@ def X0M2LeftColumns : List (Nat × Nat) := [
 ]
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X0M2Left_columns_bound. -/
 theorem X0M2Left_columns_bound : ∀ p ∈ X0M2LeftColumns, p.1 < 32 ∧ p.2 < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X0M2Left_eq. -/
 theorem X0M2Left_eq : ∀ x < 2 ^ 30, reconX X0M2LeftColumns x = sweepLeft m4TX0 2 x := by
   apply sweepLeft_eq_recon
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X0M2Left_bound. -/
 theorem X0M2Left_bound : ∀ x < 2 ^ 30, sweepLeft m4TX0 2 x < 2 ^ 30 := by
   intro x hx
@@ -312,7 +337,8 @@ theorem X0M2Left_bound : ∀ x < 2 ^ 30, sweepLeft m4TX0 2 x < 2 ^ 30 := by
   exact reconX_lt _ _ _ (fun p hp => (X0M2Left_columns_bound p hp).2)
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Columns of the split reconstruction map. -/
 def X0M2RightColumns : List (Nat × Nat) := [
   (0, 420356382),
@@ -348,20 +374,23 @@ def X0M2RightColumns : List (Nat × Nat) := [
 ]
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X0M2Right_columns_bound. -/
 theorem X0M2Right_columns_bound : ∀ p ∈ X0M2RightColumns, p.1 < 32 ∧ p.2 < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X0M2Right_eq. -/
 theorem X0M2Right_eq : ∀ x < 2 ^ 30, reconX X0M2RightColumns x = sweepRight m4TX0 2 x := by
   apply sweepRight_eq_recon
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X0M2Right_bound. -/
 theorem X0M2Right_bound : ∀ x < 2 ^ 30, sweepRight m4TX0 2 x < 2 ^ 30 := by
   intro x hx
@@ -369,13 +398,15 @@ theorem X0M2Right_bound : ∀ x < 2 ^ 30, sweepRight m4TX0 2 x < 2 ^ 30 := by
   exact reconX_lt _ _ _ (fun p hp => (X0M2Right_columns_bound p hp).2)
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X0M2_ann_bound. -/
 theorem X0M2_ann_bound : ∀ a ∈ sweepAnn m4TX0 2, a < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Columns of the split reconstruction map. -/
 def X1M0LeftColumns : List (Nat × Nat) := [
   (0, 470161665),
@@ -411,20 +442,23 @@ def X1M0LeftColumns : List (Nat × Nat) := [
 ]
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X1M0Left_columns_bound. -/
 theorem X1M0Left_columns_bound : ∀ p ∈ X1M0LeftColumns, p.1 < 32 ∧ p.2 < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X1M0Left_eq. -/
 theorem X1M0Left_eq : ∀ x < 2 ^ 30, reconX X1M0LeftColumns x = sweepLeft m4TX1 0 x := by
   apply sweepLeft_eq_recon
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X1M0Left_bound. -/
 theorem X1M0Left_bound : ∀ x < 2 ^ 30, sweepLeft m4TX1 0 x < 2 ^ 30 := by
   intro x hx
@@ -432,7 +466,8 @@ theorem X1M0Left_bound : ∀ x < 2 ^ 30, sweepLeft m4TX1 0 x < 2 ^ 30 := by
   exact reconX_lt _ _ _ (fun p hp => (X1M0Left_columns_bound p hp).2)
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Columns of the split reconstruction map. -/
 def X1M0RightColumns : List (Nat × Nat) := [
   (0, 545263681),
@@ -468,20 +503,23 @@ def X1M0RightColumns : List (Nat × Nat) := [
 ]
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X1M0Right_columns_bound. -/
 theorem X1M0Right_columns_bound : ∀ p ∈ X1M0RightColumns, p.1 < 32 ∧ p.2 < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X1M0Right_eq. -/
 theorem X1M0Right_eq : ∀ x < 2 ^ 30, reconX X1M0RightColumns x = sweepRight m4TX1 0 x := by
   apply sweepRight_eq_recon
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X1M0Right_bound. -/
 theorem X1M0Right_bound : ∀ x < 2 ^ 30, sweepRight m4TX1 0 x < 2 ^ 30 := by
   intro x hx
@@ -489,13 +527,15 @@ theorem X1M0Right_bound : ∀ x < 2 ^ 30, sweepRight m4TX1 0 x < 2 ^ 30 := by
   exact reconX_lt _ _ _ (fun p hp => (X1M0Right_columns_bound p hp).2)
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X1M0_ann_bound. -/
 theorem X1M0_ann_bound : ∀ a ∈ sweepAnn m4TX1 0, a < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Columns of the split reconstruction map. -/
 def X1M1LeftColumns : List (Nat × Nat) := [
   (0, 170264855),
@@ -531,20 +571,23 @@ def X1M1LeftColumns : List (Nat × Nat) := [
 ]
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X1M1Left_columns_bound. -/
 theorem X1M1Left_columns_bound : ∀ p ∈ X1M1LeftColumns, p.1 < 32 ∧ p.2 < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X1M1Left_eq. -/
 theorem X1M1Left_eq : ∀ x < 2 ^ 30, reconX X1M1LeftColumns x = sweepLeft m4TX1 1 x := by
   apply sweepLeft_eq_recon
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X1M1Left_bound. -/
 theorem X1M1Left_bound : ∀ x < 2 ^ 30, sweepLeft m4TX1 1 x < 2 ^ 30 := by
   intro x hx
@@ -552,7 +595,8 @@ theorem X1M1Left_bound : ∀ x < 2 ^ 30, sweepLeft m4TX1 1 x < 2 ^ 30 := by
   exact reconX_lt _ _ _ (fun p hp => (X1M1Left_columns_bound p hp).2)
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Columns of the split reconstruction map. -/
 def X1M1RightColumns : List (Nat × Nat) := [
   (0, 679608384),
@@ -588,20 +632,23 @@ def X1M1RightColumns : List (Nat × Nat) := [
 ]
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X1M1Right_columns_bound. -/
 theorem X1M1Right_columns_bound : ∀ p ∈ X1M1RightColumns, p.1 < 32 ∧ p.2 < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X1M1Right_eq. -/
 theorem X1M1Right_eq : ∀ x < 2 ^ 30, reconX X1M1RightColumns x = sweepRight m4TX1 1 x := by
   apply sweepRight_eq_recon
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X1M1Right_bound. -/
 theorem X1M1Right_bound : ∀ x < 2 ^ 30, sweepRight m4TX1 1 x < 2 ^ 30 := by
   intro x hx
@@ -609,13 +656,15 @@ theorem X1M1Right_bound : ∀ x < 2 ^ 30, sweepRight m4TX1 1 x < 2 ^ 30 := by
   exact reconX_lt _ _ _ (fun p hp => (X1M1Right_columns_bound p hp).2)
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X1M1_ann_bound. -/
 theorem X1M1_ann_bound : ∀ a ∈ sweepAnn m4TX1 1, a < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Columns of the split reconstruction map. -/
 def X1M2LeftColumns : List (Nat × Nat) := [
   (0, 181022646),
@@ -651,20 +700,23 @@ def X1M2LeftColumns : List (Nat × Nat) := [
 ]
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X1M2Left_columns_bound. -/
 theorem X1M2Left_columns_bound : ∀ p ∈ X1M2LeftColumns, p.1 < 32 ∧ p.2 < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X1M2Left_eq. -/
 theorem X1M2Left_eq : ∀ x < 2 ^ 30, reconX X1M2LeftColumns x = sweepLeft m4TX1 2 x := by
   apply sweepLeft_eq_recon
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X1M2Left_bound. -/
 theorem X1M2Left_bound : ∀ x < 2 ^ 30, sweepLeft m4TX1 2 x < 2 ^ 30 := by
   intro x hx
@@ -672,7 +724,8 @@ theorem X1M2Left_bound : ∀ x < 2 ^ 30, sweepLeft m4TX1 2 x < 2 ^ 30 := by
   exact reconX_lt _ _ _ (fun p hp => (X1M2Left_columns_bound p hp).2)
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Columns of the split reconstruction map. -/
 def X1M2RightColumns : List (Nat × Nat) := [
   (0, 137599160),
@@ -708,20 +761,23 @@ def X1M2RightColumns : List (Nat × Nat) := [
 ]
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X1M2Right_columns_bound. -/
 theorem X1M2Right_columns_bound : ∀ p ∈ X1M2RightColumns, p.1 < 32 ∧ p.2 < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X1M2Right_eq. -/
 theorem X1M2Right_eq : ∀ x < 2 ^ 30, reconX X1M2RightColumns x = sweepRight m4TX1 2 x := by
   apply sweepRight_eq_recon
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X1M2Right_bound. -/
 theorem X1M2Right_bound : ∀ x < 2 ^ 30, sweepRight m4TX1 2 x < 2 ^ 30 := by
   intro x hx
@@ -729,13 +785,15 @@ theorem X1M2Right_bound : ∀ x < 2 ^ 30, sweepRight m4TX1 2 x < 2 ^ 30 := by
   exact reconX_lt _ _ _ (fun p hp => (X1M2Right_columns_bound p hp).2)
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for X1M2_ann_bound. -/
 theorem X1M2_ann_bound : ∀ a ∈ sweepAnn m4TX1 2, a < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Columns of the split reconstruction map. -/
 def Z0M0LeftColumns : List (Nat × Nat) := [
   (0, 358646690),
@@ -771,20 +829,23 @@ def Z0M0LeftColumns : List (Nat × Nat) := [
 ]
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z0M0Left_columns_bound. -/
 theorem Z0M0Left_columns_bound : ∀ p ∈ Z0M0LeftColumns, p.1 < 32 ∧ p.2 < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z0M0Left_eq. -/
 theorem Z0M0Left_eq : ∀ x < 2 ^ 30, reconX Z0M0LeftColumns x = sweepLeft m4TZ0 0 x := by
   apply sweepLeft_eq_recon
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z0M0Left_bound. -/
 theorem Z0M0Left_bound : ∀ x < 2 ^ 30, sweepLeft m4TZ0 0 x < 2 ^ 30 := by
   intro x hx
@@ -792,7 +853,8 @@ theorem Z0M0Left_bound : ∀ x < 2 ^ 30, sweepLeft m4TZ0 0 x < 2 ^ 30 := by
   exact reconX_lt _ _ _ (fun p hp => (Z0M0Left_columns_bound p hp).2)
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Columns of the split reconstruction map. -/
 def Z0M0RightColumns : List (Nat × Nat) := [
   (0, 612641837),
@@ -828,20 +890,23 @@ def Z0M0RightColumns : List (Nat × Nat) := [
 ]
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z0M0Right_columns_bound. -/
 theorem Z0M0Right_columns_bound : ∀ p ∈ Z0M0RightColumns, p.1 < 32 ∧ p.2 < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z0M0Right_eq. -/
 theorem Z0M0Right_eq : ∀ x < 2 ^ 30, reconX Z0M0RightColumns x = sweepRight m4TZ0 0 x := by
   apply sweepRight_eq_recon
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z0M0Right_bound. -/
 theorem Z0M0Right_bound : ∀ x < 2 ^ 30, sweepRight m4TZ0 0 x < 2 ^ 30 := by
   intro x hx
@@ -849,13 +914,15 @@ theorem Z0M0Right_bound : ∀ x < 2 ^ 30, sweepRight m4TZ0 0 x < 2 ^ 30 := by
   exact reconX_lt _ _ _ (fun p hp => (Z0M0Right_columns_bound p hp).2)
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z0M0_ann_bound. -/
 theorem Z0M0_ann_bound : ∀ a ∈ sweepAnn m4TZ0 0, a < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Columns of the split reconstruction map. -/
 def Z0M2LeftColumns : List (Nat × Nat) := [
   (0, 844999538),
@@ -891,20 +958,23 @@ def Z0M2LeftColumns : List (Nat × Nat) := [
 ]
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z0M2Left_columns_bound. -/
 theorem Z0M2Left_columns_bound : ∀ p ∈ Z0M2LeftColumns, p.1 < 32 ∧ p.2 < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z0M2Left_eq. -/
 theorem Z0M2Left_eq : ∀ x < 2 ^ 30, reconX Z0M2LeftColumns x = sweepLeft m4TZ0 2 x := by
   apply sweepLeft_eq_recon
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z0M2Left_bound. -/
 theorem Z0M2Left_bound : ∀ x < 2 ^ 30, sweepLeft m4TZ0 2 x < 2 ^ 30 := by
   intro x hx
@@ -912,7 +982,8 @@ theorem Z0M2Left_bound : ∀ x < 2 ^ 30, sweepLeft m4TZ0 2 x < 2 ^ 30 := by
   exact reconX_lt _ _ _ (fun p hp => (Z0M2Left_columns_bound p hp).2)
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Columns of the split reconstruction map. -/
 def Z0M2RightColumns : List (Nat × Nat) := [
   (0, 129991599),
@@ -948,20 +1019,23 @@ def Z0M2RightColumns : List (Nat × Nat) := [
 ]
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z0M2Right_columns_bound. -/
 theorem Z0M2Right_columns_bound : ∀ p ∈ Z0M2RightColumns, p.1 < 32 ∧ p.2 < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z0M2Right_eq. -/
 theorem Z0M2Right_eq : ∀ x < 2 ^ 30, reconX Z0M2RightColumns x = sweepRight m4TZ0 2 x := by
   apply sweepRight_eq_recon
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z0M2Right_bound. -/
 theorem Z0M2Right_bound : ∀ x < 2 ^ 30, sweepRight m4TZ0 2 x < 2 ^ 30 := by
   intro x hx
@@ -969,13 +1043,15 @@ theorem Z0M2Right_bound : ∀ x < 2 ^ 30, sweepRight m4TZ0 2 x < 2 ^ 30 := by
   exact reconX_lt _ _ _ (fun p hp => (Z0M2Right_columns_bound p hp).2)
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z0M2_ann_bound. -/
 theorem Z0M2_ann_bound : ∀ a ∈ sweepAnn m4TZ0 2, a < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Columns of the split reconstruction map. -/
 def Z0M3LeftColumns : List (Nat × Nat) := [
   (0, 97189296),
@@ -1011,20 +1087,23 @@ def Z0M3LeftColumns : List (Nat × Nat) := [
 ]
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z0M3Left_columns_bound. -/
 theorem Z0M3Left_columns_bound : ∀ p ∈ Z0M3LeftColumns, p.1 < 32 ∧ p.2 < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z0M3Left_eq. -/
 theorem Z0M3Left_eq : ∀ x < 2 ^ 30, reconX Z0M3LeftColumns x = sweepLeft m4TZ0 3 x := by
   apply sweepLeft_eq_recon
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z0M3Left_bound. -/
 theorem Z0M3Left_bound : ∀ x < 2 ^ 30, sweepLeft m4TZ0 3 x < 2 ^ 30 := by
   intro x hx
@@ -1032,7 +1111,8 @@ theorem Z0M3Left_bound : ∀ x < 2 ^ 30, sweepLeft m4TZ0 3 x < 2 ^ 30 := by
   exact reconX_lt _ _ _ (fun p hp => (Z0M3Left_columns_bound p hp).2)
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Columns of the split reconstruction map. -/
 def Z0M3RightColumns : List (Nat × Nat) := [
   (0, 111861875),
@@ -1068,20 +1148,23 @@ def Z0M3RightColumns : List (Nat × Nat) := [
 ]
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z0M3Right_columns_bound. -/
 theorem Z0M3Right_columns_bound : ∀ p ∈ Z0M3RightColumns, p.1 < 32 ∧ p.2 < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z0M3Right_eq. -/
 theorem Z0M3Right_eq : ∀ x < 2 ^ 30, reconX Z0M3RightColumns x = sweepRight m4TZ0 3 x := by
   apply sweepRight_eq_recon
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z0M3Right_bound. -/
 theorem Z0M3Right_bound : ∀ x < 2 ^ 30, sweepRight m4TZ0 3 x < 2 ^ 30 := by
   intro x hx
@@ -1089,13 +1172,15 @@ theorem Z0M3Right_bound : ∀ x < 2 ^ 30, sweepRight m4TZ0 3 x < 2 ^ 30 := by
   exact reconX_lt _ _ _ (fun p hp => (Z0M3Right_columns_bound p hp).2)
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z0M3_ann_bound. -/
 theorem Z0M3_ann_bound : ∀ a ∈ sweepAnn m4TZ0 3, a < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Columns of the split reconstruction map. -/
 def Z1M0LeftColumns : List (Nat × Nat) := [
   (0, 358646690),
@@ -1131,20 +1216,23 @@ def Z1M0LeftColumns : List (Nat × Nat) := [
 ]
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z1M0Left_columns_bound. -/
 theorem Z1M0Left_columns_bound : ∀ p ∈ Z1M0LeftColumns, p.1 < 32 ∧ p.2 < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z1M0Left_eq. -/
 theorem Z1M0Left_eq : ∀ x < 2 ^ 30, reconX Z1M0LeftColumns x = sweepLeft m4TZ1 0 x := by
   apply sweepLeft_eq_recon
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z1M0Left_bound. -/
 theorem Z1M0Left_bound : ∀ x < 2 ^ 30, sweepLeft m4TZ1 0 x < 2 ^ 30 := by
   intro x hx
@@ -1152,7 +1240,8 @@ theorem Z1M0Left_bound : ∀ x < 2 ^ 30, sweepLeft m4TZ1 0 x < 2 ^ 30 := by
   exact reconX_lt _ _ _ (fun p hp => (Z1M0Left_columns_bound p hp).2)
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Columns of the split reconstruction map. -/
 def Z1M0RightColumns : List (Nat × Nat) := [
   (0, 679612416),
@@ -1188,20 +1277,23 @@ def Z1M0RightColumns : List (Nat × Nat) := [
 ]
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z1M0Right_columns_bound. -/
 theorem Z1M0Right_columns_bound : ∀ p ∈ Z1M0RightColumns, p.1 < 32 ∧ p.2 < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z1M0Right_eq. -/
 theorem Z1M0Right_eq : ∀ x < 2 ^ 30, reconX Z1M0RightColumns x = sweepRight m4TZ1 0 x := by
   apply sweepRight_eq_recon
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z1M0Right_bound. -/
 theorem Z1M0Right_bound : ∀ x < 2 ^ 30, sweepRight m4TZ1 0 x < 2 ^ 30 := by
   intro x hx
@@ -1209,13 +1301,15 @@ theorem Z1M0Right_bound : ∀ x < 2 ^ 30, sweepRight m4TZ1 0 x < 2 ^ 30 := by
   exact reconX_lt _ _ _ (fun p hp => (Z1M0Right_columns_bound p hp).2)
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z1M0_ann_bound. -/
 theorem Z1M0_ann_bound : ∀ a ∈ sweepAnn m4TZ1 0, a < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Columns of the split reconstruction map. -/
 def Z1M2LeftColumns : List (Nat × Nat) := [
   (0, 844999538),
@@ -1251,20 +1345,23 @@ def Z1M2LeftColumns : List (Nat × Nat) := [
 ]
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z1M2Left_columns_bound. -/
 theorem Z1M2Left_columns_bound : ∀ p ∈ Z1M2LeftColumns, p.1 < 32 ∧ p.2 < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z1M2Left_eq. -/
 theorem Z1M2Left_eq : ∀ x < 2 ^ 30, reconX Z1M2LeftColumns x = sweepLeft m4TZ1 2 x := by
   apply sweepLeft_eq_recon
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z1M2Left_bound. -/
 theorem Z1M2Left_bound : ∀ x < 2 ^ 30, sweepLeft m4TZ1 2 x < 2 ^ 30 := by
   intro x hx
@@ -1272,7 +1369,8 @@ theorem Z1M2Left_bound : ∀ x < 2 ^ 30, sweepLeft m4TZ1 2 x < 2 ^ 30 := by
   exact reconX_lt _ _ _ (fun p hp => (Z1M2Left_columns_bound p hp).2)
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Columns of the split reconstruction map. -/
 def Z1M2RightColumns : List (Nat × Nat) := [
   (0, 1044195154),
@@ -1308,20 +1406,23 @@ def Z1M2RightColumns : List (Nat × Nat) := [
 ]
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z1M2Right_columns_bound. -/
 theorem Z1M2Right_columns_bound : ∀ p ∈ Z1M2RightColumns, p.1 < 32 ∧ p.2 < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z1M2Right_eq. -/
 theorem Z1M2Right_eq : ∀ x < 2 ^ 30, reconX Z1M2RightColumns x = sweepRight m4TZ1 2 x := by
   apply sweepRight_eq_recon
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z1M2Right_bound. -/
 theorem Z1M2Right_bound : ∀ x < 2 ^ 30, sweepRight m4TZ1 2 x < 2 ^ 30 := by
   intro x hx
@@ -1329,13 +1430,15 @@ theorem Z1M2Right_bound : ∀ x < 2 ^ 30, sweepRight m4TZ1 2 x < 2 ^ 30 := by
   exact reconX_lt _ _ _ (fun p hp => (Z1M2Right_columns_bound p hp).2)
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z1M2_ann_bound. -/
 theorem Z1M2_ann_bound : ∀ a ∈ sweepAnn m4TZ1 2, a < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Columns of the split reconstruction map. -/
 def Z1M3LeftColumns : List (Nat × Nat) := [
   (0, 55592202),
@@ -1371,20 +1474,23 @@ def Z1M3LeftColumns : List (Nat × Nat) := [
 ]
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z1M3Left_columns_bound. -/
 theorem Z1M3Left_columns_bound : ∀ p ∈ Z1M3LeftColumns, p.1 < 32 ∧ p.2 < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z1M3Left_eq. -/
 theorem Z1M3Left_eq : ∀ x < 2 ^ 30, reconX Z1M3LeftColumns x = sweepLeft m4TZ1 3 x := by
   apply sweepLeft_eq_recon
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z1M3Left_bound. -/
 theorem Z1M3Left_bound : ∀ x < 2 ^ 30, sweepLeft m4TZ1 3 x < 2 ^ 30 := by
   intro x hx
@@ -1392,7 +1498,8 @@ theorem Z1M3Left_bound : ∀ x < 2 ^ 30, sweepLeft m4TZ1 3 x < 2 ^ 30 := by
   exact reconX_lt _ _ _ (fun p hp => (Z1M3Left_columns_bound p hp).2)
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Columns of the split reconstruction map. -/
 def Z1M3RightColumns : List (Nat × Nat) := [
   (0, 134352961),
@@ -1428,20 +1535,23 @@ def Z1M3RightColumns : List (Nat × Nat) := [
 ]
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z1M3Right_columns_bound. -/
 theorem Z1M3Right_columns_bound : ∀ p ∈ Z1M3RightColumns, p.1 < 32 ∧ p.2 < 2 ^ 30 := by
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z1M3Right_eq. -/
 theorem Z1M3Right_eq : ∀ x < 2 ^ 30, reconX Z1M3RightColumns x = sweepRight m4TZ1 3 x := by
   apply sweepRight_eq_recon
   decide +kernel
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z1M3Right_bound. -/
 theorem Z1M3Right_bound : ∀ x < 2 ^ 30, sweepRight m4TZ1 3 x < 2 ^ 30 := by
   intro x hx
@@ -1449,7 +1559,8 @@ theorem Z1M3Right_bound : ∀ x < 2 ^ 30, sweepRight m4TZ1 3 x < 2 ^ 30 := by
   exact reconX_lt _ _ _ (fun p hp => (Z1M3Right_columns_bound p hp).2)
 
 set_option maxHeartbeats 0 in
--- Elaborating this generated certificate can exceed the default heartbeat budget.
+-- Elaborating this generated certificate can exceed the default
+-- heartbeat budget.
 /-- Kernel-checked certificate for Z1M3_ann_bound. -/
 theorem Z1M3_ann_bound : ∀ a ∈ sweepAnn m4TZ1 3, a < 2 ^ 30 := by
   decide +kernel
