@@ -8,7 +8,19 @@ import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
 import QEC.Stabilizer.Framework.Core.Stabilizer.CodespaceDimension
 
 /-!
-# Core: stabilizer-formalism primitives
+# Core: stabilizer groups and codes
 
-General stabilizer-group, codespace, centralizer, and code-packaging theory.
+- `StabilizerGroup`: stabilizer groups, stabilized vectors and states, and
+  codespace membership.
+- `Codespace`: the codespace as a submodule, the stabilizer sum, and the
+  existence of a codespace state.
+- `Centralizer`: the centralizer of a stabilizer group, which is also its
+  normalizer in the Pauli group.
+- `CentralizerLemmas`: centralizer membership from commutation with generators.
+- `SubgroupLemmas`: group-theoretic lemmas about `Subgroup.closure`.
+- `GeneratorListLemmas`: generator lists indexed by a square grid.
+- `StabilizerCode`: `StabilizerCode n k`, `StabilizerCodeWithLogicals n k`, and
+  stabilizer groups built from generator lists.
+- `CodespaceDimension`: the codespace of an `[[n, k]]` code has dimension
+  `2 ^ k`.
 -/
