@@ -1,9 +1,15 @@
-/-
+import QEC.Stabilizer.Framework.Homological.F2Mask
+import Mathlib.Algebra.BigOperators.Group.List.Basic
+import Mathlib.Algebra.CharP.Two
+import Mathlib.Data.ZMod.Basic
+
+/-!
 # Brouwer–Zimmermann certificates for `𝔽₂` codes
 
 A *weight floor* — every word of a binary linear code of weight `≤ W` has some
 property — is certified here by the Brouwer–Zimmermann argument, made
-kernel-checkable on packed `Nat` masks (`F2Mask.lean`).
+kernel-checkable on the packed `Nat` masks of
+`QEC.Stabilizer.Framework.Homological.F2Mask`.
 
 * **Windows.** A window is a list of `(pivot bit, row)` pairs whose rows are a
   systematic generator matrix: every codeword `M` is the XOR of the rows whose
@@ -16,21 +22,17 @@ kernel-checkable on packed `Nat` masks (`F2Mask.lean`).
   pivot sets, a word of weight `< t₁ + t₂ + 2` has at most `t₁` pivots in the
   first window or at most `t₂` in the second, so one of the two walks visited
   it.
-* **Generators.** `bz_ok_of_xorSpan` applies this to every word in the XOR-span
-  of a generator list, given that each window reconstructs each generator.
+* **Generators.** `XorSpan gens` is the code spanned by a list of masks, and
+  `bz_ok_of_xorSpan` applies the argument to every word of it, given that each
+  window reconstructs each generator.
 
-The kernel cost is the size of the walks, so `xor_walk_decide` splits a walk
-into one `decide +kernel` per first-chosen row: each becomes its own auxiliary
-lemma with its own kernel cache.
+The kernel cost is the size of the walks, so the tactic `xor_walk_decide`
+splits a walk into one `decide +kernel` per first-chosen row: each becomes its
+own auxiliary lemma with its own kernel cache.
 
-`peelOK_sound` / `kernel_eq_sum_of_peel` are the companion certificate for a
+`peelOK_sound` and `kernel_eq_sum_of_peel` are the companion certificate for a
 kernel basis: Gaussian elimination written out as its elimination order.
 -/
-
-import QEC.Stabilizer.Framework.Homological.F2Mask
-import Mathlib.Algebra.BigOperators.Group.List.Basic
-import Mathlib.Algebra.CharP.Two
-import Mathlib.Data.ZMod.Basic
 
 namespace Quantum
 namespace Stabilizer
@@ -49,6 +51,8 @@ def xorWalk (ok : ℕ → Bool) : List ℕ → ℕ → ℕ → Bool
   | r :: rs, t + 1, acc =>
       (ok (Nat.xor acc r) && xorWalk ok rs t (Nat.xor acc r)) && xorWalk ok rs (t + 1) acc
 
+/-- A passing walk establishes `ok (acc ^^^ xorList S)` for every non-empty
+sub-list `S` of the rows with at most `t` entries. -/
 theorem xorWalk_sound {ok : ℕ → Bool} {rows : List ℕ} :
     ∀ {t acc : ℕ}, xorWalk ok rows t acc = true →
       ∀ {S : List ℕ}, S.Sublist rows → S ≠ [] → S.length ≤ t →
@@ -109,29 +113,30 @@ macro_rules
 def reconX (w : List (ℕ × ℕ)) (M : ℕ) : ℕ :=
   xorList ((w.filter fun pr => M.testBit pr.1).map Prod.snd)
 
-private lemma xor_left_comm (x y z : ℕ) : x ^^^ (y ^^^ z) = y ^^^ (x ^^^ z) := by
-  rw [← Nat.xor_assoc, Nat.xor_comm x y, Nat.xor_assoc]
+/-- Reconstruction through a window, one `(pivot, row)` pair at a time. -/
+lemma reconX_cons (pr : ℕ × ℕ) (w : List (ℕ × ℕ)) (M : ℕ) :
+    reconX (pr :: w) M = (if M.testBit pr.1 then pr.2 else 0) ^^^ reconX w M := by
+  simp only [reconX, List.filter_cons]
+  split <;> simp
 
-private lemma xor_xor_cancel (r x y : ℕ) : (r ^^^ x) ^^^ (r ^^^ y) = x ^^^ y := by
-  rw [Nat.xor_assoc, xor_left_comm x, ← Nat.xor_assoc r r, Nat.xor_self, Nat.zero_xor]
-
+/-- The zero word selects no row of a window. -/
 lemma reconX_zero (w : List (ℕ × ℕ)) : reconX w 0 = 0 := by
   simp [reconX]
 
+/-- Reconstruction through a window is additive. -/
 lemma reconX_xor (w : List (ℕ × ℕ)) (a b : ℕ) :
     reconX w (a ^^^ b) = reconX w a ^^^ reconX w b := by
   induction w with
   | nil => simp [reconX]
   | cons pr w ih =>
-    simp only [reconX] at ih ⊢
-    rw [List.filter_cons, List.filter_cons, List.filter_cons, Nat.testBit_xor]
-    cases ha : a.testBit pr.1 <;> cases hb : b.testBit pr.1 <;>
-      simp only [Bool.xor_false, Bool.xor_true, Bool.not_true,
-        Bool.not_false, Bool.false_eq_true, if_false, if_true, List.map_cons,
-        xorList_cons, ih]
-    · rw [xor_left_comm]
+    rw [reconX_cons, reconX_cons, reconX_cons, ih, Nat.testBit_xor]
+    cases a.testBit pr.1 <;> cases b.testBit pr.1 <;>
+      simp only [Bool.xor_false, Bool.xor_true, Bool.not_true, Bool.not_false,
+        Bool.false_eq_true, if_false, if_true, Nat.zero_xor]
+    · rw [Nat.xor_left_comm]
     · rw [Nat.xor_assoc]
-    · rw [xor_xor_cancel]
+    · rw [Nat.xor_assoc, Nat.xor_left_comm _ pr.2, ← Nat.xor_assoc pr.2, Nat.xor_self,
+        Nat.zero_xor]
 
 /-! ## The two-window argument -/
 
@@ -143,6 +148,8 @@ lemma filter_testBit_length_le {n M : ℕ} {P : List ℕ} (hnd : P.Nodup)
   simp only [List.mem_toFinset, List.mem_filter] at hp
   simp [hlt p hp.1, hp.2]
 
+/-- The number of window rows selected by `M` is the number of window pivots
+set in `M`. -/
 lemma window_length (w : List (ℕ × ℕ)) (M : ℕ) :
     (w.filter fun pr => M.testBit pr.1).length
       = ((w.map Prod.fst).filter fun p => M.testBit p).length := by
@@ -154,10 +161,8 @@ lemma ok_reconX_of_walk {ok : ℕ → Bool} (h0 : ok 0 = true) {w : List (ℕ ×
     (hw : xorWalk ok (w.map Prod.snd) t 0 = true) {M : ℕ}
     (hlen : (w.filter fun pr => M.testBit pr.1).length ≤ t) : ok (reconX w M) = true := by
   by_cases hS : (w.filter fun pr => M.testBit pr.1).map Prod.snd = []
-  · rw [reconX, hS, xorList_nil]
-    exact h0
-  · have := xorWalk_sound hw (List.filter_sublist.map _) hS (by simpa using hlen)
-    rwa [Nat.zero_xor] at this
+  · rwa [reconX, hS, xorList_nil]
+  · simpa using xorWalk_sound hw (List.filter_sublist.map _) hS (by simpa using hlen)
 
 /-- **The two-window argument.** If the pivots of the two windows are distinct
 and below `n`, every word of weight `< t₁ + t₂ + 2` is reconstructed through a
@@ -183,19 +188,43 @@ inductive XorSpan (gens : List ℕ) : ℕ → Prop
   | zero : XorSpan gens 0
   | step {g x : ℕ} : g ∈ gens → XorSpan gens x → XorSpan gens (g ^^^ x)
 
+/-- Every generator is in the span. -/
 lemma XorSpan.of_mem {gens : List ℕ} {g : ℕ} (hg : g ∈ gens) : XorSpan gens g := by
   simpa using XorSpan.step hg .zero
 
+/-- The span is closed under XOR. -/
 lemma XorSpan.xor {gens : List ℕ} {a b : ℕ} (ha : XorSpan gens a) (hb : XorSpan gens b) :
     XorSpan gens (a ^^^ b) := by
   induction ha with
   | zero => simpa using hb
   | step hg _ ih => rw [Nat.xor_assoc]; exact .step hg ih
 
-lemma xor_mod_two_pow (a b n : ℕ) : (a ^^^ b) % 2 ^ n = a % 2 ^ n ^^^ b % 2 ^ n := by
-  refine Nat.eq_of_testBit_eq fun i => ?_
-  simp only [Nat.testBit_mod_two_pow, Nat.testBit_xor]
-  cases decide (i < n) <;> simp
+/-- A span of masks below `2 ^ n` contains only masks below `2 ^ n`. -/
+lemma XorSpan.lt {gens : List ℕ} {M n : ℕ} (h : XorSpan gens M)
+    (hgens : ∀ g ∈ gens, g < 2 ^ n) : M < 2 ^ n := by
+  induction h with
+  | zero => exact Nat.two_pow_pos n
+  | step hg _ ih => exact Nat.xor_lt_two_pow (hgens _ hg) ih
+
+/-- The XOR of a list of generators belongs to their span. -/
+lemma xorList_mem_span (gens xs : List ℕ) (h : ∀ x ∈ xs, x ∈ gens) :
+    XorSpan gens (xorList xs) := by
+  induction xs with
+  | nil => exact .zero
+  | cons x xs ih =>
+    exact .step (h x List.mem_cons_self) (ih fun y hy => h y (List.mem_cons_of_mem x hy))
+
+/-- A reconstruction through a window belongs to the span of the window's
+rows. -/
+lemma reconX_mem_span (w : List (ℕ × ℕ)) (M : ℕ) :
+    XorSpan (w.map Prod.snd) (reconX w M) :=
+  xorList_mem_span _ _ fun _ hx => (List.filter_sublist.map _).subset hx
+
+/-- A reconstruction through a window with rows below `2 ^ n` is below
+`2 ^ n`. -/
+lemma reconX_lt (w : List (ℕ × ℕ)) (M n : ℕ) (h : ∀ p ∈ w, p.2 < 2 ^ n) :
+    reconX w M < 2 ^ n :=
+  (reconX_mem_span w M).lt (List.forall_mem_map.mpr h)
 
 /-- A window that reconstructs every generator (from its low `n` bits)
 reconstructs every word of the span. -/
@@ -204,7 +233,7 @@ lemma reconX_of_xorSpan {w : List (ℕ × ℕ)} {n : ℕ} {gens : List ℕ}
     reconX w (X % 2 ^ n) = X := by
   induction hX with
   | zero => simp [reconX_zero]
-  | step hg _ ih => rw [xor_mod_two_pow, reconX_xor, hgen _ hg, ih]
+  | step hg _ ih => rw [Nat.xor_mod_two_pow, reconX_xor, hgen _ hg, ih]
 
 /-- **Brouwer–Zimmermann for a code given by generators.** Every word `X` of the
 XOR-span of `gens` whose low `n` bits have weight `< t₁ + t₂ + 2` satisfies
@@ -238,6 +267,8 @@ def peelOK (rowCells : Q → List H) : List H → List (H × Q) → Bool
       ((rowCells q).count h == 1 && (rowCells q).all fun x => x == h || known.contains x)
         && peelOK rowCells (h :: known) rest
 
+/-- A sum over a list of cells on which `ζ` vanishes away from `h` counts the
+occurrences of `h`. -/
 private lemma sum_map_eq_count {l : List H} {h : H} {ζ : H → ZMod 2}
     (hz : ∀ x ∈ l, x ≠ h → ζ x = 0) : (l.map ζ).sum = (l.count h : ZMod 2) * ζ h := by
   induction l with
@@ -269,21 +300,14 @@ theorem peelOK_sound (rowCells : Q → List H) (ζ : H → ZMod 2)
       List.contains_iff_mem] at hok
     obtain ⟨⟨hcount, hall⟩, hrest⟩ := hok
     have hh : ζ h = 0 := by
-      have hsum := hrow q
-      rw [sum_map_eq_count fun x hx hne => hknown x ((hall x hx).resolve_left hne),
-        hcount, Nat.cast_one, one_mul] at hsum
-      exact hsum
-    have hknown' : ∀ x ∈ h :: known, ζ x = 0 := by
-      intro x hx
-      rcases List.mem_cons.mp hx with rfl | hx
-      · exact hh
-      · exact hknown x hx
-    intro x hx
-    rcases List.mem_cons.mp hx with rfl | hx
-    · exact hh
-    · exact ih (h :: known) hrest hknown' x hx
+      simpa [sum_map_eq_count fun x hx hne => hknown x ((hall x hx).resolve_left hne), hcount]
+        using hrow q
+    rw [List.map_cons]
+    exact List.forall_mem_cons.mpr
+      ⟨hh, ih (h :: known) hrest (List.forall_mem_cons.mpr ⟨hh, hknown⟩)⟩
 
 omit [DecidableEq H] in
+/-- A list sum of functions is evaluated pointwise. -/
 private lemma list_sum_apply {α : Type*} (L : List (α → ZMod 2)) (x : α) :
     L.sum x = (L.map fun c => c x).sum := by
   induction L with
@@ -291,22 +315,23 @@ private lemma list_sum_apply {α : Type*} (L : List (α → ZMod 2)) (x : α) :
   | cons c L ih => simp [ih]
 
 omit [DecidableEq H] in
-private lemma sum_map_add_fn (l : List H) (x y : H → ZMod 2) :
-    (l.map (x + y)).sum = (l.map x).sum + (l.map y).sum :=
-  List.sum_map_add
-
-omit [DecidableEq H] in
+/-- The sum of a list sum of chains over a list of cells is the sum of the
+individual sums. -/
 private lemma rowSum_listSum (l : List H) (L : List (H → ZMod 2)) :
     (l.map L.sum).sum = (L.map fun c => (l.map c).sum).sum := by
   induction L with
   | nil =>
-    simp only [List.sum_nil, List.map_nil]
-    exact List.sum_eq_zero fun y hy => by
-      obtain ⟨x, _, rfl⟩ := List.mem_map.mp hy
-      rfl
-  | cons c L ih => rw [List.sum_cons, List.map_cons, List.sum_cons, ← ih, sum_map_add_fn]
+    refine List.sum_eq_zero fun y hy => ?_
+    obtain ⟨x, _, rfl⟩ := List.mem_map.mp hy
+    rfl
+  | cons c L ih =>
+    rw [List.sum_cons, List.map_cons, List.sum_cons, ← ih]
+    exact List.sum_map_add
 
 omit [DecidableEq H] in
+/-- For a basis that is `1` at its own free cells and `0` at the others, the
+combination with coefficients `ζ b.2` takes the value `ζ b'.2` at the free
+cell of `b'`. -/
 private lemma basis_eval {basis : List ((H → ZMod 2) × H)} (ζ : H → ZMod 2)
     (hdiag : ∀ b ∈ basis, b.1 b.2 = 1)
     (hpair : basis.Pairwise fun b b' => b.1 b'.2 = 0 ∧ b'.1 b.2 = 0) :
@@ -320,8 +345,7 @@ private lemma basis_eval {basis : List ((H → ZMod 2) × H)} (ζ : H → ZMod 2
     by_cases hrest : b' ∈ rest
     · rw [ih (fun b hb => hdiag b (List.mem_cons_of_mem c hb)) hpair.2 b' hrest,
         Pi.smul_apply, (hpair.1 b' hrest).1, smul_zero, zero_add]
-    · have hbc : b' = c := (List.mem_cons.mp hb').resolve_right hrest
-      subst hbc
+    · obtain rfl : b' = c := (List.mem_cons.mp hb').resolve_right hrest
       have hzero : (rest.map fun b => ζ b.2 • b.1).sum b'.2 = 0 := by
         rw [list_sum_apply, List.map_map]
         refine List.sum_eq_zero fun y hy => ?_
@@ -354,15 +378,14 @@ theorem kernel_eq_sum_of_peel {T : (H → ZMod 2) → Q → ZMod 2} (rowCells : 
       rw [List.sum_map_mul_left, hb0, mul_zero]
     have hz := congrFun hζ q
     rw [hT, Pi.zero_apply] at hz
-    rw [sum_map_add_fn, hz, hsq, add_zero]
+    exact List.sum_map_add.trans (by rw [hz, hsq, add_zero])
   have hknown : ∀ x ∈ basis.map Prod.snd, (ζ + s) x = 0 := by
     intro x hx
     obtain ⟨b, hb, rfl⟩ := List.mem_map.mp hx
     rw [Pi.add_apply, hs, basis_eval ζ hdiag hpair b hb, CharTwo.add_self_eq_zero]
-  have key : ∀ a c : ZMod 2, a + c = 0 → a = c := by decide
   funext x
   rw [← hs]
-  refine key _ _ ?_
+  refine CharTwo.add_eq_zero.mp ?_
   rcases hcover x with hx | hx
   · exact hknown x hx
   · exact peelOK_sound rowCells (ζ + s) hrow steps _ hpeel hknown x hx
