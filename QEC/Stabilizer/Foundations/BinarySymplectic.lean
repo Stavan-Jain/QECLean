@@ -5,23 +5,19 @@ import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrixDecidable
 import QEC.Stabilizer.Foundations.BinarySymplectic.RankCertificate
 
 /-!
-# Binary symplectic representation and check matrix (Foundations)
+# Binary symplectic representation and check matrices
 
-Pure binary-symplectic algebra. Re-exports:
+- `Core`: `PauliOperator.toSymplecticSingle` and
+  `NQubitPauliOperator.toSymplectic`.
+- `SymplecticInner`: the symplectic inner product and its relation to
+  commutation (`commutes_iff_symplectic_inner_zero`).
+- `CheckMatrix`: `NQubitPauliGroupElement.checkMatrix` and
+  `rowsLinearIndependent`.
+- `CheckMatrixDecidable`: the exhaustive `Decidable` instance for
+  `rowsLinearIndependent`.
+- `RankCertificate`: polynomial-time independence certificates
+  (`rowsLinearIndependent_of_rankCertCheck`).
 
-- **Core**: `PauliOperator.toSymplecticSingle`,
-  `NQubitPauliOperator.toSymplectic`
-- **SymplecticInner**: `symplecticInner`, `commutes_iff_symplectic_inner_zero`,
-  `toSymplectic_add`
-- **CheckMatrix**: `NQubitPauliGroupElement.checkMatrix`,
-  `rowsLinearIndependent`
-- **CheckMatrixDecidable**: `Decidable (rowsLinearIndependent L)` and
-  `rowsLinearIndependent_iff_forall`
-- **RankCertificate**: polynomial-time independence certificates —
-  `rowsLinearIndependent_of_mul_eq_one`, `rankCertCheck`,
-  `rowsLinearIndependent_of_rankCertCheck`
-
-For the stabilizer-aware bridge content (`IndependentEquiv`,
-`SymplecticOrthogonal`, `SymplecticSpan`, `WeightTwoInSpan`, `SupportLemmas`),
-see `QEC.Stabilizer.Framework.Symplectic`.
+The results relating these to stabilizer groups are in
+`QEC.Stabilizer.Framework.Symplectic`.
 -/

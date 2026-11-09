@@ -571,8 +571,7 @@ theorem generators_commute (L : ℕ) [Fact (2 ≤ L)] :
   rcases hg with hgZ | hgX <;> rcases hh with hhZ | hhX
   · exact ZGenerators_commute L g hgZ h hhZ
   · exact ZGenerators_commute_XGenerators L g hgZ h hhX
-  · rw [NQubitPauliGroupElement.commutes_symm]
-    exact ZGenerators_commute_XGenerators L h hhZ g hgX
+  · exact (ZGenerators_commute_XGenerators L h hhZ g hgX).symm
   · exact XGenerators_commute L g hgX h hhX
 
 /-!

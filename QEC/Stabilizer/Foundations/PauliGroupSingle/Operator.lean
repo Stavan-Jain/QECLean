@@ -5,43 +5,48 @@ import Mathlib.Tactic
 import QEC.Foundations.Foundations
 import QEC.Stabilizer.Foundations.PauliGroupSingle.Core
 
+/-!
+# Pauli operators: gates, matrices and multiplication
+
+- `PauliOperator.toGate` / `PauliOperator.toMatrix`: the gate and matrix of a
+  Pauli operator.
+- `PauliOperator.mulOp`: the product of two Pauli operators, as a
+  `PauliGroupElement` (an operator together with the phase the product picks
+  up).
+- `PauliOperator.swapXZ`: the map exchanging `X` and `Z`.
+-/
+
 namespace Quantum
 open Matrix
 open scoped BigOperators
 
 namespace PauliOperator
 
-/-!
-# Pauli Operators: Gates, Matrices, and Multiplication
--/
-
-/-- Convert a Pauli operator to a quantum gate.
-
-Maps I → I, X → X, Y → Y, Z → Z (the gates defined in Foundations.Gates). This
-is the primary representation for operators.
--/
+/-- The quantum gate of a Pauli operator. -/
 noncomputable def toGate : PauliOperator → OneQubitGate
   | .I => Quantum.I
   | .X => Quantum.X
   | .Y => Quantum.Y
   | .Z => Quantum.Z
 
-/-- Convert a Pauli operator to its corresponding matrix representation.
-
-This is derived from `toGate` by taking the underlying matrix.
--/
+/-- The matrix of a Pauli operator; `toGate_val` identifies it with the matrix
+underlying `toGate`. -/
 noncomputable def toMatrix : PauliOperator → Matrix QubitBasis QubitBasis ℂ
   | .I => 1
   | .X => Xmat
   | .Y => Ymat
   | .Z => Zmat
 
-/-- Connection between `toGate` and `toMatrix` for operators. -/
+/-- The matrix underlying `toGate` is `toMatrix`. -/
 @[simp] lemma toGate_val (P : PauliOperator) : (P.toGate).val = P.toMatrix := by
-  cases P <;> simp [toGate, toMatrix, Quantum.coe_I, Quantum.coe_X
-  , Quantum.coe_Y, Quantum.coe_Z, Imat]
+  cases P <;> simp [toGate, toMatrix, Quantum.coe_I, Quantum.coe_X, Quantum.coe_Y,
+    Quantum.coe_Z, Imat]
 
-/-- The identity operator's matrix is the identity matrix. -/
+/-- The matrix of a Pauli operator is unitary. -/
+lemma toMatrix_mem_unitaryGroup (P : PauliOperator) :
+    P.toMatrix ∈ Matrix.unitaryGroup QubitBasis ℂ :=
+  P.toGate_val ▸ P.toGate.2
+
 @[simp] lemma toMatrix_I : PauliOperator.I.toMatrix = (1 : Matrix QubitBasis QubitBasis ℂ) := rfl
 @[simp] lemma toMatrix_X : PauliOperator.X.toMatrix = Xmat := rfl
 @[simp] lemma toMatrix_Y : PauliOperator.Y.toMatrix = Ymat := rfl
@@ -52,7 +57,8 @@ noncomputable def toMatrix : PauliOperator → Matrix QubitBasis QubitBasis ℂ
 @[simp] lemma toGate_Y : PauliOperator.Y.toGate = (Quantum.Y : OneQubitGate) := rfl
 @[simp] lemma toGate_Z : PauliOperator.Z.toGate = (Quantum.Z : OneQubitGate) := rfl
 
-/-- Multiplication of Pauli operators, returning a Pauli group element. -/
+/-- The product of two Pauli operators, as an operator together with the phase
+the product picks up. -/
 noncomputable def mulOp : PauliOperator → PauliOperator → PauliGroupElement
   | .I, q => ⟨0, q⟩
   | p, .I => ⟨0, p⟩
@@ -83,13 +89,48 @@ noncomputable def mulOp : PauliOperator → PauliOperator → PauliGroupElement
 @[simp] lemma mulOp_Z_Y : PauliOperator.Z.mulOp PauliOperator.Y = ⟨3, PauliOperator.X⟩ := rfl
 @[simp] lemma mulOp_Z_Z : PauliOperator.Z.mulOp PauliOperator.Z = ⟨0, PauliOperator.I⟩ := rfl
 
-/-- The *operator* part of `mulOp` is commutative (the phase power may differ).
--/
+/-- Multiplying by the identity on the right changes nothing. -/
+lemma mulOp_I (P : PauliOperator) : P.mulOp .I = ⟨0, P⟩ := by cases P <;> rfl
+
+/-- Multiplying by the identity on the left changes nothing. -/
+lemma I_mulOp (P : PauliOperator) : PauliOperator.I.mulOp P = ⟨0, P⟩ := by cases P <;> rfl
+
+/-- Every Pauli operator squares to the identity. -/
+lemma mulOp_self (P : PauliOperator) : P.mulOp P = ⟨0, .I⟩ := by cases P <;> rfl
+
+/-- The operator part of `mulOp` is commutative; only the phase depends on the
+order. -/
 lemma mulOp_operator_comm (P Q : PauliOperator) :
     (P.mulOp Q).operator = (Q.mulOp P).operator := by
+  cases P <;> cases Q <;> rfl
+
+/-- The operator part of `mulOp` is associative. -/
+lemma mulOp_operator_assoc (P Q R : PauliOperator) :
+    ((P.mulOp Q).operator.mulOp R).operator = (P.mulOp (Q.mulOp R).operator).operator := by
+  cases P <;> cases Q <;> cases R <;> rfl
+
+/-- The phase part of associativity of `mulOp`: both bracketings of a triple
+product pick up the same total phase. -/
+lemma mulOp_phasePower_assoc (P Q R : PauliOperator) :
+    (P.mulOp Q).phasePower + ((P.mulOp Q).operator.mulOp R).phasePower =
+      (Q.mulOp R).phasePower + (P.mulOp (Q.mulOp R).operator).phasePower := by
+  cases P <;> cases Q <;> cases R <;> rfl
+
+/-- Two Pauli operators commute exactly when they are equal or one of them is
+the identity. -/
+lemma mulOp_comm_iff (P Q : PauliOperator) :
+    P.mulOp Q = Q.mulOp P ↔ (P = Q ∨ P = PauliOperator.I ∨ Q = PauliOperator.I) := by
   cases P <;> cases Q <;> simp
 
-/-- Swap X and Z, leave I and Y unchanged. Used for conjugation by Hadamard. -/
+/-- Two Pauli operators either commute (equal phases in either order) or
+anticommute (the phases differ by `2`, a factor of `-1`). -/
+lemma mulOp_phasePower_eq_or_eq_add_two (P Q : PauliOperator) :
+    (P.mulOp Q).phasePower = (Q.mulOp P).phasePower ∨
+      (P.mulOp Q).phasePower = (Q.mulOp P).phasePower + 2 := by
+  cases P <;> cases Q <;> decide
+
+/-- Exchange `X` and `Z`, fixing `I` and `Y`: the action of conjugation by the
+Hadamard gate, up to sign. -/
 def swapXZ : PauliOperator → PauliOperator
   | .X => .Z
   | .Z => .X

@@ -5,7 +5,7 @@ import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
 /-!
 # Tactics for Pauli commutation goals
 
-Two tactics to shorten repetitive commutation proofs in stabilizer code files:
+Three tactics to shorten repetitive commutation proofs in stabilizer code files:
 
 - **`pauli_comm_componentwise [lemmas]`**: for goals `p * q = q * p` when `p`
   and `q` commute qubit-wise (e.g. both Z-type or both X-type). Applies

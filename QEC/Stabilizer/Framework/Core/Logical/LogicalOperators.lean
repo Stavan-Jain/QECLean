@@ -135,7 +135,7 @@ theorem isPauliLogicalOperator_iff_mem_centralizer (g : NQubitPauliGroupElement 
     have h_comm : g.toGate.val * h.toMatrix = h.toMatrix * g.toGate.val := by
       have h_comm : g.toMatrix * h.toMatrix = h.toMatrix * g.toMatrix := by
         have h_comm : g * h = h * g := by
-          exact (NQubitPauliGroupElement.commutes_symm h g).mp (hg h hh)
+          exact (hg h hh).symm
         rw [ ← Quantum.NQubitPauliGroupElement.toMatrix_mul,
         ← Quantum.NQubitPauliGroupElement.toMatrix_mul, h_comm ];
       convert h_comm;

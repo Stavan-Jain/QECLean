@@ -54,9 +54,8 @@ order, and `P[…]` elaborates to exactly the operator half of that form, the ba
 notation is a macro (pure syntax expansion into that form), so kernel-reduction
 behavior and every existing `simp`/`decide`/`rfl` proof over such literals are
 unchanged. In particular there is deliberately no `ofList`-style helper on the
-elaboration path: a list lookup is an O(n) walk under kernel reduction (see the
-axiom-policy notes in `CLAUDE.md`), whereas the `.set` chain is the form all
-existing proofs already consume.
+elaboration path: a list lookup is an O(n) walk under kernel reduction, whereas
+the `.set` chain is the form all existing proofs already consume.
 
 ## Delaborator
 

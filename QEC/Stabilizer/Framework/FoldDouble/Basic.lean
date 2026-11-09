@@ -50,10 +50,6 @@ quotient of the `n`-qubit Pauli group by its centre `{±1, ±i}`. -/
 
 namespace PauliOperator
 
-lemma mulOp_operator_assoc (a b c : PauliOperator) :
-    ((a.mulOp b).operator.mulOp c).operator = (a.mulOp (b.mulOp c).operator).operator := by
-  cases a <;> cases b <;> cases c <;> rfl
-
 lemma mulOp_operator_I_left (a : PauliOperator) :
     (PauliOperator.I.mulOp a).operator = a := by
   cases a <;> rfl
