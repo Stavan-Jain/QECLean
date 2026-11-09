@@ -330,7 +330,7 @@ lemma concat_closure_no_neg_identity :
       List.mem_finRange, true_and, D.inner_split.mem_iff, or_and_right, exists_or]
     rw [or_or_or_comm]
   rw [hset]
-  apply CSSCommutationLemmas.negIdentity_not_mem_closure_union
+  apply CSS.negIdentity_not_mem_closure_union
   · rintro z (⟨b, w, hw, rfl⟩ | ⟨y, hy, rfl⟩)
     · exact embedBlock_isZ b (D.innerZ_isZ w hw)
     · exact promoteE_isZ D.innerLogZ_isZ (D.outerZ_isZ y hy).2

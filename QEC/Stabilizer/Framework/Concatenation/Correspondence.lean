@@ -263,7 +263,7 @@ lemma restrict_commutes_both_iff_stab (g : NQubitPauliGroupElement (n₁ * n₂)
 /-- **(M5.)** Block `b` is in the support of the induced outer operator exactly
 when the block restriction `restrictBlock b g` is a *nontrivial* inner logical.
 This is what turns the per-block weight bound (`weight_ge_of_blocks_ge`) into a
-count of nontrivial blocks. Uses M4 (`centralizer_classify_of_k1` and the
+count of nontrivial blocks. Uses M4 (`centralizer_classify` and the
 decisive kernel via `restrict_commutes_both_iff_stab`). -/
 theorem inducedOuter_support_eq (g : NQubitPauliGroupElement (n₁ * n₂))
     (hg : g ∈ centralizer D.concatStabGroup) (b : Fin n₂) :
@@ -273,7 +273,7 @@ theorem inducedOuter_support_eq (g : NQubitPauliGroupElement (n₁ * n₂))
     D.inducedOuterOp_eq_I_iff g b, D.restrict_commutes_both_iff_stab g hg b]
   constructor
   · intro hns
-    rcases centralizer_classify_of_k1 D.Cin.toStabilizerCode (restrictBlock b g)
+    rcases centralizer_classify D.Cin.toStabilizerGroup (restrictBlock b g)
       (D.restrictBlock_mem_centralizer g hg b) with hstab | hnt
     · exact absurd hstab hns
     · exact hnt
@@ -517,10 +517,9 @@ lemma inducedOuter_symp_in_span (g : NQubitPauliGroupElement (n₁ * n₂))
       (hu_comm b).1 (hu_comm b).2
     rw [D.Cin_toSubgroup] at hs_mem
     rw [← hs_op]
-    exact mem_closure_implies_symp_in_span D.Pin.generatorsList D.Pin.generators_phaseZero s hs_mem
+    exact mem_closure_implies_symp_in_span D.Pin.generatorsList s hs_mem
   have hu_span : toSymplectic u.operators ∈ sympSpan D.concatGeneratorsList :=
-    mem_closure_implies_symp_in_span D.concatGeneratorsList
-      D.concatGeneratorsList_phaseZero u hu_mem
+    mem_closure_implies_symp_in_span D.concatGeneratorsList u hu_mem
   have hsum : toSymplectic g.operators
       = toSymplectic (g * u).operators + toSymplectic u.operators := by
     funext j

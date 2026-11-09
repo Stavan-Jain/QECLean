@@ -249,7 +249,7 @@ theorem exists_stabilizerGroup_operatorImage_eq (J : Subgroup (NQubitPauliOperat
   rw [mem_operatorImage]
   constructor
   · rintro ⟨g, hg, rfl⟩
-    have h1 := mem_closure_implies_symp_in_span L hL_phase g hg
+    have h1 := mem_closure_implies_symp_in_span L g hg
     rw [hspanL] at h1
     obtain ⟨u, hu, huv⟩ := exists_mem_of_toSymplectic_mem_span J h1
     rwa [toSymplectic_injective huv] at hu

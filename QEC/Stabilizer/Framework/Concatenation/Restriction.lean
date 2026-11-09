@@ -18,7 +18,7 @@ Pauli group `NQubitPauliGroupElement n₁`). It establishes:
   `anticommutesAt_count_eq`);
 * `restrictBlock_mem_centralizer` — if `g` centralizes the concatenated
   stabilizer then every block restriction centralizes the inner stabilizer. This
-  is what lets M4's `centralizer_classify_of_k1` apply per block.
+  is what lets M4's `centralizer_classify` apply per block.
 
 The companion file `Correspondence.lean` builds the induced outer logical on top
 of these.
@@ -225,7 +225,7 @@ lemma toSymplectic_embedBlock_mem_concatSpan (b : Fin n₂) (s : NQubitPauliGrou
 
 /-- **(M5.)** If `g` centralizes the concatenated stabilizer, every block
 restriction centralizes the inner stabilizer. The hinge that lets M4's
-`centralizer_classify_of_k1` apply block by block. -/
+`centralizer_classify` apply block by block. -/
 lemma restrictBlock_mem_centralizer (g : NQubitPauliGroupElement (n₁ * n₂))
     (hg : g ∈ centralizer D.concatStabGroup) (b : Fin n₂) :
     restrictBlock b g ∈ centralizer D.Cin.toStabilizerGroup := by

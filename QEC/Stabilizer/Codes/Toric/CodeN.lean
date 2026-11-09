@@ -221,14 +221,14 @@ private lemma ZType_commutes {n : ℕ} {g h : NQubitPauliGroupElement n}
     (hg : NQubitPauliGroupElement.IsZTypeElement g)
     (hh : NQubitPauliGroupElement.IsZTypeElement h) :
     g * h = h * g := by
-  exact CSSCommutationLemmas.ZType_commutes hg hh
+  exact NQubitPauliGroupElement.IsZTypeElement.commute hg hh
 
 /-- Any two X-type elements commute. -/
 private lemma XType_commutes {n : ℕ} {g h : NQubitPauliGroupElement n}
     (hg : NQubitPauliGroupElement.IsXTypeElement g)
     (hh : NQubitPauliGroupElement.IsXTypeElement h) :
     g * h = h * g := by
-  exact CSSCommutationLemmas.XType_commutes hg hh
+  exact NQubitPauliGroupElement.IsXTypeElement.commute hg hh
 
 /-- Every face stabilizer is X-type. -/
 lemma faceStab_is_XType (L : ℕ) [Fact (0 < L)] (x y : Fin L) :
@@ -587,7 +587,7 @@ noncomputable def subgroup (L : ℕ) [Fact (0 < L)] : Subgroup
 theorem negIdentity_not_mem (L : ℕ) [Fact (2 ≤ L)] :
     StabilizerGroup.negIdentity (numQubits L) ∉ subgroup L := by
   simpa [subgroup, generators] using
-    CSSCommutationLemmas.negIdentity_not_mem_closure_union (ZGenerators L) (XGenerators L)
+    CSS.negIdentity_not_mem_closure_union (ZGenerators L) (XGenerators L)
       (ZGenerators_are_ZType L) (XGenerators_are_XType L) (ZGenerators_commute_XGenerators L)
 
 /-- The parametric toric stabilizer group (canonical from generator list). -/

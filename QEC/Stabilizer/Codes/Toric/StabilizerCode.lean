@@ -651,14 +651,14 @@ private lemma toricXZ_commute_of_disjoint_supports (L : ℕ) [Fact (0 < L)]
 private lemma horizontalHRow_verticalVRow_Z_commute (L : ℕ) [Fact (0 < L)] :
     horizontalHRowZOperator L * verticalVRowZOperator L =
       verticalVRowZOperator L * horizontalHRowZOperator L :=
-  StabilizerGroup.CSSCommutationLemmas.ZType_commutes
+  NQubitPauliGroupElement.IsZTypeElement.commute
     (horizontalHRowZOperator_isZType L) (verticalVRowZOperator_isZType L)
 
 /-- X-X commute (both elements are X-type). -/
 private lemma horizontalLoop_verticalLoop_X_commute (L : ℕ) [Fact (0 < L)] :
     horizontalLoopXOperator L * verticalLoopXOperator L =
       verticalLoopXOperator L * horizontalLoopXOperator L :=
-  StabilizerGroup.CSSCommutationLemmas.XType_commutes
+  NQubitPauliGroupElement.IsXTypeElement.commute
     (horizontalLoopXOperator_isXType L) (verticalLoopXOperator_isXType L)
 
 /-- Cross-commutation: horizontalLoopX vs verticalVRowZ via disjoint supports.

@@ -2,45 +2,38 @@ import Mathlib.Tactic
 import QEC.Stabilizer.Framework.Core.CSS.CSSNoNegI
 import QEC.Stabilizer.Foundations.PauliGroup.Commutation
 
-namespace Quantum
-namespace StabilizerGroup
-namespace CSSCommutationLemmas
+/-!
+# Commutation of typed elements
 
-open NQubitPauliGroupElement
+Two Pauli group elements of the same type commute, because single-qubit Paulis
+drawn from `{I, Z}` (or from `{I, X}`) do:
+
+- `NQubitPauliGroupElement.IsZTypeElement.commute`: Z-type elements commute;
+- `NQubitPauliGroupElement.IsXTypeElement.commute`: X-type elements commute.
+
+So the Z-type generators of a CSS code commute among themselves, as do the
+X-type generators, and only the commutation of a Z-type generator with an
+X-type generator depends on the code.
+-/
+
+namespace Quantum
+namespace NQubitPauliGroupElement
+
+variable {n : ℕ}
 
 /-- Any two Z-type elements commute. -/
-lemma ZType_commutes {n : ℕ} {g h : NQubitPauliGroupElement n}
-    (hg : NQubitPauliGroupElement.IsZTypeElement g)
-    (hh : NQubitPauliGroupElement.IsZTypeElement h) :
-    g * h = h * g := by
-  apply NQubitPauliGroupElement.commutes_of_componentwise_commutes g h
-  intro i
-  have h_op : ∀ i, g.operators i = .I ∨ g.operators i = .Z := fun j => hg.2 j
-  have h_op' : ∀ i, h.operators i = .I ∨ h.operators i = .Z := fun j => hh.2 j
-  cases h_op i <;> cases h_op' i <;> simp +decide [*]
+lemma IsZTypeElement.commute {g h : NQubitPauliGroupElement n}
+    (hg : IsZTypeElement g) (hh : IsZTypeElement h) :
+    g * h = h * g :=
+  commutes_of_componentwise_commutes g h fun i => by
+    rcases hg.2 i with h₁ | h₁ <;> rcases hh.2 i with h₂ | h₂ <;> rw [h₁, h₂] <;> rfl
 
 /-- Any two X-type elements commute. -/
-lemma XType_commutes {n : ℕ} {g h : NQubitPauliGroupElement n}
-    (hg : NQubitPauliGroupElement.IsXTypeElement g)
-    (hh : NQubitPauliGroupElement.IsXTypeElement h) :
-    g * h = h * g := by
-  apply NQubitPauliGroupElement.commutes_of_componentwise_commutes g h
-  intro i
-  have h_op : ∀ i, g.operators i = .I ∨ g.operators i = .X := fun j => hg.2 j
-  have h_op' : ∀ i, h.operators i = .I ∨ h.operators i = .X := fun j => hh.2 j
-  cases h_op i <;> cases h_op' i <;> simp +decide [*]
+lemma IsXTypeElement.commute {g h : NQubitPauliGroupElement n}
+    (hg : IsXTypeElement g) (hh : IsXTypeElement h) :
+    g * h = h * g :=
+  commutes_of_componentwise_commutes g h fun i => by
+    rcases hg.2 i with h₁ | h₁ <;> rcases hh.2 i with h₂ | h₂ <;> rw [h₁, h₂] <;> rfl
 
-/-- Convenience wrapper for the standard CSS no-`-I` closure lemma. -/
-theorem negIdentity_not_mem_closure_union
-    {n : ℕ}
-    (ZGenerators XGenerators : Set (NQubitPauliGroupElement n))
-    (hZ : ∀ z, z ∈ ZGenerators → NQubitPauliGroupElement.IsZTypeElement z)
-    (hX : ∀ x, x ∈ XGenerators → NQubitPauliGroupElement.IsXTypeElement x)
-    (hZX : ∀ z ∈ ZGenerators, ∀ x ∈ XGenerators, z * x = x * z) :
-    StabilizerGroup.negIdentity n ∉ Subgroup.closure (ZGenerators ∪ XGenerators) := by
-  exact CSS.negIdentity_not_mem_closure_union ZGenerators XGenerators hZ hX hZX
-
-end CSSCommutationLemmas
-end StabilizerGroup
+end NQubitPauliGroupElement
 end Quantum
-

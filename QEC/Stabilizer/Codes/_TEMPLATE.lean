@@ -405,11 +405,11 @@ Z-type elements always commute, and so do two X-type elements.
 theorem generators_commute :
     ∀ g ∈ generators, ∀ h ∈ generators, g * h = h * g := by
   rintro g (hgZ | hgX) h (hhZ | hhX)
-  · exact CSSCommutationLemmas.ZType_commutes (ZGenerators_are_ZType g hgZ)
+  · exact NQubitPauliGroupElement.IsZTypeElement.commute (ZGenerators_are_ZType g hgZ)
       (ZGenerators_are_ZType h hhZ)
   · exact ZGenerators_commute_XGenerators g hgZ h hhX
   · exact (ZGenerators_commute_XGenerators h hhZ g hgX).symm
-  · exact CSSCommutationLemmas.XType_commutes (XGenerators_are_XType g hgX)
+  · exact NQubitPauliGroupElement.IsXTypeElement.commute (XGenerators_are_XType g hgX)
       (XGenerators_are_XType h hhX)
 ```
 -/

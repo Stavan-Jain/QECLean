@@ -272,7 +272,7 @@ lemma xType_in_stabilizer_implies_in_XClosure
 lemma chainXOperator_commutes_faceStabOf
     (c : X.C1 → ZMod 2) (f : X.C2) :
     X.faceStabOf f * X.chainXOperator c = X.chainXOperator c * X.faceStabOf f :=
-  Quantum.StabilizerGroup.CSSCommutationLemmas.XType_commutes
+  Quantum.NQubitPauliGroupElement.IsXTypeElement.commute
     (faceStabOf_isXType f) (chainXOperator_isXType c)
 
 lemma chainXOperator_mem_centralizer_iff_mem_cycles
@@ -531,7 +531,7 @@ theorem chainZOperator_mem_ZClosure_iff_mem_dualBoundaries (c : X.C1 → ZMod 2)
 lemma chainZOperator_commutes_vertexStabOf
     (c : X.C1 → ZMod 2) (v : X.C0) :
     X.vertexStabOf v * X.chainZOperator c = X.chainZOperator c * X.vertexStabOf v :=
-  Quantum.StabilizerGroup.CSSCommutationLemmas.ZType_commutes
+  Quantum.NQubitPauliGroupElement.IsZTypeElement.commute
     (vertexStabOf_isZType v) (chainZOperator_isZType c)
 
 /-- Z-type elements of the stabilizer come from the Z-closure (CSS

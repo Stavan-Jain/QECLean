@@ -197,13 +197,13 @@ theorem faceStabOf_commutes_vertexStabOf (f : X.C2) (v : X.C0) :
 /-- Two face X-stabilizers commute (both X-type). -/
 theorem faceStabOf_commutes_faceStabOf (f f' : X.C2) :
     X.faceStabOf f * X.faceStabOf f' = X.faceStabOf f' * X.faceStabOf f :=
-  Quantum.StabilizerGroup.CSSCommutationLemmas.XType_commutes
+  Quantum.NQubitPauliGroupElement.IsXTypeElement.commute
     (faceStabOf_isXType f) (faceStabOf_isXType f')
 
 /-- Two vertex Z-stabilizers commute (both Z-type). -/
 theorem vertexStabOf_commutes_vertexStabOf (v v' : X.C0) :
     X.vertexStabOf v * X.vertexStabOf v' = X.vertexStabOf v' * X.vertexStabOf v :=
-  Quantum.StabilizerGroup.CSSCommutationLemmas.ZType_commutes
+  Quantum.NQubitPauliGroupElement.IsZTypeElement.commute
     (vertexStabOf_isZType v) (vertexStabOf_isZType v')
 
 /-- Z generators commute with X generators (CSS cross-commutation). -/

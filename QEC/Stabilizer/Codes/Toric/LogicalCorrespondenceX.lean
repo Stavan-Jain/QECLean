@@ -384,7 +384,7 @@ lemma toricXOperatorOfChain_commutes_faceStab
         NQubitPauliGroupElement.IsXTypeElement g →
         NQubitPauliGroupElement.IsXTypeElement h →
         g * h = h * g := by
-    exact fun g h a a_1 ↦ StabilizerGroup.CSSCommutationLemmas.XType_commutes a a_1;
+    exact fun g h a a_1 ↦ NQubitPauliGroupElement.IsXTypeElement.commute a a_1;
   apply h_comm;
   · exact StabilizerGroup.ToricCodeN.faceStab_is_XType L xf yf;
   · -- By definition of toricXOperatorOfChain, it is an X-type operator.

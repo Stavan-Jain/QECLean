@@ -106,12 +106,6 @@ lemma rowsLinearIndependent_nil :
     simp only [List.length_nil]; infer_instance
   exact linearIndependent_empty_type
 
-/-- A list member's symplectic vector lies in the list's symplectic span. -/
-lemma toSymplectic_mem_sympSpan_of_mem {L : List (NQubitPauliGroupElement n)}
-    {g : NQubitPauliGroupElement n} (hg : g ∈ L) :
-    NQubitPauliOperator.toSymplectic g.operators ∈ sympSpan L :=
-  Submodule.subset_span (mem_listToSet_symp_in_range L g hg)
-
 end NQubitPauliGroupElement
 
 namespace Concatenation

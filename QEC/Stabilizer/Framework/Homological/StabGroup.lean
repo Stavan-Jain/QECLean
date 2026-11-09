@@ -51,14 +51,14 @@ lemma homologicalGenerators_commute :
     ∀ g ∈ X.homologicalGenerators, ∀ h ∈ X.homologicalGenerators, g * h = h * g := by
   rintro g (hg | hg) h (hh | hh)
   -- Z, Z
-  · exact Quantum.StabilizerGroup.CSSCommutationLemmas.ZType_commutes
+  · exact Quantum.NQubitPauliGroupElement.IsZTypeElement.commute
       (ZGenerators_isZType _ hg) (ZGenerators_isZType _ hh)
   -- Z, X
   · exact ZGenerators_commute_XGenerators _ hg _ hh
   -- X, Z
   · exact (ZGenerators_commute_XGenerators _ hh _ hg).symm
   -- X, X
-  · exact Quantum.StabilizerGroup.CSSCommutationLemmas.XType_commutes
+  · exact Quantum.NQubitPauliGroupElement.IsXTypeElement.commute
       (XGenerators_isXType _ hg) (XGenerators_isXType _ hh)
 
 variable (X)
@@ -68,7 +68,7 @@ lemma negIdentity_not_mem_closure_homologicalGenerators :
     Quantum.StabilizerGroup.negIdentity X.numQubits ∉
       Subgroup.closure X.homologicalGenerators := by
   unfold homologicalGenerators
-  exact Quantum.StabilizerGroup.CSSCommutationLemmas.negIdentity_not_mem_closure_union
+  exact Quantum.CSS.negIdentity_not_mem_closure_union
     X.ZGenerators X.XGenerators
     ZGenerators_isZType XGenerators_isXType ZGenerators_commute_XGenerators
 
