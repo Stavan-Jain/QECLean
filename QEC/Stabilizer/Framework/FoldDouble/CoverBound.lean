@@ -207,7 +207,7 @@ theorem hasCodeDistance_two_mul_of_symmetric_weight {k : ℕ} (C : StabilizerCod
   have h1 : 1 ≤ d₀ := by
     obtain ⟨g, hg, hw⟩ := hd₀.1
     exact hw ▸ one_le_weight_of_isNontrivialLogicalOperator hg
-  exact has_code_distance_of_isLeast C hC (by omega)
+  exact hasCodeDistance_of_isLeast C hC (by omega)
     (isLeast_logicalWeight_two_mul_of_symmetric_weight e S hsym hF hd₀ hR hFl hS)
 
 end FoldDouble
