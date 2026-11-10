@@ -1,36 +1,43 @@
-/-
-# BB Chain Complex (Bivariate Bicycle CSS code) as a `HomologicalCode`
-
-Given polynomial coefficient functions
-`A B : (ZMod ℓ × ZMod m) → ZMod 2` representing elements of
-`F_2[Z_ℓ × Z_m]`, we construct the length-3 chain complex underlying
-the CSS code with check matrices
-
-  H_X = [A | B]      (X-checks; matrix indexed by face-group entries × qubits)
-  H_Z = [B^T | A^T]  (Z-checks; transposed)
-
-In our convolution convention (defined below), the resulting code's
-Z-checks are *reflected* compared to the literal transpose
-(`b(g-h)` instead of `b(h-g)`).  Since the BB code is invariant under
-the relabeling `g ↦ -g` on the group, this gives the same code up to
-qubit relabeling — i.e. same parameters `(n, k, d)`.
-
-The chain-complex law `∂₁ ∘ ∂₂ = 0` reduces to commutativity of
-convolution on the abelian group `Z_ℓ × Z_m` combined with `char F_2 = 2`:
-in char 2, `(a * b) + (b * a) = 2(a * b) = 0`.  Clean, no
-transpose-juggling.
-
-## What this file provides
-
-* `conv (a b : G → ZMod 2) : G → ZMod 2` — convolution on abelian `G`, with the
-  scoped infix `a ⋆ b`
-* `poly[x^3 + y + y^2]` — scoped literal for the indicator-function polynomials
-* `conv_comm`, `conv_assoc` — algebraic properties
-* `bbBoundary1`, `bbBoundary2` — concrete boundary maps
-* `bbChainComplex ℓ m A B : HomologicalCode` — the CSS chain complex
--/
-
 import QEC.Stabilizer.Framework.Homological.Distance
+
+/-!
+# The bivariate bicycle chain complex
+
+A bivariate bicycle (BB) code is a CSS code built from two elements `A`, `B` of
+the group algebra `𝔽₂[G]` of a finite abelian group `G`; for
+`G = ZMod ℓ × ZMod m` this is `𝔽₂[x, y] / (xˡ - 1, yᵐ - 1)`. An element of
+`𝔽₂[G]` is written as a function `G → ZMod 2` and the product is the
+convolution `conv`. The code has two blocks of `|G|` qubits, so its 1-cells are
+`G × Fin 2`, and its chain complex is
+
+* `∂₂ f = (A ⋆ f | B ⋆ f)` on 2-chains `f : G → ZMod 2` (one X-check per
+  group element),
+* `∂₁ c = B ⋆ c_L + A ⋆ c_R` on 1-chains with halves `c_L`, `c_R` (one Z-check
+  per group element).
+
+The chain-complex law `∂₁ ∘ ∂₂ = 0` is `B ⋆ A + A ⋆ B = 0`, which holds because
+convolution is commutative and the coefficients have characteristic 2. In
+matrix terms, writing `M_a` for the matrix with entries `M_a f h = a (h - f)`,
+the X-check matrix is `[M_A | M_B]` and the Z-check matrix is `[M_Bᵀ | M_Aᵀ]`.
+
+## Main definitions
+
+* `conv a b`, with the scoped infix `a ⋆ b`: convolution on `G → ZMod 2`, a
+  commutative, associative, bilinear product (`conv_comm`, `conv_assoc`,
+  `conv_add_left`, `conv_smul_left`, …) for which point masses act by
+  translation (`conv_single_left`).
+* `poly[x^3 + y + y^2]`: scoped literal for an element of
+  `𝔽₂[ZMod ℓ × ZMod m]` given by its monomials.
+* `translate`, `translate1`: translation of chains by a group element, which
+  commutes with the boundary maps (`bbBoundary1Fn_translate1`,
+  `bbBoundary2Fn_translate`).
+* `leftHalf`, `rightHalf`: the two blocks of a 1-chain (`halves_ext_iff`).
+* `bbBoundary1Fn`, `bbBoundary2Fn`: the boundary maps as plain functions, and
+  `bbBoundary1`, `bbBoundary2`: the same maps as `ZMod 2`-linear maps, with
+  `bbBoundary_comp : ∂₁ ∘ ∂₂ = 0`.
+* `bbChainComplex A B : HomologicalCode`: the chain complex, on
+  `bbNumQubits G = 2 * |G|` qubits.
+-/
 
 namespace Quantum
 namespace Stabilizer
@@ -39,15 +46,13 @@ namespace BB
 
 open scoped BigOperators
 
-/-! ## Convolution on a finite abelian group
-
-We work over `G = ZMod ℓ × ZMod m`, but for generality the convolution
-definition only needs `G` to be a `Fintype` with `Sub`. -/
+/-! ## Convolution on a finite abelian group -/
 
 variable {G : Type} [Fintype G] [AddCommGroup G]
 
-/-- Convolution of two `ZMod 2`-valued functions on a finite group `G`:
-`(a * b)(g) = ∑_h a(h) · b(g - h)`. -/
+/-- Convolution of two `ZMod 2`-valued functions on a finite abelian group `G`:
+`(a ⋆ b) g = ∑ h, a h * b (g - h)`. This is the product of the group algebra
+`𝔽₂[G]`. -/
 def conv (a b : G → ZMod 2) : G → ZMod 2 :=
   fun g => ∑ h : G, a h * b (g - h)
 
@@ -67,15 +72,15 @@ open Lean
 
 The polynomials `A`, `B` of a bivariate bicycle code are `ZMod 2`-valued
 indicator functions on `G = ZMod ℓ × ZMod m`, the monomial `xᵃyᵇ` standing for
-the point `(a, b)`. `poly[x^3 + y + y^2]` writes such a function the way the
-papers do and expands to exactly
+the point `(a, b)`. `poly[x^3 + y + y^2]` writes such a function as a sum of
+monomials and expands to exactly
 
 ```lean
 fun g => if g = (3, 0) ∨ g = (0, 1) ∨ g = (0, 2) then 1 else 0
 ```
 
-(the monomials in the written order, `∨` nested to the right as usual), the form
-the kernel `decide`s downstream run through. Monomials are `1`, `x`, `y`, `x^i`,
+(the monomials in the written order, `∨` nested to the right as usual), a form
+that kernel `decide` evaluates. Monomials are `1`, `x`, `y`, `x^i`,
 `y^j`, `x^i*y^j` (with `x*y^j`, `x^i*y`, `x*y` for exponent `1`). Scoped like
 `⋆`. -/
 
@@ -224,19 +229,8 @@ end PolyNotation
     (a ⋆ b) g = ∑ h : G, a h * b (g - h) := rfl
 
 /-- Convolution is commutative on an abelian group. -/
-lemma conv_comm (a b : G → ZMod 2) : a ⋆ b = b ⋆ a := by
-  funext g
-  simp only [conv_apply]
-  -- ∑_h a h * b (g - h) = ∑_h b h * a (g - h)
-  -- reindex via h ↦ g - h
-  refine Finset.sum_bij' (fun h _ => g - h) (fun h _ => g - h)
-    (fun h _ => Finset.mem_univ _) (fun h _ => Finset.mem_univ _)
-    ?_ ?_ ?_
-  · intro h _; simp
-  · intro h _; simp
-  · intro h _
-    have : g - (g - h) = h := by simp
-    rw [this, mul_comm]
+lemma conv_comm (a b : G → ZMod 2) : a ⋆ b = b ⋆ a :=
+  funext fun g => Fintype.sum_equiv (Equiv.subLeft g) _ _ fun h => by simp [mul_comm]
 
 /-- Convolution with the zero chain on the left vanishes. -/
 lemma conv_zero_left (a : G → ZMod 2) : (0 : G → ZMod 2) ⋆ a = 0 := by
@@ -250,99 +244,60 @@ lemma conv_zero_right (a : G → ZMod 2) : a ⋆ (0 : G → ZMod 2) = 0 := by
 /-- Convolution is associative. -/
 lemma conv_assoc (a b c : G → ZMod 2) : (a ⋆ b) ⋆ c = a ⋆ (b ⋆ c) := by
   funext g
-  -- We'll show both sides equal `∑_h ∑_k, a h * b k * c (g - h - k)`.
-  -- LHS = ∑_h (conv a b) h * c (g - h) = ∑_h (∑_k a k * b (h - k)) * c (g - h)
-  -- Reindex inner sum k ↦ h - k' so that the argument of b becomes k', and
-  -- of a becomes h - k'.  Then renaming the outer variable to h_new = h - k'
-  -- to align with RHS.  Cleanest: reindex jointly via the bijection
-  -- (h, k) ↦ (h - k, k) on G × G.
-  have lhs_expand :
-      ((a ⋆ b) ⋆ c) g = ∑ h : G, ∑ k : G, a h * b k * c (g - h - k) := by
-    simp only [conv_apply, Finset.sum_mul]
-    -- LHS now: ∑ h, ∑ k, (a k * b (h - k)) * c (g - h)
-    -- Goal: ∑ h, ∑ k, a h * b k * c (g - h - k)
-    -- Reindex per outer h by k' = h - k, so a k = a (h - k'), b (h - k) = b k'
-    -- Then swap outer/inner via sum_comm.
-    rw [Finset.sum_comm]
-    -- ∑ k, ∑ h, (a k * b (h - k)) * c (g - h)
-    -- Now reindex inner h ↦ h + k:  (h - k) ↦ h, (g - h) ↦ g - h - k
-    have step : ∀ k : G, (∑ h : G, a k * b (h - k) * c (g - h)) =
-        ∑ h : G, a k * b h * c (g - k - h) := by
-      intro k
-      refine Finset.sum_bij' (fun h _ => h - k) (fun h _ => h + k)
-        (fun _ _ => Finset.mem_univ _) (fun _ _ => Finset.mem_univ _) ?_ ?_ ?_
-      · intro h _
-        change h - k + k = h
-        abel
-      · intro h _
-        change h + k - k = h
-        abel
-      · intro h _
-        have h1 : g - h = g - k - (h - k) := by abel
-        rw [h1]
-    rw [Finset.sum_congr rfl (fun k _ => step k)]
-  have rhs_expand :
-      (a ⋆ (b ⋆ c)) g = ∑ h : G, ∑ k : G, a h * b k * c (g - h - k) := by
-    simp only [conv_apply, Finset.mul_sum]
-    refine Finset.sum_congr rfl (fun h _ => ?_)
-    refine Finset.sum_congr rfl (fun k _ => ?_)
-    have : (g - h) - k = g - h - k := by abel
-    rw [← this]
-    ring
-  rw [lhs_expand, rhs_expand]
+  simp only [conv_apply, Finset.sum_mul, Finset.mul_sum]
+  rw [Finset.sum_comm]
+  -- reindex the inner sum by `h ↦ h - k`
+  exact Finset.sum_congr rfl fun k _ => Fintype.sum_equiv (Equiv.subRight k) _ _ fun h => by
+    simp [mul_assoc]
 
-/-- Convolution distributes over addition (left). -/
+/-- Convolution distributes over addition in the left factor. -/
 lemma conv_add_left (a b c : G → ZMod 2) :
     (a + b) ⋆ c = a ⋆ c + b ⋆ c := by
   funext g
   simp only [conv_apply, Pi.add_apply, add_mul, Finset.sum_add_distrib]
 
-/-- Convolution distributes over addition (right). -/
+/-- Convolution distributes over addition in the right factor. -/
 lemma conv_add_right (a b c : G → ZMod 2) :
     a ⋆ (b + c) = a ⋆ b + a ⋆ c := by
   funext g
   simp only [conv_apply, Pi.add_apply, mul_add, Finset.sum_add_distrib]
 
-/-- Convolution scales (left). -/
+/-- Convolution commutes with scalar multiplication in the left factor. -/
 lemma conv_smul_left (s : ZMod 2) (a b : G → ZMod 2) :
     (s • a) ⋆ b = s • (a ⋆ b) := by
   funext g
   simp only [conv_apply, Pi.smul_apply, smul_eq_mul, Finset.mul_sum, mul_assoc]
 
-/-- Convolution scales (right). -/
+/-- Convolution commutes with scalar multiplication in the right factor. -/
 lemma conv_smul_right (s : ZMod 2) (a b : G → ZMod 2) :
     a ⋆ (s • b) = s • (a ⋆ b) := by
-  funext g
-  simp only [conv_apply, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
-  congr 1; funext h
-  ring
+  rw [conv_comm, conv_smul_left, conv_comm]
 
-/-- In char 2, for any commuting `a, b`, `conv a b + conv b a = 0`. By
-commutativity of `conv`, this is just `2 (conv a b) = 0`. -/
+/-- `a ⋆ b + b ⋆ a = 0`: convolution is commutative and the coefficients have
+characteristic 2. -/
 lemma conv_add_swap_eq_zero (a b : G → ZMod 2) :
     a ⋆ b + b ⋆ a = 0 := by
-  rw [conv_comm a b]
-  ext g
-  simp [Pi.add_apply, CharTwo.add_self_eq_zero]
+  rw [conv_comm b a]
+  exact funext fun g => CharTwo.add_self_eq_zero _
 
 /-- Convolving with a point mass on the left translates: `δ_a ⋆ b = b (· - a)`.
 -/
 lemma conv_single_left [DecidableEq G] (a : G) (b : G → ZMod 2) :
     Pi.single a 1 ⋆ b = fun g => b (g - a) := by
   funext g
-  rw [conv_apply, Finset.sum_eq_single a]
-  · simp
-  · intro h _ hne
-    rw [Pi.single_eq_of_ne hne, zero_mul]
-  · intro habs
-    exact absurd (Finset.mem_univ a) habs
+  simp [Pi.single_apply]
 
-/-- Pointwise form of `conv_single_left` (avoids beta-redex residue when
-rewriting at an applied occurrence). -/
+/-- Pointwise form of `conv_single_left`. -/
 @[simp] lemma conv_single_left_apply [DecidableEq G] (a : G) (b : G → ZMod 2)
     (g : G) :
     (Pi.single a 1 ⋆ b) g = b (g - a) := by
   rw [conv_single_left]
+
+/-- Convolving with a point mass on the right translates:
+`(b ⋆ δ_a) g = b (g - a)`. -/
+lemma conv_single_right_apply [DecidableEq G] (a : G) (b : G → ZMod 2) (g : G) :
+    (b ⋆ Pi.single a 1) g = b (g - a) := by
+  rw [conv_comm, conv_single_left]
 
 /-! ## Translation of chains -/
 
@@ -358,110 +313,113 @@ omit [Fintype G] in
 lemma conv_translate (a v : G → ZMod 2) (c : G) :
     a ⋆ translate c v = translate c (a ⋆ v) := by
   funext g
-  simp only [conv_apply, translate_apply]
-  refine Finset.sum_congr rfl fun h _ => ?_
-  congr 1
-  abel_nf
+  simp only [conv_apply, translate_apply, sub_add_eq_add_sub]
 
-/-! ## Boundary maps for BB chain complex
+/-! ## The boundary maps
 
-Cells:
-* `C0 := G` (Z-stabilizer positions = "vertices")
-* `C1 := G × Fin 2` (qubits, indexed by group element and L/R block)
-* `C2 := G` (X-stabilizer positions = "faces")
+The cells are `C₀ = G` (Z-checks), `C₁ = G × Fin 2` (qubits, indexed by a group
+element and a block) and `C₂ = G` (X-checks). The boundary maps are
 
-Boundary maps:
-* `∂₂(f) (h, 0) := conv A f h`, `∂₂(f) (h, 1) := conv B f h`
-* `∂₁(c) (g) := conv B c_L g + conv A c_R g` where `c_L h = c (h, 0)`,
-  `c_R h = c (h, 1)`.
+* `∂₂ f = (A ⋆ f | B ⋆ f)`, and
+* `∂₁ c = B ⋆ c_L + A ⋆ c_R`, where `c_L = leftHalf c` and `c_R = rightHalf c`.
 
-Then `∂₁ ∘ ∂₂ = 0` reduces to `conv B (conv A f) + conv A (conv B f) = 0` via
-`conv_assoc` and `conv_add_swap_eq_zero` (char 2 + commutativity). -/
+Each is given first as a plain function (`bbBoundary2Fn`, `bbBoundary1Fn`),
+which `decide` can evaluate, and then as a linear map (`bbBoundary2`,
+`bbBoundary1`). -/
 
 variable (A B : G → ZMod 2)
 
-/-- The "left half" of a 1-chain. -/
+/-- The left half of a 1-chain: its restriction to the block `G × {0}`. -/
 def leftHalf (c : G × Fin 2 → ZMod 2) : G → ZMod 2 := fun g => c (g, 0)
 
-/-- The "right half" of a 1-chain. -/
+/-- The right half of a 1-chain: its restriction to the block `G × {1}`. -/
 def rightHalf (c : G × Fin 2 → ZMod 2) : G → ZMod 2 := fun g => c (g, 1)
 
-/-- Underlying function of `∂₂`. -/
+omit [Fintype G] [AddCommGroup G] in
+/-- A 1-chain is determined by its two halves. -/
+lemma halves_ext_iff {c d : G × Fin 2 → ZMod 2} :
+    c = d ↔ leftHalf c = leftHalf d ∧ rightHalf c = rightHalf d := by
+  refine ⟨fun h => h ▸ ⟨rfl, rfl⟩, fun ⟨hL, hR⟩ => funext fun ⟨g, j⟩ => ?_⟩
+  obtain rfl | rfl : j = 0 ∨ j = 1 := by omega
+  exacts [congrFun hL g, congrFun hR g]
+
+/-- The boundary map `∂₂ f = (A ⋆ f | B ⋆ f)` as a plain function. -/
 def bbBoundary2Fn (f : G → ZMod 2) : G × Fin 2 → ZMod 2 :=
   fun ⟨h, j⟩ => if j = 0 then (A ⋆ f) h else (B ⋆ f) h
 
-/-- Underlying function of `∂₁`. -/
+/-- The boundary map `∂₁ c = B ⋆ c_L + A ⋆ c_R` as a plain function. -/
 def bbBoundary1Fn (c : G × Fin 2 → ZMod 2) : G → ZMod 2 :=
   fun g => (B ⋆ leftHalf c) g + (A ⋆ rightHalf c) g
+
+/-- The left half of `∂₂ f` is `A ⋆ f`. -/
+lemma leftHalf_bbBoundary2Fn (f : G → ZMod 2) :
+    leftHalf (bbBoundary2Fn A B f) = A ⋆ f := rfl
+
+/-- The right half of `∂₂ f` is `B ⋆ f`. -/
+lemma rightHalf_bbBoundary2Fn (f : G → ZMod 2) :
+    rightHalf (bbBoundary2Fn A B f) = B ⋆ f := rfl
+
+/-- `∂₂ f = 0` iff both `A ⋆ f = 0` and `B ⋆ f = 0`. -/
+lemma bbBoundary2Fn_eq_zero_iff (f : G → ZMod 2) :
+    bbBoundary2Fn A B f = 0 ↔ A ⋆ f = 0 ∧ B ⋆ f = 0 :=
+  halves_ext_iff
+
+/-- `∂₁ c = B ⋆ c_L + A ⋆ c_R` as an equation between chains. -/
+lemma bbBoundary1Fn_eq (c : G × Fin 2 → ZMod 2) :
+    bbBoundary1Fn A B c = B ⋆ leftHalf c + A ⋆ rightHalf c := rfl
 
 /-- `∂₂` as a `ZMod 2`-linear map. -/
 noncomputable def bbBoundary2 :
     (G → ZMod 2) →ₗ[ZMod 2] (G × Fin 2 → ZMod 2) where
   toFun := bbBoundary2Fn A B
-  map_add' f₁ f₂ := by
-    ext ⟨h, j⟩
-    have key : ∀ (p : G → ZMod 2),
-        (∑ x : G, p x * ((f₁ + f₂) (h - x))) =
-          (∑ x : G, p x * f₁ (h - x)) + (∑ x : G, p x * f₂ (h - x)) := by
-      intro p
-      simp [Pi.add_apply, mul_add, Finset.sum_add_distrib]
-    by_cases hj : j = 0
-    · simp only [bbBoundary2Fn, hj, if_true, Pi.add_apply, conv_apply]
-      exact key A
-    · simp only [bbBoundary2Fn, hj, if_false, Pi.add_apply, conv_apply]
-      exact key B
-  map_smul' s f := by
-    ext ⟨h, j⟩
-    have key : ∀ (p : G → ZMod 2),
-        (∑ x : G, p x * ((s • f) (h - x))) = s * (∑ x : G, p x * f (h - x)) := by
-      intro p
-      simp only [Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
-      refine Finset.sum_congr rfl (fun x _ => ?_); ring
-    by_cases hj : j = 0
-    · simp only [bbBoundary2Fn, hj, if_true, RingHom.id_apply, Pi.smul_apply,
-        smul_eq_mul, conv_apply]
-      exact key A
-    · simp only [bbBoundary2Fn, hj, if_false, RingHom.id_apply, Pi.smul_apply,
-        smul_eq_mul, conv_apply]
-      exact key B
+  map_add' f₁ f₂ := halves_ext_iff.mpr ⟨conv_add_right A f₁ f₂, conv_add_right B f₁ f₂⟩
+  map_smul' s f := halves_ext_iff.mpr ⟨conv_smul_right s A f, conv_smul_right s B f⟩
 
 /-- `∂₁` as a `ZMod 2`-linear map. -/
 noncomputable def bbBoundary1 :
     (G × Fin 2 → ZMod 2) →ₗ[ZMod 2] (G → ZMod 2) where
   toFun := bbBoundary1Fn A B
   map_add' c₁ c₂ := by
-    ext g
-    -- Goal: bbBoundary1Fn A B (c₁ + c₂) g = bbBoundary1Fn A B c₁ g + bbBoundary1Fn A B c₂ g
-    -- Both sides expand via `conv` definition; reduces to ring arithmetic
-    -- in `ZMod 2` after splitting sums.
-    simp only [bbBoundary1Fn, leftHalf, rightHalf, conv_apply, Pi.add_apply]
-    -- Now goal is a `(∑ + ∑) = (∑ + ∑) + (∑ + ∑)` shape — split sums.
-    have hL : ∀ p : G → ZMod 2,
-        (∑ h : G, p h * (c₁ (g - h, 0) + c₂ (g - h, 0))) =
-        (∑ h : G, p h * c₁ (g - h, 0)) + (∑ h : G, p h * c₂ (g - h, 0)) := by
-      intro p
-      simp [mul_add, Finset.sum_add_distrib]
-    have hR : ∀ p : G → ZMod 2,
-        (∑ h : G, p h * (c₁ (g - h, 1) + c₂ (g - h, 1))) =
-        (∑ h : G, p h * c₁ (g - h, 1)) + (∑ h : G, p h * c₂ (g - h, 1)) := by
-      intro p
-      simp [mul_add, Finset.sum_add_distrib]
-    rw [hL B, hR A]
-    ring
+    change B ⋆ (leftHalf c₁ + leftHalf c₂) + A ⋆ (rightHalf c₁ + rightHalf c₂) = _
+    rw [conv_add_right, conv_add_right, add_add_add_comm]
+    rfl
   map_smul' s c := by
-    ext g
-    simp only [bbBoundary1Fn, leftHalf, rightHalf, conv_apply, RingHom.id_apply,
-      Pi.smul_apply, smul_eq_mul]
-    have hL : (∑ h : G, B h * (s * c (g - h, 0))) =
-        s * (∑ h : G, B h * c (g - h, 0)) := by
-      simp only [Finset.mul_sum]; refine Finset.sum_congr rfl (fun x _ => ?_); ring
-    have hR : (∑ h : G, A h * (s * c (g - h, 1))) =
-        s * (∑ h : G, A h * c (g - h, 1)) := by
-      simp only [Finset.mul_sum]; refine Finset.sum_congr rfl (fun x _ => ?_); ring
-    rw [hL, hR]
-    ring
+    change B ⋆ (s • leftHalf c) + A ⋆ (s • rightHalf c) = _
+    rw [conv_smul_right, conv_smul_right, ← smul_add]
+    rfl
 
-/-- Translation of a 1-chain by a group element (qubit blocks fixed). -/
+/-- The linear map `∂₂` applies the plain function `bbBoundary2Fn`. -/
+@[simp] lemma bbBoundary2_apply (f : G → ZMod 2) :
+    bbBoundary2 A B f = bbBoundary2Fn A B f := rfl
+
+/-- The linear map `∂₁` applies the plain function `bbBoundary1Fn`. -/
+@[simp] lemma bbBoundary1_apply (c : G × Fin 2 → ZMod 2) :
+    bbBoundary1 A B c = bbBoundary1Fn A B c := rfl
+
+/-- `∂₂`, as a plain function, is additive. -/
+lemma bbBoundary2Fn_add (f₁ f₂ : G → ZMod 2) :
+    bbBoundary2Fn A B (f₁ + f₂) = bbBoundary2Fn A B f₁ + bbBoundary2Fn A B f₂ :=
+  map_add (bbBoundary2 A B) f₁ f₂
+
+/-- `∂₁`, as a plain function, is additive. -/
+lemma bbBoundary1Fn_add (c₁ c₂ : G × Fin 2 → ZMod 2) :
+    bbBoundary1Fn A B (c₁ + c₂) = bbBoundary1Fn A B c₁ + bbBoundary1Fn A B c₂ :=
+  map_add (bbBoundary1 A B) c₁ c₂
+
+/-- The chain-complex law for the plain functions: `∂₁ (∂₂ f) = 0`, since
+`B ⋆ (A ⋆ f) + A ⋆ (B ⋆ f) = (B ⋆ A + A ⋆ B) ⋆ f = 0`. -/
+lemma bbBoundaryFn_comp (f : G → ZMod 2) :
+    bbBoundary1Fn A B (bbBoundary2Fn A B f) = 0 := by
+  rw [bbBoundary1Fn_eq, leftHalf_bbBoundary2Fn, rightHalf_bbBoundary2Fn, ← conv_assoc,
+    ← conv_assoc, ← conv_add_left, conv_add_swap_eq_zero, conv_zero_left]
+
+/-- The chain-complex law `∂₁ ∘ ∂₂ = 0`. -/
+lemma bbBoundary_comp : (bbBoundary1 A B).comp (bbBoundary2 A B) = 0 :=
+  LinearMap.ext (bbBoundaryFn_comp A B)
+
+/-! ## Translation equivariance of the boundary maps -/
+
+/-- Translation of a 1-chain by a group element, acting on each block. -/
 def translate1 (c : G) (v : G × Fin 2 → ZMod 2) : G × Fin 2 → ZMod 2 :=
   fun p => v (p.1 + c, p.2)
 
@@ -471,115 +429,47 @@ omit [Fintype G] in
     translate1 c v p = v (p.1 + c, p.2) := rfl
 
 omit [Fintype G] in
+/-- Translating a 1-chain translates its left half. -/
 lemma leftHalf_translate1 (c : G) (v : G × Fin 2 → ZMod 2) :
     leftHalf (translate1 c v) = translate c (leftHalf v) := rfl
 
 omit [Fintype G] in
+/-- Translating a 1-chain translates its right half. -/
 lemma rightHalf_translate1 (c : G) (v : G × Fin 2 → ZMod 2) :
     rightHalf (translate1 c v) = translate c (rightHalf v) := rfl
 
 /-- `∂₁` is translation-equivariant. -/
 lemma bbBoundary1Fn_translate1 (c : G) (v : G × Fin 2 → ZMod 2) :
     bbBoundary1Fn A B (translate1 c v) = translate c (bbBoundary1Fn A B v) := by
-  funext g
-  rw [bbBoundary1Fn, leftHalf_translate1, rightHalf_translate1,
-    conv_translate, conv_translate]
+  rw [bbBoundary1Fn_eq, leftHalf_translate1, rightHalf_translate1, conv_translate,
+    conv_translate]
   rfl
 
 /-- `∂₂` is translation-equivariant. -/
 lemma bbBoundary2Fn_translate (c : G) (f : G → ZMod 2) :
-    bbBoundary2Fn A B (translate c f) = translate1 c (bbBoundary2Fn A B f) := by
-  funext p
-  obtain ⟨h, j⟩ := p
-  by_cases hj : j = 0
-  · subst hj
-    change (A ⋆ translate c f) h = bbBoundary2Fn A B f (h + c, 0)
-    rw [conv_translate]
-    rfl
-  · have hj1 : j = 1 := by omega
-    subst hj1
-    change (B ⋆ translate c f) h = bbBoundary2Fn A B f (h + c, 1)
-    rw [conv_translate]
-    rfl
+    bbBoundary2Fn A B (translate c f) = translate1 c (bbBoundary2Fn A B f) :=
+  halves_ext_iff.mpr ⟨conv_translate A f c, conv_translate B f c⟩
 
-/-- `rfl` bridge from the LinearMap `∂₂` to its computable underlying function.
--/
-@[simp] lemma bbBoundary2_apply (f : G → ZMod 2) :
-    bbBoundary2 A B f = bbBoundary2Fn A B f := rfl
+/-! ## Packaging as a `HomologicalCode` -/
 
-/-- `rfl` bridge from the LinearMap `∂₁` to its computable underlying function.
--/
-@[simp] lemma bbBoundary1_apply (c : G × Fin 2 → ZMod 2) :
-    bbBoundary1 A B c = bbBoundary1Fn A B c := rfl
+/-- The number of qubits of a bivariate bicycle code over `G`: `2 * |G|`. -/
+def bbNumQubits (G : Type) [Fintype G] : ℕ := 2 * Fintype.card G
 
-/-- `∂₂` (computable form) is additive. -/
-lemma bbBoundary2Fn_add (f₁ f₂ : G → ZMod 2) :
-    bbBoundary2Fn A B (f₁ + f₂) = bbBoundary2Fn A B f₁ + bbBoundary2Fn A B f₂ := by
-  have h := map_add (bbBoundary2 A B) f₁ f₂
-  simpa [bbBoundary2_apply] using h
+/-- A numbering of the 1-cells `G × Fin 2` by `Fin (bbNumQubits G)`. -/
+noncomputable def bbEdgeEquiv : G × Fin 2 ≃ Fin (bbNumQubits G) :=
+  (((Fintype.equivFin G).prodCongr (Equiv.refl (Fin 2))).trans finProdFinEquiv).trans
+    (finCongr (Nat.mul_comm _ 2))
 
-/-- `∂₁` (computable form) is additive. -/
-lemma bbBoundary1Fn_add (c₁ c₂ : G × Fin 2 → ZMod 2) :
-    bbBoundary1Fn A B (c₁ + c₂) = bbBoundary1Fn A B c₁ + bbBoundary1Fn A B c₂ := by
-  have h := map_add (bbBoundary1 A B) c₁ c₂
-  simpa [bbBoundary1_apply] using h
-
-/-- The chain-complex law `∂₁ ∘ ∂₂ = 0`. -/
-lemma bbBoundary_comp : (bbBoundary1 A B).comp (bbBoundary2 A B) = 0 := by
-  refine LinearMap.ext (fun f => ?_)
-  ext g
-  simp only [LinearMap.comp_apply, LinearMap.zero_apply, Pi.zero_apply]
-  change bbBoundary1Fn A B (bbBoundary2Fn A B f) g = 0
-  unfold bbBoundary1Fn bbBoundary2Fn leftHalf rightHalf
-  -- ∂₁(∂₂ f)(g) = conv B (h ↦ conv A f h) g + conv A (h ↦ conv B f h) g
-  have hL : (fun h => (if (0 : Fin 2) = 0 then (A ⋆ f) h else (B ⋆ f) h)) =
-      A ⋆ f := by funext h; simp
-  have hR : (fun h => (if (1 : Fin 2) = 0 then (A ⋆ f) h else (B ⋆ f) h)) =
-      B ⋆ f := by funext h; simp
-  rw [hL, hR]
-  -- Goal: conv B (conv A f) g + conv A (conv B f) g = 0
-  -- Use conv_assoc (right-to-left) to fold: conv B (conv A f) = conv (conv B A) f
-  rw [← conv_assoc B A f, ← conv_assoc A B f]
-  -- Goal: conv (conv B A) f g + conv (conv A B) f g = 0
-  rw [conv_comm B A]
-  -- Goal: conv (conv A B) f g + conv (conv A B) f g = 0
-  -- That's `x + x = 0` in `ZMod 2` (i.e. `char F_2 = 2`).
-  exact CharTwo.add_self_eq_zero _
-
-/-- The chain-complex law in computable form: `∂₁ (∂₂ f) = 0`. -/
-lemma bbBoundaryFn_comp (f : G → ZMod 2) :
-    bbBoundary1Fn A B (bbBoundary2Fn A B f) = 0 := by
-  have h := LinearMap.congr_fun (bbBoundary_comp A B) f
-  simpa [bbBoundary1_apply, bbBoundary2_apply] using h
-
-/-! ## Packaging as a `HomologicalCode`
-
-Given `[Fintype G] [DecidableEq G] [AddCommGroup G]` and polynomials
-`A, B : G → ZMod 2`, build the chain complex `C0 = G, C1 = G × Fin 2, C2 = G`
-with `bbBoundary1`, `bbBoundary2`. -/
+omit [AddCommGroup G] in
+/-- There are `bbNumQubits G` 1-cells. -/
+lemma bbCard_C1 : Fintype.card (G × Fin 2) = bbNumQubits G := by
+  rw [Fintype.card_prod, Fintype.card_fin, mul_comm, bbNumQubits]
 
 variable [DecidableEq G]
 
-/-- Number of qubits = `2 * Fintype.card G`. -/
-def bbNumQubits (G : Type) [Fintype G] : ℕ := 2 * Fintype.card G
-
-/-- Bijection between `G × Fin 2` and `Fin (bbNumQubits G)`. -/
-noncomputable def bbEdgeEquiv :
-    (G × Fin 2) ≃ Fin (bbNumQubits G) := by
-  classical
-  -- Use the equiv G × Fin 2 ≃ Fin (card G) × Fin 2 ≃ Fin (2 * card G)
-  refine (((Fintype.equivFin G).prodCongr (Equiv.refl (Fin 2))).trans
-    (finProdFinEquiv (m := Fintype.card G) (n := 2))).trans ?_
-  -- Fin (card G * 2) → Fin (2 * card G)
-  exact finCongr (by unfold bbNumQubits; ring)
-
-omit [AddCommGroup G] [DecidableEq G] in
-lemma bbCard_C1 :
-    Fintype.card (G × Fin 2) = bbNumQubits G := by
-  unfold bbNumQubits
-  rw [Fintype.card_prod, Fintype.card_fin, mul_comm]
-
-/-- The BB chain complex packaged as a `HomologicalCode`. -/
+/-- The bivariate bicycle chain complex of `A`, `B` as a `HomologicalCode`:
+cells `C₀ = C₂ = G` and `C₁ = G × Fin 2`, with the boundary maps `bbBoundary1`
+and `bbBoundary2`. -/
 noncomputable def bbChainComplex (A B : G → ZMod 2) : HomologicalCode where
   C0 := G
   C1 := G × Fin 2

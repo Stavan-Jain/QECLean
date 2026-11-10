@@ -97,26 +97,6 @@ lemma eq_of_halves {v w : G × Fin 2 → ZMod 2}
 
 end Halves
 
-section BoundaryHalves
-
-variable {G : Type} [Fintype G] [AddCommGroup G]
-
-/-- The left half of `∂₂ f` is `A ⋆ f`. -/
-lemma leftHalf_bbBoundary2Fn (A B f : G → ZMod 2) :
-    leftHalf (bbBoundary2Fn A B f) = A ⋆ f := by
-  funext g
-  change (if (0 : Fin 2) = 0 then (A ⋆ f) g else (B ⋆ f) g) = (A ⋆ f) g
-  rw [if_pos rfl]
-
-/-- The right half of `∂₂ f` is `B ⋆ f`. -/
-lemma rightHalf_bbBoundary2Fn (A B f : G → ZMod 2) :
-    rightHalf (bbBoundary2Fn A B f) = B ⋆ f := by
-  funext g
-  change (if (1 : Fin 2) = 0 then (A ⋆ f) g else (B ⋆ f) g) = (B ⋆ f) g
-  rw [if_neg (by decide)]
-
-end BoundaryHalves
-
 /-- The fiber sum of the zero chain is zero. -/
 lemma fiberSumFn_zero {I J : Type} [Fintype I] [DecidableEq J] (f : I → J) :
     fiberSumFn f (0 : I → ZMod 2) = 0 := by
