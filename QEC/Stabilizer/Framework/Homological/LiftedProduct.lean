@@ -1,42 +1,37 @@
-/-
-# Non-abelian lifted product (mitten shape) as a `HomologicalCode`
+import QEC.Stabilizer.Framework.Homological.Distance
 
-The 1×2 lifted product LP(A,B) over the group algebra `𝔽₂[G]` of a finite,
-possibly **non-abelian** group `G` (Bhardwaj et al., *High-rate qLDPC
-processors*, arXiv:2607.28795, Eq. (J1)): base rows `A = [a₀ a₁]`,
-`B = [b₀ b₁]`, five qubit blocks (a 2×2 grid + one shared block), two X-
-and two Z-check blocks, with
+/-!
+# Non-abelian lifted product as a `HomologicalCode`
 
-  H_X = [ L(a₀)   0     L(a₁)   0     R(b₀*) ]     H_Z = [ R(b₀)  R(b₁)   0      0     L(a₀*) ]
-        [  0     L(a₀)   0     L(a₁)  R(b₁*) ]           [  0      0     R(b₀)  R(b₁)  L(a₁*) ]
+The 1×2 lifted product over the group algebra `𝔽₂[G]` of a finite, possibly
+non-abelian group `G`: base rows `A = [a₀ a₁]`, `B = [b₀ b₁]`, five qubit
+blocks (a 2×2 grid and one shared block), two X-check blocks and two Z-check
+blocks, with check matrices
 
-where `L`/`R` are left/right regular-representation sums and `*` the
-antipode `g ↦ g⁻¹`.  In place of the bivariate-bicycle chain law (`conv`
-commutativity on an abelian group, `BBChainComplex.lean`), the chain law
-here is **left/right commutation**: left- and right-convolution commute
-because group multiplication is associative (`rconv_lconv`), and the two
-occurrences of each mixed term cancel in characteristic 2.
+```
+H_X = [ L(a₀)   0     L(a₁)   0     R(b₀*) ]
+      [  0     L(a₀)   0     L(a₁)  R(b₁*) ]
+
+H_Z = [ R(b₀)  R(b₁)   0      0     L(a₀*) ]
+      [  0      0     R(b₀)  R(b₁)  L(a₁*) ]
+```
+
+where `L`/`R` are left/right regular-representation sums and `*` is the
+antipode `g ↦ g⁻¹`. The chain-complex law is left/right commutation: left and
+right convolution commute because group multiplication is associative
+(`rconv_lconv`), and the two occurrences of each mixed term cancel in
+characteristic 2.
 
 This file provides:
 
-* `lconv a f` / `rconv f b` — one-sided convolutions on `G → ZMod 2`
-* `antipode` — `a* g = a g⁻¹`
-* `rconv_lconv` — the L/R commutation law (the mathematical heart)
-* `lpBoundary1`, `lpBoundary2` — the Eq.-(J1) boundary maps
-  (`C2 = Fin 2 × G` X-checks, `C1 = Fin 5 × G` qubits,
-  `C0 = Fin 2 × G` Z-checks; grid block `m < 4` is
-  `(α, β) = (blockRow m, blockCol m) = (m/2, m%2)`)
-* `mittenChainComplex A B : HomologicalCode` — the packaged complex
-
-Instantiated for the `[[150,30,10]]` mitten code (`G = C₅×S₃`) under
-`MittenDistance/M150/` in the downstream `mitten-distance-lean` repository
-(attempt state:
-`qec-lab:pipeline/attempts/mitten_150_30_10/`).  When `G` is abelian and
-the blocks are collapsed this recovers the usual hypergraph/lifted
-product; no claims beyond the 1×2 shape are made here.
+* `lconv a f`, `rconv f b`: the one-sided convolutions on `G → ZMod 2`, and
+  `antipode`;
+* `rconv_lconv`: left and right convolution commute;
+* `lpBoundary1`, `lpBoundary2`: the boundary maps, with X-checks
+  `C2 = Fin 2 × G`, qubits `C1 = Fin 5 × G` and Z-checks `C0 = Fin 2 × G`; the
+  grid block `m < 4` is `(α, β) = (blockRow m, blockCol m)`;
+* `mittenChainComplex A B : HomologicalCode`: the packaged complex.
 -/
-
-import QEC.Stabilizer.Framework.Homological.Distance
 
 namespace Quantum
 namespace Stabilizer
@@ -75,8 +70,8 @@ omit [Fintype G] in
 @[simp] lemma antipode_apply (a : G → ZMod 2) (g : G) :
     antipode a g = a g⁻¹ := rfl
 
-/-- **L/R commutation** — the non-abelian chain-law core: left and right
-convolution commute, by associativity of group multiplication. -/
+/-- Left and right convolution commute, by associativity of the group
+multiplication. This is what makes the lifted product a chain complex. -/
 lemma rconv_lconv (a f b : G → ZMod 2) :
     rconv (lconv a f) b = lconv a (rconv f b) := by
   funext y
@@ -113,10 +108,9 @@ lemma rconv_smul (s : ZMod 2) (f b : G → ZMod 2) :
   refine Finset.sum_congr rfl fun h _ => ?_
   ring
 
-/-! Applied-lambda forms of the additivity/scalar lemmas.  In the
-LinearMap packaging proofs `Pi.add_apply` / `Pi.smul_apply` fire under
-the column-restriction lambdas first, so the rewriting hooks must match
-`fun g => f₁ … + f₂ …` shapes syntactically. -/
+/-! The same lemmas with the sum or scalar multiple written pointwise, the
+form that the block restrictions `fun g => f (m, g)` of a sum take after
+`Pi.add_apply` / `Pi.smul_apply`. -/
 
 /-- Left convolution distributes over pointwise addition. -/
 lemma lconv_add' (a f₁ f₂ : G → ZMod 2) :
@@ -141,38 +135,23 @@ lemma rconv_smul' (s : ZMod 2) (f b : G → ZMod 2) :
 section PointMass
 variable [DecidableEq G]
 
-/-- Convolution of a point mass is a single translated coefficient. -/
+/-- Left convolution with a point mass is a translated coefficient. -/
 lemma lconv_delta (a : G → ZMod 2) (c x : G) :
     lconv a (fun g => if g = c then 1 else 0) x = a (x * c⁻¹) := by
-  unfold lconv
-  simp only [mul_ite, mul_one, mul_zero]
-  rw [Finset.sum_eq_single (x * c⁻¹)]
-  · simp
-  · intro b _ hb
-    apply if_neg
-    intro h
-    apply hb
-    exact eq_mul_inv_iff_mul_eq.mpr ((inv_mul_eq_iff_eq_mul.mp h).symm)
-  · simp
+  simp only [lconv_apply, mul_ite, mul_one, mul_zero, inv_mul_eq_iff_eq_mul,
+    ← mul_inv_eq_iff_eq_mul, Finset.sum_ite_eq, Finset.mem_univ, if_true]
+
 /-- Right convolution of a point mass is a translated coefficient. -/
 lemma rconv_delta (b : G → ZMod 2) (c x : G) :
     rconv (fun g => if g = c then 1 else 0) b x = b (c⁻¹ * x) := by
-  unfold rconv
-  simp only [ite_mul, one_mul, zero_mul]
-  rw [Finset.sum_eq_single (c⁻¹ * x)]
-  · simp
-  · intro a _ ha
-    apply if_neg
-    intro h
-    apply ha
-    exact eq_inv_mul_iff_mul_eq.mpr ((mul_inv_eq_iff_eq_mul.mp h).symm)
-  · simp
+  simp only [rconv_apply, ite_mul, one_mul, zero_mul, mul_inv_eq_iff_eq_mul,
+    ← inv_mul_eq_iff_eq_mul, Finset.sum_ite_eq, Finset.mem_univ, if_true]
 
 end PointMass
 
-/-! ## Boundary maps (Eq. (J1))
+/-! ## Boundary maps
 
-Cells: `C2 = Fin 2 × G` (X-checks), `C1 = Fin 5 × G` (qubits — grid
+Cells: `C2 = Fin 2 × G` (X-checks), `C1 = Fin 5 × G` (qubits: the grid
 blocks `m < 4` carry `(α, β) = (blockRow m, blockCol m)`, block `4` is
 the shared block), `C0 = Fin 2 × G` (Z-checks). -/
 
@@ -184,42 +163,27 @@ def gridIdx (α β : Fin 2) : Fin 5 := ⟨2 * α.val + β.val, by omega⟩
 /-- The shared (fifth) block. -/
 def sharedIdx : Fin 5 := ⟨4, by omega⟩
 
-/-- Row `α` of a grid block (junk at the shared block, which is guarded
-separately). -/
+/-- Row `α` of a grid block. The value at the shared block is not used. -/
 def blockRow (m : Fin 5) : Fin 2 := if m.val < 2 then 0 else 1
 
-/-- Column `β` of a grid block (junk at the shared block). -/
+/-- Column `β` of a grid block. The value at the shared block is not used. -/
 def blockCol (m : Fin 5) : Fin 2 := if m.val % 2 = 0 then 0 else 1
 
 omit [Fintype G] [Group G] in
 /-- The row of a grid index is its first coordinate. -/
 @[simp] lemma blockRow_grid (α β : Fin 2) : blockRow (gridIdx α β) = α := by
-  have hα := α.isLt
-  have hβ := β.isLt
-  apply Fin.ext
-  change (if 2 * α.val + β.val < 2 then (0 : Fin 2) else 1).val = α.val
-  split <;> rename_i h
-  · change 0 = α.val
-    omega
-  · change 1 = α.val
-    omega
+  revert α β
+  decide
 
 omit [Fintype G] [Group G] in
 /-- The column of a grid index is its second coordinate. -/
 @[simp] lemma blockCol_grid (α β : Fin 2) : blockCol (gridIdx α β) = β := by
-  have hα := α.isLt
-  have hβ := β.isLt
-  apply Fin.ext
-  change (if (2 * α.val + β.val) % 2 = 0 then (0 : Fin 2) else 1).val = β.val
-  split <;> rename_i h
-  · change 0 = β.val
-    omega
-  · change 1 = β.val
-    omega
+  revert α β
+  decide
 
 /-- Underlying function of `∂₂` (columns of `H_X`): grid block `(α, β)`
 receives `L(a_α*)` of the `β`-th X-check chain; the shared block receives
-`R(b_β)`-type contributions from both. -/
+the `R(b_β*)` of both X-check chains. -/
 def lpBoundary2Fn (f : Fin 2 × G → ZMod 2) : Fin 5 × G → ZMod 2 :=
   fun q =>
     if q.1.val = 4 then
@@ -240,10 +204,8 @@ def lpBoundary1Fn (u : Fin 5 × G → ZMod 2) : Fin 2 × G → ZMod 2 :=
 omit [Fintype G] [Group G] in
 /-- A grid index is distinct from the shared block. -/
 lemma gridIdx_val_ne_four (α β : Fin 2) : ¬((gridIdx α β).val = 4) := by
-  have hα := α.isLt
-  have hβ := β.isLt
-  change ¬(2 * α.val + β.val = 4)
-  omega
+  revert α β
+  decide
 
 /-- `∂₂` evaluated on a grid block. -/
 lemma lpBoundary2Fn_grid (f : Fin 2 × G → ZMod 2) (α β : Fin 2) (x : G) :
@@ -258,25 +220,21 @@ lemma lpBoundary2Fn_shared (f : Fin 2 × G → ZMod 2) (x : G) :
       = rconv (fun g => f (0, g)) (antipode (B 0)) x
           + rconv (fun g => f (1, g)) (antipode (B 1)) x := rfl
 
-/-- The chain-complex law in computable form: `∂₁ (∂₂ f) = 0`.  Each mixed
-term `L(a_α*) ∘ R(b_β*)` arises once through grid block `(α, β)` and once
+/-- The chain-complex law on the underlying functions: `∂₁ (∂₂ f) = 0`. Each
+mixed term `L(a_α*) ∘ R(b_β*)` arises once through grid block `(α, β)` and once
 through the shared block; `rconv_lconv` aligns the two and characteristic 2
 cancels them. -/
 lemma lpBoundaryFn_comp (f : Fin 2 × G → ZMod 2) :
     lpBoundary1Fn A B (lpBoundary2Fn A B f) = 0 := by
   funext p
   obtain ⟨α, y⟩ := p
-  have h0 : (fun g => lpBoundary2Fn A B f (gridIdx α 0, g))
-      = lconv (antipode (A α)) (fun g => f (0, g)) := by
-    funext g; rw [lpBoundary2Fn_grid]
-  have h1 : (fun g => lpBoundary2Fn A B f (gridIdx α 1, g))
-      = lconv (antipode (A α)) (fun g => f (1, g)) := by
-    funext g; rw [lpBoundary2Fn_grid]
-  have h4 : (fun g => lpBoundary2Fn A B f (sharedIdx, g))
+  have hgrid : ∀ β, (fun g => lpBoundary2Fn A B f (gridIdx α β, g))
+      = lconv (antipode (A α)) (fun g => f (β, g)) :=
+    fun β => funext fun g => lpBoundary2Fn_grid A B f α β g
+  have hshared : (fun g => lpBoundary2Fn A B f (sharedIdx, g))
       = rconv (fun g => f (0, g)) (antipode (B 0))
-          + rconv (fun g => f (1, g)) (antipode (B 1)) := by
-    funext g; rw [lpBoundary2Fn_shared]; rfl
-  simp only [lpBoundary1Fn, h0, h1, h4, lconv_add, rconv_lconv, Pi.add_apply,
+          + rconv (fun g => f (1, g)) (antipode (B 1)) := rfl
+  simp only [lpBoundary1Fn, hgrid, hshared, lconv_add, rconv_lconv, Pi.add_apply,
     Pi.zero_apply]
   exact CharTwo.add_self_eq_zero _
 
@@ -313,22 +271,17 @@ noncomputable def lpBoundary1 :
       rconv_smul', lconv_smul']
     ring
 
-/-- `rfl` bridge from the LinearMap `∂₂` to its computable underlying
-function. -/
+/-- The linear map `∂₂` applies its underlying function. -/
 @[simp] lemma lpBoundary2_apply (f : Fin 2 × G → ZMod 2) :
     lpBoundary2 A B f = lpBoundary2Fn A B f := rfl
 
-/-- `rfl` bridge from the LinearMap `∂₁` to its computable underlying
-function. -/
+/-- The linear map `∂₁` applies its underlying function. -/
 @[simp] lemma lpBoundary1_apply (u : Fin 5 × G → ZMod 2) :
     lpBoundary1 A B u = lpBoundary1Fn A B u := rfl
 
 /-- The chain-complex law `∂₁ ∘ ∂₂ = 0`. -/
-lemma lpBoundary_comp : (lpBoundary1 A B).comp (lpBoundary2 A B) = 0 := by
-  refine LinearMap.ext fun f => ?_
-  simp only [LinearMap.comp_apply, lpBoundary1_apply, lpBoundary2_apply,
-    LinearMap.zero_apply]
-  exact lpBoundaryFn_comp A B f
+lemma lpBoundary_comp : (lpBoundary1 A B).comp (lpBoundary2 A B) = 0 :=
+  LinearMap.ext (lpBoundaryFn_comp A B)
 
 /-! ## Packaging as a `HomologicalCode` -/
 
@@ -340,15 +293,14 @@ omit [Group G] in
 lemma lpCard_C1 : Fintype.card (Fin 5 × G) = lpNumQubits G := by
   rw [lpNumQubits, Fintype.card_prod, Fintype.card_fin]
 
-/-- A bijection between qubit cells and `Fin (5 |G|)` (any choice works
-for the framework; concrete instances may pin their own indexing). -/
+/-- A numbering of the qubit cells by `Fin (5 |G|)`. -/
 noncomputable def lpEdgeEquiv : (Fin 5 × G) ≃ Fin (lpNumQubits G) :=
   ((Equiv.refl (Fin 5)).prodCongr (Fintype.equivFin G)).trans
     (finProdFinEquiv.trans (finCongr rfl))
 
-/-- The 1×2 non-abelian lifted product ("mitten shape") as a
-`HomologicalCode`: `n = 5|G|` qubits, X-checks `Fin 2 × G`, Z-checks
-`Fin 2 × G`, boundary maps per Eq. (J1). -/
+/-- The 1×2 non-abelian lifted product as a `HomologicalCode`: `n = 5|G|`
+qubits, X-checks `Fin 2 × G`, Z-checks `Fin 2 × G`, boundary maps
+`lpBoundary1` and `lpBoundary2`. -/
 noncomputable def mittenChainComplex [DecidableEq G] (A B : Fin 2 → G → ZMod 2) :
     HomologicalCode where
   C0 := Fin 2 × G

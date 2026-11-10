@@ -70,18 +70,6 @@ namespace HomologicalCode
 
 variable {X : HomologicalCode}
 
-/-- The X-type chain operator of `c` at the qubit of the edge `q`. -/
-lemma chainXOperator_operators_edgeEquiv (c : X.C1 → ZMod 2) (q : X.C1) :
-    (X.chainXOperator c).operators (X.edgeEquiv q) =
-      if c q = 1 then PauliOperator.X else PauliOperator.I := by
-  simp only [chainXOperator_op_at, Equiv.apply_eq_iff_eq, exists_eq_left]
-
-/-- The Z-type chain operator of `c` at the qubit of the edge `q`. -/
-lemma chainZOperator_operators_edgeEquiv (c : X.C1 → ZMod 2) (q : X.C1) :
-    (X.chainZOperator c).operators (X.edgeEquiv q) =
-      if c q = 1 then PauliOperator.Z else PauliOperator.I := by
-  simp only [chainZOperator_op_at, Equiv.apply_eq_iff_eq, exists_eq_left]
-
 /-- The operator part of any Pauli element is the product of the X-type chain
 operator of its X-support and the Z-type chain operator of its Z-support. -/
 lemma operators_eq_chainXOperator_mul_chainZOperator
