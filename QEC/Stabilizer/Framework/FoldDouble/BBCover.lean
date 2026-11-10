@@ -276,7 +276,7 @@ theorem fold_chainXOperator :
   rw [fold, sheet_zero_chainXOperator, sheet_one_chainXOperator, ← mul_operators,
     ← chainXOperator_add]
   exact congrArg (fun c => (D.baseComplex.chainXOperator c).operators)
-    (funext (D.sheet0_add_sheet1 v))
+    (D.sheet0_add_sheet1 v)
 
 /-- The double of an X-type chain operator is the X-type chain operator of the
 pullback. -/
@@ -330,7 +330,7 @@ theorem fold_chainZOperator :
   rw [fold, sheet_zero_chainZOperator, sheet_one_chainZOperator, ← mul_operators,
     ← chainZOperator_add]
   exact congrArg (fun c => (D.baseComplex.chainZOperator c).operators)
-    (funext (D.sheet0_add_sheet1 v))
+    (D.sheet0_add_sheet1 v)
 
 /-- The double of a Z-type chain operator is the Z-type chain operator of the
 pullback. -/
@@ -518,13 +518,6 @@ theorem condition_S_of_dangerousFloorNZ {d : ℕ} (hM : D.DangerousFloorNZ (2 * 
   rw [← hslice, ← weight_eq_weight_operators, weight_chainXOperator]
   exact hw
 
-/-- Sheet `1` of a pullback is the base chain. -/
-lemma sheet1_pull1 (u : H × Fin 2 → ZMod 2) : D.sheet1 (D.pull1 u) = u := by
-  funext q
-  change u (Prod.map ⇑D.proj id (D.deckSigma1 (D.sec1 q))) = u q
-  obtain ⟨p, i⟩ := q
-  simp [XDoubleCoverData.deckSigma1, XDoubleCoverData.sec1, D.proj_add_deckS, D.proj_sec]
-
 /-- Hypothesis (F) for the X-type seam logicals: `SeamCosetFloor (2d)` gives
 weight `≥ 2d` to every X-type seam logical. -/
 theorem condition_F_of_seamCosetFloor {d : ℕ} (hMim : D.SeamCosetFloor (2 * d)) :
@@ -573,13 +566,14 @@ theorem condition_F_of_seamCosetFloor {d : ℕ} (hMim : D.SeamCosetFloor (2 * d)
     rw [bbBoundary2Fn_add, Pi.add_apply, Pi.zero_apply]
     have hkey : ∀ n0 c0 n1 c1 w b0 b1 : ZMod 2,
         w = n0 + c1 → w = c0 + n1 → n0 + c0 = b0 → n1 + c1 = b1 → b0 + b1 = 0 := by decide
-    exact hkey _ _ _ _ _ _ _ (h0 j) (h1 j) (D.seamN_add_seamC ξ₀ j) (D.seamN_add_seamC ξ₁ j)
+    exact hkey _ _ _ _ _ _ _ (h0 j) (h1 j) (congrFun (D.seamN_add_seamC ξ₀) j)
+      (congrFun (D.seamN_add_seamC ξ₁) j)
   have hform : ζ = D.seamC (ξ₀ + ξ₁) + bbBoundary2Fn D.Ab D.Bb ξ₀ := by
     funext j
     rw [Pi.add_apply, D.seamC_add, Pi.add_apply]
     have hkey : ∀ n0 c0 c1 w b0 : ZMod 2,
         w = n0 + c1 → n0 + c0 = b0 → w = (c0 + c1) + b0 := by decide
-    exact hkey _ _ _ _ _ (h0 j) (D.seamN_add_seamC ξ₀ j)
+    exact hkey _ _ _ _ _ (h0 j) (congrFun (D.seamN_add_seamC ξ₀) j)
   have hm : 2 * d ≤ D.baseComplex.chainWeight ζ := by
     rw [hform]
     refine hMim _ hker _ ?_

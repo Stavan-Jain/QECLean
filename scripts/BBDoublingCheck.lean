@@ -94,7 +94,7 @@ theorem small_chain_distance :
     IsLeast {w : ℕ | ∃ v : ZMod 2 × Fin 2 → ZMod 2,
       v ∈ smallCover.coverComplex.cycles ∧ v ∉ smallCover.coverComplex.boundaries ∧
       smallCover.coverComplex.chainWeight v = w} 2 :=
-  smallCover.chain_distance_eq_double_of_logicalFloor small_logical_floor
+  smallCover.chain_distance_eq_double small_logical_floor
     small_dangerous_floor
     (smallCover.safeFloor_of_seamCosetFloor small_deck_trivial small_seam_floor)
     smallWitness small_witness_cycle small_witness_weight small_witness_survives
@@ -105,7 +105,7 @@ theorem small_pauli_distance :
       StabilizerGroup.IsNontrivialLogicalOperator g
         smallCover.coverComplex.homologicalStabilizerGroup ∧
       NQubitPauliGroupElement.weight g = w} 2 :=
-  smallCover.pauli_distance_eq_double_of_logicalFloor small_logical_floor
+  smallCover.pauli_distance_eq_double small_logical_floor
     small_dangerous_floor
     (smallCover.safeFloor_of_seamCosetFloor small_deck_trivial small_seam_floor)
     smallWitness small_witness_cycle small_witness_weight small_witness_survives

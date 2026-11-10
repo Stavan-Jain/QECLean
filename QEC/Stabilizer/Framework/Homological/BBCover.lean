@@ -1,44 +1,55 @@
-/-
-# Parametric free-ℤ₂ cover bundle for BB codes
-
-`XDoubleCoverData G H` packages a bivariate-bicycle code over `G` presented
-as the free ℤ₂ cover of a BB code over `H` along one doubled axis: the
-projection `proj : G →+ H`, the deck translation `deckS` (the nonzero kernel
-element), a set-theoretic section `sec`, and the two polynomial pairs with
-their descent equations `fiberSumFn proj Ac = Ab`, `fiberSumFn proj Bc = Bb`.
-
-From those five data fields and four proof obligations everything the gross
-development built in `Codes/BivariateBicycle/CoverTransfer.lean` and the
-sheet/seam plumbing of `DangerousSector.lean`/`SafeSector.lean` is derived
-*generically*: transfer maps, chain-map identities, the exactness package,
-the weight identities, the sheet decomposition, the lifted stabilizer, the
-seam split `∂₂ = N + C`, and the chain-level Smith connecting map
-(`seamC_mem_cycles`).  The doubling-template theorems consuming this bundle
-live in `BBDoubling.lean`.
-
-## Name map (parametric ↔ gross instantiation)
-
-| here (`D : XDoubleCoverData G H`)  | gross (`Codes/BivariateBicycle/`)  |
-|------------------------------------|------------------------------------|
-| `D.proj`, `D.deckS`, `D.sec`       | `coverPi`, `deckS`, `coverSec`     |
-| `D.Ac/Bc`, `D.Ab/Bb`               | `grossA/B`, `baseA/B`              |
-| `D.coverComplex`, `D.baseComplex`  | `grossComplex`, `bb72Complex`      |
-| `D.push0/1`, `D.pull0/1`           | `coverPush0/1`, `coverPull0/1`     |
-| `D.deckSigma1`, `D.deckShift0/1`   | `deckSigma1`, `deckShift0/1`       |
-| `D.sec1`                           | `coverSec1`                        |
-| `D.sheet0/1`, `D.liftC2/liftStab`  | `sheet0/1`, `liftC2/liftStab`      |
-| `D.seamN/seamC`                    | `seamN/seamC`                      |
-| `D.chainWeight_sheet_eq`           | `gross_chainWeight_sheet_eq`       |
-
-## Convention bridge (lab notes → repo)
-
-Repo convention (`BBChainComplex.lean`): `∂₂ f = (A⋆f | B⋆f)`,
-`∂₁ c = B⋆c_L + A⋆c_R`; cycle condition `B⋆v_L = A⋆v_R`.
-**Repo-left = lab-right.**  Sheet 0 = the `sec` image.
--/
-
 import QEC.Stabilizer.Framework.Homological.Covering
-import QEC.Stabilizer.Framework.Homological.BBDuality
+
+/-!
+# Free double covers of bivariate bicycle codes
+
+A bivariate bicycle code over a finite abelian group `G`, with polynomials
+`A_c`, `B_c`, is a *free double cover* of one over `H`, with polynomials `A_b`,
+`B_b`, when there is a homomorphism `proj : G →+ H` such that
+
+* the fibers of `proj` are the orbits `{g, g + s}` of a nonzero *deck
+  translation* `s : G`, so that `proj` is two-to-one, and
+* the polynomials descend: `proj_* A_c = A_b` and `proj_* B_c = B_b`, where
+  `proj_*` is summation over the fibers.
+
+The standard example is the reduction `ZMod (2 * ℓ) × ZMod m → ZMod ℓ × ZMod m`
+of the first coordinate, with `s = (ℓ, 0)`.
+
+`XDoubleCoverData G H` bundles `proj`, `s = deckS`, the four polynomials and a
+set-theoretic section `sec` of `proj`. The image of `sec` is called *sheet 0*
+and its deck translate *sheet 1*. Everything else is derived from the bundle.
+
+## Main definitions
+
+* `coverComplex`, `baseComplex`: the two bivariate bicycle chain complexes.
+* `push0`, `push1`: the pushforward `p` (fiber summation) on chains indexed by
+  `G` and on 1-chains; `pull0`, `pull1`: the pullback `τ` (composition with the
+  projection).
+* `deckShift0`, `deckShift1`: the action `σ` of the deck translation on chains.
+* `sheet0`, `sheet1`: the restrictions of a cover 1-chain to the two sheets,
+  as base 1-chains; `sheetC2_0`, `sheetC2_1`: the same for chains indexed by
+  `G`.
+* `liftC2 ξ`: the cover chain that equals `ξ` on sheet 0 and vanishes on
+  sheet 1; `liftStab ξ = ∂₂ (liftC2 ξ)`.
+* `seamN ξ`, `seamC ξ`: the sheet-0 and sheet-1 parts of `liftStab ξ`.
+
+## Main statements
+
+* `push_boundary1_comm`, `push_boundary2_comm`, `pull_boundary1_comm`,
+  `pull_boundary2_comm`: `p` and `τ` are chain maps.
+* `push1_pull1_eq_zero`, `push1_eq_zero_iff`, `pull1_push1`: `p ∘ τ = 0`,
+  `ker p = im τ` and `τ ∘ p = 1 + σ` on 1-chains.
+* `exists_pull_eq_add_boundary`: a cover cycle whose pushforward is a base
+  boundary is, up to a cover boundary, the pullback of a base cycle.
+* `chainWeight_eq_push_add_overlap`, `chainWeight_sheet_eq`,
+  `chainWeight_push_le`, `chainWeight_pull1`: the weight of a cover chain in
+  terms of its pushforward; `p` does not increase weight and `τ` doubles it.
+* `liftC2_decomp`: a cover chain is the sum of the lifts of its two sheets.
+* `seamN_add_seamC`: `seamN ξ + seamC ξ = ∂₂ ξ`.
+* `seamC_mem_cycles`: if `∂₂ ζ = 0` then `seamC ζ` is a base cycle. On homology
+  this is the connecting map from `ker ∂₂` to `H₁` of the base complex that the
+  cover induces.
+-/
 
 namespace Quantum
 namespace Stabilizer
@@ -47,41 +58,36 @@ namespace BB
 
 open scoped BigOperators
 
--- Defeq checks through `fiberSum (Prod.map ⇑D.proj id)` and the lifted-
--- stabilizer bridges unfold deep `Prod`/`ZMod` instance chains, exactly as
--- in the gross instantiation (`CoverTransfer.lean`).
-set_option maxRecDepth 4096
-
-/-- The data of a BB code over `G` presented as a free ℤ₂ cover of a BB code
-over `H` along one doubled axis. `proj` is the covering projection, `deckS` the
-deck translation, `sec` a set-theoretic section, `Ac, Bc` the cover polynomials
-and `Ab, Bb` their descents. -/
+/-- A bivariate bicycle code over `G` presented as a free double cover of one
+over `H`: a projection `proj : G →+ H` whose fibers are the orbits of a nonzero
+deck translation `deckS`, a section `sec` of `proj`, and polynomials `Ac`, `Bc`
+on `G` whose fiber sums along `proj` are `Ab`, `Bb`. -/
 structure XDoubleCoverData (G H : Type)
     [Fintype G] [AddCommGroup G] [DecidableEq G]
     [Fintype H] [AddCommGroup H] [DecidableEq H] where
-  /-- The covering projection (reduce the doubled axis). -/
+  /-- The covering projection. -/
   proj : G →+ H
-  /-- The deck translation: the nonzero element of `ker proj`. -/
+  /-- The deck translation: the nonzero element of the kernel of `proj`. -/
   deckS : G
   /-- A set-theoretic section of `proj`. -/
   sec : H → G
-  /-- The cover-code polynomial `A`. -/
+  /-- The polynomial `A` of the cover code. -/
   Ac : G → ZMod 2
-  /-- The cover-code polynomial `B`. -/
+  /-- The polynomial `B` of the cover code. -/
   Bc : G → ZMod 2
-  /-- The base-code polynomial `A`. -/
+  /-- The polynomial `A` of the base code. -/
   Ab : H → ZMod 2
-  /-- The base-code polynomial `B`. -/
+  /-- The polynomial `B` of the base code. -/
   Bb : H → ZMod 2
-  /-- The deck translation is nonzero (the cover is genuinely 2:1). -/
+  /-- The deck translation is nonzero, so the cover is two-to-one. -/
   deckS_ne_zero : deckS ≠ 0
-  /-- Fibers of `proj` are deck orbits. -/
+  /-- The fibers of `proj` are the orbits of the deck translation. -/
   proj_fiber : ∀ g g' : G, proj g' = proj g ↔ g' = g ∨ g' = g + deckS
-  /-- `sec` sections `proj`. -/
+  /-- `sec` is a section of `proj`. -/
   proj_sec : ∀ p : H, proj (sec p) = p
-  /-- The polynomial `A` descends. -/
+  /-- The polynomial `A` descends: the fiber sums of `Ac` are `Ab`. -/
   push_A : fiberSumFn ⇑proj Ac = Ab
-  /-- The polynomial `B` descends. -/
+  /-- The polynomial `B` descends: the fiber sums of `Bc` are `Bb`. -/
   push_B : fiberSumFn ⇑proj Bc = Bb
 
 namespace XDoubleCoverData
@@ -91,57 +97,59 @@ variable {G H : Type}
   [Fintype H] [AddCommGroup H] [DecidableEq H]
   (D : XDoubleCoverData G H)
 
-/-! ## Derived group facts (lemmas, not fields) -/
+/-! ## The deck translation -/
 
+/-- The deck translation lies in the kernel of the projection. -/
 lemma proj_deckS : D.proj D.deckS = 0 := by
-  have h := (D.proj_fiber 0 D.deckS).mpr (Or.inr (zero_add D.deckS).symm)
-  rwa [map_zero] at h
+  simpa using (D.proj_fiber 0 D.deckS).mpr (Or.inr (zero_add _).symm)
 
+/-- The deck translation has order two. -/
 lemma deckS_add_deckS : D.deckS + D.deckS = 0 := by
-  have h0 : D.proj 0 = D.proj D.deckS := by
-    rw [map_zero, D.proj_deckS]
-  rcases (D.proj_fiber D.deckS 0).mp h0 with h | h
-  · exact absurd h.symm D.deckS_ne_zero
-  · exact h.symm
+  rcases (D.proj_fiber D.deckS 0).mp (by rw [map_zero, D.proj_deckS]) with h | h
+  exacts [absurd h.symm D.deckS_ne_zero, h.symm]
 
+/-- The deck translation is its own negative. -/
 lemma neg_deckS : -D.deckS = D.deckS :=
   neg_eq_of_add_eq_zero_left D.deckS_add_deckS
 
+/-- The projection is invariant under the deck translation. -/
 lemma proj_add_deckS (g : G) : D.proj (g + D.deckS) = D.proj g :=
   (D.proj_fiber g (g + D.deckS)).mpr (Or.inr rfl)
 
+/-- The projection is surjective, having a section. -/
 lemma proj_surjective : Function.Surjective ⇑D.proj := fun p =>
   ⟨D.sec p, D.proj_sec p⟩
 
-/-- Every cover point is the section point of its fiber or its deck partner. -/
+/-- Every point of `G` is the section point of its fiber or its deck
+translate: it lies on sheet 0 or on sheet 1. -/
 lemma point_dichotomy (g : G) :
     g = D.sec (D.proj g) ∨ g = D.sec (D.proj g) + D.deckS :=
   (D.proj_fiber (D.sec (D.proj g)) g).mp (D.proj_sec (D.proj g)).symm
 
 /-! ## The two chain complexes -/
 
-/-- The cover-code chain complex. -/
+/-- The chain complex of the cover code. -/
 noncomputable def coverComplex : HomologicalCode := bbChainComplex D.Ac D.Bc
 
-/-- The base-code chain complex. -/
+/-- The chain complex of the base code. -/
 noncomputable def baseComplex : HomologicalCode := bbChainComplex D.Ab D.Bb
 
-/-! ## Deck data on chains -/
+/-! ## The deck translation on qubits and chains -/
 
-/-- The deck involution on qubit indices: shift the group coordinate by `deckS`,
-keep the block. -/
+/-- The deck involution on the qubits of the cover: translate the group
+coordinate by `deckS` and keep the block. -/
 def deckSigma1 : G × Fin 2 → G × Fin 2 :=
   fun p => (p.1 + D.deckS, p.2)
 
 @[simp] lemma deckSigma1_apply (p : G × Fin 2) :
     D.deckSigma1 p = (p.1 + D.deckS, p.2) := rfl
 
-/-- Deck shift on 0- and 2-chains: `(σ v)(g) = v (g + deckS)`. -/
+/-- The deck translation `σ` on chains indexed by `G`:
+`(σ v) g = v (g + deckS)`. -/
 def deckShift0 (v : G → ZMod 2) : G → ZMod 2 :=
   fun g => v (g + D.deckS)
 
-/-- Deck shift on 1-chains (qubits): shift the group coordinate, keep the block.
--/
+/-- The deck translation `σ` on 1-chains: `(σ v) p = v (deckSigma1 p)`. -/
 def deckShift1 (v : G × Fin 2 → ZMod 2) : G × Fin 2 → ZMod 2 :=
   fun p => v (p.1 + D.deckS, p.2)
 
@@ -151,71 +159,48 @@ def deckShift1 (v : G × Fin 2 → ZMod 2) : G × Fin 2 → ZMod 2 :=
 @[simp] lemma deckShift1_apply (v : G × Fin 2 → ZMod 2) (p : G × Fin 2) :
     D.deckShift1 v p = v (p.1 + D.deckS, p.2) := rfl
 
-lemma deckShift1_eq_comp (v : G × Fin 2 → ZMod 2) :
-    D.deckShift1 v = v ∘ D.deckSigma1 := rfl
+/-- The deck involution on qubits has no fixed points. -/
+lemma deckSigma1_ne (p : G × Fin 2) : D.deckSigma1 p ≠ p := fun hp =>
+  D.deckS_ne_zero (add_eq_left.mp (congrArg Prod.fst hp))
 
-theorem deckSigma1_ne : ∀ p : G × Fin 2, D.deckSigma1 p ≠ p := by
-  intro p hp
-  have h1 : p.1 + D.deckS = p.1 := congrArg Prod.fst hp
-  have h2 : D.deckS = 0 := by
-    have := congrArg (fun x => x - p.1) h1
-    simpa [add_comm, add_sub_cancel_right] using this
-  exact D.deckS_ne_zero h2
+/-- The fibers of `Prod.map proj id` on qubits are the orbits of
+`deckSigma1`. -/
+lemma proj_prodMap_fiber (q q' : G × Fin 2) :
+    Prod.map ⇑D.proj id q' = Prod.map ⇑D.proj id q
+      ↔ q' = q ∨ q' = D.deckSigma1 q := by
+  simp only [Prod.ext_iff, Prod.map_fst, Prod.map_snd, id_eq, deckSigma1_apply,
+    D.proj_fiber q.1 q'.1]
+  tauto
 
-/-- The fibers of `Prod.map proj id` on qubit indices are the
-`deckSigma1`-orbits. -/
-theorem proj_prodMap_fiber :
-    ∀ q q' : G × Fin 2,
-      Prod.map ⇑D.proj id q' = Prod.map ⇑D.proj id q
-        ↔ q' = q ∨ q' = D.deckSigma1 q := by
-  intro q q'
-  obtain ⟨g, j⟩ := q
-  obtain ⟨g', j'⟩ := q'
-  change (D.proj g', j') = (D.proj g, j)
-    ↔ (g', j') = (g, j) ∨ (g', j') = (g + D.deckS, j)
-  constructor
-  · intro h
-    have hg : D.proj g' = D.proj g := congrArg Prod.fst h
-    have hj : j' = j := congrArg Prod.snd h
-    rcases (D.proj_fiber g g').mp hg with h1 | h1
-    · exact Or.inl (by rw [h1, hj])
-    · exact Or.inr (by rw [h1, hj])
-  · rintro (h | h)
-    · have hg : g' = g := congrArg Prod.fst h
-      have hj : j' = j := congrArg Prod.snd h
-      rw [hg, hj]
-    · have hg : g' = g + D.deckS := congrArg Prod.fst h
-      have hj : j' = j := congrArg Prod.snd h
-      rw [hg, hj, (D.proj_fiber g (g + D.deckS)).mpr (Or.inr rfl)]
-
-/-- Section of `Prod.map proj id` on qubit indices. -/
+/-- The section of `Prod.map proj id` on qubits induced by `sec`. -/
 def sec1 : H × Fin 2 → G × Fin 2 := Prod.map D.sec id
 
-theorem proj_prodMap_sec1 :
-    ∀ p : H × Fin 2, Prod.map ⇑D.proj id (D.sec1 p) = p := by
-  intro p
-  obtain ⟨b, j⟩ := p
-  change (D.proj (D.sec (b, j).1), j) = (b, j)
-  rw [D.proj_sec]
+/-- `sec1` is a section of `Prod.map proj id`. -/
+lemma proj_prodMap_sec1 (p : H × Fin 2) :
+    Prod.map ⇑D.proj id (D.sec1 p) = p :=
+  Prod.ext (D.proj_sec p.1) rfl
 
-/-! ## The four transfer maps -/
+/-! ## Pushforward and pullback -/
 
-/-- Pushforward on 0- and 2-chains. -/
+/-- The pushforward `p` on chains indexed by `G` (0- and 2-chains): summation
+over the fibers of `proj`. -/
 noncomputable def push0 :
     (G → ZMod 2) →ₗ[ZMod 2] (H → ZMod 2) :=
   fiberSum ⇑D.proj
 
-/-- Pushforward on 1-chains (qubits). -/
+/-- The pushforward `p` on 1-chains: summation over the fibers of
+`Prod.map proj id`. -/
 noncomputable def push1 :
     (G × Fin 2 → ZMod 2) →ₗ[ZMod 2] (H × Fin 2 → ZMod 2) :=
   fiberSum (Prod.map ⇑D.proj id)
 
-/-- Pullback on 0- and 2-chains. -/
+/-- The pullback `τ` on chains indexed by `H` (0- and 2-chains): composition
+with `proj`. -/
 noncomputable def pull0 :
     (H → ZMod 2) →ₗ[ZMod 2] (G → ZMod 2) :=
   LinearMap.funLeft (ZMod 2) (ZMod 2) ⇑D.proj
 
-/-- Pullback on 1-chains (qubits). -/
+/-- The pullback `τ` on 1-chains: composition with `Prod.map proj id`. -/
 noncomputable def pull1 :
     (H × Fin 2 → ZMod 2) →ₗ[ZMod 2] (G × Fin 2 → ZMod 2) :=
   LinearMap.funLeft (ZMod 2) (ZMod 2) (Prod.map ⇑D.proj id)
@@ -232,196 +217,93 @@ noncomputable def pull1 :
 @[simp] lemma pull1_apply (u : H × Fin 2 → ZMod 2) :
     D.pull1 u = u ∘ Prod.map ⇑D.proj id := rfl
 
-/-! ## Chain maps -/
+/-! ## The transfer maps are chain maps -/
 
-/-- `p` is a chain map at level 1: `p₀ ∘ ∂₁ = ∂₁ ∘ p₁`. -/
+/-- The pushforward commutes with `∂₁`: `p (∂₁ c) = ∂₁ (p c)`. -/
 theorem push_boundary1_comm (c : G × Fin 2 → ZMod 2) :
     D.push0 (D.coverComplex.boundary1 c)
-      = D.baseComplex.boundary1 (D.push1 c) := by
-  change fiberSumFn ⇑D.proj (bbBoundary1Fn D.Ac D.Bc c)
-    = bbBoundary1Fn D.Ab D.Bb (fiberSumFn (Prod.map ⇑D.proj id) c)
-  exact fiberSum_bbBoundary1Fn D.proj D.Ac D.Bc D.Ab D.Bb
-    D.push_A D.push_B c
+      = D.baseComplex.boundary1 (D.push1 c) :=
+  fiberSum_bbBoundary1Fn D.proj D.Ac D.Bc D.Ab D.Bb D.push_A D.push_B c
 
-/-- `p` is a chain map at level 2: `p₁ ∘ ∂₂ = ∂₂ ∘ p₂`. -/
+/-- The pushforward commutes with `∂₂`: `p (∂₂ f) = ∂₂ (p f)`. -/
 theorem push_boundary2_comm (f : G → ZMod 2) :
     D.push1 (D.coverComplex.boundary2 f)
-      = D.baseComplex.boundary2 (D.push0 f) := by
-  change fiberSumFn (Prod.map ⇑D.proj id) (bbBoundary2Fn D.Ac D.Bc f)
-    = bbBoundary2Fn D.Ab D.Bb (fiberSumFn ⇑D.proj f)
-  exact fiberSum_bbBoundary2Fn D.proj D.Ac D.Bc D.Ab D.Bb
-    D.push_A D.push_B f
+      = D.baseComplex.boundary2 (D.push0 f) :=
+  fiberSum_bbBoundary2Fn D.proj D.Ac D.Bc D.Ab D.Bb D.push_A D.push_B f
 
-/-- `τ` is a chain map at level 1: `∂₁ ∘ τ₁ = τ₀ ∘ ∂₁`. -/
+/-- The pullback commutes with `∂₁`: `∂₁ (τ u) = τ (∂₁ u)`. -/
 theorem pull_boundary1_comm (u : H × Fin 2 → ZMod 2) :
     D.coverComplex.boundary1 (D.pull1 u)
-      = D.pull0 (D.baseComplex.boundary1 u) := by
-  change bbBoundary1Fn D.Ac D.Bc (u ∘ Prod.map ⇑D.proj id)
-    = (bbBoundary1Fn D.Ab D.Bb u) ∘ ⇑D.proj
-  exact pullback_bbBoundary1Fn D.proj D.Ac D.Bc D.Ab D.Bb
-    D.push_A D.push_B u
+      = D.pull0 (D.baseComplex.boundary1 u) :=
+  pullback_bbBoundary1Fn D.proj D.Ac D.Bc D.Ab D.Bb D.push_A D.push_B u
 
-/-- `τ` is a chain map at level 2: `∂₂ ∘ τ₂ = τ₁ ∘ ∂₂`. -/
+/-- The pullback commutes with `∂₂`: `∂₂ (τ f) = τ (∂₂ f)`. -/
 theorem pull_boundary2_comm (f : H → ZMod 2) :
     D.coverComplex.boundary2 (D.pull0 f)
-      = D.pull1 (D.baseComplex.boundary2 f) := by
-  change bbBoundary2Fn D.Ac D.Bc (f ∘ ⇑D.proj)
-    = (bbBoundary2Fn D.Ab D.Bb f) ∘ Prod.map ⇑D.proj id
-  exact pullback_bbBoundary2Fn D.proj D.Ac D.Bc D.Ab D.Bb
-    D.push_A D.push_B f
+      = D.pull1 (D.baseComplex.boundary2 f) :=
+  pullback_bbBoundary2Fn D.proj D.Ac D.Bc D.Ab D.Bb D.push_A D.push_B f
 
-/-! ## Exactness package on 1-chains -/
+/-! ## Exactness of the transfer maps on 1-chains -/
 
-/-- `p ∘ τ = 0` on 1-chains (each fiber contributes twice in char 2). -/
+/-- `p ∘ τ = 0` on 1-chains: each fiber contributes the same value twice. -/
 theorem push1_pull1_eq_zero (u : H × Fin 2 → ZMod 2) :
     D.push1 (D.pull1 u) = 0 :=
   fiberSumFn_pullback D.deckSigma1_ne D.proj_prodMap_fiber u
 
-theorem proj_prodMap_surjective :
+/-- The projection on qubits is surjective. -/
+lemma proj_prodMap_surjective :
     Function.Surjective (Prod.map ⇑D.proj (id : Fin 2 → Fin 2)) :=
   Function.Surjective.prodMap D.proj_surjective Function.surjective_id
 
-theorem pull1_injective : Function.Injective ⇑D.pull1 :=
+/-- The pullback on 1-chains is injective. -/
+lemma pull1_injective : Function.Injective ⇑D.pull1 :=
   LinearMap.funLeft_injective_of_surjective (ZMod 2) (ZMod 2) _
     D.proj_prodMap_surjective
 
-theorem pull0_injective : Function.Injective ⇑D.pull0 :=
+/-- The pullback on chains indexed by `H` is injective. -/
+lemma pull0_injective : Function.Injective ⇑D.pull0 :=
   LinearMap.funLeft_injective_of_surjective (ZMod 2) (ZMod 2) _
     D.proj_surjective
 
-theorem push1_surjective : Function.Surjective ⇑D.push1 := fun u =>
+/-- The pushforward on 1-chains is surjective. -/
+lemma push1_surjective : Function.Surjective ⇑D.push1 := fun u =>
   ⟨lift0 (Prod.map ⇑D.proj id) D.sec1 u,
     fiberSumFn_lift0 D.proj_prodMap_sec1 u⟩
 
-theorem push0_surjective : Function.Surjective ⇑D.push0 := fun u =>
+/-- The pushforward on chains indexed by `G` is surjective. -/
+lemma push0_surjective : Function.Surjective ⇑D.push0 := fun u =>
   ⟨lift0 ⇑D.proj D.sec u, fiberSumFn_lift0 D.proj_sec u⟩
 
-/-- `ker p = range τ` on 1-chains. -/
+/-- `ker p = im τ` on 1-chains. -/
 theorem push1_eq_zero_iff (v : G × Fin 2 → ZMod 2) :
     D.push1 v = 0 ↔ ∃ u : H × Fin 2 → ZMod 2, v = D.pull1 u :=
   fiberSumFn_eq_zero_iff D.deckSigma1_ne D.proj_prodMap_fiber
     D.proj_prodMap_sec1 v
 
-/-- The chain identity `τ(p(v)) = v + σv` = `(1 + σ)v`. -/
+/-- `τ ∘ p = 1 + σ` on 1-chains: `τ (p v) = v + σ v`. -/
 theorem pull1_push1 (v : G × Fin 2 → ZMod 2) :
-    D.pull1 (D.push1 v) = v + D.deckShift1 v := by
-  funext p
-  change fiberSumFn (Prod.map ⇑D.proj id) v (Prod.map ⇑D.proj id p)
-    = v p + v (p.1 + D.deckS, p.2)
-  rw [fiberSumFn_pair D.deckSigma1_ne D.proj_prodMap_fiber v p]
-  rfl
+    D.pull1 (D.push1 v) = v + D.deckShift1 v :=
+  funext fun p => fiberSumFn_pair D.deckSigma1_ne D.proj_prodMap_fiber v p
 
-/-- **The transfer chase at the cover**: a cover 1-cycle whose pushforward is a
-base boundary differs from the pullback of a base 1-cycle by a cover boundary.
-This is the hard (`ker ≤ range`) half of the exactness of the transfer sequence
-on `H₁`; the quotient-level packaging lives in `BBTransferH1.lean`.
-
-Chase: `p₁ v = ∂₂ᵇ w`; lift `w = p₀ w'` (`push0_surjective`); then
-`p₁ (v + ∂₂ᶜ w') = ∂₂ᵇ w + ∂₂ᵇ w = 0` (char 2), so `v + ∂₂ᶜ w' = τ₁ u`
-(`push1_eq_zero_iff`); finally `u` is a base cycle by `pull_boundary1_comm` and
-`pull0_injective`. -/
-theorem exists_pull_eq_add_boundary {v : G × Fin 2 → ZMod 2}
-    (hv : v ∈ D.coverComplex.cycles)
-    (hbd : D.push1 v ∈ D.baseComplex.boundaries) :
-    ∃ u : H × Fin 2 → ZMod 2, u ∈ D.baseComplex.cycles ∧
-      ∃ f : G → ZMod 2, D.pull1 u = v + bbBoundary2Fn D.Ac D.Bc f := by
-  have hkey : ∀ a : ZMod 2, a + a = 0 := by decide
-  obtain ⟨w, hw⟩ := hbd
-  -- lift the 2-chain witness through the surjective `p₀`
-  obtain ⟨w', rfl⟩ := D.push0_surjective w
-  set v' : G × Fin 2 → ZMod 2 := v + bbBoundary2Fn D.Ac D.Bc w' with hv'
-  -- the corrected chain pushes to zero (char 2)
-  have hzero : D.push1 v' = 0 := by
-    have h1 : D.push1 v'
-        = D.push1 v + D.push1 (bbBoundary2Fn D.Ac D.Bc w') := by
-      rw [hv']; exact map_add _ _ _
-    have h2 : D.push1 (bbBoundary2Fn D.Ac D.Bc w') = D.push1 v :=
-      (D.push_boundary2_comm w').trans hw
-    rw [h1, h2]
-    funext j
-    rw [Pi.add_apply, Pi.zero_apply]
-    exact hkey _
-  -- hence it is a pullback: `v + ∂₂ᶜ w' = τ₁ u`
-  obtain ⟨u, hu⟩ := (D.push1_eq_zero_iff _).mp hzero
-  -- the descended chain `u` is a base cycle
-  have hu_cyc : u ∈ D.baseComplex.cycles := by
-    have hb1 : D.coverComplex.boundary1 v' = 0 := by
-      have h1 : D.coverComplex.boundary1 v'
-          = D.coverComplex.boundary1 v
-            + D.coverComplex.boundary1 (bbBoundary2Fn D.Ac D.Bc w') := by
-        rw [hv']; exact map_add _ _ _
-      have h2 : D.coverComplex.boundary1 v = 0 := hv
-      have h3 : D.coverComplex.boundary1 (bbBoundary2Fn D.Ac D.Bc w') = 0 :=
-        D.coverComplex.boundary_comp_apply w'
-      rw [h1, h2, h3, add_zero]
-    have h4 : D.coverComplex.boundary1 (D.pull1 u) = 0 := by
-      rw [← hu]; exact hb1
-    rw [D.pull_boundary1_comm] at h4
-    exact (D.baseComplex.mem_cycles_iff u).mpr
-      (D.pull0_injective (h4.trans (map_zero D.pull0).symm))
-  exact ⟨u, hu_cyc, w', hu.symm.trans hv'⟩
-
-/-! ## Weight identities -/
-
-/-- The number of qubits in the support of `v` whose deck partner is also in the
-support (counts each doubly-covered fiber twice). -/
-noncomputable def overlapCount (v : G × Fin 2 → ZMod 2) : ℕ :=
-  (Finset.univ.filter fun p : G × Fin 2 =>
-    v p ≠ 0 ∧ v (p.1 + D.deckS, p.2) ≠ 0).card
-
-/-- `chainWeight` of a cover 1-chain in terms of raw `Finset` data. -/
-lemma coverComplex_chainWeight_eq (v : G × Fin 2 → ZMod 2) :
-    D.coverComplex.chainWeight v
-      = (Finset.univ.filter fun p : G × Fin 2 => v p ≠ 0).card := rfl
-
-/-- `chainWeight` of a base 1-chain in terms of raw `Finset` data. -/
-lemma baseComplex_chainWeight_eq (u : H × Fin 2 → ZMod 2) :
-    D.baseComplex.chainWeight u
-      = (Finset.univ.filter fun p : H × Fin 2 => u p ≠ 0).card := rfl
-
-/-- Weight identity for the pushforward: `|v| = |p(v)| + overlap`. -/
-theorem chainWeight_eq_push_add_overlap (v : G × Fin 2 → ZMod 2) :
-    D.coverComplex.chainWeight v
-      = D.baseComplex.chainWeight (D.push1 v) + D.overlapCount v := by
-  rw [coverComplex_chainWeight_eq, baseComplex_chainWeight_eq,
-    push1_apply, overlapCount]
-  exact card_support_fiberSum_add_overlap D.deckSigma1_ne D.proj_prodMap_fiber v
-
-/-- Pushing forward can only shrink chain weight. -/
-theorem chainWeight_push_le (v : G × Fin 2 → ZMod 2) :
-    D.baseComplex.chainWeight (D.push1 v) ≤ D.coverComplex.chainWeight v := by
-  rw [D.chainWeight_eq_push_add_overlap v]
-  exact Nat.le_add_right _ _
-
-/-- Pulling back exactly doubles chain weight. -/
-theorem chainWeight_pull1 (u : H × Fin 2 → ZMod 2) :
-    D.coverComplex.chainWeight (D.pull1 u)
-      = 2 * D.baseComplex.chainWeight u := by
-  rw [coverComplex_chainWeight_eq, baseComplex_chainWeight_eq, pull1_apply]
-  exact card_support_pullback D.deckSigma1_ne D.proj_prodMap_fiber
-    D.proj_prodMap_sec1 u
-
-/-! ## Cycle-membership transfer -/
+/-! ## Transfer of cycles and boundaries -/
 
 /-- Pushforwards of cycles are cycles. -/
 theorem push1_mem_cycles {v : G × Fin 2 → ZMod 2}
     (hv : v ∈ D.coverComplex.cycles) :
     D.push1 v ∈ D.baseComplex.cycles := by
   have hv' : D.coverComplex.boundary1 v = 0 := hv
-  have hgoal : D.baseComplex.boundary1 (D.push1 v) = 0 := by
-    rw [← D.push_boundary1_comm, hv']
-    exact map_zero D.push0
-  exact hgoal
+  change D.baseComplex.boundary1 (D.push1 v) = 0
+  rw [← D.push_boundary1_comm, hv']
+  exact map_zero D.push0
 
 /-- Pullbacks of cycles are cycles. -/
 theorem pull1_mem_cycles {u : H × Fin 2 → ZMod 2}
     (hu : u ∈ D.baseComplex.cycles) :
     D.pull1 u ∈ D.coverComplex.cycles := by
   have hu' : D.baseComplex.boundary1 u = 0 := hu
-  have hgoal : D.coverComplex.boundary1 (D.pull1 u) = 0 := by
-    rw [D.pull_boundary1_comm, hu']
-    exact map_zero D.pull0
-  exact hgoal
+  change D.coverComplex.boundary1 (D.pull1 u) = 0
+  rw [D.pull_boundary1_comm, hu']
+  exact map_zero D.pull0
 
 /-- Pushforwards of boundaries are boundaries. -/
 theorem push1_mem_boundaries {v : G × Fin 2 → ZMod 2}
@@ -437,13 +319,81 @@ theorem pull1_mem_boundaries {u : H × Fin 2 → ZMod 2}
   obtain ⟨f, rfl⟩ := hu
   exact ⟨D.pull0 f, D.pull_boundary2_comm f⟩
 
-/-! ## Sheet decomposition of cover 1-chains -/
+/-- A base chain whose pullback is a cover cycle is a base cycle, because the
+pullback is an injective chain map. -/
+lemma descend_cycle {u : H × Fin 2 → ZMod 2}
+    (h : D.pull1 u ∈ D.coverComplex.cycles) :
+    bbBoundary1Fn D.Ab D.Bb u = 0 := by
+  have h1 : D.coverComplex.boundary1 (D.pull1 u) = 0 := h
+  rw [D.pull_boundary1_comm] at h1
+  exact D.pull0_injective (h1.trans (map_zero D.pull0).symm)
 
-/-- Sheet-0 restriction of a cover 1-chain (via the section `sec1`). -/
+/-- A cover 1-cycle whose pushforward is a base boundary differs from the
+pullback of a base 1-cycle by a cover boundary. If `p v = ∂₂ (p w)`, then
+`p (v + ∂₂ w) = 0`, so `v + ∂₂ w = τ u`, and `u` is a cycle because `τ` is an
+injective chain map. -/
+theorem exists_pull_eq_add_boundary {v : G × Fin 2 → ZMod 2}
+    (hv : v ∈ D.coverComplex.cycles)
+    (hbd : D.push1 v ∈ D.baseComplex.boundaries) :
+    ∃ u : H × Fin 2 → ZMod 2, u ∈ D.baseComplex.cycles ∧
+      ∃ f : G → ZMod 2, D.pull1 u = v + bbBoundary2Fn D.Ac D.Bc f := by
+  obtain ⟨w, hw⟩ := hbd
+  obtain ⟨w', rfl⟩ := D.push0_surjective w
+  have hzero : D.push1 (v + bbBoundary2Fn D.Ac D.Bc w') = 0 := by
+    rw [map_add, show D.push1 (bbBoundary2Fn D.Ac D.Bc w') = D.push1 v from
+      (D.push_boundary2_comm w').trans hw]
+    exact ZModModule.add_self _
+  obtain ⟨u, hu⟩ := (D.push1_eq_zero_iff _).mp hzero
+  refine ⟨u, D.descend_cycle ?_, w', hu.symm⟩
+  rw [← hu]
+  exact add_mem hv (D.coverComplex.boundaries_le_cycles ⟨w', rfl⟩)
+
+/-! ## Weights -/
+
+/-- The number of qubits in the support of `v` whose deck partner is also in
+the support. Each fiber contained in the support is counted twice. -/
+noncomputable def overlapCount (v : G × Fin 2 → ZMod 2) : ℕ :=
+  (Finset.univ.filter fun p : G × Fin 2 =>
+    v p ≠ 0 ∧ v (p.1 + D.deckS, p.2) ≠ 0).card
+
+/-- The weight of a cover 1-chain is the size of its support. -/
+lemma coverComplex_chainWeight_eq (v : G × Fin 2 → ZMod 2) :
+    D.coverComplex.chainWeight v
+      = (Finset.univ.filter fun p : G × Fin 2 => v p ≠ 0).card := rfl
+
+/-- The weight of a base 1-chain is the size of its support. -/
+lemma baseComplex_chainWeight_eq (u : H × Fin 2 → ZMod 2) :
+    D.baseComplex.chainWeight u
+      = (Finset.univ.filter fun p : H × Fin 2 => u p ≠ 0).card := rfl
+
+/-- `|v| = |p v| + overlapCount v`: the support of `v` consists of the points
+whose deck partner is outside the support, which map bijectively onto the
+support of `p v`, and the overlap. -/
+theorem chainWeight_eq_push_add_overlap (v : G × Fin 2 → ZMod 2) :
+    D.coverComplex.chainWeight v
+      = D.baseComplex.chainWeight (D.push1 v) + D.overlapCount v :=
+  card_support_fiberSum_add_overlap D.deckSigma1_ne D.proj_prodMap_fiber v
+
+/-- The pushforward does not increase weight. -/
+theorem chainWeight_push_le (v : G × Fin 2 → ZMod 2) :
+    D.baseComplex.chainWeight (D.push1 v) ≤ D.coverComplex.chainWeight v :=
+  card_support_fiberSum_le D.deckSigma1_ne D.proj_prodMap_fiber v
+
+/-- The pullback doubles weight. -/
+theorem chainWeight_pull1 (u : H × Fin 2 → ZMod 2) :
+    D.coverComplex.chainWeight (D.pull1 u)
+      = 2 * D.baseComplex.chainWeight u :=
+  card_support_pullback D.deckSigma1_ne D.proj_prodMap_fiber
+    D.proj_prodMap_sec1 u
+
+/-! ## The two sheets of a cover 1-chain -/
+
+/-- The restriction of a cover 1-chain to sheet 0, the image of `sec1`. -/
 def sheet0 (v : G × Fin 2 → ZMod 2) : H × Fin 2 → ZMod 2 :=
   fun q => v (D.sec1 q)
 
-/-- Sheet-1 restriction of a cover 1-chain (deck partner of sheet 0). -/
+/-- The restriction of a cover 1-chain to sheet 1, the deck translate of
+sheet 0. -/
 def sheet1 (v : G × Fin 2 → ZMod 2) : H × Fin 2 → ZMod 2 :=
   fun q => v (D.deckSigma1 (D.sec1 q))
 
@@ -459,254 +409,178 @@ lemma sheet0_add (v w : G × Fin 2 → ZMod 2) :
 lemma sheet1_add (v w : G × Fin 2 → ZMod 2) :
     D.sheet1 (v + w) = D.sheet1 v + D.sheet1 w := rfl
 
-/-- The two sheets sum to the pushforward. -/
-lemma sheet0_add_sheet1 (v : G × Fin 2 → ZMod 2) (j : H × Fin 2) :
-    D.sheet0 v j + D.sheet1 v j = D.push1 v j := by
-  have h := fiberSumFn_pair D.deckSigma1_ne D.proj_prodMap_fiber v (D.sec1 j)
-  rw [D.proj_prodMap_sec1 j] at h
-  exact h.symm
-
-/-- Sheet-0 restriction inverts the pullback. -/
+/-- The sheet-0 restriction of a pullback is the base chain. -/
 lemma sheet0_pull1 (u : H × Fin 2 → ZMod 2) :
-    D.sheet0 (D.pull1 u) = u := by
-  funext q
-  change u (Prod.map ⇑D.proj id (D.sec1 q)) = u q
-  rw [D.proj_prodMap_sec1 q]
+    D.sheet0 (D.pull1 u) = u :=
+  funext fun q => congrArg u (D.proj_prodMap_sec1 q)
 
-/-! ## The refined slice identity -/
+/-- The sheet-1 restriction of a pullback is the base chain. -/
+lemma sheet1_pull1 (u : H × Fin 2 → ZMod 2) :
+    D.sheet1 (D.pull1 u) = u :=
+  funext fun q => congrArg u
+    (((D.proj_prodMap_fiber _ _).mpr (Or.inr rfl)).trans (D.proj_prodMap_sec1 q))
 
-/-- The deck-overlap of `v` counts twice the overlapping fibers. -/
-lemma overlapCount_eq_two_mul_sheets (v : G × Fin 2 → ZMod 2) :
-    D.overlapCount v
-      = 2 * (Finset.univ.filter fun j =>
-          D.sheet0 v j ≠ 0 ∧ D.sheet1 v j ≠ 0).card := by
-  exact card_overlap_eq_two_mul D.deckSigma1_ne D.proj_prodMap_fiber
-    D.proj_prodMap_sec1 v
-
-/-- **Refined slice identity**: `|v| = |p(v)| + 2·|supp(sheet0 v) ∖ supp p(v)|`.
--/
-theorem chainWeight_sheet_eq (v : G × Fin 2 → ZMod 2) :
-    D.coverComplex.chainWeight v
-      = D.baseComplex.chainWeight (D.push1 v)
-        + 2 * (Finset.univ.filter fun j =>
-            D.sheet0 v j ≠ 0 ∧ D.push1 v j = 0).card := by
-  rw [D.chainWeight_eq_push_add_overlap v, D.overlapCount_eq_two_mul_sheets]
-  have hfilter : (Finset.univ.filter fun j =>
-        D.sheet0 v j ≠ 0 ∧ D.sheet1 v j ≠ 0)
-      = Finset.univ.filter fun j =>
-          D.sheet0 v j ≠ 0 ∧ D.push1 v j = 0 := by
-    apply Finset.filter_congr
-    intro j _
-    have key : ∀ a b c : ZMod 2, a + b = c →
-        ((a ≠ 0 ∧ b ≠ 0) ↔ (a ≠ 0 ∧ c = 0)) := by decide
-    exact key _ _ _ (D.sheet0_add_sheet1 v j)
-  rw [hfilter]
-
-/-! ## The lifted stabilizer -/
-
-/-- Sheet-0 lift of a base 2-chain to the cover. -/
-def liftC2 (ξ : H → ZMod 2) : G → ZMod 2 :=
-  lift0 ⇑D.proj D.sec ξ
-
-lemma push0_liftC2 (ξ : H → ZMod 2) :
-    fiberSumFn ⇑D.proj (D.liftC2 ξ) = ξ :=
-  fiberSumFn_lift0 D.proj_sec ξ
-
-/-- The lifted stabilizer of a base 2-chain: `∂₂(cover) (lift ξ)`. -/
-def liftStab (ξ : H → ZMod 2) : G × Fin 2 → ZMod 2 :=
-  bbBoundary2Fn D.Ac D.Bc (D.liftC2 ξ)
-
-lemma liftStab_mem_boundaries (ξ : H → ZMod 2) :
-    D.liftStab ξ ∈ D.coverComplex.boundaries :=
-  ⟨D.liftC2 ξ, rfl⟩
-
-/-- The lifted stabilizer pushes forward to the base stabilizer. -/
-lemma push1_liftStab (ξ : H → ZMod 2) :
-    D.push1 (D.liftStab ξ) = bbBoundary2Fn D.Ab D.Bb ξ := by
-  change fiberSumFn (Prod.map ⇑D.proj id) (bbBoundary2Fn D.Ac D.Bc (D.liftC2 ξ))
-    = bbBoundary2Fn D.Ab D.Bb ξ
-  rw [fiberSum_bbBoundary2Fn D.proj D.Ac D.Bc D.Ab D.Bb
-    D.push_A D.push_B (D.liftC2 ξ), D.push0_liftC2]
-
-/-- The descended chain of a dangerous normalization is a base cycle. -/
-lemma descend_cycle {u : H × Fin 2 → ZMod 2}
-    (h : D.pull1 u ∈ D.coverComplex.cycles) :
-    bbBoundary1Fn D.Ab D.Bb u = 0 := by
-  have h1 : D.coverComplex.boundary1 (D.pull1 u) = 0 := h
-  rw [D.pull_boundary1_comm] at h1
-  apply D.pull0_injective
-  change D.pull0 (D.baseComplex.boundary1 u) = D.pull0 0
-  rw [h1]
-  exact (map_zero D.pull0).symm
-
-/-! ## Sheet decomposition of cover 2-chains -/
-
-/-- Sheet-0 restriction of a cover 2-chain. -/
-def sheetC2_0 (z : G → ZMod 2) : H → ZMod 2 :=
-  fun j => z (D.sec j)
-
-/-- Sheet-1 restriction of a cover 2-chain. -/
-def sheetC2_1 (z : G → ZMod 2) : H → ZMod 2 :=
-  fun j => z (D.sec j + D.deckS)
-
-/-- A cover 2-chain is the sum of the lifts of its two sheets. -/
-lemma liftC2_decomp (z : G → ZMod 2) :
-    z = D.liftC2 (D.sheetC2_0 z)
-      + D.deckShift0 (D.liftC2 (D.sheetC2_1 z)) := by
-  funext g
-  rw [Pi.add_apply]
-  rcases D.point_dichotomy g with hg | hg
-  · have h1 : D.liftC2 (D.sheetC2_0 z) g = z g := by
-      change (if g = D.sec (D.proj g) then D.sheetC2_0 z (D.proj g) else 0)
-        = z g
-      rw [if_pos hg]
-      change z (D.sec (D.proj g)) = z g
-      rw [← hg]
-    have h2 : D.deckShift0 (D.liftC2 (D.sheetC2_1 z)) g = 0 := by
-      change (if g + D.deckS = D.sec (D.proj (g + D.deckS)) then
-        D.sheetC2_1 z (D.proj (g + D.deckS)) else 0) = 0
-      rw [if_neg ?_]
-      intro hcon
-      rw [D.proj_add_deckS, ← hg] at hcon
-      apply D.deckS_ne_zero
-      have hcon' : g + D.deckS = g + 0 := by rw [add_zero]; exact hcon
-      exact add_left_cancel hcon'
-    rw [h1, h2, add_zero]
-  · have h1 : D.liftC2 (D.sheetC2_0 z) g = 0 := by
-      change (if g = D.sec (D.proj g) then D.sheetC2_0 z (D.proj g) else 0)
-        = 0
-      rw [if_neg ?_]
-      intro hcon
-      have hcontra := hcon.symm.trans hg
-      apply D.deckS_ne_zero
-      have hg' : D.sec (D.proj g) + 0 = D.sec (D.proj g) + D.deckS := by
-        rw [add_zero]; exact hcontra
-      exact (add_left_cancel hg').symm
-    have h2 : D.deckShift0 (D.liftC2 (D.sheetC2_1 z)) g = z g := by
-      have hgd : g + D.deckS = D.sec (D.proj g) := by
-        rw [hg, add_assoc, D.deckS_add_deckS, add_zero, D.proj_add_deckS,
-          D.proj_sec]
-      change (if g + D.deckS = D.sec (D.proj (g + D.deckS)) then
-        D.sheetC2_1 z (D.proj (g + D.deckS)) else 0) = z g
-      rw [D.proj_add_deckS, if_pos hgd]
-      change z (D.sec (D.proj g) + D.deckS) = z g
-      rw [← hg]
-    rw [h1, h2, zero_add]
-
-lemma liftC2_add (ξ η : H → ZMod 2) :
-    D.liftC2 (ξ + η) = D.liftC2 ξ + D.liftC2 η := by
-  funext g
-  change (if g = D.sec (D.proj g) then (ξ + η) (D.proj g) else 0)
-    = (if g = D.sec (D.proj g) then ξ (D.proj g) else 0)
-      + (if g = D.sec (D.proj g) then η (D.proj g) else 0)
-  by_cases hg : g = D.sec (D.proj g)
-  · rw [if_pos hg, if_pos hg, if_pos hg]
-    rfl
-  · rw [if_neg hg, if_neg hg, if_neg hg, add_zero]
-
-/-! ## The seam decomposition `∂₂ = N + C` -/
-
-/-- The non-crossing seam part: sheet-0 component of the lifted stabilizer. -/
-def seamN (ξ : H → ZMod 2) : H × Fin 2 → ZMod 2 :=
-  D.sheet0 (D.liftStab ξ)
-
-/-- The seam-crossing part: sheet-1 component of the lifted stabilizer. The
-Smith connecting map at chain level is `ζ ↦ seamC ζ` on 2-cycles. -/
-def seamC (ξ : H → ZMod 2) : H × Fin 2 → ZMod 2 :=
-  D.sheet1 (D.liftStab ξ)
-
-/-- The seam split sums to the base boundary. -/
-lemma seamN_add_seamC (ξ : H → ZMod 2) (j : H × Fin 2) :
-    D.seamN ξ j + D.seamC ξ j = bbBoundary2Fn D.Ab D.Bb ξ j := by
-  have h := D.sheet0_add_sheet1 (D.liftStab ξ) j
-  rw [D.push1_liftStab] at h
-  exact h
-
-lemma seamC_add (ξ η : H → ZMod 2) :
-    D.seamC (ξ + η) = D.seamC ξ + D.seamC η := by
-  unfold seamC liftStab
-  rw [D.liftC2_add, bbBoundary2Fn_add, D.sheet1_add]
-
-lemma liftC2_zero : D.liftC2 (0 : H → ZMod 2) = 0 := by
-  funext g
-  change (if g = D.sec (D.proj g) then (0 : H → ZMod 2) (D.proj g) else 0) = 0
-  split <;> rfl
-
-lemma seamC_zero : D.seamC (0 : H → ZMod 2) = 0 := by
-  unfold seamC liftStab
-  rw [D.liftC2_zero]
-  funext q
-  have h : bbBoundary2Fn D.Ac D.Bc (0 : G → ZMod 2) = 0 := by
-    have h0 : D.coverComplex.boundary2 0 = 0 := map_zero _
-    exact h0
-  rw [h]
-  rfl
-
-/-! ## Deck-shift bookkeeping -/
-
-lemma liftStab_deckShift (ξ : H → ZMod 2) :
-    bbBoundary2Fn D.Ac D.Bc (D.deckShift0 (D.liftC2 ξ))
-      = D.deckShift1 (D.liftStab ξ) :=
-  bbBoundary2Fn_translate D.Ac D.Bc D.deckS (D.liftC2 ξ)
-
+/-- The deck translation exchanges the sheets: sheet 0 of `σ s` is sheet 1 of
+`s`. -/
 lemma sheet0_deckShift1 (s : G × Fin 2 → ZMod 2) :
     D.sheet0 (D.deckShift1 s) = D.sheet1 s := rfl
 
+/-- The deck translation exchanges the sheets: sheet 1 of `σ s` is sheet 0 of
+`s`. -/
 lemma sheet1_deckShift1 (s : G × Fin 2 → ZMod 2) :
     D.sheet1 (D.deckShift1 s) = D.sheet0 s := by
   funext q
   change s ((D.sec1 q).1 + D.deckS + D.deckS, (D.sec1 q).2) = s (D.sec1 q)
   rw [add_assoc, D.deckS_add_deckS, add_zero]
 
-/-- Sheet 0 of `v + σv` is the pushforward. -/
-lemma sheet0_self_add_deck (v : G × Fin 2 → ZMod 2) (j : H × Fin 2) :
-    D.sheet0 (v + D.deckShift1 v) j = D.push1 v j := by
-  rw [D.sheet0_add, Pi.add_apply, D.sheet0_deckShift1]
-  exact D.sheet0_add_sheet1 v j
+/-- The two sheets of a chain add up to its pushforward. -/
+lemma sheet0_add_sheet1 (v : G × Fin 2 → ZMod 2) :
+    D.sheet0 v + D.sheet1 v = D.push1 v := by
+  rw [← D.sheet0_pull1 (D.push1 v), D.pull1_push1]
+  rfl
 
-/-- Sheet 1 of `v + σv` is also the pushforward. -/
-lemma sheet1_self_add_deck (v : G × Fin 2 → ZMod 2) (j : H × Fin 2) :
-    D.sheet1 (v + D.deckShift1 v) j = D.push1 v j := by
-  rw [D.sheet1_add, Pi.add_apply, D.sheet1_deckShift1, add_comm]
-  exact D.sheet0_add_sheet1 v j
+/-- The overlap of `v` is twice the number of base qubits over which both
+sheets of `v` are nonzero. -/
+lemma overlapCount_eq_two_mul_sheets (v : G × Fin 2 → ZMod 2) :
+    D.overlapCount v
+      = 2 * (Finset.univ.filter fun j =>
+          D.sheet0 v j ≠ 0 ∧ D.sheet1 v j ≠ 0).card :=
+  card_overlap_eq_two_mul D.deckSigma1_ne D.proj_prodMap_fiber
+    D.proj_prodMap_sec1 v
 
-/-! ## The chain-level Smith connecting map lands in cycles -/
+/-- `|v| = |p v| + 2 * |supp (sheet0 v) \ supp (p v)|`: the weight of a cover
+chain exceeds that of its pushforward by twice the number of base qubits where
+sheet 0 of `v` is nonzero and the pushforward vanishes. -/
+theorem chainWeight_sheet_eq (v : G × Fin 2 → ZMod 2) :
+    D.coverComplex.chainWeight v
+      = D.baseComplex.chainWeight (D.push1 v)
+        + 2 * (Finset.univ.filter fun j =>
+            D.sheet0 v j ≠ 0 ∧ D.push1 v j = 0).card := by
+  have key : ∀ a b c : ZMod 2, a + b = c →
+      ((a ≠ 0 ∧ b ≠ 0) ↔ (a ≠ 0 ∧ c = 0)) := by decide
+  rw [D.chainWeight_eq_push_add_overlap v, D.overlapCount_eq_two_mul_sheets,
+    Finset.filter_congr fun j _ => key _ _ _ (congrFun (D.sheet0_add_sheet1 v) j)]
 
-/-- For a base 2-cycle `ζ` (`∂₂ ζ = 0`), the seam-crossing component `seamC ζ`
-is a base 1-cycle. Pure exactness of the double cover. -/
+/-! ## Lifted stabilizers -/
+
+/-- The lift of a base chain `ξ : H → ZMod 2` to the cover: `ξ` on sheet 0 and
+zero on sheet 1. -/
+def liftC2 (ξ : H → ZMod 2) : G → ZMod 2 :=
+  lift0 ⇑D.proj D.sec ξ
+
+lemma liftC2_apply (ξ : H → ZMod 2) (g : G) :
+    D.liftC2 ξ g = if g = D.sec (D.proj g) then ξ (D.proj g) else 0 := rfl
+
+/-- The pushforward of the lift of `ξ` is `ξ`. -/
+lemma push0_liftC2 (ξ : H → ZMod 2) :
+    fiberSumFn ⇑D.proj (D.liftC2 ξ) = ξ :=
+  fiberSumFn_lift0 D.proj_sec ξ
+
+/-- `liftC2` is additive. -/
+lemma liftC2_add (ξ η : H → ZMod 2) :
+    D.liftC2 (ξ + η) = D.liftC2 ξ + D.liftC2 η :=
+  funext fun _ => ite_add_zero
+
+lemma liftC2_zero : D.liftC2 (0 : H → ZMod 2) = 0 :=
+  funext fun _ => ite_self 0
+
+/-- The lifted stabilizer of a base 2-chain `ξ`: the cover boundary
+`∂₂ (liftC2 ξ)`. -/
+def liftStab (ξ : H → ZMod 2) : G × Fin 2 → ZMod 2 :=
+  bbBoundary2Fn D.Ac D.Bc (D.liftC2 ξ)
+
+/-- The lifted stabilizer is a cover boundary. -/
+lemma liftStab_mem_boundaries (ξ : H → ZMod 2) :
+    D.liftStab ξ ∈ D.coverComplex.boundaries :=
+  ⟨D.liftC2 ξ, rfl⟩
+
+/-- The lifted stabilizer of `ξ` pushes forward to the base boundary `∂₂ ξ`. -/
+lemma push1_liftStab (ξ : H → ZMod 2) :
+    D.push1 (D.liftStab ξ) = bbBoundary2Fn D.Ab D.Bb ξ := by
+  have h := D.push_boundary2_comm (D.liftC2 ξ)
+  rw [push0_apply, D.push0_liftC2] at h
+  exact h
+
+/-- The lifted stabilizer of the deck translate of a lift is the deck translate
+of the lifted stabilizer. -/
+lemma liftStab_deckShift (ξ : H → ZMod 2) :
+    bbBoundary2Fn D.Ac D.Bc (D.deckShift0 (D.liftC2 ξ))
+      = D.deckShift1 (D.liftStab ξ) :=
+  bbBoundary2Fn_translate D.Ac D.Bc D.deckS (D.liftC2 ξ)
+
+/-! ## The two sheets of a cover 2-chain -/
+
+/-- The restriction of a chain `z : G → ZMod 2` to sheet 0. -/
+def sheetC2_0 (z : G → ZMod 2) : H → ZMod 2 :=
+  fun j => z (D.sec j)
+
+/-- The restriction of a chain `z : G → ZMod 2` to sheet 1. -/
+def sheetC2_1 (z : G → ZMod 2) : H → ZMod 2 :=
+  fun j => z (D.sec j + D.deckS)
+
+/-- A chain on `G` is the lift of its sheet-0 restriction plus the deck
+translate of the lift of its sheet-1 restriction. -/
+lemma liftC2_decomp (z : G → ZMod 2) :
+    z = D.liftC2 (D.sheetC2_0 z)
+      + D.deckShift0 (D.liftC2 (D.sheetC2_1 z)) := by
+  funext g
+  simp only [Pi.add_apply, deckShift0_apply, liftC2_apply, sheetC2_0, sheetC2_1,
+    D.proj_add_deckS]
+  rcases D.point_dichotomy g with hg | hg
+  · have hne : g + D.deckS ≠ D.sec (D.proj g) := fun h =>
+      D.deckS_ne_zero (add_eq_left.mp (h.trans hg.symm))
+    rw [if_pos hg, if_neg hne, add_zero, ← hg]
+  · have hne : g ≠ D.sec (D.proj g) := fun h =>
+      D.deckS_ne_zero (add_eq_left.mp (hg.symm.trans h))
+    have hg' : g + D.deckS = D.sec (D.proj g) := by
+      rw [hg, add_assoc, D.deckS_add_deckS, add_zero, D.proj_add_deckS, D.proj_sec]
+    rw [if_neg hne, if_pos hg', zero_add, ← hg]
+
+/-! ## The seam decomposition of a lifted stabilizer
+
+The lifted stabilizer `liftStab ξ = ∂₂ (liftC2 ξ)` of a base 2-chain `ξ` is
+supported on both sheets although `liftC2 ξ` lives on sheet 0. Its sheet-0 part
+`seamN ξ` and its sheet-1 part `seamC ξ`, the part that crosses the seam between
+the sheets, add up to the base boundary `∂₂ ξ`. -/
+
+/-- The part of the lifted stabilizer of `ξ` on sheet 0. -/
+def seamN (ξ : H → ZMod 2) : H × Fin 2 → ZMod 2 :=
+  D.sheet0 (D.liftStab ξ)
+
+/-- The part of the lifted stabilizer of `ξ` on sheet 1, the part crossing the
+seam. On base 2-cycles `ζ` it is a base 1-cycle (`seamC_mem_cycles`), which
+represents the image of `ζ` under the connecting map from `ker ∂₂` to `H₁`. -/
+def seamC (ξ : H → ZMod 2) : H × Fin 2 → ZMod 2 :=
+  D.sheet1 (D.liftStab ξ)
+
+/-- The two seam parts add up to the base boundary: `seamN ξ + seamC ξ = ∂₂ ξ`.
+-/
+lemma seamN_add_seamC (ξ : H → ZMod 2) :
+    D.seamN ξ + D.seamC ξ = bbBoundary2Fn D.Ab D.Bb ξ :=
+  (D.sheet0_add_sheet1 (D.liftStab ξ)).trans (D.push1_liftStab ξ)
+
+/-- `seamC` is additive. -/
+lemma seamC_add (ξ η : H → ZMod 2) :
+    D.seamC (ξ + η) = D.seamC ξ + D.seamC η := by
+  unfold seamC liftStab
+  rw [D.liftC2_add, bbBoundary2Fn_add, D.sheet1_add]
+
+lemma seamC_zero : D.seamC (0 : H → ZMod 2) = 0 := by
+  unfold seamC liftStab
+  rw [D.liftC2_zero, ← bbBoundary2_apply, map_zero]
+  rfl
+
+/-- For a base 2-cycle `ζ`, the seam-crossing part `seamC ζ` is a base 1-cycle.
+The lifted stabilizer of `ζ` pushes forward to `∂₂ ζ = 0`, so it is the
+pullback of a base chain `u`, which is a cycle and equals both of its sheets. -/
 theorem seamC_mem_cycles {ζ : H → ZMod 2}
     (hζ : bbBoundary2Fn D.Ab D.Bb ζ = 0) :
     D.seamC ζ ∈ D.baseComplex.cycles := by
-  -- `liftStab ζ` is a cover cycle (it is a cover boundary)
-  have hcover_cyc : D.liftStab ζ ∈ D.coverComplex.cycles :=
-    D.coverComplex.boundaries_le_cycles (D.liftStab_mem_boundaries ζ)
-  -- it pushes forward to `∂₂ ζ = 0`
-  have hpush : D.push1 (D.liftStab ζ) = 0 := by
-    rw [D.push1_liftStab]; exact hζ
-  -- exactness `ker p = im τ`
-  obtain ⟨u, hu⟩ := (D.push1_eq_zero_iff _).mp hpush
-  -- `u` is a base 1-cycle
-  have hu_cyc : u ∈ D.baseComplex.cycles := by
-    have h1 : D.coverComplex.boundary1 (D.pull1 u) = 0 := by
-      rw [← hu]; exact hcover_cyc
-    rw [D.pull_boundary1_comm] at h1
-    have h2 : D.baseComplex.boundary1 u = 0 := by
-      apply D.pull0_injective
-      rw [h1]
-      exact (map_zero D.pull0).symm
-    exact h2
-  -- `seamN ζ = sheet0 (liftStab ζ) = sheet0 (pull1 u) = u`
-  have hseamN : D.seamN ζ = u := by
-    change D.sheet0 (D.liftStab ζ) = u
-    rw [hu, D.sheet0_pull1]
-  -- char 2: `seamN ζ + seamC ζ = ∂₂ ζ = 0`, hence `seamC ζ = seamN ζ = u`
-  have hseamC : D.seamC ζ = u := by
-    have hkey : ∀ a b : ZMod 2, a + b = 0 → b = a := by decide
-    funext j
-    have hsum := D.seamN_add_seamC ζ j
-    rw [hseamN, hζ, Pi.zero_apply] at hsum
-    exact hkey _ _ hsum
-  rw [hseamC]; exact hu_cyc
+  obtain ⟨u, hu⟩ := (D.push1_eq_zero_iff _).mp ((D.push1_liftStab ζ).trans hζ)
+  rw [seamC, hu, D.sheet1_pull1]
+  refine D.descend_cycle ?_
+  rw [← hu]
+  exact D.coverComplex.boundaries_le_cycles (D.liftStab_mem_boundaries ζ)
 
 end XDoubleCoverData
 

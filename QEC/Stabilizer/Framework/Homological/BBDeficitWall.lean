@@ -186,7 +186,7 @@ theorem pull1_seamC {ζ : H → ZMod 2}
   have hseamC : D.seamC ζ = u := by
     have hkey : ∀ a b : ZMod 2, a + b = 0 → b = a := by decide
     funext j
-    have hsum := D.seamN_add_seamC ζ j
+    have hsum := congrFun (D.seamN_add_seamC ζ) j
     rw [hseamN, hζ, Pi.zero_apply] at hsum
     exact hkey _ _ hsum
   rw [hseamC, ← hu]
@@ -209,19 +209,6 @@ lemma deckSigma0_ne : ∀ g : G, g + D.deckS ≠ g := by
   apply D.deckS_ne_zero
   have h : g + D.deckS = g + 0 := by rw [add_zero]; exact hg
   exact add_left_cancel h
-
-/-- Sheet-1 restriction also inverts the pullback (deck partner of
-`sheet0_pull1`). -/
-lemma sheet1_pull1 (u : H × Fin 2 → ZMod 2) :
-    D.sheet1 (D.pull1 u) = u := by
-  funext q
-  change u (Prod.map ⇑D.proj id (D.deckSigma1 (D.sec1 q))) = u q
-  have hproj : Prod.map ⇑D.proj id (D.deckSigma1 (D.sec1 q))
-      = Prod.map ⇑D.proj id (D.sec1 q) := by
-    change (D.proj ((D.sec1 q).1 + D.deckS), (D.sec1 q).2)
-      = (D.proj (D.sec1 q).1, (D.sec1 q).2)
-    rw [D.proj_add_deckS]
-  rw [hproj, D.proj_prodMap_sec1 q]
 
 /-- Fiber pair formula for the 0/2-chain pushforward:
 `(p₀ z)(proj g) = z g + z (g + deckS)`. -/
@@ -285,7 +272,7 @@ theorem exists_seamCoset_of_pull1_mem_boundaries {w : H × Fin 2 → ZMod 2}
     have hseamN : D.seamN ξ₁ = bbBoundary2Fn D.Ab D.Bb ξ₁ + D.seamC ξ₁ := by
       have hkey : ∀ a b c : ZMod 2, a + b = c → a = c + b := by decide
       funext j
-      exact hkey _ _ _ (D.seamN_add_seamC ξ₁ j)
+      exact hkey _ _ _ (congrFun (D.seamN_add_seamC ξ₁) j)
     rw [hs1', hseamN, D.seamC_add]
     abel
 
