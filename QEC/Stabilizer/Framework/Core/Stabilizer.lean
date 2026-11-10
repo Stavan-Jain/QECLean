@@ -1,7 +1,6 @@
 import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
 import QEC.Stabilizer.Framework.Core.Stabilizer.Codespace
 import QEC.Stabilizer.Framework.Core.Stabilizer.Centralizer
-import QEC.Stabilizer.Framework.Core.Stabilizer.CentralizerLemmas
 import QEC.Stabilizer.Framework.Core.Stabilizer.SubgroupLemmas
 import QEC.Stabilizer.Framework.Core.Stabilizer.GeneratorListLemmas
 import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
@@ -16,7 +15,6 @@ import QEC.Stabilizer.Framework.Core.Stabilizer.CodespaceDimension
   existence of a codespace state.
 - `Centralizer`: the centralizer of a stabilizer group, which is also its
   normalizer in the Pauli group.
-- `CentralizerLemmas`: centralizer membership from commutation with generators.
 - `SubgroupLemmas`: group-theoretic lemmas about `Subgroup.closure`.
 - `GeneratorListLemmas`: generator lists indexed by a square grid.
 - `StabilizerCode`: `StabilizerCode n k`, `StabilizerCodeWithLogicals n k`, and

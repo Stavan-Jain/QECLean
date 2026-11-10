@@ -13,7 +13,8 @@ Sub-clusters:
 - `QEC.Stabilizer.Framework.Core` — general stabilizer / logical / CSS theory
 - `QEC.Stabilizer.Framework.Symplectic` — stabilizer ↔ symplectic bridge
 - `QEC.Stabilizer.Framework.Homological` — chain-complex / CSS framework
-- `QEC.Stabilizer.Framework.Concatenation` — block-embedding calculus (M1)
+- `QEC.Stabilizer.Framework.Concatenation` — concatenation of CSS codes and
+  its distance bound
 - `QEC.Stabilizer.Framework.FoldDouble` — qubit pairings, the folded code and
   the fold-and-double distance theorem
 -/
