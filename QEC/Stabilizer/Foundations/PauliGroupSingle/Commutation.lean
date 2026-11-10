@@ -3,109 +3,56 @@ import QEC.Stabilizer.Foundations.PauliGroupSingle.Core
 import QEC.Stabilizer.Foundations.PauliGroupSingle.Operator
 import QEC.Stabilizer.Foundations.PauliGroupSingle.Element
 
+/-!
+# Commutation in the single-qubit Pauli group
+
+The operator part of a product does not depend on the order of the factors, so
+whether two Pauli group elements commute is decided by the phase that
+`PauliOperator.mulOp` contributes (`commutes_iff_mulOp_phasePower`). Any two
+elements commute or anticommute (`commute_or_anticommute`).
+-/
+
 namespace Quantum
 
 namespace PauliGroupElement
 
-/-!
-# Commutation Properties
-
-Two Pauli group elements commute if their operators commute (which happens when
-the operators are equal or one is the identity). The phase factors don't affect
-commutation since they're scalars.
--/
-
-/-- Two single-qubit Pauli operators commute if and only if they are equal or
-one is I. -/
-lemma PauliOperator.commutes_iff (P Q : PauliOperator) :
-  P.mulOp Q = Q.mulOp P ↔ (P = Q ∨ P = PauliOperator.I ∨ Q = PauliOperator.I) := by
-  cases P <;> cases Q <;> simp
-
-/-- Two Pauli group elements commute if and only if their operators commute. -/
-lemma commutes_iff (p q : PauliGroupElement) :
-  p * q = q * p ↔ p.operator.mulOp q.operator = q.operator.mulOp p.operator := by
-  constructor
-  · intro h
-    have h_op : (p * q).operator = (q * p).operator := by
-      rw [h]
-    simp [mul, mul_eq] at h_op
-    have h_phase : (p * q).phasePower = (q * p).phasePower := by
-      rw [h]
-    simp [mul, mul_eq] at h_phase
-    ext
-    · simp [add_comm] at h_phase
-      rw [h_phase]
-    · exact h_op
-  · intro h
-    ext
-    · simp [mul, mul_eq]
-      have h_phase : (p.operator.mulOp q.operator).phasePower =
-                     (q.operator.mulOp p.operator).phasePower := by
-        rw [h]
-      rw [h_phase, add_comm (p.phasePower) (q.phasePower)]
-    · simp [mul, mul_eq]
-      have h_op : (p.operator.mulOp q.operator).operator =
-                  (q.operator.mulOp p.operator).operator := by
-        rw [h]
-      exact h_op
-
-/-- The `operator` part of Pauli group multiplication is commutative (phase
-factors may differ). -/
+/-- The operator part of a product is independent of the order of the factors;
+only the phase can differ. -/
 lemma operator_mul_comm (p q : PauliGroupElement) :
-    (p * q).operator = (q * p).operator := by
-  simp [mul, PauliOperator.mulOp_operator_comm]
+    (p * q).operator = (q * p).operator :=
+  PauliOperator.mulOp_operator_comm _ _
 
-/-- Two Pauli group elements commute iff the phase contributed by multiplying
-their operators is the same in either order.
-
-Since the `operator` field of `p * q` is always equal to that of `q * p` (the
-noncommutativity is entirely captured by the phase), commutation reduces to a
-statement about `phasePower`. -/
+/-- Two Pauli group elements commute iff their operators contribute the same
+phase when multiplied in either order. -/
 lemma commutes_iff_mulOp_phasePower (p q : PauliGroupElement) :
-  p * q = q * p ↔
-    (p.operator.mulOp q.operator).phasePower = (q.operator.mulOp p.operator).phasePower := by
+    p * q = q * p ↔
+      (p.operator.mulOp q.operator).phasePower = (q.operator.mulOp p.operator).phasePower := by
   constructor
   · intro h
-    have h_phase : (p * q).phasePower = (q * p).phasePower := by
-      simpa using congrArg (fun r : PauliGroupElement => r.phasePower) h
-    simpa [mul, mul_eq, add_assoc, add_comm, add_left_comm] using h_phase
-  · intro h_mulOp_phase
-    ext
-    · simp [mul, mul_eq, add_assoc, add_comm, h_mulOp_phase]
-    · exact operator_mul_comm p q
+    simpa [mul, add_comm q.phasePower] using congrArg phasePower h
+  · intro h
+    refine PauliGroupElement.ext _ _ ?_ (operator_mul_comm p q)
+    simp [mul, h, add_comm q.phasePower]
 
-/-- The central element `-1` of the Pauli group, represented as `i^2 * I`. -/
+/-- Two Pauli group elements commute iff their operators do. -/
+lemma commutes_iff (p q : PauliGroupElement) :
+    p * q = q * p ↔ p.operator.mulOp q.operator = q.operator.mulOp p.operator := by
+  rw [commutes_iff_mulOp_phasePower, PauliGroupElement.ext_iff,
+    and_iff_left (PauliOperator.mulOp_operator_comm _ _)]
+
+/-- The central element `-1` of the Pauli group, represented as `i ^ 2 * I`. -/
 def minusOne : PauliGroupElement := ⟨2, PauliOperator.I⟩
 
-/-- For Pauli operators, multiplication either commutes (same phase power) or
-anticommutes (phase differs by `2`, i.e. a factor of `-1`). -/
-lemma PauliOperator.mulOp_phasePower_eq_or_eq_add_two (P Q : PauliOperator) :
-    (P.mulOp Q).phasePower = (Q.mulOp P).phasePower ∨
-    (P.mulOp Q).phasePower = (Q.mulOp P).phasePower + 2 := by
-  cases P <;> cases Q <;> decide
-
-/-- Any two Pauli group elements either commute or anticommute.
-
-Anticommutation is expressed as `p * q = (-1) * (q * p)`, where `-1` is
-`minusOne`. -/
+/-- Any two Pauli group elements commute or anticommute, where anticommuting
+means `p * q = minusOne * (q * p)`. -/
 lemma commute_or_anticommute (p q : PauliGroupElement) :
-  p * q = q * p ∨ p * q = minusOne * (q * p) := by
+    p * q = q * p ∨ p * q = minusOne * (q * p) := by
   rcases PauliOperator.mulOp_phasePower_eq_or_eq_add_two p.operator q.operator with h | h
   · exact Or.inl ((commutes_iff_mulOp_phasePower p q).2 h)
-  · refine Or.inr ?_
-    ext
-    · unfold PauliGroupElement.minusOne; simp
-      unfold PauliGroupElement.mul; simp  [ h, Fin.val_add]
-      unfold PauliOperator.mulOp; simp ; ring_nf
-    · simpa only [mul_eq, mul, PauliOperator.mulOp, Fin.isValue, minusOne, add_zero] using
-      (operator_mul_comm p q)
-
-/-- Symmetry of commutation: if p commutes with q, then q commutes with p. -/
-lemma commutes_symm (p q : PauliGroupElement) :
-  (p * q = q * p) ↔ (q * p = p * q) := by
-  constructor
-  · intro h; symm; exact h
-  · intro h; symm; exact h
+  · refine Or.inr (PauliGroupElement.ext _ _ ?_ ?_)
+    · simp only [mul_eq, mul, minusOne, PauliOperator.I_mulOp, h]
+      abel
+    · simpa [mul, minusOne, PauliOperator.I_mulOp] using operator_mul_comm p q
 
 end PauliGroupElement
 

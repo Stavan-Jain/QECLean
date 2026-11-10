@@ -4,15 +4,20 @@ import Mathlib.Tactic
 import QEC.Foundations.Foundations
 import QEC.Stabilizer.Foundations.PauliGroupSingle.Core
 
+/-!
+# Phase powers as complex numbers
+
+The phase power `k : Fin 4` of a Pauli group element stands for the scalar
+`i ^ k`. This file gives that scalar as a complex number
+(`phasePowerToComplex`) and as a unit complex number
+(`phasePowerToUnitComplex`).
+-/
+
 namespace Quantum
 
 namespace PauliGroupElement
 
-/-!
-# Phase Utilities (Fin 4 → ℂ / UnitComplex)
--/
-
-/-- Convert a phase power (0-3) to the corresponding complex phase. -/
+/-- The complex phase `i ^ k` of a phase power `k`. -/
 def phasePowerToComplex (k : Fin 4) : ℂ :=
   Complex.I ^ (k : ℕ)
 
@@ -28,30 +33,42 @@ def phasePowerToComplex (k : Fin 4) : ℂ :=
 @[simp] lemma phasePowerToComplex_3 : phasePowerToComplex 3 = -Complex.I := by
   simp [phasePowerToComplex]
 
-/-- Product of phase powers: phasePowerToComplex a * phasePowerToComplex b =
-phasePowerToComplex (a + b). -/
+/-- Phases multiply by adding phase powers: `i ^ a * i ^ b = i ^ (a + b)`. -/
 lemma phasePowerToComplex_add (a b : Fin 4) :
-  phasePowerToComplex a * phasePowerToComplex b = phasePowerToComplex (a + b) := by
+    phasePowerToComplex a * phasePowerToComplex b = phasePowerToComplex (a + b) := by
   fin_cases a <;> fin_cases b <;> simp [phasePowerToComplex]
 
-/-- Phase powers multiply as i^a * i^b * i^c = i^{a+b+c}. -/
+/-- Three-factor form of `phasePowerToComplex_add`. -/
 lemma phasePowerToComplex_add3 (a b c : Fin 4) :
-  phasePowerToComplex a * phasePowerToComplex b * phasePowerToComplex c =
-  phasePowerToComplex (a + b + c) := by
-  rw [phasePowerToComplex_add, phasePowerToComplex_add, add_assoc]
+    phasePowerToComplex a * phasePowerToComplex b * phasePowerToComplex c =
+      phasePowerToComplex (a + b + c) := by
+  rw [phasePowerToComplex_add, phasePowerToComplex_add]
 
-/-- The conjugate of a phase power equals the negative phase power: star(i^k) =
-i^(-k). -/
+/-- The phase of a sum of phase powers is the product of the phases. -/
+lemma phasePowerToComplex_sum {ι : Type*} (s : Finset ι) (k : ι → Fin 4) :
+    phasePowerToComplex (∑ i ∈ s, k i) = ∏ i ∈ s, phasePowerToComplex (k i) := by
+  classical
+  induction s using Finset.induction with
+  | empty => simp
+  | insert a s ha ih =>
+    rw [Finset.sum_insert ha, Finset.prod_insert ha, ← phasePowerToComplex_add, ih]
+
+lemma phasePowerToComplex_ne_zero (k : Fin 4) : phasePowerToComplex k ≠ 0 :=
+  pow_ne_zero _ Complex.I_ne_zero
+
+/-- Distinct phase powers give distinct phases. -/
+lemma phasePowerToComplex_injective : Function.Injective phasePowerToComplex := by
+  simp [Function.Injective, Fin.forall_fin_succ, phasePowerToComplex, Complex.ext_iff]
+  norm_num
+
+/-- Conjugating a phase negates its phase power: `star (i ^ k) = i ^ (-k)`. -/
 lemma phasePowerToComplex_star (k : Fin 4) :
-  star (phasePowerToComplex k) = phasePowerToComplex (-k) := by
-  fin_cases k <;> simp [phasePowerToComplex]
-  · rw [← Complex.I_sq]
-    rfl
-  · symm
-    have h : (-3 : Fin 4) = 1 := by decide
-    simp [h]
+    star (phasePowerToComplex k) = phasePowerToComplex (-k) := by
+  fin_cases k <;>
+    simp [phasePowerToComplex, show (-1 : Fin 4) = 3 from rfl, show (-2 : Fin 4) = 2 from rfl,
+      show (-3 : Fin 4) = 1 from rfl, pow_succ]
 
-/-- Convert a phase power to the corresponding unit complex number. -/
+/-- The phase `i ^ k` as a unit complex number. -/
 def phasePowerToUnitComplex (k : Fin 4) : UnitComplex :=
   match k with
   | 0 => UnitComplex.one
@@ -60,11 +77,10 @@ def phasePowerToUnitComplex (k : Fin 4) : UnitComplex :=
   | 3 => UnitComplex.negI
 
 @[simp] lemma phasePowerToUnitComplex_coe (k : Fin 4) :
-  (phasePowerToUnitComplex k : ℂ) = phasePowerToComplex k := by
+    (phasePowerToUnitComplex k : ℂ) = phasePowerToComplex k := by
   fin_cases k <;> simp [phasePowerToUnitComplex, phasePowerToComplex,
     UnitComplex.one_coe, UnitComplex.negOne_coe, UnitComplex.I_coe, UnitComplex.negI_coe]
 
 end PauliGroupElement
 
 end Quantum
-

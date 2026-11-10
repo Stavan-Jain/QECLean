@@ -9,6 +9,22 @@ import QEC.Foundations.Foundations
 import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
 import QEC.Stabilizer.Foundations.PauliGroup.Representation
 
+/-!
+# Commutation in the n-qubit Pauli group
+
+The operator part of a product does not depend on the order of the factors, so
+two n-qubit Pauli group elements commute or anticommute according to the phase
+contributed by `mulOp`. Qubit by qubit, that phase changes by `2` exactly at the
+positions where the single-qubit factors anticommute (`anticommutesAt`), which
+gives the parity characterizations:
+
+- `commutes_iff_even_anticommutes`: `p` and `q` commute iff they anticommute at
+  an even number of qubits;
+- `anticommutes_iff_odd_anticommutes`: `p` and `q` anticommute iff they
+  anticommute at an odd number of qubits;
+- `commute_or_anticommute`: one of the two always holds.
+-/
+
 namespace Quantum
 open Matrix
 open scoped BigOperators
@@ -18,425 +34,194 @@ variable {n : ℕ}
 namespace NQubitPauliGroupElement
 
 /-!
-# Commutation Properties
-
-Two n-qubit Pauli group elements commute if they commute qubit-wise. The phase
-factors don't affect commutation since they're scalars.
+## Commutation and the phase of `mulOp`
 -/
 
-/-!
-## Helper Lemmas for Commutation Proofs
--/
-
-/-- The operator at qubit i in the result of mulOp is the operator from the
-    single-qubit multiplication. -/
-private lemma mulOp_operators_at (p q : NQubitPauliOperator n) (i : Fin n) :
-  (mulOp p q).operators i = ((p i).mulOp (q i)).operator := rfl
-
-/-- The phase power in mulOp is the sum of phase powers from all qubit
-multiplications. -/
-private lemma mulOp_phasePower (p q : NQubitPauliOperator n) :
-  (mulOp p q).phasePower =
-    (Finset.univ : Finset (Fin n)).sum (fun i => ((p i).mulOp (q i)).phasePower) := rfl
-
-/-- If two functions are equal pointwise, their sums over Finset.univ are equal.
--/
-private lemma sum_eq_of_pointwise_eq {α : Type*} [AddCommMonoid α] {f g : Fin n → α}
-  (h : ∀ i, f i = g i) :
-  (Finset.univ : Finset (Fin n)).sum f = (Finset.univ : Finset (Fin n)).sum g :=
-  Finset.sum_congr rfl (fun i _ => h i)
-
-/-- If operators commute qubit-wise, then the phase contributions are equal at
-each qubit. -/
-private lemma phasePower_eq_of_commutes_qubitwise {p q : NQubitPauliOperator n}
-  (h : ∀ i : Fin n, (p i).mulOp (q i) = (q i).mulOp (p i)) :
-  ∀ i : Fin n, ((p i).mulOp (q i)).phasePower = ((q i).mulOp (p i)).phasePower := by
-  intro i
-  rw [h i]
-
-/-- If operators commute qubit-wise, then the total phase contributions are
-equal. -/
-private lemma mulOp_phasePower_eq_of_commutes_qubitwise {p q : NQubitPauliOperator n}
-  (h : ∀ i : Fin n, (p i).mulOp (q i) = (q i).mulOp (p i)) :
-  (mulOp p q).phasePower = (mulOp q p).phasePower := by
-  simp [mulOp_phasePower]
-  apply sum_eq_of_pointwise_eq
-  exact phasePower_eq_of_commutes_qubitwise h
-
-/-- If operators commute qubit-wise, then the operators are equal at each qubit.
--/
-private lemma mulOp_operators_eq_of_commutes_qubitwise {p q : NQubitPauliOperator n}
-  (h : ∀ i : Fin n, (p i).mulOp (q i) = (q i).mulOp (p i)) :
-  ∀ i : Fin n, (mulOp p q).operators i = (mulOp q p).operators i := by
-  intro i
-  simp [mulOp_operators_at]
-  rw [h i]
-
-/-- The `operators` part of n-qubit Pauli group multiplication is commutative
-(phase factors may differ). -/
+/-- The operator part of a product is independent of the order of the factors;
+only the phase can differ. -/
 lemma operators_mul_comm (p q : NQubitPauliGroupElement n) :
     (p * q).operators = (q * p).operators := by
   ext i
-  simp [mul, mul_eq, mulOp_operators_at, PauliOperator.mulOp_operator_comm]
+  exact PauliOperator.mulOp_operator_comm _ _
 
-/-- Two n-qubit Pauli group elements commute if they commute at every qubit
-position. -/
-lemma commutes_of_componentwise_commutes (p q : NQubitPauliGroupElement n) :
-  (∀ i : Fin n,
-  (p.operators i).mulOp (q.operators i) = (q.operators i).mulOp (p.operators i))
-  → p * q = q * p := by
-    intro h
-    ext
-    · simp [mul, mul_eq]
-      rw [mulOp_phasePower_eq_of_commutes_qubitwise h]
-      simp [add_comm]
-    · simp [mul, mul_eq]
-      rw [mulOp_operators_eq_of_commutes_qubitwise h]
-
-/-- The `operators` field of `p * q` and `q * p` is always the same, so
-commutation of n-qubit Pauli group elements reduces to equality of the phase
-contributed by `mulOp`. -/
+/-- Two n-qubit Pauli group elements commute iff their operators contribute the
+same phase when multiplied in either order. -/
 lemma commutes_iff_mulOp_phasePower (p q : NQubitPauliGroupElement n) :
-  p * q = q * p ↔
-  (mulOp p.operators q.operators).phasePower = (mulOp q.operators p.operators).phasePower := by
+    p * q = q * p ↔
+      (mulOp p.operators q.operators).phasePower =
+        (mulOp q.operators p.operators).phasePower := by
   constructor
   · intro h
-    have h_phase : (p * q).phasePower = (q * p).phasePower := by
-      simpa using congrArg (fun r : NQubitPauliGroupElement n => r.phasePower) h
-    simpa [mul, mul_eq, add_assoc, add_comm, add_left_comm] using h_phase
-  · intro h_mulOp_phase
-    apply NQubitPauliGroupElement.ext (p * q) (q * p)
-    · simp [mul, mul_eq, add_assoc, add_comm, h_mulOp_phase]
-    · exact operators_mul_comm p q
+    simpa [mul, add_comm q.phasePower] using congrArg phasePower h
+  · intro h
+    refine NQubitPauliGroupElement.ext _ _ ?_ (operators_mul_comm p q)
+    simp [mul, h, add_comm q.phasePower]
+
+/-- Two n-qubit Pauli group elements commute if they commute at every qubit. -/
+lemma commutes_of_componentwise_commutes (p q : NQubitPauliGroupElement n) :
+    (∀ i : Fin n,
+      (p.operators i).mulOp (q.operators i) = (q.operators i).mulOp (p.operators i)) →
+      p * q = q * p := by
+  intro h
+  refine (commutes_iff_mulOp_phasePower p q).2 ?_
+  simp only [mulOp, h]
+
+/-- An element whose operator part is the identity (a pure phase) commutes with
+every element. -/
+lemma commutes_of_operators_identity (p q : NQubitPauliGroupElement n)
+    (h : p.operators = NQubitPauliOperator.identity n) : p * q = q * p := by
+  rw [commutes_iff_mulOp_phasePower, h, mulOp_identity_left_phase, mulOp_identity_right_phase]
+
+/-- The identity commutes with every element. -/
+lemma commutes_one_left (p : NQubitPauliGroupElement n) : 1 * p = p * 1 := by
+  rw [one_mul, mul_one]
+
+/-- Every element commutes with the identity. -/
+lemma commutes_one_right (p : NQubitPauliGroupElement n) : p * 1 = 1 * p := by
+  rw [mul_one, one_mul]
 
 /-!
 ## Parity characterization
 
-Two tensor-product Paulis commute iff an even number of qubit positions
-anticommute. We express "anticommute at position i" via the `Fin 4` phase
-difference in `mulOp`.
+At each qubit the single-qubit factors either commute or anticommute, and
+`mulOp p q` differs in phase from `mulOp q p` by `2` for every anticommuting
+position.
 -/
 
-/-- At qubit `i`, the single-qubit factors anticommute iff swapping the order
-flips the phase contribution by `2` (i.e. multiplies by `-1`). -/
+/-- At qubit `i`, the single-qubit factors of `p` and `q` anticommute: swapping
+their order changes the phase by `2`, a factor of `-1`. -/
 def anticommutesAt (p q : NQubitPauliOperator n) (i : Fin n) : Prop :=
   ((p i).mulOp (q i)).phasePower = ((q i).mulOp (p i)).phasePower + 2
 
-/-- If `∑ i, (if cond i then 2 else 0) = 0` in `Fin 4`, then the count of `i`
-with `cond i` is even. (Used to extract parity from the phase-difference sum.)
--/
-private lemma sum_two_ite_eq_zero_count_even {m : ℕ} (cond : Fin m → Prop)
-    [DecidablePred cond]
-    (h : (∑ i, if cond i then (2 : Fin 4) else 0) = 0) :
-    Even ((Finset.univ.filter cond).card) := by
-  classical
-  have hkey : (∑ i, if cond i then (2 : Fin 4) else 0) =
-      (Finset.univ.filter cond).card • (2 : Fin 4) := by
-    rw [Finset.sum_ite, Finset.sum_const, Finset.sum_const_zero, add_zero]
-  rw [hkey] at h
-  set k := (Finset.univ.filter cond).card with hk
-  have hval : (k • (2 : Fin 4)).val = (2 * k) % 4 := by
-    induction k with
-    | zero => simp
-    | succ m ih =>
-      rw [add_smul, one_smul, Fin.val_add, ih]
-      omega
-  have h2 : (2 * k) % 4 = 0 := by
-    rw [h] at hval
-    simpa using hval.symm
-  exact Nat.even_iff.mpr (by omega)
+/-- In `Fin 4`, a multiple `k • 2` is `0` or `2` according to the parity of
+`k`. -/
+private lemma nsmul_two (k : ℕ) : k • (2 : Fin 4) = if Even k then 0 else 2 := by
+  induction k with
+  | zero => simp
+  | succ k ih =>
+    rw [succ_nsmul, ih]
+    by_cases h : Even k <;> simp [h, Nat.even_add_one]
 
-/-- Two n-qubit Pauli group elements commute iff the number of qubit positions
-where the corresponding single-qubit factors anticommute is even. -/
+/-- Swapping the factors of `mulOp` changes the phase by `2` for each qubit at
+which the factors anticommute. -/
+lemma mulOp_phasePower_eq_add_card (p q : NQubitPauliOperator n)
+    [DecidablePred (anticommutesAt p q)] :
+    (mulOp p q).phasePower =
+      (mulOp q p).phasePower + (Finset.univ.filter (anticommutesAt p q)).card • (2 : Fin 4) := by
+  have h : ∀ i, ((p i).mulOp (q i)).phasePower =
+      ((q i).mulOp (p i)).phasePower + if anticommutesAt p q i then 2 else 0 := by
+    intro i
+    by_cases hi : anticommutesAt p q i
+    · rw [if_pos hi]
+      exact hi
+    · rw [if_neg hi, add_zero]
+      exact (PauliOperator.mulOp_phasePower_eq_or_eq_add_two (p i) (q i)).resolve_right hi
+  simp only [mulOp]
+  rw [Finset.sum_congr rfl fun i _ => h i, Finset.sum_add_distrib, Finset.sum_ite,
+    Finset.sum_const, Finset.sum_const_zero, add_zero]
+
+/-- Two n-qubit Pauli group elements commute iff the number of qubits at which
+their single-qubit factors anticommute is even. -/
 lemma commutes_iff_even_anticommutes (p q : NQubitPauliGroupElement n) :
-  p * q = q * p ↔
-    (by
-      classical
-      exact Even ((Finset.univ.filter
-      (anticommutesAt (n := n) p.operators q.operators)).card)) := by
-  constructor;
-  · intro h;
-    have h_phase_diff : (mulOp p.operators q.operators).phasePower =
-    (mulOp q.operators p.operators).phasePower := by
-      exact (commutes_iff_mulOp_phasePower p q).mp h;
-    have h_even : (Finset.univ : Finset (Fin n)).sum (fun i =>
-    ((p.operators i).mulOp (q.operators i)).phasePower) =
-    (Finset.univ : Finset (Fin n)).sum (fun i =>
-    ((q.operators i).mulOp (p.operators i)).phasePower) := by
-      convert h_phase_diff using 1;
-    have h_per_i : ∀ i : Fin n,
-        ((p.operators i).mulOp (q.operators i)).phasePower -
-            ((q.operators i).mulOp (p.operators i)).phasePower =
-          if ((p.operators i).mulOp (q.operators i)).phasePower =
-              ((q.operators i).mulOp (p.operators i)).phasePower + 2 then 2 else 0 := by
-      intro i
-      have h_diff : ((p.operators i).mulOp (q.operators i)).phasePower =
-          ((q.operators i).mulOp (p.operators i)).phasePower ∨
-          ((p.operators i).mulOp (q.operators i)).phasePower =
-          ((q.operators i).mulOp (p.operators i)).phasePower + 2 :=
-        PauliGroupElement.PauliOperator.mulOp_phasePower_eq_or_eq_add_two
-          (p.operators i) (q.operators i)
-      aesop
-    have h_sum_zero : (Finset.univ : Finset (Fin n)).sum (fun i =>
-        if ((p.operators i).mulOp (q.operators i)).phasePower =
-          ((q.operators i).mulOp (p.operators i)).phasePower + 2 then (2 : Fin 4) else 0) = 0 := by
-      have hsubst : (Finset.univ : Finset (Fin n)).sum (fun i =>
-          ((p.operators i).mulOp (q.operators i)).phasePower -
-            ((q.operators i).mulOp (p.operators i)).phasePower) =
-          (Finset.univ : Finset (Fin n)).sum (fun i =>
-            if ((p.operators i).mulOp (q.operators i)).phasePower =
-              ((q.operators i).mulOp (p.operators i)).phasePower + 2 then (2 : Fin 4) else 0) :=
-        Finset.sum_congr rfl (fun i _ => h_per_i i)
-      have hzero : (Finset.univ : Finset (Fin n)).sum (fun i =>
-          ((p.operators i).mulOp (q.operators i)).phasePower -
-            ((q.operators i).mulOp (p.operators i)).phasePower) = 0 := by
-        rw [Finset.sum_sub_distrib, h_even, sub_self]
-      rw [hsubst] at hzero
-      exact hzero
-    have h_count_even := sum_two_ite_eq_zero_count_even _ h_sum_zero
-    convert h_count_even using 1
-    congr! 1
-    ext; simp [Quantum.NQubitPauliGroupElement.anticommutesAt]
-  · intro h_even
-    have h_cancel : (Finset.univ : Finset (Fin n)).sum (fun i =>
-    ((p.operators i).mulOp (q.operators i)).phasePower) =
-    (Finset.univ : Finset (Fin n)).sum (fun i =>
-     ((q.operators i).mulOp (p.operators i)).phasePower) := by
-      have h_phase_diff : ∀ i : Fin n, ((p.operators i).mulOp (q.operators i)).phasePower =
-      ((q.operators i).mulOp (p.operators i)).phasePower ∨
-      ((p.operators i).mulOp (q.operators i)).phasePower =
-      ((q.operators i).mulOp (p.operators i)).phasePower + 2 := by
-        exact fun i ↦
-          PauliGroupElement.PauliOperator.mulOp_phasePower_eq_or_eq_add_two (p.operators i)
-            (q.operators i);
-      have h_total_phase_diff :
-      (Finset.univ : Finset (Fin n)).sum (fun i =>
-      ((p.operators i).mulOp (q.operators i)).phasePower)
-      = (Finset.univ : Finset (Fin n)).sum (fun i =>
-      ((q.operators i).mulOp (p.operators i)).phasePower) + 2 *
-      (Finset.univ : Finset (Fin n)).sum (fun i =>
-      if ((p.operators i).mulOp (q.operators i)).phasePower
-      = ((q.operators i).mulOp (p.operators i)).phasePower + 2 then 1 else 0) := by
-        rw [ Finset.mul_sum _ _ _ ];
-        rw [ ← Finset.sum_add_distrib ] ; exact Finset.sum_congr rfl fun i _ =>
-        by cases h_phase_diff i <;> simp  [ * ] ;
-      simp_all  [ Finset.sum_ite ];
-      convert congr_arg ( fun x : ℕ => x • 2 : ℕ → Fin 4 ) h_even.two_dvd.choose_spec using 1;
-      · congr! 2;
-        ext; simp [Quantum.NQubitPauliGroupElement.anticommutesAt];
-      · norm_num [ Fin.ext_iff, Fin.val_add, Fin.val_mul ];
-        erw [ Fin.val_mk ];
-        induction Exists.choose (even_iff_two_dvd.mp h_even) with
-        | zero => simp_all [nsmulRec];
-        | succ k ih => simp_all [nsmulRec];  omega
-    exact (commutes_iff_mulOp_phasePower p q).mpr h_cancel
+    p * q = q * p ↔
+      (by
+        classical
+        exact Even ((Finset.univ.filter
+          (anticommutesAt (n := n) p.operators q.operators)).card)) := by
+  classical
+  rw [commutes_iff_mulOp_phasePower, mulOp_phasePower_eq_add_card, add_eq_left, nsmul_two]
+  simp
 
 /-!
 ## Anticommutation
-
-Two n-qubit Pauli group elements anticommute when p * q = (-1) * (q * p), i.e.
-the number of qubit positions where the single-qubit factors anticommute is odd.
 -/
 
-/-- Two n-qubit Pauli group elements anticommute: p * q = (-1) * (q * p). -/
+/-- Two n-qubit Pauli group elements anticommute: `p * q = (-1) * (q * p)`. -/
 def Anticommute (p q : NQubitPauliGroupElement n) : Prop :=
   p * q = minusOne n * (q * p)
 
 /-! ### Decidability of equality and `Anticommute`
 
-`DecidableEq (NQubitPauliOperator n)` is computable (via the underlying function
-type `Fin n → PauliOperator`, see `Representation.lean`). Field-wise decision
-lifts it to `DecidableEq (NQubitPauliGroupElement n)`, and `Anticommute p q`
-unfolds to an equality of two group elements, so it is decidable too. The latter
-instance is necessarily `noncomputable`, because the `Mul` instance on
-`NQubitPauliGroupElement` is, but the kernel still reduces `decide` through it
-(`native_decide` does not work for the same reason — prefer `decide`).
-
-Both instances are global. They were file-local for a while (in
-`Codes/Small/FiveQubit_5_1_3.lean`) because a global copy once changed the
-synthesis path of a `native_decide` proof in the 3×3 rotated surface code; that
-file is parked on `claude/z3z6-parked` and `main` is `native_decide`-free, so
-the instances were promoted back. Concrete commutation facts such as
-`Z1 * X1 = X1 * Z1` on a literal code now close by `decide`. -/
+Equality of n-qubit Pauli operators is decidable qubit by qubit, so equality of
+group elements is decidable field by field, and `Anticommute p q`, an equality
+of two group elements, is decidable too. The `Anticommute` instance is
+necessarily `noncomputable`, because multiplication on
+`NQubitPauliGroupElement` is; the kernel still reduces `decide` through it, so
+concrete commutation facts between literal elements close by `decide`. -/
 
 /-- Equality of Pauli group elements is decidable, field by field. -/
 instance instDecidableEq : DecidableEq (NQubitPauliGroupElement n) := fun p q =>
   decidable_of_iff (p.phasePower = q.phasePower ∧ p.operators = q.operators)
     ⟨fun ⟨h1, h2⟩ => NQubitPauliGroupElement.ext p q h1 h2, fun h => by cases h; exact ⟨rfl, rfl⟩⟩
 
-/-- `Anticommute p q` is an equality of group elements, hence decidable
-(`noncomputable` because `*` is; the kernel reduces it regardless). -/
+/-- `Anticommute p q` is an equality of group elements, hence decidable. -/
 noncomputable instance instDecidableAnticommute (p q : NQubitPauliGroupElement n) :
     Decidable (Anticommute p q) :=
   inferInstanceAs (Decidable (p * q = minusOne n * (q * p)))
 
-/-- Anticommutation reduces to the mulOp phase differing by 2 (mod 4). -/
-lemma anticommutes_iff_mulOp_phasePower (p q : NQubitPauliGroupElement n) :
-  Anticommute p q ↔
-  (mulOp p.operators q.operators).phasePower = (mulOp q.operators p.operators).phasePower + 2 := by
-  constructor
-  · intro h
-    have h_phase : (p * q).phasePower = (minusOne n * (q * p)).phasePower :=
-      congrArg (fun r : NQubitPauliGroupElement n => r.phasePower) h
-    simp only [mul, mul_eq, minusOne_phasePower, minusOne_operators] at h_phase
-    rw [mulOp_identity_left_phase] at h_phase
-    simpa [add_assoc, add_comm, add_left_comm] using h_phase
-  · intro h_mulOp_phase
-    apply NQubitPauliGroupElement.ext (p * q) (minusOne n * (q * p))
-    · simp only [mul, mul_eq, minusOne_phasePower, minusOne_operators, mulOp_identity_left_phase,
-        zero_add, add_assoc, add_comm, add_left_comm, h_mulOp_phase]
-    · ext i
-      simp only [mul, mul_eq, minusOne_operators, mulOp_operators_at, mulOp_identity_left_op,
-        PauliOperator.mulOp_operator_comm]
+/-- Multiplying by `minusOne n` shifts the phase by `2` and leaves the operator
+part unchanged. -/
+lemma minusOne_mul (g : NQubitPauliGroupElement n) :
+    minusOne n * g = ⟨2 + g.phasePower, g.operators⟩ := by
+  ext i <;> simp [mul, mulOp_identity_left_phase, mulOp_identity_left_op]
 
-/-- Anticommutation only sees operator parts: elements with equal operator parts
-anticommute with the same things. -/
+open Fin.CommRing in
+/-- Two elements anticommute iff the phases contributed by `mulOp` in the two
+orders differ by `2`. -/
+lemma anticommutes_iff_mulOp_phasePower (p q : NQubitPauliGroupElement n) :
+    Anticommute p q ↔
+      (mulOp p.operators q.operators).phasePower =
+        (mulOp q.operators p.operators).phasePower + 2 := by
+  rw [Anticommute, minusOne_mul, NQubitPauliGroupElement.ext_iff,
+    and_iff_left (operators_mul_comm p q)]
+  simp only [mul_eq, mul]
+  constructor <;> intro h <;> linear_combination h
+
+/-- Anticommutation only depends on operator parts: elements with equal
+operator parts anticommute with the same elements. -/
 lemma anticommute_congr_left {p q r : NQubitPauliGroupElement n} (h : p.operators = q.operators) :
     Anticommute p r ↔ Anticommute q r := by
   rw [anticommutes_iff_mulOp_phasePower, anticommutes_iff_mulOp_phasePower, h]
 
-/-- When two Pauli elements anticommute, their product's matrix is -1 times the
-reversed product. -/
+/-- If `p` and `q` anticommute, the matrix of `p * q` is `-1` times that of
+`q * p`. -/
 lemma Anticommute.toMatrix_neg (p q : NQubitPauliGroupElement n) (h : Anticommute p q) :
     (p * q).toMatrix = (-1 : ℂ) • (q * p).toMatrix := by
   unfold Anticommute at h
   rw [h, toMatrix_mul, minusOne_toMatrix, Matrix.smul_mul, Matrix.one_mul, toMatrix_mul]
 
-/-- When two Pauli elements anticommute, the matrix product satisfies s * g = -1
-• (g * s). -/
+/-- If `p` and `q` anticommute, so do their matrices. -/
 lemma Anticommute.toMatrix_mul_neg (p q : NQubitPauliGroupElement n) (h : Anticommute p q) :
     p.toMatrix * q.toMatrix = (-1 : ℂ) • (q.toMatrix * p.toMatrix) := by
   rw [← toMatrix_mul, ← toMatrix_mul, Anticommute.toMatrix_neg p q h]
 
-/-- Two n-qubit Pauli group elements anticommute iff the number of qubit
-positions where the corresponding single-qubit factors anticommute is odd. -/
+/-- Two n-qubit Pauli group elements anticommute iff the number of qubits at
+which their single-qubit factors anticommute is odd. -/
 lemma anticommutes_iff_odd_anticommutes (p q : NQubitPauliGroupElement n) :
-  Anticommute p q ↔
-    (by classical exact Odd ((Finset.univ.filter
-      (anticommutesAt (n := n) p.operators q.operators)).card)) := by
-  rw [anticommutes_iff_mulOp_phasePower, Nat.odd_iff]
-  constructor
-  · intro h_phase
-    have h_odd : ((Finset.univ.filter (fun i =>
-    ((p.operators i).mulOp (q.operators i)).phasePower =
-    ((q.operators i).mulOp (p.operators i)).phasePower + 2)).card)
-    % 2 = 1 := by
-      have h_odd : ((Finset.univ : Finset (Fin n)).sum
-      (fun i => ((p.operators i).mulOp (q.operators i)).phasePower -
-      ((q.operators i).mulOp (p.operators i)).phasePower)) % 4 = 2 := by
-        convert congr_arg ( fun x : Fin 4 => x.val % 4 ) h_phase using 1;
-        simp  [ Fin.ext_iff, Fin.val_add, mulOp_phasePower ];
-        omega;
-      have h_odd : ∀ i : Fin n,
-      ((p.operators i).mulOp (q.operators i)).phasePower -
-      ((q.operators i).mulOp (p.operators i)).phasePower =
-      if ((p.operators i).mulOp (q.operators i)).phasePower =
-      ((q.operators i).mulOp (p.operators i)).phasePower + 2 then 2 else 0 := by
-        intro i; split_ifs <;> simp_all  [ sub_eq_iff_eq_add ] ;
-        have h_comm : ∀ (p q : PauliOperator), (p.mulOp q).phasePower =
-        (q.mulOp p).phasePower ∨
-        (p.mulOp q).phasePower = (q.mulOp p).phasePower + 2 := by
-          exact fun p q ↦ PauliGroupElement.PauliOperator.mulOp_phasePower_eq_or_eq_add_two p q;
-        exact Or.resolve_right ( h_comm _ _ ) ‹_›;
-      simp_all  [ Finset.sum_ite ];
-      rcases Nat.even_or_odd' ( Finset.card (
-        Finset.filter ( fun i => ( ( p.operators i ).mulOp
-      ( q.operators i ) ).phasePower =
-      ( ( q.operators i ).mulOp
-      ( p.operators i ) ).phasePower + 2 ) Finset.univ ) ) with ⟨ k, hk | hk ⟩ <;>
-      simp_all ;
-      erw [ Fin.ext_iff ] at * ; simp_all  [ Fin.val_add ];
-      erw [ Fin.val_mk ] at * ; simp_all ;
-      erw [ show ( nsmulRec ( 2 * k ) 2 : Fin 4 ) = 0 from
-      by exact Nat.recOn k ( by rfl ) fun n ihn => by simp_all
-      [ nsmulRec ] ] at * ;
-      simp_all
-    convert h_odd using 4
-  · intro h_odd
-    have h_total_phase_diff : (mulOp p.operators q.operators).phasePower =
-      (mulOp q.operators p.operators).phasePower +
-      (Finset.univ : Finset (Fin n)).sum
-      (fun i => if ((p.operators i).mulOp
-      (q.operators i)).phasePower =
-      ((q.operators i).mulOp (p.operators i)).phasePower + 2 then
-      2 else 0) := by
-        have h_total_phase_diff : ∀ i : Fin n, ((p.operators i).mulOp (q.operators i)).phasePower =
-          ((q.operators i).mulOp (p.operators i)).phasePower + if ((p.operators i).mulOp
-          (q.operators i)).phasePower =
-          ((q.operators i).mulOp (p.operators i)).phasePower + 2 then 2 else 0 := by
-            unfold PauliOperator.mulOp at *; aesop;
-        rw [ mulOp_phasePower, mulOp_phasePower, Finset.sum_congr rfl fun i _ =>
-        h_total_phase_diff i, Finset.sum_add_distrib ];
-    simp_all  [ Finset.sum_ite ];
-    erw [ Finset.card_filter ] at *;
-    rw [ ← Nat.mod_add_div ( ∑ i : Fin n, if
-    ( ( p.operators i ).mulOp
-    ( q.operators i ) ).phasePower =
-    ( ( q.operators i ).mulOp ( p.operators i ) ).phasePower +
-    2 then 1 else 0 ) 2 ] ; simp_all ;
-    simp_all  [ Fin.ext_iff, Quantum.NQubitPauliGroupElement.anticommutesAt ];
-    erw [ Fin.val_mk ];
-    induction ( Finset.card _ / 2 ) <;> simp_all  [ nsmulRec ];
-    simp_all  [ Fin.val_add]
+    Anticommute p q ↔
+      (by classical exact Odd ((Finset.univ.filter
+        (anticommutesAt (n := n) p.operators q.operators)).card)) := by
+  classical
+  rw [anticommutes_iff_mulOp_phasePower, mulOp_phasePower_eq_add_card, add_right_inj, nsmul_two,
+    ← Nat.not_even_iff_odd]
+  split_ifs with h <;> simp [h]
 
-/-- Symmetry of anticommutation: if P anticommutes with Q, then Q anticommutes
-with P. -/
+/-- Anticommutation is symmetric. -/
 lemma anticommute_symm (p q : NQubitPauliGroupElement n) :
     Anticommute p q → Anticommute q p := by
   unfold Anticommute
   intro h
-  calc q * p = (minusOne n)⁻¹ * ((minusOne n) * (q * p)) := by rw [inv_mul_cancel_left]
-      _ = (minusOne n)⁻¹ * (p * q) := by rw [← h]
-      _ = (minusOne n) * (p * q) := by rw [minusOne_inv]
+  calc q * p = (minusOne n)⁻¹ * (minusOne n * (q * p)) := by rw [inv_mul_cancel_left]
+    _ = minusOne n * (p * q) := by rw [← h, minusOne_inv]
 
 /-- Any two n-qubit Pauli group elements either commute or anticommute. -/
 lemma commute_or_anticommute (p q : NQubitPauliGroupElement n) :
-  p * q = q * p ∨ Anticommute p q := by
+    p * q = q * p ∨ Anticommute p q := by
   classical
-  set k := (Finset.univ.filter (anticommutesAt (n := n) p.operators q.operators)).card
-  rcases Nat.even_or_odd k with ⟨m, hm⟩ | ⟨m, hm⟩
-  · left; exact (commutes_iff_even_anticommutes p q).mpr ⟨m, hm⟩
-  · right; exact (anticommutes_iff_odd_anticommutes p q).mpr ⟨m, hm⟩
-
-/-- Every element commutes with itself. -/
-lemma commutes_refl (p : NQubitPauliGroupElement n) : p * p = p * p := rfl
-
-/-- Symmetry of commutation: if p commutes with q, then q commutes with p. -/
-lemma commutes_symm (p q : NQubitPauliGroupElement n) :
-  (p * q = q * p) ↔ (q * p = p * q) := by
-  constructor
-  · intro h; symm; exact h
-  · intro h; symm; exact h
-
-/-- The identity element commutes with all elements. -/
-lemma commutes_one_left (p : NQubitPauliGroupElement n) : 1 * p = p * 1 := by
-  rw [one_mul, mul_one]
-
-/-- All elements commute with the identity. -/
-lemma commutes_one_right (p : NQubitPauliGroupElement n) : p * 1 = 1 * p := by
-  rw [mul_one, one_mul]
-
-/-- If one element is the identity, they commute. -/
-lemma commutes_if_one_identity_left (p : NQubitPauliGroupElement n) :
-  (1 : NQubitPauliGroupElement n) * p = p * (1 : NQubitPauliGroupElement n) :=
-  commutes_one_left p
-
-/-- If one element is the identity, they commute. -/
-lemma commutes_if_one_identity_right (p : NQubitPauliGroupElement n) :
-  p * (1 : NQubitPauliGroupElement n) = (1 : NQubitPauliGroupElement n) * p :=
-  commutes_one_right p
-
-/-- If p has operator part equal to the identity (phase-only element), then p
-commutes with
-    every q. -/
-lemma commutes_of_operators_identity (p q : NQubitPauliGroupElement n)
-    (h : p.operators = NQubitPauliOperator.identity n) : p * q = q * p := by
-  simp only [mul_eq, mul]
-  congr 1
-  · rw [h, mulOp_identity_left_phase, mulOp_identity_right_phase]
-    rw [add_comm p.phasePower q.phasePower]
-  · rw [h, NQubitPauliGroupElement.mulOp_identity_left_op, ← NQubitPauliGroupElement.one_operators,
-      NQubitPauliGroupElement.mulOp_identity_right_op]
+  rcases Nat.even_or_odd
+    (Finset.univ.filter (anticommutesAt (n := n) p.operators q.operators)).card with h | h
+  · exact Or.inl ((commutes_iff_even_anticommutes p q).mpr h)
+  · exact Or.inr ((anticommutes_iff_odd_anticommutes p q).mpr h)
 
 end NQubitPauliGroupElement
 

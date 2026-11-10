@@ -97,7 +97,7 @@ lemma trace_eq_zero_of_ne_identity (g : NQubitPauliGroupElement n)
       have h_trace_zero : (p.toMatrix * (NQubitPauliOperator.identity n).toMatrix).trace =
           if p = NQubitPauliOperator.identity n then (2 : ℂ)^n else 0 := by
           exact
-          NQubitPauliGroupElement.NQubitPauliOperator.trace_mul p  (NQubitPauliOperator.identity n)
+          NQubitPauliOperator.trace_mul p  (NQubitPauliOperator.identity n)
       rw [h_trace_zero, if_neg hp_ne_I]
     convert h_trace_zero using 1
     rw [show (NQubitPauliOperator.identity n |> NQubitPauliOperator.toMatrix) = 1 from ?_]
