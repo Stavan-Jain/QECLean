@@ -10,11 +10,9 @@ import QEC.Stabilizer.Codes.Iceberg
 import QEC.Stabilizer.Codes.Small
 
 /-!
-# QECLight — compatibility import surface
+# QECLight
 
-This entry point predates the extraction of the large bivariate-bicycle
-certificate proofs into `bb-distance-lean`. It remains available to existing
-hosted-editor configurations. Both `QECLight` and `QEC` now leave those
-concrete distance proofs to the downstream package; the general BB foundations
-remain part of `Framework`.
+The library without the `Codes.BivariateBicycle` umbrella and the code
+template: the foundations, the geometry, the whole framework, and every other
+code family. It is the import surface used by `Playground.lean`.
 -/

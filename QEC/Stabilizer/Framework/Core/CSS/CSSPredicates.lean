@@ -117,6 +117,16 @@ lemma IsZType_identity : IsZType (NQubitPauliOperator.identity n) :=
 lemma IsXType_identity : IsXType (NQubitPauliOperator.identity n) :=
   fun _ => PauliOperator.IsXType_I
 
+/-- An `X`-type operator has no `Y` factor. -/
+lemma IsXType.ne_Y {op : NQubitPauliOperator n} (h : IsXType op) (i : Fin n) :
+    op i ≠ PauliOperator.Y := by
+  rcases h i with hi | hi <;> rw [hi] <;> decide
+
+/-- A `Z`-type operator has no `Y` factor. -/
+lemma IsZType.ne_Y {op : NQubitPauliOperator n} (h : IsZType op) (i : Fin n) :
+    op i ≠ PauliOperator.Y := by
+  rcases h i with hi | hi <;> rw [hi] <;> decide
+
 /-- If `p` is Z-type and `q` is X-type, the operator part of `mulOp p q` is the
 identity iff both `p` and `q` are the identity. -/
 lemma mulOp_operators_eq_identity_iff_of_types {p q : NQubitPauliOperator n}

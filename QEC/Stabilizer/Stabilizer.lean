@@ -9,14 +9,13 @@ import QEC.Stabilizer.Geometry
 import QEC.Stabilizer.Codes
 
 /-!
-# Stabilizer formalism — top-level umbrella
+# The stabilizer formalism
 
-Top-down structure of the stabilizer-code library:
+- `Foundations`: the Pauli groups and the binary symplectic representation.
+- `Geometry`: lattice primitives shared by the lattice code families.
+- `Framework`: stabilizer groups and codes, logical operators and distance,
+  and the homological description of CSS codes.
+- `Codes`: concrete codes and code families.
 
-1. `Foundations` — Pauli + binary-symplectic algebra (pure algebra; floor)
-2. `Geometry` — lattice-family-agnostic primitives
-3. `Framework` — abstract stabilizer / homological theory
-4. `Codes` — concrete codes (toric, rotated-surface, repetition, small)
-
-Layering: `Foundations < {Geometry, Framework} < Codes`.
+Each layer imports only the ones above it in this list.
 -/

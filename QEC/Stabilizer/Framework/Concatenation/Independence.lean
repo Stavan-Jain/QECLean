@@ -19,9 +19,8 @@ itself on that block and to `0` on the others; a promoted outer generator
 restricts to a combination of the two inner logical operators; and a vector
 whose restrictions all vanish is `0`.
 
-The file also provides general facts about `rowsLinearIndependent`:
-`rowsLinearIndependent_append_iff` for an appended list and
-`rowsLinearIndependent_map` for a mapped list.
+The pieces are assembled with `rowsLinearIndependent_append_iff` for an appended
+list and `rowsLinearIndependent_map` for a mapped list.
 -/
 
 namespace Quantum
@@ -32,40 +31,7 @@ open NQubitPauliOperator Submodule
 
 variable {n : ℕ}
 
-/-! ## Row independence of appended and mapped lists -/
-
-/-- The rows of `A ++ B` are linearly independent iff the rows of `A` are, the
-rows of `B` are, and the spans of the two sets of rows are disjoint. -/
-theorem rowsLinearIndependent_append_iff (A B : List (NQubitPauliGroupElement n)) :
-    rowsLinearIndependent (A ++ B) ↔
-      rowsLinearIndependent A ∧ rowsLinearIndependent B ∧
-        Disjoint (sympSpan A) (sympSpan B) := by
-  let e : Fin A.length ⊕ Fin B.length ≃ Fin (A ++ B).length :=
-    finSumFinEquiv.trans (finCongr List.length_append.symm)
-  have key : (fun i => checkMatrix (A ++ B) i) ∘ e = Sum.elim (checkMatrix A) (checkMatrix B) := by
-    funext s
-    rcases s with i | j <;> funext col <;> simp [checkMatrix, e]
-  rw [rowsLinearIndependent, ← linearIndependent_equiv e, key, linearIndependent_sum]
-  simp only [Sum.elim_comp_inl, Sum.elim_comp_inr]
-  rfl
-
-/-- The empty list has linearly independent rows. -/
-lemma rowsLinearIndependent_nil :
-    rowsLinearIndependent ([] : List (NQubitPauliGroupElement n)) :=
-  linearIndependent_empty_type (ι := Fin 0)
-
-/-- The rows of `L.map f` are linearly independent iff the symplectic vectors
-of the elements `f g`, for `g` in `L`, are. -/
-lemma rowsLinearIndependent_map {m : ℕ}
-    (f : NQubitPauliGroupElement n → NQubitPauliGroupElement m)
-    (L : List (NQubitPauliGroupElement n)) :
-    rowsLinearIndependent (L.map f) ↔
-      LinearIndependent (ZMod 2) fun i : Fin L.length => toSymplectic (f (L.get i)).operators := by
-  have key : (fun i => checkMatrix (L.map f) i) ∘ finCongr (List.length_map f).symm =
-      fun i : Fin L.length => toSymplectic (f (L.get i)).operators := by
-    funext i col
-    simp [checkMatrix]
-  rw [rowsLinearIndependent, ← linearIndependent_equiv (finCongr (List.length_map f).symm), key]
+/-! ## Combinations of two independent rows -/
 
 /-- If the rows of `[x, z]` are linearly independent, a vanishing combination
 of them has both coefficients `0`. -/

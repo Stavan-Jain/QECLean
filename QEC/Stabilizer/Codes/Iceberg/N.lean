@@ -1,620 +1,188 @@
 import Mathlib.Tactic
-import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
-import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
-import QEC.Stabilizer.Framework.Core.Stabilizer.SubgroupLemmas
-import QEC.Stabilizer.Framework.Core.CSS.CSSPredicates
-import QEC.Stabilizer.Framework.Core.CSS.CSSNoNegI
+import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrixDecidable
+import QEC.Stabilizer.Foundations.PauliGroup.Commutation
+import QEC.Stabilizer.Foundations.PauliGroup.Notation
+import QEC.Stabilizer.Framework.Core.CodeNotation
 import QEC.Stabilizer.Framework.Core.CSS.CSSCommutationLemmas
 import QEC.Stabilizer.Framework.Core.CSS.CSSDistance
-import QEC.Stabilizer.Framework.Core.Stabilizer.Centralizer
 import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
 import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
-import QEC.Stabilizer.Foundations.PauliGroup.Commutation
-import QEC.Stabilizer.Foundations.PauliGroup.CommutationTactics
-import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
-import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
-import QEC.Stabilizer.Foundations.BinarySymplectic.Core
-import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrix
-import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrixDecidable
-import QEC.Stabilizer.Foundations.BinarySymplectic.SymplecticInner
-import QEC.Stabilizer.Framework.Symplectic.IndependentEquiv
+import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
 import QEC.Stabilizer.Framework.Symplectic.Presentation
-
-namespace Quantum
-open scoped BigOperators
-
-namespace StabilizerGroup
-namespace Iceberg
+import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
 
 /-!
-# The iceberg / generalized parity code family `[[2m, 2m−2, 2]]`
+# The iceberg codes `[[2m, 2m − 2, 2]]`
 
-A parametric, self-complementary, self-dual CSS detection code on `n = 2m`
-physical qubits with `k = 2m − 2` logical qubits and distance `d = 2`.
-Originally analyzed in [Steane 1996, `arxiv:quant-ph/9605021`] and [Gottesman
-1997, `arxiv:quant-ph/9702029`]; see also EC Zoo:
-`https://errorcorrectionzoo.org/c/iceberg`.
+The iceberg codes, or generalized parity codes: for `m ≥ 2`, the self-dual CSS
+stabilizer code on `2m` qubits whose two generators (`n − k = 2`) are `Z⊗²ᵐ`
+and `X⊗²ᵐ`. It encodes `2m − 2` logical qubits, with code distance 2. The two
+generators meet on all `2m` qubits, an even number, which is why they commute
+and why the family lives on an even number of qubits. The instance `m = 2` is
+the four-qubit code of `Small/FourQubit_4_2_2.lean`.
 
-## Parameters
+Being parametric, the family takes the **CSS route** rather than the decide
+route: the number of qubits is symbolic, so `decide` has nothing to evaluate.
+Commutation comes from the Z/X typing and the even overlap, `−I ∉ closure` from
+`CSS.negIdentity_not_mem_closure_union`, and independence from one pivot column
+per generator.
 
-- Physical qubits: `n = 2m`
-- Logical qubits: `k = 2m − 2`
-- Distance: `d = 2`
-- Family: CSS, self-dual (X- and Z-stabilizers share the same full support).
-- Parameter constraint: `[Fact (2 ≤ m)]` (`m = 1` would give a trivial
-  `[[2, 0, 2]]` code with zero logical qubits, which we exclude).
+Distance 2 is `hasCodeDistance_two_of_anticommute_witness`: both generators act
+on every qubit, so every weight-1 Pauli anticommutes with `Z⊗²ᵐ` (local `X` or
+`Y`) or `X⊗²ᵐ` (local `Z`), and `X` on qubits `{0, 1}` is a nontrivial logical
+of weight 2.
 
-## Stabilizer generators
+The logical basis `X̄ᵢ = XᵢX₂ₘ₋₁`, `Z̄ᵢ = ZᵢZ₂ₘ₋₂` is in `NLogicals.lean`.
 
-Exactly two generators, `n − k = 2`:
+## Outline
 
-```
-S_Z := Z Z Z ... Z   (Z on all 2m qubits)
-S_X := X X X ... X   (X on all 2m qubits)
-```
-
-They commute because the symplectic inner product `⟨S_X, S_Z⟩ = 2m mod 2 = 0`
-when `n = 2m` is even (this is the **defining property** of the iceberg family:
-the all-X / all-Z stabilizers commute precisely when `n` is even, which is why
-the iceberg is a `[[2m, *, *]]` rather than `[[2m+1, *, *]]` family — the odd-n
-version gives the Shor / Steane / repetition codes).
-
-## Logical operators (split-anchor convention)
-
-For each logical qubit `i : Fin (2m − 2)`:
-
-- Qubit `i.val` (= 0, 1, …, 2m − 3) is the "individual" position
-- Qubit `2m − 1` is the global "X-anchor" (in every `X̄_i`)
-- Qubit `2m − 2` is the global "Z-anchor" (in every `Z̄_i`)
-
-```
-X̄_i := X at qubits {i.val, 2m − 1}     (weight 2)
-Z̄_i := Z at qubits {i.val, 2m − 2}     (weight 2)
-```
-
-This convention makes the (anti)commutation table clean:
-
-- `X̄_i Z̄_i`: anticomm at qubit `i.val` only (count 1, odd) ⇒ anticommute
-- `X̄_i Z̄_j` for `i ≠ j`: disjoint supports ⇒ commute
-- `X̄_i S_Z`: anticomm at `{i.val, 2m-1}` (count 2, even) ⇒ commute
-- `Z̄_i S_X`: anticomm at `{i.val, 2m-2}` (count 2, even) ⇒ commute
-
-## Relation to `Codes/Small/FourQubit_4_2_2.lean`
-
-This parametric family at `m = 2` is the **same code** as the existing
-`FourQubit_4_2_2.lean`, but uses a **different** logical-operator basis from
-the one in `FourQubit_4_2_2Logicals.lean` (see
-`qec-lab:pipeline/attempts/iceberg/informal_spec.md` § "Relation to
-FourQubit_4_2_2.lean"). Both formalizations coexist as separate Lean objects,
-mirroring the `RepetitionCode3.lean` / `RepetitionCodeN.lean` pattern: we do NOT
-prove equivalence between the two.
-
-## File status
-
-**Stage-2 skeleton.** Every theorem ends in a `sorry` tagged
-`TODO(iceberg-T<n>): <one-line hint>`. Stage 4 closes them following the
-`FourQubit_4_2_2.lean` template, scaled up for parametric `m` and generalized
-for k = 2m − 2 logical qubits.
+- Generators `ZStab`, `XStab`, the list `generatorsList`, the sets
+  `ZGenerators`, `XGenerators`, `generators` and the subgroup `subgroup`
+- Hypotheses on the generators: `ZGenerators_isZType`, `XGenerators_isXType`,
+  `ZGenerators_commute_XGenerators`, `generators_commute`,
+  `AllPhaseZero_generatorsList`, `rowsLinearIndependent_generatorsList`
+- `negIdentity_not_mem`, the bundled `stabilizerGroup`
+- `presentation`, `stabilizerCode : Code[[2m, 2m − 2]]`
+- Centralizer criteria `xOn_mem_centralizer`, `zOn_mem_centralizer`: `X` or `Z`
+  on an even number of qubits commutes with the stabilizer
+- Distance 2 (weight-1 anticommute witness, weight-2 logical):
+  `code_has_distance_two`, `stabilizerCodeWithDistance : Code[[2m, 2m − 2, 2]]`
 -/
+
+namespace Quantum
+namespace StabilizerGroup
+namespace Iceberg
 
 open NQubitPauliGroupElement
 open scoped Pauli
 
-/-! ## Local convenience -/
+/-! ## Generators -/
 
-/-- Lift a logical-qubit index `Fin (2m − 2)` into the physical-qubit index
-`Fin (2m)`. The `[Fact (2 ≤ m)]` instance discharges the bound proof
-`i.val < 2m` via `omega`. -/
-@[inline] private def logIdx {m : ℕ} [Fact (2 ≤ m)] (i : Fin (2 * m - 2)) :
-    Fin (2 * m) :=
-  ⟨i.val, by
-    have h : 2 ≤ m := Fact.out
-    have hi : i.val < 2 * m - 2 := i.isLt
-    omega⟩
-
-/-- Z-anchor qubit (always part of every `Z̄_i`): qubit `2m − 2`. -/
-@[inline] private def zAnchor (m : ℕ) [Fact (2 ≤ m)] : Fin (2 * m) :=
-  ⟨2 * m - 2, by have h : 2 ≤ m := Fact.out; omega⟩
-
-/-- X-anchor qubit (always part of every `X̄_i`): qubit `2m − 1`. -/
-@[inline] private def xAnchor (m : ℕ) [Fact (2 ≤ m)] : Fin (2 * m) :=
-  ⟨2 * m - 1, by have h : 2 ≤ m := Fact.out; omega⟩
-
-/-! ## §1 — Generators -/
-
-/-- The Z-type stabilizer generator: `Z Z Z … Z` on all `2m` qubits. -/
-def S_Z (m : ℕ) [Fact (2 ≤ m)] : NQubitPauliGroupElement (2 * m) :=
+/-- The Z-check stabilizer: `Z` on all `2m` qubits. -/
+def ZStab (m : ℕ) : NQubitPauliGroupElement (2 * m) :=
   ⟨0, NQubitPauliOperator.Z (2 * m)⟩
 
-/-- The X-type stabilizer generator: `X X X … X` on all `2m` qubits. -/
-def S_X (m : ℕ) [Fact (2 ≤ m)] : NQubitPauliGroupElement (2 * m) :=
+/-- The X-check stabilizer: `X` on all `2m` qubits. -/
+def XStab (m : ℕ) : NQubitPauliGroupElement (2 * m) :=
   ⟨0, NQubitPauliOperator.X (2 * m)⟩
 
-/-! ## §2 — Generator sets and subgroup -/
+/-- The Z-check is `Z` on the support of all qubits. -/
+lemma ZStab_eq_zOn (m : ℕ) : ZStab m = zOn Finset.univ :=
+  zOn_univ.symm
 
-/-- The single Z-check generator. -/
-def ZGenerators (m : ℕ) [Fact (2 ≤ m)] : Set (NQubitPauliGroupElement (2 * m)) :=
-  {S_Z m}
+/-- The X-check is `X` on the support of all qubits. -/
+lemma XStab_eq_xOn (m : ℕ) : XStab m = xOn Finset.univ :=
+  xOn_univ.symm
 
-/-- The single X-check generator. -/
-def XGenerators (m : ℕ) [Fact (2 ≤ m)] : Set (NQubitPauliGroupElement (2 * m)) :=
-  {S_X m}
+/-- The two generators as a list (Z-check first, then X-check). -/
+def generatorsList (m : ℕ) : List (NQubitPauliGroupElement (2 * m)) :=
+  [ZStab m, XStab m]
 
-/-- The full generator set: one Z-check and one X-check. -/
-def generators (m : ℕ) [Fact (2 ≤ m)] : Set (NQubitPauliGroupElement (2 * m)) :=
+/-- The Z-generators: the single Z-check. -/
+def ZGenerators (m : ℕ) : Set (NQubitPauliGroupElement (2 * m)) :=
+  {ZStab m}
+
+/-- The X-generators: the single X-check. -/
+def XGenerators (m : ℕ) : Set (NQubitPauliGroupElement (2 * m)) :=
+  {XStab m}
+
+/-- The two generators as a set. -/
+def generators (m : ℕ) : Set (NQubitPauliGroupElement (2 * m)) :=
   ZGenerators m ∪ XGenerators m
 
-/-- The iceberg stabilizer subgroup: closure of `{ZZ…Z, XX…X}`. -/
-noncomputable def subgroup (m : ℕ) [Fact (2 ≤ m)] :
-    Subgroup (NQubitPauliGroupElement (2 * m)) :=
+/-- The subgroup generated by `Z⊗²ᵐ` and `X⊗²ᵐ`. -/
+noncomputable def subgroup (m : ℕ) : Subgroup (NQubitPauliGroupElement (2 * m)) :=
   Subgroup.closure (generators m)
 
-/-! ## §3 — Z-type / X-type predicates -/
+/-- The generator list has the elements of the generator set. -/
+lemma listToSet_generatorsList (m : ℕ) : listToSet (generatorsList m) = generators m := by
+  simp [generatorsList, generators, ZGenerators, XGenerators, Set.pair_comm]
 
-/-- T1: the Z-generator `S_Z m` is Z-type (Z on every qubit, hence I-or-Z on
-every qubit trivially). -/
-lemma ZGenerators_are_ZType (m : ℕ) [Fact (2 ≤ m)] :
-    ∀ g, g ∈ ZGenerators m → NQubitPauliGroupElement.IsZTypeElement g := by
-  classical
-  intro g hg
-  rcases (by simpa [ZGenerators] using hg) with rfl
-  refine ⟨rfl, ?_⟩
-  intro i
-  exact Or.inr (by simp [S_Z, NQubitPauliOperator.Z])
+/-! ## Hypotheses on the generators
 
-/-- T2: the X-generator `S_X m` is X-type. -/
-lemma XGenerators_are_XType (m : ℕ) [Fact (2 ≤ m)] :
-    ∀ g, g ∈ XGenerators m → NQubitPauliGroupElement.IsXTypeElement g := by
-  classical
-  intro g hg
-  rcases (by simpa [XGenerators] using hg) with rfl
-  refine ⟨rfl, ?_⟩
-  intro i
-  exact Or.inr (by simp [S_X, NQubitPauliOperator.X])
+`Z⊗²ᵐ` and `X⊗²ᵐ` meet on all `2m` qubits, an even number, so they commute.
+For independence, `Z⊗²ᵐ` has a `1` in the `Z`-column of qubit `0`, where
+`X⊗²ᵐ` has a `0`, and `X⊗²ᵐ` has a `1` in the `X`-column of qubit `0`. -/
 
-/-! ## §4 — Cross-commutation (the iceberg-defining property)
+/-- The Z-generator is Z-type. -/
+lemma ZGenerators_isZType (m : ℕ) : ∀ g ∈ ZGenerators m, IsZTypeElement g := by
+  rintro _ rfl
+  exact ⟨rfl, fun _ => Or.inr rfl⟩
 
-`S_Z m` and `S_X m` anticommute at every one of the `2m` qubits — count `2m`,
-even (since `2m = 2 * m`), so they **commute**. This is why the iceberg family
-lives on an even number of physical qubits.
--/
+/-- The X-generator is X-type. -/
+lemma XGenerators_isXType (m : ℕ) : ∀ g ∈ XGenerators m, IsXTypeElement g := by
+  rintro _ rfl
+  exact ⟨rfl, fun _ => Or.inr rfl⟩
 
-private lemma S_Z_comm_S_X (m : ℕ) [Fact (2 ≤ m)] :
-    S_Z m * S_X m = S_X m * S_Z m := by
-  classical
-  pauli_comm_even_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-        (NQubitPauliGroupElement.anticommutesAt (n := 2 * m)
-          (S_Z m).operators (S_X m).operators)) =
-        (Finset.univ : Finset (Fin (2 * m))) := by
-    ext i
-    simp [Finset.mem_filter, NQubitPauliGroupElement.anticommutesAt,
-      S_Z, S_X, NQubitPauliOperator.Z, NQubitPauliOperator.X, PauliOperator.mulOp]
-  rw [hfilter, Finset.card_univ, Fintype.card_fin]
-  exact ⟨m, by ring⟩
-
-/-- T3 packaged: every Z-generator commutes with every X-generator. -/
-lemma ZGenerators_commute_XGenerators (m : ℕ) [Fact (2 ≤ m)] :
+/-- The Z-generator commutes with the X-generator: they meet on `2m` qubits. -/
+lemma ZGenerators_commute_XGenerators (m : ℕ) :
     ∀ z ∈ ZGenerators m, ∀ x ∈ XGenerators m, z * x = x * z := by
-  classical
-  intro z hz x hx
-  rcases (by simpa [ZGenerators] using hz) with rfl
-  rcases (by simpa [XGenerators] using hx) with rfl
-  exact S_Z_comm_S_X m
+  rintro _ rfl _ rfl
+  rw [ZStab_eq_zOn, XStab_eq_xOn, eq_comm, commutes_xOn_zOn_iff, Finset.inter_self,
+    Finset.card_univ, Fintype.card_fin]
+  exact even_two_mul m
 
-/-! ## §5 — All-pair commutation -/
-
-private lemma ZType_commutes {m : ℕ} {g h : NQubitPauliGroupElement (2 * m)}
-    (hg : NQubitPauliGroupElement.IsZTypeElement g)
-    (hh : NQubitPauliGroupElement.IsZTypeElement h) :
-    g * h = h * g :=
-  NQubitPauliGroupElement.IsZTypeElement.commute hg hh
-
-private lemma XType_commutes {m : ℕ} {g h : NQubitPauliGroupElement (2 * m)}
-    (hg : NQubitPauliGroupElement.IsXTypeElement g)
-    (hh : NQubitPauliGroupElement.IsXTypeElement h) :
-    g * h = h * g :=
-  NQubitPauliGroupElement.IsXTypeElement.commute hg hh
-
-/-- T4: all generators pairwise commute. -/
-theorem generators_commute (m : ℕ) [Fact (2 ≤ m)] :
-    ∀ g ∈ generators m, ∀ h ∈ generators m, g * h = h * g := by
-  classical
-  intro g hg h hh
-  have hg' : g ∈ ZGenerators m ∨ g ∈ XGenerators m := by simpa [generators] using hg
-  have hh' : h ∈ ZGenerators m ∨ h ∈ XGenerators m := by simpa [generators] using hh
-  rcases hg' with hgZ | hgX <;> rcases hh' with hhZ | hhX
-  · exact ZType_commutes (ZGenerators_are_ZType m g hgZ) (ZGenerators_are_ZType m h hhZ)
+/-- The two generators commute. -/
+lemma generators_commute (m : ℕ) : ∀ g ∈ generators m, ∀ h ∈ generators m, g * h = h * g := by
+  rintro g (hgZ | hgX) h (hhZ | hhX)
+  · exact (ZGenerators_isZType m g hgZ).commute (ZGenerators_isZType m h hhZ)
   · exact ZGenerators_commute_XGenerators m g hgZ h hhX
-  · simpa using (ZGenerators_commute_XGenerators m h hhZ g hgX).symm
-  · exact XType_commutes (XGenerators_are_XType m g hgX) (XGenerators_are_XType m h hhX)
+  · exact (ZGenerators_commute_XGenerators m h hhZ g hgX).symm
+  · exact (XGenerators_isXType m g hgX).commute (XGenerators_isXType m h hhX)
 
-/-! ## §6 — `−I` is not in the stabilizer subgroup -/
+/-- Every generator has phase power 0. -/
+lemma AllPhaseZero_generatorsList (m : ℕ) : AllPhaseZero (generatorsList m) :=
+  (AllPhaseZero_cons _ _).mpr ⟨rfl, (AllPhaseZero_cons _ _).mpr ⟨rfl, AllPhaseZero_nil⟩⟩
 
-/-- T5: `−I` is not in the iceberg stabilizer subgroup (CSS argument with T1,
-T2, T3 + `CSS.negIdentity_not_mem_closure_union`). -/
-theorem negIdentity_not_mem (m : ℕ) [Fact (2 ≤ m)] :
-    negIdentity (2 * m) ∉ subgroup m := by
-  have hZX : ∀ z ∈ ZGenerators m, ∀ x ∈ XGenerators m, z * x = x * z :=
-    ZGenerators_commute_XGenerators m
-  simpa [subgroup, generators] using
-    (CSS.negIdentity_not_mem_closure_union (n := 2 * m) (ZGenerators m) (XGenerators m)
-      (ZGenerators_are_ZType m) (XGenerators_are_XType m) hZX)
+/-- The check-matrix rows of the two generators are linearly independent. -/
+lemma rowsLinearIndependent_generatorsList (m : ℕ) [Fact (2 ≤ m)] :
+    rowsLinearIndependent (generatorsList m) := by
+  have hm : 0 < 2 * m := by have := Fact.out (p := 2 ≤ m); omega
+  have hZ : (ZStab m).operators.toSymplectic (Fin.natAdd _ ⟨0, hm⟩) = 1 := by
+    rw [ZStab_eq_zOn, toSymplectic_zOn_natAdd, if_pos (Finset.mem_univ _)]
+  have hX : (XStab m).operators.toSymplectic (Fin.castAdd _ ⟨0, hm⟩) = 1 := by
+    rw [XStab_eq_xOn, toSymplectic_xOn_castAdd, if_pos (Finset.mem_univ _)]
+  have hXZ : (XStab m).operators.toSymplectic (Fin.natAdd _ ⟨0, hm⟩) = 0 := by
+    rw [XStab_eq_xOn, toSymplectic_xOn_natAdd]
+  have h := rowsLinearIndependent_ofFn_of_pivots ![ZStab m, XStab m]
+    ![Fin.natAdd _ ⟨0, hm⟩, Fin.castAdd _ ⟨0, hm⟩] (Fin.forall_fin_two.mpr ⟨hZ, hX⟩)
+    (Fin.forall_fin_two.mpr ⟨fun j hj => absurd hj (Fin.not_lt_zero j),
+      Fin.forall_fin_two.mpr ⟨fun _ => hXZ, fun hj => absurd hj (lt_irrefl _)⟩⟩)
+  simpa [generatorsList] using h
 
-/-! ## §7 — Generator list and `listToSet` equality -/
+/-! ## No `−I` in the stabilizer subgroup -/
 
-/-- The generator list, canonical order Z then X. Length = 2 = n − k. -/
-def generatorsList (m : ℕ) [Fact (2 ≤ m)] :
-    List (NQubitPauliGroupElement (2 * m)) :=
-  [S_Z m, S_X m]
+/-- The closure of the two generators does not contain `−I`. -/
+lemma negIdentity_not_mem (m : ℕ) : negIdentity (2 * m) ∉ subgroup m :=
+  CSS.negIdentity_not_mem_closure_union (ZGenerators m) (XGenerators m)
+    (ZGenerators_isZType m) (XGenerators_isXType m) (ZGenerators_commute_XGenerators m)
 
-/-- T6: the generator list and the generator set agree. -/
-lemma listToSet_generatorsList (m : ℕ) [Fact (2 ≤ m)] :
-    NQubitPauliGroupElement.listToSet (generatorsList m) = generators m := by
-  simp only [generatorsList, generators, ZGenerators, XGenerators,
-    NQubitPauliGroupElement.listToSet_cons, NQubitPauliGroupElement.listToSet_nil]
-  ext g
-  simp only [Set.mem_insert_iff, Set.mem_union, Set.mem_singleton_iff, Set.mem_empty_iff_false,
-    or_false]
+/-! ## Bundled `StabilizerGroup (2 * m)` -/
 
-/-- T7: all generators have phase 0. -/
-lemma AllPhaseZero_generatorsList (m : ℕ) [Fact (2 ≤ m)] :
-    NQubitPauliGroupElement.AllPhaseZero (generatorsList m) := by
-  rw [generatorsList, NQubitPauliGroupElement.AllPhaseZero_cons]
-  exact ⟨rfl, (NQubitPauliGroupElement.AllPhaseZero_cons _ _).mpr
-    ⟨rfl, NQubitPauliGroupElement.AllPhaseZero_nil⟩⟩
-
-/-! ## §9 — Generator independence (linear independence of check-matrix rows)
-
-The check matrix of `[S_Z m, S_X m]` has 2 rows × 4m columns. Row 0 has
-all-zeros on the X-half and all-ones on the Z-half; row 1 is its mirror. Both
-nonzero, neither a `ZMod 2`-multiple of the other (the only nonzero multiple is
-itself; sum of the two has all-ones everywhere, also nonzero).
--/
-
-/-- T8: the check-matrix rows of `[S_Z m, S_X m]` are linearly independent. -/
-theorem rowsLinearIndependent_generatorsList (m : ℕ) [Fact (2 ≤ m)] :
-    NQubitPauliGroupElement.rowsLinearIndependent (generatorsList m) := by
-  classical
-  have hm : 2 ≤ m := Fact.out
-  have h2m_pos : 0 < 2 * m := by omega
-  have hlen : (generatorsList m).length = 2 := by simp [generatorsList]
-  rw [NQubitPauliGroupElement.rowsLinearIndependent_iff_forall]
-  intro f hf
-  -- Length-2 row indices.
-  have h0lt : 0 < (generatorsList m).length := by simp [generatorsList]
-  have h1lt : 1 < (generatorsList m).length := by simp [generatorsList]
-  set i0 : Fin (generatorsList m).length := ⟨0, h0lt⟩ with hi0_def
-  set i1 : Fin (generatorsList m).length := ⟨1, h1lt⟩ with hi1_def
-  have hi01 : i0 ≠ i1 := by simp [hi0_def, hi1_def, Fin.ext_iff]
-  let q0 : Fin (2 * m) := ⟨0, h2m_pos⟩
-  -- Z-column values.
-  have hZ_i0 : NQubitPauliGroupElement.checkMatrix (generatorsList m) i0
-      (Fin.natAdd (2 * m) q0) = 1 := by
-    simp only [NQubitPauliGroupElement.checkMatrix, generatorsList, List.get, hi0_def, S_Z]
-    rw [NQubitPauliOperator.toSymplectic_Z_part]
-    simp [NQubitPauliOperator.Z]
-  have hZ_i1 : NQubitPauliGroupElement.checkMatrix (generatorsList m) i1
-      (Fin.natAdd (2 * m) q0) = 0 := by
-    simp only [NQubitPauliGroupElement.checkMatrix, generatorsList, List.get, hi1_def, S_X]
-    rw [NQubitPauliOperator.toSymplectic_Z_part]
-    simp [NQubitPauliOperator.X]
-  -- X-column values.
-  have hX_i0 : NQubitPauliGroupElement.checkMatrix (generatorsList m) i0
-      (Fin.castAdd (2 * m) q0) = 0 := by
-    simp only [NQubitPauliGroupElement.checkMatrix, generatorsList, List.get, hi0_def, S_Z]
-    rw [NQubitPauliOperator.toSymplectic_X_part]
-    simp [NQubitPauliOperator.Z]
-  have hX_i1 : NQubitPauliGroupElement.checkMatrix (generatorsList m) i1
-      (Fin.castAdd (2 * m) q0) = 1 := by
-    simp only [NQubitPauliGroupElement.checkMatrix, generatorsList, List.get, hi1_def, S_X]
-    rw [NQubitPauliOperator.toSymplectic_X_part]
-    simp [NQubitPauliOperator.X]
-  -- Evaluate hf at the two columns. The sum over Fin 2 splits as i0 + i1.
-  have hsum_Z := congrArg (fun (φ : Fin (2 * m + 2 * m) → ZMod 2) =>
-    φ (Fin.natAdd (2 * m) q0)) hf
-  have hsum_X := congrArg (fun (φ : Fin (2 * m + 2 * m) → ZMod 2) =>
-    φ (Fin.castAdd (2 * m) q0)) hf
-  simp only [Finset.sum_apply, Pi.smul_apply, Pi.zero_apply, smul_eq_mul] at hsum_Z hsum_X
-  -- The Fin 2 sum is i0 + i1 (since these are the only two elements).
-  have hfi_iff : ∀ (g : Fin (generatorsList m).length → ZMod 2),
-      ∑ i, g i = g i0 + g i1 := by
-    intro g
-    rw [show (Finset.univ : Finset (Fin (generatorsList m).length)) = {i0, i1} by
-      ext k
-      simp only [Finset.mem_univ, Finset.mem_insert, Finset.mem_singleton, true_iff]
-      have hkval : k.val < 2 := by have := k.2; omega
-      rcases Nat.lt_or_ge k.val 1 with h | h
-      · left
-        apply Fin.ext
-        show k.val = i0.val
-        simp [hi0_def]; omega
-      · right
-        apply Fin.ext
-        show k.val = i1.val
-        simp [hi1_def]; omega]
-    rw [Finset.sum_pair hi01]
-  rw [hfi_iff (fun i => f i * NQubitPauliGroupElement.checkMatrix (generatorsList m) i
-    (Fin.natAdd (2 * m) q0))] at hsum_Z
-  rw [hfi_iff (fun i => f i * NQubitPauliGroupElement.checkMatrix (generatorsList m) i
-    (Fin.castAdd (2 * m) q0))] at hsum_X
-  rw [hZ_i0, hZ_i1] at hsum_Z
-  rw [hX_i0, hX_i1] at hsum_X
-  have hf0 : f i0 = 0 := by simpa using hsum_Z
-  have hf1 : f i1 = 0 := by simpa using hsum_X
-  -- Conclude f = 0.
-  funext i
-  have hival : i.val < 2 := by have := i.2; omega
-  interval_cases hi : i.val
-  · have : i = i0 := by apply Fin.ext; show i.val = i0.val; simp [hi0_def, hi]
-    rw [this]; exact hf0
-  · have : i = i1 := by apply Fin.ext; show i.val = i1.val; simp [hi1_def, hi]
-    rw [this]; exact hf1
-
-theorem GeneratorsIndependent_generatorsList (m : ℕ) [Fact (2 ≤ m)] :
-    GeneratorsIndependent (2 * m) (generatorsList m) :=
-  GeneratorsIndependent_of_rowsLinearIndependent (rowsLinearIndependent_generatorsList m)
-
-/-! ## §8 — Bundled `StabilizerGroup (2 * m)` -/
-
-/-- T9: the iceberg stabilizer group, from the generator list. -/
-noncomputable def stabilizerGroup (m : ℕ) [Fact (2 ≤ m)] :
-    StabilizerGroup (2 * m) :=
+/-- The stabilizer group of the iceberg code on `2m` qubits, generated by
+`generatorsList m`. -/
+noncomputable def stabilizerGroup (m : ℕ) : StabilizerGroup (2 * m) :=
   mkStabilizerFromGenerators (2 * m) (generatorsList m)
     (by rw [listToSet_generatorsList]; exact generators_commute m)
     (by rw [listToSet_generatorsList]; exact negIdentity_not_mem m)
 
-/-- T10: the bundled stabilizer group's subgroup equals the set-form closure. -/
-lemma stabilizerGroup_toSubgroup_eq (m : ℕ) [Fact (2 ≤ m)] :
-    (stabilizerGroup m).toSubgroup = subgroup m := by
-  simp only [stabilizerGroup, mkStabilizerFromGenerators, subgroup]
-  rw [listToSet_generatorsList]
+/-- The stabilizer subgroup is the closure of the generator set. -/
+lemma stabilizerGroup_toSubgroup_eq (m : ℕ) : (stabilizerGroup m).toSubgroup = subgroup m :=
+  congrArg Subgroup.closure (listToSet_generatorsList m)
 
-/-! ## §10 — Logical operators
+/-! ## The bare code `Code[[2m, 2m − 2]]`
 
-For each `i : Fin (2m − 2)`:
-- `logicalX m i`: X at qubits `logIdx i` and `xAnchor m`
-- `logicalZ m i`: Z at qubits `logIdx i` and `zAnchor m`
--/
+Two independent, commuting generators on `2m` qubits: `2m − 2` logical
+qubits. -/
 
-/-- Logical X for logical qubit `i`: X on qubits `i` and `2m − 1`. -/
-def logicalX (m : ℕ) [Fact (2 ≤ m)] (i : Fin (2 * m - 2)) :
-    NQubitPauliGroupElement (2 * m) :=
-  σ[2 * m | logIdx i ↦ X, xAnchor m ↦ X]
-
-/-- Logical Z for logical qubit `i`: Z on qubits `i` and `2m − 2`. -/
-def logicalZ (m : ℕ) [Fact (2 ≤ m)] (i : Fin (2 * m - 2)) :
-    NQubitPauliGroupElement (2 * m) :=
-  σ[2 * m | logIdx i ↦ Z, zAnchor m ↦ Z]
-
-/-! ## §11 — Logical (anti)commutation -/
-
-/-- Internal helper: the three anchor positions are pairwise distinct. -/
-private lemma logIdx_ne_xAnchor (m : ℕ) [Fact (2 ≤ m)] (i : Fin (2 * m - 2)) :
-    logIdx i ≠ xAnchor m := by
-  have h : 2 ≤ m := Fact.out
-  intro heq
-  have := congrArg Fin.val heq
-  simp [logIdx, xAnchor] at this
-  omega
-
-private lemma logIdx_ne_zAnchor (m : ℕ) [Fact (2 ≤ m)] (i : Fin (2 * m - 2)) :
-    logIdx i ≠ zAnchor m := by
-  have h : 2 ≤ m := Fact.out
-  intro heq
-  have := congrArg Fin.val heq
-  simp [logIdx, zAnchor] at this
-  omega
-
-private lemma xAnchor_ne_zAnchor (m : ℕ) [Fact (2 ≤ m)] :
-    xAnchor m ≠ zAnchor m := by
-  have h : 2 ≤ m := Fact.out
-  intro heq
-  have := congrArg Fin.val heq
-  simp [xAnchor, zAnchor] at this
-  omega
-
-/-- T11: diagonal anticommutation `X̄_i Z̄_i = − Z̄_i X̄_i`. -/
-theorem logicalX_anticommutes_logicalZ_diag (m : ℕ) [Fact (2 ≤ m)]
-    (i : Fin (2 * m - 2)) :
-    NQubitPauliGroupElement.Anticommute (logicalX m i) (logicalZ m i) := by
-  classical
-  pauli_anticomm_odd_anticommutes
-  have hxa : logIdx i ≠ xAnchor m := logIdx_ne_xAnchor m i
-  have hza : logIdx i ≠ zAnchor m := logIdx_ne_zAnchor m i
-  have hax : xAnchor m ≠ zAnchor m := xAnchor_ne_zAnchor m
-  have hfilter :
-      (Finset.univ.filter
-        (NQubitPauliGroupElement.anticommutesAt (n := 2 * m)
-          (logicalX m i).operators (logicalZ m i).operators)) =
-        ({logIdx i} : Finset (Fin (2 * m))) := by
-    ext j
-    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_singleton,
-      NQubitPauliGroupElement.anticommutesAt, logicalX, logicalZ,
-      NQubitPauliOperator.set, NQubitPauliOperator.identity]
-    by_cases hj1 : j = logIdx i
-    · subst hj1
-      simp [PauliOperator.mulOp]
-    · by_cases hj2 : j = xAnchor m
-      · subst hj2
-        simp [hax, PauliOperator.mulOp,
-          (show (xAnchor m : Fin (2 * m)) ≠ logIdx i from fun h => hxa h.symm)]
-      · by_cases hj3 : j = zAnchor m
-        · subst hj3
-          simp [PauliOperator.mulOp,
-            (show (zAnchor m : Fin (2 * m)) ≠ logIdx i from fun h => hza h.symm),
-            (show (zAnchor m : Fin (2 * m)) ≠ xAnchor m from fun h => hax h.symm)]
-        · simp [hj1, hj2, hj3, PauliOperator.mulOp]
-  rw [hfilter, Finset.card_singleton]
-  decide
-
-/-- T12a: X̄_i and X̄_j always commute (both X-type). -/
-theorem logicalX_commutes_logicalX (m : ℕ) [Fact (2 ≤ m)]
-    (i j : Fin (2 * m - 2)) :
-    logicalX m i * logicalX m j = logicalX m j * logicalX m i := by
-  apply NQubitPauliGroupElement.commutes_of_componentwise_commutes
-  intro k
-  -- At every qubit, both operators are I or X. I·X = X·I, X·X = X·X.
-  simp only [logicalX, NQubitPauliOperator.set, NQubitPauliOperator.identity]
-  split_ifs <;> simp [PauliOperator.mulOp]
-
-/-- T12b: Z̄_i and Z̄_j always commute (both Z-type). -/
-theorem logicalZ_commutes_logicalZ (m : ℕ) [Fact (2 ≤ m)]
-    (i j : Fin (2 * m - 2)) :
-    logicalZ m i * logicalZ m j = logicalZ m j * logicalZ m i := by
-  apply NQubitPauliGroupElement.commutes_of_componentwise_commutes
-  intro k
-  simp only [logicalZ, NQubitPauliOperator.set, NQubitPauliOperator.identity]
-  split_ifs <;> simp [PauliOperator.mulOp]
-
-/-- T12c: X̄_i and Z̄_j commute when i ≠ j (disjoint supports). -/
-theorem logicalX_commutes_logicalZ_offdiag (m : ℕ) [Fact (2 ≤ m)]
-    {i j : Fin (2 * m - 2)} (hij : i ≠ j) :
-    logicalX m i * logicalZ m j = logicalZ m j * logicalX m i := by
-  apply NQubitPauliGroupElement.commutes_of_componentwise_commutes
-  intro k
-  -- At every qubit, only one of {X̄ at logIdx i / xAnchor} or {Z̄ at logIdx j / zAnchor}
-  -- can be non-I (since their supports are disjoint when i ≠ j).
-  have hij_idx : logIdx i ≠ logIdx j := by
-    intro heq
-    apply hij
-    have := congrArg Fin.val heq
-    simp only [logIdx] at this
-    exact Fin.ext this
-  have hxa_i : logIdx i ≠ xAnchor m := logIdx_ne_xAnchor m i
-  have hxa_j : logIdx j ≠ xAnchor m := logIdx_ne_xAnchor m j
-  have hza_i : logIdx i ≠ zAnchor m := logIdx_ne_zAnchor m i
-  have hza_j : logIdx j ≠ zAnchor m := logIdx_ne_zAnchor m j
-  have hax : xAnchor m ≠ zAnchor m := xAnchor_ne_zAnchor m
-  simp only [logicalX, logicalZ, NQubitPauliOperator.set, NQubitPauliOperator.identity]
-  split_ifs <;> simp_all [PauliOperator.mulOp]
-
-/-! ## §12 — Logicals in the centralizer
-
-Per-generator commutation lemmas — used by T13 and T14 below.
--/
-
-private lemma logicalX_commutes_S_Z (m : ℕ) [Fact (2 ≤ m)]
-    (i : Fin (2 * m - 2)) :
-    logicalX m i * S_Z m = S_Z m * logicalX m i := by
-  classical
-  pauli_comm_even_anticommutes
-  have hxa : logIdx i ≠ xAnchor m := logIdx_ne_xAnchor m i
-  have hfilter :
-      (Finset.univ.filter
-        (NQubitPauliGroupElement.anticommutesAt (n := 2 * m)
-          (logicalX m i).operators (S_Z m).operators)) =
-        ({logIdx i, xAnchor m} : Finset (Fin (2 * m))) := by
-    ext k
-    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_insert,
-      Finset.mem_singleton,
-      NQubitPauliGroupElement.anticommutesAt, logicalX, S_Z,
-      NQubitPauliOperator.set, NQubitPauliOperator.identity, NQubitPauliOperator.Z]
-    by_cases hj1 : k = logIdx i
-    · subst hj1
-      simp [PauliOperator.mulOp]
-    · by_cases hj2 : k = xAnchor m
-      · subst hj2
-        simp [PauliOperator.mulOp,
-          (show (xAnchor m : Fin (2 * m)) ≠ logIdx i from fun h => hxa h.symm)]
-      · simp [hj1, hj2, PauliOperator.mulOp]
-  rw [hfilter]
-  rw [Finset.card_insert_of_notMem (by simp [hxa]), Finset.card_singleton]
-  exact even_two
-
-private lemma logicalX_commutes_S_X (m : ℕ) [Fact (2 ≤ m)]
-    (i : Fin (2 * m - 2)) :
-    logicalX m i * S_X m = S_X m * logicalX m i := by
-  apply NQubitPauliGroupElement.commutes_of_componentwise_commutes
-  intro k
-  simp only [logicalX, S_X, NQubitPauliOperator.set, NQubitPauliOperator.identity,
-    NQubitPauliOperator.X]
-  split_ifs <;> simp [PauliOperator.mulOp]
-
-private lemma logicalZ_commutes_S_Z (m : ℕ) [Fact (2 ≤ m)]
-    (i : Fin (2 * m - 2)) :
-    logicalZ m i * S_Z m = S_Z m * logicalZ m i := by
-  apply NQubitPauliGroupElement.commutes_of_componentwise_commutes
-  intro k
-  simp only [logicalZ, S_Z, NQubitPauliOperator.set, NQubitPauliOperator.identity,
-    NQubitPauliOperator.Z]
-  split_ifs <;> simp [PauliOperator.mulOp]
-
-private lemma logicalZ_commutes_S_X (m : ℕ) [Fact (2 ≤ m)]
-    (i : Fin (2 * m - 2)) :
-    logicalZ m i * S_X m = S_X m * logicalZ m i := by
-  classical
-  pauli_comm_even_anticommutes
-  have hza : logIdx i ≠ zAnchor m := logIdx_ne_zAnchor m i
-  have hfilter :
-      (Finset.univ.filter
-        (NQubitPauliGroupElement.anticommutesAt (n := 2 * m)
-          (logicalZ m i).operators (S_X m).operators)) =
-        ({logIdx i, zAnchor m} : Finset (Fin (2 * m))) := by
-    ext k
-    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_insert,
-      Finset.mem_singleton,
-      NQubitPauliGroupElement.anticommutesAt, logicalZ, S_X,
-      NQubitPauliOperator.set, NQubitPauliOperator.identity, NQubitPauliOperator.X]
-    by_cases hj1 : k = logIdx i
-    · subst hj1
-      simp [PauliOperator.mulOp]
-    · by_cases hj2 : k = zAnchor m
-      · subst hj2
-        simp [PauliOperator.mulOp,
-          (show (zAnchor m : Fin (2 * m)) ≠ logIdx i from fun h => hza h.symm)]
-      · simp [hj1, hj2, PauliOperator.mulOp]
-  rw [hfilter]
-  rw [Finset.card_insert_of_notMem (by simp [hza]), Finset.card_singleton]
-  exact even_two
-
-/-- T13: every `logicalX m i` is in the centralizer of the stabilizer. -/
-theorem logicalX_mem_centralizer (m : ℕ) [Fact (2 ≤ m)]
-    (i : Fin (2 * m - 2)) :
-    logicalX m i ∈ centralizer (stabilizerGroup m) := by
-  rw [StabilizerGroup.mem_centralizer_iff, stabilizerGroup_toSubgroup_eq, subgroup]
-  rw [Subgroup.forall_comm_closure_iff]
-  intro s hs
-  simp only [generators, Set.mem_union] at hs
-  rcases hs with hgZ | hgX
-  · rcases (by simpa [ZGenerators] using hgZ) with rfl
-    exact (logicalX_commutes_S_Z m i).symm
-  · rcases (by simpa [XGenerators] using hgX) with rfl
-    exact (logicalX_commutes_S_X m i).symm
-
-/-- T14: every `logicalZ m i` is in the centralizer of the stabilizer. -/
-theorem logicalZ_mem_centralizer (m : ℕ) [Fact (2 ≤ m)]
-    (i : Fin (2 * m - 2)) :
-    logicalZ m i ∈ centralizer (stabilizerGroup m) := by
-  rw [StabilizerGroup.mem_centralizer_iff, stabilizerGroup_toSubgroup_eq, subgroup]
-  rw [Subgroup.forall_comm_closure_iff]
-  intro s hs
-  simp only [generators, Set.mem_union] at hs
-  rcases hs with hgZ | hgX
-  · rcases (by simpa [ZGenerators] using hgZ) with rfl
-    exact (logicalZ_commutes_S_Z m i).symm
-  · rcases (by simpa [XGenerators] using hgX) with rfl
-    exact (logicalZ_commutes_S_X m i).symm
-
-/-! ## §13 — `StabilizerCode (2 * m) (2 * m - 2)` packaging -/
-
-/-- The `(2m - 2)`-many-logical-qubit data for the iceberg code. -/
-private def logicalOpsIceberg (m : ℕ) [Fact (2 ≤ m)] :
-    Fin (2 * m - 2) → LogicalQubitOps (2 * m) (stabilizerGroup m) :=
-  fun i => ⟨logicalX m i, logicalZ m i,
-    logicalX_mem_centralizer m i, logicalZ_mem_centralizer m i,
-    logicalX_anticommutes_logicalZ_diag m i⟩
-
-/-- The two iceberg checks as a presentation of a `[[2m, 2m-2]]` code. -/
-def presentation (m : ℕ) [Fact (2 ≤ m)] :
-    StabilizerCode.Presentation (2 * m) (2 * m - 2) where
-  hk := by have h : 2 ≤ m := Fact.out; omega
+/-- The generator list as a presentation of a `[[2m, 2m − 2]]` code: its 2
+check-matrix rows are linearly independent. -/
+def presentation (m : ℕ) [Fact (2 ≤ m)] : StabilizerCode.Presentation (2 * m) (2 * m - 2) where
+  hk := Nat.sub_le _ _
   generatorsList := generatorsList m
   generators_length := by
-    -- |[S_Z, S_X]| = 2 = 2m - (2m - 2)
-    have h : 2 ≤ m := Fact.out
-    simp [generatorsList]
+    have := Fact.out (p := 2 ≤ m)
+    change 2 = _
     omega
   generators_phaseZero := AllPhaseZero_generatorsList m
   generators_independent := rowsLinearIndependent_generatorsList m
@@ -622,153 +190,133 @@ def presentation (m : ℕ) [Fact (2 ≤ m)] :
     have h := generators_commute m
     rw [← listToSet_generatorsList] at h
     exact h
-  closure_no_neg_identity := by
-    rw [listToSet_generatorsList]; exact negIdentity_not_mem m
+  closure_no_neg_identity := by rw [listToSet_generatorsList]; exact negIdentity_not_mem m
 
-/-- T15: the iceberg code as a stabilizer code `[[2m, 2m-2]]`. -/
-noncomputable def stabilizerCode (m : ℕ) [Fact (2 ≤ m)] :
-    StabilizerCode (2 * m) (2 * m - 2) :=
+/-- The iceberg code on `2m` qubits as a stabilizer code `[[2m, 2m − 2]]`. -/
+noncomputable def stabilizerCode (m : ℕ) [Fact (2 ≤ m)] : Code[[2 * m, 2 * m - 2]] :=
   (presentation m).toCode
 
-/-- The iceberg code packaged with its `2m − 2` logical pairs
-`(logicalX m i, logicalZ m i)`. -/
-noncomputable def stabilizerCodeWithLogicals (m : ℕ) [Fact (2 ≤ m)] :
-    StabilizerCodeWithLogicals (2 * m) (2 * m - 2) where
-  toStabilizerCode := stabilizerCode m
-  logicalOps := logicalOpsIceberg m
-  logical_commute_cross := by
-    intro ℓ ℓ' hne
-    refine ⟨logicalX_commutes_logicalX m ℓ ℓ', ?_, ?_, logicalZ_commutes_logicalZ m ℓ ℓ'⟩
-    · exact logicalX_commutes_logicalZ_offdiag m hne
-    · exact (logicalX_commutes_logicalZ_offdiag m (Ne.symm hne)).symm
+/-- The stabilizer code's subgroup is the closure of the generator set. -/
+lemma stabilizerCode_toSubgroup_eq (m : ℕ) [Fact (2 ≤ m)] :
+    (stabilizerCode m).toStabilizerGroup.toSubgroup = subgroup m :=
+  stabilizerGroup_toSubgroup_eq m
 
-/-! ## §14 — Code distance = 2 -/
+/-! ## Centralizer criteria
 
-/-- T16: bridge between `stabilizerCode`'s and the set-form generators. -/
-private lemma stabilizerCode_toSubgroup_eq (m : ℕ) [Fact (2 ≤ m)] :
-    (stabilizerCode m).toStabilizerGroup.toSubgroup =
-      Subgroup.closure (generators m) := by
-  change (Subgroup.closure (NQubitPauliGroupElement.listToSet (generatorsList m)) : _) =
-    Subgroup.closure (generators m)
-  rw [listToSet_generatorsList]
+`X` on a support `S` meets `Z⊗²ᵐ` on the qubits of `S` and is X-type like
+`X⊗²ᵐ`, so it commutes with the stabilizer as soon as `|S|` is even; dually for
+`Z` on `S`. The distance witness below and the logical basis in `NLogicals.lean`
+are all of this form, with `|S| = 2`. -/
 
-/-- Weight-1 X-anchored Pauli at qubit `i` anticommutes with `S_Z m` (all-Z).
-The anticomm filter is exactly `{i}`, cardinality 1, odd. -/
-private lemma weightOneAt_X_anticomm_S_Z (m : ℕ) [Fact (2 ≤ m)] (i : Fin (2 * m)) :
-    NQubitPauliGroupElement.Anticommute (weightOneAt i PauliOperator.X) (S_Z m) := by
-  classical
-  pauli_anticomm_odd_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-        (NQubitPauliGroupElement.anticommutesAt (n := 2 * m)
-          (weightOneAt i PauliOperator.X).operators (S_Z m).operators)) =
-        ({i} : Finset (Fin (2 * m))) := by
-    ext k
-    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_singleton,
-      NQubitPauliGroupElement.anticommutesAt, weightOneAt,
-      NQubitPauliGroupElement.ofOperator_operators, S_Z, NQubitPauliOperator.Z]
-    by_cases hk : k = i
-    · subst hk; simp [PauliOperator.mulOp]
-    · simp [hk, PauliOperator.mulOp]
-  rw [hfilter, Finset.card_singleton]
-  decide
+/-- `X` on an even number of qubits commutes with every element of the
+stabilizer. -/
+lemma xOn_mem_centralizer (m : ℕ) {S : Finset (Fin (2 * m))} (hS : Even S.card) :
+    xOn S ∈ centralizer (stabilizerGroup m) := by
+  rw [mem_centralizer_iff_closure _ _ (generators m) (stabilizerGroup_toSubgroup_eq m)]
+  rintro _ (rfl | rfl)
+  · rwa [ZStab_eq_zOn, eq_comm, commutes_xOn_zOn_iff, Finset.inter_univ]
+  · exact (XGenerators_isXType m _ rfl).commute (IsXTypeElement_xOn S)
 
-/-- Weight-1 Y-anchored Pauli at qubit `i` anticommutes with `S_Z m`. -/
-private lemma weightOneAt_Y_anticomm_S_Z (m : ℕ) [Fact (2 ≤ m)] (i : Fin (2 * m)) :
-    NQubitPauliGroupElement.Anticommute (weightOneAt i PauliOperator.Y) (S_Z m) := by
-  classical
-  pauli_anticomm_odd_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-        (NQubitPauliGroupElement.anticommutesAt (n := 2 * m)
-          (weightOneAt i PauliOperator.Y).operators (S_Z m).operators)) =
-        ({i} : Finset (Fin (2 * m))) := by
-    ext k
-    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_singleton,
-      NQubitPauliGroupElement.anticommutesAt, weightOneAt,
-      NQubitPauliGroupElement.ofOperator_operators, S_Z, NQubitPauliOperator.Z]
-    by_cases hk : k = i
-    · subst hk; simp [PauliOperator.mulOp]
-    · simp [hk, PauliOperator.mulOp]
-  rw [hfilter, Finset.card_singleton]
-  decide
+/-- `Z` on an even number of qubits commutes with every element of the
+stabilizer. -/
+lemma zOn_mem_centralizer (m : ℕ) {S : Finset (Fin (2 * m))} (hS : Even S.card) :
+    zOn S ∈ centralizer (stabilizerGroup m) := by
+  rw [mem_centralizer_iff_closure _ _ (generators m) (stabilizerGroup_toSubgroup_eq m)]
+  rintro _ (rfl | rfl)
+  · exact (ZGenerators_isZType m _ rfl).commute (IsZTypeElement_zOn S)
+  · rwa [XStab_eq_xOn, commutes_xOn_zOn_iff, Finset.univ_inter]
 
-/-- Weight-1 Z-anchored Pauli at qubit `i` anticommutes with `S_X m` (all-X). -/
-private lemma weightOneAt_Z_anticomm_S_X (m : ℕ) [Fact (2 ≤ m)] (i : Fin (2 * m)) :
-    NQubitPauliGroupElement.Anticommute (weightOneAt i PauliOperator.Z) (S_X m) := by
-  classical
-  pauli_anticomm_odd_anticommutes
-  have hfilter :
-      (Finset.univ.filter
-        (NQubitPauliGroupElement.anticommutesAt (n := 2 * m)
-          (weightOneAt i PauliOperator.Z).operators (S_X m).operators)) =
-        ({i} : Finset (Fin (2 * m))) := by
-    ext k
-    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_singleton,
-      NQubitPauliGroupElement.anticommutesAt, weightOneAt,
-      NQubitPauliGroupElement.ofOperator_operators, S_X, NQubitPauliOperator.X]
-    by_cases hk : k = i
-    · subst hk; simp [PauliOperator.mulOp]
-    · simp [hk, PauliOperator.mulOp]
-  rw [hfilter, Finset.card_singleton]
-  decide
+/-! ## Distance 2
 
-/-- T17: every weight-1 single-qubit Pauli anticommutes with one of the two
-generators. Z-anchored Pauli at any qubit anticomms with `S_X m`; X- or
-Y-anchored Pauli at any qubit anticomms with `S_Z m`. -/
-private lemma weight_one_anticomm_witness (m : ℕ) [Fact (2 ≤ m)] :
-    ∀ i : Fin (2 * m), ∀ P : PauliOperator, P ≠ PauliOperator.I →
-      ∃ g ∈ generators m, NQubitPauliGroupElement.Anticommute
-        (weightOneAt i P) g := by
-  intro i P hP
-  match P, hP with
-  | PauliOperator.X, _ =>
-    exact ⟨S_Z m, by simp [generators, ZGenerators], weightOneAt_X_anticomm_S_Z m i⟩
-  | PauliOperator.Y, _ =>
-    exact ⟨S_Z m, by simp [generators, ZGenerators], weightOneAt_Y_anticomm_S_Z m i⟩
-  | PauliOperator.Z, _ =>
-    exact ⟨S_X m, by simp [generators, XGenerators], weightOneAt_Z_anticomm_S_X m i⟩
-  | PauliOperator.I, hP => exact (hP rfl).elim
+### No nontrivial logical of weight 1
 
-/-- Weight of `logicalX m i` equals 2 (parametric — the support is exactly
-`{logIdx i, xAnchor m}` and these are distinct). -/
-private lemma weight_logicalX (m : ℕ) [Fact (2 ≤ m)] (i : Fin (2 * m - 2)) :
-    NQubitPauliGroupElement.weight (logicalX m i) = 2 := by
-  classical
-  have hxa : logIdx i ≠ xAnchor m := logIdx_ne_xAnchor m i
-  -- Compute the support: precisely {logIdx i, xAnchor m}.
-  have hsupp : NQubitPauliOperator.support (logicalX m i).operators =
-      ({logIdx i, xAnchor m} : Finset (Fin (2 * m))) := by
-    ext k
-    simp only [NQubitPauliOperator.mem_support, Finset.mem_insert, Finset.mem_singleton,
-      logicalX, NQubitPauliOperator.set, NQubitPauliOperator.identity]
-    by_cases hk1 : k = logIdx i
-    · subst hk1; simp
-    · by_cases hk2 : k = xAnchor m
-      · subst hk2; simp
-      · simp [hk1, hk2]
-  -- The support has cardinality 2.
-  change NQubitPauliOperator.weight (logicalX m i).operators = 2
-  unfold NQubitPauliOperator.weight
-  rw [hsupp]
-  rw [Finset.card_insert_of_notMem (by simp [hxa]), Finset.card_singleton]
+A local `X` or `Y` anticommutes with the `Z` of `Z⊗²ᵐ`, and a local `Z` with the
+`X` of `X⊗²ᵐ`, whatever the qubit: each check matrix is a single row of ones,
+with no zero column. -/
 
-/-- T18: the iceberg `[[2m, 2m − 2, 2]]` code has distance exactly 2. -/
-theorem code_has_distance_two (m : ℕ) [Fact (2 ≤ m)] :
-    HasCodeDistance (stabilizerCode m) 2 := by
-  have h2 : 2 ≤ m := Fact.out
-  have h0lt : 0 < 2 * m - 2 := by omega
-  refine hasCodeDistance_two_of_anticommute_witness (stabilizerCode m) (generators m)
-    (stabilizerCode_toSubgroup_eq m) (weight_one_anticomm_witness m) ?_
-  refine ⟨logicalX m ⟨0, h0lt⟩, ?_, ?_⟩
-  · exact (logicalOpsIceberg m ⟨0, h0lt⟩).xOp_nontrivial
-  · exact weight_logicalX m ⟨0, h0lt⟩
+/-- Every weight-1 Pauli anticommutes with some generator. -/
+private lemma weight_one_anticomm_witness (m : ℕ) :
+    ∀ i : Fin (2 * m), ∀ P : PauliOperator, P ≠ .I →
+      ∃ g ∈ generators m, Anticommute (weightOneAt i P) g :=
+  weight_one_anticomm_witness_of_columns (fun _ : Unit => Finset.univ)
+    (fun _ : Unit => Finset.univ) (generators m) (fun _ => .inl zOn_univ) (fun _ => .inr xOn_univ)
+    (fun i => ⟨(), Finset.mem_univ i⟩) (fun i => ⟨(), Finset.mem_univ i⟩)
 
-/-- T19: the iceberg code packaged with its distance. -/
+/-! ### A nontrivial logical of weight 2
+
+`X` on qubits `{0, 1}` meets `Z⊗²ᵐ` on two qubits, so it commutes with both
+checks; it anticommutes with `Z` on `{0, 2}` (one shared qubit), which also
+commutes with both. -/
+
+/-- Qubit `k < 4` of the `2m ≥ 4` qubits. -/
+def qubit (m : ℕ) [Fact (2 ≤ m)] (k : Fin 4) : Fin (2 * m) :=
+  Fin.castLE (by have := Fact.out (p := 2 ≤ m); omega) k
+
+/-- Distinct indices below 4 name distinct qubits. -/
+lemma qubit_ne (m : ℕ) [Fact (2 ≤ m)] {k l : Fin 4} (h : k ≠ l) : qubit m k ≠ qubit m l :=
+  (Fin.castLE_injective _).ne h
+
+/-- `X` on qubits `0` and `1`: a nontrivial logical of weight 2. -/
+def minWeightLogical (m : ℕ) [Fact (2 ≤ m)] : NQubitPauliGroupElement (2 * m) :=
+  σ[2 * m | qubit m 0 ↦ X, qubit m 1 ↦ X]
+
+/-- `Z` on qubits `0` and `2`: a centralizer element anticommuting with
+`minWeightLogical`. -/
+def minWeightPartner (m : ℕ) [Fact (2 ≤ m)] : NQubitPauliGroupElement (2 * m) :=
+  σ[2 * m | qubit m 0 ↦ Z, qubit m 2 ↦ Z]
+
+/-- `minWeightLogical m` is `X` on the support `{0, 1}`. -/
+lemma minWeightLogical_eq_xOn (m : ℕ) [Fact (2 ≤ m)] :
+    minWeightLogical m = xOn {qubit m 0, qubit m 1} :=
+  (xOn_pair _ _).symm
+
+/-- `minWeightPartner m` is `Z` on the support `{0, 2}`. -/
+lemma minWeightPartner_eq_zOn (m : ℕ) [Fact (2 ≤ m)] :
+    minWeightPartner m = zOn {qubit m 0, qubit m 2} :=
+  (zOn_pair _ _).symm
+
+/-- `X` on qubits `0` and `1` has weight 2. -/
+lemma minWeightLogical_weight (m : ℕ) [Fact (2 ≤ m)] : weight (minWeightLogical m) = 2 := by
+  rw [minWeightLogical_eq_xOn, weight_xOn, Finset.card_pair (qubit_ne m (by decide))]
+
+/-- `X` on qubits `0` and `1` commutes with every element of the stabilizer. -/
+lemma minWeightLogical_mem_centralizer (m : ℕ) [Fact (2 ≤ m)] :
+    minWeightLogical m ∈ centralizer (stabilizerGroup m) :=
+  minWeightLogical_eq_xOn m ▸ xOn_mem_centralizer m (even_card_pair (qubit_ne m (by decide)))
+
+/-- `Z` on qubits `0` and `2` commutes with every element of the stabilizer. -/
+lemma minWeightPartner_mem_centralizer (m : ℕ) [Fact (2 ≤ m)] :
+    minWeightPartner m ∈ centralizer (stabilizerGroup m) :=
+  minWeightPartner_eq_zOn m ▸ zOn_mem_centralizer m (even_card_pair (qubit_ne m (by decide)))
+
+/-- `X` on `{0, 1}` and `Z` on `{0, 2}` meet on qubit 0 only, an odd number. -/
+lemma minWeightLogical_anticommutes_minWeightPartner (m : ℕ) [Fact (2 ≤ m)] :
+    Anticommute (minWeightLogical m) (minWeightPartner m) := by
+  rw [minWeightLogical_eq_xOn, minWeightPartner_eq_zOn]
+  exact anticommute_xOn_pair_zOn_pair (qubit_ne m (by decide))
+
+/-- `X` on qubits `0` and `1` is a nontrivial logical operator: it lies in the
+centralizer and anticommutes with the centralizer element `minWeightPartner`. -/
+lemma minWeightLogical_isNontrivial (m : ℕ) [Fact (2 ≤ m)] :
+    IsNontrivialLogicalOperator (minWeightLogical m) (stabilizerCode m).toStabilizerGroup :=
+  isNontrivialLogicalOperator_of_anticommute_centralizer _ (minWeightLogical_mem_centralizer m)
+    (minWeightPartner_mem_centralizer m) (minWeightLogical_anticommutes_minWeightPartner m)
+
+/-! ### The code with its distance `Code[[2m, 2m − 2, 2]]` -/
+
+/-- **The iceberg codes have distance 2.** Every weight-1 Pauli anticommutes
+with one of the two generators, and `X` on qubits `{0, 1}` is a nontrivial
+logical of weight 2. -/
+theorem code_has_distance_two (m : ℕ) [Fact (2 ≤ m)] : HasCodeDistance (stabilizerCode m) 2 :=
+  hasCodeDistance_two_of_anticommute_witness (stabilizerCode m) (generators m)
+    (stabilizerCode_toSubgroup_eq m) (weight_one_anticomm_witness m)
+    ⟨minWeightLogical m, minWeightLogical_isNontrivial m, minWeightLogical_weight m⟩
+
+/-- The iceberg code on `2m` qubits packaged with its distance. -/
 noncomputable def stabilizerCodeWithDistance (m : ℕ) [Fact (2 ≤ m)] :
-    StabilizerCodeWithDistance (2 * m) (2 * m - 2) 2 where
+    Code[[2 * m, 2 * m - 2, 2]] where
   toStabilizerCode := stabilizerCode m
-  hasDistance      := code_has_distance_two m
+  hasDistance := code_has_distance_two m
 
 end Iceberg
 end StabilizerGroup

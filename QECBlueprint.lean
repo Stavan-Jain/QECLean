@@ -740,7 +740,7 @@ attribute [blueprint "thm:toric-phi-equiv"
     chains. Injectivity is the substantive direction: a cycle with $h = v = 0$
     is shown to be a boundary. With \cref{thm:toric-H1-dim} giving
     $\dim H_1 = 2$, a surjection onto $\F_2^2$ is automatically injective. -/)]
-  Quantum.Stabilizer.Lattice.phi_equiv
+  Quantum.Stabilizer.Lattice.phi_bijective
 
 attribute [blueprint "def:toric-code"
   (title := /-- The toric code as a stabilizer code -/)
@@ -771,9 +771,15 @@ attribute [blueprint "thm:toric-dZ"
   (title := /-- $Z$ distance -/)
   (statement := /-- $d_Z = L$, by the same argument on the dual lattice. -/)
   (proof := /-- The dual complex of \cref{def:toric-chain-complex} is again an
-    $L \times L$ torus lattice with the roles of faces and vertices exchanged,
-    so the argument of \cref{thm:toric-dX} applies verbatim to the dual
-    wrapping invariants. -/)]
+    $L \times L$ torus lattice with the roles of faces and vertices exchanged.
+    Relabelling each edge by the dual edge that crosses it is a
+    weight-preserving linear bijection of $1$-chains that carries cycles to
+    dual cycles and boundaries to dual boundaries. A nontrivial $Z$-type
+    logical operator is the $Z$-chain operator of a dual cycle that is not a
+    dual boundary, hence of the image under this duality of a cycle that is not
+    a boundary, which has at least $L$ edges by the lower bound in the proof of
+    \cref{thm:toric-dX}. The image of a loop of $L$ edges attains the
+    bound. -/)]
   Quantum.StabilizerGroup.ToricCodeN.toricCodeN_dZ_eq_L
 
 attribute [blueprint "thm:toric-distance"
@@ -781,11 +787,15 @@ attribute [blueprint "thm:toric-distance"
   (statement := /-- For every $L \ge 2$ the $L \times L$ toric code
     (\cref{def:toric-code}) has distance exactly $L$, so it is an
     $[[2L^2, 2, L]]$ code. -/)
-  (proof := /-- For a CSS code $d = \min(d_X, d_Z)$, and both are $L$ by
-    \cref{thm:toric-dX} and \cref{thm:toric-dZ}. The chain-level bounds are
-    moved to Pauli weights by \cref{thm:chain-weight-transfer}, and the result
-    is transported from the hand-built stabilizer group to the packaged code of
-    \cref{def:toric-code} by \cref{thm:nontrivial-logical-transfer}. -/)]
+  (proof := /-- Lower bound: every cycle that is not a boundary and every dual
+    cycle that is not a dual boundary has at least $L$ edges; these are the
+    chain-level bounds in the proofs of \cref{thm:toric-dX} and
+    \cref{thm:toric-dZ}. By \cref{thm:chain-weight-transfer} every nontrivial
+    logical operator, of any Pauli type, then has weight at least $L$. Upper
+    bound: the horizontal $X$-loop is a nontrivial logical operator of weight
+    $L$. The result is transported from the hand-built stabilizer group to the
+    packaged code of \cref{def:toric-code} by
+    \cref{thm:nontrivial-logical-transfer}. -/)]
   Quantum.StabilizerGroup.ToricCodeN.toricCodeN_distance_eq_L
 
 attribute [blueprint "def:toric-code-with-distance"

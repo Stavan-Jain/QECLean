@@ -22,6 +22,9 @@ span:
   `Subgroup.closure (listToSet L)` lies in `sympSpan L`;
 - `exists_mem_closure_of_symp_in_span`: every operator whose symplectic vector
   lies in `sympSpan L` is the operator part of an element of the closure;
+- `rowsLinearIndependent_append_iff`: the rows of `A ++ B` are linearly
+  independent iff those of `A` and of `B` are and `sympSpan A`, `sympSpan B`
+  are disjoint;
 - `negIdentity_not_mem_of_indep_phase_zero_commute`: if the elements of `L`
   have phase `+1`, pairwise commute and have linearly independent check-matrix
   rows, then `−I` is not in the closure.
@@ -110,6 +113,21 @@ theorem exists_mem_closure_of_symp_in_span (L : List (NQubitPauliGroupElement n)
     mem_span_image_toSymplectic_iff] at h_in_span
   obtain ⟨s, hs, hs_eq⟩ := h_in_span
   exact ⟨s, hs, toSymplectic_injective hs_eq⟩
+
+/-- The rows of `A ++ B` are linearly independent iff the rows of `A` are, the
+rows of `B` are, and the spans of the two sets of rows are disjoint. -/
+theorem rowsLinearIndependent_append_iff (A B : List (NQubitPauliGroupElement n)) :
+    rowsLinearIndependent (A ++ B) ↔
+      rowsLinearIndependent A ∧ rowsLinearIndependent B ∧
+        Disjoint (sympSpan A) (sympSpan B) := by
+  let e : Fin A.length ⊕ Fin B.length ≃ Fin (A ++ B).length :=
+    finSumFinEquiv.trans (finCongr List.length_append.symm)
+  have key : (fun i => checkMatrix (A ++ B) i) ∘ e = Sum.elim (checkMatrix A) (checkMatrix B) := by
+    funext s
+    rcases s with i | j <;> funext col <;> simp [checkMatrix, e]
+  rw [rowsLinearIndependent, ← linearIndependent_equiv e, key, linearIndependent_sum]
+  simp only [Sum.elim_comp_inl, Sum.elim_comp_inr]
+  rfl
 
 /-- A sum of coordinates that vanishes on every row of the check matrix
 vanishes on `sympSpan L`. -/

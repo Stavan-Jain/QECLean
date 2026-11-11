@@ -1,41 +1,43 @@
 import QEC.Stabilizer.Codes.Color.Geometry
 
 /-!
-# Even color-code faces
+# Faces of the color code have an even number of qubits
 
-Every honeycomb face has a fixed-point-free reflection of its physical sites.
-The reflection axis is chosen along the boundary for a clipped face and through
-the center for an interior face. Pairing the sites proves even incidence parity.
+A set of qubits that is invariant under a fixed-point-free involution of the
+lattice coordinates has even cardinality (`sum_one_eq_zero_of_coord_pairing`).
+Every face has such an involution, `faceReflection`: the point reflection in
+the center for an interior face, and a reflection that preserves the side for
+a face on a side of the patch. Hence every face has an even number of qubits
+(`faceSupport_sum_one`), and its indicator vector is orthogonal to itself over
+`ZMod 2` (`incidence_self_orthogonal`).
 -/
 
 namespace Quantum.StabilizerGroup.ColorCode
 
 open scoped BigOperators
 
-/-- A coordinate pairing makes the binary cardinality of a support vanish. -/
-theorem sum_one_eq_zero_of_coord_pairing {r : ℕ} (s : Finset (Qubit r))
+/-- A set `s` of qubits has even cardinality if a map `t` of the lattice
+coordinates sends the qubits of `s` to qubits of `s`, without fixed points and
+involutively. -/
+lemma sum_one_eq_zero_of_coord_pairing {r : ℕ} (s : Finset (Qubit r))
     (t : Coord → Coord)
     (hsite : ∀ q ∈ s, IsSite r (t (qubitCoord q)))
     (hmem : ∀ q ∈ s, ∀ p, qubitCoord p = t (qubitCoord q) → p ∈ s)
     (hne : ∀ q ∈ s, t (qubitCoord q) ≠ qubitCoord q)
     (hinv : ∀ q ∈ s, t (t (qubitCoord q)) = qubitCoord q) :
     (∑ _q ∈ s, (1 : ZMod 2)) = 0 := by
-  classical
-  let g (q : Qubit r) (hq : q ∈ s) : Qubit r :=
-    Classical.choose (exists_qubitCoord (t (qubitCoord q)) (hsite q hq))
-  have hg (q : Qubit r) (hq : q ∈ s) : qubitCoord (g q hq) = t (qubitCoord q) :=
-    Classical.choose_spec (exists_qubitCoord (t (qubitCoord q)) (hsite q hq))
+  choose g hg using fun q (hq : q ∈ s) => exists_qubitCoord _ (hsite q hq)
   have hgm (q : Qubit r) (hq : q ∈ s) : g q hq ∈ s := hmem q hq _ (hg q hq)
-  refine Finset.sum_involution g ?_ ?_ hgm ?_
-  · intro q hq
-    decide
-  · intro q hq _ heq
-    exact hne q hq ((hg q hq).symm.trans (congrArg qubitCoord heq))
-  · intro q hq
-    apply qubitCoord_injective r
-    rw [hg (g q hq) (hgm q hq), hg q hq, hinv q hq]
+  refine Finset.sum_involution g (fun _ _ => rfl)
+    (fun q hq _ heq => hne q hq ((hg q hq).symm.trans (congrArg qubitCoord heq))) hgm
+    fun q hq => qubitCoord_injective r ?_
+  rw [hg (g q hq) (hgm q hq), hg q hq, hinv q hq]
 
-/-- A reflection preserving the sites of an interior or boundary face. -/
+/-- The involution of the qubits of the face with center `f`. For a face on a
+side of the patch it is a reflection that preserves that side: it fixes the
+column on the left side (`column = 0`), exchanges rows and columns on the
+diagonal side (`row = column`), and fixes the row on the bottom side
+(`row = 3 * r`). For every other face it is the point reflection in `f`. -/
 def faceReflection (r : ℕ) (f p : Coord) : Coord :=
   if f.2 = 0 then (2 * f.1 + p.2 - p.1, p.2)
   else if f.1 = f.2 then (2 * f.1 - p.2, 2 * f.1 - p.1)
@@ -43,9 +45,10 @@ def faceReflection (r : ℕ) (f p : Coord) : Coord :=
   else (2 * f.1 - p.1, 2 * f.2 - p.2)
 
 set_option maxHeartbeats 800000 in
--- The six neighbor directions and four boundary cases require 24 arithmetic checks.
-/-- Reflection pairs the physical sites of each face without fixed points. -/
-theorem faceReflection_properties {r : ℕ} (f p : Coord) (hf : IsFace r f)
+-- The six neighbors and the four cases of `faceReflection` give 24 arithmetic goals.
+/-- `faceReflection` maps the qubits of a face to qubits of that face, without
+fixed points and involutively. -/
+lemma faceReflection_properties {r : ℕ} (f p : Coord) (hf : IsFace r f)
     (hp : IsSite r p) (ha : Adjacent f p) :
     IsSite r (faceReflection r f p) ∧
       Adjacent f (faceReflection r f p) ∧
@@ -54,9 +57,8 @@ theorem faceReflection_properties {r : ℕ} (f p : Coord) (hf : IsFace r f)
   rcases f with ⟨a, b⟩
   rcases p with ⟨x, y⟩
   rcases hf with ⟨⟨hba, har⟩, hfmod⟩
-  rcases hp with ⟨⟨hyx, hxr⟩, hpmod⟩
-  dsimp at hba har hfmod hyx hxr hpmod
-  clear hpmod
+  rcases hp with ⟨⟨hyx, hxr⟩, -⟩
+  dsimp at hba har hfmod hyx hxr
   simp only [Adjacent] at ha
   rcases ha with h | h | h | h | h | h <;> rcases h with ⟨hxa, hyb⟩
   all_goals simp only [faceReflection]
@@ -64,35 +66,21 @@ theorem faceReflection_properties {r : ℕ} (f p : Coord) (hf : IsFace r f)
     simp only [IsSite, InPatch, Adjacent, Prod.mk.injEq, ne_eq] <;>
     (repeat' apply And.intro) <;> first | trivial | omega
 
-/-- The number of qubits on a face is zero as an element of `ZMod 2`. -/
+/-- Every face has an even number of qubits. -/
 theorem faceSupport_sum_one {r : ℕ} (f : Face r) :
     (∑ _q ∈ faceSupport f, (1 : ZMod 2)) = 0 := by
-  apply sum_one_eq_zero_of_coord_pairing (faceSupport f) (faceReflection r (faceCoord f))
-  · intro q hq
-    exact (faceReflection_properties _ _ (faceCoord_isFace f)
-      (qubitCoord_isSite q) ((mem_faceSupport f q).mp hq)).1
-  · intro q hq p hp
-    rw [mem_faceSupport, hp]
-    exact (faceReflection_properties _ _ (faceCoord_isFace f)
-      (qubitCoord_isSite q) ((mem_faceSupport f q).mp hq)).2.1
-  · intro q hq
-    exact (faceReflection_properties _ _ (faceCoord_isFace f)
-      (qubitCoord_isSite q) ((mem_faceSupport f q).mp hq)).2.2.1
-  · intro q hq
-    exact (faceReflection_properties _ _ (faceCoord_isFace f)
-      (qubitCoord_isSite q) ((mem_faceSupport f q).mp hq)).2.2.2
+  have hp (q : Qubit r) (hq : q ∈ faceSupport f) :=
+    faceReflection_properties _ _ (faceCoord_isFace f) (qubitCoord_isSite q)
+      ((mem_faceSupport f q).mp hq)
+  exact sum_one_eq_zero_of_coord_pairing _ (faceReflection r (faceCoord f))
+    (fun q hq => (hp q hq).1)
+    (fun q hq p hpq => (mem_faceSupport f p).mpr (hpq ▸ (hp q hq).2.1))
+    (fun q hq => (hp q hq).2.2.1) (fun q hq => (hp q hq).2.2.2)
 
-/-- A face incidence vector is self-orthogonal over `ZMod 2`. -/
-theorem incidence_self_orthogonal {r : ℕ} (f : Face r) :
+/-- The indicator vector of a face is orthogonal to itself over `ZMod 2`. -/
+lemma incidence_self_orthogonal {r : ℕ} (f : Face r) :
     (∑ q, incidence f q * incidence f q) = 0 := by
-  classical
-  have h : (∑ q, incidence f q * incidence f q) =
-      ∑ _q ∈ faceSupport f, (1 : ZMod 2) := by
-    simp only [incidence, faceSupport, Finset.mem_filter, Finset.mem_univ,
-      true_and, Finset.sum_filter]
-    apply Finset.sum_congr rfl
-    intro q _
-    split_ifs <;> norm_num
-  exact h.trans (faceSupport_sum_one f)
+  rw [sum_incidence_mul_incidence, Finset.inter_self]
+  exact faceSupport_sum_one f
 
 end Quantum.StabilizerGroup.ColorCode

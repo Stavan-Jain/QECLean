@@ -32,22 +32,6 @@ Concatenation encodes each qubit of an *outer* code into a block carrying an
 
 namespace Quantum
 
-namespace NQubitPauliOperator
-
-variable {n : ℕ}
-
-/-- An `X`-type operator has no `Y` factor. -/
-lemma IsXType.ne_Y {op : NQubitPauliOperator n} (h : IsXType op) (i : Fin n) :
-    op i ≠ PauliOperator.Y := by
-  rcases h i with hi | hi <;> rw [hi] <;> decide
-
-/-- A `Z`-type operator has no `Y` factor. -/
-lemma IsZType.ne_Y {op : NQubitPauliOperator n} (h : IsZType op) (i : Fin n) :
-    op i ≠ PauliOperator.Y := by
-  rcases h i with hi | hi <;> rw [hi] <;> decide
-
-end NQubitPauliOperator
-
 namespace Concatenation
 
 open NQubitPauliGroupElement NQubitPauliOperator StabilizerGroup

@@ -98,25 +98,11 @@ lemma operators_eq_chainXOperator_mul_chainZOperator
   generalize g.operators i = a
   cases a <;> decide
 
-/-- An X-type element is the X-type chain operator of its X-support. -/
-lemma chainXOperator_xChainOf_of_isXTypeElement {g : NQubitPauliGroupElement X.numQubits}
-    (hg : IsXTypeElement g) : X.chainXOperator (X.xChainOf g) = g := by
-  refine NQubitPauliGroupElement.ext _ _ hg.1.symm (funext fun i => ?_)
-  rw [chainXOperator_xChainOf_op_at]
-  rcases hg.2 i with h | h <;> simp [h]
-
-/-- A Z-type element is the Z-type chain operator of its Z-support. -/
-lemma chainZOperator_zChainOf_of_isZTypeElement {g : NQubitPauliGroupElement X.numQubits}
-    (hg : IsZTypeElement g) : X.chainZOperator (X.zChainOf g) = g := by
-  refine NQubitPauliGroupElement.ext _ _ hg.1.symm (funext fun i => ?_)
-  rw [chainZOperator_zChainOf_op_at]
-  rcases hg.2 i with h | h <;> simp [h]
-
 /-- Every X-type operator is the operator part of an X-type chain operator. -/
 lemma exists_chainXOperator_operators_eq {u : NQubitPauliOperator X.numQubits}
     (hu : IsXType u) : ∃ c : X.C1 → ZMod 2, (X.chainXOperator c).operators = u :=
   ⟨_, congrArg operators
-    (chainXOperator_xChainOf_of_isXTypeElement (g := ofOperator u) ⟨rfl, hu⟩)⟩
+    (chainXOperator_xChainOf (g := ofOperator u) ⟨rfl, hu⟩)⟩
 
 /-- The X-type chain operator of a boundary is a stabilizer. -/
 lemma chainXOperator_mem_of_mem_boundaries {c : X.C1 → ZMod 2} (hc : c ∈ X.boundaries) :
@@ -145,9 +131,9 @@ lemma exists_eq_chainZOperator_mul_chainXOperator {s : NQubitPauliGroupElement X
       s = X.chainZOperator cz * X.chainXOperator cx := by
   obtain ⟨z, hz, x, hx, rfl⟩ :=
     Subgroup.mem_closure_union_exists_mul_of_commute_generators ZGenerators_commute_XGenerators s hs
-  have hz' := chainZOperator_zChainOf_of_isZTypeElement
+  have hz' := chainZOperator_zChainOf
     (IsZTypeElement_of_mem_closure ZGenerators_isZType z hz)
-  have hx' := chainXOperator_xChainOf_of_isXTypeElement
+  have hx' := chainXOperator_xChainOf
     (IsXTypeElement_of_mem_closure XGenerators_isXType x hx)
   exact ⟨X.zChainOf z, (chainZOperator_mem_ZClosure_iff_mem_dualBoundaries _).mp (by rwa [hz']),
     X.xChainOf x, (chainXOperator_mem_XClosure_iff_mem_boundaries _).mp (by rwa [hx']),

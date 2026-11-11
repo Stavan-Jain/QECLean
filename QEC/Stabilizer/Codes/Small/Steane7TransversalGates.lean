@@ -1,357 +1,142 @@
-import Mathlib.Tactic
-import Mathlib.LinearAlgebra.Matrix.Defs
-import Mathlib.Data.Complex.Basic
 import QEC.Stabilizer.Codes.Small.Steane7Logicals
-import QEC.Foundations.Gates
-import QEC.Foundations.GateConjugation
-import QEC.Stabilizer.Framework.Core.Logical.LogicalGates
-import QEC.Stabilizer.Framework.Core.Logical.LogicalCliffordAction
-import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
-import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
-import QEC.Stabilizer.Foundations.PauliGroup.Representation
 import QEC.Stabilizer.Foundations.PauliGroup.TransversalConjugation
-import QEC.Stabilizer.Foundations.PauliGroupSingle.Operator
-
-namespace Quantum
-
-open Matrix
-open scoped BigOperators
+import QEC.Stabilizer.Framework.Core.Logical.LogicalCliffordAction
+import QEC.Stabilizer.Framework.Core.Logical.LogicalGates
 
 /-!
-Conjugation convention: conjugation by a matrix U means U P U† (adjoint on the
-right). So we state and prove equalities of the form U * M * star U = ...
+# Transversal `H` and `S` on the Steane code
+
+The uniform transversal Hadamard gate `H⊗⁷` and the uniform transversal inverse
+phase gate `(S†)⊗⁷` are logical gates of the Steane code, and they act on the
+logical basis `X̄ = X⊗⁷`, `Z̄ = Z⊗⁷` of `Steane7.stabilizerCodeWithLogicals` as
+the logical Hadamard and the logical phase gate.
+
+Conjugation by a gate `U` means `P ↦ U P U†`. A gate whose conjugation maps
+every generator into the stabilizer group is a logical gate
+(`isLogicalGate_of_generator_set_conjugation`):
+
+- `H⊗⁷` exchanges `X` and `Z` on every qubit, so it exchanges the Z-check and
+  the X-check on each Hamming row, and it exchanges `X̄` and `Z̄`.
+- `(S†)⊗⁷` fixes `Z` and sends `X` to `−Y` on every qubit. It fixes each Z-check
+  and `Z̄`. An X-check has weight four, so it goes to `Y` on its row, the
+  product of the X-check and the Z-check on that row. `X̄` has weight seven, so
+  it goes to `−Y⊗⁷ = i X̄ Z̄`, the logical `Y`.
+
+## Outline
+
+- The gates `transversalH`, `transversalS`
+- Conjugation of Pauli group elements: `conjByGate_transversalH`,
+  `conjByGate_transversalS_of_Z`, `conjByGate_transversalS_of_X`
+- `transversalH_isLogicalGate`, `transversalH_isLogicalHadamard`
+- `transversalS_isLogicalGate`, `transversalS_isLogicalS`
 -/
 
+namespace Quantum
 namespace StabilizerGroup
 namespace Steane7
 
-open Matrix
-open scoped BigOperators
+open NQubitPauliGroupElement
 
-/-!
-# Transversal H and S as logical gates for the Steane [[7,1,3]] code
+/-! ## The transversal gates -/
 
-We show that the uniform transversal Hadamard and phase gates (H⊗7 and S⊗7) are
-logical gates for the Steane code: they map the codespace to itself. Their
-action on the logical qubit is stated against the logical basis bundled in
-`Steane7.stabilizerCodeWithLogicals`.
--/
-
-/-- Transversal Hadamard: H on each of the 7 physical qubits. -/
-noncomputable def transversalH_Steane7 : NQubitGate 7 :=
+/-- Transversal Hadamard: `H` on each of the seven physical qubits. -/
+noncomputable def transversalH : NQubitGate 7 :=
   uniformTransversalGate 7 H
 
-/-- Transversal phase gate: S† on each of the 7 physical qubits. Conjugation is
-U P U† (adjoint on the right). -/
-noncomputable def transversalS_Steane7 : NQubitGate 7 :=
+/-- Transversal inverse phase gate: `S†` on each of the seven physical qubits.
+Its conjugation action is the logical phase gate `S`
+(`transversalS_isLogicalS`). -/
+noncomputable def transversalS : NQubitGate 7 :=
   uniformTransversalGate 7 inv_S
 
-/-- Steane generators use only I, X, Z (no Y). -/
-lemma generators_no_Y :
-    ∀ g ∈ generatorsList, ∀ i, g.operators i ≠ PauliOperator.Y := by
-  intro g hg i
-  have h : g = Z1 ∨ g = Z2 ∨ g = Z3 ∨ g = X1 ∨ g = X2 ∨ g = X3 := by
-    unfold generatorsList at hg
-    aesop
-  rcases h with rfl|rfl|rfl|rfl|rfl|rfl <;> fin_cases i <;> simp [Z1, Z2, Z3, X1, X2, X3,
-    NQubitPauliOperator.set, NQubitPauliOperator.identity]
+/-! ## Transversal `H` -/
 
-/-- Pauli group element with operators swapped (X↔Z). -/
-def swapXZ_element (g : NQubitPauliGroupElement 7) : NQubitPauliGroupElement 7 :=
-  ⟨g.phasePower, NQubitPauliOperator.transversalSwapXZ g.operators⟩
+/-- The Pauli group element with `X` and `Z` exchanged on every qubit, and the
+same phase. -/
+def swapXZ (g : NQubitPauliGroupElement 7) : NQubitPauliGroupElement 7 :=
+  ⟨g.phasePower, g.operators.transversalSwapXZ⟩
 
-/-- `swapXZ_element` pairwise swaps the Steane X- and Z-generators. -/
-private lemma swapXZ_element_swaps_generators :
-    swapXZ_element Z1 = X1 ∧ swapXZ_element Z2 = X2 ∧ swapXZ_element Z3 = X3 ∧
-      swapXZ_element X1 = Z1 ∧ swapXZ_element X2 = Z2 ∧ swapXZ_element X3 = Z3 := by
-  refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩ <;>
-    (unfold swapXZ_element; congr 2; ext i; fin_cases i <;>
-      simp [Z1, Z2, Z3, X1, X2, X3, NQubitPauliOperator.transversalSwapXZ,
-        PauliOperator.swapXZ, NQubitPauliOperator.set, NQubitPauliOperator.identity])
+/-- Transversal `H` conjugates a Pauli group element with no `Y` factor to the
+element with `X` and `Z` exchanged. -/
+lemma conjByGate_transversalH (g : NQubitPauliGroupElement 7)
+    (hg : ∀ i, g.operators i ≠ .Y) :
+    conjByGate transversalH g.gate = (swapXZ g).gate := by
+  rw [conjByGate_gate_eq_iff]
+  change uniformTransversalGateMatrix 7 H * g.toMatrix *
+    star (uniformTransversalGateMatrix 7 H) = (swapXZ g).toMatrix
+  simp only [NQubitPauliGroupElement.toMatrix, Matrix.mul_smul, Matrix.smul_mul,
+    uniformTransversalGateMatrix_H_conj_op 7 g.operators hg, swapXZ]
 
-/-- Swapping X↔Z on any Steane generator yields an element of the stabilizer
-subgroup. -/
-lemma transversalSwapXZ_mem_subgroup
-    (g : NQubitPauliGroupElement 7) (hg : g ∈ generatorsList) :
-    (⟨g.phasePower, NQubitPauliOperator.transversalSwapXZ g.operators⟩ :
-      NQubitPauliGroupElement 7) ∈ stabilizerGroup.toSubgroup := by
-  obtain ⟨hZ1, hZ2, hZ3, hX1, hX2, hX3⟩ := swapXZ_element_swaps_generators
-  change swapXZ_element g ∈ stabilizerGroup.toSubgroup
-  rw [stabilizerGroup_toSubgroup_eq]
-  rcases (by simpa [generatorsList] using hg) with
-    (rfl | rfl | rfl | rfl | rfl | rfl)
-  all_goals
-    refine Subgroup.subset_closure ?_
-    simp [generatorsList, hZ1, hZ2, hZ3, hX1, hX2, hX3]
+/-- Transversal Hadamard is a logical gate of the Steane code: it exchanges the
+Z-check and the X-check on each Hamming row. -/
+theorem transversalH_isLogicalGate : IsLogicalGate transversalH stabilizerGroup := by
+  refine isLogicalGate_of_generator_set_conjugation _ _ _ stabilizerGroup_toSubgroup_eq
+    fun g (hg : g ∈ generatorsList) => ⟨swapXZ g,
+      Subgroup.subset_closure (?_ : swapXZ g ∈ generatorsList), conjByGate_transversalH g ?_⟩
+  all_goals fin_cases hg <;> decide
 
-/-- Conjugating a Pauli group element (no Y) by transversal H gives the swapXZ
-element (U P U†). -/
-lemma transversalH_conjugates_element
-    (g : NQubitPauliGroupElement 7) (h_no_Y : ∀ i, g.operators i ≠ .Y) :
-    (uniformTransversalGateMatrix 7 H) * g.toMatrix * star (uniformTransversalGateMatrix 7 H) =
-    (swapXZ_element g).toMatrix := by
-  have h_conj := uniformTransversalGateMatrix_H_conj_op 7 g.operators h_no_Y
-  unfold NQubitPauliGroupElement.toMatrix swapXZ_element
-  simp [h_conj]
+/-- Transversal Hadamard acts as the logical Hadamard on the logical basis of
+`stabilizerCodeWithLogicals`: it conjugates `X̄` to `Z̄` and `Z̄` to `X̄`. -/
+theorem transversalH_isLogicalHadamard :
+    LogicalQubitOps.IsLogicalHadamard (stabilizerCodeWithLogicals.logicalOps 0) transversalH :=
+  ⟨transversalH_isLogicalGate, conjByGate_transversalH logicalX (by decide),
+    conjByGate_transversalH logicalZ (by decide)⟩
 
-/-- Transversal H conjugates every stabilizer element to some stabilizer element
-(U P U†). -/
-lemma transversalH_conjugates_stabilizer_to_stabilizer (g : NQubitPauliGroupElement 7)
-    (hg : g ∈ stabilizerGroup.toSubgroup) :
-    ∃ g' ∈ stabilizerGroup.toSubgroup,
-      transversalH_Steane7.val * g.toMatrix * star transversalH_Steane7.val = g'.toMatrix := by
-  have hS :
-      stabilizerGroup.toSubgroup =
-        Subgroup.closure (NQubitPauliGroupElement.listToSet generatorsList) :=
-    stabilizerGroup_toSubgroup_eq
-  have hgen :
-      ∀ x ∈ NQubitPauliGroupElement.listToSet generatorsList,
-        ∃ x' ∈ stabilizerGroup.toSubgroup, conjByGate transversalH_Steane7 x.gate = x'.gate := by
-    intro x hx
-    have hxList : x ∈ generatorsList := by
-      simpa [NQubitPauliGroupElement.listToSet] using hx
-    refine ⟨swapXZ_element x, ?_, ?_⟩
-    · exact transversalSwapXZ_mem_subgroup x hxList
-    · apply Subtype.ext
-      simpa [conjByGate_val, NQubitPauliGroupElement.gate_val] using
-        transversalH_conjugates_element x (generators_no_Y x hxList)
-  obtain ⟨g', hg', hgg'⟩ :=
-    conjugates_mem_closure_of_set_conjugates transversalH_Steane7
-      (NQubitPauliGroupElement.listToSet generatorsList)
-      (by
-        intro x hx
-        obtain ⟨x', hx', hxx'⟩ := hgen x hx
-        exact ⟨x', by simpa [hS] using hx', hxx'⟩) g (by simpa [hS] using hg)
-  refine ⟨g', by simpa [hS] using hg', ?_⟩
-  simpa [conjByGate_val, NQubitPauliGroupElement.gate_val] using congrArg Subtype.val hgg'
+/-! ## Transversal `S` -/
 
-/-- Transversal Hadamard is a logical gate for the Steane code. -/
-theorem transversalH_Steane7_isLogicalGate :
-    IsLogicalGate transversalH_Steane7 stabilizerGroup := by
-  have hS :
-      stabilizerGroup.toSubgroup =
-        Subgroup.closure (NQubitPauliGroupElement.listToSet generatorsList) :=
-    stabilizerGroup_toSubgroup_eq
-  refine isLogicalGate_of_generator_set_conjugation transversalH_Steane7 stabilizerGroup
-    (NQubitPauliGroupElement.listToSet generatorsList) hS ?_
-  intro x hx
-  have hxList : x ∈ generatorsList := by
-    simpa [NQubitPauliGroupElement.listToSet] using hx
-  refine ⟨swapXZ_element x, ?_, ?_⟩
-  · exact transversalSwapXZ_mem_subgroup x hxList
-  · apply Subtype.ext
-    simpa [conjByGate_val, NQubitPauliGroupElement.gate_val] using
-      transversalH_conjugates_element x (generators_no_Y x hxList)
+/-- Transversal `S†` fixes a Pauli group element whose factors are all `Z` or
+`I`. -/
+lemma conjByGate_transversalS_of_Z (g : NQubitPauliGroupElement 7)
+    (hg : ∀ i, g.operators i = .Z ∨ g.operators i = .I) :
+    conjByGate transversalS g.gate = g.gate := by
+  rw [conjByGate_gate_eq_iff]
+  change uniformTransversalGateMatrix 7 inv_S * g.toMatrix *
+    star (uniformTransversalGateMatrix 7 inv_S) = g.toMatrix
+  simp only [NQubitPauliGroupElement.toMatrix, Matrix.mul_smul, Matrix.smul_mul,
+    uniformTransversalGateMatrix_inv_S_conj_Z_op 7 g.operators hg]
 
-/-- `swapXZ_element` sends Steane logical X to logical Z. -/
-private lemma swapXZ_element_logicalX_eq_logicalZ :
-    swapXZ_element logicalX = logicalZ := by
-  ext i <;> simp [swapXZ_element, logicalX, logicalZ, NQubitPauliOperator.transversalSwapXZ,
-    NQubitPauliOperator.X, NQubitPauliOperator.Z, PauliOperator.swapXZ]
+/-- Transversal `S†` conjugates a phase-0 Pauli group element `g` whose factors
+are all `X` or `I` to `h`, where `h` is `Y` on the `X`-support of `g` with the
+sign `(-1) ^ |X-support|`: phase power `0` if the support is even, `2` if it is
+odd. -/
+lemma conjByGate_transversalS_of_X {g h : NQubitPauliGroupElement 7}
+    (hphase : g.phasePower = 0) (hg : ∀ i, g.operators i = .X ∨ g.operators i = .I)
+    (hh : h = ⟨if Even (xSupport g.operators).card then 0 else 2,
+      invSConjXIImage g.operators⟩) :
+    conjByGate transversalS g.gate = h.gate := by
+  rw [conjByGate_gate_eq_iff, hh]
+  refine (uniformTransversalGateMatrix_inv_S_conj_element_XI_phase0 7 g hphase hg).trans ?_
+  rw [invSConjXIScalar_eq_negOne_pow_xSupportCard]
+  split_ifs with hc
+  · simp [NQubitPauliGroupElement.toMatrix, hc.neg_one_pow]
+  · simp [NQubitPauliGroupElement.toMatrix, (Nat.not_even_iff_odd.mp hc).neg_one_pow]
 
-/-- `swapXZ_element` sends Steane logical Z to logical X. -/
-private lemma swapXZ_element_logicalZ_eq_logicalX :
-    swapXZ_element logicalZ = logicalX := by
-  ext i <;> simp [swapXZ_element, logicalX, logicalZ, NQubitPauliOperator.transversalSwapXZ,
-    NQubitPauliOperator.X, NQubitPauliOperator.Z, PauliOperator.swapXZ]
+/-- Transversal `S†` is a logical gate of the Steane code: it fixes each
+Z-check and sends the X-check on a Hamming row to its product with the Z-check
+on that row. -/
+theorem transversalS_isLogicalGate : IsLogicalGate transversalS stabilizerGroup := by
+  have hmem : ∀ g ∈ generatorsList, g ∈ stabilizerGroup.toSubgroup :=
+    fun g hg => Subgroup.subset_closure hg
+  refine isLogicalGate_of_generator_set_conjugation _ _ _ stabilizerGroup_toSubgroup_eq
+    fun g (hg : g ∈ generatorsList) => ?_
+  fin_cases hg
+  · exact ⟨Z1, hmem _ (by decide), conjByGate_transversalS_of_Z _ (by decide)⟩
+  · exact ⟨Z2, hmem _ (by decide), conjByGate_transversalS_of_Z _ (by decide)⟩
+  · exact ⟨Z3, hmem _ (by decide), conjByGate_transversalS_of_Z _ (by decide)⟩
+  · exact ⟨X1 * Z1, Subgroup.mul_mem _ (hmem X1 (by decide)) (hmem Z1 (by decide)),
+      conjByGate_transversalS_of_X rfl (by decide) (by decide)⟩
+  · exact ⟨X2 * Z2, Subgroup.mul_mem _ (hmem X2 (by decide)) (hmem Z2 (by decide)),
+      conjByGate_transversalS_of_X rfl (by decide) (by decide)⟩
+  · exact ⟨X3 * Z3, Subgroup.mul_mem _ (hmem X3 (by decide)) (hmem Z3 (by decide)),
+      conjByGate_transversalS_of_X rfl (by decide) (by decide)⟩
 
-/-- Steane logical X has no Y components. -/
-private lemma logicalX_no_Y : ∀ i, logicalX.operators i ≠ PauliOperator.Y := by
-  simp [logicalX, NQubitPauliOperator.X]
-
-/-- Steane logical Z has no Y components. -/
-private lemma logicalZ_no_Y : ∀ i, logicalZ.operators i ≠ PauliOperator.Y := by
-  simp [logicalZ, NQubitPauliOperator.Z]
-
-/-- Transversal Hadamard acts as logical Hadamard on the Steane code's logical
-basis (`stabilizerCodeWithLogicals`): it conjugates `X̄` to `Z̄` and `Z̄` to
-`X̄`. -/
-theorem transversalH_Steane7_isLogicalHadamard :
-    LogicalQubitOps.IsLogicalHadamard (stabilizerCodeWithLogicals.logicalOps 0)
-      transversalH_Steane7 := by
-  change LogicalQubitOps.IsLogicalHadamard
-    ⟨logicalX, logicalZ, logicalX_mem_centralizer, logicalZ_mem_centralizer,
-      logicalX_anticommutes_logicalZ⟩
-    transversalH_Steane7
-  refine ⟨transversalH_Steane7_isLogicalGate, ?_, ?_⟩
-  · apply Subtype.ext
-    simpa [conjByGate_val, NQubitPauliGroupElement.gate_val,
-      swapXZ_element_logicalX_eq_logicalZ] using
-      transversalH_conjugates_element logicalX logicalX_no_Y
-  · apply Subtype.ext
-    simpa [conjByGate_val, NQubitPauliGroupElement.gate_val,
-      swapXZ_element_logicalZ_eq_logicalX] using
-      transversalH_conjugates_element logicalZ logicalZ_no_Y
-
-/-!
-## Transversal S as a logical gate
-
-Conjugation is U P U† (adjoint on the right). S† on each qubit fixes Z and sends
-X to Y. Z-generators are fixed; X-generators go to X*Z (in the stabilizer).
--/
-
-lemma transversalS_conjugates_Z_generator (g : NQubitPauliGroupElement 7)
-    (hg : g ∈ ({Z1, Z2, Z3} : Set (NQubitPauliGroupElement 7))) :
-    transversalS_Steane7.val * g.toMatrix * star transversalS_Steane7.val = g.toMatrix := by
-  have hZ : ∀ i, g.operators i = .Z ∨ g.operators i = .I := by
-    rcases hg with rfl | rfl | rfl <;> intro i <;> fin_cases i <;> decide
-  have hphase : g.phasePower = 0 := by
-    rcases hg with rfl | rfl | rfl <;> decide
-  simpa [transversalS_Steane7, NQubitPauliGroupElement.toMatrix,
-         PauliGroupElement.phasePowerToComplex, hphase] using
-    uniformTransversalGateMatrix_inv_S_conj_Z_op 7 g.operators hZ
-
-/-- Gate-level version: transversal `inv_S` fixes each Steane Z-generator. -/
-lemma transversalS_conjugates_Z_generator_gate
-    (g : NQubitPauliGroupElement 7) (hg : g ∈ ({Z1, Z2, Z3} : Set (NQubitPauliGroupElement 7))) :
-    conjByGate transversalS_Steane7 g.gate = g.gate := by
-  apply Subtype.ext
-  simpa [conjByGate_val, NQubitPauliGroupElement.gate_val] using
-    transversalS_conjugates_Z_generator g hg
-
-/-- Generic gate-level helper: transversal `inv_S` conjugation for a phase-0 X/I
-generator with X-support of size 4 sends `g` to `h` whenever `invSConjXIImage`
-matches `h.operators` and `h.phasePower = 0`. Specializations follow for each
-Steane X-generator. -/
-private lemma transversalS_conjugates_XI_phase0_card4_gate
-    {g h : NQubitPauliGroupElement 7}
-    (hphase_g : g.phasePower = 0) (hphase_h : h.phasePower = 0)
-    (hXI : ∀ i, g.operators i = .X ∨ g.operators i = .I)
-    (hcard : (xSupport g.operators).card = 4)
-    (himage : invSConjXIImage g.operators = h.operators) :
-    conjByGate transversalS_Steane7 g.gate = h.gate := by
-  apply Subtype.ext
-  have hscalar : invSConjXIScalar g.operators = 1 := by
-    rw [invSConjXIScalar_eq_negOne_pow_xSupportCard, hcard]; norm_num
-  have hconj := uniformTransversalGateMatrix_inv_S_conj_element_XI_phase0 7 g hphase_g hXI
-  simpa [conjByGate_val, transversalS_Steane7, NQubitPauliGroupElement.gate_val,
-    himage, hscalar, NQubitPauliGroupElement.toMatrix, hphase_h, hphase_g,
-    PauliGroupElement.phasePowerToComplex] using hconj
-
-/-- Gate-level `inv_S` conjugation for `X1`: `X1 ↦ X1*Z1`. -/
-lemma transversalS_conjugates_X1_gate :
-    conjByGate transversalS_Steane7 X1.gate = (X1 * Z1).gate :=
-  transversalS_conjugates_XI_phase0_card4_gate rfl (by decide)
-    (fun i => by fin_cases i <;>
-      simp [X1, NQubitPauliOperator.set, NQubitPauliOperator.identity])
-    (by unfold xSupport X1; decide)
-    (by ext i; fin_cases i <;>
-      simp [invSConjXIImage, X1, Z1, NQubitPauliOperator.set, NQubitPauliOperator.identity,
-        NQubitPauliGroupElement.mul, NQubitPauliGroupElement.mulOp, PauliOperator.mulOp])
-
-/-- Gate-level `inv_S` conjugation for `X2`: `X2 ↦ X2*Z2`. -/
-lemma transversalS_conjugates_X2_gate :
-    conjByGate transversalS_Steane7 X2.gate = (X2 * Z2).gate :=
-  transversalS_conjugates_XI_phase0_card4_gate rfl (by decide)
-    (fun i => by fin_cases i <;>
-      simp [X2, NQubitPauliOperator.set, NQubitPauliOperator.identity])
-    (by unfold xSupport X2; decide)
-    (by ext i; fin_cases i <;>
-      simp [invSConjXIImage, X2, Z2, NQubitPauliOperator.set, NQubitPauliOperator.identity,
-        NQubitPauliGroupElement.mul, NQubitPauliGroupElement.mulOp, PauliOperator.mulOp])
-
-/-- Gate-level `inv_S` conjugation for `X3`: `X3 ↦ X3*Z3`. -/
-lemma transversalS_conjugates_X3_gate :
-    conjByGate transversalS_Steane7 X3.gate = (X3 * Z3).gate :=
-  transversalS_conjugates_XI_phase0_card4_gate rfl (by decide)
-    (fun i => by fin_cases i <;>
-      simp [X3, NQubitPauliOperator.set, NQubitPauliOperator.identity])
-    (by unfold xSupport X3; decide)
-    (by ext i; fin_cases i <;>
-      simp [invSConjXIImage, X3, Z3, NQubitPauliOperator.set, NQubitPauliOperator.identity,
-        NQubitPauliGroupElement.mul, NQubitPauliGroupElement.mulOp, PauliOperator.mulOp])
-
-/-- Transversal S conjugates X1 to X1*Z1 (matrix bridge). -/
-lemma transversalS_conjugates_X1 :
-    transversalS_Steane7.val * X1.toMatrix * star transversalS_Steane7.val =
-      (X1 * Z1).toMatrix := by
-  simpa [conjByGate_val, NQubitPauliGroupElement.gate_val] using
-    congrArg Subtype.val transversalS_conjugates_X1_gate
-
-/-- Transversal S conjugates X2 to X2*Z2 (matrix bridge). -/
-lemma transversalS_conjugates_X2 :
-    transversalS_Steane7.val * X2.toMatrix * star transversalS_Steane7.val =
-      (X2 * Z2).toMatrix := by
-  simpa [conjByGate_val, NQubitPauliGroupElement.gate_val] using
-    congrArg Subtype.val transversalS_conjugates_X2_gate
-
-/-- Transversal S conjugates X3 to X3*Z3 (matrix bridge). -/
-lemma transversalS_conjugates_X3 :
-    transversalS_Steane7.val * X3.toMatrix * star transversalS_Steane7.val =
-      (X3 * Z3).toMatrix := by
-  simpa [conjByGate_val, NQubitPauliGroupElement.gate_val] using
-    congrArg Subtype.val transversalS_conjugates_X3_gate
-
-/-- Transversal S is a logical gate for the Steane code. -/
-theorem transversalS_Steane7_isLogicalGate :
-    IsLogicalGate transversalS_Steane7 stabilizerGroup := by
-  have hS :
-      stabilizerGroup.toSubgroup =
-        Subgroup.closure (NQubitPauliGroupElement.listToSet generatorsList) :=
-    stabilizerGroup_toSubgroup_eq
-  have hmemGen : ∀ x ∈ generatorsList, x ∈ stabilizerGroup.toSubgroup := fun x hx =>
-    hS ▸ Subgroup.subset_closure (by simpa [NQubitPauliGroupElement.listToSet] using hx)
-  refine isLogicalGate_of_generator_set_conjugation transversalS_Steane7 stabilizerGroup
-    (NQubitPauliGroupElement.listToSet generatorsList) hS ?_
-  intro x hx
-  have hxList : x ∈ generatorsList := by
-    simpa [NQubitPauliGroupElement.listToSet] using hx
-  have hxCases : x = Z1 ∨ x = Z2 ∨ x = Z3 ∨ x = X1 ∨ x = X2 ∨ x = X3 := by
-    unfold generatorsList at hxList
-    aesop
-  rcases hxCases with (rfl | rfl | rfl | rfl | rfl | rfl)
-  · refine ⟨Z1, hmemGen Z1 (by simp [generatorsList]), ?_⟩
-    simpa [transversalS_Steane7] using
-      transversalS_conjugates_Z_generator_gate Z1 (by simp)
-  · refine ⟨Z2, hmemGen Z2 (by simp [generatorsList]), ?_⟩
-    simpa [transversalS_Steane7] using
-      transversalS_conjugates_Z_generator_gate Z2 (by simp)
-  · refine ⟨Z3, hmemGen Z3 (by simp [generatorsList]), ?_⟩
-    simpa [transversalS_Steane7] using
-      transversalS_conjugates_Z_generator_gate Z3 (by simp)
-  · refine ⟨X1 * Z1, ?_, ?_⟩
-    · exact Subgroup.mul_mem _ (hmemGen X1 (by simp [generatorsList]))
-        (hmemGen Z1 (by simp [generatorsList]))
-    · simpa [transversalS_Steane7] using transversalS_conjugates_X1_gate
-  · refine ⟨X2 * Z2, ?_, ?_⟩
-    · exact Subgroup.mul_mem _ (hmemGen X2 (by simp [generatorsList]))
-        (hmemGen Z2 (by simp [generatorsList]))
-    · simpa [transversalS_Steane7] using transversalS_conjugates_X2_gate
-  · refine ⟨X3 * Z3, ?_, ?_⟩
-    · exact Subgroup.mul_mem _ (hmemGen X3 (by simp [generatorsList]))
-        (hmemGen Z3 (by simp [generatorsList]))
-    · simpa [transversalS_Steane7] using transversalS_conjugates_X3_gate
-
-/-- Transversal `S†` (implemented as `inv_S` on each qubit) acts as logical
-phase `S` on the Steane code's logical basis (`stabilizerCodeWithLogicals`),
-under the convention `Ȳ := i X̄ Z̄`. -/
-theorem transversalS_Steane7_isLogicalS :
-    LogicalQubitOps.IsLogicalS (stabilizerCodeWithLogicals.logicalOps 0)
-      transversalS_Steane7 := by
-  change LogicalQubitOps.IsLogicalS
-    ⟨logicalX, logicalZ, logicalX_mem_centralizer, logicalZ_mem_centralizer,
-      logicalX_anticommutes_logicalZ⟩
-    transversalS_Steane7
-  refine ⟨transversalS_Steane7_isLogicalGate, ?_, ?_⟩
-  · apply Subtype.ext
-    change (uniformTransversalGateMatrix 7 inv_S) * logicalZ.toMatrix *
-      star (uniformTransversalGateMatrix 7 inv_S) = logicalZ.toMatrix
-    simpa [conjByGate_val, NQubitPauliGroupElement.gate_val,
-      logicalZ, NQubitPauliGroupElement.toMatrix, PauliGroupElement.phasePowerToComplex] using
-      (uniformTransversalGateMatrix_inv_S_conj_Z_op 7 (NQubitPauliOperator.Z 7)
-        (fun _ => Or.inl rfl))
-  · apply Subtype.ext
-    have hXY : (uniformTransversalGateMatrix 7 inv_S) * logicalX.toMatrix *
-        star (uniformTransversalGateMatrix 7 inv_S) = logicalY.toMatrix := by
-      have hX :
-          logicalX.toMatrix = (NQubitPauliOperator.X 7).toMatrix := by
-        simp [logicalX, NQubitPauliGroupElement.toMatrix, PauliGroupElement.phasePowerToComplex]
-      rw [hX, uniformTransversalGateMatrix_inv_S_conj_allX]
-      have hpow : ((-1 : ℂ) ^ 7) = -1 := by norm_num
-      simp [logicalY_eq_phase2_allY, NQubitPauliGroupElement.toMatrix,
-        PauliGroupElement.phasePowerToComplex, hpow]
-    simpa [conjByGate_val, NQubitPauliGroupElement.gate_val] using hXY
-
+/-- Transversal `S†` acts as the logical phase gate `S` on the logical basis of
+`stabilizerCodeWithLogicals`: it fixes `Z̄` and conjugates `X̄` to
+`Ȳ = i X̄ Z̄`. -/
+theorem transversalS_isLogicalS :
+    LogicalQubitOps.IsLogicalS (stabilizerCodeWithLogicals.logicalOps 0) transversalS :=
+  ⟨transversalS_isLogicalGate, conjByGate_transversalS_of_Z logicalZ (by decide),
+    conjByGate_transversalS_of_X rfl (by decide) (by decide)⟩
 
 end Steane7
 end StabilizerGroup

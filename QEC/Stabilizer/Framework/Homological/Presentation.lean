@@ -123,15 +123,10 @@ has independent rows. -/
 theorem rowsLinearIndependent_generatorsList
     (hcut : Function.Injective X.cutMap) (hboundary : Function.Injective X.boundary2) :
     rowsLinearIndependent X.generatorsList := by
-  classical
-  let e : Fin X.generatorsList.length ≃ X.C0 ⊕ X.C2 :=
-    (finCongr (List.length_ofFn)).trans (Fintype.equivFin (X.C0 ⊕ X.C2)).symm
-  have h := (X.linearIndependent_cellGenerator hcut hboundary).comp e e.injective
-  unfold rowsLinearIndependent checkMatrix
-  convert h using 1
-  funext i col
-  simp only [generatorsList, List.get_ofFn]
-  rfl
+  rw [generatorsList, List.ofFn_eq_map]
+  exact rowsLinearIndependent_map_of_nodup
+    ((X.linearIndependent_cellGenerator hcut hboundary).comp _
+      (Fintype.equivFin (X.C0 ⊕ X.C2)).symm.injective) (List.nodup_finRange _)
 
 /-- The presentation of a homological CSS code by its canonical checks, given
 that they are independent (`cutMap` and `∂₂` injective) and that their number

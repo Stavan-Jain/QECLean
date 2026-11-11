@@ -1,23 +1,35 @@
 import Mathlib.Tactic
 
+/-!
+# Cyclic successor and predecessor on `Fin L`
+
+`next L i` and `prev L i` are `i + 1` and `i - 1` modulo `L`. They are mutually
+inverse (`next_prev`, `prev_next`) and, for `2 ≤ L`, have no fixed points
+(`next_ne_self`, `prev_ne_self`). Stating facts about periodic lattices through
+these lemmas avoids reasoning about `%` directly.
+
+The cycle `Fin L` is connected: a function invariant under `next` is constant
+(`eq_of_forall_next_eq`, and `eq_of_forall_next_eq₂` on `Fin L × Fin L`). A sum
+over `Fin L` is unchanged by shifting the index (`sum_comp_next`,
+`sum_comp_prev`). `zeroCoord L` is the coordinate `0`.
+-/
 
 namespace Quantum
 namespace Stabilizer
 namespace Lattice
 
-/-- Convert the nondegeneracy assumption `2 ≤ L` into positivity `0 < L`. -/
-instance factPosOfTwoLE (L : ℕ) [Fact (2 ≤ L)] : Fact (0 < L) := ⟨by
-  have h2 : 0 < 2 := by decide
-  exact lt_of_lt_of_le h2 Fact.out⟩
+/-- A lattice size `2 ≤ L` is positive. -/
+instance factPosOfTwoLE (L : ℕ) [Fact (2 ≤ L)] : Fact (0 < L) :=
+  ⟨Nat.lt_of_lt_of_le Nat.zero_lt_two Fact.out⟩
 
-/-- Useful base instance for concrete `L = 2` specializations. -/
+/-- The lattice size `2` is positive. -/
 instance factPosTwo : Fact (0 < 2) := ⟨by decide⟩
 
-/-- Successor modulo `L` on `Fin L`. -/
+/-- The successor of `i` modulo `L`. -/
 def next (L : ℕ) [Fact (0 < L)] (i : Fin L) : Fin L :=
   ⟨(i.val + 1) % L, Nat.mod_lt _ Fact.out⟩
 
-/-- Predecessor modulo `L` on `Fin L`. -/
+/-- The predecessor of `i` modulo `L`. -/
 def prev (L : ℕ) [Fact (0 < L)] (i : Fin L) : Fin L :=
   ⟨(i.val + (L - 1)) % L, Nat.mod_lt _ Fact.out⟩
 
@@ -27,104 +39,89 @@ def prev (L : ℕ) [Fact (0 < L)] (i : Fin L) : Fin L :=
 @[simp] lemma prev_val (L : ℕ) [Fact (0 < L)] (i : Fin L) :
     (prev L i).val = (i.val + (L - 1)) % L := rfl
 
-/-- `next` and `prev` are inverses on `Fin L` (left inverse direction). -/
 @[simp] lemma next_prev (L : ℕ) [Fact (0 < L)] (i : Fin L) :
     next L (prev L i) = i := by
+  have hL : 0 < L := Fact.out
   apply Fin.ext
-  by_cases h0 : i.val = 0
-  · have hL : 0 < L := Fact.out
-    have hmod : (((0 + (L - 1)) % L + 1) % L) = 0 := by
-      have hm1 : L - 1 < L := by omega
-      simp [Nat.mod_eq_of_lt hm1]
-      have : (L - 1) + 1 = L := by omega
-      rw [this, Nat.mod_self]
-    simpa [next, prev, h0] using hmod
-  · have hL : 0 < L := Fact.out
-    have hpos : 0 < i.val := Nat.pos_of_ne_zero h0
-    have hmod1 : ((i.val + (L - 1)) % L) = i.val - 1 := by
-      have hsum : i.val + (L - 1) = L + (i.val - 1) := by omega
-      rw [hsum, Nat.add_mod_left]
-      have hlt' : i.val - 1 < L := by omega
-      exact Nat.mod_eq_of_lt hlt'
-    have hmod2 : (((i.val + (L - 1)) % L + 1) % L) = i.val := by
-      rw [hmod1]
-      have : i.val - 1 + 1 = i.val := by omega
-      rw [this, Nat.mod_eq_of_lt i.isLt]
-    simpa [next, prev] using hmod2
+  rw [next_val, prev_val, Nat.mod_add_mod, show i.val + (L - 1) + 1 = i.val + L by omega,
+    Nat.add_mod_right, Nat.mod_eq_of_lt i.isLt]
 
-/-- `next` and `prev` are inverses on `Fin L` (right inverse direction). -/
 @[simp] lemma prev_next (L : ℕ) [Fact (0 < L)] (i : Fin L) :
     prev L (next L i) = i := by
-  apply Fin.ext
   have hL : 0 < L := Fact.out
-  by_cases hlast : i.val + 1 = L
-  · have hmod0 : (i.val + 1) % L = 0 := by simp [hlast]
-    have hi : i.val = L - 1 := by omega
-    have hm1 : L - 1 < L := by omega
-    have hcalc : (((i.val + 1) % L + (L - 1)) % L) = i.val := by
-      rw [hmod0, Nat.zero_add, Nat.mod_eq_of_lt hm1, hi]
-    simpa [prev, next] using hcalc
-  · have hlt : i.val + 1 < L := by
-      have hle : i.val + 1 ≤ L := Nat.succ_le_of_lt i.isLt
-      exact Nat.lt_of_le_of_ne hle hlast
-    have hmod : (i.val + 1) % L = i.val + 1 := Nat.mod_eq_of_lt hlt
-    have hcalc : (((i.val + 1) % L + (L - 1)) % L) = i.val := by
-      rw [hmod]
-      have hsum : i.val + 1 + (L - 1) = L + i.val := by omega
-      rw [hsum, Nat.add_mod_left, Nat.mod_eq_of_lt i.isLt]
-    simpa [prev, next] using hcalc
+  apply Fin.ext
+  rw [prev_val, next_val, Nat.mod_add_mod, show i.val + 1 + (L - 1) = i.val + L by omega,
+    Nat.add_mod_right, Nat.mod_eq_of_lt i.isLt]
 
-/-- Rewriting `prev a = b` as `a = next b`. -/
 @[simp] lemma prev_eq_iff_eq_next (L : ℕ) [Fact (0 < L)] (a b : Fin L) :
-    prev L a = b ↔ a = next L b := by
-  constructor
-  · intro h
-    calc
-      a = next L (prev L a) := by simp
-      _ = next L b := by simp [h]
-  · intro h
-    calc
-      prev L a = prev L (next L b) := by simp [h]
-      _ = b := by simp
+    prev L a = b ↔ a = next L b :=
+  ⟨fun h => by rw [← h, next_prev], fun h => by rw [h, prev_next]⟩
 
-/-- Rewriting `a = prev b` as `next a = b`. -/
 @[simp] lemma eq_prev_iff_next_eq (L : ℕ) [Fact (0 < L)] (a b : Fin L) :
-    a = prev L b ↔ next L a = b := by
-  constructor
-  · intro h
-    calc
-      next L a = next L (prev L b) := by simp [h]
-      _ = b := by simp
-  · intro h
-    calc
-      a = prev L (next L a) := by simp
-      _ = prev L b := by simp [h]
+    a = prev L b ↔ next L a = b :=
+  ⟨fun h => by rw [h, next_prev], fun h => by rw [← h, prev_next]⟩
 
-/-- On nontrivial cyclic indices (`2 ≤ L`), `next` has no fixed points. -/
+/-- For `2 ≤ L`, `next` has no fixed points. -/
 lemma next_ne_self (L : ℕ) [Fact (2 ≤ L)] (i : Fin L) : next L i ≠ i := by
   intro h
-  have hL : 0 < L := (factPosOfTwoLE L).out
   have h2 : 2 ≤ L := Fact.out
+  have hi := i.isLt
   have hval : (i.val + 1) % L = i.val := congrArg Fin.val h
   by_cases htop : i.val + 1 = L
-  · have hmod : (i.val + 1) % L = 0 := by simp [htop]
-    have hi0 : i.val = 0 := by simpa [hmod] using hval.symm
-    have hiLast : i.val = L - 1 := by omega
+  · rw [htop, Nat.mod_self] at hval
     omega
-  · have hle : i.val + 1 ≤ L := Nat.succ_le_of_lt i.isLt
-    have hlt : i.val + 1 < L := Nat.lt_of_le_of_ne hle htop
-    have hmod : (i.val + 1) % L = i.val + 1 := Nat.mod_eq_of_lt hlt
-    rw [hmod] at hval
+  · rw [Nat.mod_eq_of_lt (by omega)] at hval
     omega
 
-/-- On nontrivial cyclic indices (`2 ≤ L`), `prev` has no fixed points. -/
-lemma prev_ne_self (L : ℕ) [Fact (2 ≤ L)] (i : Fin L) : prev L i ≠ i := by
-  intro h
-  have hnext : next L (prev L i) = next L i := congrArg (next L) h
-  have hi : i = next L i := by simpa using hnext
-  exact next_ne_self L i hi.symm
+/-- For `2 ≤ L`, `prev` has no fixed points. -/
+lemma prev_ne_self (L : ℕ) [Fact (2 ≤ L)] (i : Fin L) : prev L i ≠ i :=
+  fun h => next_ne_self L i (by simpa using (congrArg (next L) h).symm)
+
+/-! ## Functions and sums on the cycle `Fin L` -/
+
+section Cycle
+
+variable (L : ℕ) [Fact (0 < L)]
+
+/-- The coordinate `0 : Fin L` of a nonempty lattice. -/
+def zeroCoord : Fin L := ⟨0, Fact.out⟩
+
+/-- A function on `Fin L` that is invariant under the cyclic successor is
+constant. -/
+lemma eq_of_forall_next_eq {α : Type*} (g : Fin L → α) (h : ∀ i, g (next L i) = g i)
+    (i j : Fin L) : g i = g j := by
+  have key : ∀ (k : ℕ) (hk : k < L), g ⟨k, hk⟩ = g (zeroCoord L) := by
+    intro k
+    induction k with
+    | zero => intro _; rfl
+    | succ k ih =>
+      intro hk
+      rw [← ih (Nat.lt_of_succ_lt hk), ← h ⟨k, Nat.lt_of_succ_lt hk⟩]
+      exact congrArg g (Fin.ext (Nat.mod_eq_of_lt hk).symm)
+  exact (key i i.isLt).trans (key j j.isLt).symm
+
+/-- A function on `Fin L × Fin L` that is invariant under the cyclic successor
+in each coordinate is constant. -/
+lemma eq_of_forall_next_eq₂ {α : Type*} (g : Fin L × Fin L → α)
+    (hx : ∀ x y, g (next L x, y) = g (x, y)) (hy : ∀ x y, g (x, next L y) = g (x, y))
+    (p q : Fin L × Fin L) : g p = g q :=
+  (eq_of_forall_next_eq L (fun x => g (x, p.2)) (fun x => hx x p.2) p.1 q.1).trans
+    (eq_of_forall_next_eq L (fun y => g (q.1, y)) (hy q.1) p.2 q.2)
+
+/-- A sum over `Fin L` is unchanged by shifting the index forward. -/
+lemma sum_comp_next {M : Type*} [AddCommMonoid M] (f : Fin L → M) :
+    ∑ i, f (next L i) = ∑ i, f i :=
+  Function.Bijective.sum_comp
+    (Function.bijective_iff_has_inverse.2 ⟨prev L, prev_next L, next_prev L⟩) f
+
+/-- A sum over `Fin L` is unchanged by shifting the index backward. -/
+lemma sum_comp_prev {M : Type*} [AddCommMonoid M] (f : Fin L → M) :
+    ∑ i, f (prev L i) = ∑ i, f i :=
+  Function.Bijective.sum_comp
+    (Function.bijective_iff_has_inverse.2 ⟨next L, next_prev L, prev_next L⟩) f
+
+end Cycle
 
 end Lattice
 end Stabilizer
 end Quantum
-

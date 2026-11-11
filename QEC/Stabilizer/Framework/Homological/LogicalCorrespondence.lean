@@ -11,7 +11,9 @@ the chain operators are logical exactly on (dual) cycles and trivial exactly on
 X side, for the chain complex itself:
 
 * `chainXOperator_mem_centralizer_iff_mem_cycles`: `chainXOperator c` commutes
-  with the stabilizer group iff `c` is a cycle;
+  with the stabilizer group iff `c` is a cycle
+  (`chainXOperator_mem_centralizer_iff_of_toSubgroup_eq` for a stabilizer group
+  given by another generating set);
 * `chainXOperator_mem_XClosure_iff_mem_boundaries`: `chainXOperator c` is a
   product of X-checks iff `c` is a boundary;
 * `chainXOperator_isNontrivialLogical_iff`: `chainXOperator c` is a nontrivial
@@ -20,7 +22,8 @@ X side, for the chain complex itself:
 Z side, for the dual complex (`dualCycles = ker dualBoundary`,
 `dualBoundaries = range cutMap`):
 
-* `chainZOperator_mem_centralizer_iff_mem_dualCycles`,
+* `chainZOperator_mem_centralizer_iff_mem_dualCycles`
+  (`chainZOperator_mem_centralizer_iff_of_toSubgroup_eq`),
   `chainZOperator_mem_ZClosure_iff_mem_dualBoundaries` and
   `chainZOperator_isNontrivialLogical_iff`.
 
@@ -129,6 +132,15 @@ lemma chainXOperator_mem_centralizer_iff_mem_cycles
   · exact h s hz
   · exact (XGenerators_isXType s hx).commute (chainXOperator_isXType c)
 
+/-- `chainXOperator c` commutes with a stabilizer group `S` whose subgroup is
+that of the homological stabilizer group iff `c` is a cycle. -/
+lemma chainXOperator_mem_centralizer_iff_of_toSubgroup_eq
+    {S : StabilizerGroup X.numQubits}
+    (hS : S.toSubgroup = X.homologicalStabilizerGroup.toSubgroup) (c : X.C1 → ZMod 2) :
+    X.chainXOperator c ∈ StabilizerGroup.centralizer S ↔ c ∈ X.cycles := by
+  rw [StabilizerGroup.centralizer_eq_of_toSubgroup_eq _ _ hS]
+  exact chainXOperator_mem_centralizer_iff_mem_cycles c
+
 /-! ## X side: products of X-checks and boundaries -/
 
 /-- `chainXOperator c` is a product of X-checks iff `c` is a boundary. -/
@@ -223,6 +235,15 @@ lemma chainZOperator_mem_centralizer_iff_mem_dualCycles
   rcases hs with hz | hx
   · exact (ZGenerators_isZType s hz).commute (chainZOperator_isZType c)
   · exact h s hx
+
+/-- `chainZOperator c` commutes with a stabilizer group `S` whose subgroup is
+that of the homological stabilizer group iff `c` is a dual cycle. -/
+lemma chainZOperator_mem_centralizer_iff_of_toSubgroup_eq
+    {S : StabilizerGroup X.numQubits}
+    (hS : S.toSubgroup = X.homologicalStabilizerGroup.toSubgroup) (c : X.C1 → ZMod 2) :
+    X.chainZOperator c ∈ StabilizerGroup.centralizer S ↔ c ∈ X.dualCycles := by
+  rw [StabilizerGroup.centralizer_eq_of_toSubgroup_eq _ _ hS]
+  exact chainZOperator_mem_centralizer_iff_mem_dualCycles c
 
 /-! ## Z side: products of Z-checks and dual boundaries -/
 
