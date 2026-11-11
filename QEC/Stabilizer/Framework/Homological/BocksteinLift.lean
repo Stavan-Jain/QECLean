@@ -29,6 +29,11 @@ The proof has three steps, each a lemma:
   representative by an element of `(ε * A, ε * B)`, because the annihilator of
   `ε` in `Q` is `(ε)` (`ann_eps_quotient`).
 
+`bockstein_element_form_of_surjective` is the same statement with the quotient
+`R ⧸ (ε ^ 2)` replaced by any ring onto which `R` maps with kernel inside
+`(ε ^ 2)` and with the square of the image of `ε` equal to zero; there the
+ideal membership is spelled out as an equation.
+
 `bockstein_element_form_deck` is the instance `R = 𝔽₂[X] ⧸ (X ^ 4)`, `ε = X`,
 which is the group algebra of `ℤ/4` with `X = 1 + σ`.
 -/
@@ -127,6 +132,33 @@ theorem bockstein_element_form (ε A B : R)
     exists_vanishing_choice_in_quotient ε A B hchar hann z a b hAz hBz
   exact mem_span_of_vanishing_choice _ _ _ z a b a₀ b₀
     (ann_eps_quotient ε hann) hAz.symm hBz.symm hAz₀.symm hBz₀.symm h₀
+
+/-- `bockstein_element_form` for a ring `S` in place of `R ⧸ (ε ^ 2)`. Let
+`ρ : R →+* S` be surjective with kernel contained in `(ε ^ 2)`, and let
+`ε' = ρ ε` satisfy `ε' ^ 2 = 0`, where `R` has `2 = 0` and the annihilator of
+`ε` equal to `(ε ^ 3)`. If `A * z = ε' * a` and `B * z = ε' * b` in `S`, then
+`A * b + B * a = ε' * (A * r + B * s)` for some `r s : S`: lift everything to
+`R` and apply `rep_eq_zero_upstairs`. -/
+theorem bockstein_element_form_of_surjective {S : Type*} [CommRing S] (ρ : R →+* S)
+    (hρ : Function.Surjective ρ) {ε : R} {ε' : S} (hε : ρ ε = ε') (hε' : ε' ^ 2 = 0)
+    (hchar : (2 : R) = 0)
+    (hann : ∀ w : R, ε * w = 0 → ∃ v, w = ε ^ 3 * v)
+    (hker : ∀ x : R, ρ x = 0 → ε ^ 2 ∣ x)
+    {A B z a b : S} (hAz : A * z = ε' * a) (hBz : B * z = ε' * b) :
+    ∃ r s : S, A * b + B * a = ε' * (A * r + B * s) := by
+  subst hε
+  obtain ⟨A, rfl⟩ := hρ A
+  obtain ⟨B, rfl⟩ := hρ B
+  obtain ⟨z, rfl⟩ := hρ z
+  obtain ⟨a, rfl⟩ := hρ a
+  obtain ⟨b, rfl⟩ := hρ b
+  obtain ⟨rA, hrA⟩ := hker (A * z - ε * a) (by rw [map_sub, map_mul, map_mul, hAz, sub_self])
+  obtain ⟨rB, hrB⟩ := hker (B * z - ε * b) (by rw [map_sub, map_mul, map_mul, hBz, sub_self])
+  obtain ⟨v, hv⟩ := rep_eq_zero_upstairs ε A B z (a + ε * rA) (b + ε * rB) hchar hann
+    (by linear_combination hrA) (by linear_combination hrB)
+  have h := congrArg ρ hv
+  simp only [map_add, map_mul, map_pow] at h
+  exact ⟨-ρ rB, -ρ rA, by linear_combination h + ρ ε * ρ v * hε'⟩
 
 /-! ## The group algebra of `ℤ/4`
 
