@@ -6,12 +6,15 @@ import QEC.Stabilizer.Codes.Repetition.NLogicals
 /-!
 # Repetition codes
 
-Classical repetition codes, embedded as degenerate distance-1 quantum stabilizer
-codes: the 3-qubit instance (`Three`) and the parametric `[[n+2, 1, 1]]` family
-(`N`).
+The classical bit-flip repetition codes as quantum stabilizer codes of
+distance 1, in the two-file layout described in `Codes/_TEMPLATE.lean`.
 
-Each follows the same two-file layout as `Codes/Small/`: `Three.lean` / `N.lean`
-run from the generators to `stabilizerCodeWithDistance`, and
-`ThreeLogicals.lean` / `NLogicals.lean` add the logical basis and
-`stabilizerCodeWithLogicals`.
+- `Three`: the 3-qubit repetition code `[[3, 1, 1]]`, from its two `ZZ` checks
+  to `RepetitionCode3.stabilizerCodeWithDistance`.
+- `ThreeLogicals`: its logical basis `X̄ = XXX`, `Z̄ = ZZZ`, ending in
+  `RepetitionCode3.stabilizerCodeWithLogicals`.
+- `N`: the family `[[n+2, 1, 1]]` on `n + 2` qubits, from its `n + 1` adjacent
+  `ZZ` checks to `RepetitionCodeN.stabilizerCodeWithDistance`.
+- `NLogicals`: its logical basis `X̄ = X⊗ⁿ⁺²`, `Z̄ = Z⊗ⁿ⁺²` for odd `n + 2`,
+  ending in `RepetitionCodeN.stabilizerCodeWithLogicals`.
 -/

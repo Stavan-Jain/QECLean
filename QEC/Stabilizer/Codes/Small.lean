@@ -1,36 +1,41 @@
-import QEC.Stabilizer.Codes.Small.Shor9
-import QEC.Stabilizer.Codes.Small.Shor9Logicals
-import QEC.Stabilizer.Codes.Small.Steane7
-import QEC.Stabilizer.Codes.Small.Steane7Logicals
-import QEC.Stabilizer.Codes.Small.Steane7TransversalGates
+import QEC.Stabilizer.Codes.Small.CSS_4_1_2
+import QEC.Stabilizer.Codes.Small.CSS_4_1_2Logicals
+import QEC.Stabilizer.Codes.Small.FiveQubit_5_1_3
+import QEC.Stabilizer.Codes.Small.FiveQubit_5_1_3Logicals
 import QEC.Stabilizer.Codes.Small.FourQubit_4_2_2
 import QEC.Stabilizer.Codes.Small.FourQubit_4_2_2Logicals
 import QEC.Stabilizer.Codes.Small.QuantumHamming
 import QEC.Stabilizer.Codes.Small.QuantumHammingLogicals
-import QEC.Stabilizer.Codes.Small.FiveQubit_5_1_3
-import QEC.Stabilizer.Codes.Small.FiveQubit_5_1_3Logicals
-import QEC.Stabilizer.Codes.Small.CSS_4_1_2
-import QEC.Stabilizer.Codes.Small.CSS_4_1_2Logicals
+import QEC.Stabilizer.Codes.Small.Shor9
+import QEC.Stabilizer.Codes.Small.Shor9Logicals
 import QEC.Stabilizer.Codes.Small.SixQubit_6_2_2
 import QEC.Stabilizer.Codes.Small.SixQubit_6_2_2Logicals
+import QEC.Stabilizer.Codes.Small.Steane7
+import QEC.Stabilizer.Codes.Small.Steane7Logicals
+import QEC.Stabilizer.Codes.Small.Steane7TransversalGates
 
 /-!
 # Small concrete codes
 
-Single-instance stabilizer codes: Shor's [[9,1,3]], Steane [[7,1,3]] (with
-transversal gates), the [[4,2,2]] code, quantum Hamming, the [[5,1,3]] perfect
-code (the first non-CSS code in the repo), the [[4,1,2]] LNCY CSS detection
-code, and Knill's C_6 [[6,2,2]] CSS detection code.
+Stabilizer codes on a fixed, small number of qubits, and the quantum Hamming
+family. Every code has the same two-file layout, described in
+`Codes/_TEMPLATE.lean`: `<Code>.lean` runs from the generators to the code with
+its distance, `stabilizerCodeWithDistance`, and `<Code>Logicals.lean` adds a
+logical basis, ending in `stabilizerCodeWithLogicals`.
 
-Every code has the same two-file layout:
-- `<Code>.lean` — the generators, the bundled `stabilizerCode`, and its
-  distance proof, ending in `stabilizerCodeWithDistance`. Self-contained: the
-  distance witness carries its own nontriviality proof, so nothing here depends
-  on a choice of logical basis.
-- `<Code>Logicals.lean` — the chosen logical basis, its (anti)commutation and
-  centralizer membership, ending in `stabilizerCodeWithLogicals`.
-
-Quantum Hamming, a parametric family, has no full logical basis yet, so its
-logicals file stops short of `stabilizerCodeWithLogicals`. Code-specific
-extras, such as `Steane7TransversalGates.lean`, build on the logicals file.
+- `CSS_4_1_2`, `CSS_4_1_2Logicals`: the LNCY code `[[4, 1, 2]]`, a CSS
+  detection code with one logical qubit.
+- `FourQubit_4_2_2`, `FourQubit_4_2_2Logicals`: the four-qubit detection code
+  `[[4, 2, 2]]`, with two logical qubits.
+- `SixQubit_6_2_2`, `SixQubit_6_2_2Logicals`: the six-qubit code `C₆`,
+  `[[6, 2, 2]]`, with two logical qubits.
+- `FiveQubit_5_1_3`, `FiveQubit_5_1_3Logicals`: the five-qubit code
+  `[[5, 1, 3]]`, which is not CSS.
+- `Steane7`, `Steane7Logicals`: the Steane code `[[7, 1, 3]]`.
+- `Steane7TransversalGates`: transversal `H` and `S` are logical gates of the
+  Steane code, acting as the logical Hadamard and phase gates.
+- `Shor9`, `Shor9Logicals`: Shor's code `[[9, 1, 3]]`, a degenerate code.
+- `QuantumHamming`, `QuantumHammingLogicals`: the quantum Hamming codes
+  `[[2^r − 1, 2^r − 1 − 2r, 3]]` for `r ≥ 3`, with the transversal logical pair
+  `X⊗ⁿ`, `Z⊗ⁿ`.
 -/
