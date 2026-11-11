@@ -43,13 +43,14 @@ build/MCP workflow. Volatile or topic-scoped knowledge lives elsewhere:
   them, and the linter rules for adding widget files. Read before editing
   `QECWidgets/`.
 - **[`QEC/Stabilizer/Codes/BivariateBicycle/README.md`](QEC/Stabilizer/Codes/BivariateBicycle/README.md)**
-  — orientation for the BB family (gross d=12 proof spine, instance
-  dirs, hypothesis-discharge map, engine-vs-analytic status,
-  generated-file manifest). Read before any BB edit. Generated files
-  carry `GENERATED FILE — DO NOT HAND-EDIT` banners: change the
-  generator (see qec-lab's `experiments/bb_lab/GENERATORS.md`) and
-  regenerate, landing both repos' changes together — never hand-edit
-  the emitted Lean.
+  — orientation for the bivariate bicycle (BB) family: which `Framework`
+  modules hold the general theory (chain complex, covers, doubling,
+  certificates), and where the concrete distance proofs live (the downstream
+  repo [bb-distance-lean](https://github.com/Stavan-Jain/bb-distance-lean),
+  which pins this library). Read before any BB edit.
+- **[`QEC/Stabilizer/Codes/Color/README.md`](QEC/Stabilizer/Codes/Color/README.md)**
+  — the triangular color-code family: interface, construction, and the shape
+  of the distance proof.
 
 ## Project tour
 
@@ -61,38 +62,50 @@ QEC/
     │   ├── PauliGroupSingle/    # Single-qubit Pauli operators (X, Y, Z, I, phases)
     │   ├── PauliGroup/          # n-qubit Pauli group + commutation theory
     │   └── BinarySymplectic/    # Symplectic representation, check matrices,
-    │                            # span and weight-two structure
+    │                            # the symplectic inner product
     ├── Framework/           # Abstract stabilizer + homological theory
     │   ├── Core/                # General stabilizer formalism, split three ways:
-    │   │   ├── Stabilizer/          # StabilizerGroup, Codespace, Centralizer,
-    │   │   │                        # SubgroupLemmas, StabilizerCode
-    │   │   ├── Logical/             # LogicalOperators, LogicalGates, LogicalCliffordAction,
-    │   │   │                        # CodeDistance (distance lives with logicals)
+    │   │   ├── Stabilizer/          # StabilizerGroup, Codespace(Dimension),
+    │   │   │                        # Centralizer, SubgroupLemmas,
+    │   │   │                        # GeneratorListLemmas, StabilizerCode
+    │   │   ├── Logical/             # LogicalOperators, LogicalOperatorCoset,
+    │   │   │                        # LogicalGates, LogicalGateGroup,
+    │   │   │                        # LogicalCliffordAction, CodeDistance
     │   │   └── CSS/                 # CSSPredicates, CSSNoNegI, CSSCommutationLemmas,
-    │   │                            # CSSDistance
+    │   │                            # CSSDistance (xOn / zOn, distance closers)
     │   ├── Symplectic/          # Stabilizer ↔ symplectic bridge: IndependentEquiv,
-    │   │                        # SymplecticOrthogonal, SupportLemmas (these import
-    │   │                        # Core; they are NOT in Foundations)
-    │   ├── Homological/         # Abstract chain-complex / CSS framework:
-    │   │                        # Code, CSS, Generators, StabGroup,
-    │   │                        # LogicalCorrespondence, Distance, BBChainComplex
-    │   └── FoldDouble/          # Qubit pairings: the phase-free Pauli group,
-    │                            # fold/double, the folded code, the code-agnostic
-    │                            # fold-and-double distance theorem, and its BB
-    │                            # instance (BBCover: fold = push1, double = pull1)
+    │   │                        # SymplecticSpan, SymplecticImage,
+    │   │                        # SymplecticOrthogonal, CentralizerStructure,
+    │   │                        # Presentation, SupportLemmas, WeightTwoInSpan
+    │   │                        # (these import Core; they are NOT in Foundations)
+    │   ├── Homological/         # Chain-complex (CSS) codes: Code, CSS, Generators,
+    │   │                        # StabGroup, LogicalCorrespondence, Distance,
+    │   │                        # Presentation, ToCode; the bivariate bicycle
+    │   │                        # theory (BB*, Covering, Bockstein*); and the
+    │   │                        # kernel-checked certificate layer (F2Mask,
+    │   │                        # BZCertificate, Certificate/)
+    │   ├── FoldDouble/          # Qubit pairings: the phase-free Pauli group,
+    │   │                        # fold/double, the folded code, the code-agnostic
+    │   │                        # fold-and-double distance theorem, and its BB
+    │   │                        # instance (BBCover: fold = push1, double = pull1)
+    │   └── Concatenation/       # CSS concatenation [[n₁n₂, k₂, ≥ d₁d₂]]
     ├── Geometry/            # Lattice-family-agnostic primitives:
     │                        # FinPeriodic, GridIndexing, CellComplexTypes
     └── Codes/               # Concrete codes, organized by family:
-        ├── _TEMPLATE.lean       # Canonical structural reference for new CSS codes
-        ├── BivariateBicycle/    # BB family, one subdir per instance:
-        │                        # Gross/. READ ITS
-        │                        # README.md BEFORE EDITING — task router,
-        │                        # discharge map, generated-file rules
-        ├── Toric/               # Parametric L×L toric code: CodeN, Chains,
-        │                        # BoundaryMaps, Homology, H1Dimension,
-        │                        # LogicalCorrespondence{X,Z}, ChainComplex,
-        │                        # Distance{,X,Z}, StabilizerCode (16 files)
-        ├── RotatedSurface/      # parametric N (9 files, same shape as Toric)
+        ├── _TEMPLATE.lean       # Canonical structural reference for new codes
+        ├── BivariateBicycle/    # README only: the family is defined for all
+        │                        # parameters in Framework/Homological (BB*);
+        │                        # BivariateBicycle.lean re-exports it
+        ├── Toric/               # Parametric L×L toric code: Chains, BoundaryMaps,
+        │                        # OperatorChains, Homology, ChainComplex, ChainOps,
+        │                        # H1Dimension, CodeN, (Dual)WrappingInvariants,
+        │                        # LogicalCorrespondence{X,Z}, Distance{,X,Z},
+        │                        # StabilizerCode, RankCertificate (17 files)
+        ├── RotatedSurface/      # Parametric odd-L rotated surface code: CellComplex,
+        │                        # BoundaryMaps, ChainComplex, N, H1Dimension,
+        │                        # StabilizerCode, Distance{,X,Z} (9 files)
+        ├── Color/               # Triangular honeycomb color codes (see its README)
+        ├── Iceberg/             # [[2m, 2m − 2, 2]] family: N.lean + NLogicals.lean
         ├── Repetition/          # Three.lean (3-qubit) + N.lean (parametric),
         │                        # each + <Code>Logicals.lean (as in Small/)
         └── Small/               # Single-instance codes: Shor9, Steane7
@@ -103,19 +116,19 @@ QEC/
                                  # <Code>Logicals.lean (→ WithLogicals)
 ```
 
-Everything under `Codes/` is `native_decide`-free. The instances that carried
+Everything under `Codes/` is `native_decide`-free. The instances that carry
 one are parked on branch `claude/z3z6-parked`:
 `BivariateBicycle/{Z3Z6,Z5Z15F2A6,BaseFloors}/`, `Codes/Concat/` (both Steane
-concatenations), and `RotatedSurface/Three.lean`. (The Steane distance proof,
-now in `Small/Steane7.lean`, was de-nativized and is back on `main`.)
-`Framework/` keeps the abstract machinery they exercised — notably
-`Framework/Concatenation/`, which now has no concrete instance in this tree.
+concatenations), and `RotatedSurface/Three.lean`. `Framework/` keeps the
+abstract machinery they exercise — notably `Framework/Concatenation/`, which
+has no concrete instance in this tree.
 
 **Layering** (lower can be imported by higher; not the reverse):
 
 ```
-Foundations  <  {Geometry, Framework.Core}  <  Framework.{Symplectic, Homological}
-            <  Framework.FoldDouble  <  Codes
+Foundations  <  {Geometry, Framework.Core}  <  Framework.Symplectic
+            <  Framework.{Homological, Concatenation}  <  Framework.FoldDouble
+            <  Codes
 ```
 
 Top-level umbrella `.lean` files at the *sibling* level of each directory
@@ -140,7 +153,7 @@ content there. Same convention for the sub-umbrellas
   `mkStabilizerFromGenerators` (`StabilizerCode.lean`) and
   `StabilizerCode.Presentation.toCode` (`Symplectic/Presentation.lean`). The
   `presentation` itself is computable unless its generator list is not
-  (rotated surface, gross).
+  (rotated surface, color).
 - **Tactics**:
   - `simp +decide` is preferred over hand-written `decide` (and avoids the
     "expected type must not contain free variables" trap).
@@ -164,7 +177,7 @@ content there. Same convention for the sub-umbrellas
   Always tag so the next session can grep for them.
 - **Global vs. `local instance` discipline**: by default, declare typeclass
   instances that service a single concrete code as `local instance` *inside
-  that code's file* (e.g. `Codes/FiveQubit_5_1_3.lean`). Reserve global
+  that code's file* (e.g. `Codes/Small/FiveQubit_5_1_3.lean`). Reserve global
   instances in `PauliGroup/`, `Core/`, `BinarySymplectic/`, `Homological/`
   for genuinely reusable typeclass content. **Always run a whole-repo
   `lake build` after adding a global instance** — the typeclass synthesizer
@@ -200,7 +213,7 @@ quietly. To check the whole repo the way CI does:
 lake env lean scripts/AxiomCheck.lean
 ```
 
-It walks every declaration defined under `QEC/` (~6.3k of them), reports each
+It walks every declaration defined under `QEC/` (~5.5k of them), reports each
 offender with its module and the offending axioms, and exits non-zero. It is
 not part of any `lean_lib`, so a normal `lake build` does not pay for it —
 but it needs a completed build to run against.
@@ -245,11 +258,12 @@ warning is either fixed cleanly or left visible. Don't reach for
 `set_option linter.X false in` even on tricky proofs — restructure, or
 accept the visible warning and document it as out-of-scope.
 
-The only category currently treated as out-of-scope is `linter.flexible`
-on the toric proofs under `Codes/Toric/` and the rotated-surface proofs
-under `Codes/RotatedSurface/` (the `simp_all +decide [...]` / `simp +decide [...]`
-family). Don't introduce new sites; existing ones will be cleaned up
-in a dedicated batch via the MCP union trick above.
+`QEC/Stabilizer/` builds with no warnings at all; keep it that way. In
+particular there is no `linter.flexible` site left (`simp_all +decide [...]`
+/ `simp +decide [...]` followed by further tactics) — if you hit the warning,
+use the MCP union trick below or, better, write the direct proof. The only
+warnings in a full build come from `QEC/Foundations/` (`Gates.lean`,
+`Tensor.lean`).
 
 ## Linter-clean idioms
 
@@ -366,8 +380,13 @@ These are local to this codebase — search here before assuming mathlib has the
   elements (`Z1 * X1 = X1 * Z1`, `Anticommute (weightOneAt i P) g`) close by
   `decide`; the `Anticommute` instance is `noncomputable` because `Mul` is,
   and `native_decide` does **not** work on it — prefer `decide`. The
-  [[5,1,3]] anti-witness tables (105 cases) and the Steane7 commutation
-  lemmas are the canonical users.
+  anticommute-witness lemmas of the literal codes in `Codes/Small/`
+  (`weight_one_anticomm_witness`, `weight_two_anticomm_witness`, stated over
+  the generator list and decided whole) are the canonical users. For
+  list-bounded statements `StabilizerCode.lean` pins `List.decidableBAll`
+  instances and provides `instDecidableCommuteList` /
+  `mem_centralizer_of_commute_list`, so "commutes with every generator" is a
+  one-line `by decide`.
 - `StabilizerGroup`, `.toSubgroup`, `.is_abelian`, `.one_mem`,
   `.neg_identity_not_mem`, `.codespaceSubmodule`
 - `IsNontrivialLogicalOperator` has **two** conditions (see
@@ -379,13 +398,37 @@ These are local to this codebase — search here before assuming mathlib has the
   operator part as `g`, so it can't be in the stabilizer).
 - `IsNontrivialLogicalOperator_of_toSubgroup_eq` — translates the predicate
   between two stabilizer groups with the same `toSubgroup`. Used to convert
-  `HasToricDistance`-style proofs (against `stabilizerGroup L`) into
-  `HasCodeDistance`-style proofs (against `(toricStabilizerCode L).toStabilizerGroup`).
-- `IsStabilizedBy`, `IsStabilizedVec`, `IsInCodespace`, `PreservesCodespaceConjugation`
+  proofs against a family's `stabilizerGroup L` into `HasCodeDistance`-style
+  proofs (against `(toricStabilizerCode L).toStabilizerGroup`).
+  `IsNontrivialLogicalOperator.weight_pos` and
+  `isNontrivialLogicalOperator_of_anticommute_centralizer` are the other two
+  everyday lemmas about the predicate.
+- **Distance closers**: `hasCodeDistance_of_isLeast` (`CodeDistance.lean`);
+  `hasCodeDistance_two_of_anticommute_witness`,
+  `hasCodeDistance_three_of_anticommute_witness`,
+  `hasCodeDistance_three_of_columns` (`Core/CSS/CSSDistance.lean`); and, for
+  chain-complex codes, `HomologicalCode.chainWeight_lower_bound_transfers`
+  (`Homological/Distance.lean`), which turns chain-level bounds on cycles and
+  dual cycles into a bound on every nontrivial Pauli logical.
+- **`xOn S` / `zOn S`** (`Core/CSS/CSSDistance.lean`): the X-type / Z-type
+  operator supported on a `Finset` of qubits, with `weight_xOn`,
+  `commutes_xOn_zOn_iff`, `anticommute_xOn_zOn_iff`,
+  `commutes_xOn_zOn_of_disjoint`. The parametric small families write every
+  generator and logical this way.
+- **Independence of a generator list**: `decide` for literal lists;
+  `rowsLinearIndependent_ofFn_of_pivots` / `rowsLinearIndependent_of_pivots`
+  (`Symplectic/IndependentEquiv.lean`) when each row has a pivot coordinate;
+  `HomologicalCode.linearIndependent_cellGenerator`
+  (`Homological/Presentation.lean`) when the cut map and `∂₂` are injective;
+  `rowsLinearIndependent_of_length_eq_finrank_sympImage`
+  (`Symplectic/SymplecticImage.lean`) when the list length equals the
+  dimension of the group's symplectic image.
+- `IsStabilizedBy`, `IsStabilizedVec`, `IsInCodespace`
 - `NQubitVec`, `Vector` (= `α → ℂ`), `NQubitBasis`
 - `Stabilizer.Lattice.rowMajor_injective`, `fin_ne_of_val_lt_offset_le`
 - `EdgeIdx`, `FaceIdx`, `VtxIdx`, `C0`/`C1`/`C2` chains, `next`/`prev`,
-  `zeroCoord`, `hEdge`/`vEdge`/`hEdgeIdx`/`vEdgeIdx`, `singleFace`, `singleVtx`
+  `zeroCoord`, `hEdge`/`vEdge`/`hEdgeIdx`/`vEdgeIdx`, `singleFace`, `singleVtx`;
+  `sum_comp_next`, `sum_comp_prev`, `eq_of_forall_next_eq` (`Geometry/FinPeriodic.lean`)
 - `Stabilizer.Lattice.eq_prev_iff_next_eq` (and `.next_prev`, `.prev_next`,
   `.next_ne_self`, `.prev_ne_self`) — use these instead of unfolding `next`/`prev`
   to raw `(i + 1) % L` / `(i + L - 1) % L`; `omega` chokes on the modular
@@ -393,10 +436,19 @@ These are local to this codebase — search here before assuming mathlib has the
 - `toricCycles`, `toricBoundaries`, `toricBoundary1`/`toricBoundary2`,
   `toricDualCycles`, `toricDualBoundaries`
 - `toricXOperatorOfChain`, `toricZOperatorOfChain` (and `_add`, `_zero` for
-  homomorphism); `toricVertexCutMap` (LinearMap C0 → C1)
-- `toricZOperatorOfChain_cutMap_singleVtx` /
-  `toricXOperatorOfChain_boundary_singleFace` — bridges single-stab vertex/face
-  ops to chain operators; key inputs for any homological identity proof.
+  homomorphism); `toricVertexCutMap` (LinearMap C0 → C1); `loopChain` /
+  `dualLoopChain` (the wrapping cycles); `edgeDual` / `toricDuality` (the
+  lattice duality that transports primal statements to the dual complex).
+- `vertexStab_eq_toricZOperatorOfChain` / `faceStab_eq_toricXOperatorOfChain`
+  (`Toric/CodeN.lean`) — bridges single-stab vertex/face ops to chain
+  operators; with `ZGenerators_eq_homologicalZGenerators`,
+  `XGenerators_eq_homologicalXGenerators` and
+  `stabilizerGroup_toSubgroup_eq_homologicalStabilizerGroup` they let every
+  commutation / centralizer / logical-correspondence fact come from
+  `Framework/Homological` (`chainXOperator_commutes_chainZOperator_iff`,
+  `chainXOperator_anticommutes_chainZOperator_iff`,
+  `chainXOperator_mem_centralizer_iff_mem_cycles`, …) rather than from
+  support bookkeeping. RotatedSurface and Color follow the same pattern.
 
 ## Build & verification
 
@@ -428,7 +480,7 @@ lake build && lake build QECLight && lake build QECBlueprint \
   `QECLight`. Removing or renaming one of them breaks it. Checked by
   `hosted-env`'s "Check Playground.lean elaborates" step.
 - **`QECBlueprint`** (root `QECBlueprint.lean`) carries the blueprint
-  annotations. Also outside `defaultTargets`. It names ~86 declarations by
+  annotations. Also outside `defaultTargets`. It names ~90 declarations by
   fully-qualified name, so **renaming or removing an annotated declaration
   breaks it** — and nothing else in the build will tell you. Checked by the
   `blueprint` workflow. See "Blueprint" below.
@@ -535,10 +587,8 @@ invalidates most of the tree), and run one Lean process at a time:
 LEAN_NUM_THREADS=2 lake build
 ```
 
-The heaviest gross modules are `Gross/SeamBZWalk` (the Brouwer–Zimmermann
-walks, ~80 s, ~0.5 GB above the import baseline) and `Gross/StabilizerCode`
-(~60 s). Quit or idle the Lean LSP first — its file workers hold gigabytes too,
-and a worker still elaborating a heavy file keeps doing so after an MCP request
+Quit or idle the Lean LSP first — its file workers hold gigabytes too, and a
+worker still elaborating a heavy file keeps doing so after an MCP request
 times out.
 
 **`decide` over a list of `Fintype`-typed elements.** `decide` on
@@ -546,7 +596,10 @@ times out.
 is a `Fintype` — e.g. `(BaseGroup → ZMod 2) × BaseGroup` — and the kernel then
 enumerates the whole type (`2³⁶ · 36` elements) instead of the list, exhausting
 memory within seconds. State such checks over data whose element type is not a
-`Fintype` (lists, `ℕ`), as `Gross/SeamBZ.lean` does with `kbSupports.zip kbFree`.
+`Fintype` (lists, `ℕ`), or make sure the list instance is the one found: for
+lists of Pauli group elements, `Core/Stabilizer/StabilizerCode.lean` and
+`Symplectic/IndependentEquiv.lean` pin `List.decidableBAll` for exactly this
+reason.
 
 ## Agent tooling: lean-lsp MCP
 
@@ -686,40 +739,54 @@ its `CLAUDE.md`, then `docs/pipeline-usage.md` (recipes) and
 Lean in a checkout of *this* repo (usually a worktree) while tracking
 their state in qec-lab.
 
-## Canonical CSS code structure (`_TEMPLATE.lean`)
+## Canonical code structure (`_TEMPLATE.lean`)
 
 `QEC/Stabilizer/Codes/_TEMPLATE.lean` is the canonical structural reference
-for formalizing a new stabilizer code. It documents the standard §1–§14
-section breakdown. §1–§6 is the **decide route**, the default for every
-literal code (generators → generator list → pairwise commutation by `decide`
-→ phase-zero + independence by `decide` → −I via
-`negIdentity_not_mem_of_indep_phase_zero_commute` → `StabilizerGroup`);
-§7–§9 is the **CSS route** kept for parametric families whose `List.ofFn`
-generator lists `decide` cannot evaluate (generator sets → Z/X typing →
-cross-commutation → −I via `CSS.negIdentity_not_mem_closure_union` →
-`listToSet` bridge); §10–§14 are logical operators → anticommutation →
-centralizer → `StabilizerCode.Presentation` → `StabilizerCode` +
-`StabilizerCodeWithLogicals` → distance,
-with variant notes for `k ≥ 2` codes, non-CSS codes, and parametric families.
+for formalizing a new stabilizer code. It fixes the two-file layout
+(`<Code>.lean` ends in `stabilizerCodeWithDistance`, `<Code>Logicals.lean`
+adds the logical basis and ends in `stabilizerCodeWithLogicals`), the section
+order, and the declaration names, and gives a copy-paste sample for each
+section:
+
+- The **decide route**, the default for every literal code, CSS or not:
+  *Generators* → *Decided hypotheses* (pairwise commutation, phase zero and
+  check-matrix independence, each one `decide`) → *No `−I`* (via
+  `negIdentity_not_mem_of_indep_phase_zero_commute`) → *Bundled
+  `StabilizerGroup n`* → *The bare code* (`presentation`, `stabilizerCode`) →
+  *Distance* (anticommute witnesses decided over the generator list, or the
+  column condition; a minimum-weight logical with its own nontriviality
+  proof).
+- The **CSS route**, for parametric families whose `List.ofFn` generator lists
+  `decide` cannot evaluate: generators `ZStab` / `XStab` written as `zOn S` /
+  `xOn S`, *Hypotheses on the generators* proved from the supports (typing,
+  cross-commutation by even overlap, independence by
+  `rowsLinearIndependent_ofFn_of_pivots`), `−I` via
+  `CSS.negIdentity_not_mem_closure_union`, and the `listToSet` bridge
+  (`listToSet_append`).
+- The logicals file: logical operators → anticommutation → centralizer
+  membership (`mem_centralizer_of_commute_list`) →
+  `stabilizerCodeWithLogicals`, with notes for `k ≥ 2` and non-CSS codes.
 
 Before drafting a new code file by hand or via the
 `qec-skeleton-drafter` agent (spec in qec-lab), **read `_TEMPLATE.lean`
-first**. The embedded code samples there are copy-paste-ready and capture
-the v4.30-era tactic patterns (notably the `_root_.mul_assoc` /
-`_root_.one_mul` qualification trick and the `change` step before `rw`
-after `closure_induction`).
+first**.
 
 Concrete instantiations of the template:
 
-- `Steane7.lean` + `Steane7Logicals.lean` — k = 1, n = 7, fully-supported
-  all-X / all-Z logicals; every `Codes/Small/` code has the same
-  code-file / logicals-file split (see `_TEMPLATE.lean` § "Two files per code")
-- `Shor9.lean` — k = 1, n = 9, repetition-of-cat encoding
+- `Small/Steane7.lean` + `Steane7Logicals.lean` — k = 1, n = 7,
+  fully-supported all-X / all-Z logicals; distance 3 by the column condition.
+  Every `Codes/Small/` code has the same code-file / logicals-file split.
+- `Small/FiveQubit_5_1_3.lean` — non-CSS; distance 3 by decided weight-1 and
+  weight-2 anticommute witnesses.
+- `Small/FourQubit_4_2_2Logicals.lean` — k = 2 logical basis.
 - `Repetition/{Three,N}.lean` (+ `…Logicals.lean`) — degenerate distance-1
-  cases
-- `RotatedSurfaceCodeN*.lean` — parametric family; distance proof
-  in sibling files using the homological framework
-- `ToricCodeN*.lean` — parametric family with trimmed-generator packaging
+  cases; `N` is the smallest example of the CSS route.
+- `Iceberg/N.lean`, `Small/QuantumHamming.lean` — parametric CSS families on
+  the CSS route.
+- `Toric/`, `RotatedSurface/`, `Color/` — lattice families: the code file
+  (`Toric/CodeN.lean`, `RotatedSurface/N.lean`, `Color/Code.lean`) identifies
+  the checks with a `HomologicalCode`, and commutation, independence and the
+  distance come from `Framework/Homological`.
 
 ## Stabilizer-code packaging (trimmed generator lists)
 
@@ -733,24 +800,34 @@ For the toric code, the natural `generatorsList L` in `Toric/CodeN.lean`
 has length `2L²` (all vertex + face stabs) and dependent rows, but the
 presentation needs `numQubits L - 2 = 2L² - 2` independent ones. The
 packaging is therefore built separately in `Toric/StabilizerCode.lean` with a
-trimmed list — see the note in `Toric/CodeN.lean` §6 for the cross-reference.
+trimmed list (`generatorsListPackaged L`: every vertex and face check except
+the ones at the origin).
 
 **Pattern for new packagings** (see `Toric/StabilizerCode.lean`):
 
 1. Define a trimmed list `generatorsListPackaged L` whose closure equals
    the existing `(stabilizerGroup L).toSubgroup` (`closure_packaged_eq_full`).
    Closure equality requires showing each *dropped* generator is in the
-   closure of the kept ones — i.e. the homological identities.
-2. Build a `StabilizerCode.Presentation n k` (`toricPresentation L`) with the
+   closure of the kept ones — i.e. the homological identities (the constant
+   chain is in the kernel of the cut map and of `∂₂`).
+2. Prove independence of the trimmed list. For the toric code this is a
+   dimension count, not a check-matrix computation: the list generates a
+   group whose symplectic image has dimension `n − dim H₁`, which equals the
+   list length (`rowsLinearIndependent_of_length_eq_finrank_sympImage`).
+3. Build a `StabilizerCode.Presentation n k` (`toricPresentation L`) with the
    trimmed list as `generatorsList`, and take the code to be its `toCode`.
-3. Expose `(toricStabilizerCode L).toStabilizerGroup.toSubgroup =
+4. Expose `(toricStabilizerCode L).toStabilizerGroup.toSubgroup =
    (stabilizerGroup L).toSubgroup` as a public lemma
    (`toricStabilizerCode_subgroup_eq`); use it to translate
    stabilizer-group-based proofs to stabilizer-code-based proofs via
    `IsNontrivialLogicalOperator_of_toSubgroup_eq`.
 
-This keeps existing distance proofs (which run against `stabilizerGroup L`)
-intact instead of forcing a downstream rewrite.
+This keeps the distance proofs (which run against `stabilizerGroup L`)
+independent of the choice of trimmed list.
+
+A code whose natural generator list is already independent needs none of
+this: the rotated surface code presents its full list, with independence from
+`HomologicalCode.linearIndependent_cellGenerator`.
 
 ## Umbrella files (orphan-module trap)
 

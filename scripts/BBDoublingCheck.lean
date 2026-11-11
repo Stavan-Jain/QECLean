@@ -2,12 +2,11 @@
 Regression checks for the generic BB doubling route.
 
 The small cover below has two base qubits and four cover qubits. It supplies
-its own certificates and derives distance two with the same logical-floor,
-Bézout, seam-coset, and assembly APIs used by Gross. It is a test fixture, not
-a second library definition of the existing four-qubit stabilizer code.
+its own certificates and derives distance two through the logical-floor,
+Bézout, seam-coset, and assembly theorems of `XDoubleCoverData`, so every
+hypothesis of the doubling route is discharged at least once. It is a test
+fixture, not a second library definition of the four-qubit stabilizer code.
 
-Gross-specific proof-dependency regressions live in the downstream
-bb-distance-lean repository alongside the Gross proof.
 Run after building QEC: `lake env lean scripts/BBDoublingCheck.lean`.
 -/
 import QEC.Stabilizer.Framework.FoldDouble.BBCover

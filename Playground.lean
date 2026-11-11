@@ -8,8 +8,8 @@ part of the library, and no `lean_lib` builds it.
 
 It imports `QECLight`, which is the library minus the bivariate-bicycle code
 family (too memory-hungry for a container or a shared session; see
-`QECLight.lean`). For the gross-code results, use `import QEC` in a local
-checkout with the memory to spare.
+`QECLight.lean`). For the bivariate-bicycle theory, use `import QEC` in a
+local checkout with the memory to spare.
 
 Put your cursor at the end of a line to see the goal state in the InfoView.
 -/
