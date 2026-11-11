@@ -21,6 +21,11 @@ Concatenation encodes each qubit of an *outer* code into a block carrying an
   inner product, and `inducedOuterOp_promoteOp`: inducing after promoting is
   the identity when `X̄` and `Z̄` anticommute. Hence promotion preserves the
   symplectic inner product (`symplecticInner_promoteOp_promoteOp`).
+- `inducedOuterOp_promoteOp_of_isXType` and `weight_promoteE_of_isXType`:
+  promoting an `X`-type outer operator `h` along any operator `X'` of logical
+  class `X` (not necessarily `X̄` itself) still induces `h`, and the result has
+  weight `X'.weight * h.weight`. With `X'` of minimum weight this is how
+  minimum-weight logical operators of a concatenated code arise.
 - `ConcatCSSData n₁ n₂ k₂` bundles an inner CSS code with one logical qubit
   and an outer CSS code, each with a generator list split into `Z`-type and
   `X`-type generators and with CSS-typed logical operators.
@@ -74,6 +79,24 @@ its factor at `b`. -/
     restrictBlockOp b (promoteOp Xbar Zbar h) = promoteSingle Xbar Zbar (h b) := by
   funext i
   simp [promoteOp]
+
+/-- The promotion of an `X`-type outer element `h` along `Xbar` has weight
+`Xbar.weight * h.weight`: it is `Xbar` on each block of the support of `h` and
+the identity on the other blocks. -/
+lemma weight_promoteE_of_isXType (Xbar Zbar : NQubitPauliOperator n₁)
+    {h : NQubitPauliGroupElement n₂} (hh : IsXType h.operators) :
+    (promoteE Xbar Zbar h).weight = Xbar.weight * h.weight := by
+  have key : ∀ b, (restrictBlock b (promoteE Xbar Zbar h)).weight =
+      if h.operators b ≠ PauliOperator.I then Xbar.weight else 0 := by
+    intro b
+    change (restrictBlockOp b (promoteOp Xbar Zbar h.operators)).weight = _
+    rw [restrictBlockOp_promoteOp]
+    rcases hh b with hI | hX
+    · simp [hI, promoteSingle]
+    · simp [hX, promoteSingle]
+  rw [weight_eq_sum_restrictBlock, Finset.sum_congr rfl fun b _ => key b, ← Finset.sum_filter,
+    Finset.sum_const, smul_eq_mul, mul_comm]
+  rfl
 
 /-! ## CSS types of promoted and embedded elements -/
 
@@ -146,6 +169,14 @@ lemma logicalClass_eq_I_iff {Xbar Zbar R : NQubitPauliOperator n₁} :
   rw [← PauliOperator.toSymplecticSingle_injective.eq_iff, toSymplecticSingle_logicalClass,
     PauliOperator.toSymplecticSingle_I, Prod.mk.injEq, and_comm]
 
+/-- The logical class of `R` is `X` iff `R` is orthogonal to `Xbar` and pairs
+to `1` with `Zbar`. -/
+lemma logicalClass_eq_X_iff {Xbar Zbar R : NQubitPauliOperator n₁} :
+    logicalClass Xbar Zbar R = PauliOperator.X ↔
+      symplecticInner R Xbar = 0 ∧ symplecticInner R Zbar = 1 := by
+  rw [← PauliOperator.toSymplecticSingle_injective.eq_iff, toSymplecticSingle_logicalClass,
+    PauliOperator.toSymplecticSingle_X, Prod.mk.injEq, and_comm]
+
 /-- Up to phase, the logical class is multiplicative. -/
 lemma logicalClass_mul (Xbar Zbar : NQubitPauliOperator n₁) (r s : NQubitPauliGroupElement n₁) :
     logicalClass Xbar Zbar (r * s).operators =
@@ -212,6 +243,21 @@ lemma inducedOuterOp_promoteOp {Xbar Zbar : NQubitPauliOperator n₁}
     inducedOuterOp Xbar Zbar (promoteOp Xbar Zbar h) = h :=
   funext fun b => by
     rw [inducedOuterOp, restrictBlockOp_promoteOp, logicalClass_promoteSingle hXZ (hY b)]
+
+/-- Promoting an `X`-type outer operator `h` along any operator `X'` of logical
+class `X` induces `h`: the block restrictions are `X'` on the support of `h`
+and the identity elsewhere. -/
+lemma inducedOuterOp_promoteOp_of_isXType {Xbar Zbar X' Z' : NQubitPauliOperator n₁}
+    (hX' : logicalClass Xbar Zbar X' = PauliOperator.X) {h : NQubitPauliOperator n₂}
+    (hh : IsXType h) : inducedOuterOp Xbar Zbar (promoteOp X' Z' h) = h :=
+  funext fun b => by
+    rw [inducedOuterOp, restrictBlockOp_promoteOp]
+    rcases hh b with hI | hX
+    · rw [hI]
+      exact logicalClass_eq_I_iff.mpr
+        ⟨symplecticInner_identity_left _, symplecticInner_identity_left _⟩
+    · rw [hX]
+      exact hX'
 
 /-- If `Xbar` and `Zbar` anticommute, promotion preserves the symplectic inner
 product of outer operators without `Y` factors. -/

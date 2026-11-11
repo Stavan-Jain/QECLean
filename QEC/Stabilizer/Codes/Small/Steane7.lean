@@ -38,6 +38,7 @@ The logical basis `X̄ = X⊗⁷`, `Z̄ = Z⊗⁷` is in `Steane7Logicals.lean`.
 ## Outline
 
 - Generators `Z1`–`Z3`, `X1`–`X3` and the list `generatorsList`
+- CSS type of the generators: `zChecks_isZType`, `xChecks_isXType`
 - Decided hypotheses: `generators_commute`, `AllPhaseZero_generatorsList`,
   `rowsLinearIndependent_generatorsList`
 - `negIdentity_not_mem`, the bundled `stabilizerGroup`
@@ -76,6 +77,18 @@ def X3 : NQubitPauliGroupElement 7 := σ[XIXXIIX]
 /-- The six generators as a list (Z-checks first, then X-checks). -/
 def generatorsList : List (NQubitPauliGroupElement 7) :=
   [Z1, Z2, Z3, X1, X2, X3]
+
+/-! ## CSS type -/
+
+/-- The three Z-checks are Z-type. -/
+lemma zChecks_isZType : ∀ g ∈ [Z1, Z2, Z3], IsZTypeElement g := by
+  simp only [List.mem_cons, List.not_mem_nil, or_false, forall_eq_or_imp, forall_eq]
+  decide
+
+/-- The three X-checks are X-type. -/
+lemma xChecks_isXType : ∀ g ∈ [X1, X2, X3], IsXTypeElement g := by
+  simp only [List.mem_cons, List.not_mem_nil, or_false, forall_eq_or_imp, forall_eq]
+  decide
 
 /-! ## Decided hypotheses
 

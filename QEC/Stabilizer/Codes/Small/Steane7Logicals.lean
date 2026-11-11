@@ -13,6 +13,9 @@ and they anticommute with each other (seven qubits, an odd number).
 - Anticommutation `logicalX_anticommutes_logicalZ`
 - Centralizer membership `logicalX_mem_centralizer`, `logicalZ_mem_centralizer`
 - `stabilizerCodeWithLogicals : Code[[7, 1]]ₗ`
+- CSS type `logicalX_isXType`, `logicalZ_isZType`, and the weight-3
+  representative of `X̄`: `minWeightLogical_commutes_logicalX`,
+  `minWeightLogical_anticommutes_logicalZ`
 - The logical `Y` operator `logicalY = i X̄ Z̄`, with `logicalY_eq_phase2_allY`
 -/
 
@@ -61,6 +64,30 @@ noncomputable def stabilizerCodeWithLogicals : Code[[7, 1]]ₗ where
   logicalOps _ := ⟨logicalX, logicalZ, logicalX_mem_centralizer, logicalZ_mem_centralizer,
     logicalX_anticommutes_logicalZ⟩
   logical_commute_cross ℓ ℓ' h := (h (Subsingleton.elim ℓ ℓ')).elim
+
+/-! ## CSS type and the minimum-weight representative
+
+`X̄` is X-type and `Z̄` is Z-type. The weight-3 logical `IIIXIXX` of
+`Steane7.lean` is `X̄ · X1`, a representative of `X̄`: it commutes with `X̄` and
+anticommutes with `Z̄`. -/
+
+/-- `X̄ = X⊗⁷` is X-type. -/
+lemma logicalX_isXType : NQubitPauliOperator.IsXType logicalX.operators := by decide
+
+/-- `Z̄ = Z⊗⁷` is Z-type. -/
+lemma logicalZ_isZType : NQubitPauliOperator.IsZType logicalZ.operators := by decide
+
+/-- `IIIXIXX` is X-type. -/
+lemma minWeightLogical_isXType : NQubitPauliOperator.IsXType minWeightLogical.operators := by
+  decide
+
+/-- `IIIXIXX` commutes with `X̄ = X⊗⁷`. -/
+lemma minWeightLogical_commutes_logicalX :
+    minWeightLogical * logicalX = logicalX * minWeightLogical := by decide
+
+/-- `IIIXIXX` and `Z̄ = Z⊗⁷` meet on qubits 3, 5 and 6, an odd number. -/
+lemma minWeightLogical_anticommutes_logicalZ : Anticommute minWeightLogical logicalZ := by
+  decide
 
 /-! ## Logical `Y` -/
 

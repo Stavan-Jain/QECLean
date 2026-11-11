@@ -1,4 +1,4 @@
-import QEC.Stabilizer.Framework.Concatenation.Promotion
+import QEC.Stabilizer.Framework.Concatenation.Independence
 
 /-!
 # Concatenation: the concatenated code
@@ -16,11 +16,12 @@ qubits with `k₂` logical qubits.
   generate a stabilizer group `concatStabGroup`.
 - `concatLogicalOps`: the promoted outer logical operators are logical
   operators of the concatenated code.
+- `promoteE_rep_mem_centralizer`: promoting an `X`-type element of the outer
+  centralizer along any element of the inner centralizer of logical class `X`
+  gives an element of the centralizer of `concatStabGroup`.
 - `concatPresentation`, `concatenate` and `concatenateWithLogicals`: the
   concatenated code as a presentation, as a `StabilizerCode (n₁ * n₂) k₂`, and
-  with its logical basis. They take the linear independence of the
-  check-matrix rows of the concatenated generators as a hypothesis;
-  `rowsLinearIndependent_concat` provides it.
+  with its logical basis.
 -/
 
 namespace Quantum.Concatenation
@@ -68,6 +69,15 @@ lemma logicalClass_eq_I_iff_commute (r : NQubitPauliGroupElement n₁) :
         r * D.Cin.logicalZ 0 = D.Cin.logicalZ 0 * r := by
   rw [logicalClass_eq_I_iff, commutes_iff_symplectic_inner_zero,
     commutes_iff_symplectic_inner_zero]
+  rfl
+
+/-- The logical class of an inner element is `X` iff it commutes with the inner
+logical `X` and anticommutes with the inner logical `Z`. -/
+lemma logicalClass_eq_X_iff_commute (r : NQubitPauliGroupElement n₁) :
+    logicalClass D.Xbar D.Zbar r.operators = PauliOperator.X ↔
+      r * D.Cin.logicalX 0 = D.Cin.logicalX 0 * r ∧ Anticommute r (D.Cin.logicalZ 0) := by
+  rw [logicalClass_eq_X_iff, commutes_iff_symplectic_inner_zero,
+    anticommutes_iff_symplectic_inner_one]
   rfl
 
 /-- An element of the inner stabilizer group has logical class `I`: it commutes
@@ -166,6 +176,37 @@ lemma promoteE_mem_centralizer {h : NQubitPauliGroupElement n₂}
   · exact (D.promoteE_commute_iff (D.outer_gen_noY hy) hY).mpr
       ((mem_centralizer_iff _ _).mp hh y (D.mem_Cout_of_mem_gens (D.outer_split.mem_iff.mpr hy)))
 
+/-- Promoting an `X`-type element `h` of the outer centralizer along an element
+`x` of the inner centralizer of logical class `X` gives an element of the
+centralizer of the concatenated stabilizer group. On each block it is `x` or
+the identity, which commute with the inner generators; and it induces `h`,
+which commutes with the outer generators.
+
+For `x` the inner logical `X` this is `promoteE_mem_centralizer`; a
+representative `x` of smaller weight gives a logical operator of smaller
+weight. -/
+lemma promoteE_rep_mem_centralizer {x : NQubitPauliGroupElement n₁}
+    (hx : x ∈ centralizer D.Cin.toStabilizerGroup)
+    (hxX : logicalClass D.Xbar D.Zbar x.operators = PauliOperator.X)
+    {h : NQubitPauliGroupElement n₂} (hhX : IsXType h.operators)
+    (hh : h ∈ centralizer D.Cout.toStabilizerGroup) :
+    promoteE x.operators D.Zbar h ∈ centralizer D.concatStabGroup := by
+  refine (mem_centralizer_iff_closure _ _ _ rfl).mpr fun s hs => ?_
+  obtain ⟨b, z, hz, rfl⟩ | ⟨y, hy, rfl⟩ := D.mem_concatGeneratorsList.mp hs
+  · rw [commutes_iff_symplectic_inner_zero, embedBlock_operators, promoteE_operators,
+      symplecticInner_embedBlockOp_left, restrictBlockOp_promoteOp]
+    rcases hhX b with hI | hX
+    · rw [hI]
+      exact symplecticInner_identity_right _
+    · rw [hX]
+      exact (commutes_iff_symplectic_inner_zero z x).mp
+        ((mem_centralizer_iff _ _).mp hx z (D.mem_Cin_of_mem_gens hz))
+  · rw [commutes_iff_symplectic_inner_zero, promoteE_operators, promoteE_operators,
+      symplecticInner_comm, symplecticInner_promoteOp _ _ _ (D.outer_gen_noY hy),
+      inducedOuterOp_promoteOp_of_isXType hxX hhX, symplecticInner_comm]
+    exact (commutes_iff_symplectic_inner_zero y h).mp
+      ((mem_centralizer_iff _ _).mp hh y (D.mem_Cout_of_mem_gens (D.outer_split.mem_iff.mpr hy)))
+
 /-- The logical `X` of logical qubit `ℓ` of the concatenated code: the promoted
 outer logical `X`. -/
 def concatLogicalX (ℓ : Fin k₂) : NQubitPauliGroupElement (n₁ * n₂) :=
@@ -224,33 +265,28 @@ lemma concat_logical_commute_cross (ℓ ℓ' : Fin k₂) (hne : ℓ ≠ ℓ') :
 
 /-! ## The concatenated code -/
 
-/-- The generator-list presentation of the concatenated code, given that the
-check-matrix rows of the concatenated generators are linearly independent. -/
-def concatPresentation (D : ConcatCSSData n₁ n₂ k₂)
-    (hindep : rowsLinearIndependent D.concatGeneratorsList) :
+/-- The generator-list presentation of the concatenated code. -/
+def concatPresentation (D : ConcatCSSData n₁ n₂ k₂) :
     StabilizerCode.Presentation (n₁ * n₂) k₂ where
   hk := D.Cout.hk.trans (Nat.le_mul_of_pos_left n₂ D.Cin.hk)
   generatorsList := D.concatGeneratorsList
   generators_length := D.concatGeneratorsList_length
   generators_phaseZero := D.concatGeneratorsList_phaseZero
-  generators_independent := hindep
+  generators_independent := D.rowsLinearIndependent_concat
   generators_commute := D.concat_generators_commute
   closure_no_neg_identity := D.concat_closure_no_neg_identity
 
 /-- The concatenation of an inner CSS code with one logical qubit and an outer
 CSS code, as a `StabilizerCode (n₁ * n₂) k₂`: the code presented by
 `concatPresentation`. Its stabilizer group is `concatStabGroup`. -/
-noncomputable def concatenate (D : ConcatCSSData n₁ n₂ k₂)
-    (hindep : rowsLinearIndependent D.concatGeneratorsList) :
-    StabilizerCode (n₁ * n₂) k₂ :=
-  (D.concatPresentation hindep).toCode
+noncomputable def concatenate (D : ConcatCSSData n₁ n₂ k₂) : StabilizerCode (n₁ * n₂) k₂ :=
+  D.concatPresentation.toCode
 
 /-- The concatenated code together with its logical basis, the promoted outer
 logical operators `concatLogicalOps`. -/
-noncomputable def concatenateWithLogicals (D : ConcatCSSData n₁ n₂ k₂)
-    (hindep : rowsLinearIndependent D.concatGeneratorsList) :
+noncomputable def concatenateWithLogicals (D : ConcatCSSData n₁ n₂ k₂) :
     StabilizerCodeWithLogicals (n₁ * n₂) k₂ where
-  toStabilizerCode := D.concatenate hindep
+  toStabilizerCode := D.concatenate
   logicalOps := D.concatLogicalOps
   logical_commute_cross := D.concat_logical_commute_cross
 
