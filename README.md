@@ -41,9 +41,13 @@ and other foundations. Import everything via `QEC`.
   distance proof). Concrete codes are built from a generator list through
   `StabilizerCode.Presentation`.
 - **Homological framework**: chain-complex (CSS) codes, the
-  logical-operator-to-homology correspondence, and the bivariate-bicycle
-  doubling layer (`Framework/Homological/BB*`): cover transfer, deck homotopy,
-  deck towers, Bockstein rank, and small-cycle base floors.
+  logical-operator-to-homology correspondence, the transfer of chain-weight
+  bounds to Pauli weights, and the bivariate-bicycle doubling layer
+  (`Framework/Homological/BB*`): cover transfer, deck homotopy, deck towers,
+  Bockstein rank, and small-cycle base floors.
+- **Fold-and-double**: a code-agnostic distance theorem for qubit pairings
+  (`Framework/FoldDouble/`), with the bivariate-bicycle double cover as its
+  instance.
 - **CSS concatenation framework**: a parametric `[[n₁n₂, k₂, ≥ d₁d₂]]`
   concatenation construction (`Framework/Concatenation/`).
 - **Concrete codes**: see the list below.
@@ -59,7 +63,8 @@ Every distance `d` listed in the parameters below is proved.
 | Bravyi360 (downstream) | `[[360, 12, 24]]` | [bb-distance-lean](https://github.com/Stavan-Jain/bb-distance-lean) |
 | Toric code, `L ≥ 2` | `[[2L², 2, L]]` | `Codes/Toric/` |
 | Rotated surface code, odd `L ≥ 3` | `[[L², 1, L]]` | `Codes/RotatedSurface/` |
-| Iceberg family, `m ≥ 2` | `[[2m, 2m − 2, 2]]` | `Codes/Iceberg/N.lean` |
+| Triangular color code, every `r` | `[[3r(r+1) + 1, 1, 2r + 1]]` | `Codes/Color/` |
+| Iceberg family, `m ≥ 2` | `[[2m, 2m − 2, 2]]` | `Codes/Iceberg/N*.lean` |
 | Five-qubit perfect code (non-CSS) | `[[5, 1, 3]]` | `Codes/Small/FiveQubit_5_1_3*.lean` |
 | Steane code | `[[7, 1, 3]]` | `Codes/Small/Steane7*.lean` |
 | `C_6` (Knill) | `[[6, 2, 2]]` | `Codes/Small/SixQubit_6_2_2*.lean` |
@@ -80,8 +85,8 @@ centralizer, with the required anticommutation) and, where the distance is
 proved, a `StabilizerCodeWithDistance`. In addition, for the Steane code,
 transversal `H` and `S` are verified as the logical Hadamard and phase gates.
 
-The single-instance and repetition codes (`Codes/Small/`, `Codes/Repetition/`)
-share one layout: `<Code>.lean` runs from the generators to the distance proof
+The single-instance, repetition and Iceberg codes (`Codes/Small/`,
+`Codes/Repetition/`, `Codes/Iceberg/`) share one layout: `<Code>.lean` runs from the generators to the distance proof
 and `stabilizerCodeWithDistance`, and `<Code>Logicals.lean` adds the chosen
 logical basis and `stabilizerCodeWithLogicals`. The distance proof does not
 depend on the logical basis.
@@ -89,7 +94,7 @@ depend on the logical basis.
 ## Headline results
 
 **Bivariate-bicycle distances.** The Gross `[[144,12,12]]` and Bravyi360
-`[[360,12,24]]` proofs now live in
+`[[360,12,24]]` proofs live in
 [bb-distance-lean](https://github.com/Stavan-Jain/bb-distance-lean), together with
 their certificates and generators. That repository pins QECLean and uses its
 general homological, cover, and doubling theory. See the
@@ -113,11 +118,20 @@ The homological distance argument is mechanized:
   on boundaries, and give an isomorphism `H₁ ≅ 𝔽₂²`.
 - **Distance lower bound.** Any nontrivial cycle has weight `≥ L`. One of `h`
   and `v` is `1`, which forces at least one edge in each of `L` disjoint slices.
-- **CSS bridge.** `d = min(d_X, d_Z)`, and both equal `L` by symmetry.
+- **Duality.** A relabelling of the edges identifies the dual complex with the
+  primal one, so the same bound holds for nontrivial dual cycles.
+- **Transfer to Pauli operators.** The framework turns the two chain-level
+  bounds into `weight ≥ L` for every nontrivial logical operator, of any Pauli
+  type; a wrapping loop of weight `L` attains it.
 
 **The rotated surface family.** For every odd `L ≥ 3`, the rotated surface code
 is a verified `[[L², 1, L]]` code (`rotatedSurfaceCodeN_distance_eq_L`). It is
 built on the same homological framework as the toric code.
+
+**The triangular color-code family.** For every `r`, the honeycomb color code
+of distance `2r + 1` is a verified `[[3r(r+1) + 1, 1, 2r + 1]]` code
+(`ColorCode.stabilizerCodeWithDistance`). See the
+[color-code overview](QEC/Stabilizer/Codes/Color/README.md).
 
 ## Project structure
 
@@ -127,14 +141,16 @@ QEC/
 └── Stabilizer/
     ├── Foundations/    # Pauli groups + binary-symplectic algebra
     ├── Framework/      # Core (stabilizer / logical / CSS), Symplectic,
-    │                   # Homological (incl. BB doubling), Concatenation
+    │                   # Homological (incl. BB doubling), Concatenation,
+    │                   # FoldDouble
     ├── Geometry/       # Lattice-family-agnostic primitives
-    └── Codes/          # BivariateBicycle, Toric, RotatedSurface, Iceberg,
-                        # Repetition, Small
+    └── Codes/          # BivariateBicycle, Toric, RotatedSurface, Color,
+                        # Iceberg, Repetition, Small
 ```
 
 Lower layers never import higher ones:
-`Foundations < {Geometry, Framework.Core} < Framework.{Symplectic, Homological} < Codes`.
+`Foundations < {Geometry, Framework.Core} < Framework.Symplectic <
+Framework.{Homological, Concatenation} < Framework.FoldDouble < Codes`.
 
 The repo also contains these companion libraries, all outside the default
 `lake build` target:
@@ -188,9 +204,10 @@ lake exe cache get   # prebuilt mathlib
 lake build
 ```
 
-A full build includes the gross code's kernel-checked leaves, which peak at
-several GB of memory each. On a <=16 GB machine, limit parallelism (for example
-`LEAN_NUM_THREADS=3 lake build`), or build `QECLight` instead.
+A full build runs many kernel-checked `decide` proofs side by side, which can
+exhaust memory at Lake's default parallelism. On a <=16 GB machine, limit
+parallelism (for example `LEAN_NUM_THREADS=3 lake build`), or build `QECLight`
+instead.
 
 The companion targets and checks that CI runs are:
 

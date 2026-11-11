@@ -1,9 +1,9 @@
 # Triangular honeycomb color codes
 
-This directory formalizes the triangular color-code family described in
-Ali Lavasani et al., *Quantum error correction well below the color code
-threshold*, p. 1 and Fig. 1(a), [arXiv:2610.24077]. The parameters count data
-qubits; syndrome-extraction ancillas are not part of the stabilizer code.
+This directory formalizes the triangular color-code family on the honeycomb
+(6.6.6) lattice: one logical qubit, odd distance `d = 2*r + 1`, on
+`3*r*(r+1) + 1` data qubits. The parameters count data qubits;
+syndrome-extraction ancillas are not part of the stabilizer code.
 
 Import `QEC.Stabilizer.Codes.Color`. The namespace is
 `Quantum.StabilizerGroup.ColorCode`.
@@ -49,10 +49,9 @@ The distance lower bound is a uniform induction on three-row shells:
    shell's energy relative to its inner and outer boundary labels.
 3. `LowerBound` inducts on the number of shells. The external labels are
    zero, giving the lower bound `2*r+1` without a distance hypothesis.
-4. `Distance` applies the existing CSS distance bridge and the boundary
-   witness to package the exact `[[n,k,d]]` parameters.
+4. `Distance` transfers the chain-level bound to arbitrary Pauli logicals
+   with `HomologicalCode.chainWeight_lower_bound_transfers` and uses the
+   boundary witness to package the exact `[[n,k,d]]` parameters.
 
 Only the constant-size local inequalities use finite case checking. The
 distance proof does not enumerate logical operators or bound `r`.
-
-[arXiv:2610.24077]: https://arxiv.org/abs/2610.24077
