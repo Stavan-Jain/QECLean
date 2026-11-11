@@ -497,7 +497,7 @@ lemma toricZOperatorOfChain_commutes_vertexStab
       by_cases h : ∃ e : EdgeIdx L, edgeToQubitIdx L e = j ∧ c e = 1
       · exact Or.inr (by simp [h])
       · exact Or.inl (by simp [h])⟩
-  exact StabilizerGroup.CSSCommutationLemmas.ZType_commutes
+  exact NQubitPauliGroupElement.IsZTypeElement.commute
     (StabilizerGroup.ToricCodeN.vertexStab_is_ZType L xv yv) hzZtype
 
 /-- Centralizer membership for Z-chain operator ↔ dual-cycle membership. -/

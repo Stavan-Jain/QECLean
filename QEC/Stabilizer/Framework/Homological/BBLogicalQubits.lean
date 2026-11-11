@@ -11,33 +11,28 @@ abelian group `G`, the first homology has dimension
 dim H₁ = 2 · dim (ker A ⊓ ker B)
 ```
 
-where `A` and `B` act on `G → ZMod 2` by convolution (`convLin`), and `ker a`
-is the scoped notation for the kernel of convolution by `a`. This is the
-logical-qubit count of Bravyi–Cross–Gambetta–Maslov–Rall–Yoder,
-*High-threshold and low-overhead fault-tolerant quantum memory* (Nature 627,
-2024), Lemma 1, and it is what `bbStabilizerCode` (`BBStabilizerCode.lean`)
-uses as its `k`.
+(`finrank_H1_bbChainComplex`), where `A` and `B` act on `G → ZMod 2` by
+convolution (`convLin`) and `ker a` is the scoped notation for the kernel of
+convolution by `a`. This is the number of logical qubits of the code, the `k`
+of `bbStabilizerCode`.
 
 ## The argument
 
-`ToCode.lean` and `Code.lean` give `dim H₁ = dim Z₁ − dim B₁` together with
-rank-nullity for `∂₁`, `∂₂`, and the cut map, and `rank cutMap = rank ∂₁`
-(`finrank_range_cutMap`, since the two are transposes). It remains to name
-the two kernels:
+`dim H₁ = dim Z₁ − dim B₁`, with rank-nullity for `∂₁`, `∂₂` and the cut map,
+and `rank cutMap = rank ∂₁` since the two are transposes
+(`HomologicalCode.finrank_range_cutMap`). It remains to name two kernels:
 
-- `ker ∂₂ = ker A ⊓ ker B` (`ker_bbBoundary2`): `∂₂ f = (A ⋆ f | B ⋆ f)`.
-- `ker cutMap = ker (reflect A) ⊓ ker (reflect B)` (`ker_cutMap`): by the
-  transpose formula `bb_cutMap_eq` of `BBDuality.lean`, the cut map is
-  `s ↦ (reflect B ⋆ s | reflect A ⋆ s)`, where `reflect a = a ∘ (-·)` is the
-  group-algebra antipode.
-- The two kernels have the same dimension
-  (`finrank_ker_inf_ker_reflect`): reflection is a linear automorphism of
-  the chain space carrying one onto the other, since
-  `reflect (a ⋆ f) = reflect a ⋆ reflect f`.
+* `ker_bbBoundary2`: `ker ∂₂ = ker A ⊓ ker B`, as `∂₂ f = (A ⋆ f | B ⋆ f)`;
+* `ker_cutMap`: `ker cutMap = ker (reflect A) ⊓ ker (reflect B)`, as the cut
+  map is `s ↦ (reflect B ⋆ s | reflect A ⋆ s)` (`bb_cutMap_eq`), where
+  `reflect a = a ∘ (-·)`.
 
-Writing `κ = dim (ker A ⊓ ker B)` and `|G|` for the group order,
-`rank ∂₂ = rank ∂₁ = |G| − κ`, so `dim Z₁ = 2|G| − (|G| − κ)`,
-`dim B₁ = |G| − κ`, and `dim H₁ = 2κ`.
+The two kernels have the same dimension (`finrank_ker_inf_ker_reflect`):
+reflection is a linear automorphism of the chain space (`reflectLin`) carrying
+one onto the other, since `reflect (a ⋆ f) = reflect a ⋆ reflect f`.
+
+Writing `κ = dim (ker A ⊓ ker B)`, this gives `rank ∂₂ = rank ∂₁ = |G| − κ`, so
+`dim Z₁ = 2|G| − (|G| − κ)`, `dim B₁ = |G| − κ` and `dim H₁ = 2κ`.
 -/
 
 namespace Quantum
@@ -90,6 +85,7 @@ like `⋆`; `ker A ⊓ ker B` is the common kernel whose dimension is half the
 number of logical qubits (`finrank_H1_bbChainComplex`). -/
 scoped notation:max "ker " a:max => LinearMap.ker (convLin a)
 
+/-- `f` lies in `ker A ⊓ ker B` iff `A ⋆ f = 0` and `B ⋆ f = 0`. -/
 lemma mem_ker_inf_ker {A B f : G → ZMod 2} :
     f ∈ ker A ⊓ ker B ↔ A ⋆ f = 0 ∧ B ⋆ f = 0 :=
   Iff.rfl
@@ -97,23 +93,8 @@ lemma mem_ker_inf_ker {A B f : G → ZMod 2} :
 /-- `ker ∂₂ = ker A ⊓ ker B`: `∂₂ f = (A ⋆ f | B ⋆ f)` vanishes iff both
 halves do. -/
 theorem ker_bbBoundary2 (A B : G → ZMod 2) :
-    LinearMap.ker (bbBoundary2 A B) = ker A ⊓ ker B := by
-  ext f
-  rw [LinearMap.mem_ker, mem_ker_inf_ker]
-  constructor
-  · intro h
-    refine ⟨funext fun g => ?_, funext fun g => ?_⟩
-    · have h0 : bbBoundary2Fn A B f (g, 0) = 0 := congrFun h (g, 0)
-      simpa [bbBoundary2Fn] using h0
-    · have h1 : bbBoundary2Fn A B f (g, 1) = 0 := congrFun h (g, 1)
-      simpa [bbBoundary2Fn] using h1
-  · rintro ⟨hA, hB⟩
-    funext ⟨g, j⟩
-    change bbBoundary2Fn A B f (g, j) = 0
-    simp only [bbBoundary2Fn]
-    split_ifs
-    · exact congrFun hA g
-    · exact congrFun hB g
+    LinearMap.ker (bbBoundary2 A B) = ker A ⊓ ker B :=
+  Submodule.ext fun f => bbBoundary2Fn_eq_zero_iff A B f
 
 /-- `reflect a ⋆ f = 0 ↔ a ⋆ reflect f = 0`: reflection is multiplicative and
 injective. -/
@@ -122,6 +103,8 @@ lemma reflect_conv_eq_zero_iff (a f : G → ZMod 2) :
   conv_lhs => rw [← reflect_reflect f, ← reflect_conv]
   exact reflect_eq_zero_iff _
 
+/-- `f` lies in `ker (reflect A) ⊓ ker (reflect B)` iff `reflect f` lies in
+`ker A ⊓ ker B`. -/
 lemma mem_ker_inf_ker_reflect_iff (A B f : G → ZMod 2) :
     f ∈ ker (reflect A) ⊓ ker (reflect B) ↔ reflect f ∈ ker A ⊓ ker B := by
   rw [mem_ker_inf_ker, mem_ker_inf_ker, reflect_conv_eq_zero_iff, reflect_conv_eq_zero_iff]
@@ -148,30 +131,21 @@ section LogicalQubits
 
 variable {G : Type} [Fintype G] [AddCommGroup G] [DecidableEq G]
 
-/-- `ker cutMap = ker (reflect A) ⊓ ker (reflect B)`: by the transpose formula
-`bb_cutMap_eq`, `cutMap s = (reflect B ⋆ s | reflect A ⋆ s)`. -/
+/-- `ker cutMap = ker (reflect A) ⊓ ker (reflect B)`: by `bb_cutMap_eq` the cut
+map is `s ↦ (reflect B ⋆ s | reflect A ⋆ s)`, which vanishes iff both halves
+do. -/
 theorem ker_cutMap (A B : G → ZMod 2) :
     LinearMap.ker (bbChainComplex A B).cutMap = ker (reflect A) ⊓ ker (reflect B) := by
   ext s
-  rw [LinearMap.mem_ker, bb_cutMap_eq]
-  change _ ↔ reflect A ⋆ s = 0 ∧ reflect B ⋆ s = 0
-  constructor
-  · intro h
-    refine ⟨funext fun g => ?_, funext fun g => ?_⟩
-    · simpa using congrFun h (g, 1)
-    · simpa using congrFun h (g, 0)
-  · rintro ⟨hA, hB⟩
-    funext ⟨g, j⟩
-    split_ifs
-    · exact congrFun hB g
-    · exact congrFun hA g
+  change (bbChainComplex A B).cutMap s = 0 ↔ reflect A ⋆ s = 0 ∧ reflect B ⋆ s = 0
+  rw [bb_cutMap_eq, and_comm]
+  exact halves_ext_iff
 
-/-- **`dim H₁ = 2 · dim (ker A ⊓ ker B)`** for the bivariate bicycle chain
-complex (Bravyi et al. 2024, Lemma 1). -/
+/-- The first homology of the bivariate bicycle chain complex has dimension
+`dim H₁ = 2 · dim (ker A ⊓ ker B)`. -/
 theorem finrank_H1_bbChainComplex (A B : G → ZMod 2) :
     Module.finrank (ZMod 2) (bbChainComplex A B).H1 =
       2 * Module.finrank (ZMod 2) ↥(ker A ⊓ ker B) := by
-  have hH1 := (bbChainComplex A B).finrank_H1_eq_cycles_sub_boundaries
   have hrn1 := (bbChainComplex A B).rank_nullity_boundary1
   have hrn2 := (bbChainComplex A B).rank_nullity_boundary2
   have hcut := (bbChainComplex A B).finrank_range_cutMap
@@ -190,7 +164,7 @@ theorem finrank_H1_bbChainComplex (A B : G → ZMod 2) :
       Module.finrank (ZMod 2) ↥(ker A ⊓ ker B) := by
     rw [ker_cutMap]
     exact finrank_ker_inf_ker_reflect A B
-  rw [hH1]
+  rw [(bbChainComplex A B).finrank_H1_eq_cycles_sub_boundaries]
   omega
 
 end LogicalQubits

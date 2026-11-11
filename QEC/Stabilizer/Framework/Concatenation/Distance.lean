@@ -2,115 +2,57 @@ import QEC.Stabilizer.Framework.Concatenation.Correspondence
 import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
 
 /-!
-# Concatenation, Tier 2b: the distance lower bound (Milestone M6)
+# Concatenation: the distance of the concatenated code
 
-Milestone **M6** of the CSS concatenation plan
-(`qec-lab:pipeline/attempts/concat_css_general/plan.md`) — the headline distance
-result.
+Concatenating an inner code of distance `d₁` with an outer code of distance
+`d₂` gives a code of distance at least `d₁ * d₂`.
 
-The structural core is `weight_ge_d1_mul_d2`: every nontrivial logical of the
-concatenated code has weight at least `d₁ · d₂`. The argument assembles the M5
-correspondence:
-
-* each block restriction of a nontrivial logical is either inner-stabilizer-like
-  or a *nontrivial inner logical* (the latter contributing weight ≥ `d₁`);
-* the nontrivial blocks are exactly the support of `inducedOuter`, which is a
-  *nontrivial outer logical* (so ≥ `d₂` of them);
-* weight superadditivity over the disjoint blocks (`weight_ge_of_blocks_ge`,
-  M1).
-
-`concat_hasCodeDistance` packages this into
-`HasCodeDistance (concatenate D) (d₁·d₂)`. The exact-distance *witness* (a
-nontrivial logical of weight exactly `d₁·d₂`) genuinely depends on
-minimum-weight logical representatives, which the abstract `ConcatCSSData` does
-not pin down, so it is an explicit hypothesis here and is exhibited concretely
-in the Steane⊗Steane instance (M7).
+- `ConcatCSSData.weight_ge_d1_mul_d2`: every nontrivial logical operator `g` of
+  the concatenated code has weight at least `d₁ * d₂`. Its induced outer
+  operator is a nontrivial logical operator of the outer code, so its support
+  has at least `d₂` blocks; on each of these blocks the restriction of `g` is a
+  nontrivial logical operator of the inner code, so it has weight at least
+  `d₁`.
+- `ConcatCSSData.concat_hasCodeDistance`: the concatenated code has distance
+  `d₁ * d₂`, given a nontrivial logical operator of weight `d₁ * d₂`.
+- `ConcatCSSData.concatenateWithDistance`: the concatenated code as a
+  `StabilizerCodeWithDistance (n₁ * n₂) k₂ (d₁ * d₂)`.
 -/
 
-namespace Quantum.Concatenation
+namespace Quantum
+
+namespace Concatenation.ConcatCSSData
 
 open NQubitPauliGroupElement StabilizerGroup
 
-variable {n₁ n₂ k₂ : ℕ} [NeZero n₁]
+variable {n₁ n₂ k₂ : ℕ} (D : ConcatCSSData n₁ n₂ k₂)
 
-/-- A nontrivial logical operator has positive weight: weight 0 means operator
-part `I`, which the identity stabilizer already realizes (contradicting the
-distinct-operator clause). -/
-lemma weight_pos_of_nontrivial {m : ℕ} {S : StabilizerGroup m} {g : NQubitPauliGroupElement m}
-    (hg : IsNontrivialLogicalOperator g S) : 0 < weight g := by
-  rcases Nat.eq_zero_or_pos (weight g) with h0 | h0
-  · exact absurd ((NQubitPauliGroupElement.one_operators_def m).trans
-      ((NQubitPauliGroupElement.weight_eq_zero_iff g).mp h0).symm)
-      (((IsNontrivialLogicalOperator_iff g S).mp hg).2 1 S.one_mem)
-  · exact h0
-
-/-- The number of support qubits of `g` lying in block `b` equals the weight of
-the block restriction (the `qIdx b`-image bijection of
-`image_qIdx_support_restrictBlock`). -/
-lemma card_block_filter_eq_restrictBlock_weight (b : Fin n₂)
-    (g : NQubitPauliGroupElement (n₁ * n₂)) :
-    (g.support.filter (fun q => blockOf q = b)).card = weight (restrictBlock b g) := by
-  rw [← image_qIdx_support_restrictBlock b g,
-    Finset.card_image_of_injective _ (fun i i' h => (qIdx_injective h).2)]
-  rfl
-
-namespace ConcatCSSData
-
-variable (D : ConcatCSSData n₁ n₂ k₂)
-
-/-- **(M6, the structural distance bound.)** Every nontrivial logical of the
-concatenated code has weight at least `d₁ · d₂`. Assembled entirely from the M5
-correspondence: `inducedOuter_support_eq` (nontrivial blocks = support of
-`inducedOuter`), `inducedOuter_isNontrivialLogical` (so `≥ d₂` of them),
-`HasCodeDistance.min_weight` on both codes, and `weight_ge_of_blocks_ge` (M1).
--/
+/-- Every nontrivial logical operator of the concatenated code has weight at
+least `d₁ * d₂`, where `d₁` and `d₂` are the distances of the inner and the
+outer code. -/
 theorem weight_ge_d1_mul_d2 {d₁ d₂ : ℕ} (h1 : HasCodeDistance D.Cin.toStabilizerCode d₁)
     (h2 : HasCodeDistance D.Cout.toStabilizerCode d₂)
     (g : NQubitPauliGroupElement (n₁ * n₂))
-    (hg : IsNontrivialLogicalOperator g D.concatStabGroup) (_hw : 0 < weight g) :
+    (hg : IsNontrivialLogicalOperator g D.concatStabGroup) :
     d₁ * d₂ ≤ weight g := by
-  classical
-  have hgc : g ∈ centralizer D.concatStabGroup := hg.1
-  -- Each nontrivial block contributes at least `d₁` to the weight.
-  have hblock : ∀ b ∈ (inducedOuter D g).support,
-      d₁ ≤ (g.support.filter (fun q => blockOf q = b)).card := by
-    intro b hbB
-    have hnt : IsNontrivialLogicalOperator (restrictBlock b g) D.Cin.toStabilizerGroup :=
-      (D.inducedOuter_support_eq g hgc b).mp hbB
-    rw [card_block_filter_eq_restrictBlock_weight]
-    exact HasCodeDistance.min_weight D.Cin.toStabilizerCode d₁ h1 _ hnt
-      (weight_pos_of_nontrivial hnt)
-  have hwt : d₁ * (inducedOuter D g).support.card ≤ weight g :=
-    weight_ge_of_blocks_ge d₁ g (inducedOuter D g).support hblock
-  -- The induced outer operator is a nontrivial outer logical: ≥ `d₂` nontrivial blocks.
-  have hntO : IsNontrivialLogicalOperator (inducedOuter D g) D.Cout.toStabilizerGroup :=
-    D.inducedOuter_isNontrivialLogical g hg
-  have hd2 : d₂ ≤ (inducedOuter D g).support.card :=
-    HasCodeDistance.min_weight D.Cout.toStabilizerCode d₂ h2 _ hntO
-      (weight_pos_of_nontrivial hntO)
-  calc d₁ * d₂ ≤ d₁ * (inducedOuter D g).support.card := Nat.mul_le_mul le_rfl hd2
-    _ ≤ weight g := hwt
+  have hO := D.inducedOuter_isNontrivialLogical g hg
+  calc d₁ * d₂ ≤ d₁ * (inducedOuter D g).support.card :=
+        Nat.mul_le_mul_left d₁ (h2.min_weight _ d₂ _ hO hO.weight_pos)
+    _ ≤ weight g := weight_ge_of_blocks_ge d₁ g _ fun b hb =>
+        have hb' := (D.mem_support_inducedOuter_iff g hg.1 b).mp hb
+        h1.min_weight _ d₁ _ hb' hb'.weight_pos
 
-/-- **(M6, headline.)** The concatenated code has distance `d₁ · d₂`: the lower
-bound is `weight_ge_d1_mul_d2`, and a weight-`d₁·d₂` nontrivial logical witness
-(which depends on the codes' minimum-weight representatives) is supplied as
-`hwit` — discharged concretely for Steane⊗Steane in M7. -/
+/-- The concatenated code has distance `d₁ * d₂`, given a nontrivial logical
+operator of weight `d₁ * d₂`; the lower bound is `weight_ge_d1_mul_d2`. -/
 theorem concat_hasCodeDistance
     (hindep : rowsLinearIndependent D.concatGeneratorsList)
     {d₁ d₂ : ℕ} (h1 : HasCodeDistance D.Cin.toStabilizerCode d₁)
     (h2 : HasCodeDistance D.Cout.toStabilizerCode d₂)
     (hwit : ∃ g, IsNontrivialLogicalOperator g D.concatStabGroup ∧ weight g = d₁ * d₂) :
-    HasCodeDistance (D.concatenate hindep) (d₁ * d₂) := by
-  refine ⟨Nat.mul_pos h1.1 h2.1, ?_, hwit⟩
-  intro g hg hw
-  exact D.weight_ge_d1_mul_d2 h1 h2 g hg hw
+    HasCodeDistance (D.concatenate hindep) (d₁ * d₂) :=
+  ⟨Nat.mul_pos h1.1 h2.1, fun g hg _ => D.weight_ge_d1_mul_d2 h1 h2 g hg, hwit⟩
 
-/-- **(M6, packaged.)** The concatenated code as a `StabilizerCodeWithDistance`
-— one object carrying all three `[[n₁ n₂, k₂, d₁ d₂]]` parameters in its type,
-combining `concatenate` with `concat_hasCodeDistance`. With this, any
-inner⊗outer instance becomes a first-class `[[n, k, d]]` code once its four
-inputs (row independence of the concatenated list, inner/outer distances, and a
-`d₁·d₂`-weight witness) are discharged. -/
+/-- The concatenated code together with its distance `d₁ * d₂`. -/
 noncomputable def concatenateWithDistance
     (hindep : rowsLinearIndependent D.concatGeneratorsList)
     {d₁ d₂ : ℕ} (h1 : HasCodeDistance D.Cin.toStabilizerCode d₁)
@@ -120,6 +62,6 @@ noncomputable def concatenateWithDistance
   toStabilizerCode := D.concatenate hindep
   hasDistance := D.concat_hasCodeDistance hindep h1 h2 hwit
 
-end ConcatCSSData
+end Concatenation.ConcatCSSData
 
-end Quantum.Concatenation
+end Quantum

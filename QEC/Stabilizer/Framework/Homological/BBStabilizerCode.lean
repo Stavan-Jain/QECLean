@@ -1,43 +1,39 @@
-import QEC.Stabilizer.Framework.Homological.BBChainComplex
-import QEC.Stabilizer.Framework.Homological.ToCode
 import QEC.Stabilizer.Framework.Homological.BBLogicalQubits
 
 /-!
 # The bivariate bicycle code as a `StabilizerCode`
 
 A bivariate bicycle code is determined by two cycle lengths `ℓ, m` and two
-polynomials `A, B ∈ 𝔽₂[x, y] / (xˡ − 1, yᵐ − 1)`, written here as
-`ZMod 2`-valued functions on the group `ZMod ℓ × ZMod m` (the `poly[…]`
-literal of `BBChainComplex.lean` builds them from a polynomial expression).
-`bbChainComplex A B` is the corresponding length-3 chain complex, and the
-hypothesis-free `HomologicalCode.toStabilizerCode` (`ToCode.lean`) turns any
-chain complex into a stabilizer code whose number of logical qubits is
-`dim H₁`.
+polynomials `A, B ∈ 𝔽₂[x, y] / (xˡ − 1, yᵐ − 1)`, written as `ZMod 2`-valued
+functions on the group `ZMod ℓ × ZMod m` (the `poly[…]` literal builds them
+from a polynomial expression). `bbChainComplex A B` is the corresponding
+length-3 chain complex, and `HomologicalCode.toStabilizerCode` turns any chain
+complex into a stabilizer code with `dim H₁` logical qubits.
 
-This file names the composite, with the logical-qubit count of
-`BBLogicalQubits.lean` in its type:
+This file names the composite, with the logical-qubit count
+`finrank_H1_bbChainComplex : dim H₁ = 2 · dim (ker A ⊓ ker B)` in its type:
 
 ```
 bbStabilizerCode ℓ m A B :
     StabilizerCode (2 * (ℓ * m)) (2 * Module.finrank (ZMod 2) ↥(ker A ⊓ ker B))
 ```
 
-`bbChainComplex` counts its qubits as `bbNumQubits G = 2 * Fintype.card G`,
-which is only propositionally `2 * (ℓ * m)` (`bbNumQubits_zmod`). Since
-`numQubits` is a field of `HomologicalCode` chosen by each instance,
-`bbHomologicalCode ℓ m A B` is the same chain complex with its qubit count
-written as `2 * (ℓ * m)` (`HomologicalCode.withNumQubits`), so that the
-stabilizer code lives on `2ℓm` qubits definitionally. The `rfl` lemmas
-identify its stabilizer group with the closure of the face checks `[A | B]`
-and vertex checks `[Bᵀ | Aᵀ]`.
+Here `A` and `B` act on `ZMod ℓ × ZMod m → ZMod 2` by convolution and `ker a`
+is the scoped notation for the kernel of convolution by `a`. A numeral `k` for
+particular `A, B` is then a kernel computation.
 
-The number of logical qubits is `2 · dim (ker A ⊓ ker B)`, where `A` and `B`
-act on `ZMod ℓ × ZMod m → ZMod 2` by convolution and `ker a` is the scoped
-notation for the kernel of convolution by `a` (`BBLogicalQubits.lean`): the
-generic code has `dim H₁` logical qubits, and `finrank_H1_bbChainComplex`
-is `dim H₁ = 2 · dim (ker A ⊓ ker B)`. A numeral `k`
-is then a kernel computation for the particular `A, B` (for the gross code,
-`12`; its proof lives downstream in `bb-distance-lean`, which pins QECLean).
+## Main definitions
+
+* `HomologicalCode.withNumQubits`: a chain complex with its qubit count
+  rewritten to a propositionally equal number, with the same cells, boundary
+  maps and homology.
+* `bbHomologicalCode ℓ m A B`: `bbChainComplex A B` with its qubit count
+  `bbNumQubits G = 2 * Fintype.card G` written as `2 * (ℓ * m)`
+  (`bbNumQubits_zmod`), so that the stabilizer code lives on `2ℓm` qubits
+  definitionally.
+* `bbStabilizerCode ℓ m A B`: the stabilizer code. Its stabilizer group is the
+  closure of the X-checks (rows of `[A | B]`) and the Z-checks (rows of
+  `[Bᵀ | Aᵀ]`), as `bbStabilizerCode_toSubgroup` states by `rfl`.
 -/
 
 namespace Quantum
@@ -94,11 +90,11 @@ noncomputable def bbHomologicalCode (ℓ m : ℕ) [NeZero ℓ] [NeZero m]
     (A B : ZMod ℓ × ZMod m → ZMod 2) : HomologicalCode :=
   (bbChainComplex A B).withNumQubits (2 * (ℓ * m)) (bbNumQubits_zmod ℓ m)
 
-/-- **The bivariate bicycle code** with cycle lengths `ℓ, m` and polynomials
-`A, B` on `ZMod ℓ × ZMod m`: the stabilizer code of the BB chain complex, on
-`2ℓm` qubits, with `2 · dim (ker A ⊓ ker B)` logical qubits
+/-- The bivariate bicycle code with cycle lengths `ℓ, m` and polynomials `A, B`
+on `ZMod ℓ × ZMod m`: the stabilizer code of the bivariate bicycle chain
+complex, on `2ℓm` qubits, with `2 · dim (ker A ⊓ ker B)` logical qubits
 (`finrank_H1_bbChainComplex`). Its stabilizer group is the closure of all
-face and vertex checks, with no independence hypothesis on them. -/
+X-checks and Z-checks, with no independence hypothesis on them. -/
 noncomputable def bbStabilizerCode (ℓ m : ℕ) [NeZero ℓ] [NeZero m]
     (A B : ZMod ℓ × ZMod m → ZMod 2) :
     StabilizerGroup.StabilizerCode (2 * (ℓ * m))
@@ -130,9 +126,10 @@ variable {ℓ m : ℕ} [NeZero ℓ] [NeZero m] (A B : ZMod ℓ × ZMod m → ZMo
     Module.finrank (ZMod 2) (bbHomologicalCode ℓ m A B).H1 =
       Module.finrank (ZMod 2) (bbChainComplex A B).H1 := rfl
 
-/-- The logical-qubit count of `bbStabilizerCode` is `dim H₁` of the BB chain
-complex: it has the stabilizer group of `toStabilizerCode` of the chain
-complex, and differs from it only in how `k` is written. -/
+/-- The logical-qubit count of `bbStabilizerCode` is `dim H₁` of the bivariate
+bicycle chain complex: the code has the stabilizer group of
+`toStabilizerCode` of the chain complex, and differs from it only in how `k`
+is written. -/
 theorem bbStabilizerCode_k_eq_finrank_H1 :
     2 * Module.finrank (ZMod 2) ↥(ker A ⊓ ker B) =
       Module.finrank (ZMod 2) (bbChainComplex A B).H1 :=
@@ -146,17 +143,16 @@ stabilizer group of its chain complex. -/
   rfl
 
 /-- The stabilizer subgroup of a bivariate bicycle code is the closure of the
-face checks (`X`-type, rows of `[A | B]`) and vertex checks (`Z`-type, rows
-of `[Bᵀ | Aᵀ]`). -/
+X-checks (rows of `[A | B]`) and the Z-checks (rows of `[Bᵀ | Aᵀ]`). -/
 @[simp] theorem bbStabilizerCode_toSubgroup :
     (bbStabilizerCode ℓ m A B).toStabilizerGroup.toSubgroup =
       Subgroup.closure (bbHomologicalCode ℓ m A B).homologicalGenerators :=
   rfl
 
-/-! ## Example: the gross code parameters
+/-! ## Example
 
-`ℓ = 12`, `m = 6`, `A = x³ + y + y²`, `B = y³ + x + x²` give a code on
-`144` qubits, definitionally. -/
+`ℓ = 12`, `m = 6`, `A = x³ + y + y²`, `B = y³ + x + x²` (the gross code) give a
+code on `144` qubits, definitionally. -/
 
 noncomputable example :
     StabilizerGroup.StabilizerCode 144

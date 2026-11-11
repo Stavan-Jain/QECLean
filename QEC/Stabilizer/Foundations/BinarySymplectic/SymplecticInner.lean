@@ -79,6 +79,26 @@ lemma toSymplecticSingle_snd_eq_one_of_fst_eq_zero {P : PauliOperator} (hP : P �
   · exact absurd rfl hP
   all_goals first | rfl | exact absurd h (by decide)
 
+/-! ### Symmetry and additivity -/
+
+/-- The single-qubit symplectic product is symmetric. -/
+lemma symplecticProductSingle_comm (P Q : PauliOperator) :
+    symplecticProductSingle P Q = symplecticProductSingle Q P := by
+  unfold symplecticProductSingle
+  ring
+
+/-- Every Pauli operator commutes with itself. -/
+lemma symplecticProductSingle_self (P : PauliOperator) : symplecticProductSingle P P = 0 := by
+  cases P <;> decide
+
+/-- The single-qubit symplectic product is additive in its first argument with
+respect to the product of Pauli operators. -/
+lemma symplecticProductSingle_mulOp_left (P Q R : PauliOperator) :
+    symplecticProductSingle (P.mulOp Q).operator R =
+      symplecticProductSingle P R + symplecticProductSingle Q R := by
+  simp only [symplecticProductSingle, toSymplecticSingle_add]
+  ring
+
 end PauliOperator
 
 namespace NQubitPauliOperator
@@ -181,6 +201,43 @@ lemma toSymplectic_add (p q : NQubitPauliOperator n) (j : Fin (n + n)) :
       (PauliOperator.toSymplecticSingle_add (p ⟨j.val, hj⟩) (q ⟨j.val, hj⟩))
   · exact congr_arg Prod.snd
       (PauliOperator.toSymplecticSingle_add (p ⟨j.val - n, by omega⟩) (q ⟨j.val - n, by omega⟩))
+
+/-- The symplectic inner product is symmetric. -/
+lemma symplecticInner_comm (p q : NQubitPauliOperator n) :
+    symplecticInner p q = symplecticInner q p :=
+  Finset.sum_congr rfl fun i _ => PauliOperator.symplecticProductSingle_comm (p i) (q i)
+
+/-- Every operator is orthogonal to itself. -/
+lemma symplecticInner_self (p : NQubitPauliOperator n) : symplecticInner p p = 0 :=
+  Finset.sum_eq_zero fun i _ => PauliOperator.symplecticProductSingle_self (p i)
+
+/-- The identity operator is orthogonal to every operator. -/
+lemma symplecticInner_identity_left (q : NQubitPauliOperator n) :
+    symplecticInner (identity n) q = 0 :=
+  Finset.sum_eq_zero fun i _ => PauliOperator.symplecticProductSingle_I_left (q i)
+
+/-- Every operator is orthogonal to the identity operator. -/
+lemma symplecticInner_identity_right (p : NQubitPauliOperator n) :
+    symplecticInner p (identity n) = 0 :=
+  Finset.sum_eq_zero fun i _ => PauliOperator.symplecticProductSingle_I_right (p i)
+
+/-- The symplectic inner product is additive in its first argument with respect
+to the qubit-wise product of operators. -/
+lemma symplecticInner_mulOp_left (p q r : NQubitPauliOperator n) :
+    symplecticInner (NQubitPauliGroupElement.mulOp p q).operators r =
+      symplecticInner p r + symplecticInner q r := by
+  unfold symplecticInner
+  rw [← Finset.sum_add_distrib]
+  exact Finset.sum_congr rfl fun i _ =>
+    PauliOperator.symplecticProductSingle_mulOp_left (p i) (q i) _
+
+/-- The symplectic inner product is additive in its second argument with respect
+to the qubit-wise product of operators. -/
+lemma symplecticInner_mulOp_right (p q r : NQubitPauliOperator n) :
+    symplecticInner p (NQubitPauliGroupElement.mulOp q r).operators =
+      symplecticInner p q + symplecticInner p r := by
+  rw [symplecticInner_comm, symplecticInner_mulOp_left, symplecticInner_comm q,
+    symplecticInner_comm r]
 
 /-- The symplectic inner product counts, modulo `2`, the qubits at which the
 two operators anticommute. -/

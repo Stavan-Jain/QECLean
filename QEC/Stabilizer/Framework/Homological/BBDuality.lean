@@ -1,32 +1,32 @@
-/-
-# Chain-level X/Z duality for BB chain complexes
-
-For a BB chain complex `bbChainComplex A B` over a finite abelian group `G`,
-the block-swap-and-negate equivalence
-
-  `Φ : (g, j) ↦ (-g, swap j)`
-
-exchanges the primal chain data (`cycles`, `boundaries`) with the dual chain
-data (`dualCycles`, `dualBoundaries`) while preserving chain weight.  The
-upshot (`bb_cycle_bound_iff_dual_bound`) is that any chain-weight lower bound
-on the X side transfers verbatim to the Z side: `d_X = d_Z` at the chain
-level, for every BB code at once.
-
-## Convention bridge (lab notes → repo)
-
-Repo convention (`BBChainComplex.lean`): `∂₂ f = (A⋆f | B⋆f)` and
-`∂₁ c = B⋆c_L + A⋆c_R`, so the cycle condition is `B⋆v_L = A⋆v_R`.
-Repo-left = lab-right.  The transpose formulas below follow this convention:
-
-* `dualBoundary c = (reflect A) ⋆ c_L + (reflect B) ⋆ c_R`
-* `cutMap s = ((reflect B) ⋆ s | (reflect A) ⋆ s)`
-
-where `reflect a = a ∘ (-·)` implements the `𝔽₂[G]`-antipode (transpose of
-convolution-multiplication).
--/
-
 import QEC.Stabilizer.Framework.Homological.Covering
 import QEC.Stabilizer.Framework.Homological.LogicalCorrespondence
+
+/-!
+# X/Z duality of the bivariate bicycle chain complex
+
+For the bivariate bicycle complex `bbChainComplex A B` over a finite abelian
+group `G`, with `∂₂ f = (A ⋆ f | B ⋆ f)` and `∂₁ c = B ⋆ c_L + A ⋆ c_R`, the
+transposes of the boundary maps are again convolutions, by the reflected
+elements `reflect a = a ∘ (-·)`:
+
+* `bb_dualBoundary_eq`: `dualBoundary c = reflect A ⋆ c_L + reflect B ⋆ c_R`;
+* `bb_cutMap_eq`: `cutMap s = (reflect B ⋆ s | reflect A ⋆ s)`.
+
+So the dual of the complex of `(A, B)` is the complex of
+`(reflect B, reflect A)`, and the map `bbDualFn c = c ∘ blockSwapNeg`, which
+negates the group coordinate and swaps the two blocks of qubits, is a
+weight-preserving involution exchanging the two:
+
+* `bbDual_mem_dualCycles_iff`: `bbDualFn c` is a dual cycle iff `c` is a cycle;
+* `bbDual_mem_dualBoundaries_iff`: `bbDualFn c` is a dual boundary iff `c` is a
+  boundary;
+* `bbDual_chainWeight`: `bbDualFn` preserves `chainWeight`.
+
+Consequently (`bb_cycle_bound_iff_dual_bound`) a lower bound on the weight of
+the cycles that are not boundaries holds iff the same bound holds for the dual
+cycles that are not dual boundaries: the X- and Z-distances of a bivariate
+bicycle code agree at the level of chains.
+-/
 
 namespace Quantum
 namespace Stabilizer
@@ -35,34 +35,33 @@ namespace BB
 
 open scoped BigOperators
 
-/-! ## The reflection (group antipode) on `ZMod 2`-chains -/
+/-! ## Reflection of chains -/
 
 section Reflect
 
 variable {G : Type} [AddCommGroup G]
 
-/-- Reflection of a chain through the group inverse: `(reflect a)(g) = a(-g)`.
-This is the `𝔽₂[G]`-antipode; transposing convolution-by-`a` gives
-convolution-by-`reflect a`. -/
+/-- Reflection of a chain through the group inverse: `reflect a g = a (-g)`.
+This is the antipode of the group algebra `𝔽₂[G]`; convolution by `reflect a`
+is the transpose of convolution by `a` (`reflect_conv_apply`). -/
 def reflect (a : G → ZMod 2) : G → ZMod 2 := fun g => a (-g)
 
 @[simp] lemma reflect_apply (a : G → ZMod 2) (g : G) :
     reflect a g = a (-g) := rfl
 
-@[simp] lemma reflect_reflect (a : G → ZMod 2) : reflect (reflect a) = a := by
-  funext g
-  simp
+/-- Reflection is an involution. -/
+@[simp] lemma reflect_reflect (a : G → ZMod 2) : reflect (reflect a) = a :=
+  funext fun g => congrArg a (neg_neg g)
 
-lemma reflect_eq_zero_iff (a : G → ZMod 2) : reflect a = 0 ↔ a = 0 := by
-  constructor
-  · intro h
-    funext g
-    have hg := congrFun h (-g)
-    simpa using hg
-  · rintro rfl
-    funext g
-    simp
+/-- Reflection is injective, being an involution. -/
+lemma reflect_injective : Function.Injective (reflect (G := G)) :=
+  Function.LeftInverse.injective reflect_reflect
 
+/-- A chain vanishes iff its reflection does. -/
+lemma reflect_eq_zero_iff (a : G → ZMod 2) : reflect a = 0 ↔ a = 0 :=
+  reflect_injective.eq_iff' rfl
+
+/-- Reflection is multiplicative: `reflect (a ⋆ b) = reflect a ⋆ reflect b`. -/
 lemma reflect_conv [Fintype G] (a b : G → ZMod 2) :
     reflect (a ⋆ b) = reflect a ⋆ reflect b := by
   funext g
@@ -73,289 +72,171 @@ lemma reflect_conv [Fintype G] (a b : G → ZMod 2) :
   congr 1
   abel_nf
 
-/-! ## The block-swap-and-negate equivalence Φ -/
+/-- Convolution by `reflect q` is the transpose of convolution by `q`:
+`(reflect q ⋆ s) g = ∑ v, s v * q (v - g)`. -/
+lemma reflect_conv_apply [Fintype G] (q s : G → ZMod 2) (g : G) :
+    (reflect q ⋆ s) g = ∑ v, s v * q (v - g) := by
+  rw [conv_comm, conv_apply]
+  simp only [reflect_apply, neg_sub]
 
-/-- The duality equivalence on BB qubits: negate the group coordinate and swap
-the L/R block. -/
+/-! ## The duality map on 1-chains -/
+
+/-- The duality equivalence on the qubits of a bivariate bicycle code: negate
+the group coordinate and swap the two blocks. -/
 def blockSwapNeg : (G × Fin 2) ≃ (G × Fin 2) :=
   (Equiv.neg G).prodCongr (Equiv.swap 0 1)
 
 @[simp] lemma blockSwapNeg_apply_zero (g : G) :
-    blockSwapNeg (g, (0 : Fin 2)) = (-g, 1) := by
-  simp [blockSwapNeg]
+    blockSwapNeg (g, (0 : Fin 2)) = (-g, 1) := rfl
 
 @[simp] lemma blockSwapNeg_apply_one (g : G) :
-    blockSwapNeg (g, (1 : Fin 2)) = (-g, 0) := by
-  simp [blockSwapNeg, Equiv.swap_apply_right]
+    blockSwapNeg (g, (1 : Fin 2)) = (-g, 0) := rfl
 
-/-- The chain-level duality map `Φ c := c ∘ blockSwapNeg`. -/
+/-- `blockSwapNeg` is an involution. -/
+lemma blockSwapNeg_involutive (p : G × Fin 2) :
+    blockSwapNeg (blockSwapNeg p) = p :=
+  Prod.ext (neg_neg p.1) (Equiv.swap_apply_self 0 1 p.2)
+
+/-- The duality map on 1-chains: `bbDualFn c = c ∘ blockSwapNeg`. -/
 def bbDualFn (c : G × Fin 2 → ZMod 2) : G × Fin 2 → ZMod 2 :=
   c ∘ blockSwapNeg
 
-lemma blockSwapNeg_involutive (p : G × Fin 2) :
-    blockSwapNeg (blockSwapNeg p) = p := by
-  obtain ⟨g, j⟩ := p
-  by_cases hj : j = 0
-  · subst hj
-    rw [blockSwapNeg_apply_zero, blockSwapNeg_apply_one, neg_neg]
-  · have hj1 : j = 1 := by omega
-    subst hj1
-    rw [blockSwapNeg_apply_one, blockSwapNeg_apply_zero, neg_neg]
-
+/-- The duality map is an involution. -/
 @[simp] lemma bbDualFn_bbDualFn (c : G × Fin 2 → ZMod 2) :
-    bbDualFn (bbDualFn c) = c := by
-  funext p
-  change c (blockSwapNeg (blockSwapNeg p)) = c p
-  rw [blockSwapNeg_involutive]
+    bbDualFn (bbDualFn c) = c :=
+  funext fun p => congrArg c (blockSwapNeg_involutive p)
 
+/-- The duality map is injective, being an involution. -/
 lemma bbDualFn_injective :
-    Function.Injective (bbDualFn (G := G)) := by
-  intro c d h
-  have h2 := congrArg bbDualFn h
-  rwa [bbDualFn_bbDualFn, bbDualFn_bbDualFn] at h2
+    Function.Injective (bbDualFn (G := G)) :=
+  Function.LeftInverse.injective bbDualFn_bbDualFn
 
+/-- The left half of `bbDualFn c` is the reflected right half of `c`. -/
 lemma leftHalf_bbDualFn (c : G × Fin 2 → ZMod 2) :
-    leftHalf (bbDualFn c) = reflect (rightHalf c) := by
-  funext g
-  change c (blockSwapNeg (g, 0)) = rightHalf c (-g)
-  rw [blockSwapNeg_apply_zero]
-  rfl
+    leftHalf (bbDualFn c) = reflect (rightHalf c) := rfl
 
+/-- The right half of `bbDualFn c` is the reflected left half of `c`. -/
 lemma rightHalf_bbDualFn (c : G × Fin 2 → ZMod 2) :
-    rightHalf (bbDualFn c) = reflect (leftHalf c) := by
-  funext g
-  change c (blockSwapNeg (g, 1)) = leftHalf c (-g)
-  rw [blockSwapNeg_apply_one]
-  rfl
+    rightHalf (bbDualFn c) = reflect (leftHalf c) := rfl
 
 end Reflect
 
-/-! ## Concrete transpose formulas for `dualBoundary` and `cutMap` -/
+/-! ## The transposes of the boundary maps -/
 
 variable {G : Type} [Fintype G] [AddCommGroup G] [DecidableEq G]
 variable (A B : G → ZMod 2)
 
-/-- `∂₂` of a point mass: `∂₂(δ_f)(h, j) = A(h-f)` on the left block, `B(h-f)`
-on the right. -/
+/-- `∂₂` of a point mass: `∂₂ δ_f` is `A (h - f)` at `(h, 0)` and `B (h - f)`
+at `(h, 1)`. -/
 lemma bbBoundary2Fn_single (f : G) (h : G) (j : Fin 2) :
     bbBoundary2Fn A B (Pi.single f 1) (h, j)
       = if j = 0 then A (h - f) else B (h - f) := by
-  by_cases hj : j = 0
-  · rw [if_pos hj]
-    change (if j = 0 then (A ⋆ Pi.single f 1) h else (B ⋆ Pi.single f 1) h)
-      = A (h - f)
-    rw [if_pos hj, conv_comm A, conv_single_left_apply]
-  · rw [if_neg hj]
-    change (if j = 0 then (A ⋆ Pi.single f 1) h else (B ⋆ Pi.single f 1) h)
-      = B (h - f)
-    rw [if_neg hj, conv_comm B, conv_single_left_apply]
+  simp only [bbBoundary2Fn, conv_single_right_apply]
 
-/-- Transpose formula for the dual boundary of the BB complex:
-`dualBoundary c = (reflect A) ⋆ c_L + (reflect B) ⋆ c_R`. -/
+/-- The transpose of `∂₂` for the bivariate bicycle complex:
+`dualBoundary c = reflect A ⋆ c_L + reflect B ⋆ c_R`. -/
 theorem bb_dualBoundary_eq (c : G × Fin 2 → ZMod 2) :
     (bbChainComplex A B).dualBoundary c
       = fun f => (reflect A ⋆ leftHalf c) f
           + (reflect B ⋆ rightHalf c) f := by
-  change (fun f : G =>
-      ∑ p : G × Fin 2, c p * bbBoundary2Fn A B (Pi.single f 1) p) = _
   funext f
-  have hL : (reflect A ⋆ leftHalf c) f
-      = ∑ h : G, c (h, 0) * A (h - f) := by
-    rw [conv_apply,
-      ← Equiv.sum_comp (Equiv.subLeft f)
-        (fun h => reflect A h * leftHalf c (f - h))]
-    refine Finset.sum_congr rfl fun h _ => ?_
-    simp only [Equiv.subLeft_apply, reflect_apply, neg_sub, sub_sub_cancel]
-    rw [mul_comm]
-    rfl
-  have hR : (reflect B ⋆ rightHalf c) f
-      = ∑ h : G, c (h, 1) * B (h - f) := by
-    rw [conv_apply,
-      ← Equiv.sum_comp (Equiv.subLeft f)
-        (fun h => reflect B h * rightHalf c (f - h))]
-    refine Finset.sum_congr rfl fun h _ => ?_
-    simp only [Equiv.subLeft_apply, reflect_apply, neg_sub, sub_sub_cancel]
-    rw [mul_comm]
-    rfl
-  rw [hL, hR, Fintype.sum_prod_type, ← Finset.sum_add_distrib]
-  refine Finset.sum_congr rfl fun h _ => ?_
-  rw [Fin.sum_univ_two, bbBoundary2Fn_single, bbBoundary2Fn_single]
-  simp
+  change ∑ p : G × Fin 2, c p * bbBoundary2Fn A B (Pi.single f 1) p = _
+  simp only [Fintype.sum_prod_type, Fin.sum_univ_two, bbBoundary2Fn_single,
+    reflect_conv_apply, Finset.sum_add_distrib]
+  rfl
 
-/-- `∂₁` of a left-block point mass: `∂₁(δ_(g,0))(v) = B(v-g)`. -/
+/-- `∂₁` of a point mass in the left block: `(∂₁ δ_(g,0)) v = B (v - g)`. -/
 lemma bbBoundary1Fn_single_left (g v : G) :
     bbBoundary1Fn A B (Pi.single ((g, 0) : G × Fin 2) 1) v = B (v - g) := by
-  have hLhalf : leftHalf (Pi.single ((g, 0) : G × Fin 2) (1 : ZMod 2))
-      = Pi.single g 1 := by
+  have hL : leftHalf (Pi.single ((g, 0) : G × Fin 2) (1 : ZMod 2)) = Pi.single g 1 := by
     funext h
-    rw [leftHalf, Pi.single_apply, Pi.single_apply]
-    by_cases hh : h = g
-    · simp [hh]
-    · simp [hh, Prod.ext_iff]
-  have hRhalf : rightHalf (Pi.single ((g, 0) : G × Fin 2) (1 : ZMod 2)) = 0 := by
+    simp [leftHalf, Pi.single_apply]
+  have hR : rightHalf (Pi.single ((g, 0) : G × Fin 2) (1 : ZMod 2)) = 0 := by
     funext h
-    rw [rightHalf, Pi.single_apply]
-    simp [Prod.ext_iff]
-  have hzero : (A ⋆ (0 : G → ZMod 2)) v = 0 := by
-    simp [conv_apply]
-  rw [bbBoundary1Fn, hLhalf, hRhalf, conv_comm B, conv_single_left_apply,
-    hzero, add_zero]
+    simp [rightHalf]
+  rw [bbBoundary1Fn_eq, hL, hR, conv_zero_right, add_zero, conv_single_right_apply]
 
-/-- `∂₁` of a right-block point mass: `∂₁(δ_(g,1))(v) = A(v-g)`. -/
+/-- `∂₁` of a point mass in the right block: `(∂₁ δ_(g,1)) v = A (v - g)`. -/
 lemma bbBoundary1Fn_single_right (g v : G) :
     bbBoundary1Fn A B (Pi.single ((g, 1) : G × Fin 2) 1) v = A (v - g) := by
-  have hLhalf : leftHalf (Pi.single ((g, 1) : G × Fin 2) (1 : ZMod 2)) = 0 := by
+  have hL : leftHalf (Pi.single ((g, 1) : G × Fin 2) (1 : ZMod 2)) = 0 := by
     funext h
-    rw [leftHalf, Pi.single_apply]
-    simp [Prod.ext_iff]
-  have hRhalf : rightHalf (Pi.single ((g, 1) : G × Fin 2) (1 : ZMod 2))
-      = Pi.single g 1 := by
+    simp [leftHalf]
+  have hR : rightHalf (Pi.single ((g, 1) : G × Fin 2) (1 : ZMod 2)) = Pi.single g 1 := by
     funext h
-    rw [rightHalf, Pi.single_apply, Pi.single_apply]
-    by_cases hh : h = g
-    · simp [hh]
-    · simp [hh, Prod.ext_iff]
-  have hzero : (B ⋆ (0 : G → ZMod 2)) v = 0 := by
-    simp [conv_apply]
-  rw [bbBoundary1Fn, hLhalf, hRhalf, conv_comm A, conv_single_left_apply,
-    hzero, zero_add]
+    simp [rightHalf, Pi.single_apply]
+  rw [bbBoundary1Fn_eq, hL, hR, conv_zero_right, zero_add, conv_single_right_apply]
 
-/-- Transpose formula for the cut map of the BB complex:
-`cutMap s = ((reflect B) ⋆ s | (reflect A) ⋆ s)`. -/
+/-- `∂₁` of a point mass: `(∂₁ δ_q) v` is `B (v - q.1)` for a qubit `q` of the
+left block and `A (v - q.1)` for one of the right block. -/
+lemma bbBoundary1Fn_single (q : G × Fin 2) (v : G) :
+    bbBoundary1Fn A B (Pi.single q 1) v = if q.2 = 0 then B (v - q.1) else A (v - q.1) := by
+  obtain ⟨g, j⟩ := q
+  obtain rfl | rfl : j = 0 ∨ j = 1 := by omega
+  exacts [bbBoundary1Fn_single_left A B g v, bbBoundary1Fn_single_right A B g v]
+
+/-- The transpose of `∂₁` for the bivariate bicycle complex:
+`cutMap s = (reflect B ⋆ s | reflect A ⋆ s)`. -/
 theorem bb_cutMap_eq (s : G → ZMod 2) :
     (bbChainComplex A B).cutMap s
       = fun p : G × Fin 2 =>
           if p.2 = 0 then (reflect B ⋆ s) p.1 else (reflect A ⋆ s) p.1 := by
-  change (fun e : G × Fin 2 =>
-      ∑ v : G, s v * bbBoundary1Fn A B (Pi.single e 1) v) = _
-  funext p
-  obtain ⟨g, j⟩ := p
-  have key : ∀ q : G → ZMod 2,
-      (reflect q ⋆ s) g = ∑ v : G, s v * q (v - g) := by
-    intro q
-    rw [conv_apply,
-      ← Equiv.sum_comp (Equiv.subLeft g) (fun h => reflect q h * s (g - h))]
-    refine Finset.sum_congr rfl fun v _ => ?_
-    simp only [Equiv.subLeft_apply, reflect_apply, neg_sub, sub_sub_cancel]
-    rw [mul_comm]
-  by_cases hj : j = 0
-  · subst hj
-    change ∑ v : G, s v * bbBoundary1Fn A B (Pi.single ((g, 0) : G × Fin 2) 1) v
-      = (reflect B ⋆ s) g
-    rw [key B]
-    refine Finset.sum_congr rfl fun v _ => ?_
-    rw [bbBoundary1Fn_single_left]
-  · have hj1 : j = 1 := by omega
-    subst hj1
-    change ∑ v : G, s v * bbBoundary1Fn A B (Pi.single ((g, 1) : G × Fin 2) 1) v
-      = (reflect A ⋆ s) g
-    rw [key A]
-    refine Finset.sum_congr rfl fun v _ => ?_
-    rw [bbBoundary1Fn_single_right]
+  funext q
+  change ∑ v : G, s v * bbBoundary1Fn A B (Pi.single q 1) v = _
+  simp only [bbBoundary1Fn_single, reflect_conv_apply]
+  split_ifs <;> rfl
 
-/-! ## Φ exchanges primal and dual chain data -/
+/-! ## The duality map exchanges the complex with its dual -/
 
-/-- `dualBoundary ∘ Φ = reflect ∘ ∂₁`: the dual boundary of a Φ-image is the
-reflected primal boundary. -/
+/-- The dual boundary of `bbDualFn c` is the reflected boundary of `c`. -/
 theorem dualBoundary_bbDualFn (c : G × Fin 2 → ZMod 2) :
     (bbChainComplex A B).dualBoundary (bbDualFn c)
       = reflect (bbBoundary1Fn A B c) := by
-  rw [bb_dualBoundary_eq]
-  funext f
-  rw [leftHalf_bbDualFn, rightHalf_bbDualFn, ← reflect_conv, ← reflect_conv]
-  simp only [reflect_apply, bbBoundary1Fn]
-  ring
+  rw [bb_dualBoundary_eq, leftHalf_bbDualFn, rightHalf_bbDualFn, ← reflect_conv,
+    ← reflect_conv]
+  exact funext fun f => add_comm _ _
 
-/-- `Φ ∘ ∂₂ = cutMap ∘ reflect`: Φ carries primal boundaries to dual boundaries.
--/
+/-- `bbDualFn` carries `∂₂ f` to the cut of the reflected chain. -/
 theorem bbDualFn_bbBoundary2Fn (f2 : G → ZMod 2) :
     bbDualFn (bbBoundary2Fn A B f2)
       = (bbChainComplex A B).cutMap (reflect (G := G) f2) := by
-  rw [bb_cutMap_eq]
-  funext p
-  obtain ⟨g, j⟩ := p
-  have hconv : ∀ q : G → ZMod 2,
-      (q ⋆ f2) (-g) = (reflect q ⋆ reflect f2) g := by
-    intro q
-    have hq := congrFun (reflect_conv q f2) g
-    rw [reflect_apply] at hq
-    exact hq
-  by_cases hj : j = 0
-  · subst hj
-    change bbBoundary2Fn A B f2 (blockSwapNeg (g, 0))
-      = (reflect B ⋆ reflect f2) g
-    rw [blockSwapNeg_apply_zero]
-    change (B ⋆ f2) (-g) = (reflect B ⋆ reflect f2) g
-    exact hconv B
-  · have hj1 : j = 1 := by omega
-    subst hj1
-    change bbBoundary2Fn A B f2 (blockSwapNeg (g, 1))
-      = (reflect A ⋆ reflect f2) g
-    rw [blockSwapNeg_apply_one]
-    change (A ⋆ f2) (-g) = (reflect A ⋆ reflect f2) g
-    exact hconv A
+  rw [bb_cutMap_eq, halves_ext_iff, leftHalf_bbDualFn, rightHalf_bbDualFn,
+    leftHalf_bbBoundary2Fn, rightHalf_bbBoundary2Fn, reflect_conv, reflect_conv]
+  exact ⟨rfl, rfl⟩
 
-/-- Φ carries cycles to dual cycles (and conversely, by involutivity). -/
+/-- `bbDualFn c` is a dual cycle iff `c` is a cycle. -/
 theorem bbDual_mem_dualCycles_iff (c : G × Fin 2 → ZMod 2) :
     bbDualFn c ∈ (bbChainComplex A B).dualCycles
       ↔ c ∈ (bbChainComplex A B).cycles := by
-  have h1 : bbDualFn c ∈ (bbChainComplex A B).dualCycles
-      ↔ (bbChainComplex A B).dualBoundary (bbDualFn c) = 0 := Iff.rfl
-  have h2 : c ∈ (bbChainComplex A B).cycles
-      ↔ bbBoundary1Fn A B c = 0 := Iff.rfl
-  rw [h1, h2, dualBoundary_bbDualFn]
-  exact reflect_eq_zero_iff (bbBoundary1Fn A B c)
+  change (bbChainComplex A B).dualBoundary (bbDualFn c) = 0 ↔ bbBoundary1Fn A B c = 0
+  rw [dualBoundary_bbDualFn]
+  exact reflect_eq_zero_iff _
 
-/-- Φ carries boundaries to dual boundaries (and conversely). -/
+/-- `bbDualFn c` is a dual boundary iff `c` is a boundary. -/
 theorem bbDual_mem_dualBoundaries_iff (c : G × Fin 2 → ZMod 2) :
     bbDualFn c ∈ (bbChainComplex A B).dualBoundaries
       ↔ c ∈ (bbChainComplex A B).boundaries := by
   constructor
   · rintro ⟨s, hs⟩
-    refine ⟨reflect (G := G) s, ?_⟩
-    apply bbDualFn_injective
-    change bbDualFn (bbBoundary2Fn A B (reflect (G := G) s)) = bbDualFn c
-    rw [bbDualFn_bbBoundary2Fn, reflect_reflect]
-    exact hs
-  · rintro ⟨f2, hf2⟩
-    refine ⟨reflect (G := G) f2, ?_⟩
-    change (bbChainComplex A B).cutMap (reflect (G := G) f2) = bbDualFn c
-    rw [← bbDualFn_bbBoundary2Fn]
-    exact congrArg bbDualFn hf2
+    exact ⟨reflect (G := G) s, bbDualFn_injective <|
+      (bbDualFn_bbBoundary2Fn A B (reflect (G := G) s)).trans (by rw [reflect_reflect]; exact hs)⟩
+  · rintro ⟨f2, rfl⟩
+    exact ⟨reflect (G := G) f2, (bbDualFn_bbBoundary2Fn A B f2).symm⟩
 
-/-! ## Φ preserves chain weight -/
+/-! ## The duality map preserves weight -/
 
-/-- Filtering through an equivalence preserves the count. -/
-lemma card_filter_comp_equiv {α β : Type} [Fintype α] [Fintype β]
-    (e : α ≃ β) (p : β → Prop) [DecidablePred p] :
-    (Finset.univ.filter fun a => p (e a)).card
-      = (Finset.univ.filter p).card := by
-  apply Finset.card_bij (fun a _ => e a)
-  · intro a ha
-    rw [Finset.mem_filter] at ha ⊢
-    exact ⟨Finset.mem_univ _, ha.2⟩
-  · intro a₁ _ a₂ _ heq
-    exact e.injective heq
-  · intro b hb
-    rw [Finset.mem_filter] at hb
-    refine ⟨e.symm b, ?_, by simp⟩
-    rw [Finset.mem_filter]
-    refine ⟨Finset.mem_univ _, ?_⟩
-    rw [Equiv.apply_symm_apply]
-    exact hb.2
-
-/-- Φ preserves chain weight. -/
+/-- `bbDualFn` preserves chain weight. -/
 theorem bbDual_chainWeight (c : G × Fin 2 → ZMod 2) :
     (bbChainComplex A B).chainWeight (bbDualFn c)
-      = (bbChainComplex A B).chainWeight c := by
-  unfold HomologicalCode.chainWeight HomologicalCode.chainSupport
-  exact card_filter_comp_equiv blockSwapNeg (fun p => c p ≠ 0)
+      = (bbChainComplex A B).chainWeight c :=
+  Finset.card_equiv (s := Finset.univ.filter fun p => c (blockSwapNeg p) ≠ 0)
+    (t := Finset.univ.filter fun p => c p ≠ 0) blockSwapNeg (by simp)
 
-/-! ## Chain-level `d_X = d_Z` -/
+/-! ## Equality of the chain-level X- and Z-distances -/
 
-/-- A chain-weight lower bound on nontrivial primal cycles holds iff the same
-bound holds on nontrivial dual cycles: the chain-level `d_X = d_Z` for BB codes.
--/
+/-- A lower bound on the weight of the cycles that are not boundaries holds iff
+the same bound holds on the dual cycles that are not dual boundaries, since
+`bbDualFn` is a weight-preserving bijection between the two. -/
 theorem bb_cycle_bound_iff_dual_bound (K : ℕ) :
     (∀ c ∈ (bbChainComplex A B).cycles,
         c ∉ (bbChainComplex A B).boundaries →
@@ -365,25 +246,14 @@ theorem bb_cycle_bound_iff_dual_bound (K : ℕ) :
         K ≤ (bbChainComplex A B).chainWeight c) := by
   constructor
   · intro hX c hc hnb
-    have hc' : bbDualFn (bbDualFn c) ∈ (bbChainComplex A B).dualCycles := by
-      rwa [bbDualFn_bbDualFn]
-    have hcyc : bbDualFn c ∈ (bbChainComplex A B).cycles :=
-      (bbDual_mem_dualCycles_iff A B (bbDualFn c)).mp hc'
-    have hnb' : bbDualFn c ∉ (bbChainComplex A B).boundaries := by
-      intro hmem
-      apply hnb
-      have hdual := (bbDual_mem_dualBoundaries_iff A B (bbDualFn c)).mpr hmem
-      rwa [bbDualFn_bbDualFn] at hdual
-    have hbound := hX (bbDualFn c) hcyc hnb'
-    rwa [bbDual_chainWeight] at hbound
+    rw [← bbDual_chainWeight]
+    refine hX (bbDualFn c) ((bbDual_mem_dualCycles_iff A B _).mp (by rwa [bbDualFn_bbDualFn]))
+      fun h => hnb ?_
+    simpa using (bbDual_mem_dualBoundaries_iff A B _).mpr h
   · intro hZ c hc hnb
-    have hcyc : bbDualFn c ∈ (bbChainComplex A B).dualCycles :=
-      (bbDual_mem_dualCycles_iff A B c).mpr hc
-    have hnb' : bbDualFn c ∉ (bbChainComplex A B).dualBoundaries := by
-      intro hmem
-      exact hnb ((bbDual_mem_dualBoundaries_iff A B c).mp hmem)
-    have hbound := hZ (bbDualFn c) hcyc hnb'
-    rwa [bbDual_chainWeight] at hbound
+    rw [← bbDual_chainWeight]
+    exact hZ (bbDualFn c) ((bbDual_mem_dualCycles_iff A B c).mpr hc)
+      fun h => hnb ((bbDual_mem_dualBoundaries_iff A B c).mp h)
 
 end BB
 end Homological

@@ -177,6 +177,12 @@ lemma anticommutes_iff_mulOp_phasePower (p q : NQubitPauliGroupElement n) :
   simp only [mul_eq, mul]
   constructor <;> intro h <;> linear_combination h
 
+/-- Anticommuting elements do not commute. -/
+lemma Anticommute.not_commute {p q : NQubitPauliGroupElement n} (h : Anticommute p q) :
+    p * q ≠ q * p := fun hc => by
+  rw [anticommutes_iff_mulOp_phasePower, (commutes_iff_mulOp_phasePower p q).1 hc] at h
+  exact absurd (left_eq_add.mp h) (by decide)
+
 /-- Anticommutation only depends on operator parts: elements with equal
 operator parts anticommute with the same elements. -/
 lemma anticommute_congr_left {p q r : NQubitPauliGroupElement n} (h : p.operators = q.operators) :

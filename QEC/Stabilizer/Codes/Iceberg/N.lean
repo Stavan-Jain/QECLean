@@ -209,13 +209,13 @@ private lemma ZType_commutes {m : ℕ} {g h : NQubitPauliGroupElement (2 * m)}
     (hg : NQubitPauliGroupElement.IsZTypeElement g)
     (hh : NQubitPauliGroupElement.IsZTypeElement h) :
     g * h = h * g :=
-  CSSCommutationLemmas.ZType_commutes hg hh
+  NQubitPauliGroupElement.IsZTypeElement.commute hg hh
 
 private lemma XType_commutes {m : ℕ} {g h : NQubitPauliGroupElement (2 * m)}
     (hg : NQubitPauliGroupElement.IsXTypeElement g)
     (hh : NQubitPauliGroupElement.IsXTypeElement h) :
     g * h = h * g :=
-  CSSCommutationLemmas.XType_commutes hg hh
+  NQubitPauliGroupElement.IsXTypeElement.commute hg hh
 
 /-- T4: all generators pairwise commute. -/
 theorem generators_commute (m : ℕ) [Fact (2 ≤ m)] :

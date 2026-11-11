@@ -1,27 +1,33 @@
-/-
-# Packed-`Nat` encodings of `𝔽₂`-chains
-
-Kernel `decide` over `𝔽₂`-chains is only fast when the chains are packed into
-`Nat` bitmasks: XOR, shifts and masks are single GMP operations in the kernel,
-while evaluating a `ZMod 2`-valued function point by point is not. This module
-is the bridge, generic in the index type: an enumeration `e : ι ≃ Fin n` packs
-a chain `x : ι → ZMod 2` into `maskOf e x`, with
-
-* `maskOf_add` — addition of chains is XOR of masks;
-* `card_support_eq_bitCount` — the Hamming weight is the bit count;
-* `maskOf_chainOfMask` / `chainOfMask_maskOf` — the two directions invert.
-
-`bitCount n m` (the number of set bits below `n`) is the specification, and
-`bitCountFast` evaluates it a byte at a time from a packed `256`-entry table
-(`bitCountFast_eq`), which is what certificates should put inside `decide`.
--/
-
 import Mathlib.Data.Nat.Bitwise
 import Mathlib.Data.Nat.Bits
 import Mathlib.Data.ZMod.Defs
 import Mathlib.Data.Fintype.Card
 import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Ring
+
+/-!
+# Packed-`Nat` encodings of `𝔽₂`-chains
+
+Kernel `decide` over `𝔽₂`-chains is only fast when the chains are packed into
+`Nat` bitmasks: XOR, shifts and masks are single big-number operations in the
+kernel, while evaluating a `ZMod 2`-valued function point by point is not. This
+module is the dictionary between the two, generic in the index type: an
+enumeration `e : ι ≃ Fin n` packs a chain `x : ι → ZMod 2` into the mask
+`maskOf e x`, and `chainOfMask e M` reads a mask back as a chain.
+
+* `maskOf_add`, `maskOf_sum`, `chainOfMask_xor`: addition of chains is XOR of
+  masks.
+* `maskOf_chainOfMask`, `chainOfMask_maskOf`: the two directions invert each
+  other (on masks below `2 ^ n`).
+* `maskOf_single`, `chainOfMask_two_pow`: point masses are single bits.
+* `card_support_eq_bitCount`: the Hamming weight of a chain is the bit count
+  of its mask.
+
+`bitCount n m`, the number of set bits of `m` below position `n`, is the
+specification of the weight. `bitCountFast` evaluates it a byte at a time from
+a packed `256`-entry table (`bitCountFast_eq`), and is the form to put inside a
+`decide`.
+-/
 
 namespace Quantum
 namespace Stabilizer
@@ -35,6 +41,8 @@ def bitCount : ℕ → ℕ → ℕ
   | 0, _ => 0
   | n + 1, m => m % 2 + bitCount n (m / 2)
 
+/-- A bit count over `a + b` positions splits into the low `a` positions and
+the next `b`. -/
 lemma bitCount_add (a b m : ℕ) :
     bitCount (a + b) m = bitCount a m + bitCount b (m / 2 ^ a) := by
   induction a generalizing m with
@@ -47,12 +55,9 @@ lemma bitCount_add (a b m : ℕ) :
 /-- The top step of a bit count. -/
 lemma bitCount_succ (n m : ℕ) :
     bitCount (n + 1) m = bitCount n m + if m.testBit n then 1 else 0 := by
-  rw [bitCount_add, show bitCount 1 (m / 2 ^ n) = m / 2 ^ n % 2 by simp [bitCount]]
-  congr 1
-  have h := Nat.testBit_div_two_pow (n := n) m 0
-  rw [zero_add, Nat.testBit_zero] at h
-  rw [← h]
-  rcases Nat.mod_two_eq_zero_or_one (m / 2 ^ n) with h2 | h2 <;> simp [h2]
+  rw [bitCount_add, Nat.testBit_eq_decide_div_mod_eq]
+  simp only [bitCount, Nat.add_zero, decide_eq_true_eq]
+  split <;> omega
 
 /-- `bitCount` is the cardinality of the set of set bits below `n`. -/
 lemma bitCount_eq_card (n m : ℕ) :
@@ -72,12 +77,27 @@ lemma bitCount_mod (n m : ℕ) : bitCount n (m % 2 ^ n) = bitCount n m := by
   refine Finset.filter_congr fun i hi => ?_
   simp [Nat.testBit_mod_two_pow, Finset.mem_range.mp hi]
 
+/-- There are at most `n` set bits below position `n`. -/
+lemma bitCount_le (n m : ℕ) : bitCount n m ≤ n := by
+  rw [bitCount_eq_card]
+  exact (Finset.card_filter_le _ _).trans_eq (Finset.card_range n)
+
+/-- The zero word has no set bits. -/
+lemma bitCount_zero_right (n : ℕ) : bitCount n 0 = 0 := by
+  simp [bitCount_eq_card]
+
+/-- Counting over more positions than a word occupies does not change the
+count. -/
+lemma bitCount_extend (bits extra m : ℕ) (hm : m < 2 ^ bits) :
+    bitCount (bits + extra) m = bitCount bits m := by
+  rw [bitCount_add, Nat.div_eq_of_lt hm, bitCount_zero_right, Nat.add_zero]
+
 /-! ## A byte-table popcount for kernel evaluation
 
 These are written with the raw `Nat.*` functions rather than `>>>`, `&&&`, `%`:
-the kernel evaluates both with GMP, but the notation goes through typeclass
-instances that the kernel re-unfolds at every call, which dominates the cost of
-a long `decide` walk. -/
+the kernel evaluates both with big-number primitives, but the notation goes
+through typeclass instances that the kernel re-unfolds at every call, which
+dominates the cost of a long `decide` walk. -/
 
 /-- `bitCount 8 y` for every byte `y`, packed four bits per entry (entry `y` at
 bit `4·y`), assembled from four 64-digit pieces to respect the line limit. -/
@@ -97,13 +117,11 @@ def bitCountFast : ℕ → ℕ → ℕ
 
 private lemma pop8_table : ∀ y < 256, pop8 y = bitCount 8 y := by decide +kernel
 
+/-- The table lookup computes the bit count of the lowest byte. -/
 lemma pop8_eq (m : ℕ) : pop8 m = bitCount 8 m := by
-  have h := pop8_table (m % 256) (Nat.mod_lt _ (by norm_num))
-  have hm : pop8 (m % 256) = pop8 m := by
-    unfold pop8
-    rw [show Nat.mod (m % 256) 256 = Nat.mod m 256 from Nat.mod_mod m 256]
-  rw [hm] at h
-  rw [h, show (256 : ℕ) = 2 ^ 8 by norm_num, bitCount_mod]
+  rw [← bitCount_mod, ← pop8_table (m % 2 ^ 8) (Nat.mod_lt _ (by norm_num))]
+  exact congrArg (fun k => Nat.land (Nat.shiftRight POP8 (Nat.mul 4 k)) 15)
+    (Nat.mod_mod m 256).symm
 
 /-- The byte-table popcount computes `bitCount` on the lowest `8·k` bits. -/
 lemma bitCountFast_eq (k m : ℕ) : bitCountFast k m = bitCount (8 * k) m := by
@@ -121,6 +139,7 @@ def ofBits (b : ℕ → Bool) : ℕ → ℕ
   | 0 => 0
   | n + 1 => Nat.bit (b 0) (ofBits (fun i => b (i + 1)) n)
 
+/-- Bit `i` of `ofBits b n` is `b i` below `n` and `false` from `n` on. -/
 lemma testBit_ofBits (b : ℕ → Bool) (n i : ℕ) :
     (ofBits b n).testBit i = (decide (i < n) && b i) := by
   induction n generalizing b i with
@@ -146,17 +165,20 @@ def maskOf (x : ι → ZMod 2) : ℕ :=
 /-- The chain of a mask: `1` exactly at the indices whose bit is set. -/
 def chainOfMask (M : ℕ) : ι → ZMod 2 := fun i => if M.testBit (e i) then 1 else 0
 
+/-- Bit `k` of the mask of `x` is set iff `k < n` and `x` is nonzero at the
+index enumerated as `k`. -/
 lemma testBit_maskOf (x : ι → ZMod 2) (k : ℕ) :
     (maskOf e x).testBit k
       = if h : k < n then decide (x (e.symm ⟨k, h⟩) ≠ 0) else false := by
   rw [maskOf, testBit_ofBits]
   by_cases h : k < n <;> simp [h]
 
+/-- Bit `e i` of the mask of `x` is set iff `x i ≠ 0`. -/
 @[simp] lemma testBit_maskOf_apply (x : ι → ZMod 2) (i : ι) :
     (maskOf e x).testBit (e i) = decide (x i ≠ 0) := by
-  rw [testBit_maskOf, dif_pos (e i).isLt]
-  simp
+  simp [testBit_maskOf]
 
+/-- The mask of a chain on `n` indices occupies the lowest `n` bits. -/
 lemma maskOf_lt (x : ι → ZMod 2) : maskOf e x < 2 ^ n := by
   refine Nat.lt_pow_two_of_testBit _ fun i hi => ?_
   rw [testBit_maskOf, dif_neg (by omega)]
@@ -181,43 +203,67 @@ lemma maskOf_add (x y : ι → ZMod 2) : maskOf e (x + y) = maskOf e x ^^^ maskO
   rw [testBit_maskOf, Nat.zero_testBit]
   split_ifs <;> simp
 
-/-- Masks of a list sum are the XOR of the masks. -/
+/-- The mask of a list sum is the XOR of the masks. -/
 lemma maskOf_sum (l : List (ι → ZMod 2)) :
     maskOf e l.sum = xorList (l.map (maskOf e)) := by
   induction l with
   | nil => simp
   | cons x l ih => rw [List.sum_cons, maskOf_add, ih, List.map_cons, xorList_cons]
 
+/-- Reading back the mask of a chain recovers the chain. -/
 lemma chainOfMask_maskOf (x : ι → ZMod 2) : chainOfMask e (maskOf e x) = x := by
   funext i
   simp only [chainOfMask, testBit_maskOf_apply, decide_eq_true_eq]
   exact zmod2_eq_ite _
 
+/-- Distinct chains have distinct masks. -/
 lemma maskOf_injective : Function.Injective (maskOf e) := fun x y h => by
   rw [← chainOfMask_maskOf e x, h, chainOfMask_maskOf]
 
+/-- A mask below `2 ^ n` is the mask of the chain it reads as. -/
 lemma maskOf_chainOfMask {M : ℕ} (hM : M < 2 ^ n) : maskOf e (chainOfMask e M) = M := by
   refine Nat.eq_of_testBit_eq fun k => ?_
   rw [testBit_maskOf]
   split_ifs with h
   · simp only [chainOfMask, Equiv.apply_symm_apply]
     split_ifs with hb <;> simp only [hb] <;> decide
-  · rw [Nat.testBit_eq_false_of_lt (lt_of_lt_of_le hM (Nat.pow_le_pow_right (by norm_num)
-      (by omega)))]
+  · exact (Nat.testBit_lt_two_pow (hM.trans_le (Nat.pow_le_pow_right (by norm_num)
+      (by omega)))).symm
+
+/-- The zero mask reads as the zero chain. -/
+lemma chainOfMask_zero : chainOfMask e 0 = 0 := by
+  ext i
+  simp [chainOfMask]
+
+/-- The XOR of two masks reads as the sum of their chains. -/
+lemma chainOfMask_xor (a b : ℕ) :
+    chainOfMask e (a ^^^ b) = chainOfMask e a + chainOfMask e b := by
+  ext i
+  simp only [chainOfMask, Nat.testBit_xor, Pi.add_apply]
+  cases a.testBit (e i) <;> cases b.testBit (e i) <;> decide
+
+/-- The mask with only the bit of index `i` set reads as the point mass at
+`i`. -/
+lemma chainOfMask_two_pow [DecidableEq ι] (i : ι) :
+    chainOfMask e (2 ^ (e i).val) = Pi.single i 1 := by
+  funext k
+  simp [chainOfMask, Nat.testBit_two_pow, Pi.single_apply, Fin.val_inj, eq_comm]
+
+/-- The mask of the point mass at `i` has exactly the bit of index `i` set. -/
+lemma maskOf_single [DecidableEq ι] (i : ι) :
+    maskOf e (Pi.single i 1) = 2 ^ (e i).val := by
+  rw [← chainOfMask_two_pow,
+    maskOf_chainOfMask e (Nat.pow_lt_pow_right (by norm_num) (e i).isLt)]
 
 /-- The Hamming weight of a chain is the bit count of its mask. -/
 lemma card_support_eq_bitCount [Fintype ι] (x : ι → ZMod 2) :
     (Finset.univ.filter fun i => x i ≠ 0).card = bitCount n (maskOf e x) := by
   rw [bitCount_eq_card]
-  refine Finset.card_bij (fun i _ => (e i : ℕ)) ?_ ?_ ?_
+  refine Finset.card_bij (fun i _ => (e i : ℕ)) ?_ (fun i _ j _ h => e.injective (Fin.ext h)) ?_
   · intro i hi
-    simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hi
-    simp [Finset.mem_filter, hi]
-  · intro i _ j _ h
-    exact e.injective (Fin.ext h)
+    simpa using hi
   · intro k hk
-    simp only [Finset.mem_filter, Finset.mem_range] at hk
-    obtain ⟨hk, hb⟩ := hk
+    obtain ⟨hk, hb⟩ : k < n ∧ (maskOf e x).testBit k = true := by simpa using hk
     refine ⟨e.symm ⟨k, hk⟩, ?_, by simp⟩
     rw [testBit_maskOf, dif_pos hk] at hb
     simpa using hb

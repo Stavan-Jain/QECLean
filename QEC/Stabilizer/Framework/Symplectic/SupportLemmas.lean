@@ -3,6 +3,23 @@ import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
 import QEC.Stabilizer.Framework.Core.CSS.CSSPredicates
 import QEC.Stabilizer.Foundations.PauliGroup.Commutation
 
+/-!
+# Support lemmas for `set` and for typed operators
+
+Lemmas about `NQubitPauliOperator.set`, the operation that builds an n-qubit
+Pauli operator one qubit at a time, and about the supports of Z-type and X-type
+operators:
+
+- `set_apply_eq`, `set_apply_ne`: the components of `set op i p`;
+- `mem_support_set_same_iff`, `mem_support_set_ne_iff`,
+  `support_set_subset_insert`: its support;
+- `IsZType_set_of_IsZType`, `IsXType_set_of_IsXType`: `set` preserves the Z-type
+  and X-type predicates;
+- `NQubitPauliGroupElement.anticommutesAt_iff_mem_support_both_of_ZXType` and
+  `anticommutesAt_iff_mem_support_both_of_XZType`: a Z-type and an X-type
+  operator anticommute at qubit `i` iff `i` lies in both supports.
+-/
+
 namespace Quantum
 namespace NQubitPauliOperator
 
@@ -19,13 +36,14 @@ variable {n : ℕ}
     set op i p j = op j := by
   simp [set, h]
 
-/-- Membership in the support of `set op i p` at the edited index. -/
+/-- The edited index is in the support of `set op i p` iff `p ≠ I`. -/
 @[simp] lemma mem_support_set_same_iff
     (op : NQubitPauliOperator n) (i : Fin n) (p : PauliOperator) :
     i ∈ support (set op i p) ↔ p ≠ PauliOperator.I := by
   simp [support, set]
 
-/-- Membership in the support of `set op i p` at any other index. -/
+/-- Any other index is in the support of `set op i p` iff it is in the support
+of `op`. -/
 @[simp] lemma mem_support_set_ne_iff
     (op : NQubitPauliOperator n) (i j : Fin n) (p : PauliOperator) (h : j ≠ i) :
     j ∈ support (set op i p) ↔ j ∈ support op := by
@@ -35,29 +53,27 @@ variable {n : ℕ}
 lemma support_set_subset_insert (op : NQubitPauliOperator n) (i : Fin n) (p : PauliOperator) :
     support (set op i p) ⊆ insert i (support op) := by
   intro j hj
-  by_cases hji : j = i
-  · exact Finset.mem_insert.mpr (Or.inl hji)
-  · exact Finset.mem_insert.mpr (Or.inr ((mem_support_set_ne_iff op i j p hji).1 hj))
+  rcases eq_or_ne j i with rfl | hji
+  · exact Finset.mem_insert_self _ _
+  · exact Finset.mem_insert_of_mem ((mem_support_set_ne_iff op i j p hji).1 hj)
 
 /-- Setting a Z-type single-qubit operator preserves n-qubit Z-type. -/
 lemma IsZType_set_of_IsZType (op : NQubitPauliOperator n) (i : Fin n) (p : PauliOperator)
     (hop : IsZType op) (hp : PauliOperator.IsZType p) :
     IsZType (set op i p) := by
   intro j
-  by_cases hji : j = i
-  · subst hji
-    simpa [set] using hp
-  · simpa [set, hji] using hop j
+  change PauliOperator.IsZType (if j = i then p else op j)
+  split_ifs
+  exacts [hp, hop j]
 
 /-- Setting an X-type single-qubit operator preserves n-qubit X-type. -/
 lemma IsXType_set_of_IsXType (op : NQubitPauliOperator n) (i : Fin n) (p : PauliOperator)
     (hop : IsXType op) (hp : PauliOperator.IsXType p) :
     IsXType (set op i p) := by
   intro j
-  by_cases hji : j = i
-  · subst hji
-    simpa [set] using hp
-  · simpa [set, hji] using hop j
+  change PauliOperator.IsXType (if j = i then p else op j)
+  split_ifs
+  exacts [hp, hop j]
 
 /-- Setting a `Z` preserves n-qubit Z-type. -/
 lemma IsZType_set_Z_of_IsZType (op : NQubitPauliOperator n) (i : Fin n) (hop : IsZType op) :
@@ -75,42 +91,27 @@ namespace NQubitPauliGroupElement
 
 variable {n : ℕ}
 
-/-- For Z/X-typed operator tensors, `anticommutesAt` is equivalent to support
-overlap. -/
+/-- A Z-type operator `p` and an X-type operator `q` anticommute at qubit `i`
+iff `i` is in the support of both. -/
 lemma anticommutesAt_iff_mem_support_both_of_ZXType
     {p q : NQubitPauliOperator n}
     (hp : NQubitPauliOperator.IsZType p)
     (hq : NQubitPauliOperator.IsXType q)
     (i : Fin n) :
-    anticommutesAt (n := n) p q i ↔ i ∈ p.support ∧ i ∈ q.support := by
-  have hp' : p i = PauliOperator.I ∨ p i = PauliOperator.Z := hp i
-  have hq' : q i = PauliOperator.I ∨ q i = PauliOperator.X := hq i
-  rcases hp' with hpI | hpZ
-  · rcases hq' with hqI | hqX
-    · simp [anticommutesAt, NQubitPauliOperator.support, hpI, hqI]
-    · simp [anticommutesAt, NQubitPauliOperator.support, hpI, hqX]
-  · rcases hq' with hqI | hqX
-    · simp [anticommutesAt, NQubitPauliOperator.support, hpZ, hqI]
-    · simp [anticommutesAt, NQubitPauliOperator.support, hpZ, hqX]
+    anticommutesAt p q i ↔ i ∈ p.support ∧ i ∈ q.support := by
+  rcases hp i with h | h <;> rcases hq i with h' | h' <;>
+    simp [anticommutesAt, NQubitPauliOperator.support, h, h']
 
-/-- For X/Z-typed operator tensors, `anticommutesAt` is equivalent to support
-overlap. -/
+/-- An X-type operator `p` and a Z-type operator `q` anticommute at qubit `i`
+iff `i` is in the support of both. -/
 lemma anticommutesAt_iff_mem_support_both_of_XZType
     {p q : NQubitPauliOperator n}
     (hp : NQubitPauliOperator.IsXType p)
     (hq : NQubitPauliOperator.IsZType q)
     (i : Fin n) :
-    anticommutesAt (n := n) p q i ↔ i ∈ p.support ∧ i ∈ q.support := by
-  have hp' : p i = PauliOperator.I ∨ p i = PauliOperator.X := hp i
-  have hq' : q i = PauliOperator.I ∨ q i = PauliOperator.Z := hq i
-  rcases hp' with hpI | hpX
-  · rcases hq' with hqI | hqZ
-    · simp [anticommutesAt, NQubitPauliOperator.support, hpI, hqI]
-    · simp [anticommutesAt, NQubitPauliOperator.support, hpI, hqZ]
-  · rcases hq' with hqI | hqZ
-    · simp [anticommutesAt, NQubitPauliOperator.support, hpX, hqI]
-    · simp [anticommutesAt, NQubitPauliOperator.support, hpX, hqZ]
+    anticommutesAt p q i ↔ i ∈ p.support ∧ i ∈ q.support := by
+  rcases hp i with h | h <;> rcases hq i with h' | h' <;>
+    simp [anticommutesAt, NQubitPauliOperator.support, h, h']
 
 end NQubitPauliGroupElement
 end Quantum
-

@@ -4,27 +4,35 @@ import QEC.Stabilizer.Foundations.BinarySymplectic.SymplecticInner
 import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
 import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
 
+/-!
+# Weight-two operators in the symplectic span
+
+To show that a code has no nontrivial logical operator of weight `2`, one shows
+that every weight-`2` operator commuting with all generators in `L` has its
+symplectic vector in `sympSpan L`. This file reduces that statement to a finite
+check:
+
+- `weight_two_in_span_of_per_pair`: it suffices to treat, for each pair of
+  distinct qubits `i ≠ j`, the operators with support exactly `{i, j}`;
+- `weight_2_pair_by_enum`: for a fixed pair, it suffices to treat the `9`
+  operators that carry non-identity Paulis `pi`, `pj` at `i`, `j`;
+- `weight_2_in_span_by_enum`: the combination of the two, whose hypothesis
+  quantifies only over `Fin n`, `Fin n` and two single-qubit Paulis and is
+  therefore decidable by enumeration.
+-/
+
 namespace Quantum
 
 variable {n : ℕ}
-
-/-!
-# Weight-2 "in span" reduction
-
-If for every pair of distinct qubits (i, j), every operator with support exactly
-{i, j} that commutes with all generators has its symplectic vector in sympSpan
-L, then every weight-2 operator that commutes with all generators is in the
-span. This reduces weight_2_operators_in_span to 36 per-pair lemmas (for n = 9).
--/
 
 namespace NQubitPauliGroupElement
 
 open NQubitPauliOperator Submodule
 
-/-- Reduction: if for every pair of distinct qubits (i, j), every operator with
-    support {i, j} that commutes with all generators is in the symplectic span,
-    then every weight-2 operator that commutes with all generators is in the span.
--/
+/-- If, for every pair of distinct qubits `i ≠ j`, every operator with support
+`{i, j}` that commutes with all elements of `L` has its symplectic vector in
+`sympSpan L`, then so does every weight-`2` operator that commutes with all
+elements of `L`. -/
 theorem weight_two_in_span_of_per_pair (L : List (NQubitPauliGroupElement n))
     (h_per_pair : ∀ i j : Fin n, i ≠ j →
       ∀ op : NQubitPauliOperator n,
@@ -34,16 +42,14 @@ theorem weight_two_in_span_of_per_pair (L : List (NQubitPauliGroupElement n))
     (op : NQubitPauliOperator n) (h_weight : NQubitPauliOperator.weight op = 2)
     (h_comm : ∀ g ∈ L, NQubitPauliOperator.symplecticInner op g.operators = 0) :
     NQubitPauliOperator.toSymplectic op ∈ sympSpan L := by
-  obtain ⟨i, j, hij, h_supp⟩ :=
-    Finset.card_eq_two.mp (by rw [← NQubitPauliOperator.weight, h_weight])
+  obtain ⟨i, j, hij, h_supp⟩ := Finset.card_eq_two.mp h_weight
   exact h_per_pair i j hij op h_supp h_comm
 
-/-- Reduce a per-pair weight-2 proof to enumeration over PauliOperator ×
-PauliOperator.
-    Instead of quantifying over all NQubitPauliOperator n (4^n elements), the hypothesis `h`
-    only quantifies over PauliOperator × PauliOperator (16 elements), making `decide` feasible.
--/
-theorem weight_2_pair_by_enum (L : List (NQubitPauliGroupElement n)) (i j : Fin n) (hij : i ≠ j)
+/-- An operator with support `{i, j}` is determined by its non-identity Paulis
+at `i` and `j`. So a statement about all such operators that commute with `L`
+follows from the same statement for the `9` operators
+`fun k => if k = i then pi else if k = j then pj else I` with `pi, pj ≠ I`. -/
+theorem weight_2_pair_by_enum (L : List (NQubitPauliGroupElement n)) (i j : Fin n)
     (h : ∀ (pi pj : PauliOperator), pi ≠ .I → pj ≠ .I →
       let op : NQubitPauliOperator n := fun k => if k = i then pi else if k = j then pj else .I
       (∀ g ∈ L, NQubitPauliOperator.symplecticInner op g.operators = 0) →
@@ -51,34 +57,23 @@ theorem weight_2_pair_by_enum (L : List (NQubitPauliGroupElement n)) (i j : Fin 
     (op : NQubitPauliOperator n) (h_supp : NQubitPauliOperator.support op = {i, j})
     (h_comm : ∀ g ∈ L, NQubitPauliOperator.symplecticInner op g.operators = 0) :
     NQubitPauliOperator.toSymplectic op ∈ sympSpan L := by
-  have hi : op i ≠ .I := by
-    have : i ∈ NQubitPauliOperator.support op := by
-      rw [h_supp]; exact Finset.mem_insert_self i {j}
-    exact (NQubitPauliOperator.mem_support op i).mp this
-  have hj : op j ≠ .I := by
-    have : j ∈ NQubitPauliOperator.support op := by
-      rw [h_supp]; exact Finset.mem_insert.mpr (Or.inr (Finset.mem_singleton_self j))
-    exact (NQubitPauliOperator.mem_support op j).mp this
+  have h_mem : ∀ k, op k ≠ .I ↔ k = i ∨ k = j := fun k => by
+    rw [← NQubitPauliOperator.mem_support, h_supp, Finset.mem_insert, Finset.mem_singleton]
   have hop : op = fun k => if k = i then op i else if k = j then op j else .I := by
-    ext k
-    by_cases hki : k = i
-    · simp [hki]
-    · by_cases hkj : k = j
-      · subst hkj; simp [hki]
-      · have hk_not_supp : k ∉ NQubitPauliOperator.support op := by
-          rw [h_supp, Finset.mem_insert, Finset.mem_singleton]; push Not; exact ⟨hki, hkj⟩
-        have : op k = .I := by
-          by_contra h_ne; exact hk_not_supp ((NQubitPauliOperator.mem_support op k).mpr h_ne)
-        simp [hki, hkj, this]
+    funext k
+    split_ifs with hki hkj
+    · rw [hki]
+    · rw [hkj]
+    · exact not_not.mp fun hk => ((h_mem k).mp hk).elim hki hkj
   rw [hop]
-  exact h (op i) (op j) hi hj (by rwa [← hop])
+  exact h (op i) (op j) ((h_mem i).mpr (.inl rfl)) ((h_mem j).mpr (.inr rfl)) (by rwa [← hop])
 
-/-- Combined helper: proves all weight-2 operators are in span by enumerating
-PauliOperator pairs.
-    For each pair (i,j), the hypothesis only checks 9 non-identity PauliOperator assignments.
-    This is the main entry point for concrete codes — the `h` hypothesis is designed to be
-    closed by a single `decide` (quantifies over Fin n × Fin n × PauliOperator × PauliOperator,
-    which for n=9 is ~648 cases instead of ~67M). -/
+/-- Every weight-`2` operator commuting with all elements of `L` has its
+symplectic vector in `sympSpan L`, provided this holds for the operators
+`fun k => if k = i then pi else if k = j then pj else I` with `i ≠ j` and
+`pi, pj ≠ I`. The hypothesis `h` ranges over `Fin n × Fin n` and pairs of
+single-qubit Paulis rather than over all `4 ^ n` operators, so that `decide`
+can check it for a concrete code. -/
 theorem weight_2_in_span_by_enum (L : List (NQubitPauliGroupElement n))
     (h : ∀ (i j : Fin n), i ≠ j → ∀ (pi pj : PauliOperator), pi ≠ .I → pj ≠ .I →
       let op : NQubitPauliOperator n := fun k => if k = i then pi else if k = j then pj else .I
@@ -87,8 +82,7 @@ theorem weight_2_in_span_by_enum (L : List (NQubitPauliGroupElement n))
     (op : NQubitPauliOperator n) (h_weight : NQubitPauliOperator.weight op = 2)
     (h_comm : ∀ g ∈ L, NQubitPauliOperator.symplecticInner op g.operators = 0) :
     NQubitPauliOperator.toSymplectic op ∈ sympSpan L :=
-  weight_two_in_span_of_per_pair L
-    (fun i j hij op h_supp h_comm => weight_2_pair_by_enum L i j hij (h i j hij) op h_supp h_comm)
+  weight_two_in_span_of_per_pair L (fun i j hij => weight_2_pair_by_enum L i j (h i j hij))
     op h_weight h_comm
 
 end NQubitPauliGroupElement

@@ -7,13 +7,15 @@ import QEC.Stabilizer.Framework.FoldDouble
 /-!
 # Framework
 
-Abstract stabilizer + homological theory. Depends on `Foundations` only.
+The theory of stabilizer codes, independent of any particular code:
 
-Sub-clusters:
-- `QEC.Stabilizer.Framework.Core` — general stabilizer / logical / CSS theory
-- `QEC.Stabilizer.Framework.Symplectic` — stabilizer ↔ symplectic bridge
-- `QEC.Stabilizer.Framework.Homological` — chain-complex / CSS framework
-- `QEC.Stabilizer.Framework.Concatenation` — block-embedding calculus (M1)
-- `QEC.Stabilizer.Framework.FoldDouble` — qubit pairings, the folded code and
-  the fold-and-double distance theorem
+- `Core`: stabilizer groups and codes, the codespace, logical operators and
+  gates, code distance, and CSS codes.
+- `Symplectic`: stabilizer groups through their symplectic vectors;
+  presentations of a code by independent generators.
+- `Homological`: CSS codes as chain complexes, the correspondence between
+  logical operators and homology, and bivariate bicycle codes.
+- `Concatenation`: concatenation of CSS codes and its distance bound.
+- `FoldDouble`: qubit pairings, the folded code and the fold-and-double
+  distance theorem.
 -/

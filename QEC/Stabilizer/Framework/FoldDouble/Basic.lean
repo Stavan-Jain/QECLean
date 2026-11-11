@@ -13,26 +13,33 @@ the elementary calculus of a pairing on phase-free Pauli operators
 `NQubitPauliOperator n`:
 
 * the phase-free Pauli group itself: `NQubitPauliOperator n` is a commutative
-  group under the qubit-wise product (every element is an involution), and
+  group under the qubit-wise product (every element is an involution),
   forgetting the phase of a Pauli group element is the group homomorphism
-  `NQubitPauliGroupElement.operatorsHom`;
+  `NQubitPauliGroupElement.operatorsHom`, and the symplectic form is additive
+  in each argument (`symplecticInner_mul_left`, `symplecticInner_mul_right`);
 * the two **sheets** `sheet e s P` of an operator, the **sheet swap**
   `sheetSwap e P` (written `P^σ` below), the **fold**
   `fold e P = sheet e 0 P * sheet e 1 P` and the **double**
   `double e u = (u, u)`;
-* the algebra of fold and double: `fold (double u) = 1`,
-  `double (fold P) = P * P^σ`, `fold P = 1 ↔ P^σ = P ↔ P = double u` (with
-  `u = sheet e 0 P`), and all four maps are group homomorphisms;
-* the weight identities `wt (double u) = 2 wt u`, `wt (fold P) ≤ wt P`, and
-  the exact pair-by-pair bookkeeping `wt P = wt (fold P) + 2 · overlap` for
-  operators of a single Pauli type;
-* the two commutation rules `⟪double u, P⟫ = ⟪u, fold P⟫` and
-  `⟪fold P, fold Q⟫ = ⟪P, Q⟫ + ⟪P, Q^σ⟫` for the symplectic form, and
-  the invariance of weight and symplectic form under the sheet swap.
+* the algebra of fold and double: `fold (double u) = 1` (`fold_double`),
+  `double (fold P) = P * P^σ` (`double_fold`),
+  `fold P = 1 ↔ P^σ = P ↔ P = double u` with `u = sheet e 0 P`
+  (`fold_eq_one_iff`, `sheetSwap_eq_self_iff`), and all four maps are group
+  homomorphisms;
+* the weight identities `wt (double u) = 2 wt u` (`weight_double`),
+  `wt (fold P) ≤ wt P` (`weight_fold_le`), and the exact pair-by-pair
+  bookkeeping `wt P = wt (fold P) + 2 · overlap` for operators of a single
+  Pauli type (`weight_eq_weight_fold_add_two_mul_overlap`);
+* the two commutation rules `⟪double u, P⟫ = ⟪u, fold P⟫`
+  (`symplecticInner_double_left`) and
+  `⟪fold P, fold Q⟫ = ⟪P, Q⟫ + ⟪P, Q^σ⟫` (`symplecticInner_fold_fold`) for the
+  symplectic form, and the invariance of weight and symplectic form under the
+  sheet swap.
 
 The stabilizer-theoretic consequences — the four groups attached to a paired
 stabilizer code, the folded code, and the fold-and-double distance theorem —
-are developed in the sibling files of `QEC/Stabilizer/Framework/FoldDouble/`.
+are developed in `FoldDouble.OperatorImage`, `FoldDouble.Groups` and
+`FoldDouble.Distance`.
 -/
 
 namespace Quantum
@@ -49,18 +56,6 @@ commutative group in which every element is its own inverse: it is the
 quotient of the `n`-qubit Pauli group by its centre `{±1, ±i}`. -/
 
 namespace PauliOperator
-
-lemma mulOp_operator_I_left (a : PauliOperator) :
-    (PauliOperator.I.mulOp a).operator = a := by
-  cases a <;> rfl
-
-lemma mulOp_operator_I_right (a : PauliOperator) :
-    (a.mulOp PauliOperator.I).operator = a := by
-  cases a <;> rfl
-
-lemma mulOp_operator_self (a : PauliOperator) :
-    (a.mulOp a).operator = PauliOperator.I := by
-  cases a <;> rfl
 
 /-- The operator part of a product of single-qubit Paulis is the identity iff
 the two factors agree. -/
@@ -94,39 +89,77 @@ lemma one_eq_identity : (1 : NQubitPauliOperator n) = identity n := rfl
 /-- The phase-free Pauli group: `NQubitPauliOperator n` with the qubit-wise
 product is a commutative group (an elementary abelian `2`-group). -/
 noncomputable instance instCommGroup : CommGroup (NQubitPauliOperator n) where
-  mul_assoc u v w := by
-    ext i
-    exact PauliOperator.mulOp_operator_assoc (u i) (v i) (w i)
-  one_mul u := by
-    ext i
-    exact PauliOperator.mulOp_operator_I_left (u i)
-  mul_one u := by
-    ext i
-    exact PauliOperator.mulOp_operator_I_right (u i)
-  inv_mul_cancel u := by
-    ext i
-    exact PauliOperator.mulOp_operator_self (u i)
-  mul_comm u v := by
-    ext i
-    exact PauliOperator.mulOp_operator_comm (u i) (v i)
+  mul_assoc u v w := funext fun i => PauliOperator.mulOp_operator_assoc (u i) (v i) (w i)
+  one_mul u := funext fun i => congrArg (·.operator) (PauliOperator.I_mulOp (u i))
+  mul_one u := funext fun i => congrArg (·.operator) (PauliOperator.mulOp_I (u i))
+  inv_mul_cancel u := funext fun i => congrArg (·.operator) (PauliOperator.mulOp_self (u i))
+  mul_comm u v := funext fun i => PauliOperator.mulOp_operator_comm (u i) (v i)
 
 /-- Every phase-free Pauli operator is an involution. -/
 @[simp] lemma mul_self_eq_one (u : NQubitPauliOperator n) : u * u = 1 :=
   inv_mul_cancel u
 
+/-- Multiplying twice by the same operator on the right changes nothing. -/
+@[simp] lemma mul_mul_cancel_right (u v : NQubitPauliOperator n) : u * v * v = u :=
+  mul_inv_cancel_right u v
+
+/-- Multiplying twice by the same operator on the left changes nothing. -/
+@[simp] lemma mul_mul_cancel_left (u v : NQubitPauliOperator n) : u * (u * v) = v :=
+  mul_inv_cancel_left u v
+
 /-- Two phase-free Pauli operators multiply to the identity iff they are equal.
 -/
-lemma mul_eq_one_iff (u v : NQubitPauliOperator n) : u * v = 1 ↔ u = v := by
-  rw [mul_eq_one_iff_eq_inv, inv_eq_self]
+lemma mul_eq_one_iff (u v : NQubitPauliOperator n) : u * v = 1 ↔ u = v :=
+  mul_eq_one_iff_eq_inv
+
+@[simp] lemma support_one : support (1 : NQubitPauliOperator n) = ∅ :=
+  support_identity n
 
 @[simp] lemma weight_one : weight (1 : NQubitPauliOperator n) = 0 :=
   weight_identity n
 
+/-- A product acts nontrivially only where one of its factors does. -/
+lemma support_mul_subset (u v : NQubitPauliOperator n) :
+    support (u * v) ⊆ support u ∪ support v := by
+  intro i hi
+  simp only [Finset.mem_union, mem_support] at hi ⊢
+  by_contra h
+  push Not at h
+  exact hi (by rw [mul_apply, h.1, h.2]; rfl)
+
 /-- The weight as a sum of indicators over the qubits. -/
 lemma weight_eq_sum (P : NQubitPauliOperator n) :
-    weight P = ∑ i, if P i ≠ PauliOperator.I then 1 else 0 := by
-  unfold weight support
-  exact Finset.card_filter _ _
+    weight P = ∑ i, if P i ≠ PauliOperator.I then 1 else 0 :=
+  Finset.card_filter _ _
+
+/-- The identity is X-type. -/
+lemma isXType_one : IsXType (1 : NQubitPauliOperator n) :=
+  IsXType_identity
+
+/-- X-type operators are closed under the phase-free product. -/
+lemma isXType_mul {u v : NQubitPauliOperator n} (hu : IsXType u) (hv : IsXType v) :
+    IsXType (u * v) :=
+  NQubitPauliGroupElement.mulOp_operators_IsXType_of_IsXType hu hv
+
+/-- Two qubits of an operator of a single Pauli type carry the same Pauli
+unless one of them carries the identity. -/
+lemma eq_I_or_eq_I_or_eq_of_isXType_or_isZType {P : NQubitPauliOperator n}
+    (hP : IsXType P ∨ IsZType P) (i i' : Fin n) :
+    P i = PauliOperator.I ∨ P i' = PauliOperator.I ∨ P i = P i' := by
+  rcases hP with hP | hP <;> rcases hP i with h | h <;> rcases hP i' with h' | h' <;>
+    simp [h, h']
+
+/-- The symplectic form is additive in the left argument for the phase-free
+product. -/
+lemma symplecticInner_mul_left (u v w : NQubitPauliOperator n) :
+    symplecticInner (u * v) w = symplecticInner u w + symplecticInner v w :=
+  symplecticInner_mulOp_left u v w
+
+/-- The symplectic form is additive in the right argument for the phase-free
+product. -/
+lemma symplecticInner_mul_right (u v w : NQubitPauliOperator n) :
+    symplecticInner u (v * w) = symplecticInner u v + symplecticInner u w :=
+  symplecticInner_mulOp_right u v w
 
 end NQubitPauliOperator
 
@@ -150,6 +183,18 @@ lemma mul_operators (g h : NQubitPauliGroupElement n) :
 /-- The weight of a Pauli group element is the weight of its operator part. -/
 lemma weight_eq_weight_operators (g : NQubitPauliGroupElement n) :
     weight g = NQubitPauliOperator.weight g.operators := rfl
+
+/-- `ofOperator` is injective. -/
+lemma ofOperator_injective : Function.Injective (ofOperator : NQubitPauliOperator n → _) :=
+  fun _ _ h => congrArg operators h
+
+/-- Commutation of Pauli group elements depends only on their operator parts.
+-/
+theorem commute_iff_of_operators_eq {g g' h : NQubitPauliGroupElement n}
+    (hg : g.operators = g'.operators) :
+    g * h = h * g ↔ g' * h = h * g' := by
+  rw [NQubitPauliOperator.commutes_iff_symplectic_inner_zero,
+    NQubitPauliOperator.commutes_iff_symplectic_inner_zero, hg]
 
 end NQubitPauliGroupElement
 
@@ -225,7 +270,7 @@ def double (u : NQubitPauliOperator m) : NQubitPauliOperator n :=
 lemma fold_apply (P : NQubitPauliOperator n) (j : Fin m) :
     fold e P j = ((P (e.symm (j, 0))).mulOp (P (e.symm (j, 1)))).operator := rfl
 
-/-! ### The four maps are group homomorphisms (Lemma 2.3 (4)) -/
+/-! ### The four maps are group homomorphisms -/
 
 @[simp] lemma sheet_mul (s : Fin 2) (P Q : NQubitPauliOperator n) :
     sheet e s (P * Q) = sheet e s P * sheet e s Q := rfl
@@ -242,13 +287,11 @@ lemma fold_apply (P : NQubitPauliOperator n) (j : Fin m) :
 
 @[simp] lemma double_one : double e (1 : NQubitPauliOperator m) = 1 := rfl
 
-lemma fold_mul (P Q : NQubitPauliOperator n) : fold e (P * Q) = fold e P * fold e Q := by
-  unfold fold
-  rw [sheet_mul, sheet_mul, mul_mul_mul_comm]
+lemma fold_mul (P Q : NQubitPauliOperator n) : fold e (P * Q) = fold e P * fold e Q :=
+  mul_mul_mul_comm _ _ _ _
 
-@[simp] lemma fold_one : fold e (1 : NQubitPauliOperator n) = 1 := by
-  unfold fold
-  rw [sheet_one, sheet_one, one_mul]
+@[simp] lemma fold_one : fold e (1 : NQubitPauliOperator n) = 1 :=
+  mul_one 1
 
 /-- The sheet-`s` projection as a group homomorphism. -/
 noncomputable def sheetHom (s : Fin 2) : NQubitPauliOperator n →* NQubitPauliOperator m :=
@@ -299,72 +342,53 @@ noncomputable def doubleHom : NQubitPauliOperator m →* NQubitPauliOperator n :
   simp
 
 lemma fold_sheetSwap (P : NQubitPauliOperator n) : fold e (sheetSwap e P) = fold e P := by
-  unfold fold
-  rw [sheet_sheetSwap, sheet_sheetSwap, rev_zero_two, rev_one_two, mul_comm]
+  rw [fold, sheet_sheetSwap, sheet_sheetSwap, rev_zero_two, rev_one_two, mul_comm, fold]
 
-/-! ### Lemma 2.3: the algebra of fold and double -/
+/-- The sheet-`s` part of `double u * t` is `u * sheet e s t`. -/
+lemma sheet_double_mul (s : Fin 2) (u : NQubitPauliOperator m) (t : NQubitPauliOperator n) :
+    sheet e s (double e u * t) = u * sheet e s t := by
+  rw [sheet_mul, sheet_double]
 
-/-- Lemma 2.3 (1): the fold of a double is the identity. -/
+/-! ### The algebra of fold and double -/
+
+/-- The fold of a double is the identity. -/
 @[simp] theorem fold_double (u : NQubitPauliOperator m) : fold e (double e u) = 1 := by
-  unfold fold
-  rw [sheet_double, sheet_double, mul_self_eq_one]
+  rw [fold, sheet_double, sheet_double, mul_self_eq_one]
 
-/-- Lemma 2.3 (2): the double of the fold is `P * P^σ`. -/
+/-- Multiplying by a double does not change the fold. -/
+lemma fold_double_mul (u : NQubitPauliOperator m) (t : NQubitPauliOperator n) :
+    fold e (double e u * t) = fold e t := by
+  rw [fold_mul, fold_double, one_mul]
+
+/-- The double of the fold is `P * P^σ`. -/
 theorem double_fold (P : NQubitPauliOperator n) : double e (fold e P) = P * sheetSwap e P := by
   refine ext_pairs e (fun j => ?_) (fun j => ?_)
   · simp [fold_apply]
   · simp [fold_apply, PauliOperator.mulOp_operator_comm]
 
-/-- Lemma 2.3 (3): an operator folds to the identity iff it is the double of
-its sheet-`0` part. -/
-theorem fold_eq_one_iff (P : NQubitPauliOperator n) :
-    fold e P = 1 ↔ P = double e (sheet e 0 P) := by
-  constructor
-  · intro h
-    refine ext_pairs e (fun j => ?_) (fun j => ?_)
-    · simp
-    · have hj := congrFun h j
-      rw [fold_apply, one_apply, PauliOperator.mulOp_operator_eq_I_iff] at hj
-      simp [hj]
-  · intro h
-    rw [h, fold_double]
-
-/-- Lemma 2.3 (3): an operator is fixed by the sheet swap iff it folds to the
-identity. -/
-theorem sheetSwap_eq_self_iff (P : NQubitPauliOperator n) :
-    sheetSwap e P = P ↔ fold e P = 1 := by
-  constructor
-  · intro h
-    have h1 : sheet e 1 P = sheet e 0 P := by
-      conv_lhs => rw [← h]
-      rw [sheet_sheetSwap, rev_one_two]
-    unfold fold
-    rw [h1, mul_self_eq_one]
-  · intro h
-    rw [(fold_eq_one_iff e P).mp h, sheetSwap_double]
-
-/-- Lemma 2.3 (3): an operator folds to the identity iff it is a double. -/
-theorem fold_eq_one_iff_exists (P : NQubitPauliOperator n) :
-    fold e P = 1 ↔ ∃ u, P = double e u := by
-  rw [fold_eq_one_iff]
-  constructor
-  · intro h
-    exact ⟨_, h⟩
-  · rintro ⟨u, rfl⟩
-    rw [sheet_double]
-
-/-- Lemma 2.3 (3): the double is injective. -/
+/-- The double is injective. -/
 theorem double_injective : Function.Injective (double e) :=
   Function.LeftInverse.injective (sheet_double e 0)
 
-/-- The double of `u` is the product of its sheet-`0` lift with the sheet-`1`
-lift; in particular the sheet-`0` part of `double u * t` is `u * sheet e 0 t`.
--/
-lemma sheet_double_mul (s : Fin 2) (u : NQubitPauliOperator m) (t : NQubitPauliOperator n) :
-    sheet e s (double e u * t) = u * sheet e s t := by
-  rw [sheet_mul, sheet_double]
+/-- An operator folds to the identity iff it is the double of its sheet-`0`
+part. -/
+theorem fold_eq_one_iff (P : NQubitPauliOperator n) :
+    fold e P = 1 ↔ P = double e (sheet e 0 P) := by
+  refine ⟨fun h => ext_pairs e (fun j => by simp) fun j => ?_, fun h => by rw [h, fold_double]⟩
+  simpa using (congrFun ((mul_eq_one_iff _ _).mp h) j).symm
 
-/-! ### Lemma 2.4: weights -/
+/-- An operator is fixed by the sheet swap iff it folds to the identity. -/
+theorem sheetSwap_eq_self_iff (P : NQubitPauliOperator n) :
+    sheetSwap e P = P ↔ fold e P = 1 := by
+  rw [← (double_injective e).eq_iff (a := fold e P), double_fold, double_one, mul_eq_one_iff,
+    eq_comm]
+
+/-- An operator folds to the identity iff it is a double. -/
+theorem fold_eq_one_iff_exists (P : NQubitPauliOperator n) :
+    fold e P = 1 ↔ ∃ u, P = double e u :=
+  ⟨fun h => ⟨_, (fold_eq_one_iff e P).mp h⟩, by rintro ⟨u, rfl⟩; exact fold_double e u⟩
+
+/-! ### Weights -/
 
 /-- A sum over the qubits, pair by pair. -/
 lemma sum_pairs {M : Type*} [AddCommMonoid M] (F : Fin n → M) :
@@ -378,24 +402,25 @@ lemma weight_eq_sum_pairs (P : NQubitPauliOperator n) :
       (if P (e.symm (j, 1)) ≠ PauliOperator.I then 1 else 0)) := by
   rw [weight_eq_sum, sum_pairs e]
 
-/-- Lemma 2.4 (1): doubling doubles the weight. -/
+/-- Doubling doubles the weight. -/
 theorem weight_double (u : NQubitPauliOperator m) : weight (double e u) = 2 * weight u := by
   rw [weight_eq_sum_pairs e, weight_eq_sum, Finset.mul_sum]
-  refine Finset.sum_congr rfl fun j _ => ?_
-  simp only [double_apply, Equiv.apply_symm_apply]
-  ring
+  exact Finset.sum_congr rfl fun j _ => by
+    simp only [double_apply, Equiv.apply_symm_apply, two_mul]
 
 /-- The sheet swap preserves weight. -/
 theorem weight_sheetSwap (P : NQubitPauliOperator n) : weight (sheetSwap e P) = weight P := by
   rw [weight_eq_sum, weight_eq_sum]
-  exact Fintype.sum_equiv (partnerPerm e) _ _ (fun i => rfl)
+  exact Fintype.sum_equiv (partnerPerm e) _ _ fun _ => rfl
 
-lemma indicator_mulOp_le (a b : PauliOperator) :
+/-- A product of two single-qubit Paulis acts nontrivially only if one of the
+factors does. -/
+private lemma indicator_mulOp_le (a b : PauliOperator) :
     (if (a.mulOp b).operator ≠ PauliOperator.I then 1 else 0) ≤
       (if a ≠ PauliOperator.I then 1 else 0) + (if b ≠ PauliOperator.I then 1 else 0) := by
   cases a <;> cases b <;> decide
 
-/-- Lemma 2.4 (2): folding does not increase weight. -/
+/-- Folding does not increase weight. -/
 theorem weight_fold_le (P : NQubitPauliOperator n) : weight (fold e P) ≤ weight P := by
   rw [weight_eq_sum, weight_eq_sum_pairs e]
   exact Finset.sum_le_sum fun j _ => indicator_mulOp_le _ _
@@ -405,99 +430,58 @@ def overlap (P : NQubitPauliOperator n) : ℕ :=
   (Finset.univ.filter fun j : Fin m =>
     sheet e 0 P j ≠ PauliOperator.I ∧ sheet e 1 P j ≠ PauliOperator.I).card
 
-lemma indicator_add_eq_of_isXType {a b : PauliOperator} (ha : a.IsXType) (hb : b.IsXType) :
+/-- If two single-qubit Paulis agree unless one of them is the identity, they
+contribute to the weight what their product contributes, plus `2` if both act.
+-/
+private lemma indicator_add_eq {a b : PauliOperator}
+    (h : a = PauliOperator.I ∨ b = PauliOperator.I ∨ a = b) :
     (if a ≠ PauliOperator.I then 1 else 0) + (if b ≠ PauliOperator.I then 1 else 0) =
       (if (a.mulOp b).operator ≠ PauliOperator.I then 1 else 0) +
         2 * (if a ≠ PauliOperator.I ∧ b ≠ PauliOperator.I then 1 else 0) := by
-  rcases ha with rfl | rfl <;> rcases hb with rfl | rfl <;> decide
+  revert h
+  cases a <;> cases b <;> decide
 
-lemma indicator_add_eq_of_isZType {a b : PauliOperator} (ha : a.IsZType) (hb : b.IsZType) :
-    (if a ≠ PauliOperator.I then 1 else 0) + (if b ≠ PauliOperator.I then 1 else 0) =
-      (if (a.mulOp b).operator ≠ PauliOperator.I then 1 else 0) +
-        2 * (if a ≠ PauliOperator.I ∧ b ≠ PauliOperator.I then 1 else 0) := by
-  rcases ha with rfl | rfl <;> rcases hb with rfl | rfl <;> decide
-
-/-- Lemma 2.4 (3): for an operator of a single Pauli type, the weight is the
-weight of the fold plus twice the number of pairs on which both sheets act. -/
+/-- For an operator of a single Pauli type, the weight is the weight of the
+fold plus twice the number of pairs on which both sheets act. -/
 theorem weight_eq_weight_fold_add_two_mul_overlap (P : NQubitPauliOperator n)
     (hP : IsXType P ∨ IsZType P) :
     weight P = weight (fold e P) + 2 * overlap e P := by
   rw [weight_eq_sum_pairs e, weight_eq_sum, overlap, Finset.card_filter, Finset.mul_sum,
     ← Finset.sum_add_distrib]
-  refine Finset.sum_congr rfl fun j _ => ?_
-  rcases hP with hP | hP
-  · exact indicator_add_eq_of_isXType (hP _) (hP _)
-  · exact indicator_add_eq_of_isZType (hP _) (hP _)
+  exact Finset.sum_congr rfl fun j _ =>
+    indicator_add_eq (eq_I_or_eq_I_or_eq_of_isXType_or_isZType hP _ _)
 
-/-! ### Lemma 2.5: the two commutation rules -/
+/-! ### The two commutation rules -/
 
-lemma symplecticProductSingle_comm (a b : PauliOperator) :
-    PauliOperator.symplecticProductSingle a b = PauliOperator.symplecticProductSingle b a := by
-  cases a <;> cases b <;> decide
-
-lemma symplecticProductSingle_mulOp_right (a b c : PauliOperator) :
-    PauliOperator.symplecticProductSingle a (b.mulOp c).operator =
-      PauliOperator.symplecticProductSingle a b + PauliOperator.symplecticProductSingle a c := by
-  cases a <;> cases b <;> cases c <;> decide
-
-lemma symplecticProductSingle_mulOp_left (a b c : PauliOperator) :
-    PauliOperator.symplecticProductSingle (a.mulOp b).operator c =
-      PauliOperator.symplecticProductSingle a c + PauliOperator.symplecticProductSingle b c := by
-  cases a <;> cases b <;> cases c <;> decide
-
-/-- The symplectic form is symmetric. -/
-lemma symplecticInner_comm (P Q : NQubitPauliOperator n) :
-    symplecticInner P Q = symplecticInner Q P := by
-  unfold symplecticInner
-  exact Finset.sum_congr rfl fun i _ => symplecticProductSingle_comm _ _
-
-/-- The symplectic form is additive in the right argument. -/
-lemma symplecticInner_mul_right (P Q R : NQubitPauliOperator n) :
-    symplecticInner P (Q * R) = symplecticInner P Q + symplecticInner P R := by
-  unfold symplecticInner
-  rw [← Finset.sum_add_distrib]
-  exact Finset.sum_congr rfl fun i _ => symplecticProductSingle_mulOp_right _ _ _
-
-/-- The symplectic form is additive in the left argument. -/
-lemma symplecticInner_mul_left (P Q R : NQubitPauliOperator n) :
-    symplecticInner (P * Q) R = symplecticInner P R + symplecticInner Q R := by
-  unfold symplecticInner
-  rw [← Finset.sum_add_distrib]
-  exact Finset.sum_congr rfl fun i _ => symplecticProductSingle_mulOp_left _ _ _
-
-/-- Lemma 2.5, first rule: `⟪double u, P⟫ = ⟪u, fold P⟫`. -/
+/-- The first commutation rule: `⟪double u, P⟫ = ⟪u, fold P⟫`. -/
 theorem symplecticInner_double_left (u : NQubitPauliOperator m) (P : NQubitPauliOperator n) :
     symplecticInner (double e u) P = symplecticInner u (fold e P) := by
+  rw [fold, symplecticInner_mul_right]
   unfold symplecticInner
-  rw [sum_pairs e]
-  refine Finset.sum_congr rfl fun j _ => ?_
-  simp only [double_apply, Equiv.apply_symm_apply, fold_apply]
-  exact (symplecticProductSingle_mulOp_right _ _ _).symm
+  rw [sum_pairs e, Finset.sum_add_distrib]
+  simp only [double_apply, Equiv.apply_symm_apply, sheet_apply]
 
-/-- Lemma 2.5, first rule, mirrored: `⟪P, double u⟫ = ⟪fold P, u⟫`. -/
+/-- The first commutation rule, mirrored: `⟪P, double u⟫ = ⟪fold P, u⟫`. -/
 theorem symplecticInner_double_right (P : NQubitPauliOperator n) (u : NQubitPauliOperator m) :
     symplecticInner P (double e u) = symplecticInner (fold e P) u := by
   rw [symplecticInner_comm, symplecticInner_double_left, symplecticInner_comm]
 
 /-- The sheet swap preserves the symplectic form. -/
 theorem symplecticInner_sheetSwap (P Q : NQubitPauliOperator n) :
-    symplecticInner (sheetSwap e P) (sheetSwap e Q) = symplecticInner P Q := by
-  unfold symplecticInner
-  exact Fintype.sum_equiv (partnerPerm e) _ _ (fun i => rfl)
+    symplecticInner (sheetSwap e P) (sheetSwap e Q) = symplecticInner P Q :=
+  Fintype.sum_equiv (partnerPerm e) _ _ fun _ => rfl
 
 /-- The sheet swap is self-adjoint for the symplectic form. -/
 theorem symplecticInner_sheetSwap_left (P Q : NQubitPauliOperator n) :
     symplecticInner (sheetSwap e P) Q = symplecticInner P (sheetSwap e Q) := by
   rw [← symplecticInner_sheetSwap e (sheetSwap e P) Q, sheetSwap_sheetSwap]
 
-/-- Lemma 2.5, second rule:
+/-- The second commutation rule:
 `⟪fold P, fold Q⟫ = ⟪P, Q⟫ + ⟪P, Q^σ⟫`. -/
 theorem symplecticInner_fold_fold (P Q : NQubitPauliOperator n) :
     symplecticInner (fold e P) (fold e Q) =
       symplecticInner P Q + symplecticInner P (sheetSwap e Q) := by
   rw [← symplecticInner_double_right, double_fold, symplecticInner_mul_right]
-
-/-! ### The commutation rules for Pauli group elements -/
 
 open NQubitPauliGroupElement in
 /-- The phase-zero lift of a double commutes with `g` iff
@@ -508,37 +492,18 @@ theorem ofOperator_double_commute_iff (u : NQubitPauliOperator m)
       symplecticInner u (fold e g.operators) = 0 := by
   rw [commutes_iff_symplectic_inner_zero, ofOperator_operators, symplecticInner_double_left]
 
-open NQubitPauliGroupElement in
-/-- Commutation of Pauli group elements depends only on their operator parts.
--/
-theorem commute_iff_of_operators_eq {g g' h : NQubitPauliGroupElement n}
-    (hg : g.operators = g'.operators) :
-    g * h = h * g ↔ g' * h = h * g' := by
-  rw [commutes_iff_symplectic_inner_zero, commutes_iff_symplectic_inner_zero, hg]
-
 /-! ### X-type operators form a sector
 
 The X-type operators (every entry `I` or `X`) are closed under products,
 sheets, fold and double; the same holds for Z-type operators. This is what lets
 the distance theorem be applied one Pauli type at a time to a CSS code. -/
 
-lemma isXType_one : IsXType (1 : NQubitPauliOperator m) :=
-  fun _ => PauliOperator.IsXType_I
-
-lemma isXType_mul {x y : NQubitPauliOperator m} (hx : IsXType x) (hy : IsXType y) :
-    IsXType (x * y) := by
-  intro j
-  rw [mul_apply]
-  exact PauliOperator.mulOp_operator_IsXType_of_IsXType (hx j) (hy j)
-
 lemma isXType_sheet (s : Fin 2) {P : NQubitPauliOperator n} (hP : IsXType P) :
     IsXType (sheet e s P) :=
   fun j => hP (e.symm (j, s))
 
-lemma isXType_fold {P : NQubitPauliOperator n} (hP : IsXType P) : IsXType (fold e P) := by
-  intro j
-  rw [fold_apply]
-  exact PauliOperator.mulOp_operator_IsXType_of_IsXType (hP _) (hP _)
+lemma isXType_fold {P : NQubitPauliOperator n} (hP : IsXType P) : IsXType (fold e P) :=
+  isXType_mul (isXType_sheet e 0 hP) (isXType_sheet e 1 hP)
 
 lemma isXType_double {u : NQubitPauliOperator m} (hu : IsXType u) : IsXType (double e u) :=
   fun i => hu (e i).1
