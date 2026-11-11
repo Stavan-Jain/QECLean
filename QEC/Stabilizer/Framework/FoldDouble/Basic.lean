@@ -16,7 +16,7 @@ the elementary calculus of a pairing on phase-free Pauli operators
   group under the qubit-wise product (every element is an involution),
   forgetting the phase of a Pauli group element is the group homomorphism
   `NQubitPauliGroupElement.operatorsHom`, and the symplectic form is additive
-  in each argument (`symplecticInner_mul_left'`, `symplecticInner_mul_right'`);
+  in each argument (`symplecticInner_mul_left`, `symplecticInner_mul_right`);
 * the two **sheets** `sheet e s P` of an operator, the **sheet swap**
   `sheetSwap e P` (written `P^σ` below), the **fold**
   `fold e P = sheet e 0 P * sheet e 1 P` and the **double**
@@ -150,16 +150,16 @@ lemma eq_I_or_eq_I_or_eq_of_isXType_or_isZType {P : NQubitPauliOperator n}
     simp [h, h']
 
 /-- The symplectic form is additive in the left argument for the phase-free
-product: `symplecticInner_mul_left` stated on operators. -/
-lemma symplecticInner_mul_left' (u v w : NQubitPauliOperator n) :
+product. -/
+lemma symplecticInner_mul_left (u v w : NQubitPauliOperator n) :
     symplecticInner (u * v) w = symplecticInner u w + symplecticInner v w :=
-  symplecticInner_mul_left (.ofOperator u) (.ofOperator v) (.ofOperator w)
+  symplecticInner_mulOp_left u v w
 
 /-- The symplectic form is additive in the right argument for the phase-free
-product: `symplecticInner_mul_right` stated on operators. -/
-lemma symplecticInner_mul_right' (u v w : NQubitPauliOperator n) :
+product. -/
+lemma symplecticInner_mul_right (u v w : NQubitPauliOperator n) :
     symplecticInner u (v * w) = symplecticInner u v + symplecticInner u w :=
-  symplecticInner_mul_right (.ofOperator u) (.ofOperator v) (.ofOperator w)
+  symplecticInner_mulOp_right u v w
 
 end NQubitPauliOperator
 
@@ -456,7 +456,7 @@ theorem weight_eq_weight_fold_add_two_mul_overlap (P : NQubitPauliOperator n)
 /-- The first commutation rule: `⟪double u, P⟫ = ⟪u, fold P⟫`. -/
 theorem symplecticInner_double_left (u : NQubitPauliOperator m) (P : NQubitPauliOperator n) :
     symplecticInner (double e u) P = symplecticInner u (fold e P) := by
-  rw [fold, symplecticInner_mul_right']
+  rw [fold, symplecticInner_mul_right]
   unfold symplecticInner
   rw [sum_pairs e, Finset.sum_add_distrib]
   simp only [double_apply, Equiv.apply_symm_apply, sheet_apply]
@@ -481,7 +481,7 @@ theorem symplecticInner_sheetSwap_left (P Q : NQubitPauliOperator n) :
 theorem symplecticInner_fold_fold (P Q : NQubitPauliOperator n) :
     symplecticInner (fold e P) (fold e Q) =
       symplecticInner P Q + symplecticInner P (sheetSwap e Q) := by
-  rw [← symplecticInner_double_right, double_fold, symplecticInner_mul_right']
+  rw [← symplecticInner_double_right, double_fold, symplecticInner_mul_right]
 
 open NQubitPauliGroupElement in
 /-- The phase-zero lift of a double commutes with `g` iff

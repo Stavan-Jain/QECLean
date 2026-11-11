@@ -8,7 +8,9 @@ Transfer of chains along a map of index types, in four layers.
 1. **Fiber summation.** `fiberSumFn f u` is the pushforward
    `(f_* u) j = ∑ i ∈ f⁻¹ j, u i` of a chain along an arbitrary map
    `f : I → J` of finite types; `fiberSum f` is the same as a linear map. It is
-   the transpose of the pullback `u ↦ u ∘ f` (`sum_fiberSumFn_mul`).
+   the transpose of the pullback `u ↦ u ∘ f` (`sum_fiberSumFn_mul`), preserves
+   the sum of the values (`sum_fiberSumFn`) and sends point masses to point
+   masses (`fiberSumFn_single`).
 2. **Convolution.** Along an additive homomorphism `π : G →+ H` the pushforward
    is multiplicative (`fiberSum_conv`), and convolution against a pulled-back
    chain is the pullback of a convolution (`conv_pullback`). Neither needs `π`
@@ -78,6 +80,19 @@ lemma sum_fiberSumFn_mul [Fintype J] (f : I → J) (u : I → ZMod 2) (F : J →
   simp only [fiberSumFn_apply, Finset.sum_mul, ite_mul, zero_mul]
   rw [Finset.sum_comm]
   simp
+
+/-- The pushforward preserves the sum of the values of a chain. -/
+lemma sum_fiberSumFn [Fintype J] (f : I → J) (u : I → ZMod 2) :
+    ∑ j, fiberSumFn f u j = ∑ i, u i := by
+  simpa using sum_fiberSumFn_mul f u fun _ => 1
+
+/-- The pushforward of a point mass is a point mass. -/
+lemma fiberSumFn_single [DecidableEq I] (f : I → J) (i : I) (c : ZMod 2) :
+    fiberSumFn f (Pi.single i c) = Pi.single (f i) c := by
+  funext j
+  rw [fiberSumFn_apply, Fintype.sum_eq_single i fun x hx => by rw [Pi.single_eq_of_ne hx, ite_self],
+    Pi.single_eq_same, Pi.single_apply]
+  exact if_congr eq_comm rfl rfl
 
 /-- Fiber summation along `Prod.map f id` acts blockwise: at `(j, b)` it is
 fiber summation along `f` of the `b`-slice. -/

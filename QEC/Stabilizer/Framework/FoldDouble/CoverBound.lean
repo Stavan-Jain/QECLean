@@ -169,8 +169,7 @@ theorem isLeast_logicalWeight_two_mul_of_symmetric_weight (hsym : IsSymmetric e 
   constructor
   · -- a minimum-weight logical of `F` is not a seam logical; its double is a witness
     obtain ⟨g, hg, hw⟩ := hd₀.1
-    have h1 : 1 ≤ NQubitPauliGroupElement.weight g :=
-      one_le_weight_of_isNontrivialLogicalOperator hg
+    have h1 := hg.weight_pos
     have hns : ¬ IsSeamLogical e S g.operators := fun hseam => by
       have := hFl _ hseam
       rw [← weight_eq_weight_operators, hw] at this
@@ -203,11 +202,8 @@ theorem hasCodeDistance_two_mul_of_symmetric_weight {k : ℕ} (C : StabilizerCod
     (hS : ∀ b ∈ foldImage e S, b ≠ 1 → weight b < 2 * d₀ →
       ∀ v, IsNontrivialLogicalOperator v S → fold e v.operators = b →
         2 * d₀ ≤ NQubitPauliGroupElement.weight v) :
-    HasCodeDistance C (2 * d₀) := by
-  have h1 : 1 ≤ d₀ := by
-    obtain ⟨g, hg, hw⟩ := hd₀.1
-    exact hw ▸ one_le_weight_of_isNontrivialLogicalOperator hg
-  exact hasCodeDistance_of_isLeast C hC (by omega)
+    HasCodeDistance C (2 * d₀) :=
+  hasCodeDistance_of_isLeast C hC
     (isLeast_logicalWeight_two_mul_of_symmetric_weight e S hsym hF hd₀ hR hFl hS)
 
 end FoldDouble

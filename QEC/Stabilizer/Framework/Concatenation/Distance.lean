@@ -21,19 +21,6 @@ Concatenating an inner code of distance `d₁` with an outer code of distance
 
 namespace Quantum
 
-namespace StabilizerGroup
-
-open NQubitPauliGroupElement
-
-/-- A nontrivial logical operator has positive weight: an element of weight `0`
-has the operator part of the identity, which is in the stabilizer group. -/
-lemma IsNontrivialLogicalOperator.weight_pos {n : ℕ} {S : StabilizerGroup n}
-    {g : NQubitPauliGroupElement n} (hg : IsNontrivialLogicalOperator g S) : 0 < weight g :=
-  Nat.pos_of_ne_zero fun h =>
-    hg.2 1 S.one_mem ((one_operators_def n).trans ((weight_eq_zero_iff g).mp h).symm)
-
-end StabilizerGroup
-
 namespace Concatenation.ConcatCSSData
 
 open NQubitPauliGroupElement StabilizerGroup

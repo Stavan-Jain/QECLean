@@ -16,7 +16,9 @@ transformation `σ`.
   `dim (range ε) + dim Hb + dim (range p ⊓ ker τ) = dim Hc + dim (ker τ)`;
 - `finrank_sub_le_finrank_range_comp`: the bound
   `dim Hc - dim Hb ≤ dim (range ε)`;
-- `finrank_range_comp_eq_of_ker_le`: equality when `ker τ ≤ range p`.
+- `finrank_range_comp_add_eq_of_ker_le`, `finrank_range_comp_eq_of_ker_le`:
+  when `ker τ ≤ range p`, the equality `dim (range ε) + dim Hb = dim Hc`, hence
+  `dim (range ε) = dim Hc - dim Hb`.
 -/
 
 namespace Quantum
@@ -65,14 +67,21 @@ theorem finrank_sub_le_finrank_range_comp (p : Hc →ₗ[F] Hb) (τ : Hb →ₗ[
   have hle := Submodule.finrank_mono (inf_le_right : range p ⊓ ker τ ≤ ker τ)
   omega
 
+/-- With `ker p = range τ` and `ker τ ≤ range p`, the composite `ε = τ ∘ p`
+satisfies `dim (range ε) + dim Hb = dim Hc`. -/
+theorem finrank_range_comp_add_eq_of_ker_le (p : Hc →ₗ[F] Hb) (τ : Hb →ₗ[F] Hc)
+    (hexact : ker p = range τ) (hle : ker τ ≤ range p) :
+    finrank F (range (τ ∘ₗ p)) + finrank F Hb = finrank F Hc := by
+  have hid := finrank_range_comp_add_eq p τ hexact
+  rw [inf_of_le_right hle] at hid
+  omega
+
 /-- With `ker p = range τ` and `ker τ ≤ range p`, the image of the composite
 `ε = τ ∘ p` has dimension exactly `dim Hc - dim Hb`. -/
 theorem finrank_range_comp_eq_of_ker_le (p : Hc →ₗ[F] Hb) (τ : Hb →ₗ[F] Hc)
     (hexact : ker p = range τ) (hle : ker τ ≤ range p) :
-    finrank F (range (τ ∘ₗ p)) = finrank F Hc - finrank F Hb := by
-  have hid := finrank_range_comp_add_eq p τ hexact
-  rw [inf_of_le_right hle] at hid
-  omega
+    finrank F (range (τ ∘ₗ p)) = finrank F Hc - finrank F Hb :=
+  Nat.eq_sub_of_add_eq (finrank_range_comp_add_eq_of_ker_le p τ hexact hle)
 
 end BBBocksteinRank
 end Homological

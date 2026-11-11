@@ -30,13 +30,19 @@ the X-check matrix is `[M_A | M_B]` and the Z-check matrix is `[M_Bᵀ | M_Aᵀ]
   `𝔽₂[ZMod ℓ × ZMod m]` given by its monomials.
 * `translate`, `translate1`: translation of chains by a group element, which
   commutes with the boundary maps (`bbBoundary1Fn_translate1`,
-  `bbBoundary2Fn_translate`).
+  `bbBoundary2Fn_translate`) and preserves weight (`card_support_translate1`).
 * `leftHalf`, `rightHalf`: the two blocks of a 1-chain (`halves_ext_iff`).
 * `bbBoundary1Fn`, `bbBoundary2Fn`: the boundary maps as plain functions, and
   `bbBoundary1`, `bbBoundary2`: the same maps as `ZMod 2`-linear maps, with
   `bbBoundary_comp : ∂₁ ∘ ∂₂ = 0`.
 * `bbChainComplex A B : HomologicalCode`: the chain complex, on
   `bbNumQubits G = 2 * |G|` qubits.
+
+## Main statements
+
+* `sum_conv`: the augmentation `a ↦ ∑ g, a g` is multiplicative for `⋆`.
+* `cycle_support_even`: if `A` and `B` each have an odd number of terms, every
+  1-cycle has even weight.
 -/
 
 namespace Quantum
@@ -299,6 +305,16 @@ lemma conv_single_right_apply [DecidableEq G] (a : G) (b : G → ZMod 2) (g : G)
     (b ⋆ Pi.single a 1) g = b (g - a) := by
   rw [conv_comm, conv_single_left]
 
+/-- The augmentation `a ↦ ∑ g, a g` of `𝔽₂[G]` is multiplicative:
+`∑ g, (a ⋆ b) g = (∑ g, a g) * ∑ g, b g`. -/
+lemma sum_conv (a b : G → ZMod 2) :
+    ∑ g, (a ⋆ b) g = (∑ g, a g) * ∑ g, b g := by
+  simp only [conv_apply]
+  rw [Finset.sum_comm, Finset.sum_mul]
+  refine Finset.sum_congr rfl fun h _ => ?_
+  rw [← Finset.mul_sum]
+  exact congrArg _ (Equiv.sum_comp (Equiv.subRight h) b)
+
 /-! ## Translation of chains -/
 
 /-- Translation of a chain by a group element: `(translate c v) g = v (g + c)`.
@@ -449,6 +465,40 @@ lemma bbBoundary1Fn_translate1 (c : G) (v : G × Fin 2 → ZMod 2) :
 lemma bbBoundary2Fn_translate (c : G) (f : G → ZMod 2) :
     bbBoundary2Fn A B (translate c f) = translate1 c (bbBoundary2Fn A B f) :=
   halves_ext_iff.mpr ⟨conv_translate A f c, conv_translate B f c⟩
+
+/-- Translating a 1-chain does not change the size of its support. -/
+lemma card_support_translate1 (c : G) (v : G × Fin 2 → ZMod 2) :
+    (Finset.univ.filter fun p => translate1 c v p ≠ 0).card
+      = (Finset.univ.filter fun p => v p ≠ 0).card :=
+  Finset.card_equiv ((Equiv.addRight c).prodCongr (Equiv.refl (Fin 2))) (by simp)
+
+/-! ## Parity of cycles
+
+If `A` and `B` both have an odd number of terms, every 1-cycle has even weight:
+applying the augmentation to `B ⋆ c_L + A ⋆ c_R = 0` gives
+`∑ g, c_L g + ∑ g, c_R g = 0`. -/
+
+/-- The size of the support of a `ZMod 2`-chain, reduced modulo 2, is the sum
+of its values. -/
+lemma natCast_card_support {I : Type*} [Fintype I] (v : I → ZMod 2) :
+    ((Finset.univ.filter fun i => v i ≠ 0).card : ZMod 2) = ∑ i, v i := by
+  have key : ∀ a : ZMod 2, ((if a ≠ 0 then 1 else 0 : ℕ) : ZMod 2) = a := by decide
+  rw [Finset.card_filter, Nat.cast_sum]
+  exact Finset.sum_congr rfl fun i _ => key (v i)
+
+/-- If `∑ g, A g = 1` and `∑ g, B g = 1`, that is, `A` and `B` each have an odd
+number of terms, then every 1-cycle of the bivariate bicycle complex has even
+weight. -/
+theorem cycle_support_even (hA : ∑ g, A g = 1) (hB : ∑ g, B g = 1)
+    {v : G × Fin 2 → ZMod 2} (hv : bbBoundary1Fn A B v = 0) :
+    Even (Finset.univ.filter fun p => v p ≠ 0).card := by
+  have h : ∑ g, bbBoundary1Fn A B v g = 0 := by
+    rw [hv]
+    exact Finset.sum_const_zero
+  simp only [bbBoundary1Fn, Finset.sum_add_distrib, sum_conv, hA, hB, one_mul] at h
+  rw [← ZMod.natCast_eq_zero_iff_even, natCast_card_support, Fintype.sum_prod_type_right,
+    Fin.sum_univ_two]
+  exact h
 
 /-! ## Packaging as a `HomologicalCode` -/
 

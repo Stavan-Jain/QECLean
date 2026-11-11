@@ -167,19 +167,24 @@ lemma bbBoundary1Fn_single_right (g v : G) :
     simp [rightHalf, Pi.single_apply]
   rw [bbBoundary1Fn_eq, hL, hR, conv_zero_right, zero_add, conv_single_right_apply]
 
+/-- `∂₁` of a point mass: `(∂₁ δ_q) v` is `B (v - q.1)` for a qubit `q` of the
+left block and `A (v - q.1)` for one of the right block. -/
+lemma bbBoundary1Fn_single (q : G × Fin 2) (v : G) :
+    bbBoundary1Fn A B (Pi.single q 1) v = if q.2 = 0 then B (v - q.1) else A (v - q.1) := by
+  obtain ⟨g, j⟩ := q
+  obtain rfl | rfl : j = 0 ∨ j = 1 := by omega
+  exacts [bbBoundary1Fn_single_left A B g v, bbBoundary1Fn_single_right A B g v]
+
 /-- The transpose of `∂₁` for the bivariate bicycle complex:
 `cutMap s = (reflect B ⋆ s | reflect A ⋆ s)`. -/
 theorem bb_cutMap_eq (s : G → ZMod 2) :
     (bbChainComplex A B).cutMap s
       = fun p : G × Fin 2 =>
           if p.2 = 0 then (reflect B ⋆ s) p.1 else (reflect A ⋆ s) p.1 := by
-  funext ⟨g, j⟩
-  change ∑ v : G, s v * bbBoundary1Fn A B (Pi.single (g, j) 1) v = _
-  obtain rfl | rfl : j = 0 ∨ j = 1 := by omega
-  · simp only [bbBoundary1Fn_single_left, reflect_conv_apply]
-    rfl
-  · simp only [bbBoundary1Fn_single_right, reflect_conv_apply]
-    rfl
+  funext q
+  change ∑ v : G, s v * bbBoundary1Fn A B (Pi.single q 1) v = _
+  simp only [bbBoundary1Fn_single, reflect_conv_apply]
+  split_ifs <;> rfl
 
 /-! ## The duality map exchanges the complex with its dual -/
 
@@ -220,19 +225,12 @@ theorem bbDual_mem_dualBoundaries_iff (c : G × Fin 2 → ZMod 2) :
 
 /-! ## The duality map preserves weight -/
 
-/-- Composing a predicate with an equivalence does not change how many points
-satisfy it. -/
-lemma card_filter_comp_equiv {α β : Type} [Fintype α] [Fintype β]
-    (e : α ≃ β) (p : β → Prop) [DecidablePred p] :
-    (Finset.univ.filter fun a => p (e a)).card
-      = (Finset.univ.filter p).card :=
-  Finset.card_equiv e (by simp)
-
 /-- `bbDualFn` preserves chain weight. -/
 theorem bbDual_chainWeight (c : G × Fin 2 → ZMod 2) :
     (bbChainComplex A B).chainWeight (bbDualFn c)
       = (bbChainComplex A B).chainWeight c :=
-  card_filter_comp_equiv blockSwapNeg (fun p => c p ≠ 0)
+  Finset.card_equiv (s := Finset.univ.filter fun p => c (blockSwapNeg p) ≠ 0)
+    (t := Finset.univ.filter fun p => c p ≠ 0) blockSwapNeg (by simp)
 
 /-! ## Equality of the chain-level X- and Z-distances -/
 

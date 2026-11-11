@@ -170,8 +170,8 @@ lemma logicalClass_mul (Xbar Zbar : NQubitPauliOperator n₁) (r s : NQubitPauli
   apply PauliOperator.toSymplecticSingle_injective
   rw [PauliOperator.toSymplecticSingle_add]
   simp only [toSymplecticSingle_logicalClass]
-  exact congrArg₂ Prod.mk (symplecticInner_mul_left r s (ofOperator Zbar))
-    (symplecticInner_mul_left r s (ofOperator Xbar))
+  exact congrArg₂ Prod.mk (symplecticInner_mulOp_left r.operators s.operators Zbar)
+    (symplecticInner_mulOp_left r.operators s.operators Xbar)
 
 /-- Pairing `R` with the promotion of a single-qubit Pauli `P ≠ Y` is the
 single-qubit symplectic product of the logical class of `R` with `P`. -/

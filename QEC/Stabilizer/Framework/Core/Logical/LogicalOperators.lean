@@ -27,6 +27,8 @@ Main definitions and results:
   minimizes over;
 - `isNontrivialLogicalOperator_of_anticommute_centralizer`: a centralizer
   element that anticommutes with another centralizer element is nontrivial;
+- `IsNontrivialLogicalOperator.weight_pos`: a nontrivial logical operator has
+  positive weight;
 - `LogicalQubitOps n S`: an anticommuting pair of logical `X` and `Z`
   operators, both of which are nontrivial logical operators;
 - `SameLogicalOperator L L' S`: `L` and `L'` lie in the same coset of `S`, an
@@ -142,6 +144,14 @@ theorem isNontrivialLogicalOperator_of_anticommute_centralizer (S : StabilizerGr
   ⟨hg, fun s hs h_ops =>
     not_mem_stabilizer_of_anticommutes_centralizer S s h hh
       ((NQubitPauliGroupElement.anticommute_congr_left h_ops).mpr hgh) hs⟩
+
+/-- A nontrivial logical operator has positive weight: an element of weight `0`
+has the operator part of the identity, which is in the stabilizer group. -/
+lemma IsNontrivialLogicalOperator.weight_pos {g : NQubitPauliGroupElement n}
+    {S : StabilizerGroup n} (hg : IsNontrivialLogicalOperator g S) :
+    0 < NQubitPauliGroupElement.weight g :=
+  Nat.pos_of_ne_zero fun h =>
+    hg.2 1 S.one_mem ((NQubitPauliGroupElement.weight_eq_zero_iff g).mp h).symm
 
 /-!
 ## Logical `X` and `Z` of one logical qubit

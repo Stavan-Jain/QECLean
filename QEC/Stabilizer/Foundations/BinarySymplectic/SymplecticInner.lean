@@ -222,20 +222,22 @@ lemma symplecticInner_identity_right (p : NQubitPauliOperator n) :
   Finset.sum_eq_zero fun i _ => PauliOperator.symplecticProductSingle_I_right (p i)
 
 /-- The symplectic inner product is additive in its first argument with respect
-to the product of Pauli group elements. -/
-lemma symplecticInner_mul_left (p q r : NQubitPauliGroupElement n) :
-    ⟪p * q, r⟫ₛ = ⟪p, r⟫ₛ + ⟪q, r⟫ₛ := by
+to the qubit-wise product of operators. -/
+lemma symplecticInner_mulOp_left (p q r : NQubitPauliOperator n) :
+    symplecticInner (NQubitPauliGroupElement.mulOp p q).operators r =
+      symplecticInner p r + symplecticInner q r := by
   unfold symplecticInner
   rw [← Finset.sum_add_distrib]
   exact Finset.sum_congr rfl fun i _ =>
-    PauliOperator.symplecticProductSingle_mulOp_left (p.operators i) (q.operators i) _
+    PauliOperator.symplecticProductSingle_mulOp_left (p i) (q i) _
 
 /-- The symplectic inner product is additive in its second argument with respect
-to the product of Pauli group elements. -/
-lemma symplecticInner_mul_right (p q r : NQubitPauliGroupElement n) :
-    ⟪p, q * r⟫ₛ = ⟪p, q⟫ₛ + ⟪p, r⟫ₛ := by
-  rw [symplecticInner_comm, symplecticInner_mul_left, symplecticInner_comm q.operators,
-    symplecticInner_comm r.operators]
+to the qubit-wise product of operators. -/
+lemma symplecticInner_mulOp_right (p q r : NQubitPauliOperator n) :
+    symplecticInner p (NQubitPauliGroupElement.mulOp q r).operators =
+      symplecticInner p q + symplecticInner p r := by
+  rw [symplecticInner_comm, symplecticInner_mulOp_left, symplecticInner_comm q,
+    symplecticInner_comm r]
 
 /-- The symplectic inner product counts, modulo `2`, the qubits at which the
 two operators anticommute. -/

@@ -64,19 +64,19 @@ theorem hasCodeDistance_of (C : StabilizerCode n k) (d : ℕ)
     HasCodeDistance C d :=
   ⟨hd, fun g hg hw => not_lt.mp fun h => h_min (weight g) hw h g rfl hg, h_witness⟩
 
-/-- If `d ≥ 1` is the least weight of a nontrivial logical operator of a
-stabilizer group `S` with the same subgroup as the code `C`, then `C` has
-distance `d`. -/
+/-- If `d` is the least weight of a nontrivial logical operator of a stabilizer
+group `S` with the same subgroup as the code `C`, then `C` has distance `d`;
+`d ≥ 1` because a nontrivial logical operator has positive weight. -/
 theorem hasCodeDistance_of_isLeast (C : StabilizerCode n k)
     {S : StabilizerGroup n} {d : ℕ}
-    (hS : C.toStabilizerGroup.toSubgroup = S.toSubgroup) (hd : 1 ≤ d)
+    (hS : C.toStabilizerGroup.toSubgroup = S.toSubgroup)
     (hleast : IsLeast {w : ℕ | ∃ g : NQubitPauliGroupElement n,
       IsNontrivialLogicalOperator g S ∧ weight g = w} d) :
     HasCodeDistance C d := by
-  refine ⟨hd, fun g hg _ => ?_, ?_⟩
-  · exact hleast.2 ⟨g, (IsNontrivialLogicalOperator_of_toSubgroup_eq g hS).mp hg, rfl⟩
-  · obtain ⟨g, hg, hw⟩ := hleast.1
-    exact ⟨g, (IsNontrivialLogicalOperator_of_toSubgroup_eq g hS).mpr hg, hw⟩
+  obtain ⟨g, hg, rfl⟩ := hleast.1
+  exact ⟨hg.weight_pos,
+    fun g' hg' _ => hleast.2 ⟨g', (IsNontrivialLogicalOperator_of_toSubgroup_eq g' hS).mp hg', rfl⟩,
+    g, (IsNontrivialLogicalOperator_of_toSubgroup_eq g hS).mpr hg, rfl⟩
 
 /-!
 ## `StabilizerCodeWithDistance`: the full `[[n, k, d]]` packaging

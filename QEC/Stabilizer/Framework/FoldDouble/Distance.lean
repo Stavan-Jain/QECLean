@@ -394,14 +394,6 @@ theorem isLeast_logicalWeight_two_mul_of_symmetric (hsym : IsSymmetric e S)
       ((isLeast_logicalWeight_iff_of_operatorImage_eq e S hF d₀).mp hd₀) hW)
     (fun b hb => hFl b ⟨(logicalFoldImage_le_seamGroup_iff e S).mp hR hb.1, hb.2⟩) hS
 
-/-- A nontrivial logical operator has positive weight: a weight-`0` element has
-the operator part of the identity, which is a stabilizer. -/
-lemma one_le_weight_of_isNontrivialLogicalOperator {F : StabilizerGroup m}
-    {g : NQubitPauliGroupElement m} (hg : IsNontrivialLogicalOperator g F) :
-    1 ≤ NQubitPauliGroupElement.weight g :=
-  Nat.one_le_iff_ne_zero.mpr fun h0 =>
-    hg.2 1 F.one_mem ((NQubitPauliGroupElement.weight_eq_zero_iff g).mp h0).symm
-
 /-- The symmetric form for a packaged `[[n, k]]` code: under the hypotheses of
 `isLeast_logicalWeight_two_mul_of_symmetric`, a stabilizer code with stabilizer
 group `S` has distance `2 d₀`. -/
@@ -416,11 +408,8 @@ theorem hasCodeDistance_two_mul_of_symmetric {k : ℕ} (C : StabilizerCode n k)
     (hS : ∀ b ∈ foldImage e S, b ≠ 1 → weight b < 2 * d₀ →
       ∀ v, IsNontrivialLogicalOperator v S → fold e v.operators = b →
         2 * d₀ ≤ weight b + 2 * residualWeight e v) :
-    HasCodeDistance C (2 * d₀) := by
-  have h1 : 1 ≤ d₀ := by
-    obtain ⟨g, hg, hw⟩ := hd₀.1
-    exact hw ▸ one_le_weight_of_isNontrivialLogicalOperator hg
-  exact hasCodeDistance_of_isLeast C hC (by omega)
+    HasCodeDistance C (2 * d₀) :=
+  hasCodeDistance_of_isLeast C hC
     (isLeast_logicalWeight_two_mul_of_symmetric e S hsym hF hd₀ hW hR hFl hS)
 
 /-! ## The unconditional floor -/
