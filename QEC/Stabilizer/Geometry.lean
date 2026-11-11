@@ -5,8 +5,10 @@ import QEC.Stabilizer.Geometry.CellComplexTypes
 /-!
 # Geometry
 
-Lattice-family-agnostic geometric primitives:
-- `FinPeriodic`: modular arithmetic on `Fin L` (`next`, `prev`)
-- `GridIndexing`: row-major / column-major coordinate encodings
-- `CellComplexTypes`: abstract `EdgeIdx`, `FaceIdx`, `VtxIdx` and chain types
+Lattice primitives shared by the lattice code families:
+
+- `FinPeriodic`: cyclic successor and predecessor on `Fin L` (`next`, `prev`).
+- `GridIndexing`: injectivity of the row-major encoding of grid coordinates.
+- `CellComplexTypes`: vertex, edge and face indices of an `L × L` periodic
+  square lattice, and the chain groups over `ZMod 2`.
 -/

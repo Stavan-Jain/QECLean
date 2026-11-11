@@ -10,41 +10,28 @@ import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
 import QEC.Stabilizer.Framework.Symplectic.Presentation
 import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
 
-namespace Quantum
-open scoped BigOperators
-open scoped Pauli
-
-namespace StabilizerGroup
-namespace FiveQubit_5_1_3
-
 /-!
-# The five-qubit perfect code `[[5, 1, 3]]`
+# The five-qubit code `[[5, 1, 3]]`
 
-The smallest stabilizer code that corrects an arbitrary single-qubit error
-[Laflamme–Miquel–Paz–Zurek 1996, `arxiv:quant-ph/9602019`;
-Bennett–DiVincenzo–Smolin–Wootters 1996, `arxiv:quant-ph/9604024`]. It encodes
-`k = 1` logical qubit in `n = 5` physical qubits with distance `d = 3`,
-saturating the quantum Hamming bound. The generators are the cyclic shifts of
-`XZZXI` (EC Zoo `stab_5_1_3`, cross-referenced with Qiskit preset ID 21):
+The five-qubit perfect code: the smallest stabilizer code that corrects an
+arbitrary single-qubit error. It encodes one logical qubit in five physical
+qubits with code distance 3, saturating the quantum Hamming bound. Its four
+generators (`n − k = 4`) are the cyclic shifts of `XZZXI`:
 - `g1 = XZZXI`
 - `g2 = IXZZX`
 - `g3 = XIXZZ`
 - `g4 = ZXIXZ`
 
-This is the **first non-CSS code** in the repository: each generator carries
-both `X` and `Z` factors, so there is no Z/X split. That changes nothing up to
-the bare code — the **decide route** never looks at the split: the four
-generators form a literal list, pairwise commutation, phase zero and
-check-matrix independence are closed statements settled by `decide`, and
-`−I ∉ closure` follows by `negIdentity_not_mem_of_indep_phase_zero_commute`.
+The code is not CSS: each generator carries both `X` and `Z` factors, so there
+is no split into Z-checks and X-checks. The **decide route** never looks at
+that split: the four generators form a literal list, and pairwise commutation,
+phase zero and check-matrix independence are closed statements settled by
+`decide`; `−I ∉ closure` follows by
+`negIdentity_not_mem_of_indep_phase_zero_commute`.
 
-It does change the distance argument, since the CSS closers no longer apply.
-Distance 3 goes through the general `hasCodeDistance_of`: kernel-checked
-anti-witness tables rule out nontrivial logicals of weight 1 (15 cases, via
-`no_weight_one_mem_centralizer_of_anticommute_witness`) and weight 2 (90 cases,
-via `no_weight_two_mem_centralizer_of_anticommute_witness`), and `IYYIX` is a
-nontrivial logical of weight 3. See qec-lab's
-`pipeline/attempts/stab_5_1_3/result.md` for the original formalization log.
+Distance 3 is `hasCodeDistance_three_of_anticommute_witness`: every weight-1
+Pauli (15 cases) and every weight-2 Pauli (90 cases) anticommutes with some
+generator, and `IYYIX` is a nontrivial logical of weight 3.
 
 The logical basis `X̄ = X⊗⁵`, `Z̄ = Z⊗⁵` is in `FiveQubit_5_1_3Logicals.lean`.
 
@@ -54,12 +41,17 @@ The logical basis `X̄ = X⊗⁵`, `Z̄ = Z⊗⁵` is in `FiveQubit_5_1_3Logical
 - Decided hypotheses: `generators_commute`, `AllPhaseZero_generatorsList`,
   `rowsLinearIndependent_generatorsList`
 - `negIdentity_not_mem`, the bundled `stabilizerGroup`
-- `stabilizerCode : Code[[5, 1]]`
-- Distance 3 (weight-1 and weight-2 anti-witness tables, weight-3 witness):
+- `presentation`, `stabilizerCode : Code[[5, 1]]`
+- Distance 3 (weight-1 and weight-2 anticommute witnesses, weight-3 logical):
   `code_has_distance_three`, `stabilizerCodeWithDistance : Code[[5, 1, 3]]`
 -/
 
+namespace Quantum
+namespace StabilizerGroup
+namespace FiveQubit_5_1_3
+
 open NQubitPauliGroupElement
+open scoped Pauli
 
 /-! ## Generators -/
 
@@ -88,7 +80,7 @@ on `{1,3}`; `g1`, `g3` on `{2,3}`; `g1`, `g4` on `{0,1}`; `g2`, `g3` on
 rank. -/
 
 /-- All four generators pairwise commute. -/
-theorem generators_commute :
+lemma generators_commute :
     ∀ g ∈ listToSet generatorsList, ∀ h ∈ listToSet generatorsList, g * h = h * g := by
   decide
 
@@ -97,24 +89,20 @@ lemma AllPhaseZero_generatorsList : AllPhaseZero generatorsList := by
   decide
 
 /-- The check-matrix rows of the four generators are linearly independent. -/
-theorem rowsLinearIndependent_generatorsList :
-    rowsLinearIndependent generatorsList := by decide
-
-/-- The generator list is an independent generating set. -/
-theorem GeneratorsIndependent_5_generatorsList : GeneratorsIndependent 5 generatorsList :=
-  GeneratorsIndependent_of_rowsLinearIndependent rowsLinearIndependent_generatorsList
+lemma rowsLinearIndependent_generatorsList : rowsLinearIndependent generatorsList := by
+  decide
 
 /-! ## No `−I` in the stabilizer subgroup -/
 
 /-- The closure of the four generators does not contain `−I`. -/
-theorem negIdentity_not_mem :
-    negIdentity 5 ∉ Subgroup.closure (listToSet generatorsList) :=
+lemma negIdentity_not_mem : negIdentity 5 ∉ Subgroup.closure (listToSet generatorsList) :=
   negIdentity_not_mem_of_indep_phase_zero_commute generatorsList
     AllPhaseZero_generatorsList rowsLinearIndependent_generatorsList generators_commute
 
 /-! ## Bundled `StabilizerGroup 5` -/
 
-/-- The `[[5, 1, 3]]` stabilizer group, from the generator list. -/
+/-- The stabilizer group of the five-qubit code, generated by
+`generatorsList`. -/
 noncomputable def stabilizerGroup : StabilizerGroup 5 :=
   mkStabilizerFromGenerators 5 generatorsList generators_commute negIdentity_not_mem
 
@@ -138,7 +126,7 @@ def presentation : StabilizerCode.Presentation 5 1 where
   generators_commute := generators_commute
   closure_no_neg_identity := negIdentity_not_mem
 
-/-- The five-qubit perfect code as a stabilizer code `[[5, 1]]`. -/
+/-- The five-qubit code as a stabilizer code `[[5, 1]]`. -/
 noncomputable def stabilizerCode : Code[[5, 1]] := presentation.toCode
 
 /-- The stabilizer code's subgroup is the closure of the generator list. -/
@@ -151,104 +139,20 @@ lemma stabilizerCode_toSubgroup_eq :
 ### No nontrivial logical of weight 1 or 2
 
 For every weight-1 and weight-2 Pauli, some generator anticommutes with it. Each
-case is a closed `Anticommute` statement between literals, decided through the
-global `Decidable (Anticommute p q)` instance, with `first` backtracking across
-the generators. -/
+case is a closed `Anticommute` statement between literals, so `decide` settles
+the whole table. -/
 
 /-- Every weight-1 Pauli anticommutes with some generator. -/
 private lemma weight_one_anticomm_witness :
-    ∀ i : Fin 5, ∀ P : PauliOperator, P ≠ PauliOperator.I →
-      ∃ g ∈ listToSet generatorsList, Anticommute (weightOneAt i P) g := by
-  intro i P hP
-  fin_cases i <;>
-    (match P, hP with
-    | PauliOperator.X, _ => first
-      | exact ⟨g1, by simp [generatorsList], by decide⟩
-      | exact ⟨g2, by simp [generatorsList], by decide⟩
-      | exact ⟨g3, by simp [generatorsList], by decide⟩
-      | exact ⟨g4, by simp [generatorsList], by decide⟩
-    | PauliOperator.Y, _ => first
-      | exact ⟨g1, by simp [generatorsList], by decide⟩
-      | exact ⟨g2, by simp [generatorsList], by decide⟩
-    | PauliOperator.Z, _ => first
-      | exact ⟨g1, by simp [generatorsList], by decide⟩
-      | exact ⟨g2, by simp [generatorsList], by decide⟩
-      | exact ⟨g3, by simp [generatorsList], by decide⟩
-    | PauliOperator.I, hP => exact (hP rfl).elim)
+    ∀ i : Fin 5, ∀ P : PauliOperator, P ≠ .I →
+      ∃ g ∈ generatorsList, Anticommute (weightOneAt i P) g := by
+  decide
 
-/-- Every weight-2 Pauli anticommutes with some generator. The table is the
-weight-1 one nested: `match` on `(P, Q)`, then `fin_cases i <;> fin_cases j`,
-with `exact absurd rfl hij` discharging the diagonal. Generator branches that
-no case of a given `(P, Q)` needs are trimmed (`g4` for `(X, X)`, `(Y, Z)`,
-`(Z, Y)`), since an unused `first` alternative trips `linter.unusedTactic`. -/
+/-- Every weight-2 Pauli anticommutes with some generator. -/
 private lemma weight_two_anticomm_witness :
-    ∀ i j : Fin 5, i ≠ j → ∀ P Q : PauliOperator, P ≠ PauliOperator.I →
-        Q ≠ PauliOperator.I →
-      ∃ g ∈ listToSet generatorsList, Anticommute (weightTwoAt i j P Q) g := by
-  intro i j hij P Q hP hQ
-  match P, Q, hP, hQ with
-  | PauliOperator.I, _, hP, _ => exact (hP rfl).elim
-  | _, PauliOperator.I, _, hQ => exact (hQ rfl).elim
-  | PauliOperator.X, PauliOperator.X, _, _ =>
-      fin_cases i <;> fin_cases j <;> first
-        | exact absurd rfl hij
-        | exact ⟨g1, by simp [generatorsList], by decide⟩
-        | exact ⟨g2, by simp [generatorsList], by decide⟩
-        | exact ⟨g3, by simp [generatorsList], by decide⟩
-  | PauliOperator.X, PauliOperator.Y, _, _ =>
-      fin_cases i <;> fin_cases j <;> first
-        | exact absurd rfl hij
-        | exact ⟨g1, by simp [generatorsList], by decide⟩
-        | exact ⟨g2, by simp [generatorsList], by decide⟩
-        | exact ⟨g3, by simp [generatorsList], by decide⟩
-        | exact ⟨g4, by simp [generatorsList], by decide⟩
-  | PauliOperator.X, PauliOperator.Z, _, _ =>
-      fin_cases i <;> fin_cases j <;> first
-        | exact absurd rfl hij
-        | exact ⟨g1, by simp [generatorsList], by decide⟩
-        | exact ⟨g2, by simp [generatorsList], by decide⟩
-        | exact ⟨g3, by simp [generatorsList], by decide⟩
-        | exact ⟨g4, by simp [generatorsList], by decide⟩
-  | PauliOperator.Y, PauliOperator.X, _, _ =>
-      fin_cases i <;> fin_cases j <;> first
-        | exact absurd rfl hij
-        | exact ⟨g1, by simp [generatorsList], by decide⟩
-        | exact ⟨g2, by simp [generatorsList], by decide⟩
-        | exact ⟨g3, by simp [generatorsList], by decide⟩
-        | exact ⟨g4, by simp [generatorsList], by decide⟩
-  | PauliOperator.Y, PauliOperator.Y, _, _ =>
-      fin_cases i <;> fin_cases j <;> first
-        | exact absurd rfl hij
-        | exact ⟨g1, by simp [generatorsList], by decide⟩
-        | exact ⟨g2, by simp [generatorsList], by decide⟩
-        | exact ⟨g3, by simp [generatorsList], by decide⟩
-        | exact ⟨g4, by simp [generatorsList], by decide⟩
-  | PauliOperator.Y, PauliOperator.Z, _, _ =>
-      fin_cases i <;> fin_cases j <;> first
-        | exact absurd rfl hij
-        | exact ⟨g1, by simp [generatorsList], by decide⟩
-        | exact ⟨g2, by simp [generatorsList], by decide⟩
-        | exact ⟨g3, by simp [generatorsList], by decide⟩
-  | PauliOperator.Z, PauliOperator.X, _, _ =>
-      fin_cases i <;> fin_cases j <;> first
-        | exact absurd rfl hij
-        | exact ⟨g1, by simp [generatorsList], by decide⟩
-        | exact ⟨g2, by simp [generatorsList], by decide⟩
-        | exact ⟨g3, by simp [generatorsList], by decide⟩
-        | exact ⟨g4, by simp [generatorsList], by decide⟩
-  | PauliOperator.Z, PauliOperator.Y, _, _ =>
-      fin_cases i <;> fin_cases j <;> first
-        | exact absurd rfl hij
-        | exact ⟨g1, by simp [generatorsList], by decide⟩
-        | exact ⟨g2, by simp [generatorsList], by decide⟩
-        | exact ⟨g3, by simp [generatorsList], by decide⟩
-  | PauliOperator.Z, PauliOperator.Z, _, _ =>
-      fin_cases i <;> fin_cases j <;> first
-        | exact absurd rfl hij
-        | exact ⟨g1, by simp [generatorsList], by decide⟩
-        | exact ⟨g2, by simp [generatorsList], by decide⟩
-        | exact ⟨g3, by simp [generatorsList], by decide⟩
-        | exact ⟨g4, by simp [generatorsList], by decide⟩
+    ∀ i j : Fin 5, i ≠ j → ∀ P Q : PauliOperator, P ≠ .I → Q ≠ .I →
+      ∃ g ∈ generatorsList, Anticommute (weightTwoAt i j P Q) g := by
+  decide
 
 /-! ### A nontrivial logical of weight 3
 
@@ -262,19 +166,16 @@ def minWeightLogical : NQubitPauliGroupElement 5 := σ[IYYIX]
 /-- `ZZZZZ`: a centralizer element anticommuting with `minWeightLogical`. -/
 def minWeightPartner : NQubitPauliGroupElement 5 := σ[ZZZZZ]
 
+/-- `IYYIX` has weight 3. -/
 lemma minWeightLogical_weight : weight minWeightLogical = 3 := by decide
 
-lemma minWeightLogical_mem_centralizer : minWeightLogical ∈ centralizer stabilizerGroup := by
-  rw [StabilizerGroup.mem_centralizer_iff_closure _ _ _ stabilizerGroup_toSubgroup_eq]
-  simp only [generatorsList, listToSet_cons, listToSet_nil, Set.mem_insert_iff,
-    Set.mem_empty_iff_false, or_false, forall_eq_or_imp, forall_eq]
-  decide
+/-- `IYYIX` commutes with every element of the stabilizer. -/
+lemma minWeightLogical_mem_centralizer : minWeightLogical ∈ centralizer stabilizerGroup :=
+  mem_centralizer_of_commute_list stabilizerGroup_toSubgroup_eq (by decide)
 
-lemma minWeightPartner_mem_centralizer : minWeightPartner ∈ centralizer stabilizerGroup := by
-  rw [StabilizerGroup.mem_centralizer_iff_closure _ _ _ stabilizerGroup_toSubgroup_eq]
-  simp only [generatorsList, listToSet_cons, listToSet_nil, Set.mem_insert_iff,
-    Set.mem_empty_iff_false, or_false, forall_eq_or_imp, forall_eq]
-  decide
+/-- `ZZZZZ` commutes with every element of the stabilizer. -/
+lemma minWeightPartner_mem_centralizer : minWeightPartner ∈ centralizer stabilizerGroup :=
+  mem_centralizer_of_commute_list stabilizerGroup_toSubgroup_eq (by decide)
 
 /-- `IYYIX` and `ZZZZZ` anticommute locally on qubits 1, 2 and 4, an odd
 number. -/
@@ -290,29 +191,19 @@ lemma minWeightLogical_isNontrivial :
 
 /-! ### The code with its distance `Code[[5, 1, 3]]` -/
 
-/-- **The five-qubit perfect code has distance 3.** The anti-witness tables
-rule out nontrivial logicals of weight 1 and 2, and `IYYIX` is a nontrivial
-logical of weight 3. -/
-theorem code_has_distance_three : HasCodeDistance stabilizerCode 3 := by
-  refine hasCodeDistance_of stabilizerCode 3 (by decide)
-    ⟨minWeightLogical, minWeightLogical_isNontrivial, minWeightLogical_weight⟩ ?_
-  intro w hw_pos hw_lt g hg_weight h_nontrivial
-  rcases (IsNontrivialLogicalOperator_iff g stabilizerCode.toStabilizerGroup).mp h_nontrivial
-    with ⟨h_cent, _⟩
-  interval_cases w
-  · exact no_weight_one_mem_centralizer_of_anticommute_witness
-      stabilizerCode.toStabilizerGroup (listToSet generatorsList) stabilizerCode_toSubgroup_eq
-      weight_one_anticomm_witness g hg_weight h_cent
-  · exact no_weight_two_mem_centralizer_of_anticommute_witness
-      stabilizerCode.toStabilizerGroup (listToSet generatorsList) stabilizerCode_toSubgroup_eq
-      weight_two_anticomm_witness g hg_weight h_cent
+/-- **The five-qubit code has distance 3.** Every weight-1 and weight-2 Pauli
+anticommutes with some generator, and `IYYIX` is a nontrivial logical of
+weight 3. -/
+theorem code_has_distance_three : HasCodeDistance stabilizerCode 3 :=
+  hasCodeDistance_three_of_anticommute_witness stabilizerCode (listToSet generatorsList)
+    stabilizerCode_toSubgroup_eq weight_one_anticomm_witness weight_two_anticomm_witness
+    ⟨minWeightLogical, minWeightLogical_isNontrivial, minWeightLogical_weight⟩
 
-/-- The five-qubit perfect code packaged with its distance. -/
+/-- The five-qubit code packaged with its distance. -/
 noncomputable def stabilizerCodeWithDistance : Code[[5, 1, 3]] where
   toStabilizerCode := stabilizerCode
   hasDistance := code_has_distance_three
 
 end FiveQubit_5_1_3
 end StabilizerGroup
-
 end Quantum

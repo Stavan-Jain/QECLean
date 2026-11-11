@@ -1,12 +1,20 @@
 import QEC.Stabilizer.Codes.Color.Code
-import QEC.Stabilizer.Framework.Homological.Distance
 
 /-!
-# Face-spin coordinates for triangular color-code logical chains
+# Spins of the color code in terms of face labels
 
-A face-check combination is evaluated by adding the incident face labels.
-The formulas below express these local values in the three-row layer
-enumeration, with missing boundary labels set to zero.
+Given a label `a f : ZMod 2` on every face, the *spin* `spinAt a p` at a
+lattice point `p` is `1` plus the sum of the labels of the faces adjacent to
+`p`. At the position of a qubit it is the value of the all-ones chain plus the
+combination of face checks with coefficients `a` (`spinAt_qubitCoord`).
+
+`faceBit a k l j` is the label of the face at position `j` of row `k` of layer
+`l`, and `0` if there is no such face. The lemmas `spinAt_apex`, `spinAt_a0`,
+`spinAt_a_odd`, `spinAt_a_even_succ`, `spinAt_b_even`, `spinAt_b_odd`,
+`spinAt_c0`, `spinAt_c_odd` and `spinAt_c_even_succ` express the spin at every
+qubit position through the labels `faceBit` of the at most three faces that
+contain it. Here `a`, `b`, `c` name the three rows of qubits of a layer, the
+lattice rows `3 * l + 1`, `3 * l + 2` and `3 * l + 3`.
 -/
 
 namespace Quantum.StabilizerGroup.ColorCode
@@ -14,325 +22,193 @@ namespace Quantum.StabilizerGroup.ColorCode
 open scoped BigOperators
 open Stabilizer.Homological
 
-/-- A face label, extended by zero beyond the finite triangular patch. -/
+/-- The label of the face at position `j` of row `k` of layer `l`, and `0` if
+the patch has no such face. -/
 def faceBit {r : ℕ} (a : Face r → ZMod 2) (k : Fin 3) (l j : ℕ) : ZMod 2 :=
   if hl : l < r then
     if hj : j < l + 1 then a (k, ⟨⟨l, hl⟩, ⟨j, hj⟩⟩) else 0
   else 0
 
 /-- Face labels vanish beyond the last layer. -/
-@[simp] theorem faceBit_of_layer_ge {r : ℕ} (a : Face r → ZMod 2)
+@[simp] lemma faceBit_of_layer_ge {r : ℕ} (a : Face r → ZMod 2)
     (k : Fin 3) (l j : ℕ) (h : r ≤ l) : faceBit a k l j = 0 := by
   simp [faceBit, show ¬l < r from by omega]
 
-/-- Face labels vanish beyond the last position of their triangular row. -/
-@[simp] theorem faceBit_of_column_ge {r : ℕ} (a : Face r → ZMod 2)
+/-- Face labels vanish beyond the last position of a row of faces. -/
+@[simp] lemma faceBit_of_column_ge {r : ℕ} (a : Face r → ZMod 2)
     (k : Fin 3) (l j : ℕ) (h : l + 1 ≤ j) : faceBit a k l j = 0 := by
   simp [faceBit, show ¬j < l + 1 from by omega]
 
-/-- A zero-extended face label is a sum selecting its unique finite index. -/
-private theorem faceBit_eq_sum {r : ℕ} (a : Face r → ZMod 2)
+/-- `faceBit a k l j` is the sum of the labels of the faces of row `k` at
+layer `l` and position `j`, of which there is at most one. -/
+private lemma faceBit_eq_sum {r : ℕ} (a : Face r → ZMod 2)
     (k : Fin 3) (l j : ℕ) :
     faceBit a k l j =
       ∑ f : FaceRow r, if f.1.val = l ∧ f.2.val = j then a (k, f) else 0 := by
-  classical
-  by_cases hl : l < r
-  · by_cases hj : j < l + 1
-    · let f : FaceRow r := ⟨⟨l, hl⟩, ⟨j, hj⟩⟩
-      have hsingle : (∑ g : FaceRow r,
-          if g.1.val = l ∧ g.2.val = j then a (k, g) else 0) = a (k, f) := by
-        rw [Finset.sum_eq_single f]
-        · simp [f]
-        · intro g _ hgf
-          have hnot : ¬(g.1.val = l ∧ g.2.val = j) := by
-            intro h
-            apply hgf
-            rcases g with ⟨s, t⟩
-            have hs : s = ⟨l, hl⟩ := Fin.ext h.1
-            subst s
-            have ht : t = ⟨j, hj⟩ := Fin.ext h.2
-            subst t
-            rfl
-          simp [hnot]
-        · intro h
-          exact (h (Finset.mem_univ f)).elim
-      rw [hsingle]
-      simp [faceBit, hl, hj, f]
-    · rw [faceBit, dif_pos hl, dif_neg hj]
-      symm
-      apply Finset.sum_eq_zero
-      intro f _
-      have hnot : ¬(f.1.val = l ∧ f.2.val = j) := by
-        have hcol := f.2.isLt
-        omega
-      simp [hnot]
-  · rw [faceBit, dif_neg hl]
-    symm
-    apply Finset.sum_eq_zero
-    intro f _
-    have hnot : ¬(f.1.val = l ∧ f.2.val = j) := by
-      have hrow := f.1.isLt
-      omega
-    simp [hnot]
+  unfold faceBit
+  split_ifs with hl hj
+  · rw [Finset.sum_eq_single ⟨⟨l, hl⟩, ⟨j, hj⟩⟩]
+    · simp
+    · rintro ⟨s, t⟩ - hne
+      refine if_neg fun h => hne ?_
+      obtain rfl : s = ⟨l, hl⟩ := Fin.ext h.1
+      obtain rfl : t = ⟨j, hj⟩ := Fin.ext h.2
+      rfl
+    · exact fun h => (h (Finset.mem_univ _)).elim
+  · refine (Finset.sum_eq_zero fun f _ => if_neg fun h => hj ?_).symm
+    have := f.2.isLt
+    omega
+  · refine (Finset.sum_eq_zero fun f _ => if_neg fun h => hl ?_).symm
+    have := f.1.isLt
+    omega
 
-/-- The contribution from one of the three colors of faces at a site. -/
+/-- The sum of the labels of the faces of row `k` adjacent to the lattice
+point `p`. -/
 def faceClassSum {r : ℕ} (a : Face r → ZMod 2) (k : Fin 3) (p : Coord) : ZMod 2 :=
   ∑ f : FaceRow r, if Adjacent (faceCoord (k, f)) p then a (k, f) else 0
 
-/-- Classifying the unique neighboring face evaluates a single-color sum. -/
-private theorem faceClassSum_eq_faceBit {r : ℕ} (a : Face r → ZMod 2)
+/-- If the faces of row `k` adjacent to `p` are those at layer `l` and
+position `j`, their labels sum to `faceBit a k l j`. -/
+private lemma faceClassSum_eq_faceBit {r : ℕ} (a : Face r → ZMod 2)
     (k : Fin 3) (p : Coord) (l j : ℕ)
     (h : ∀ f : FaceRow r, Adjacent (faceCoord (k, f)) p ↔
       f.1.val = l ∧ f.2.val = j) :
     faceClassSum a k p = faceBit a k l j := by
   rw [faceBit_eq_sum]
-  apply Finset.sum_congr rfl
-  intro f _
-  simp only [h f]
+  exact Finset.sum_congr rfl fun f _ => by simp only [h f]
 
-/-- A boundary guard omits a neighboring face outside the lattice. -/
-private theorem faceClassSum_eq_guard {r : ℕ} (a : Face r → ZMod 2)
+/-- The form of `faceClassSum_eq_faceBit` for a point that has an adjacent
+face of row `k` only if `P` does not hold. -/
+private lemma faceClassSum_eq_guard {r : ℕ} (a : Face r → ZMod 2)
     (k : Fin 3) (p : Coord) (l j : ℕ) (P : Prop) [Decidable P]
     (h : ∀ f : FaceRow r, Adjacent (faceCoord (k, f)) p ↔
-      P ∧ f.1.val = l ∧ f.2.val = j) :
-    faceClassSum a k p = if P then faceBit a k l j else 0 := by
-  by_cases hP : P
-  · rw [if_pos hP]
-    apply faceClassSum_eq_faceBit
-    intro f
-    simpa only [hP, true_and] using h f
-  · rw [if_neg hP]
-    apply Finset.sum_eq_zero
-    intro f _
-    simp only [h f, hP, false_and, if_false]
+      ¬P ∧ f.1.val = l ∧ f.2.val = j) :
+    faceClassSum a k p = if P then 0 else faceBit a k l j := by
+  split_ifs with hP
+  · exact Finset.sum_eq_zero fun f _ => if_neg fun hf => ((h f).mp hf).1 hP
+  · exact faceClassSum_eq_faceBit a k p l j fun f => (h f).trans (and_iff_right hP)
 
-/-- A color absent from a site's neighborhood contributes no face labels. -/
-private theorem faceClassSum_zero {r : ℕ} (a : Face r → ZMod 2)
+/-- A point with no adjacent face of row `k` has no labels to sum. -/
+private lemma faceClassSum_zero {r : ℕ} (a : Face r → ZMod 2)
     (k : Fin 3) (p : Coord)
     (h : ∀ f : FaceRow r, ¬Adjacent (faceCoord (k, f)) p) :
-    faceClassSum a k p = 0 := by
-  apply Finset.sum_eq_zero
-  intro f _
-  simp only [h f, if_false]
+    faceClassSum a k p = 0 :=
+  Finset.sum_eq_zero fun f _ => if_neg (h f)
 
-/-- The odd logical coset evaluated at a lattice coordinate. -/
+/-- The spin at a lattice point: `1` plus the sum of the labels of the
+adjacent faces. -/
 def spinAt {r : ℕ} (a : Face r → ZMod 2) (p : Coord) : ZMod 2 :=
   1 + ∑ k : Fin 3, faceClassSum a k p
 
-/-- Local face-spin evaluation agrees with the binary check combination. -/
+/-- The spin at a qubit is the value there of the all-ones chain plus the
+combination of face checks with coefficients `a`. -/
 theorem spinAt_qubitCoord {r : ℕ} (a : Face r → ZMod 2) (q : Qubit r) :
     spinAt a (qubitCoord q) = 1 + SelfDual.checkCombination (@incidence r) a q := by
-  unfold spinAt
-  congr 1
-  change (∑ k : Fin 3, ∑ f : FaceRow r,
-    if Adjacent (faceCoord (k, f)) (qubitCoord q) then a (k, f) else 0) =
-      ∑ f : Face r, a f * incidence f q
-  rw [Fintype.sum_prod_type]
-  apply Finset.sum_congr rfl
-  intro k _
-  apply Finset.sum_congr rfl
-  intro f _
-  simp only [incidence, mem_faceSupport]
-  split_ifs <;> simp
+  rw [spinAt, SelfDual.checkCombination_apply, Fintype.sum_prod_type]
+  refine congrArg (1 + ·) (Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun f _ => ?_)
+  simp [incidence]
 
-/-- The apex meets only the first face in the first row. -/
-theorem spinAt_apex {r : ℕ} (a : Face r → ZMod 2) :
-    spinAt a (0, 0) =
-      1 + faceBit a 0 0 0 := by
-  have h0 : faceClassSum a 0 (0, 0) = faceBit a 0 0 0 := by
-    apply faceClassSum_eq_faceBit
-    rintro ⟨s, t⟩
-    norm_num [faceCoord, Adjacent]
-  have h1 : faceClassSum a 1 (0, 0) = 0 := by
-    apply faceClassSum_zero
-    rintro ⟨s, t⟩
-    norm_num [faceCoord, Adjacent]
-  have h2 : faceClassSum a 2 (0, 0) = 0 := by
-    apply faceClassSum_zero
-    rintro ⟨s, t⟩
-    norm_num [faceCoord, Adjacent]
-  simp only [spinAt, Fin.sum_univ_three, h0, h1, h2]
+/-! ## The spin at each kind of qubit position -/
+
+/-- Decides which faces of a row are adjacent to a given lattice point: the
+hypotheses of `faceClassSum_eq_faceBit`, `faceClassSum_eq_guard` and
+`faceClassSum_zero` for explicit coordinates. -/
+local macro "adjacent_faces" : tactic =>
+  `(tactic| (rintro ⟨s, t⟩; norm_num [faceCoord, Adjacent] <;> omega))
+
+/-- The spin at the apex `(0, 0)`. -/
+lemma spinAt_apex {r : ℕ} (a : Face r → ZMod 2) :
+    spinAt a (0, 0) = 1 + faceBit a 0 0 0 := by
+  rw [spinAt, Fin.sum_univ_three,
+    faceClassSum_eq_faceBit a 0 (0, 0) 0 0 (by adjacent_faces),
+    faceClassSum_zero a 1 (0, 0) (by adjacent_faces),
+    faceClassSum_zero a 2 (0, 0) (by adjacent_faces)]
   ring
 
-/-- The leftmost site of the first row meets its first two face colors. -/
-theorem spinAt_a0 {r : ℕ} (a : Face r → ZMod 2) (l : ℕ) :
-    spinAt a (3 * l + 1, 0) =
-      1 + faceBit a 0 l 0 + faceBit a 1 l 0 := by
-  have h0 : faceClassSum a 0 (3 * l + 1, 0) = faceBit a 0 l 0 := by
-    apply faceClassSum_eq_faceBit
-    rintro ⟨s, t⟩
-    norm_num [faceCoord, Adjacent]
-    omega
-  have h1 : faceClassSum a 1 (3 * l + 1, 0) = faceBit a 1 l 0 := by
-    apply faceClassSum_eq_faceBit
-    rintro ⟨s, t⟩
-    norm_num [faceCoord, Adjacent]
-    omega
-  have h2 : faceClassSum a 2 (3 * l + 1, 0) = 0 := by
-    apply faceClassSum_zero
-    rintro ⟨s, t⟩
-    norm_num [faceCoord, Adjacent]
-  simp only [spinAt, Fin.sum_univ_three, h0, h1, h2]
+/-- The spin at the leftmost qubit of row `a` of layer `l`. -/
+lemma spinAt_a0 {r : ℕ} (a : Face r → ZMod 2) (l : ℕ) :
+    spinAt a (3 * l + 1, 0) = 1 + faceBit a 0 l 0 + faceBit a 1 l 0 := by
+  rw [spinAt, Fin.sum_univ_three,
+    faceClassSum_eq_faceBit a 0 (3 * l + 1, 0) l 0 (by adjacent_faces),
+    faceClassSum_eq_faceBit a 1 (3 * l + 1, 0) l 0 (by adjacent_faces),
+    faceClassSum_zero a 2 (3 * l + 1, 0) (by adjacent_faces)]
   ring
 
-/-- An odd site in the first row also meets a face in the previous layer. -/
-theorem spinAt_a_odd {r : ℕ} (a : Face r → ZMod 2) (l j : ℕ) :
+/-- The spin at the qubit `(3 * l + 1, 3 * j + 2)` of row `a` of layer `l`,
+which also lies on a face of the previous layer if `l ≠ 0`. -/
+lemma spinAt_a_odd {r : ℕ} (a : Face r → ZMod 2) (l j : ℕ) :
     spinAt a (3 * l + 1, 3 * j + 2) =
       1 + (if l = 0 then 0 else faceBit a 2 (l - 1) j) +
         faceBit a 0 l j + faceBit a 1 l (j + 1) := by
-  have h0 : faceClassSum a 0 (3 * l + 1, 3 * j + 2) = faceBit a 0 l j := by
-    apply faceClassSum_eq_faceBit
-    rintro ⟨s, t⟩
-    norm_num [faceCoord, Adjacent]
-    omega
-  have h1 : faceClassSum a 1 (3 * l + 1, 3 * j + 2) = faceBit a 1 l (j + 1) := by
-    apply faceClassSum_eq_faceBit
-    rintro ⟨s, t⟩
-    norm_num [faceCoord, Adjacent]
-    omega
-  have h2 : faceClassSum a 2 (3 * l + 1, 3 * j + 2) =
-      if l = 0 then 0 else faceBit a 2 (l - 1) j := by
-    have h := faceClassSum_eq_guard a 2 (3 * l + 1, 3 * j + 2) (l - 1) j (l ≠ 0) (by
-      rintro ⟨s, t⟩
-      norm_num [faceCoord, Adjacent]
-      omega)
-    simpa only [ne_eq, ite_not] using h
-  simp only [spinAt, Fin.sum_univ_three, h0, h1, h2]
+  rw [spinAt, Fin.sum_univ_three,
+    faceClassSum_eq_faceBit a 0 (3 * l + 1, 3 * j + 2) l j (by adjacent_faces),
+    faceClassSum_eq_faceBit a 1 (3 * l + 1, 3 * j + 2) l (j + 1) (by adjacent_faces),
+    faceClassSum_eq_guard a 2 (3 * l + 1, 3 * j + 2) (l - 1) j (l = 0) (by adjacent_faces)]
   ring
 
-/-- The next even site shares the previous-layer face with its odd neighbor. -/
-theorem spinAt_a_even_succ {r : ℕ} (a : Face r → ZMod 2) (l j : ℕ) :
+/-- The spin at the qubit `(3 * l + 1, 3 * j + 3)` of row `a` of layer `l`,
+which also lies on a face of the previous layer if `l ≠ 0`. -/
+lemma spinAt_a_even_succ {r : ℕ} (a : Face r → ZMod 2) (l j : ℕ) :
     spinAt a (3 * l + 1, 3 * j + 3) =
       1 + (if l = 0 then 0 else faceBit a 2 (l - 1) j) +
         faceBit a 0 l (j + 1) + faceBit a 1 l (j + 1) := by
-  have h0 : faceClassSum a 0 (3 * l + 1, 3 * j + 3) = faceBit a 0 l (j + 1) := by
-    apply faceClassSum_eq_faceBit
-    rintro ⟨s, t⟩
-    norm_num [faceCoord, Adjacent]
-    omega
-  have h1 : faceClassSum a 1 (3 * l + 1, 3 * j + 3) = faceBit a 1 l (j + 1) := by
-    apply faceClassSum_eq_faceBit
-    rintro ⟨s, t⟩
-    norm_num [faceCoord, Adjacent]
-    omega
-  have h2 : faceClassSum a 2 (3 * l + 1, 3 * j + 3) =
-      if l = 0 then 0 else faceBit a 2 (l - 1) j := by
-    have h := faceClassSum_eq_guard a 2 (3 * l + 1, 3 * j + 3) (l - 1) j (l ≠ 0) (by
-      rintro ⟨s, t⟩
-      norm_num [faceCoord, Adjacent]
-      omega)
-    simpa only [ne_eq, ite_not] using h
-  simp only [spinAt, Fin.sum_univ_three, h0, h1, h2]
+  rw [spinAt, Fin.sum_univ_three,
+    faceClassSum_eq_faceBit a 0 (3 * l + 1, 3 * j + 3) l (j + 1) (by adjacent_faces),
+    faceClassSum_eq_faceBit a 1 (3 * l + 1, 3 * j + 3) l (j + 1) (by adjacent_faces),
+    faceClassSum_eq_guard a 2 (3 * l + 1, 3 * j + 3) (l - 1) j (l = 0) (by adjacent_faces)]
   ring
 
-/-- An even site in the middle row meets all three faces in one column. -/
-theorem spinAt_b_even {r : ℕ} (a : Face r → ZMod 2) (l j : ℕ) :
+/-- The spin at the qubit `(3 * l + 2, 3 * j + 1)` of row `b` of layer `l`. -/
+lemma spinAt_b_even {r : ℕ} (a : Face r → ZMod 2) (l j : ℕ) :
     spinAt a (3 * l + 2, 3 * j + 1) =
       1 + faceBit a 2 l j + faceBit a 0 l j + faceBit a 1 l j := by
-  have h0 : faceClassSum a 0 (3 * l + 2, 3 * j + 1) = faceBit a 0 l j := by
-    apply faceClassSum_eq_faceBit
-    rintro ⟨s, t⟩
-    norm_num [faceCoord, Adjacent]
-    omega
-  have h1 : faceClassSum a 1 (3 * l + 2, 3 * j + 1) = faceBit a 1 l j := by
-    apply faceClassSum_eq_faceBit
-    rintro ⟨s, t⟩
-    norm_num [faceCoord, Adjacent]
-    omega
-  have h2 : faceClassSum a 2 (3 * l + 2, 3 * j + 1) = faceBit a 2 l j := by
-    apply faceClassSum_eq_faceBit
-    rintro ⟨s, t⟩
-    norm_num [faceCoord, Adjacent]
-    omega
-  simp only [spinAt, Fin.sum_univ_three, h0, h1, h2]
+  rw [spinAt, Fin.sum_univ_three,
+    faceClassSum_eq_faceBit a 0 (3 * l + 2, 3 * j + 1) l j (by adjacent_faces),
+    faceClassSum_eq_faceBit a 1 (3 * l + 2, 3 * j + 1) l j (by adjacent_faces),
+    faceClassSum_eq_faceBit a 2 (3 * l + 2, 3 * j + 1) l j (by adjacent_faces)]
   ring
 
-/-- An odd middle-row site meets the next face of the second color. -/
-theorem spinAt_b_odd {r : ℕ} (a : Face r → ZMod 2) (l j : ℕ) :
+/-- The spin at the qubit `(3 * l + 2, 3 * j + 2)` of row `b` of layer `l`. -/
+lemma spinAt_b_odd {r : ℕ} (a : Face r → ZMod 2) (l j : ℕ) :
     spinAt a (3 * l + 2, 3 * j + 2) =
       1 + faceBit a 2 l j + faceBit a 0 l j + faceBit a 1 l (j + 1) := by
-  have h0 : faceClassSum a 0 (3 * l + 2, 3 * j + 2) = faceBit a 0 l j := by
-    apply faceClassSum_eq_faceBit
-    rintro ⟨s, t⟩
-    norm_num [faceCoord, Adjacent]
-    omega
-  have h1 : faceClassSum a 1 (3 * l + 2, 3 * j + 2) = faceBit a 1 l (j + 1) := by
-    apply faceClassSum_eq_faceBit
-    rintro ⟨s, t⟩
-    norm_num [faceCoord, Adjacent]
-    omega
-  have h2 : faceClassSum a 2 (3 * l + 2, 3 * j + 2) = faceBit a 2 l j := by
-    apply faceClassSum_eq_faceBit
-    rintro ⟨s, t⟩
-    norm_num [faceCoord, Adjacent]
-    omega
-  simp only [spinAt, Fin.sum_univ_three, h0, h1, h2]
+  rw [spinAt, Fin.sum_univ_three,
+    faceClassSum_eq_faceBit a 0 (3 * l + 2, 3 * j + 2) l j (by adjacent_faces),
+    faceClassSum_eq_faceBit a 1 (3 * l + 2, 3 * j + 2) l (j + 1) (by adjacent_faces),
+    faceClassSum_eq_faceBit a 2 (3 * l + 2, 3 * j + 2) l j (by adjacent_faces)]
   ring
 
-/-- The leftmost site of the bottom row meets the next layer. -/
-theorem spinAt_c0 {r : ℕ} (a : Face r → ZMod 2) (l : ℕ) :
-    spinAt a (3 * l + 3, 0) =
-      1 + faceBit a 1 l 0 + faceBit a 0 (l + 1) 0 := by
-  have h0 : faceClassSum a 0 (3 * l + 3, 0) = faceBit a 0 (l + 1) 0 := by
-    apply faceClassSum_eq_faceBit
-    rintro ⟨s, t⟩
-    norm_num [faceCoord, Adjacent]
-    omega
-  have h1 : faceClassSum a 1 (3 * l + 3, 0) = faceBit a 1 l 0 := by
-    apply faceClassSum_eq_faceBit
-    rintro ⟨s, t⟩
-    norm_num [faceCoord, Adjacent]
-    omega
-  have h2 : faceClassSum a 2 (3 * l + 3, 0) = 0 := by
-    apply faceClassSum_zero
-    rintro ⟨s, t⟩
-    norm_num [faceCoord, Adjacent]
-  simp only [spinAt, Fin.sum_univ_three, h0, h1, h2]
+/-- The spin at the leftmost qubit of row `c` of layer `l`, which also lies on
+a face of the next layer. -/
+lemma spinAt_c0 {r : ℕ} (a : Face r → ZMod 2) (l : ℕ) :
+    spinAt a (3 * l + 3, 0) = 1 + faceBit a 1 l 0 + faceBit a 0 (l + 1) 0 := by
+  rw [spinAt, Fin.sum_univ_three,
+    faceClassSum_eq_faceBit a 0 (3 * l + 3, 0) (l + 1) 0 (by adjacent_faces),
+    faceClassSum_eq_faceBit a 1 (3 * l + 3, 0) l 0 (by adjacent_faces),
+    faceClassSum_zero a 2 (3 * l + 3, 0) (by adjacent_faces)]
   ring
 
-/-- An odd bottom-row site meets the current and next layers. -/
-theorem spinAt_c_odd {r : ℕ} (a : Face r → ZMod 2) (l j : ℕ) :
+/-- The spin at the qubit `(3 * l + 3, 3 * j + 1)` of row `c` of layer `l`,
+which also lies on a face of the next layer. -/
+lemma spinAt_c_odd {r : ℕ} (a : Face r → ZMod 2) (l j : ℕ) :
     spinAt a (3 * l + 3, 3 * j + 1) =
       1 + faceBit a 2 l j + faceBit a 1 l j + faceBit a 0 (l + 1) j := by
-  have h0 : faceClassSum a 0 (3 * l + 3, 3 * j + 1) = faceBit a 0 (l + 1) j := by
-    apply faceClassSum_eq_faceBit
-    rintro ⟨s, t⟩
-    norm_num [faceCoord, Adjacent]
-    omega
-  have h1 : faceClassSum a 1 (3 * l + 3, 3 * j + 1) = faceBit a 1 l j := by
-    apply faceClassSum_eq_faceBit
-    rintro ⟨s, t⟩
-    norm_num [faceCoord, Adjacent]
-    omega
-  have h2 : faceClassSum a 2 (3 * l + 3, 3 * j + 1) = faceBit a 2 l j := by
-    apply faceClassSum_eq_faceBit
-    rintro ⟨s, t⟩
-    norm_num [faceCoord, Adjacent]
-    omega
-  simp only [spinAt, Fin.sum_univ_three, h0, h1, h2]
+  rw [spinAt, Fin.sum_univ_three,
+    faceClassSum_eq_faceBit a 0 (3 * l + 3, 3 * j + 1) (l + 1) j (by adjacent_faces),
+    faceClassSum_eq_faceBit a 1 (3 * l + 3, 3 * j + 1) l j (by adjacent_faces),
+    faceClassSum_eq_faceBit a 2 (3 * l + 3, 3 * j + 1) l j (by adjacent_faces)]
   ring
 
-/-- The next even bottom site joins adjacent face columns. -/
-theorem spinAt_c_even_succ {r : ℕ} (a : Face r → ZMod 2) (l j : ℕ) :
+/-- The spin at the qubit `(3 * l + 3, 3 * j + 3)` of row `c` of layer `l`,
+which also lies on a face of the next layer. -/
+lemma spinAt_c_even_succ {r : ℕ} (a : Face r → ZMod 2) (l j : ℕ) :
     spinAt a (3 * l + 3, 3 * j + 3) =
       1 + faceBit a 2 l j + faceBit a 1 l (j + 1) +
         faceBit a 0 (l + 1) (j + 1) := by
-  have h0 : faceClassSum a 0 (3 * l + 3, 3 * j + 3) = faceBit a 0 (l + 1) (j + 1) := by
-    apply faceClassSum_eq_faceBit
-    rintro ⟨s, t⟩
-    norm_num [faceCoord, Adjacent]
-    omega
-  have h1 : faceClassSum a 1 (3 * l + 3, 3 * j + 3) = faceBit a 1 l (j + 1) := by
-    apply faceClassSum_eq_faceBit
-    rintro ⟨s, t⟩
-    norm_num [faceCoord, Adjacent]
-    omega
-  have h2 : faceClassSum a 2 (3 * l + 3, 3 * j + 3) = faceBit a 2 l j := by
-    apply faceClassSum_eq_faceBit
-    rintro ⟨s, t⟩
-    norm_num [faceCoord, Adjacent]
-    omega
-  simp only [spinAt, Fin.sum_univ_three, h0, h1, h2]
+  rw [spinAt, Fin.sum_univ_three,
+    faceClassSum_eq_faceBit a 0 (3 * l + 3, 3 * j + 3) (l + 1) (j + 1) (by adjacent_faces),
+    faceClassSum_eq_faceBit a 1 (3 * l + 3, 3 * j + 3) l (j + 1) (by adjacent_faces),
+    faceClassSum_eq_faceBit a 2 (3 * l + 3, 3 * j + 3) l j (by adjacent_faces)]
   ring
 
 end Quantum.StabilizerGroup.ColorCode

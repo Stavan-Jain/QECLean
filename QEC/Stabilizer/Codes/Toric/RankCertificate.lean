@@ -2,23 +2,27 @@ import QEC.Stabilizer.Foundations.BinarySymplectic.RankCertificate
 import QEC.Stabilizer.Codes.Toric.StabilizerCode
 
 /-!
-# Rank certificates for concrete toric codes
+# Rank certificates for the toric code at `L = 4, 5, 6`
 
-Generator independence for the trimmed toric generator lists at `L = 4, 5, 6`
-(`m = 30, 48, 70` generators on `n = 32, 50, 72` qubits), each closed by a
-right inverse of the check matrix and `rankCertCheck` under
-`decide +kernel`. The exhaustive `Decidable (rowsLinearIndependent L)`
-instance would enumerate `2 ^ m` coefficient vectors (`2 ^ 30` already at
-`L = 4`), so it is out of reach here.
+Independence of the trimmed list of checks `generatorsListPackaged L` at
+`L = 4, 5, 6` (`m = 30, 48, 70` checks on `n = 32, 50, 72` qubits), each by a
+right inverse of the check matrix that `rankCertCheck` verifies under
+`decide +kernel`:
 
-These duplicate the parametric `rowsLinearIndependent_generatorsListPackaged`
-(`StabilizerCode.lean`), which stays the source of the toric presentation:
-they are concrete instances of the certificate route at sizes the exhaustive
-search cannot reach.
+* `rowsLinearIndependent_generatorsListPackaged_four`,
+* `rowsLinearIndependent_generatorsListPackaged_five`,
+* `rowsLinearIndependent_generatorsListPackaged_six`.
 
-The certificate literals below are emitted by
+The theorem `rowsLinearIndependent_generatorsListPackaged` of
+`QEC.Stabilizer.Codes.Toric.StabilizerCode` proves the same for every `L`, and
+it is the one the toric presentation uses. The theorems here are instances of
+the certificate route `rowsLinearIndependent_of_rankCertCheck` at sizes that
+the exhaustive `Decidable (rowsLinearIndependent l)` instance cannot reach: it
+enumerates `2 ^ m` coefficient vectors, `2 ^ 30` already at `L = 4`.
+
+The certificate literals `rankCert4`, `rankCert5`, `rankCert6` are emitted by
 `lake env lean --run scripts/RankCertificateGen.lean toric4 toric5 toric6`.
-Regenerate them with the script rather than editing them by hand.
+Regenerate them with the script instead of editing them by hand.
 -/
 
 namespace Quantum

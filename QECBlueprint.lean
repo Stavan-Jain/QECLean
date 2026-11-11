@@ -740,7 +740,7 @@ attribute [blueprint "thm:toric-phi-equiv"
     chains. Injectivity is the substantive direction: a cycle with $h = v = 0$
     is shown to be a boundary. With \cref{thm:toric-H1-dim} giving
     $\dim H_1 = 2$, a surjection onto $\F_2^2$ is automatically injective. -/)]
-  Quantum.Stabilizer.Lattice.phi_equiv
+  Quantum.Stabilizer.Lattice.phi_bijective
 
 attribute [blueprint "def:toric-code"
   (title := /-- The toric code as a stabilizer code -/)

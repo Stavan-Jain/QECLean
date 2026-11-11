@@ -3,99 +3,116 @@ import QEC.Stabilizer.Codes.Color.Orthogonality
 import QEC.Stabilizer.Framework.Homological.Presentation
 
 /-!
-# The parametric triangular color code as a stabilizer code
+# The triangular color code as a stabilizer code
 
-The distance-parameter `2r+1` honeycomb patch has `3r(r+1)+1` qubits
-and `3r(r+1)/2` faces. Each face supplies an X-check and a Z-check with
-the same support. Orthogonality and independence of these checks yield
-an unconditional `[[3r(r+1)+1, 1]]` stabilizer code.
+The color code of parameter `r` has an X-check and a Z-check on every face of
+the triangular honeycomb patch, both supported on the qubits of the face. It
+is the self-dual CSS code `homologicalCode r` of the matrix `incidence` of
+face indicator vectors: the checks commute because the rows are mutually
+orthogonal (`incidence_orthogonal`), and they are independent because the rows
+are (`checkCombination_injective`).
 
-The canonical stabilizer is derived from its generator-list presentation.
-The homological construction is used only through a subgroup equality
-for access to the generic CSS cycle and logical-operator theorems.
+* `presentation r`: the `numQubits r - 1` checks `generatorsList r` as a
+  `StabilizerCode.Presentation`.
+* `stabilizerCode r : StabilizerCode (numQubits r) 1`: the code, which encodes
+  one logical qubit, with stabilizer group `stabilizerGroup r`.
+* `stabilizerGroup_eq_homological_subgroup`: the stabilizer subgroup is that
+  of `(homologicalCode r).homologicalStabilizerGroup`, so the theorems on
+  cycles and logical operators of homological CSS codes apply.
+* `mem_cycles_iff_sum_faceSupport`: a chain is a cycle of `homologicalCode r`
+  iff it has an even number of qubits on every face. Cycles and dual cycles,
+  and boundaries and dual boundaries, coincide (`dualCycles_eq_cycles`,
+  `dualBoundaries_eq_boundaries`).
 -/
 
 namespace Quantum.StabilizerGroup.ColorCode
 
 open Stabilizer.Homological
 
-/-- Number the physical sites by the proven physical-qubit count. -/
+/-- A numbering of the qubits by `Fin (numQubits r)`. -/
 noncomputable def qubitEquiv (r : ℕ) : Qubit r ≃ Fin (numQubits r) :=
   (Fintype.equivFin (Qubit r)).trans (finCongr (card_qubit r))
 
-/-- The self-dual CSS chain complex of the triangular honeycomb patch. -/
+/-- The self-dual CSS chain complex of the color code: the 1-cells are the
+qubits, the 0-cells and the 2-cells are the faces, and both boundary maps are
+given by the matrix `incidence`. -/
 noncomputable def homologicalCode (r : ℕ) : HomologicalCode :=
   SelfDual.homologicalCode (@incidence r) incidence_orthogonal
     (numQubits r) (card_qubit r) (qubitEquiv r)
 
-/-- X-check and Z-check combinations use the same incidence map. -/
-theorem cutMap_eq_boundary2 (r : ℕ) :
+/-- A chain is a cycle iff it has an even number of qubits on every face. -/
+theorem mem_cycles_iff_sum_faceSupport {r : ℕ} (c : Qubit r → ZMod 2) :
+    c ∈ (homologicalCode r).cycles ↔ ∀ f, ∑ q ∈ faceSupport f, c q = 0 := by
+  simp only [← sum_incidence_mul]
+  exact ((homologicalCode r).mem_cycles_iff c).trans funext_iff
+
+/-- The combinations of Z-checks and of X-checks are given by the same map. -/
+lemma cutMap_eq_boundary2 (r : ℕ) :
     (homologicalCode r).cutMap = (homologicalCode r).boundary2 :=
   SelfDual.cutMap_eq_boundary2 _ _ _ _ _
 
-/-- Primal and dual cycle spaces agree. -/
-theorem dualCycles_eq_cycles (r : ℕ) :
+/-- The dual cycles of the color code are its cycles. -/
+lemma dualCycles_eq_cycles (r : ℕ) :
     (homologicalCode r).dualCycles = (homologicalCode r).cycles :=
   SelfDual.dualCycles_eq_cycles _ _ _ _ _
 
-/-- Primal and dual boundary spaces agree. -/
-theorem dualBoundaries_eq_boundaries (r : ℕ) :
+/-- The dual boundaries of the color code are its boundaries. -/
+lemma dualBoundaries_eq_boundaries (r : ℕ) :
     (homologicalCode r).dualBoundaries = (homologicalCode r).boundaries :=
   SelfDual.dualBoundaries_eq_boundaries _ _ _ _ _
 
-/-- Face-boundary combinations are injective. -/
-theorem boundary2_injective (r : ℕ) :
+/-- The X-checks are independent: `∂₂` is injective. -/
+lemma boundary2_injective (r : ℕ) :
     Function.Injective (homologicalCode r).boundary2 :=
   checkCombination_injective r
 
-/-- Vertex-cut combinations are injective. -/
-theorem cutMap_injective (r : ℕ) : Function.Injective (homologicalCode r).cutMap := by
-  rw [cutMap_eq_boundary2]
-  exact boundary2_injective r
+/-- The Z-checks are independent: `cutMap` is injective. -/
+lemma cutMap_injective (r : ℕ) : Function.Injective (homologicalCode r).cutMap :=
+  (cutMap_eq_boundary2 r).symm ▸ boundary2_injective r
 
-/-- The full generator list contains an X-check and a Z-check per face. -/
-noncomputable def generatorsList (r : ℕ) := (homologicalCode r).generatorsList
+/-- The list of checks: the Z-check and the X-check of every face. -/
+noncomputable def generatorsList (r : ℕ) : List (NQubitPauliGroupElement (numQubits r)) :=
+  (homologicalCode r).generatorsList
 
-/-- The independent checks number exactly one less than the physical qubits. -/
-theorem generatorsList_length (r : ℕ) :
-    (generatorsList r).length = numQubits r - 1 := by
-  rw [generatorsList, HomologicalCode.generatorsList_length]
-  change Fintype.card (Face r) + Fintype.card (Face r) = numQubits r - 1
-  rw [card_face]
-  have h := twice_numFaces r
-  omega
-
-/-- The canonical presentation of the triangular color code. -/
+/-- The checks of the color code as a presentation of a stabilizer code with
+one logical qubit. -/
 noncomputable def presentation (r : ℕ) :
     StabilizerCode.Presentation (numQubits r) 1 :=
-  (homologicalCode r).presentation 1 (by change 1 ≤ 3 * r * (r + 1) + 1; omega)
+  (homologicalCode r).presentation 1 (Nat.le_add_left 1 _)
     (by
+      have h := card_qubit_eq_two_mul_card_face_add_one r
+      rw [card_qubit] at h
       change Fintype.card (Face r) + Fintype.card (Face r) = numQubits r - 1
-      rw [card_face]
-      have h := twice_numFaces r
       omega)
     (cutMap_injective r) (boundary2_injective r)
 
-/-- The triangular color code encodes exactly one logical qubit. -/
+/-- There are `numQubits r - 1` checks. -/
+lemma generatorsList_length (r : ℕ) :
+    (generatorsList r).length = numQubits r - 1 :=
+  (presentation r).generators_length
+
+/-- The triangular color code of parameter `r`, a stabilizer code on
+`numQubits r` qubits with one logical qubit. -/
 noncomputable def stabilizerCode (r : ℕ) : StabilizerCode (numQubits r) 1 :=
   (presentation r).toCode
 
-/-- The single canonical stabilizer group, derived from its presentation. -/
+/-- The stabilizer group of the triangular color code. -/
 noncomputable abbrev stabilizerGroup (r : ℕ) : StabilizerGroup (numQubits r) :=
   (stabilizerCode r).toStabilizerGroup
 
-/-- The canonical subgroup is generated by the face-check list. -/
-theorem stabilizerGroup_toSubgroup (r : ℕ) :
+/-- The stabilizer subgroup is generated by the list of checks. -/
+lemma stabilizerGroup_toSubgroup (r : ℕ) :
     (stabilizerGroup r).toSubgroup =
       Subgroup.closure (NQubitPauliGroupElement.listToSet (generatorsList r)) := rfl
 
-/-- The canonical subgroup agrees with the abstract homological construction. -/
+/-- The stabilizer subgroup is that of the homological CSS code
+`homologicalCode r`. -/
 theorem stabilizerGroup_eq_homological_subgroup (r : ℕ) :
     (stabilizerGroup r).toSubgroup =
       (homologicalCode r).homologicalStabilizerGroup.toSubgroup :=
   (homologicalCode r).presentation_toCode_subgroup _ _ _ _ _
 
-/-- The stabilizer has exactly `2^(n-1)` elements. -/
+/-- The stabilizer group has `2 ^ (numQubits r - 1)` elements. -/
 theorem stabilizer_card (r : ℕ) :
     Nat.card (stabilizerGroup r).toSubgroup = 2 ^ (numQubits r - 1) :=
   (stabilizerCode r).card_eq

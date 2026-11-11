@@ -10,20 +10,16 @@ import QEC.Stabilizer.Codes.Small
 /-!
 # Codes
 
-Concrete stabilizer codes, organized by family:
-- `Toric` — parametric toric code (code + lattice + homology)
-- `RotatedSurface` — rotated surface code (code + lattice + homology)
-- `Repetition` — classical repetition codes
-- `Iceberg` — parametric `[[2m, 2m−2, 2]]` iceberg / generalized parity code
-  family
-- `BivariateBicycle` — BB foundations; concrete proofs live in `bb-distance-lean`
-- `Small` — single-instance codes (Shor9, Steane7, [[5,1,3]], …)
+Concrete stabilizer codes, by family:
 
-The concrete concatenated codes (`Concat/`: Steane⊗Steane `[[49,1,9]]` and
-Steane⊗`[[4,2,2]]` `[[28,2,6]]`) are **parked on branch `claude/z3z6-parked`**
-pending de-nativization. The concatenation framework itself
-(`Framework/Concatenation`, M1–M6) stays in this tree; it currently has no
-concrete instance here.
-
-`_TEMPLATE.lean` is the canonical structural reference for drafting new codes.
+- `Small`: single codes on a fixed number of qubits (the `[[4, 1, 2]]`,
+  `[[4, 2, 2]]`, `[[6, 2, 2]]`, `[[5, 1, 3]]`, Steane `[[7, 1, 3]]` and Shor
+  `[[9, 1, 3]]` codes) and the quantum Hamming family.
+- `Repetition`: the repetition codes.
+- `Iceberg`: the `[[2m, 2m − 2, 2]]` iceberg codes.
+- `Toric`: the `L × L` toric code.
+- `RotatedSurface`: the rotated surface code.
+- `Color`: the triangular honeycomb color codes.
+- `BivariateBicycle`: the bivariate bicycle codes.
+- `_TEMPLATE`: the structure every code file follows.
 -/

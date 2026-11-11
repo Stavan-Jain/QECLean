@@ -1,18 +1,23 @@
-import Mathlib.Tactic
-import QEC.Stabilizer.Framework.Homological
+import QEC.Stabilizer.Framework.Homological.Distance
+import QEC.Stabilizer.Framework.Homological.ToCode
 import QEC.Stabilizer.Codes.RotatedSurface.BoundaryMaps
-import QEC.Stabilizer.Geometry.GridIndexing
 
 /-!
-# Rotated-surface-code chain complex as an instance of `HomologicalCode`
+# The rotated surface code as a `HomologicalCode`
 
-Packages the boundary maps `rscBoundary1` / `rscBoundary2` from
-[RotatedSurfaceBoundaryMaps](RotatedSurfaceBoundaryMaps.lean) into a generic
-`HomologicalCode` instance, plus rfl-bridges relating the lattice-specific
-submodules (`rscCycles`, `rscBoundaries`, `rscH1`) to the abstract versions.
+`rotatedSurfaceHomologicalCode L` packages the boundary maps `rscBoundary1` and
+`rscBoundary2` of the rotated surface code of odd size `L ≥ 3` as a
+`HomologicalCode`, with the qubit `(x, y)` numbered `y * L + x`
+(`rscQubitEquiv`). The theorems on homological CSS codes then apply to it.
 
-The qubit indexing is the standard row-major map `(x, y) ↦ y * L + x`, packaged
-via `rscQubitEquiv` as an `Equiv VtxIdx L ≃ Fin (L * L)`.
+The cycles, boundaries and first homology of the complex are also available
+under their own names `rscCycles` (`Z₁ L`), `rscBoundaries` (`B₁ L`) and
+`rscH1` (`H₁ L`), which do not depend on the `HomologicalCode` structure. Those
+of `rotatedSurfaceHomologicalCode L` are these by definition
+(`rotatedSurfaceHomologicalCode_cycles_eq`,
+`rotatedSurfaceHomologicalCode_boundaries_eq`,
+`rotatedSurfaceHomologicalCode_H1_eq`), and its cut map is `rscZCutMap`
+(`rotatedSurfaceHomologicalCode_cutMap_eq`).
 -/
 
 namespace Quantum
@@ -20,22 +25,18 @@ namespace Stabilizer
 namespace Lattice
 namespace RotatedSurface
 
-open scoped BigOperators
 open scoped RotatedSurfaceChain
+open Homological
 
-/-! ## Lattice-specific cycles / boundaries / `H₁`
-
-These mirror the toric `toricCycles` / `toricBoundaries` / `toricH1`
-definitions, providing a stable API surface for downstream files that reason
-against the rotated-surface chain complex directly. -/
+/-! ## Cycles, boundaries and homology -/
 
 variable (L : ℕ)
 
-/-- 1-cycles: kernel of `∂₁`. -/
-def rscCycles [Fact (Odd L)] : Submodule (ZMod 2) (VtxIdx L → ZMod 2) :=
+/-- 1-cycles: the kernel of `∂₁`. -/
+def rscCycles : Submodule (ZMod 2) (VtxIdx L → ZMod 2) :=
   LinearMap.ker (∂₁ L)
 
-/-- 1-boundaries: range of `∂₂`. -/
+/-- 1-boundaries: the range of `∂₂`. -/
 def rscBoundaries : Submodule (ZMod 2) (VtxIdx L → ZMod 2) :=
   LinearMap.range (∂₂ L)
 
@@ -50,69 +51,36 @@ Scoped: `open scoped RotatedSurfaceChain`. -/
 scoped[RotatedSurfaceChain] notation "B₁" =>
   Quantum.Stabilizer.Lattice.RotatedSurface.rscBoundaries
 
-
-/-- Every boundary is a cycle (`∂₁ ∘ ∂₂ = 0`). -/
-theorem rscBoundaries_le_rscCycles [Fact (Odd L)] :
-    rscBoundaries L ≤ rscCycles L := by
-  intro c hc
-  rcases hc with ⟨f, rfl⟩
+/-- Every boundary is a cycle. -/
+theorem rscBoundaries_le_rscCycles [Fact (Odd L)] : B₁ L ≤ Z₁ L := by
+  rintro _ ⟨f, rfl⟩
   exact rscBoundary_comp_zero_apply L f
 
-/-- First homology `H₁ = Z₁ / B₁` for the rotated surface code. -/
-abbrev rscH1 [Fact (Odd L)] : Type :=
+/-- First homology `H₁ = Z₁ / B₁` of the rotated surface code. -/
+abbrev rscH1 : Type :=
   Z₁ L ⧸ Submodule.comap (Z₁ L).subtype (B₁ L)
 
 /-- `H₁ L` is the rotated-surface first homology `rscH1 L = Z₁ L ⧸ B₁ L`.
 Scoped: `open scoped RotatedSurfaceChain`. -/
 scoped[RotatedSurfaceChain] notation "H₁" => Quantum.Stabilizer.Lattice.RotatedSurface.rscH1
 
+/-! ## Numbering of the qubits -/
 
-/-! ## Row-major qubit indexing -/
+/-- The row-major numbering of the qubits: `(x, y)` is qubit `y * L + x`. -/
+def rscQubitEquiv : VtxIdx L ≃ Fin (L * L) :=
+  (Equiv.prodComm (Fin L) (Fin L)).trans finProdFinEquiv
 
-/-- Row-major qubit indexing: `(x, y) ↦ y * L + x`. This is the canonical
-bijection `VtxIdx L ≃ Fin (L * L)` and matches the convention used elsewhere in
-the codebase (`Lattice.rowMajor_injective`). -/
-def vtxToQubitIdx (p : VtxIdx L) : Fin (L * L) :=
-  ⟨p.2.val * L + p.1.val, by
-    have h1 := p.1.isLt
-    have h2 := p.2.isLt
-    calc p.2.val * L + p.1.val
-        < p.2.val * L + L := by omega
-      _ = (p.2.val + 1) * L := by ring
-      _ ≤ L * L := Nat.mul_le_mul_right _ h2⟩
+lemma rscQubitEquiv_apply_val (v : VtxIdx L) :
+    (rscQubitEquiv L v).val = v.2.val * L + v.1.val := by
+  simp [rscQubitEquiv, Nat.add_comm, Nat.mul_comm]
 
-@[simp] lemma vtxToQubitIdx_val (p : VtxIdx L) :
-    (vtxToQubitIdx L p).val = p.2.val * L + p.1.val := rfl
+/-! ## The `HomologicalCode` -/
 
-lemma vtxToQubitIdx_injective [Fact (0 < L)] :
-    Function.Injective (vtxToQubitIdx L) := by
-  intro p q hpq
-  have h := Fin.mk.inj_iff.mp hpq
-  exact rowMajor_injective L h
-
-/-- The canonical row-major bijection `VtxIdx L ≃ Fin (L * L)`. -/
-noncomputable def rscQubitEquiv [Fact (0 < L)] :
-    VtxIdx L ≃ Fin (L * L) := by
-  have hbij : Function.Bijective (vtxToQubitIdx L) := by
-    rw [Fintype.bijective_iff_injective_and_card]
-    refine ⟨vtxToQubitIdx_injective L, ?_⟩
-    simp [Fintype.card_prod, Fintype.card_fin]
-  exact Equiv.ofBijective _ hbij
-
-/-! ## The `HomologicalCode` instance -/
-
-/-- Positivity of `L` follows from `Fact (3 ≤ L)`. Registered as an instance so
-the qubit-equivalence and other `[Fact (0 < L)]`-requiring lemmas resolve
-automatically downstream. -/
-instance pos_of_three_le {L : ℕ} [Fact (3 ≤ L)] : Fact (0 < L) :=
-  ⟨lt_of_lt_of_le (by decide : 0 < 3) Fact.out⟩
-
-/-- The rotated-surface-code chain complex packaged as a generic
-`HomologicalCode`. Consumers of `Homological.HomologicalCode`'s API (generic
-stabilizer construction, CSS distance bridge, etc.) can operate on this without
-re-deriving any lattice-specific facts. -/
+/-- The chain complex of the rotated surface code as a `HomologicalCode`: the
+0-cells are the Z-checks, the 1-cells the qubits and the 2-cells the
+X-checks. -/
 noncomputable def rotatedSurfaceHomologicalCode [Fact (Odd L)] [Fact (3 ≤ L)] :
-    Quantum.Stabilizer.Homological.HomologicalCode where
+    HomologicalCode where
   C0 := ZFaceIdx L
   C1 := VtxIdx L
   C2 := XFaceIdx L
@@ -126,51 +94,31 @@ noncomputable def rotatedSurfaceHomologicalCode [Fact (Odd L)] [Fact (3 ≤ L)] 
   boundary2 := ∂₂ L
   boundary_comp := rscBoundary_comp_zero L
   numQubits := L * L
-  numQubits_eq := by simp [Fintype.card_prod, Fintype.card_fin]
+  numQubits_eq := by simp
   edgeEquiv := rscQubitEquiv L
-
-/-! ## RFL bridges
-
-These all hold definitionally — the proofs are `rfl`. They give downstream code
-a stable interface for translating between lattice-specific and abstract names.
--/
 
 variable [Fact (Odd L)] [Fact (3 ≤ L)]
 
-theorem rotatedSurfaceHomologicalCode_C0 :
-    (rotatedSurfaceHomologicalCode L).C0 = ZFaceIdx L := rfl
+/-! ## Definitional identifications -/
 
-theorem rotatedSurfaceHomologicalCode_C1 :
-    (rotatedSurfaceHomologicalCode L).C1 = VtxIdx L := rfl
-
-theorem rotatedSurfaceHomologicalCode_C2 :
-    (rotatedSurfaceHomologicalCode L).C2 = XFaceIdx L := rfl
-
-theorem rotatedSurfaceHomologicalCode_boundary1 :
-    (rotatedSurfaceHomologicalCode L).boundary1 = ∂₁ L := rfl
-
-theorem rotatedSurfaceHomologicalCode_boundary2 :
-    (rotatedSurfaceHomologicalCode L).boundary2 = ∂₂ L := rfl
-
-theorem rotatedSurfaceHomologicalCode_numQubits :
-    (rotatedSurfaceHomologicalCode L).numQubits = L * L := rfl
-
-/-- The lattice-specific 1-cycle submodule equals the generic version. -/
 theorem rotatedSurfaceHomologicalCode_cycles_eq :
-    Z₁ L = (rotatedSurfaceHomologicalCode L).cycles := rfl
+    (rotatedSurfaceHomologicalCode L).cycles = Z₁ L := rfl
 
-/-- The lattice-specific 1-boundary submodule equals the generic version. -/
 theorem rotatedSurfaceHomologicalCode_boundaries_eq :
-    B₁ L = (rotatedSurfaceHomologicalCode L).boundaries := rfl
+    (rotatedSurfaceHomologicalCode L).boundaries = B₁ L := rfl
 
-/-- The lattice-specific `H₁` definition agrees with the generic one. -/
 theorem rotatedSurfaceHomologicalCode_H1_eq :
-    H₁ L = (rotatedSurfaceHomologicalCode L).H1 := rfl
+    (rotatedSurfaceHomologicalCode L).H1 = H₁ L := rfl
 
-/-- `boundaries ≤ cycles` follows from the generic chain-complex law. -/
-theorem rotatedSurfaceHomologicalCode_boundaries_le_cycles :
-    B₁ L ≤ Z₁ L :=
-  (rotatedSurfaceHomologicalCode L).boundaries_le_cycles
+/-! ## The cut map -/
+
+/-- The cut map of `rotatedSurfaceHomologicalCode L`, defined as the transpose
+of `∂₁`, is `δ⁰`: both send a combination of Z-checks to the sum of their
+supports. -/
+theorem rotatedSurfaceHomologicalCode_cutMap_eq :
+    (rotatedSurfaceHomologicalCode L).cutMap = δ⁰ L :=
+  LinearMap.ext fun s => funext fun v =>
+    Finset.sum_congr rfl fun zf _ => congrArg (s zf * ·) (rscBoundary1_single L v zf)
 
 end RotatedSurface
 end Lattice

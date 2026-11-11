@@ -1,51 +1,68 @@
 import Mathlib.Tactic
 
 /-!
-# Triangular honeycomb color-code geometry
+# Geometry of the triangular honeycomb color code
 
-The parameter `r` gives distance `2 * r + 1`. Coordinates follow the triangular
-honeycomb convention: `0 ≤ column ≤ row ≤ 3 * r`; faces have
-`(row + column) % 3 = 2`, and the remaining positions are data qubits.
+The patch of parameter `r` consists of the lattice points `(row, column)` with
+`0 ≤ column ≤ row ≤ 3 * r` (`InPatch`). A point with `(row + column) % 3 = 2`
+is the center of a face (`IsFace`); every other point carries a data qubit
+(`IsSite`). A face contains its six lattice neighbors (`Adjacent`) that lie in
+the patch.
 
-The finite index types enumerate the rows explicitly. This keeps the physical
-qubit and face counts separate from any linear-algebra or distance assumptions.
+The qubits and the faces are enumerated row by row by the finite types
+`Qubit r` and `Face r`, with coordinates `qubitCoord` and `faceCoord`. Both
+enumerations are bijections onto the sites and the face centers
+(`qubitEquivSite`, `faceEquivCenter`). There are `numQubits r = 3r(r+1) + 1`
+qubits (`card_qubit`) and `numFaces r = 3r(r+1)/2` faces (`card_face`), so
+that `numQubits r = 2 * numFaces r + 1` (`twice_numFaces`).
+
+`faceSupport f` is the set of qubits of the face `f` and `incidence f` its
+indicator vector over `ZMod 2`. Pairing a chain with `incidence f` sums the
+chain over the face (`sum_incidence_mul`).
 -/
 
 namespace Quantum.StabilizerGroup.ColorCode
 
 open scoped BigOperators
 
-/-- Triangular honeycomb coordinates, ordered as `(row, column)`. -/
+/-! ## Coordinates and index types -/
+
+/-- Lattice coordinates, ordered as `(row, column)`. -/
 abbrev Coord := ℕ × ℕ
 
-/-- A row of faces in one of the three-row layers of the patch. -/
+/-- A layer `l < r` of the patch together with a position `< l + 1` in a row
+of faces of that layer. -/
 abbrev FaceRow (r : ℕ) := (l : Fin r) × Fin (l.val + 1)
 
-/-- Faces, with a row class and a triangular row index. -/
+/-- Faces: each layer has three rows of faces, and the rows of layer `l` have
+`l + 1` faces each. -/
 abbrev Face (r : ℕ) := Fin 3 × FaceRow r
 
-/-- Non-apex qubits, enumerated by layer, row within that layer, and site. -/
+/-- Qubits other than the apex: row `k` of layer `l` has `2 * l + 1 + k`
+qubits. -/
 abbrev LayerQubit (r : ℕ) :=
   (l : Fin r) × (k : Fin 3) × Fin (2 * l.val + 1 + k.val)
 
-/-- Data qubits: the apex and the three rows in each successive layer. -/
+/-- Data qubits: the apex and the three rows of qubits of each layer. -/
 abbrev Qubit (r : ℕ) := Unit ⊕ LayerQubit r
 
-/-- Number of physical data qubits in the distance-`2r+1` patch. -/
+/-- The number of data qubits of the patch of parameter `r`. -/
 def numQubits (r : ℕ) : ℕ := 3 * r * (r + 1) + 1
 
-/-- Number of independent face checks of either Pauli type. -/
+/-- The number of faces of the patch of parameter `r`. -/
 def numFaces (r : ℕ) : ℕ := 3 * (r * (r + 1) / 2)
 
-/-- The odd distance parameter of the triangular patch. -/
+/-- The distance `2 * r + 1` of the color code of parameter `r`. -/
 def distance (r : ℕ) : ℕ := 2 * r + 1
 
-/-- Coordinates of a face in row classes `0`, `1`, and `2`. -/
+/-- The coordinates of the center of a face: row `k` of layer `l` is the
+lattice row `3 * l + 1 + k`. -/
 def faceCoord {r : ℕ} (f : Face r) : Coord :=
   (3 * f.2.1.val + 1 + f.1.val,
     3 * f.2.2.val + if f.1.val = 0 then 1 else if f.1.val = 1 then 0 else 2)
 
-/-- Coordinates of a physical site in its explicitly enumerated row. -/
+/-- The coordinates of a qubit: the apex is `(0, 0)`, and row `k` of layer `l`
+is the lattice row `3 * l + 1 + k`. -/
 def qubitCoord {r : ℕ} : Qubit r → Coord
   | .inl _ => (0, 0)
   | .inr ⟨l, k, j⟩ =>
@@ -54,18 +71,19 @@ def qubitCoord {r : ℕ} : Qubit r → Coord
           if k.val = 0 then 2 * (j.val % 2)
           else if k.val = 1 then 1 + j.val % 2 else j.val % 2)
 
-/-- A coordinate belongs to the triangular patch. -/
+/-- A point lies in the triangular patch: `column ≤ row ≤ 3 * r`. -/
 def InPatch (r : ℕ) (p : Coord) : Prop := p.2 ≤ p.1 ∧ p.1 ≤ 3 * r
 
-/-- A coordinate is a data-qubit site of the triangular honeycomb patch. -/
+/-- A point of the patch carries a data qubit. -/
 def IsSite (r : ℕ) (p : Coord) : Prop :=
   InPatch r p ∧ (p.1 + p.2) % 3 ≠ 2
 
-/-- A coordinate is a face center of the triangular honeycomb patch. -/
+/-- A point of the patch is the center of a face. -/
 def IsFace (r : ℕ) (p : Coord) : Prop :=
   InPatch r p ∧ (p.1 + p.2) % 3 = 2
 
-/-- The six face neighbors, expressed without truncated subtraction. -/
+/-- `q` is one of the six lattice neighbors of `f`: the points `f ± (1, 0)`,
+`f ± (0, 1)` and `f ± (1, 1)`, stated without subtraction. -/
 def Adjacent (f q : Coord) : Prop :=
   (q.1 + 1 = f.1 ∧ q.2 = f.2) ∨
   (q.1 = f.1 + 1 ∧ q.2 = f.2) ∨
@@ -74,134 +92,150 @@ def Adjacent (f q : Coord) : Prop :=
   (q.1 + 1 = f.1 ∧ q.2 + 1 = f.2) ∨
   (q.1 = f.1 + 1 ∧ q.2 = f.2 + 1)
 
+/-- Adjacency of two lattice points is decidable. -/
 instance (f q : Coord) : Decidable (Adjacent f q) := inferInstanceAs (Decidable (_ ∨ _))
 
-/-- Face qubits, clipped to the triangular patch by their index type. -/
+/-! ## Faces as sets of qubits -/
+
+/-- The qubits of a face: those at a lattice neighbor of its center. -/
 def faceSupport {r : ℕ} (f : Face r) : Finset (Qubit r) :=
   Finset.univ.filter fun q => Adjacent (faceCoord f) (qubitCoord q)
 
-/-- Binary incidence vector of one color-code face. -/
+/-- The indicator vector of a face over `ZMod 2`. -/
 def incidence {r : ℕ} (f : Face r) (q : Qubit r) : ZMod 2 :=
   if q ∈ faceSupport f then 1 else 0
 
-/-- Membership in a face is exactly adjacency of its lattice coordinates. -/
-@[simp] theorem mem_faceSupport {r : ℕ} (f : Face r) (q : Qubit r) :
+/-- A qubit lies on a face iff it is at a lattice neighbor of its center. -/
+@[simp] lemma mem_faceSupport {r : ℕ} (f : Face r) (q : Qubit r) :
     q ∈ faceSupport f ↔ Adjacent (faceCoord f) (qubitCoord q) := by
   simp [faceSupport]
 
-/-- The triangular row sum, stated without natural-number division. -/
-private theorem twice_sum_rows (r : ℕ) :
+/-- Pairing a chain with the indicator vector of a face sums the chain over
+the qubits of the face. -/
+lemma sum_incidence_mul {r : ℕ} (f : Face r) (c : Qubit r → ZMod 2) :
+    ∑ q, incidence f q * c q = ∑ q ∈ faceSupport f, c q := by
+  simp only [incidence, ite_mul, one_mul, zero_mul, Finset.sum_ite_mem, Finset.univ_inter]
+
+/-- The pairing of the indicator vectors of two faces counts their common
+qubits modulo `2`. -/
+lemma sum_incidence_mul_incidence {r : ℕ} (f g : Face r) :
+    ∑ q, incidence f q * incidence g q =
+      ∑ _q ∈ faceSupport f ∩ faceSupport g, (1 : ZMod 2) :=
+  (sum_incidence_mul f _).trans (Finset.sum_ite_mem _ _ _)
+
+/-! ## Counting qubits and faces -/
+
+/-- The sum `1 + 2 + ⋯ + r`, stated without division. -/
+private lemma twice_sum_rows (r : ℕ) :
     2 * (∑ l : Fin r, (l.val + 1)) = r * (r + 1) := by
   induction r with
   | zero => simp
   | succ r ih =>
-      rw [Fin.sum_univ_castSucc]
-      simp only [Fin.val_castSucc, Fin.val_last]
-      nlinarith
+    rw [Fin.sum_univ_castSucc]
+    simp only [Fin.val_castSucc, Fin.val_last]
+    linarith
 
-/-- The number of triangular face-row slots. -/
-theorem card_faceRow (r : ℕ) : Fintype.card (FaceRow r) = r * (r + 1) / 2 := by
+/-- There are `r(r+1)/2` pairs of a layer and a position in a row of faces of
+that layer. -/
+lemma card_faceRow (r : ℕ) : Fintype.card (FaceRow r) = r * (r + 1) / 2 := by
   simp only [FaceRow, Fintype.card_sigma, Fintype.card_fin]
   have h := twice_sum_rows r
   omega
 
-/-- The patch contains `3r(r+1)/2` faces. -/
+/-- The patch has `3r(r+1)/2` faces. -/
 theorem card_face (r : ℕ) : Fintype.card (Face r) = numFaces r := by
-  change Fintype.card (Fin 3 × FaceRow r) = numFaces r
-  rw [Fintype.card_prod, Fintype.card_fin, card_faceRow]
-  rfl
+  rw [Fintype.card_prod, Fintype.card_fin, card_faceRow, numFaces]
 
-/-- The patch contains `3r(r+1)+1` physical data qubits. -/
+/-- The patch has `3r(r+1) + 1` data qubits. -/
 theorem card_qubit (r : ℕ) : Fintype.card (Qubit r) = numQubits r := by
-  simp only [Qubit, LayerQubit, Fintype.card_sum, Fintype.card_unit,
-    Fintype.card_sigma, Fintype.card_fin, Fin.sum_univ_three]
   have h := twice_sum_rows r
-  have hs : (∑ l : Fin r, ((2 * l.val + 1) + (2 * l.val + 1 + 1) +
-      (2 * l.val + 1 + 2))) = 6 * ∑ l : Fin r, (l.val + 1) := by
-    rw [Finset.mul_sum]
-    apply Finset.sum_congr rfl
-    intro l _
+  have hs (l : Fin r) : ∑ k : Fin 3, (2 * l.val + 1 + k.val) = 6 * (l.val + 1) := by
+    simp only [Fin.sum_univ_three, Fin.val_zero, Fin.val_one, Fin.val_two]
     ring
-  change 1 + (∑ l : Fin r, ((2 * l.val + 1) + (2 * l.val + 1 + 1) +
-    (2 * l.val + 1 + 2))) = numQubits r
-  rw [hs]
-  dsimp [numQubits]
-  nlinarith
+  simp only [Qubit, LayerQubit, Fintype.card_sum, Fintype.card_unit, Fintype.card_sigma,
+    Fintype.card_fin, hs, ← Finset.mul_sum, numQubits]
+  linarith
 
-/-- Twice the face count is one less than the number of physical qubits. -/
-theorem twice_numFaces (r : ℕ) : 2 * numFaces r + 1 = numQubits r := by
-  have h := twice_sum_rows r
-  have hd : 2 * (r * (r + 1) / 2) = r * (r + 1) := by omega
-  dsimp [numFaces, numQubits]
-  nlinarith
+/-- The number of qubits is one more than twice the number of faces. -/
+lemma twice_numFaces (r : ℕ) : 2 * numFaces r + 1 = numQubits r := by
+  have h := Nat.two_mul_div_two_of_even (Nat.even_mul_succ_self r)
+  simp only [numFaces, numQubits]
+  linarith
 
-/-- The row enumeration places every face at a genuine face center. -/
-theorem faceCoord_isFace {r : ℕ} (f : Face r) : IsFace r (faceCoord f) := by
+/-- The cardinality form of `twice_numFaces`: there is one more qubit than
+there are X-checks and Z-checks together. -/
+lemma card_qubit_eq_two_mul_card_face_add_one (r : ℕ) :
+    Fintype.card (Qubit r) = 2 * Fintype.card (Face r) + 1 := by
+  rw [card_qubit, card_face, twice_numFaces]
+
+/-- In terms of the distance `d = 2r + 1`, the number of qubits is
+`(3d² + 1) / 4`. -/
+lemma numQubits_eq_distance (r : ℕ) :
+    numQubits r = (3 * (distance r) ^ 2 + 1) / 4 := by
+  have h : 4 * numQubits r = 3 * (distance r) ^ 2 + 1 := by
+    simp only [numQubits, distance]
+    ring
+  omega
+
+/-- The distance `2 * r + 1` is odd. -/
+lemma distance_odd (r : ℕ) : Odd (distance r) := ⟨r, rfl⟩
+
+/-! ## The enumerations are bijections onto the sites and the face centers -/
+
+/-- The center of every face of the enumeration is a face center of the
+patch. -/
+lemma faceCoord_isFace {r : ℕ} (f : Face r) : IsFace r (faceCoord f) := by
   rcases f with ⟨k, l, c⟩
   have hl := l.isLt
   have hc := c.isLt
   fin_cases k <;> simp [faceCoord, IsFace, InPatch] <;> omega
 
-/-- The row enumeration places every data qubit at a genuine physical site. -/
-theorem qubitCoord_isSite {r : ℕ} (q : Qubit r) : IsSite r (qubitCoord q) := by
+/-- Every qubit of the enumeration sits at a site of the patch. -/
+lemma qubitCoord_isSite {r : ℕ} (q : Qubit r) : IsSite r (qubitCoord q) := by
   rcases q with u | ⟨l, k, j⟩
   · simp [qubitCoord, IsSite, InPatch]
   · have hl := l.isLt
     have hj := j.isLt
     fin_cases k <;> simp [qubitCoord, IsSite, InPatch] <;> simp at hj <;> omega
 
-/-- Distinct face indices have distinct lattice coordinates. -/
-theorem faceCoord_injective (r : ℕ) : Function.Injective (@faceCoord r) := by
+/-- Distinct faces have distinct centers. -/
+lemma faceCoord_injective (r : ℕ) : Function.Injective (@faceCoord r) := by
   rintro ⟨k, l, c⟩ ⟨k', l', c'⟩ h
   have hrow := congrArg Prod.fst h
   have hcol := congrArg Prod.snd h
   have hk := k.isLt
   have hk' := k'.isLt
   simp only [faceCoord] at hrow hcol
-  have hl : l = l' := Fin.ext (by omega)
-  have heq : k = k' := Fin.ext (by omega)
-  subst l'
-  subst k'
-  have hc : c = c' := Fin.ext (by omega)
-  subst c'
+  obtain rfl : l = l' := Fin.ext (by omega)
+  obtain rfl : k = k' := Fin.ext (by omega)
+  obtain rfl : c = c' := Fin.ext (by omega)
   rfl
 
-/-- Distinct physical-qubit indices have distinct lattice coordinates. -/
-theorem qubitCoord_injective (r : ℕ) : Function.Injective (@qubitCoord r) := by
-  rintro (u | ⟨l, k, j⟩) (u' | ⟨l', k', j'⟩) h
-  · cases u
-    cases u'
-    rfl
-  · have hrow := congrArg Prod.fst h
-    simp only [qubitCoord] at hrow
+/-- Distinct qubits have distinct coordinates. -/
+lemma qubitCoord_injective (r : ℕ) : Function.Injective (@qubitCoord r) := by
+  rintro (_ | ⟨l, k, j⟩) (_ | ⟨l', k', j'⟩) h
+  · rfl
+  · have hrow : 0 = 3 * l'.val + 1 + k'.val := congrArg Prod.fst h
     omega
-  · have hrow := congrArg Prod.fst h
-    simp only [qubitCoord] at hrow
+  · have hrow : 3 * l.val + 1 + k.val = 0 := congrArg Prod.fst h
     omega
   · have hrow := congrArg Prod.fst h
     have hcol := congrArg Prod.snd h
     have hk := k.isLt
     have hk' := k'.isLt
     simp only [qubitCoord] at hrow hcol
-    have hl : l = l' := Fin.ext (by omega)
-    have heq : k = k' := Fin.ext (by omega)
-    subst l'
-    subst k'
-    have hj : j = j' := by
-      apply Fin.ext
-      fin_cases k <;> simp at hcol <;> omega
-    subst j'
+    obtain rfl : l = l' := Fin.ext (by omega)
+    obtain rfl : k = k' := Fin.ext (by omega)
+    obtain rfl : j = j' := Fin.ext (by fin_cases k <;> simp at hcol <;> omega)
     rfl
 
-/-- Every physical site of the triangle occurs in the finite row enumeration. -/
-theorem exists_qubitCoord {r : ℕ} (p : Coord) (hp : IsSite r p) :
+/-- Every site of the patch is the position of a qubit of the enumeration. -/
+lemma exists_qubitCoord {r : ℕ} (p : Coord) (hp : IsSite r p) :
     ∃ q : Qubit r, qubitCoord q = p := by
   rcases p with ⟨a, b⟩
   rcases hp with ⟨⟨hba, har⟩, hmod⟩
-  by_cases ha : a = 0
-  · have hb : b = 0 := by omega
-    subst a
-    subst b
+  obtain rfl | ha := Nat.eq_zero_or_pos a
+  · obtain rfl : b = 0 := by omega
     exact ⟨.inl (), rfl⟩
   have hcases : a % 3 = 0 ∨ a % 3 = 1 ∨ a % 3 = 2 := by omega
   rcases hcases with h0 | h1 | h2
@@ -215,8 +249,9 @@ theorem exists_qubitCoord {r : ℕ} (p : Coord) (hp : IsSite r p) :
       ⟨2 * (b / 3) + (b % 3 - 1), by dsimp; omega⟩⟩, ?_⟩
     apply Prod.ext <;> dsimp [qubitCoord] <;> omega
 
-/-- Every face center of the triangle occurs in the finite face enumeration. -/
-theorem exists_faceCoord {r : ℕ} (p : Coord) (hp : IsFace r p) :
+/-- Every face center of the patch is the center of a face of the
+enumeration. -/
+lemma exists_faceCoord {r : ℕ} (p : Coord) (hp : IsFace r p) :
     ∃ f : Face r, faceCoord f = p := by
   rcases p with ⟨a, b⟩
   rcases hp with ⟨⟨hba, har⟩, hmod⟩
@@ -233,35 +268,18 @@ theorem exists_faceCoord {r : ℕ} (p : Coord) (hp : IsFace r p) :
       ⟨b / 3, by dsimp; omega⟩⟩, ?_⟩
     apply Prod.ext <;> dsimp [faceCoord] <;> omega
 
-/-- The row enumeration is equivalent to the geometric set of physical sites. -/
+/-- The qubits of the enumeration correspond bijectively to the sites of the
+patch. -/
 noncomputable def qubitEquivSite (r : ℕ) : Qubit r ≃ {p : Coord // IsSite r p} :=
-  Equiv.ofBijective (fun q => ⟨qubitCoord q, qubitCoord_isSite q⟩) (by
-    constructor
-    · intro q q' h
-      exact qubitCoord_injective r (congrArg Subtype.val h)
-    · rintro ⟨p, hp⟩
-      obtain ⟨q, hq⟩ := exists_qubitCoord p hp
-      exact ⟨q, Subtype.ext hq⟩)
+  Equiv.ofBijective (fun q => ⟨qubitCoord q, qubitCoord_isSite q⟩)
+    ⟨fun _ _ h => qubitCoord_injective r (congrArg Subtype.val h),
+      fun ⟨p, hp⟩ => (exists_qubitCoord p hp).imp fun _ hq => Subtype.ext hq⟩
 
-/-- The row enumeration is equivalent to the geometric set of face centers. -/
+/-- The faces of the enumeration correspond bijectively to the face centers of
+the patch. -/
 noncomputable def faceEquivCenter (r : ℕ) : Face r ≃ {p : Coord // IsFace r p} :=
-  Equiv.ofBijective (fun f => ⟨faceCoord f, faceCoord_isFace f⟩) (by
-    constructor
-    · intro f f' h
-      exact faceCoord_injective r (congrArg Subtype.val h)
-    · rintro ⟨p, hp⟩
-      obtain ⟨f, hf⟩ := exists_faceCoord p hp
-      exact ⟨f, Subtype.ext hf⟩)
-
-/-- The physical-qubit count has the paper's expression in the odd distance. -/
-theorem numQubits_eq_distance (r : ℕ) :
-    numQubits r = (3 * (distance r) ^ 2 + 1) / 4 := by
-  have h : 4 * numQubits r = 3 * (distance r) ^ 2 + 1 := by
-    simp only [numQubits, distance]
-    ring
-  omega
-
-/-- The code-distance parameter is always odd. -/
-theorem distance_odd (r : ℕ) : Odd (distance r) := ⟨r, rfl⟩
+  Equiv.ofBijective (fun f => ⟨faceCoord f, faceCoord_isFace f⟩)
+    ⟨fun _ _ h => faceCoord_injective r (congrArg Subtype.val h),
+      fun ⟨p, hp⟩ => (exists_faceCoord p hp).imp fun _ hf => Subtype.ext hf⟩
 
 end Quantum.StabilizerGroup.ColorCode
