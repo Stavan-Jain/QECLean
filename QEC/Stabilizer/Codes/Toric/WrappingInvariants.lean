@@ -18,6 +18,13 @@ parity `vAt L y c = ∑ x, c (EdgeIdx.v x y)` in every row `y`.
   `phiEquiv L`): it is onto because the cycles `loopChain L a b` realise all
   four values, and `dim H₁ = 2`. Equivalently, a cycle is a boundary iff both
   of its wrapping numbers vanish (`mem_toricBoundaries_iff_wrap_eq_zero`).
+* A cycle that is not a boundary has weight at least `L`
+  (`le_edgeWeight_of_not_mem_toricBoundaries`): one of its wrapping numbers is
+  nonzero, so it has an odd number of horizontal edges in each of the `L`
+  columns, or an odd number of vertical edges in each of the `L` rows.
+* The horizontal loop `loopChain L 1 0` and the vertical loop `loopChain L 0 1`
+  are not boundaries and have weight `L` (`loopChain_mem_toricBoundaries_iff`,
+  `edgeWeight_loopChain_one_zero`, `edgeWeight_loopChain_zero_one`).
 -/
 
 namespace Quantum
@@ -30,9 +37,6 @@ open scoped ToricChain
 variable (L : ℕ)
 
 /-! ## Column and row parities -/
-
-/-- The coordinate `0 : Fin L` of a nonempty lattice. -/
-def zeroCoord [Fact (0 < L)] : Fin L := ⟨0, Fact.out⟩
 
 /-- The parity of the horizontal edges of `c` in the column `x0`. -/
 def hAt (x0 : Fin L) (c : C1 L) : ZMod 2 :=
@@ -53,6 +57,34 @@ def vAtLinear (y0 : Fin L) : C1 L →ₗ[ZMod 2] ZMod 2 where
   toFun := vAt L y0
   map_add' c d := by simp [vAt, Finset.sum_add_distrib]
   map_smul' a c := by simp [vAt, Finset.mul_sum]
+
+section Weight
+
+variable {L}
+
+/-- A 1-chain that is nonzero on `L` distinct edges has weight at least `L`. -/
+lemma le_edgeWeight_of_injective {c : C1 L} {e : Fin L → EdgeIdx L}
+    (he : Function.Injective e) (h : ∀ i, c (e i) ≠ 0) : L ≤ edgeWeight c := by
+  simpa [edgeWeight] using Finset.card_le_card_of_injOn (s := Finset.univ) (t := edgeSupport c) e
+    (fun i _ => Finset.mem_coe.2 ((mem_edgeSupport _ _).2 (h i))) he.injOn
+
+/-- A 1-chain with odd horizontal-edge parity in every column has weight at
+least `L`: it has a horizontal edge in each of the `L` columns. -/
+lemma le_edgeWeight_of_forall_hAt_ne_zero {c : C1 L} (h : ∀ x, hAt L x c ≠ 0) :
+    L ≤ edgeWeight c := by
+  choose y _ hy using fun x => Finset.exists_ne_zero_of_sum_ne_zero (h x)
+  exact le_edgeWeight_of_injective (e := fun x => EdgeIdx.h x (y x))
+    (fun _ _ hab => (EdgeIdx.h.inj hab).1) hy
+
+/-- A 1-chain with odd vertical-edge parity in every row has weight at least
+`L`: it has a vertical edge in each of the `L` rows. -/
+lemma le_edgeWeight_of_forall_vAt_ne_zero {c : C1 L} (h : ∀ y, vAt L y c ≠ 0) :
+    L ≤ edgeWeight c := by
+  choose x _ hx using fun y => Finset.exists_ne_zero_of_sum_ne_zero (h y)
+  exact le_edgeWeight_of_injective (e := fun y => EdgeIdx.v (x y) y)
+    (fun _ _ hab => (EdgeIdx.v.inj hab).2) hx
+
+end Weight
 
 variable [Fact (0 < L)]
 
@@ -178,6 +210,45 @@ theorem mem_toricBoundaries_iff_wrap_eq_zero (c : Z₁ L) :
   rw [← Prod.mk_eq_zero, ← phi_mk, map_eq_zero_iff _ (phi_injective L),
     Submodule.Quotient.mk_eq_zero]
   rfl
+
+/-! ## The weight of cycles that are not boundaries -/
+
+variable {L} in
+/-- A cycle that is not a boundary has weight at least `L`: one of its wrapping
+numbers is nonzero, and that parity is the same in every column or row. -/
+theorem le_edgeWeight_of_not_mem_toricBoundaries {c : C1 L} (hc : c ∈ Z₁ L) (hb : c ∉ B₁ L) :
+    L ≤ edgeWeight c := by
+  rcases not_and_or.1 (mt (mem_toricBoundaries_iff_wrap_eq_zero L ⟨c, hc⟩).2 hb) with h | h
+  · exact le_edgeWeight_of_forall_hAt_ne_zero fun x =>
+      (hAt_independent_on_cycles L ⟨c, hc⟩ x (zeroCoord L)).trans_ne h
+  · exact le_edgeWeight_of_forall_vAt_ne_zero fun y =>
+      (vAt_independent_on_cycles L ⟨c, hc⟩ y (zeroCoord L)).trans_ne h
+
+/-- `loopChain L a b` is a boundary only for `a = b = 0`. -/
+lemma loopChain_mem_toricBoundaries_iff (a b : ZMod 2) :
+    loopChain L a b ∈ B₁ L ↔ a = 0 ∧ b = 0 :=
+  (mem_toricBoundaries_iff_wrap_eq_zero L ⟨_, loopChain_mem_toricCycles L a b⟩).trans
+    (by simp [hWrap, vWrap, hAt, vAt, loopChain])
+
+/-- The horizontal loop `loopChain L 1 0` consists of the `L` horizontal edges
+of one row. -/
+lemma edgeWeight_loopChain_one_zero : edgeWeight (loopChain L 1 0) = L := by
+  have h : edgeSupport (loopChain L 1 0) =
+      Finset.univ.image fun x => EdgeIdx.h x (zeroCoord L) := by
+    ext e
+    cases e <;> simp [loopChain, eq_comm]
+  rw [edgeWeight, h, Finset.card_image_of_injective _ fun _ _ h => (EdgeIdx.h.inj h).1,
+    Finset.card_univ, Fintype.card_fin]
+
+/-- The vertical loop `loopChain L 0 1` consists of the `L` vertical edges of
+one column. -/
+lemma edgeWeight_loopChain_zero_one : edgeWeight (loopChain L 0 1) = L := by
+  have h : edgeSupport (loopChain L 0 1) =
+      Finset.univ.image fun y => EdgeIdx.v (zeroCoord L) y := by
+    ext e
+    cases e <;> simp [loopChain, eq_comm]
+  rw [edgeWeight, h, Finset.card_image_of_injective _ fun _ _ h => (EdgeIdx.v.inj h).2,
+    Finset.card_univ, Fintype.card_fin]
 
 end Lattice
 end Stabilizer

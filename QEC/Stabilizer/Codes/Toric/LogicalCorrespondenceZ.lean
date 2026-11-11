@@ -36,16 +36,6 @@ namespace Lattice
 open scoped ToricChain
 open Homological
 open StabilizerGroup.ToricCodeN
-open NQubitPauliGroupElement (IsZTypeElement)
-
-/-- Every Z-type Pauli group element is the Z-chain operator of its Z-support
-chain. -/
-lemma toricZOperatorOfChain_zChainOf (L : ℕ) [Fact (0 < L)]
-    {g : NQubitPauliGroupElement (toricNumQubits L)} (hg : IsZTypeElement g) :
-    toricZOperatorOfChain L ((toricHomologicalCode L).zChainOf g) = g :=
-  NQubitPauliGroupElement.ext _ _ hg.1.symm <| funext fun i => by
-    rw [← toricHomologicalCode_chainZOperator_eq, HomologicalCode.chainZOperator_zChainOf_op_at]
-    rcases hg.2 i with h | h <;> simp [h]
 
 variable (L : ℕ) [Fact (2 ≤ L)] (c : C1 L)
 
@@ -80,11 +70,9 @@ dual cycle. -/
 theorem toricZOperatorOfChain_mem_centralizer_iff_mem_toricDualCycles :
     toricZOperatorOfChain L c ∈ StabilizerGroup.centralizer (stabilizerGroup L) ↔
       c ∈ Z¹ L := by
-  rw [StabilizerGroup.centralizer_eq_of_toSubgroup_eq _ _
-    (stabilizerGroup_toSubgroup_eq_homologicalStabilizerGroup L),
-    ← toricHomologicalCode_dualCycles_eq]
-  exact HomologicalCode.chainZOperator_mem_centralizer_iff_mem_dualCycles
-    (X := toricHomologicalCode L) c
+  rw [← toricHomologicalCode_dualCycles_eq]
+  exact HomologicalCode.chainZOperator_mem_centralizer_iff_of_toSubgroup_eq
+    (X := toricHomologicalCode L) (stabilizerGroup_toSubgroup_eq_homologicalStabilizerGroup L) c
 
 /-- The Z-chain operator of `c` is a nontrivial logical operator iff `c` is a
 dual cycle that is not a dual boundary. -/

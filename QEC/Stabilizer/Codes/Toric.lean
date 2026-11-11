@@ -30,12 +30,14 @@ for every `2 ≤ L`.
 * `OperatorChains`: the numbering of the edges as qubits and the X- and Z-type
   operators of a 1-chain.
 * `ChainComplex`: the chain complex as a `HomologicalCode`.
-* `ChainOps`: algebra of the chain operators.
+* `ChainOps`: algebra and weight of the chain operators.
 * `H1Dimension`: `dim H₁ = 2`.
-* `WrappingInvariants`: the wrapping numbers of a cycle and the isomorphism
-  `H₁ ≃ (ZMod 2)²`.
-* `DualWrappingInvariants`: the dual complex, the duality of the lattice and
-  the wrapping numbers of a dual cycle.
+* `WrappingInvariants`: the wrapping numbers of a cycle, the isomorphism
+  `H₁ ≃ (ZMod 2)²`, and the weight bound `L` for cycles that are not
+  boundaries.
+* `DualWrappingInvariants`: the dual complex, the duality of the lattice, the
+  wrapping numbers of a dual cycle, and the weight bound `L` for dual cycles
+  that are not dual boundaries.
 * `CodeN`: the vertex and face checks and the stabilizer group.
 * `LogicalCorrespondenceX`, `LogicalCorrespondenceZ`: X-type logical operators
   are the cycles modulo boundaries, and Z-type logical operators are the dual

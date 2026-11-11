@@ -1,3 +1,4 @@
+import QEC.Stabilizer.Framework.Homological.Distance
 import QEC.Stabilizer.Codes.Toric.ChainComplex
 
 /-!
@@ -13,6 +14,11 @@ them:
 * `toricXOperatorOfChain_isXType`: the encoded operator is X-type;
 * `toricXOperatorOfChain_zero`, `toricXOperatorOfChain_add`: the encoding turns
   sums of chains into products of operators;
+* `toricXOperatorOfChain_xChainOf`: every X-type Pauli group element is the
+  X-chain operator of its X-support chain;
+* `weight_toricXOperatorOfChain`: the operator has the weight `edgeWeight c` of
+  its chain, which is the `chainWeight` of `toricHomologicalCode L`
+  (`toricHomologicalCode_chainWeight_eq`);
 
 and likewise for `toricZOperatorOfChain`.
 -/
@@ -55,6 +61,23 @@ lemma toricXOperatorOfChain_add (c c' : C1 L) :
       toricXOperatorOfChain L c * toricXOperatorOfChain L c' :=
   HomologicalCode.chainXOperator_add (X := toricHomologicalCode L) c c'
 
+/-- Every X-type Pauli group element is the X-chain operator of its X-support
+chain. -/
+lemma toricXOperatorOfChain_xChainOf {g : NQubitPauliGroupElement (toricNumQubits L)}
+    (hg : IsXTypeElement g) :
+    toricXOperatorOfChain L ((toricHomologicalCode L).xChainOf g) = g :=
+  HomologicalCode.chainXOperator_xChainOf (X := toricHomologicalCode L) hg
+
+/-- The weight `edgeWeight c` of a 1-chain is its `chainWeight` in
+`toricHomologicalCode L`. -/
+theorem toricHomologicalCode_chainWeight_eq (c : C1 L) :
+    (toricHomologicalCode L).chainWeight c = edgeWeight c := rfl
+
+/-- The X-chain operator of `c` has the weight of `c`. -/
+lemma weight_toricXOperatorOfChain (c : C1 L) :
+    NQubitPauliGroupElement.weight (toricXOperatorOfChain L c) = edgeWeight c :=
+  HomologicalCode.weight_chainXOperator (X := toricHomologicalCode L) c
+
 /-! ## Z-chain operators -/
 
 /-- The Z-chain operator of `c` at the qubit of the edge `e`. -/
@@ -83,6 +106,18 @@ lemma toricZOperatorOfChain_add (c c' : C1 L) :
     toricZOperatorOfChain L (c + c') =
       toricZOperatorOfChain L c * toricZOperatorOfChain L c' :=
   HomologicalCode.chainZOperator_add (X := toricHomologicalCode L) c c'
+
+/-- Every Z-type Pauli group element is the Z-chain operator of its Z-support
+chain. -/
+lemma toricZOperatorOfChain_zChainOf {g : NQubitPauliGroupElement (toricNumQubits L)}
+    (hg : IsZTypeElement g) :
+    toricZOperatorOfChain L ((toricHomologicalCode L).zChainOf g) = g :=
+  HomologicalCode.chainZOperator_zChainOf (X := toricHomologicalCode L) hg
+
+/-- The Z-chain operator of `c` has the weight of `c`. -/
+lemma weight_toricZOperatorOfChain (c : C1 L) :
+    NQubitPauliGroupElement.weight (toricZOperatorOfChain L c) = edgeWeight c :=
+  HomologicalCode.weight_chainZOperator (X := toricHomologicalCode L) c
 
 end Lattice
 end Stabilizer

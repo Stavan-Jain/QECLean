@@ -489,11 +489,24 @@ keeps the same order and the same declaration names; `Repetition/N.lean`,
 `Iceberg/N.lean`, `Small/QuantumHamming.lean` and `Toric/CodeN.lean` follow
 this route.
 
-**Generators.** Besides the list, define the generators as sets, and the
-subgroup they generate. The proof of `listToSet_generatorsList` depends on how
-the family indexes its generators:
+**Generators.** Name the checks `ZStab` and `XStab`, and state each as `Z` or
+`X` on its support (`zOn S`, `xOn S`), by definition or by a lemma
+`ZStab_eq_zOn` / `XStab_eq_xOn`: the type, the check-matrix row and the
+commutation of `zOn S` and `xOn S` are then read off the supports. Besides the
+list, define the generators as sets, and the subgroup they generate.
+`listToSet_generatorsList` follows from `listToSet_append` and
+`listToSet_ofFn`:
 
 ```lean
+/-- The Z-check stabilizer of row `a`: `Z` on the qubits of the row. -/
+def ZStab (a : Fin r) : NQubitPauliGroupElement n := zOn (row a)
+
+/-- The X-check stabilizer of row `a`: `X` on the qubits of the row. -/
+def XStab (a : Fin r) : NQubitPauliGroupElement n := xOn (row a)
+
+def generatorsList : List (NQubitPauliGroupElement n) :=
+  List.ofFn ZStab ++ List.ofFn XStab
+
 def ZGenerators : Set (NQubitPauliGroupElement n) := Set.range ZStab
 def XGenerators : Set (NQubitPauliGroupElement n) := Set.range XStab
 def generators : Set (NQubitPauliGroupElement n) := ZGenerators ∪ XGenerators
@@ -501,25 +514,34 @@ def generators : Set (NQubitPauliGroupElement n) := ZGenerators ∪ XGenerators
 noncomputable def subgroup : Subgroup (NQubitPauliGroupElement n) :=
   Subgroup.closure generators
 
+/-- The generator list has the elements of the generator set. -/
 lemma listToSet_generatorsList : listToSet generatorsList = generators := by
-  simp only [generatorsList, generators, ZGenerators, XGenerators, listToSet_ofFn]
+  rw [generatorsList, listToSet_append, listToSet_ofFn, listToSet_ofFn]
+  rfl
 ```
 
-**Commutation and `−I`.** Prove that the Z-generators are Z-type
-(`IsZTypeElement`: phase power 0 and each factor `I` or `Z`), that the
-X-generators are X-type, and that each Z-generator commutes with each
-X-generator. The last is a parity count: the tactic
-`pauli_comm_even_anticommutes` reduces it to the statement that the two
-generators differ non-trivially on an even number of qubits. Two elements of
-the same type commute (`IsZTypeElement.commute`, `IsXTypeElement.commute`),
-which gives `generators_commute` over `generators`, and
-`CSS.negIdentity_not_mem_closure_union` gives `negIdentity_not_mem` from the
-same three facts:
+**Hypotheses on the generators.** This section replaces *Decided hypotheses*,
+under the title `## Hypotheses on the generators`; its paragraph says why the
+checks commute and names the pivot column of each row. The Z-generators are
+Z-type (`IsZTypeElement_zOn`), the X-generators are X-type
+(`IsXTypeElement_xOn`), and a Z-generator commutes with an X-generator because
+their supports meet in an even number of qubits (`commutes_xOn_zOn_iff`). Two
+elements of the same type commute (`IsZTypeElement.commute`,
+`IsXTypeElement.commute`), which gives `generators_commute` over `generators`:
 
 ```lean
-lemma ZGenerators_isZType : ∀ g ∈ ZGenerators, IsZTypeElement g
-lemma XGenerators_isXType : ∀ g ∈ XGenerators, IsXTypeElement g
-lemma ZGenerators_commute_XGenerators : ∀ z ∈ ZGenerators, ∀ x ∈ XGenerators, z * x = x * z
+lemma ZGenerators_isZType : ∀ g ∈ ZGenerators, IsZTypeElement g := by
+  rintro _ ⟨a, rfl⟩
+  exact IsZTypeElement_zOn _
+
+lemma XGenerators_isXType : ∀ g ∈ XGenerators, IsXTypeElement g := by
+  rintro _ ⟨a, rfl⟩
+  exact IsXTypeElement_xOn _
+
+lemma ZGenerators_commute_XGenerators :
+    ∀ z ∈ ZGenerators, ∀ x ∈ XGenerators, z * x = x * z := by
+  rintro _ ⟨a, rfl⟩ _ ⟨b, rfl⟩
+  exact ((commutes_xOn_zOn_iff _ _).mpr (even_card_row_inter_row b a)).symm
 
 lemma generators_commute : ∀ g ∈ generators, ∀ h ∈ generators, g * h = h * g := by
   rintro g (hgZ | hgX) h (hhZ | hhX)
@@ -527,15 +549,37 @@ lemma generators_commute : ∀ g ∈ generators, ∀ h ∈ generators, g * h = h
   · exact ZGenerators_commute_XGenerators g hgZ h hhX
   · exact (ZGenerators_commute_XGenerators h hhZ g hgX).symm
   · exact (XGenerators_isXType g hgX).commute (XGenerators_isXType h hhX)
+```
 
+`AllPhaseZero_generatorsList` follows from `AllPhaseZero_ofFn`. Independence is
+`rowsLinearIndependent_ofFn_of_pivots`: name, for each row of the check matrix,
+a pivot column where that row is `1` and every later row is `0`. For a Z-check
+the pivot is the `Z`-column `Fin.natAdd n q` of a qubit `q` of its support that
+no later Z-check contains, and for an X-check the `X`-column `Fin.castAdd n q`;
+the entries are computed by `toSymplectic_zOn_natAdd`,
+`toSymplectic_zOn_castAdd`, `toSymplectic_xOn_castAdd` and
+`toSymplectic_xOn_natAdd`. A list `List.ofFn ZStab ++ List.ofFn XStab` is first
+rewritten as one `List.ofFn` with `List.ofFn_fin_append`, and the rows are then
+split with `Fin.addCases`:
+
+```lean
+/-- The check-matrix rows of the generators are linearly independent. -/
+lemma rowsLinearIndependent_generatorsList : rowsLinearIndependent generatorsList := by
+  rw [generatorsList, ← List.ofFn_fin_append]
+  refine rowsLinearIndependent_ofFn_of_pivots _
+    (Fin.append (fun a => Fin.natAdd _ (pivot a)) fun a => Fin.castAdd _ (pivot a))
+    (fun i => ?_) (fun i j hij => ?_)
+  -- one case per block of rows, by `induction i using Fin.addCases`
+```
+
+**No `−I`.** `CSS.negIdentity_not_mem_closure_union` gives
+`negIdentity_not_mem` from the typing and the cross-commutation:
+
+```lean
 lemma negIdentity_not_mem : negIdentity n ∉ subgroup :=
   CSS.negIdentity_not_mem_closure_union ZGenerators XGenerators
     ZGenerators_isZType XGenerators_isXType ZGenerators_commute_XGenerators
 ```
-
-`AllPhaseZero_generatorsList` follows from `AllPhaseZero_ofFn`, and
-`rowsLinearIndependent_generatorsList` needs a proof from the shape of the
-check matrix.
 
 **Stabilizer group and code.** `mkStabilizerFromGenerators` and the
 presentation take statements over `listToSet generatorsList`, so rewrite with
@@ -567,8 +611,11 @@ the rewrite goes the other way, into the hypothesis:
 **Centralizer membership.** `mem_centralizer_iff_closure` with
 `stabilizerGroup_toSubgroup_eq` reduces membership in the centralizer to
 commuting with each element of `generators`, and
-`rintro s (⟨i, rfl⟩ | ⟨i, rfl⟩)` splits that into the Z-generators and the
-X-generators.
+`rintro _ (⟨a, rfl⟩ | ⟨a, rfl⟩)` splits that into the Z-generators and the
+X-generators. The families state it once for supports, as
+`xOn_mem_centralizer` and `zOn_mem_centralizer` under the title
+`## Centralizer criteria`: `X` on `S` commutes with the stabilizer when `S`
+meets the support of every Z-check in an even number of qubits.
 
 **Distance.** The same closers apply, with `generators` as the generating set
 and the side conditions proved rather than decided. Families whose distance

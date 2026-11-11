@@ -201,8 +201,8 @@ noncomputable def subgroup : Subgroup (NQubitPauliGroupElement (2 ^ r - 1)) :=
 
 /-- The generator list has the elements of the generator set. -/
 lemma listToSet_generatorsList : listToSet (generatorsList r) = generators r := by
-  rw [generators, ZGenerators, XGenerators, ← listToSet_ofFn, ← listToSet_ofFn]
-  exact Set.ext fun _ => List.mem_append
+  rw [generatorsList, listToSet_append, listToSet_ofFn, listToSet_ofFn]
+  rfl
 
 /-! ## Hypotheses on the generators
 

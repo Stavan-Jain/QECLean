@@ -18,8 +18,10 @@ Commutation with a chain operator is read off the pairing
   `chainZOperator c` iff its X-support chain `xChainOf g` pairs to `0` with
   `c`; `chainXOperator_commutes_iff` is the statement for `chainXOperator c`
   and the Z-support chain `zChainOf g`;
-* `chainXOperator_commutes_chainZOperator_iff`: two chain operators of
-  opposite types commute iff their chains pair to `0`;
+* `chainXOperator_commutes_chainZOperator_iff`,
+  `chainXOperator_anticommutes_chainZOperator_iff`: two chain operators of
+  opposite types commute iff their chains pair to `0`, and anticommute iff
+  they pair to `1`;
 * `faceStabOf_commutes_vertexStabOf`, `ZGenerators_commute_XGenerators`: the
   checks commute, since `⟨∂₂ f, cutMap s⟩ = ⟨∂₁ (∂₂ f), s⟩ = 0`
   (`chainInnerProduct_boundary2_cutMap_eq_zero`).
@@ -172,6 +174,14 @@ theorem chainXOperator_commutes_chainZOperator_iff (c c' : X.C1 → ZMod 2) :
       X.chainZOperator c' * X.chainXOperator c
     ↔ chainInnerProduct c c' = 0 := by
   rw [commutes_chainZOperator_iff, xChainOf_chainXOperator]
+
+/-- `chainXOperator c` anticommutes with `chainZOperator c'` iff the chains
+pair to `1`. -/
+theorem chainXOperator_anticommutes_chainZOperator_iff (c c' : X.C1 → ZMod 2) :
+    NQubitPauliGroupElement.Anticommute (X.chainXOperator c) (X.chainZOperator c') ↔
+      chainInnerProduct c c' = 1 := by
+  rw [NQubitPauliOperator.anticommutes_iff_symplectic_inner_one,
+    symplecticInner_chainZOperator_right, xChainOf_chainXOperator]
 
 /-- An X-check commutes with a Z-check, by the chain-complex law. -/
 theorem faceStabOf_commutes_vertexStabOf (f : X.C2) (v : X.C0) :

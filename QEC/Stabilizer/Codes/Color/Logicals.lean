@@ -64,26 +64,22 @@ noncomputable def logicalZ (r : ℕ) : NQubitPauliGroupElement (numQubits r) :=
 
 /-- The logical X operator commutes with every stabilizer. -/
 theorem logicalX_mem_centralizer (r : ℕ) :
-    logicalX r ∈ centralizer (stabilizerGroup r) := by
-  rw [centralizer_eq_of_toSubgroup_eq _ _ (stabilizerGroup_eq_homological_subgroup r)]
-  exact (HomologicalCode.chainXOperator_mem_centralizer_iff_mem_cycles
-    (X := homologicalCode r) (allOnes r)).mpr (allOnes_mem_cycles r)
+    logicalX r ∈ centralizer (stabilizerGroup r) :=
+  (HomologicalCode.chainXOperator_mem_centralizer_iff_of_toSubgroup_eq
+    (stabilizerGroup_eq_homological_subgroup r) _).mpr (allOnes_mem_cycles r)
 
 /-- The logical Z operator commutes with every stabilizer. -/
 theorem logicalZ_mem_centralizer (r : ℕ) :
-    logicalZ r ∈ centralizer (stabilizerGroup r) := by
-  rw [centralizer_eq_of_toSubgroup_eq _ _ (stabilizerGroup_eq_homological_subgroup r)]
-  exact (HomologicalCode.chainZOperator_mem_centralizer_iff_mem_dualCycles
-    (X := homologicalCode r) (allOnes r)).mpr (allOnes_mem_dualCycles r)
+    logicalZ r ∈ centralizer (stabilizerGroup r) :=
+  (HomologicalCode.chainZOperator_mem_centralizer_iff_of_toSubgroup_eq
+    (stabilizerGroup_eq_homological_subgroup r) _).mpr (allOnes_mem_dualCycles r)
 
 /-- The logical X and Z operators anticommute, because the all-ones chain
 pairs to `1` with itself. -/
 theorem logicalX_anticommutes_logicalZ (r : ℕ) :
     Anticommute (logicalX r) (logicalZ r) :=
-  (commute_or_anticommute _ _).resolve_left fun hc => one_ne_zero <|
-    (allOnes_innerProduct r).symm.trans <|
-      (HomologicalCode.chainXOperator_commutes_chainZOperator_iff
-        (X := homologicalCode r) _ _).mp hc
+  (HomologicalCode.chainXOperator_anticommutes_chainZOperator_iff _ _).mpr
+    (allOnes_innerProduct r)
 
 /-- The logical operators of the one logical qubit of the color code. -/
 noncomputable def logicalOps (r : ℕ) : Fin 1 → LogicalQubitOps (numQubits r)

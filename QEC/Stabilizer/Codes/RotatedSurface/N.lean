@@ -113,8 +113,8 @@ lemma listToSet_generatorsListX :
 
 lemma listToSet_generatorsList :
     listToSet (generatorsList L) = generators L := by
-  rw [generators, ← listToSet_generatorsListZ, ← listToSet_generatorsListX]
-  exact Set.ext fun _ => List.mem_append
+  rw [generators, generatorsList, listToSet_append, listToSet_generatorsListZ,
+    listToSet_generatorsListX]
 
 lemma allPhaseZero_generatorsListZ : AllPhaseZero (generatorsListZ L) := by
   intro g hg

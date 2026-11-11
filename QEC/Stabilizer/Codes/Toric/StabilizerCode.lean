@@ -1,3 +1,4 @@
+import QEC.Stabilizer.Codes.Toric.DistanceX
 import QEC.Stabilizer.Codes.Toric.DistanceZ
 import QEC.Stabilizer.Framework.Homological.ToCode
 import QEC.Stabilizer.Framework.Symplectic.Presentation
@@ -29,25 +30,11 @@ independent list of checks, which presents the code.
   horizontal X-loop with the Z-operator of the dual loop crossing it, and the
   vertical X-loop with the Z-operator of the dual loop crossing it. A loop and
   a dual loop anticommute exactly when they cross in one edge
-  (`loopXOperator_commutes_dualLoopZOperator_iff`).
+  (`chainInnerProduct_loopChain_dualLoopChain`).
   `toricStabilizerCodeWithLogicals L` bundles the code with these operators.
 -/
 
 namespace Quantum
-
-/-! ## A rank criterion for independent rows -/
-
-/-- A list of Pauli group elements that generates a stabilizer group whose
-symplectic image has dimension the length of the list has linearly independent
-check-matrix rows: the rows span a space of that dimension. -/
-theorem NQubitPauliGroupElement.rowsLinearIndependent_of_length_eq_finrank_sympImage {n : ℕ}
-    (S : StabilizerGroup n) (l : List (NQubitPauliGroupElement n))
-    (hS : S.toSubgroup = Subgroup.closure (listToSet l))
-    (hl : l.length = Module.finrank (ZMod 2) S.sympImage) : rowsLinearIndependent l := by
-  rw [StabilizerGroup.sympImage_eq_span_of_toSubgroup_eq_closure S _ hS,
-    ← sympSpan_eq_span_listToSet] at hl
-  exact linearIndependent_iff_card_eq_finrank_span.2 ((Fintype.card_fin _).trans hl)
-
 namespace StabilizerGroup
 namespace ToricCodeN
 
@@ -276,36 +263,43 @@ lemma mem_centralizer_of_mem_toricDualCycles {c : C1 L} (hc : c ∈ Z¹ L) :
   rw [centralizer_eq_of_toSubgroup_eq _ _ (toricStabilizerCode_subgroup_eq L)]
   exact (toricZOperatorOfChain_mem_centralizer_iff_mem_toricDualCycles L c).2 hc
 
+/-- The loop `loopChain L a b` and the dual loop `dualLoopChain L a' b'` pair
+to `a * a' + b * b'`: they share one horizontal edge if `a = a' = 1`, and one
+vertical edge if `b = b' = 1`. -/
+lemma chainInnerProduct_loopChain_dualLoopChain (a b a' b' : ZMod 2) :
+    (toricHomologicalCode L).chainInnerProduct (loopChain L a b) (dualLoopChain L a' b') =
+      a * a' + b * b' := by
+  change ∑ e : EdgeIdx L, loopChain L a b e * dualLoopChain L a' b' e = _
+  rw [← (edgeIdxEquivSum L).symm.sum_comp, Fintype.sum_sum_type, Fintype.sum_prod_type,
+    Fintype.sum_prod_type]
+  simp [edgeIdxEquivSum, loopChain, dualLoopChain]
+
 /-- The X-operator of the loop `loopChain L a b` commutes with the Z-operator
-of the dual loop `dualLoopChain L a' b'` iff `a * a' + b * b' = 0`: the two
-loops share one horizontal edge if `a = a' = 1`, and one vertical edge if
-`b = b' = 1`. -/
+of the dual loop `dualLoopChain L a' b'` iff `a * a' + b * b' = 0`. -/
 theorem loopXOperator_commutes_dualLoopZOperator_iff (a b a' b' : ZMod 2) :
     toricXOperatorOfChain L (loopChain L a b) *
           toricZOperatorOfChain L (dualLoopChain L a' b') =
         toricZOperatorOfChain L (dualLoopChain L a' b') *
           toricXOperatorOfChain L (loopChain L a b) ↔
-      a * a' + b * b' = 0 := by
-  have h : ∑ e : EdgeIdx L, loopChain L a b e * dualLoopChain L a' b' e = a * a' + b * b' := by
-    rw [← (edgeIdxEquivSum L).symm.sum_comp, Fintype.sum_sum_type, Fintype.sum_prod_type,
-      Fintype.sum_prod_type]
-    simp [edgeIdxEquivSum, loopChain, dualLoopChain]
-  rw [← h]
-  exact HomologicalCode.chainXOperator_commutes_chainZOperator_iff (X := toricHomologicalCode L) _ _
+      a * a' + b * b' = 0 :=
+  (HomologicalCode.chainXOperator_commutes_chainZOperator_iff (X := toricHomologicalCode L)
+    _ _).trans (by rw [chainInnerProduct_loopChain_dualLoopChain])
 
 /-- The horizontal X-loop anticommutes with `horizontalHRowZOperator L`: they
 share one horizontal edge. -/
 theorem horizontalLoopXOperator_anticommutes_horizontalHRowZOperator :
     Anticommute (horizontalLoopXOperator L) (horizontalHRowZOperator L) :=
-  (commute_or_anticommute _ _).resolve_left fun h =>
-    absurd ((loopXOperator_commutes_dualLoopZOperator_iff L 1 0 1 0).1 h) (by decide)
+  (HomologicalCode.chainXOperator_anticommutes_chainZOperator_iff
+    (X := toricHomologicalCode L) _ _).2
+    ((chainInnerProduct_loopChain_dualLoopChain L 1 0 1 0).trans (by decide))
 
 /-- The vertical X-loop anticommutes with `verticalVRowZOperator L`: they share
 one vertical edge. -/
 theorem verticalLoopXOperator_anticommutes_verticalVRowZOperator :
     Anticommute (verticalLoopXOperator L) (verticalVRowZOperator L) :=
-  (commute_or_anticommute _ _).resolve_left fun h =>
-    absurd ((loopXOperator_commutes_dualLoopZOperator_iff L 0 1 0 1).1 h) (by decide)
+  (HomologicalCode.chainXOperator_anticommutes_chainZOperator_iff
+    (X := toricHomologicalCode L) _ _).2
+    ((chainInnerProduct_loopChain_dualLoopChain L 0 1 0 1).trans (by decide))
 
 /-- The logical operators of the two logical qubits: the horizontal X-loop
 with `horizontalHRowZOperator L`, and the vertical X-loop with

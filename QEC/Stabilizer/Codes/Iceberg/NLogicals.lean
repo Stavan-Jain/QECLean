@@ -103,11 +103,10 @@ lemma logicalZ_commutes_logicalZ (m : ℕ) [Fact (2 ≤ m)] (i j : Fin (2 * m - 
 `{j, 2m − 2}` are disjoint. -/
 lemma logicalX_commutes_logicalZ_of_ne (m : ℕ) [Fact (2 ≤ m)] {i j : Fin (2 * m - 2)}
     (hij : i ≠ j) : logicalX m i * logicalZ m j = logicalZ m j * logicalX m i := by
-  have h : ({logIdx m i, xAnchor m} ∩ {logIdx m j, zAnchor m} : Finset (Fin (2 * m))) = ∅ := by
-    simp [Finset.insert_inter_of_notMem, (logIdx_injective m).ne hij, logIdx_ne_zAnchor,
-      (logIdx_ne_xAnchor m j).symm, xAnchor_ne_zAnchor]
-  rw [logicalX_eq_xOn, logicalZ_eq_zOn, commutes_xOn_zOn_iff, h, Finset.card_empty]
-  exact Even.zero
+  rw [logicalX_eq_xOn, logicalZ_eq_zOn]
+  refine commutes_xOn_zOn_of_disjoint (Finset.disjoint_iff_inter_eq_empty.2 ?_)
+  simp [Finset.insert_inter_of_notMem, (logIdx_injective m).ne hij, logIdx_ne_zAnchor,
+    (logIdx_ne_xAnchor m j).symm, xAnchor_ne_zAnchor]
 
 /-! ## Centralizer membership
 

@@ -33,6 +33,12 @@ column, they vanish on dual boundaries, and they define a linear bijection
 the linear equivalence is `phiDualEquiv L`): a dual cycle is a dual boundary
 iff both parities vanish (`mem_toricDualBoundaries_iff_wrap_eq_zero`). The
 chains `dualLoopChain L a b` realise all four values.
+
+A dual cycle that is not a dual boundary has weight at least `L`
+(`le_edgeWeight_of_not_mem_toricDualBoundaries`), and the dual loops
+`dualLoopChain L 1 0` and `dualLoopChain L 0 1` are not dual boundaries and
+have weight `L` (`dualLoopChain_mem_toricDualBoundaries_iff`,
+`edgeWeight_dualLoopChain_one_zero`, `edgeWeight_dualLoopChain_zero_one`).
 -/
 
 namespace Quantum
@@ -377,6 +383,34 @@ theorem phiDual_bijective : Function.Bijective (phiDual L) :=
 /-- The dual wrapping map as a linear equivalence. -/
 noncomputable def phiDualEquiv : toricDualH1 L ≃ₗ[ZMod 2] ZMod 2 × ZMod 2 :=
   LinearEquiv.ofBijective (phiDual L) (phiDual_bijective L)
+
+/-! ## The weight of dual cycles that are not dual boundaries -/
+
+variable {L} in
+/-- A dual cycle that is not a dual boundary has weight at least `L`: it is
+the image under duality of a cycle that is not a boundary. -/
+theorem le_edgeWeight_of_not_mem_toricDualBoundaries {c : C1 L} (hc : c ∈ Z¹ L)
+    (hb : c ∉ B¹ L) : L ≤ edgeWeight c := by
+  obtain ⟨c, rfl⟩ := (toricDuality L).surjective c
+  rw [edgeWeight_toricDuality]
+  exact le_edgeWeight_of_not_mem_toricBoundaries (toricDuality_mem_toricDualCycles_iff.1 hc)
+    (mt toricDuality_mem_toricDualBoundaries_iff.2 hb)
+
+/-- `dualLoopChain L a b` is a dual boundary only for `a = b = 0`. -/
+lemma dualLoopChain_mem_toricDualBoundaries_iff (a b : ZMod 2) :
+    dualLoopChain L a b ∈ B¹ L ↔ a = 0 ∧ b = 0 := by
+  rw [← toricDuality_loopChain, toricDuality_mem_toricDualBoundaries_iff,
+    loopChain_mem_toricBoundaries_iff, and_comm]
+
+/-- The dual loop `dualLoopChain L 1 0` consists of the `L` horizontal edges of
+one column. -/
+lemma edgeWeight_dualLoopChain_one_zero : edgeWeight (dualLoopChain L 1 0) = L := by
+  rw [← toricDuality_loopChain, edgeWeight_toricDuality, edgeWeight_loopChain_zero_one]
+
+/-- The dual loop `dualLoopChain L 0 1` consists of the `L` vertical edges of
+one row. -/
+lemma edgeWeight_dualLoopChain_zero_one : edgeWeight (dualLoopChain L 0 1) = L := by
+  rw [← toricDuality_loopChain, edgeWeight_toricDuality, edgeWeight_loopChain_one_zero]
 
 end Lattice
 end Stabilizer

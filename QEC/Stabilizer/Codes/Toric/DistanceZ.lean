@@ -1,77 +1,22 @@
 import QEC.Stabilizer.Codes.Toric.LogicalCorrespondenceZ
-import QEC.Stabilizer.Codes.Toric.DistanceX
 
 /-!
 # The Z-distance of the toric code is `L`
 
 The mirror image of `QEC.Stabilizer.Codes.Toric.DistanceX` for the dual
-complex. The chain-level statements are transported from the X side by the
-lattice duality `toricDuality L`, which preserves weights:
-
-* `le_edgeWeight_of_not_mem_toricDualBoundaries`: a dual cycle that is not a
-  dual boundary has weight at least `L`;
-* `dualLoopChain_mem_toricDualBoundaries_iff`,
-  `edgeWeight_dualLoopChain_one_zero`, `edgeWeight_dualLoopChain_zero_one`: the
-  dual loops `dualLoopChain L 1 0` and `dualLoopChain L 0 1` are not dual
-  boundaries and have weight `L`.
-
-On operators:
+complex.
 
 * `horizontalHRowZOperator L` and `verticalVRowZOperator L` are the Z-chain
-  operators of the two dual loops: Z-type nontrivial logical operators of
-  weight `L`.
+  operators of the dual loops `dualLoopChain L 1 0` and `dualLoopChain L 0 1`:
+  Z-type nontrivial logical operators of weight `L`.
 * `HasToricZDistance L d` says that `d` is the least weight of a Z-type
   nontrivial logical operator of the toric code, and `toricCodeN_dZ_eq_L` that
-  this distance is `L`.
+  this distance is `L`. The lower bound is the statement on chains
+  `le_edgeWeight_of_not_mem_toricDualBoundaries`: a dual cycle that is not a
+  dual boundary has weight at least `L`.
 -/
 
 namespace Quantum
-namespace Stabilizer
-namespace Lattice
-
-open scoped ToricChain
-open Homological
-
-variable (L : ℕ) [Fact (0 < L)]
-
-/-! ## Nontrivial dual cycles have weight at least `L` -/
-
-variable {L} in
-/-- A dual cycle that is not a dual boundary has weight at least `L`: it is
-the image under duality of a cycle that is not a boundary. -/
-theorem le_edgeWeight_of_not_mem_toricDualBoundaries {c : C1 L} (hc : c ∈ Z¹ L)
-    (hb : c ∉ B¹ L) : L ≤ edgeWeight c := by
-  obtain ⟨c, rfl⟩ := (toricDuality L).surjective c
-  rw [edgeWeight_toricDuality]
-  exact le_edgeWeight_of_not_mem_toricBoundaries (toricDuality_mem_toricDualCycles_iff.1 hc)
-    (mt toricDuality_mem_toricDualBoundaries_iff.2 hb)
-
-/-! ## The dual loops -/
-
-/-- `dualLoopChain L a b` is a dual boundary only for `a = b = 0`. -/
-lemma dualLoopChain_mem_toricDualBoundaries_iff (a b : ZMod 2) :
-    dualLoopChain L a b ∈ B¹ L ↔ a = 0 ∧ b = 0 := by
-  rw [← toricDuality_loopChain, toricDuality_mem_toricDualBoundaries_iff,
-    loopChain_mem_toricBoundaries_iff, and_comm]
-
-/-- The dual loop `dualLoopChain L 1 0` consists of the `L` horizontal edges of
-one column. -/
-lemma edgeWeight_dualLoopChain_one_zero : edgeWeight (dualLoopChain L 1 0) = L := by
-  rw [← toricDuality_loopChain, edgeWeight_toricDuality, edgeWeight_loopChain_zero_one]
-
-/-- The dual loop `dualLoopChain L 0 1` consists of the `L` vertical edges of
-one row. -/
-lemma edgeWeight_dualLoopChain_zero_one : edgeWeight (dualLoopChain L 0 1) = L := by
-  rw [← toricDuality_loopChain, edgeWeight_toricDuality, edgeWeight_loopChain_one_zero]
-
-/-- The Z-chain operator of `c` has the weight of `c`. -/
-lemma weight_toricZOperatorOfChain (c : C1 L) :
-    NQubitPauliGroupElement.weight (toricZOperatorOfChain L c) = edgeWeight c :=
-  HomologicalCode.weight_chainZOperator (X := toricHomologicalCode L) c
-
-end Lattice
-end Stabilizer
-
 namespace StabilizerGroup
 namespace ToricCodeN
 

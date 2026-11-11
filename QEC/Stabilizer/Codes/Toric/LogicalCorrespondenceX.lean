@@ -35,16 +35,6 @@ namespace Lattice
 open scoped ToricChain
 open Homological
 open StabilizerGroup.ToricCodeN
-open NQubitPauliGroupElement (IsXTypeElement)
-
-/-- Every X-type Pauli group element is the X-chain operator of its X-support
-chain. -/
-lemma toricXOperatorOfChain_xChainOf (L : ℕ) [Fact (0 < L)]
-    {g : NQubitPauliGroupElement (toricNumQubits L)} (hg : IsXTypeElement g) :
-    toricXOperatorOfChain L ((toricHomologicalCode L).xChainOf g) = g :=
-  NQubitPauliGroupElement.ext _ _ hg.1.symm <| funext fun i => by
-    rw [← toricHomologicalCode_chainXOperator_eq, HomologicalCode.chainXOperator_xChainOf_op_at]
-    rcases hg.2 i with h | h <;> simp [h]
 
 variable (L : ℕ) [Fact (2 ≤ L)] (c : C1 L)
 
@@ -78,11 +68,9 @@ theorem toricXOperatorOfChain_mem_XClosure_iff_mem_toricBoundaries :
 cycle. -/
 theorem toricXOperatorOfChain_mem_centralizer_iff_mem_toricCycles :
     toricXOperatorOfChain L c ∈ StabilizerGroup.centralizer (stabilizerGroup L) ↔
-      c ∈ Z₁ L := by
-  rw [StabilizerGroup.centralizer_eq_of_toSubgroup_eq _ _
-    (stabilizerGroup_toSubgroup_eq_homologicalStabilizerGroup L)]
-  exact HomologicalCode.chainXOperator_mem_centralizer_iff_mem_cycles
-    (X := toricHomologicalCode L) c
+      c ∈ Z₁ L :=
+  HomologicalCode.chainXOperator_mem_centralizer_iff_of_toSubgroup_eq
+    (X := toricHomologicalCode L) (stabilizerGroup_toSubgroup_eq_homologicalStabilizerGroup L) c
 
 /-- The X-chain operator of `c` is a nontrivial logical operator iff `c` is a
 cycle that is not a boundary. -/

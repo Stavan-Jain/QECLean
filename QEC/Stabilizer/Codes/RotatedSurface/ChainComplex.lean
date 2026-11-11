@@ -16,8 +16,10 @@ under their own names `rscCycles` (`Z₁ L`), `rscBoundaries` (`B₁ L`) and
 of `rotatedSurfaceHomologicalCode L` are these by definition
 (`rotatedSurfaceHomologicalCode_cycles_eq`,
 `rotatedSurfaceHomologicalCode_boundaries_eq`,
-`rotatedSurfaceHomologicalCode_H1_eq`), and its cut map is `rscZCutMap`
-(`rotatedSurfaceHomologicalCode_cutMap_eq`).
+`rotatedSurfaceHomologicalCode_H1_eq`), its cut map is `rscZCutMap`
+(`rotatedSurfaceHomologicalCode_cutMap_eq`), and its dual boundary map sums a
+chain over the support of each X-check
+(`rotatedSurfaceHomologicalCode_dualBoundary_apply`).
 -/
 
 namespace Quantum
@@ -110,7 +112,7 @@ theorem rotatedSurfaceHomologicalCode_boundaries_eq :
 theorem rotatedSurfaceHomologicalCode_H1_eq :
     (rotatedSurfaceHomologicalCode L).H1 = H₁ L := rfl
 
-/-! ## The cut map -/
+/-! ## The cut map and the dual boundary map -/
 
 /-- The cut map of `rotatedSurfaceHomologicalCode L`, defined as the transpose
 of `∂₁`, is `δ⁰`: both send a combination of Z-checks to the sum of their
@@ -119,6 +121,16 @@ theorem rotatedSurfaceHomologicalCode_cutMap_eq :
     (rotatedSurfaceHomologicalCode L).cutMap = δ⁰ L :=
   LinearMap.ext fun s => funext fun v =>
     Finset.sum_congr rfl fun zf _ => congrArg (s zf * ·) (rscBoundary1_single L v zf)
+
+/-- The dual boundary map of `rotatedSurfaceHomologicalCode L`, defined as the
+transpose of `∂₂`, sends a chain to its sum over the support of each
+X-check. -/
+theorem rotatedSurfaceHomologicalCode_dualBoundary_apply (c : VtxIdx L → ZMod 2)
+    (xf : XFaceIdx L) :
+    (rotatedSurfaceHomologicalCode L).dualBoundary c xf = ∑ v ∈ xFaceSupport xf, c v :=
+  (Finset.sum_congr rfl fun v _ =>
+    (congrArg (c v * ·) (rscBoundary2_single L xf v)).trans (mul_boole _ _)).trans
+    (Fintype.sum_ite_mem _ _)
 
 end RotatedSurface
 end Lattice

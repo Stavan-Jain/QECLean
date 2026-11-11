@@ -1,3 +1,4 @@
+import QEC.Stabilizer.Framework.Homological.Code
 import QEC.Stabilizer.Codes.RotatedSurface.CellComplex
 
 /-!
@@ -16,7 +17,8 @@ qubits as 1-cells and the Z-checks as 0-cells, with chains taking values in
 
 The chain-complex law `∂₁ ∘ ∂₂ = 0` (`rscBoundary_comp_zero`) holds because a
 Z-check and an X-check share an even number of qubits
-(`even_card_zFaceSupport_inter_xFaceSupport`). In the same way, a combination
+(`even_card_zFaceSupport_inter_xFaceSupport`, through
+`Homological.sum_sum_mul_indicator_eq_zero`). In the same way, a combination
 of X-checks has an even number of qubits in every row
 (`sum_row_rscBoundary2`), and a combination of Z-checks in every column
 (`sum_col_rscZCutMap`).
@@ -123,22 +125,12 @@ lemma rscZCutMap_single (L : ℕ) (zf : ZFaceIdx L) (v : VtxIdx L) :
 
 /-! ## The chain-complex law -/
 
-/-- A combination of the indicator functions of sets `S i` sums to zero over a
-set `T` that meets every `S i` in an even number of points. -/
-lemma sum_sum_mul_indicator_eq_zero {ι V : Type*} [Fintype ι] [DecidableEq V]
-    (T : Finset V) (S : ι → Finset V) (hS : ∀ i, Even (T ∩ S i).card) (c : ι → ZMod 2) :
-    ∑ v ∈ T, ∑ i, c i * (if v ∈ S i then 1 else 0) = 0 := by
-  rw [Finset.sum_comm]
-  refine Finset.sum_eq_zero fun i _ => ?_
-  rw [← Finset.mul_sum, Finset.sum_boole, Finset.filter_mem_eq_inter,
-    (ZMod.natCast_eq_zero_iff_even).2 (hS i), mul_zero]
-
 /-- Chain-complex law `∂₁ ∘ ∂₂ = 0`: the support of an X-check has zero
 syndrome, since it meets every Z-check in an even number of qubits. -/
 theorem rscBoundary_comp_zero (L : ℕ) [Fact (Odd L)] :
     (∂₁ L).comp (∂₂ L) = 0 :=
   LinearMap.ext fun c => funext fun zf =>
-    sum_sum_mul_indicator_eq_zero _ _ (even_card_zFaceSupport_inter_xFaceSupport zf) c
+    Homological.sum_sum_mul_indicator_eq_zero _ _ (even_card_zFaceSupport_inter_xFaceSupport zf) c
 
 /-- Pointwise form of `rscBoundary_comp_zero`. -/
 theorem rscBoundary_comp_zero_apply (L : ℕ) [Fact (Odd L)]
@@ -151,12 +143,12 @@ theorem rscBoundary_comp_zero_apply (L : ℕ) [Fact (Odd L)]
 /-- A combination of X-checks has an even number of qubits in every row. -/
 theorem sum_row_rscBoundary2 (L : ℕ) (c : XFaceIdx L → ZMod 2) (y : Fin L) :
     ∑ v : VtxIdx L with v.2 = y, ∂₂ L c v = 0 :=
-  sum_sum_mul_indicator_eq_zero _ _ (fun xf => even_card_row_inter_xFaceSupport xf y) c
+  Homological.sum_sum_mul_indicator_eq_zero _ _ (fun xf => even_card_row_inter_xFaceSupport xf y) c
 
 /-- A combination of Z-checks has an even number of qubits in every column. -/
 theorem sum_col_rscZCutMap (L : ℕ) (s : ZFaceIdx L → ZMod 2) (x : Fin L) :
     ∑ v : VtxIdx L with v.1 = x, δ⁰ L s v = 0 :=
-  sum_sum_mul_indicator_eq_zero _ _ (fun zf => even_card_col_inter_zFaceSupport zf x) s
+  Homological.sum_sum_mul_indicator_eq_zero _ _ (fun zf => even_card_col_inter_zFaceSupport zf x) s
 
 end RotatedSurface
 end Lattice

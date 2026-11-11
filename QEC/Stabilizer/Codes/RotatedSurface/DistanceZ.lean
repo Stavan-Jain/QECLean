@@ -19,50 +19,6 @@ every `HomologicalCode`, the dual homology has the dimension of `H₁`
 -/
 
 namespace Quantum
-namespace Stabilizer
-namespace Homological
-namespace HomologicalCode
-
-open scoped Homology
-
-variable (X : HomologicalCode)
-
-/-! ## The dimension of the dual homology -/
-
-/-- `dualBoundary` and `∂₂` are transposes, so they have the same rank. -/
-theorem finrank_range_dualBoundary :
-    dim₂ (LinearMap.range X.dualBoundary) = dim₂ X.boundaries := by
-  have hrank : ∀ {A B : Type} [Fintype A] [DecidableEq A] [Finite B]
-      (T : (A → ZMod 2) →ₗ[ZMod 2] (B → ZMod 2)),
-      dim₂ (LinearMap.range T) = (LinearMap.toMatrix' T).rank := fun {A B} _ _ _ T => by
-    rw [Matrix.rank_eq_finrank_range_toLin (LinearMap.toMatrix' T) (Pi.basisFun (ZMod 2) B)
-      (Pi.basisFun (ZMod 2) A), Matrix.toLin_eq_toLin', Matrix.toLin'_toMatrix']
-  have h : LinearMap.toMatrix' X.dualBoundary =
-      (LinearMap.toMatrix' X.boundary2).transpose := by
-    ext f e
-    simp [LinearMap.toMatrix'_apply, Pi.single_apply]
-  rw [boundaries, hrank, hrank, h, Matrix.rank_transpose]
-
-/-- The dual homology `dualCycles / dualBoundaries` has the dimension of `H₁`:
-`dim dualCycles = dim dualBoundaries + dim H₁`. Both sides are
-`dim C₁ - dim B₁`, as `dualCycles` is the kernel of the transpose of `∂₂` and
-`dualBoundaries` the range of the transpose of `∂₁`. -/
-theorem finrank_dualCycles_eq_dualBoundaries_add_H1 :
-    dim₂ X.dualCycles = dim₂ X.dualBoundaries + dim₂ X.H1 := by
-  have h1 := X.rank_nullity_boundary1
-  have h2 : dim₂ X.dualBoundaries = dim₂ (LinearMap.range X.boundary1) :=
-    X.finrank_range_cutMap
-  have h3 : dim₂ (LinearMap.range X.dualBoundary) + dim₂ X.dualCycles =
-      dim₂ (X.C1 → ZMod 2) := LinearMap.finrank_range_add_finrank_ker X.dualBoundary
-  have h4 := X.finrank_range_dualBoundary
-  have h5 := X.finrank_H1_eq_cycles_sub_boundaries
-  have h6 := Submodule.finrank_mono X.boundaries_le_cycles
-  omega
-
-end HomologicalCode
-end Homological
-end Stabilizer
-
 namespace StabilizerGroup
 namespace RotatedSurfaceCodeN
 

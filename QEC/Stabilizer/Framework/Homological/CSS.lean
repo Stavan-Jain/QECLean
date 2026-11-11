@@ -22,7 +22,10 @@ Main results:
   recover the chain, so the encodings are injective
   (`chainXOperator_injective`, `chainZOperator_injective`);
 * `chainXOperator_xChainOf_op_at`, `chainZOperator_zChainOf_op_at`: the X-only
-  and Z-only parts of a Pauli group element.
+  and Z-only parts of a Pauli group element;
+* `chainXOperator_xChainOf`, `chainZOperator_zChainOf`: an X-type element is
+  the X-chain operator of its X-support chain, and a Z-type element the
+  Z-chain operator of its Z-support chain.
 -/
 
 namespace Quantum
@@ -228,6 +231,22 @@ lemma chainZOperator_zChainOf_op_at
   obtain ⟨e, rfl⟩ := X.edgeEquiv.surjective i
   rw [chainZOperator_operators_edgeEquiv, zChainOf]
   split_ifs <;> simp_all
+
+/-- An X-type Pauli group element is the X-chain operator of its X-support
+chain. -/
+lemma chainXOperator_xChainOf {g : NQubitPauliGroupElement X.numQubits}
+    (hg : IsXTypeElement g) : X.chainXOperator (X.xChainOf g) = g :=
+  NQubitPauliGroupElement.ext _ _ hg.1.symm <| funext fun i => by
+    rw [chainXOperator_xChainOf_op_at]
+    rcases hg.2 i with h | h <;> simp [h]
+
+/-- A Z-type Pauli group element is the Z-chain operator of its Z-support
+chain. -/
+lemma chainZOperator_zChainOf {g : NQubitPauliGroupElement X.numQubits}
+    (hg : IsZTypeElement g) : X.chainZOperator (X.zChainOf g) = g :=
+  NQubitPauliGroupElement.ext _ _ hg.1.symm <| funext fun i => by
+    rw [chainZOperator_zChainOf_op_at]
+    rcases hg.2 i with h | h <;> simp [h]
 
 end HomologicalCode
 

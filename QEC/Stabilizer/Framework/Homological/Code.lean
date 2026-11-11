@@ -22,6 +22,13 @@ This file provides the chain-level API:
   `dualBoundaries_le_dualCycles`, and the pairing certificate
   `not_mem_boundaries_of_dual_witness` for a chain not being a boundary.
 
+It opens with coordinate lemmas over `ZMod 2`, among them two facts about
+combinations of indicator functions of finite sets: such a combination sums to
+zero over a set meeting every one of them evenly
+(`sum_sum_mul_indicator_eq_zero`), and the indicator functions are linearly
+independent when the sets have distinct first points
+(`eq_zero_of_sum_indicator_eq_zero`).
+
 The notation `dim₂ V` (scope `Homology`) abbreviates
 `Module.finrank (ZMod 2) V`.
 -/
@@ -88,6 +95,39 @@ lemma sum_apply_mul_eq_sum_mul_sum_single {A B : Type*} [Fintype A] [DecidableEq
   simp_rw [linearMap_apply_eq_sum_single T c, Finset.sum_mul, Finset.mul_sum]
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => by ring
+
+/-- A combination of the indicator functions of sets `S i` sums to zero over a
+set `T` that meets every `S i` in an even number of points. -/
+lemma sum_sum_mul_indicator_eq_zero {ι V : Type*} [Fintype ι] [DecidableEq V]
+    (T : Finset V) (S : ι → Finset V) (hS : ∀ i, Even (T ∩ S i).card) (c : ι → ZMod 2) :
+    ∑ v ∈ T, ∑ i, c i * (if v ∈ S i then 1 else 0) = 0 := by
+  rw [Finset.sum_comm]
+  refine Finset.sum_eq_zero fun i _ => ?_
+  rw [← Finset.mul_sum, Finset.sum_boole, Finset.filter_mem_eq_inter,
+    (ZMod.natCast_eq_zero_iff_even).2 (hS i), mul_zero]
+
+/-- **Triangularity criterion.** Let `S i` be finite sets of points numbered
+by `idx`, such that `S i` has a point of number `key i` and no point of
+smaller number, with `key` injective. Then the indicator functions of the
+`S i` are linearly independent over `ZMod 2`: a combination `c` of them that
+vanishes at every point is zero. -/
+lemma eq_zero_of_sum_indicator_eq_zero {ι V : Type*} [Fintype ι] [DecidableEq V]
+    {S : ι → Finset V} {idx : V → ℕ} {key : ι → ℕ} (hkey : Function.Injective key)
+    (hmem : ∀ i, ∃ v ∈ S i, idx v = key i) (hle : ∀ i, ∀ v ∈ S i, key i ≤ idx v)
+    {c : ι → ZMod 2} (hc : ∀ v, ∑ i, c i * (if v ∈ S i then 1 else 0) = 0) :
+    c = 0 := by
+  by_contra hne
+  obtain ⟨i₀, hi₀⟩ := Function.ne_iff.mp hne
+  obtain ⟨m, hm, hmin⟩ := (Finset.univ.filter fun i => c i ≠ 0).exists_min_image key
+    ⟨i₀, by simpa using hi₀⟩
+  obtain ⟨v, hv, hvm⟩ := hmem m
+  refine (Finset.mem_filter.mp hm).2 ?_
+  rw [← hc v, Fintype.sum_eq_single m, if_pos hv, mul_one]
+  intro j hjm
+  by_cases hj : c j = 0
+  · rw [hj, zero_mul]
+  · rw [if_neg, mul_zero]
+    exact fun hvj => hjm (hkey (le_antisymm (hvm ▸ hle j v hvj) (hmin j (by simpa using hj))))
 
 /-! ## The chain complex -/
 

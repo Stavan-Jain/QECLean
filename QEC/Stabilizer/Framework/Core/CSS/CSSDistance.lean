@@ -39,7 +39,10 @@ A CSS check is named by its support: `zOn S` and `xOn S` are `Z` and `X` on the
 qubits of `S`. Their type (`IsZTypeElement_zOn`, `IsXTypeElement_xOn`), weight
 (`weight_zOn`, `weight_xOn`), check-matrix rows and commutation
 (`commutes_xOn_zOn_iff`, `anticommute_xOn_zOn_iff`: `xOn S` and `zOn T` commute
-iff `S ∩ T` has even cardinality) are read off the supports.
+iff `S ∩ T` has even cardinality) are read off the supports. In particular
+they commute when the supports are disjoint (`commutes_xOn_zOn_of_disjoint`),
+and `X` on `{a, b}` anticommutes with `Z` on `{a, c}` for `b ≠ c`
+(`anticommute_xOn_pair_zOn_pair`).
 
 For a CSS code whose generators are `zOn S` and `xOn S` for the rows `S` of two
 classical check matrices, the criteria become conditions on the columns of
@@ -372,6 +375,29 @@ lemma anticommute_xOn_zOn_iff (S T : Finset (Fin n)) :
     Anticommute (xOn S) (zOn T) ↔ Odd (S ∩ T).card := by
   rw [NQubitPauliOperator.anticommutes_iff_symplectic_inner_one, symplecticInner_xOn_zOn,
     ZMod.natCast_eq_one_iff_odd]
+
+/-- `X` on `S` commutes with `Z` on `T` when the supports are disjoint. -/
+lemma commutes_xOn_zOn_of_disjoint {S T : Finset (Fin n)} (h : Disjoint S T) :
+    xOn S * zOn T = zOn T * xOn S :=
+  (commutes_xOn_zOn_iff S T).2 <| by
+    rw [Finset.disjoint_iff_inter_eq_empty.1 h, Finset.card_empty]
+    exact Even.zero
+
+/-- A pair of distinct qubits has an even number of elements. -/
+lemma even_card_pair {a b : Fin n} (hab : a ≠ b) : Even ({a, b} : Finset (Fin n)).card :=
+  Finset.card_pair hab ▸ even_two
+
+/-- `X` on `{a, b}` and `Z` on `{a, c}`, with `b ≠ c`, meet on qubit `a` only,
+an odd number, so they anticommute. -/
+lemma anticommute_xOn_pair_zOn_pair {a b c : Fin n} (hbc : b ≠ c) :
+    Anticommute (xOn {a, b}) (zOn {a, c}) := by
+  have h : ({a, b} ∩ {a, c} : Finset (Fin n)) = {a} := by
+    ext x
+    simp only [Finset.mem_inter, Finset.mem_insert, Finset.mem_singleton]
+    exact ⟨fun h => h.1.elim id fun hb => h.2.elim id fun hc => absurd (hb.symm.trans hc) hbc,
+      fun h => ⟨.inl h, .inl h⟩⟩
+  rw [anticommute_xOn_zOn_iff, h, Finset.card_singleton]
+  exact odd_one
 
 /-- A `Z`-check on `S` detects the weight-one Pauli `P` at `i` iff `i ∈ S` and
 `P` has an `X`-component (`P = X` or `P = Y`, i.e. `X`-bit `1`). -/

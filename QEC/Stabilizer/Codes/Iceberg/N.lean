@@ -226,22 +226,6 @@ lemma zOn_mem_centralizer (m : ℕ) {S : Finset (Fin (2 * m))} (hS : Even S.card
   · exact (ZGenerators_isZType m _ rfl).commute (IsZTypeElement_zOn S)
   · rwa [XStab_eq_xOn, commutes_xOn_zOn_iff, Finset.univ_inter]
 
-/-- A pair of distinct qubits has an even number of elements. -/
-lemma even_card_pair {n : ℕ} {a b : Fin n} (hab : a ≠ b) : Even ({a, b} : Finset (Fin n)).card :=
-  Finset.card_pair hab ▸ even_two
-
-/-- `X` on `{a, b}` and `Z` on `{a, c}`, with `b ≠ c`, meet on qubit `a` only,
-an odd number, so they anticommute. -/
-lemma anticommute_xOn_pair_zOn_pair {n : ℕ} {a b c : Fin n} (hbc : b ≠ c) :
-    Anticommute (xOn {a, b}) (zOn {a, c}) := by
-  have h : ({a, b} ∩ {a, c} : Finset (Fin n)) = {a} := by
-    ext x
-    simp only [Finset.mem_inter, Finset.mem_insert, Finset.mem_singleton]
-    exact ⟨fun h => h.1.elim id fun hb => h.2.elim id fun hc => absurd (hb.symm.trans hc) hbc,
-      fun h => ⟨.inl h, .inl h⟩⟩
-  rw [anticommute_xOn_zOn_iff, h, Finset.card_singleton]
-  exact odd_one
-
 /-! ## Distance 2
 
 ### No nontrivial logical of weight 1
