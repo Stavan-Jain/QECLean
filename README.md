@@ -49,7 +49,9 @@ and other foundations. Import everything via `QEC`.
   (`Framework/FoldDouble/`), with the bivariate-bicycle double cover as its
   instance.
 - **CSS concatenation framework**: a parametric `[[n₁n₂, k₂, ≥ d₁d₂]]`
-  concatenation construction (`Framework/Concatenation/`).
+  concatenation construction (`Framework/Concatenation/`), with the distance
+  exactly `d₁d₂` once a minimum-weight inner and outer logical operator are
+  given. The concatenated Steane code `[[49, 1, 9]]` is its instance.
 - **Concrete codes**: see the list below.
 
 ### Codes
@@ -67,6 +69,7 @@ Every distance `d` listed in the parameters below is proved.
 | Iceberg family, `m ≥ 2` | `[[2m, 2m − 2, 2]]` | `Codes/Iceberg/N*.lean` |
 | Five-qubit perfect code (non-CSS) | `[[5, 1, 3]]` | `Codes/Small/FiveQubit_5_1_3*.lean` |
 | Steane code | `[[7, 1, 3]]` | `Codes/Small/Steane7*.lean` |
+| Concatenated Steane code | `[[49, 1, 9]]` | `Codes/Concat/SteaneSteane.lean` |
 | `C_6` (Knill) | `[[6, 2, 2]]` | `Codes/Small/SixQubit_6_2_2*.lean` |
 | `[[4, 2, 2]]` | `[[4, 2, 2]]` | `Codes/Small/FourQubit_4_2_2*.lean` |
 | LNCY code | `[[4, 1, 2]]` | `Codes/Small/CSS_4_1_2*.lean` |
@@ -145,7 +148,7 @@ QEC/
     │                   # FoldDouble
     ├── Geometry/       # Lattice-family-agnostic primitives
     └── Codes/          # BivariateBicycle, Toric, RotatedSurface, Color,
-                        # Iceberg, Repetition, Small
+                        # Iceberg, Repetition, Small, Concat
 ```
 
 Lower layers never import higher ones:

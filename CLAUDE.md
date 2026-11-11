@@ -114,14 +114,21 @@ QEC/
                                  # FiveQubit_5_1_3 (first non-CSS); each split
                                  # into <Code>.lean (→ WithDistance) and
                                  # <Code>Logicals.lean (→ WithLogicals)
+        └── Concat/              # Instances of Framework/Concatenation:
+                                 # SteaneSteane ([[49, 1, 9]]), derived from
+                                 # 7-qubit facts only — nothing is checked on
+                                 # 49 qubits
 ```
 
 Everything under `Codes/` is `native_decide`-free. The instances that carry
 one are parked on branch `claude/z3z6-parked`:
-`BivariateBicycle/{Z3Z6,Z5Z15F2A6,BaseFloors}/`, `Codes/Concat/` (both Steane
-concatenations), and `RotatedSurface/Three.lean`. `Framework/` keeps the
-abstract machinery they exercise — notably `Framework/Concatenation/`, which
-has no concrete instance in this tree.
+`BivariateBicycle/{Z3Z6,Z5Z15F2A6,BaseFloors}/`,
+`Codes/Concat/SteaneFourQubit.lean` (Steane ⊗ `[[4,2,2]]`), and
+`RotatedSurface/Three.lean`. `Codes/Concat/SteaneSteane.lean` came back from
+there kernel-only: generator independence and the weight-`d₁d₂` logical are
+now theorems of `Framework/Concatenation/`
+(`rowsLinearIndependent_concat`, `exists_nontrivial_logical_weight_mul`), so a
+new concatenation instance needs no check beyond its inner and outer codes.
 
 **Layering** (lower can be imported by higher; not the reverse):
 

@@ -1,16 +1,19 @@
-import QEC.Stabilizer.Framework.Concatenation.Constructor
+import QEC.Stabilizer.Framework.Concatenation.Promotion
 
 /-!
 # Concatenation: independence of the concatenated generators
 
-`concatenate` takes as a hypothesis that the check-matrix rows of the
-concatenated generators are linearly independent. Deciding this directly means
-enumerating all `2 ^ (n₁ * n₂ - k₂)` coefficient vectors.
-`ConcatCSSData.rowsLinearIndependent_concat` derives it from two conditions on
-much shorter lists:
+The check-matrix rows of the concatenated generators are linearly independent
+(`ConcatCSSData.rowsLinearIndependent_concat`), which is the one field of the
+presentation of the concatenated code that is not a blockwise computation.
+Deciding it directly would mean enumerating all `2 ^ (n₁ * n₂ - k₂)`
+coefficient vectors; instead it follows from the independence of the inner and
+of the outer generators:
 
 - the inner generators together with the two inner logical operators have
-  linearly independent rows;
+  linearly independent rows (`rowsLinearIndependent_inner_append_logicals`),
+  because the logical operators commute with the generators and anticommute
+  with each other (`rowsLinearIndependent_append_pair`);
 - the outer generators have linearly independent rows.
 
 The proof restricts symplectic vectors to one block at a time, by the linear
@@ -183,23 +186,51 @@ namespace ConcatCSSData
 
 variable (D : ConcatCSSData n₁ n₂ k₂)
 
+/-! ## Independence of the inner generators and the inner logical operators -/
+
+/-- The inner generators together with the two inner logical operators have
+linearly independent rows: the logical operators commute with the generators
+and anticommute with each other. -/
+lemma rowsLinearIndependent_inner_append_logicals :
+    rowsLinearIndependent (D.Pin.generatorsList ++ [D.Cin.logicalX 0, D.Cin.logicalZ 0]) :=
+  rowsLinearIndependent_append_pair D.Pin.generators_independent
+    (fun g hg => (mem_centralizer_iff _ _).mp (D.Cin.logicalOps 0).x_mem_centralizer g
+      (D.mem_Cin_of_mem_gens hg))
+    (fun g hg => (mem_centralizer_iff _ _).mp (D.Cin.logicalOps 0).z_mem_centralizer g
+      (D.mem_Cin_of_mem_gens hg))
+    (D.Cin.logicalOps 0).anticommute
+
+/-- The two inner logical operators have linearly independent rows. -/
+lemma rowsLinearIndependent_logicals :
+    rowsLinearIndependent [D.Cin.logicalX 0, D.Cin.logicalZ 0] :=
+  ((rowsLinearIndependent_append_iff _ _).mp D.rowsLinearIndependent_inner_append_logicals).2.1
+
+/-- The span of the inner generators and the span of the two inner logical
+operators are disjoint. -/
+lemma disjoint_inner_logicals :
+    Disjoint (sympSpan D.Pin.generatorsList) (sympSpan [D.Cin.logicalX 0, D.Cin.logicalZ 0]) :=
+  ((rowsLinearIndependent_append_iff _ _).mp D.rowsLinearIndependent_inner_append_logicals).2.2
+
+/-- The outer generators, `Z`-type ones first, have linearly independent
+rows. -/
+lemma rowsLinearIndependent_outer : rowsLinearIndependent (D.outerZ ++ D.outerX) :=
+  D.outer_split.rowsLinearIndependent_iff.mp D.Pout.generators_independent
+
+/-! ## Independence of the embedded inner generators -/
+
 /-- The inner generators embedded in every block have linearly independent
-rows if the inner generators do. -/
-lemma rowsLinearIndependent_s1PerBlockList (hCin : rowsLinearIndependent D.Pin.generatorsList) :
-    rowsLinearIndependent D.s1PerBlockList :=
-  rowsLinearIndependent_flatMap_embedBlock D.Pin.generatorsList hCin (List.nodup_finRange n₂)
+rows. -/
+lemma rowsLinearIndependent_s1PerBlockList : rowsLinearIndependent D.s1PerBlockList :=
+  rowsLinearIndependent_flatMap_embedBlock D.Pin.generatorsList D.Pin.generators_independent
+    (List.nodup_finRange n₂)
 
 /-! ## Independence of the promoted outer generators -/
 
-/-- The promoted outer generators have linearly independent rows if the two
-inner logical operators and the outer generators do. Restricting a vanishing
-combination to a block gives a vanishing combination of the two inner logical
-operators, so the combination of the outer generators vanishes at every
-qubit. -/
-lemma rowsLinearIndependent_promotedOuterList
-    (hlog : rowsLinearIndependent [D.Cin.logicalX 0, D.Cin.logicalZ 0])
-    (hout : rowsLinearIndependent (D.outerZ ++ D.outerX)) :
-    rowsLinearIndependent D.promotedOuterList := by
+/-- The promoted outer generators have linearly independent rows. Restricting a
+vanishing combination to a block gives a vanishing combination of the two
+inner logical operators, so the combination of the outer generators vanishes
+at every qubit. -/
+lemma rowsLinearIndependent_promotedOuterList : rowsLinearIndependent D.promotedOuterList := by
   rw [promotedOuterList, rowsLinearIndependent_map, Fintype.linearIndependent_iff]
   intro f hf
   have hY : ∀ (i : Fin (D.outerZ ++ D.outerX).length) (b : Fin n₂),
@@ -212,8 +243,8 @@ lemma rowsLinearIndependent_promotedOuterList
     have h := congrArg (blockRestrictSymp b) hf
     simp only [map_sum, map_smul, map_zero, blockRestrictSymp_promoteE _ _ b _ (hY _ b),
       smul_add, smul_smul, Finset.sum_add_distrib, ← Finset.sum_smul] at h
-    exact eq_zero_of_rowsLinearIndependent_pair hlog h
-  refine Fintype.linearIndependent_iff.mp hout f (funext fun col => ?_)
+    exact eq_zero_of_rowsLinearIndependent_pair D.rowsLinearIndependent_logicals h
+  refine Fintype.linearIndependent_iff.mp D.rowsLinearIndependent_outer f (funext fun col => ?_)
   rw [Finset.sum_apply, Pi.zero_apply]
   refine Fin.addCases (fun b => ?_) (fun b => ?_) col
   · simpa only [Pi.smul_apply, smul_eq_mul, checkMatrix, toSymplectic_X_part] using (hcoeff b).1
@@ -255,39 +286,27 @@ lemma blockRestrictSymp_mem_span_logicals (b : Fin n₂)
     (smul_mem _ _ (toSymplectic_mem_sympSpan_of_mem (g := D.Cin.logicalZ 0) (by simp)))
 
 /-- The span of the embedded inner generators and the span of the promoted
-outer generators are disjoint if the span of the inner generators and the span
-of the two inner logical operators are. -/
-lemma disjoint_s1_promoted
-    (hdisj : Disjoint (sympSpan D.Pin.generatorsList)
-      (sympSpan [D.Cin.logicalX 0, D.Cin.logicalZ 0])) :
+outer generators are disjoint: on every block, a common vector restricts to a
+vector in both the span of the inner generators and the span of the two inner
+logical operators. -/
+lemma disjoint_s1_promoted :
     Disjoint (sympSpan D.s1PerBlockList) (sympSpan D.promotedOuterList) :=
   disjoint_def.mpr fun v hv hv' => eq_zero_of_forall_blockRestrictSymp_zero v fun b =>
-    disjoint_def.mp hdisj _ (D.blockRestrictSymp_mem_sympSpan_inner b hv)
+    disjoint_def.mp D.disjoint_inner_logicals _ (D.blockRestrictSymp_mem_sympSpan_inner b hv)
       (D.blockRestrictSymp_mem_span_logicals b hv')
 
 /-! ## Independence of the concatenated generators -/
 
-/-- The concatenated generators have linearly independent check-matrix rows,
-provided the inner generators together with the two inner logical operators do
-(`hin`) and the outer generators do (`hout`). -/
-theorem rowsLinearIndependent_concat
-    (hin : rowsLinearIndependent (D.Pin.generatorsList ++
-      [D.Cin.logicalX 0, D.Cin.logicalZ 0]))
-    (hout : rowsLinearIndependent (D.outerZ ++ D.outerX)) :
-    rowsLinearIndependent D.concatGeneratorsList := by
-  obtain ⟨hCin, hlog, hdisj⟩ := (rowsLinearIndependent_append_iff _ _).mp hin
-  exact (rowsLinearIndependent_append_iff _ _).mpr
-    ⟨D.rowsLinearIndependent_s1PerBlockList hCin,
-      D.rowsLinearIndependent_promotedOuterList hlog hout, D.disjoint_s1_promoted hdisj⟩
+/-- The concatenated generators have linearly independent check-matrix rows. -/
+theorem rowsLinearIndependent_concat : rowsLinearIndependent D.concatGeneratorsList :=
+  (rowsLinearIndependent_append_iff _ _).mpr
+    ⟨D.rowsLinearIndependent_s1PerBlockList, D.rowsLinearIndependent_promotedOuterList,
+      D.disjoint_s1_promoted⟩
 
-/-- Under the hypotheses of `rowsLinearIndependent_concat`, no concatenated
-generator is in the subgroup generated by the others. -/
-theorem generatorsIndependent_concat
-    (hin : rowsLinearIndependent (D.Pin.generatorsList ++
-      [D.Cin.logicalX 0, D.Cin.logicalZ 0]))
-    (hout : rowsLinearIndependent (D.outerZ ++ D.outerX)) :
+/-- No concatenated generator is in the subgroup generated by the others. -/
+theorem generatorsIndependent_concat :
     GeneratorsIndependent (n₁ * n₂) D.concatGeneratorsList :=
-  GeneratorsIndependent_of_rowsLinearIndependent (D.rowsLinearIndependent_concat hin hout)
+  GeneratorsIndependent_of_rowsLinearIndependent D.rowsLinearIndependent_concat
 
 end ConcatCSSData
 

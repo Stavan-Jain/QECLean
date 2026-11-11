@@ -17,6 +17,9 @@ levels:
   `NQubitPauliGroupElement.IsXTypeElement`: the phase is `0` and the operator
   part is Z-type (respectively X-type).
 
+All six predicates are decidable, so `decide` checks the type of a literal
+operator or group element.
+
 Main results, in the namespace `NQubitPauliGroupElement`:
 
 - `IsZTypeElement_of_mem_closure`, `IsXTypeElement_of_mem_closure`: typed
@@ -41,6 +44,12 @@ def IsZType (p : PauliOperator) : Prop :=
 /-- X-type single-qubit Pauli: `I` or `X`. -/
 def IsXType (p : PauliOperator) : Prop :=
   p = PauliOperator.I ∨ p = PauliOperator.X
+
+instance : DecidablePred IsZType := fun p =>
+  inferInstanceAs (Decidable (p = PauliOperator.I ∨ p = PauliOperator.Z))
+
+instance : DecidablePred IsXType := fun p =>
+  inferInstanceAs (Decidable (p = PauliOperator.I ∨ p = PauliOperator.X))
 
 /-- The identity `I` is Z-type. -/
 lemma IsZType_I : IsZType PauliOperator.I := Or.inl rfl
@@ -109,6 +118,16 @@ def IsZType (op : NQubitPauliOperator n) : Prop :=
 def IsXType (op : NQubitPauliOperator n) : Prop :=
   ∀ i, PauliOperator.IsXType (op i)
 
+/-- Being Z-type is a finite conjunction over the qubits, so `decide` settles it
+for a literal operator. -/
+instance (op : NQubitPauliOperator n) : Decidable (IsZType op) :=
+  Fintype.decidableForallFintype
+
+/-- Being X-type is a finite conjunction over the qubits, so `decide` settles it
+for a literal operator. -/
+instance (op : NQubitPauliOperator n) : Decidable (IsXType op) :=
+  Fintype.decidableForallFintype
+
 /-- The n-qubit identity operator is Z-type. -/
 lemma IsZType_identity : IsZType (NQubitPauliOperator.identity n) :=
   fun _ => PauliOperator.IsZType_I
@@ -151,6 +170,12 @@ def IsZTypeElement (g : NQubitPauliGroupElement n) : Prop :=
 /-- X-type group element: phase `0` and X-type operator part. -/
 def IsXTypeElement (g : NQubitPauliGroupElement n) : Prop :=
   g.phasePower = 0 ∧ NQubitPauliOperator.IsXType g.operators
+
+instance (g : NQubitPauliGroupElement n) : Decidable (IsZTypeElement g) :=
+  inferInstanceAs (Decidable (_ ∧ _))
+
+instance (g : NQubitPauliGroupElement n) : Decidable (IsXTypeElement g) :=
+  inferInstanceAs (Decidable (_ ∧ _))
 
 /-- The product `mulOp p q` of two Z-type n-qubit operators has phase `0`. -/
 lemma mulOp_phasePower_zero_of_IsZType {p q : NQubitPauliOperator n}
