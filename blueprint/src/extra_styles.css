@@ -100,7 +100,7 @@ button.focus-link:hover {
 
 /* --- Suppress the per-node "Lean" links ----------------------------------
  * leanblueprint points these at `\dochome`/find/#doc/<decl>, i.e. at
- * https://stavan-jain.github.io/QECLean/docs — and nothing publishes anything
+ * https://qeclean.github.io/QECLean/docs — and nothing publishes anything
  * there, so every one of them falls through to 404.html and bounces the reader
  * to the qec-lab dashboard. A link that silently sends you somewhere unrelated
  * is worse than no link, so hide them until the docs exist.

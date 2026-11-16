@@ -1,10 +1,10 @@
 # Quantum Error Correction in Lean
 
 [![Lean V4](https://img.shields.io/badge/Lean-V4-blueviolet)](https://lean-lang.org/)
-[![Blueprint](https://img.shields.io/badge/blueprint-live-success)](https://stavan-jain.github.io/QECLean/)
+[![Blueprint](https://img.shields.io/badge/blueprint-live-success)](https://qeclean.github.io/QECLean/)
 [![Dashboard](https://img.shields.io/badge/pipeline%20dashboard-live-success)](https://stavan-jain.github.io/qec-lab/)
 [![Research: qec-lab](https://img.shields.io/badge/research-qec--lab-informational)](https://github.com/Stavan-Jain/qec-lab)
-[![Open in Codespaces](https://img.shields.io/badge/Codespaces-open-blue?logo=github)](https://codespaces.new/Stavan-Jain/QECLean)
+[![Open in Codespaces](https://img.shields.io/badge/Codespaces-open-blue?logo=github)](https://codespaces.new/QECLean/QECLean)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
 This project formalizes the stabilizer formalism for quantum error correction in
@@ -60,9 +60,9 @@ Every distance `d` listed in the parameters below is proved.
 
 | Code | Parameters | Where |
 |---|---|---|
-| Mitten (downstream) | `[[150, 30, 10]]` | [mitten-distance-lean](https://github.com/Stavan-Jain/mitten-distance-lean) |
-| Gross (downstream) | `[[144, 12, 12]]` | [bb-distance-lean](https://github.com/Stavan-Jain/bb-distance-lean) |
-| Bravyi360 (downstream) | `[[360, 12, 24]]` | [bb-distance-lean](https://github.com/Stavan-Jain/bb-distance-lean) |
+| Mitten (downstream) | `[[150, 30, 10]]` | [mitten-distance-lean](https://github.com/QECLean/mitten-distance-lean) |
+| Gross (downstream) | `[[144, 12, 12]]` | [bb-distance-lean](https://github.com/QECLean/bb-distance-lean) |
+| Bravyi360 (downstream) | `[[360, 12, 24]]` | [bb-distance-lean](https://github.com/QECLean/bb-distance-lean) |
 | Toric code, `L ≥ 2` | `[[2L², 2, L]]` | `Codes/Toric/` |
 | Rotated surface code, odd `L ≥ 3` | `[[L², 1, L]]` | `Codes/RotatedSurface/` |
 | Triangular color code, every `r` | `[[3r(r+1) + 1, 1, 2r + 1]]` | `Codes/Color/` |
@@ -98,7 +98,7 @@ depend on the logical basis.
 
 **Bivariate-bicycle distances.** The Gross `[[144,12,12]]` and Bravyi360
 `[[360,12,24]]` proofs live in
-[bb-distance-lean](https://github.com/Stavan-Jain/bb-distance-lean), together with
+[bb-distance-lean](https://github.com/QECLean/bb-distance-lean), together with
 their certificates and generators. That repository pins QECLean and uses its
 general homological, cover, and doubling theory. See the
 [BB foundations overview](QEC/Stabilizer/Codes/BivariateBicycle/README.md).
@@ -186,7 +186,7 @@ yourself with `#print axioms Your.Theorem`.
 ### Try it without installing
 
 Open the repo in
-[GitHub Codespaces](https://codespaces.new/Stavan-Jain/QECLean). The container
+[GitHub Codespaces](https://codespaces.new/QECLean/QECLean). The container
 installs the toolchain, fetches mathlib's cache, builds `QECLight`, and opens on
 [`Playground.lean`](Playground.lean). See [`deploy/README.md`](deploy/README.md)
 for this setup and for self-hosting a lean4web instance.
@@ -201,7 +201,7 @@ for this setup and for self-hosting a lean4web instance.
 ### Building
 
 ```bash
-git clone https://github.com/Stavan-Jain/QECLean
+git clone https://github.com/QECLean/QECLean
 cd QECLean
 lake exe cache get   # prebuilt mathlib
 lake build

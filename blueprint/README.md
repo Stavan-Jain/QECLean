@@ -258,7 +258,7 @@ middle of a chain will take over edges that previously ran past it.
 
 The `Blueprint` workflow builds on every push and uploads `blueprint/web` as a
 run artifact. **A push to `main` also republishes
-[the site](https://stavan-jain.github.io/QECLean/)**, so what is served always
+[the site](https://qeclean.github.io/QECLean/)**, so what is served always
 matches `main`; pull requests and branch pushes build and check the blueprint
 but publish nothing. The `deploy` input on `workflow_dispatch` is still there
 for republishing without a content change.
@@ -274,7 +274,7 @@ concurrency group so their deploys serialize.
 
 ### The `\lean{}` links are hidden, not fixed
 
-`\dochome` in `web.tex` points at `https://stavan-jain.github.io/QECLean/docs`,
+`\dochome` in `web.tex` points at `https://qeclean.github.io/QECLean/docs`,
 so every node's **Lean** link goes to `…/docs/find/#doc/<decl>`. Nothing
 publishes anything at `/docs`, so those links fall through to `404.html` and
 bounce the reader to the qec-lab dashboard — worse than no link at all. Until
