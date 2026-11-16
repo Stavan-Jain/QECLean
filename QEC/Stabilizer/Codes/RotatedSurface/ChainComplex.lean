@@ -1,6 +1,8 @@
-import QEC.Stabilizer.Framework.Homological.Distance
-import QEC.Stabilizer.Framework.Homological.ToCode
-import QEC.Stabilizer.Codes.RotatedSurface.BoundaryMaps
+module
+
+public import QEC.Stabilizer.Framework.Homological.Distance
+public import QEC.Stabilizer.Framework.Homological.ToCode
+public import QEC.Stabilizer.Codes.RotatedSurface.BoundaryMaps
 
 /-!
 # The rotated surface code as a `HomologicalCode`
@@ -21,6 +23,8 @@ of `rotatedSurfaceHomologicalCode L` are these by definition
 chain over the support of each X-check
 (`rotatedSurfaceHomologicalCode_dualBoundary_apply`).
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

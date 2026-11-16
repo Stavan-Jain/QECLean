@@ -1,5 +1,7 @@
-import Mathlib.Tactic
-import QEC.Stabilizer.Geometry.FinPeriodic
+module
+
+public import Mathlib.Tactic
+public import QEC.Stabilizer.Geometry.FinPeriodic
 
 /-!
 # Cells of the periodic square lattice
@@ -8,6 +10,8 @@ Index types for the vertices, edges and faces of an `L × L` periodic square
 lattice (`VtxIdx`, `EdgeIdx`, `FaceIdx`), their cardinalities, and the chain
 groups `C0`, `C1`, `C2` of `ZMod 2`-valued functions on them.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

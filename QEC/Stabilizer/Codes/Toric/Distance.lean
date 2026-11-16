@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Codes.Toric.StabilizerCode
+module
+
+public import QEC.Stabilizer.Codes.Toric.StabilizerCode
 
 /-!
 # Distance of the toric code
@@ -14,6 +16,8 @@ weight at least `L` by `le_edgeWeight_of_not_mem_toricBoundaries` and
 `le_edgeWeight_of_not_mem_toricDualBoundaries`. The horizontal X-loop
 `horizontalLoopXOperator L` attains the bound.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

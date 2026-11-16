@@ -1,7 +1,9 @@
-import Mathlib.Tactic
-import QEC.Stabilizer.Codes.Toric.Chains
-import QEC.Stabilizer.Geometry.GridIndexing
-import QEC.Stabilizer.Foundations.PauliGroup
+module
+
+public import Mathlib.Tactic
+public import QEC.Stabilizer.Codes.Toric.Chains
+public import QEC.Stabilizer.Geometry.GridIndexing
+public import QEC.Stabilizer.Foundations.PauliGroup
 
 /-!
 # Qubits and chain operators of the toric code
@@ -16,6 +18,8 @@ A 1-chain `c` is encoded as a Pauli group element on these qubits:
 `toricXOperatorOfChain L c` has `X` on the qubits of the edges where `c` is `1`
 and `I` elsewhere, and `toricZOperatorOfChain L c` has `Z` there.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

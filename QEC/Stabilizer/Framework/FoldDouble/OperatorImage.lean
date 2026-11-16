@@ -1,9 +1,11 @@
-import QEC.Stabilizer.Framework.FoldDouble.Basic
-import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
-import QEC.Stabilizer.Framework.Core.Stabilizer.Centralizer
-import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
-import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
-import QEC.Stabilizer.Framework.Symplectic.SymplecticImage
+module
+
+public import QEC.Stabilizer.Framework.FoldDouble.Basic
+public import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
+public import QEC.Stabilizer.Framework.Core.Stabilizer.Centralizer
+public import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
+public import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
+public import QEC.Stabilizer.Framework.Symplectic.SymplecticImage
 
 /-!
 # Phase-free images of stabilizer groups
@@ -24,6 +26,8 @@ the phased objects — `StabilizerGroup n`, `centralizer S`,
   stabilizer group. The signs are chosen on an `𝔽₂`-basis of the symplectic
   image, through `negIdentity_not_mem_of_indep_phase_zero_commute`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

@@ -1,6 +1,8 @@
-import Mathlib.LinearAlgebra.Matrix.Notation
-import Mathlib.Basic.Complex.Basic
-import Mathlib.Tactic
+module
+
+public import Mathlib.LinearAlgebra.Matrix.Notation
+public import Mathlib.Basic.Complex.Basic
+public import Mathlib.Tactic
 
 /-!
 # Vectors, norms, and quantum states
@@ -80,6 +82,8 @@ the Hadamard-basis `ketPlus` and `ketMinus`. The scoped Dirac notation for all
 of them (`|0⟩`, `|01⟩`, `|0101⟩`, …) lives in `KetNotation.lean`; `Gates.lean`
 builds the unitary matrices that act on these spaces.
 -/
+
+@[expose] public section
 
 namespace Quantum
 open Matrix

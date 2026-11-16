@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Framework.Homological.SelfDual
-import Mathlib.LinearAlgebra.Matrix.Rank
+module
+
+public import QEC.Stabilizer.Framework.Homological.SelfDual
+public import Mathlib.LinearAlgebra.Matrix.Rank
 
 /-!
 # The binary logical class of a self-dual CSS code
@@ -13,6 +15,8 @@ even-parity part of the zero-syndrome space
 (`mem_range_checkCombination_iff`): the all-ones chain represents the one
 nontrivial logical class.
 -/
+
+@[expose] public section
 
 open scoped BigOperators
 

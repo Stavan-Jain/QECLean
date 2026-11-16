@@ -3,7 +3,10 @@ Copyright (c) 2026 Stavan Jain. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Stavan Jain
 -/
-import QEC.Stabilizer.Foundations.PauliGroup
+module
+
+public import QEC.Stabilizer.Foundations.PauliGroup
+public meta import QEC.Stabilizer.Foundations.PauliGroup
 
 /-!
 # Meta-level evaluation of Pauli expressions
@@ -24,6 +27,8 @@ through the kernel. We therefore evaluate by weak-head normalization, escalating
 through transparency levels and finishing with the kernel evaluator (which
 ignores `@[irreducible]` markers, i.e. sees exactly what `decide` sees).
 -/
+
+public meta section
 
 namespace QECWidgets
 

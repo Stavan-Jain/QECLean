@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Codes.RotatedSurface.DistanceX
+module
+
+public import QEC.Stabilizer.Codes.RotatedSurface.DistanceX
 
 /-!
 # Z-distance of the rotated surface code
@@ -17,6 +19,8 @@ dual cycles (`rsc_finrank_dualCycles_eq_dualBoundaries_add_one`) because, for
 every `HomologicalCode`, the dual homology has the dimension of `H₁`
 (`HomologicalCode.finrank_dualCycles_eq_dualBoundaries_add_H1`).
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

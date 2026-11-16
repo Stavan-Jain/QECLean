@@ -1,16 +1,18 @@
-import QEC.Stabilizer.Codes.Color.Geometry
-import QEC.Stabilizer.Codes.Color.FaceParity
-import QEC.Stabilizer.Codes.Color.Orthogonality
-import QEC.Stabilizer.Codes.Color.Independence
-import QEC.Stabilizer.Codes.Color.Code
-import QEC.Stabilizer.Codes.Color.Logicals
-import QEC.Stabilizer.Codes.Color.Boundary
-import QEC.Stabilizer.Codes.Color.BinaryLogical
-import QEC.Stabilizer.Codes.Color.Energy
-import QEC.Stabilizer.Codes.Color.Spin
-import QEC.Stabilizer.Codes.Color.SpinSum
-import QEC.Stabilizer.Codes.Color.LowerBound
-import QEC.Stabilizer.Codes.Color.Distance
+module
+
+public import QEC.Stabilizer.Codes.Color.Geometry
+public import QEC.Stabilizer.Codes.Color.FaceParity
+public import QEC.Stabilizer.Codes.Color.Orthogonality
+public import QEC.Stabilizer.Codes.Color.Independence
+public import QEC.Stabilizer.Codes.Color.Code
+public import QEC.Stabilizer.Codes.Color.Logicals
+public import QEC.Stabilizer.Codes.Color.Boundary
+public import QEC.Stabilizer.Codes.Color.BinaryLogical
+public import QEC.Stabilizer.Codes.Color.Energy
+public import QEC.Stabilizer.Codes.Color.Spin
+public import QEC.Stabilizer.Codes.Color.SpinSum
+public import QEC.Stabilizer.Codes.Color.LowerBound
+public import QEC.Stabilizer.Codes.Color.Distance
 
 /-!
 # Triangular honeycomb color codes

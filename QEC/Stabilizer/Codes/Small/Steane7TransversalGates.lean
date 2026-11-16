@@ -1,7 +1,9 @@
-import QEC.Stabilizer.Codes.Small.Steane7Logicals
-import QEC.Stabilizer.Foundations.PauliGroup.TransversalConjugation
-import QEC.Stabilizer.Framework.Core.Logical.LogicalCliffordAction
-import QEC.Stabilizer.Framework.Core.Logical.LogicalGates
+module
+
+public import QEC.Stabilizer.Codes.Small.Steane7Logicals
+public import QEC.Stabilizer.Foundations.PauliGroup.TransversalConjugation
+public import QEC.Stabilizer.Framework.Core.Logical.LogicalCliffordAction
+public import QEC.Stabilizer.Framework.Core.Logical.LogicalGates
 
 /-!
 # Transversal `H` and `S` on the Steane code
@@ -30,6 +32,8 @@ every generator into the stabilizer group is a logical gate
 - `transversalH_isLogicalGate`, `transversalH_isLogicalHadamard`
 - `transversalS_isLogicalGate`, `transversalS_isLogicalS`
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

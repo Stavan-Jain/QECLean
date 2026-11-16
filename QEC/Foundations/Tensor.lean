@@ -1,5 +1,7 @@
-import QEC.Foundations.KetNotation
-import QEC.Foundations.Gates
+module
+
+public import QEC.Foundations.KetNotation
+public import QEC.Foundations.Gates
 
 /-!
 # Tensor Products
@@ -29,6 +31,9 @@ component-wise.
   normalized)
 - The Kronecker product satisfies `(A ⊗ B)ᴴ = Aᴴ ⊗ Bᴴ`
 -/
+
+@[expose] public section
+
 namespace Quantum
 
 open Matrix

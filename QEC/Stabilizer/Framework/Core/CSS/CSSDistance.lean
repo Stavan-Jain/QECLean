@@ -1,13 +1,15 @@
-import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
-import QEC.Stabilizer.Framework.Core.Stabilizer.Centralizer
-import QEC.Stabilizer.Framework.Core.CSS.CSSPredicates
-import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
-import QEC.Stabilizer.Foundations.PauliGroup.Notation
-import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
-import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
-import QEC.Stabilizer.Foundations.PauliGroup.Commutation
-import QEC.Stabilizer.Foundations.PauliGroupSingle
-import QEC.Stabilizer.Foundations.BinarySymplectic.SymplecticInner
+module
+
+public import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
+public import QEC.Stabilizer.Framework.Core.Stabilizer.Centralizer
+public import QEC.Stabilizer.Framework.Core.CSS.CSSPredicates
+public import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
+public import QEC.Stabilizer.Foundations.PauliGroup.Notation
+public import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
+public import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
+public import QEC.Stabilizer.Foundations.PauliGroup.Commutation
+public import QEC.Stabilizer.Foundations.PauliGroupSingle
+public import QEC.Stabilizer.Foundations.BinarySymplectic.SymplecticInner
 
 /-!
 # Distance closers for low-weight Paulis
@@ -54,6 +56,8 @@ those matrices:
   where two columns may agree provided the corresponding weight-two operator is
   a stabilizer.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

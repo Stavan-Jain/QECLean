@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Codes.Toric.LogicalCorrespondenceX
-import QEC.Stabilizer.Codes.Toric.WrappingInvariants
+module
+
+public import QEC.Stabilizer.Codes.Toric.LogicalCorrespondenceX
+public import QEC.Stabilizer.Codes.Toric.WrappingInvariants
 
 /-!
 # The X-distance of the toric code is `L`
@@ -13,6 +15,8 @@ import QEC.Stabilizer.Codes.Toric.WrappingInvariants
   `le_edgeWeight_of_not_mem_toricBoundaries`: a cycle that is not a boundary
   has weight at least `L`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

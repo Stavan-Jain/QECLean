@@ -1,9 +1,11 @@
-import Mathlib.LinearAlgebra.Matrix.Defs
-import Mathlib.LinearAlgebra.Matrix.Notation
-import Mathlib.Basic.Complex.Basic
-import Mathlib.Tactic
-import QEC.Foundations.Foundations
-import QEC.Stabilizer.Foundations.PauliGroupSingle.Core
+module
+
+public import Mathlib.LinearAlgebra.Matrix.Defs
+public import Mathlib.LinearAlgebra.Matrix.Notation
+public import Mathlib.Basic.Complex.Basic
+public import Mathlib.Tactic
+public import QEC.Foundations.Foundations
+public import QEC.Stabilizer.Foundations.PauliGroupSingle.Core
 
 /-!
 # Pauli operators: gates, matrices and multiplication
@@ -15,6 +17,8 @@ import QEC.Stabilizer.Foundations.PauliGroupSingle.Core
   up).
 - `PauliOperator.swapXZ`: the map exchanging `X` and `Z`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 open Matrix

@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Codes.Toric.H1Dimension
+module
+
+public import QEC.Stabilizer.Codes.Toric.H1Dimension
 
 /-!
 # Wrapping numbers of toric cycles
@@ -26,6 +28,8 @@ parity `vAt L y c = ∑ x, c (EdgeIdx.v x y)` in every row `y`.
   are not boundaries and have weight `L` (`loopChain_mem_toricBoundaries_iff`,
   `edgeWeight_loopChain_one_zero`, `edgeWeight_loopChain_zero_one`).
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

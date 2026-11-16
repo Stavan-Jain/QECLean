@@ -1,11 +1,13 @@
-import Mathlib.LinearAlgebra.Matrix.Defs
-import Mathlib.LinearAlgebra.Matrix.Notation
-import Mathlib.Basic.Complex.Basic
-import Mathlib.Tactic
-import Mathlib.Algebra.Group.Defs
-import QEC.Foundations.Foundations
-import QEC.Stabilizer.Foundations.PauliGroupSingle
-import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
+module
+
+public import Mathlib.LinearAlgebra.Matrix.Defs
+public import Mathlib.LinearAlgebra.Matrix.Notation
+public import Mathlib.Basic.Complex.Basic
+public import Mathlib.Tactic
+public import Mathlib.Algebra.Group.Defs
+public import QEC.Foundations.Foundations
+public import QEC.Stabilizer.Foundations.PauliGroupSingle
+public import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
 
 /-!
 # The n-qubit Pauli group
@@ -15,6 +17,8 @@ a global phase `i ^ k`. This file defines the type `NQubitPauliGroupElement n`,
 its matrix and gate, the group structure, and the `support` and `weight` of an
 element.
 -/
+
+@[expose] public section
 
 namespace Quantum
 open Matrix

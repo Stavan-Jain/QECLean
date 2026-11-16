@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Framework.Homological.BZCertificate
-import Mathlib.Algebra.BigOperators.Group.Finset.Basic
+module
+
+public import QEC.Stabilizer.Framework.Homological.BZCertificate
+public import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 
 /-!
 # Dual witnesses excluding subset-sum solutions
@@ -19,6 +21,8 @@ a set `support`, that equation only involves the part of `u` outside
 * `no_flat_solution_of_dual`: one witness with value `1` on `rhs` excludes
   every solution inside `support`.
 -/
+
+@[expose] public section
 
 open scoped BigOperators
 namespace Quantum.Stabilizer.Homological

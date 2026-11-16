@@ -1,7 +1,9 @@
-import QEC.Stabilizer.Framework.Homological.BBTransferH1
-import QEC.Stabilizer.Framework.Homological.BBDeficitWall
-import QEC.Stabilizer.Framework.Homological.BBConvRing
-import QEC.Stabilizer.Framework.Homological.BBEpsFreeGroupAlgebra
+module
+
+public import QEC.Stabilizer.Framework.Homological.BBTransferH1
+public import QEC.Stabilizer.Framework.Homological.BBDeficitWall
+public import QEC.Stabilizer.Framework.Homological.BBConvRing
+public import QEC.Stabilizer.Framework.Homological.BBEpsFreeGroupAlgebra
 
 /-!
 # The Bockstein-vanishing criterion from an order-four lift of the deck
@@ -56,6 +58,8 @@ double cover of `G`, and in particular for the cover groups
   lift is the reduction `ZMod (4 * n) × ZMod m → ZMod (2 * n) × ZMod m` and
   `ŝ = (n, t)`. The `_right` versions exchange the two factors.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Framework.Homological.BBCover
-import QEC.Stabilizer.Framework.Homological.BBDuality
+module
+
+public import QEC.Stabilizer.Framework.Homological.BBCover
+public import QEC.Stabilizer.Framework.Homological.BBDuality
 
 /-!
 # The doubling theorem for free double covers of bivariate bicycle codes
@@ -63,6 +65,8 @@ A cover cycle `v` that is not a boundary falls into one of three cases.
 * `chainWeight_ge_of_strongBaseFloor`: from `StrongBaseFloor d` alone, every
   cover cycle that is not a boundary has weight at least `d`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

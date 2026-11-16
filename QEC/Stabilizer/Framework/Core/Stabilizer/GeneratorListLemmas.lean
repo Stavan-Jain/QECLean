@@ -1,6 +1,8 @@
-import Mathlib.Tactic
-import Mathlib.Data.List.OfFn
-import QEC.Stabilizer.Framework.Symplectic.IndependentEquiv
+module
+
+public import Mathlib.Tactic
+public import Mathlib.Data.List.OfFn
+public import QEC.Stabilizer.Framework.Symplectic.IndependentEquiv
 
 /-!
 # Generator lists indexed by a square grid
@@ -11,6 +13,8 @@ list contains every pair (`mem_finRange_product`), so the set of elements of
 the mapped list is the range of the function
 (`listToSet_map_product_finRange_eq_range`).
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

@@ -1,11 +1,13 @@
-import Mathlib.SetTheory.Cardinal.Finite
-import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
-import QEC.Stabilizer.Framework.Core.Stabilizer.Centralizer
-import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
-import QEC.Stabilizer.Framework.Core.Stabilizer.SubgroupLemmas
-import QEC.Stabilizer.Foundations.PauliGroup.Commutation
-import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrix
-import QEC.Stabilizer.Framework.Symplectic.IndependentEquiv
+module
+
+public import Mathlib.SetTheory.Cardinal.Finite
+public import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
+public import QEC.Stabilizer.Framework.Core.Stabilizer.Centralizer
+public import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
+public import QEC.Stabilizer.Framework.Core.Stabilizer.SubgroupLemmas
+public import QEC.Stabilizer.Foundations.PauliGroup.Commutation
+public import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrix
+public import QEC.Stabilizer.Framework.Symplectic.IndependentEquiv
 
 /-!
 # Stabilizer codes `[[n, k]]`
@@ -37,6 +39,8 @@ in `CodespaceDimension.lean`).
   actions, the encoding step of code concatenation, and the `k = 1` centralizer
   classification.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

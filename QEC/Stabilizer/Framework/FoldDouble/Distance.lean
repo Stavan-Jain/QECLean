@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Framework.FoldDouble.Groups
-import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
+module
+
+public import QEC.Stabilizer.Framework.FoldDouble.Groups
+public import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
 
 /-!
 # The fold-and-double distance theorem
@@ -52,6 +54,8 @@ Main results:
   lift, `wt v = wt u + wt (u * b)`, and if moreover `b ∈ T` then
   `wt v ≥ 2 d_K`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

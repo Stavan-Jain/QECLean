@@ -1,8 +1,10 @@
-import QEC.Stabilizer.Foundations.BinarySymplectic.Core
-import QEC.Stabilizer.Foundations.BinarySymplectic.SymplecticInner
-import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrix
-import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrixDecidable
-import QEC.Stabilizer.Foundations.BinarySymplectic.RankCertificate
+module
+
+public import QEC.Stabilizer.Foundations.BinarySymplectic.Core
+public import QEC.Stabilizer.Foundations.BinarySymplectic.SymplecticInner
+public import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrix
+public import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrixDecidable
+public import QEC.Stabilizer.Foundations.BinarySymplectic.RankCertificate
 
 /-!
 # Binary symplectic representation and check matrices

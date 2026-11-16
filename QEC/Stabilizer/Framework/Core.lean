@@ -1,7 +1,9 @@
-import QEC.Stabilizer.Framework.Core.Stabilizer
-import QEC.Stabilizer.Framework.Core.Logical
-import QEC.Stabilizer.Framework.Core.CSS
-import QEC.Stabilizer.Framework.Core.CodeNotation
+module
+
+public import QEC.Stabilizer.Framework.Core.Stabilizer
+public import QEC.Stabilizer.Framework.Core.Logical
+public import QEC.Stabilizer.Framework.Core.CSS
+public import QEC.Stabilizer.Framework.Core.CodeNotation
 
 /-!
 # Framework.Core

@@ -1,10 +1,12 @@
-import QECWidgets.PauliEval
-import QECWidgets.Style
-import QECWidgets.PauliStrip
-import QECWidgets.PauliGoalPanel
-import QECWidgets.ToricLattice
-import QECWidgets.CheckMatrix
-import QECWidgets.Demo
+module
+
+public import QECWidgets.PauliEval
+public import QECWidgets.Style
+public import QECWidgets.PauliStrip
+public import QECWidgets.PauliGoalPanel
+public import QECWidgets.ToricLattice
+public import QECWidgets.CheckMatrix
+public import QECWidgets.Demo
 
 /-!
 # QECWidgets

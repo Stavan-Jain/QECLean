@@ -1,7 +1,9 @@
-import Mathlib.Tactic
-import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
-import QEC.Stabilizer.Framework.Core.CSS.CSSPredicates
-import QEC.Stabilizer.Foundations.PauliGroup.Commutation
+module
+
+public import Mathlib.Tactic
+public import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
+public import QEC.Stabilizer.Framework.Core.CSS.CSSPredicates
+public import QEC.Stabilizer.Foundations.PauliGroup.Commutation
 
 /-!
 # Support lemmas for `set` and for typed operators
@@ -19,6 +21,8 @@ operators:
   `anticommutesAt_iff_mem_support_both_of_XZType`: a Z-type and an X-type
   operator anticommute at qubit `i` iff `i` lies in both supports.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace NQubitPauliOperator

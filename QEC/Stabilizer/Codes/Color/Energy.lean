@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Codes.Color.Geometry
+module
+
+public import QEC.Stabilizer.Codes.Color.Geometry
 
 /-!
 # The shell inequality for the distance of the color code
@@ -25,6 +27,8 @@ The inequality is proved by a sweep along the layer with the potential
 position. The inequalities for the first step, a middle step and the last step
 of the sweep involve finitely many labels and are checked by `decide`.
 -/
+
+@[expose] public section
 
 namespace Quantum.StabilizerGroup.ColorCode
 

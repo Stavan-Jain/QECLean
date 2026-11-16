@@ -1,8 +1,10 @@
-import Mathlib.Data.Finset.Card
-import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
-import QEC.Stabilizer.Foundations.BinarySymplectic.SymplecticInner
-import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
-import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
+module
+
+public import Mathlib.Data.Finset.Card
+public import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
+public import QEC.Stabilizer.Foundations.BinarySymplectic.SymplecticInner
+public import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
+public import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
 
 /-!
 # Weight-two operators in the symplectic span
@@ -20,6 +22,8 @@ check:
   quantifies only over `Fin n`, `Fin n` and two single-qubit Paulis and is
   therefore decidable by enumeration.
 -/
+
+@[expose] public section
 
 namespace Quantum
 

@@ -1,6 +1,8 @@
-import QEC.Stabilizer.Framework.Homological.Generators
-import QEC.Stabilizer.Codes.Toric.Homology
-import QEC.Stabilizer.Codes.Toric.OperatorChains
+module
+
+public import QEC.Stabilizer.Framework.Homological.Generators
+public import QEC.Stabilizer.Codes.Toric.Homology
+public import QEC.Stabilizer.Codes.Toric.OperatorChains
 
 /-!
 # The toric chain complex as a `HomologicalCode`
@@ -20,6 +22,8 @@ The constructions of the general theory specialise to the toric ones:
 * `toricHomologicalCode_singleVtx_eq`, `toricHomologicalCode_singleFace_eq`:
   its indicator chains are `singleVtx` and `singleFace`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

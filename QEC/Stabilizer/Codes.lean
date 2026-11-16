@@ -1,12 +1,14 @@
-import QEC.Stabilizer.Codes._TEMPLATE
-import QEC.Stabilizer.Codes.Toric
-import QEC.Stabilizer.Codes.RotatedSurface
-import QEC.Stabilizer.Codes.Color
-import QEC.Stabilizer.Codes.Repetition
-import QEC.Stabilizer.Codes.Iceberg
-import QEC.Stabilizer.Codes.BivariateBicycle
-import QEC.Stabilizer.Codes.Small
-import QEC.Stabilizer.Codes.Concat
+module
+
+public import QEC.Stabilizer.Codes._TEMPLATE
+public import QEC.Stabilizer.Codes.Toric
+public import QEC.Stabilizer.Codes.RotatedSurface
+public import QEC.Stabilizer.Codes.Color
+public import QEC.Stabilizer.Codes.Repetition
+public import QEC.Stabilizer.Codes.Iceberg
+public import QEC.Stabilizer.Codes.BivariateBicycle
+public import QEC.Stabilizer.Codes.Small
+public import QEC.Stabilizer.Codes.Concat
 
 /-!
 # Codes

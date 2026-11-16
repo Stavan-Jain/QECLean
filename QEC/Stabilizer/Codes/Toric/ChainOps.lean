@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Framework.Homological.Distance
-import QEC.Stabilizer.Codes.Toric.ChainComplex
+module
+
+public import QEC.Stabilizer.Framework.Homological.Distance
+public import QEC.Stabilizer.Codes.Toric.ChainComplex
 
 /-!
 # Algebra of the toric chain operators
@@ -22,6 +24,8 @@ them:
 
 and likewise for `toricZOperatorOfChain`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

@@ -1,7 +1,9 @@
-import Mathlib.Algebra.Group.Defs
-import Mathlib.Tactic
-import QEC.Stabilizer.Foundations.PauliGroupSingle.Core
-import QEC.Stabilizer.Foundations.PauliGroupSingle.Operator
+module
+
+public import Mathlib.Algebra.Group.Defs
+public import Mathlib.Tactic
+public import QEC.Stabilizer.Foundations.PauliGroupSingle.Core
+public import QEC.Stabilizer.Foundations.PauliGroupSingle.Operator
 
 /-!
 # The single-qubit Pauli group
@@ -9,6 +11,8 @@ import QEC.Stabilizer.Foundations.PauliGroupSingle.Operator
 The group structure on `PauliGroupElement`: phases add, and operators multiply
 through `PauliOperator.mulOp`, which contributes its own phase.
 -/
+
+@[expose] public section
 
 namespace Quantum
 

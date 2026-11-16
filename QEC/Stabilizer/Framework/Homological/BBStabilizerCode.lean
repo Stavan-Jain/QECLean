@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Framework.Homological.BBLogicalQubits
+module
+
+public import QEC.Stabilizer.Framework.Homological.BBLogicalQubits
 
 /-!
 # The bivariate bicycle code as a `StabilizerCode`
@@ -35,6 +37,8 @@ particular `A, B` is then a kernel computation.
   closure of the X-checks (rows of `[A | B]`) and the Z-checks (rows of
   `[Bᵀ | Aᵀ]`), as `bbStabilizerCode_toSubgroup` states by `rfl`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

@@ -1,6 +1,8 @@
-import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
-import QEC.Stabilizer.Framework.Core.Stabilizer.Centralizer
-import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
+module
+
+public import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
+public import QEC.Stabilizer.Framework.Core.Stabilizer.Centralizer
+public import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
 
 /-!
 # Logical operators as cosets
@@ -19,6 +21,8 @@ This file defines the element-level predicate `RepresentsNontrivialCoset g S`:
 `g` is in the centralizer of `S` and no element of `S` has the operator part of
 `g`. The quotient `centralizer S ⧸ S` is not constructed.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

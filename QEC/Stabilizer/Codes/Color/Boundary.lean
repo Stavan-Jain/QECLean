@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Codes.Color.Logicals
+module
+
+public import QEC.Stabilizer.Codes.Color.Logicals
 
 /-!
 # A logical operator on the left side of the color-code patch
@@ -11,6 +13,8 @@ so there is an even number of them. It has `2 * r + 1` qubits
 cycle and is not a boundary (`leftBoundary_not_mem_boundaries`). Its X-chain
 operator is therefore a nontrivial logical operator of weight `distance r`.
 -/
+
+@[expose] public section
 
 namespace Quantum.StabilizerGroup.ColorCode
 

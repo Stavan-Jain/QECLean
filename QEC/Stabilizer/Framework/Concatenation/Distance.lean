@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Framework.Concatenation.Correspondence
-import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
+module
+
+public import QEC.Stabilizer.Framework.Concatenation.Correspondence
+public import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
 
 /-!
 # Concatenation: the distance of the concatenated code
@@ -24,6 +26,8 @@ Concatenating an inner code of distance `d₁` with an outer code of distance
 - `ConcatCSSData.concatenateWithDistance`: the concatenated code as a
   `StabilizerCodeWithDistance (n₁ * n₂) k₂ (d₁ * d₂)`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 

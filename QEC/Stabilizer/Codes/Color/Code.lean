@@ -1,6 +1,8 @@
-import QEC.Stabilizer.Codes.Color.Independence
-import QEC.Stabilizer.Codes.Color.Orthogonality
-import QEC.Stabilizer.Framework.Homological.Presentation
+module
+
+public import QEC.Stabilizer.Codes.Color.Independence
+public import QEC.Stabilizer.Codes.Color.Orthogonality
+public import QEC.Stabilizer.Framework.Homological.Presentation
 
 /-!
 # The triangular color code as a stabilizer code
@@ -24,6 +26,8 @@ are (`checkCombination_injective`).
   and boundaries and dual boundaries, coincide (`dualCycles_eq_cycles`,
   `dualBoundaries_eq_boundaries`).
 -/
+
+@[expose] public section
 
 namespace Quantum.StabilizerGroup.ColorCode
 

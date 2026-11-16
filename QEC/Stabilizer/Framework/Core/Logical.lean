@@ -1,9 +1,11 @@
-import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
-import QEC.Stabilizer.Framework.Core.Logical.LogicalOperatorCoset
-import QEC.Stabilizer.Framework.Core.Logical.LogicalGates
-import QEC.Stabilizer.Framework.Core.Logical.LogicalGateGroup
-import QEC.Stabilizer.Framework.Core.Logical.LogicalCliffordAction
-import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
+module
+
+public import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
+public import QEC.Stabilizer.Framework.Core.Logical.LogicalOperatorCoset
+public import QEC.Stabilizer.Framework.Core.Logical.LogicalGates
+public import QEC.Stabilizer.Framework.Core.Logical.LogicalGateGroup
+public import QEC.Stabilizer.Framework.Core.Logical.LogicalCliffordAction
+public import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
 
 /-!
 # Core: logical operators and code distance

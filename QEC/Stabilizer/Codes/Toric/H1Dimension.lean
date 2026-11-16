@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Framework.Homological.ToCode
-import QEC.Stabilizer.Codes.Toric.ChainComplex
+module
+
+public import QEC.Stabilizer.Framework.Homological.ToCode
+public import QEC.Stabilizer.Codes.Toric.ChainComplex
 
 /-!
 # The toric code encodes two qubits: `dim H₁ = 2`
@@ -18,6 +20,8 @@ The connectivity argument rests on `eq_of_forall_next_eq₂`: a function on
 `Fin L × Fin L` that is invariant under the cyclic successor in each coordinate
 is constant.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

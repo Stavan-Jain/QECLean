@@ -1,11 +1,13 @@
-import Mathlib.FieldTheory.Finiteness
-import Mathlib.LinearAlgebra.Dimension.Constructions
-import Mathlib.LinearAlgebra.Dimension.OrzechProperty
-import Mathlib.SetTheory.Cardinal.Finite
-import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrix
-import QEC.Stabilizer.Framework.Core.Stabilizer.Codespace
-import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
-import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
+module
+
+public import Mathlib.FieldTheory.Finiteness
+public import Mathlib.LinearAlgebra.Dimension.Constructions
+public import Mathlib.LinearAlgebra.Dimension.OrzechProperty
+public import Mathlib.SetTheory.Cardinal.Finite
+public import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrix
+public import QEC.Stabilizer.Framework.Core.Stabilizer.Codespace
+public import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
+public import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
 
 /-!
 # The symplectic image of a stabilizer group, and its size
@@ -38,6 +40,8 @@ This is the bridge between the group-level definition of a stabilizer code
   conversely, a generating list whose length is the rank of the symplectic
   image has linearly independent rows.
 -/
+
+@[expose] public section
 
 namespace Quantum
 

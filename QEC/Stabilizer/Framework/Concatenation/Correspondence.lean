@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Framework.Concatenation.Constructor
+module
+
+public import QEC.Stabilizer.Framework.Concatenation.Constructor
 
 /-!
 # Concatenation: the induced outer logical operator
@@ -24,6 +26,8 @@ that the restriction acts as on the logical qubit of the inner code.
   the concatenated code, then `inducedOuter D g` is a nontrivial logical
   operator of the outer code.
 -/
+
+@[expose] public section
 
 namespace Quantum.Concatenation
 

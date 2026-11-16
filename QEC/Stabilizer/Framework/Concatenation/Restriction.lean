@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Framework.Concatenation.Embedding
+module
+
+public import QEC.Stabilizer.Framework.Concatenation.Embedding
 
 /-!
 # Concatenation: block restriction and blockwise commutation
@@ -19,6 +21,8 @@ that operator part. Weight and commutation are both computed block by block:
 - `toSymplectic_eq_sum_embedBlockOp_restrictBlockOp`: an operator is, as a
   symplectic vector, the sum of its embedded block restrictions.
 -/
+
+@[expose] public section
 
 namespace Quantum.Concatenation
 

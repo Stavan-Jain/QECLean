@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Foundations.BinarySymplectic.RankCertificate
-import QEC.Stabilizer.Codes.Toric.StabilizerCode
+module
+
+public import QEC.Stabilizer.Foundations.BinarySymplectic.RankCertificate
+public import QEC.Stabilizer.Codes.Toric.StabilizerCode
 
 /-!
 # Rank certificates for the toric code at `L = 4, 5, 6`
@@ -24,6 +26,8 @@ The certificate literals `rankCert4`, `rankCert5`, `rankCert6` are emitted by
 `lake env lean --run scripts/RankCertificateGen.lean toric4 toric5 toric6`.
 Regenerate them with the script instead of editing them by hand.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Framework.Homological.BBDoubling
+module
+
+public import QEC.Stabilizer.Framework.Homological.BBDoubling
 
 /-!
 # Seam cosets, the kernel of the pullback, and the parity of the floors
@@ -33,6 +35,8 @@ polynomials have an odd number of terms.
   `m`. Equivalently, if a floor fails at an even `m`, it is violated by a chain
   of weight at most `m - 2`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Codes.Concat.SteaneSteane
+module
+
+public import QEC.Stabilizer.Codes.Concat.SteaneSteane
 
 /-!
 # Concatenated codes

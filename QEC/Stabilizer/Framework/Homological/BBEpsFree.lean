@@ -1,6 +1,8 @@
-import QEC.Stabilizer.Framework.Homological.BBDeckTower
-import Mathlib.RingTheory.AdjoinRoot
-import Mathlib.LinearAlgebra.Basis.Basic
+module
+
+public import QEC.Stabilizer.Framework.Homological.BBDeckTower
+public import Mathlib.RingTheory.AdjoinRoot
+public import Mathlib.LinearAlgebra.Basis.Basic
 
 /-!
 # `EpsFree` for chain rings and free extensions
@@ -21,6 +23,8 @@ sources of `EpsFree`:
 together with `hann_of_epsFree`, which extracts the annihilator hypothesis from
 `EpsFree ε 4`, and `two_eq_zero_of_algebra`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

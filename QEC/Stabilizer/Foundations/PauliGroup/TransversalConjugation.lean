@@ -1,11 +1,13 @@
-import Mathlib.Tactic
-import Mathlib.LinearAlgebra.Matrix.Defs
-import Mathlib.Basic.Complex.Basic
-import QEC.Foundations.Tensor
-import QEC.Foundations.Gates
-import QEC.Foundations.GateConjugation
-import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
-import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
+module
+
+public import Mathlib.Tactic
+public import Mathlib.LinearAlgebra.Matrix.Defs
+public import Mathlib.Basic.Complex.Basic
+public import QEC.Foundations.Tensor
+public import QEC.Foundations.Gates
+public import QEC.Foundations.GateConjugation
+public import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
+public import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
 
 /-!
 # Conjugating Pauli operators by uniform transversal gates
@@ -21,6 +23,8 @@ to the Hadamard gate and to the inverse phase gate `inv_S`.
 Conjugation by `U` always means `U P U†`, written out as
 `U * P * star U`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 

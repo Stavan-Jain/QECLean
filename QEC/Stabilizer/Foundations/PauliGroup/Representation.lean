@@ -1,11 +1,13 @@
-import Mathlib.LinearAlgebra.Matrix.Defs
-import Mathlib.LinearAlgebra.Matrix.Notation
-import Mathlib.Basic.Complex.Basic
-import Mathlib.Tactic
-import Mathlib.Algebra.Group.Defs
-import QEC.Foundations.Foundations
-import QEC.Stabilizer.Foundations.PauliGroupSingle
-import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
+module
+
+public import Mathlib.LinearAlgebra.Matrix.Defs
+public import Mathlib.LinearAlgebra.Matrix.Notation
+public import Mathlib.Basic.Complex.Basic
+public import Mathlib.Tactic
+public import Mathlib.Algebra.Group.Defs
+public import QEC.Foundations.Foundations
+public import QEC.Stabilizer.Foundations.PauliGroupSingle
+public import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
 
 /-!
 # Matrix and gate representation of the n-qubit Pauli group
@@ -18,6 +20,8 @@ faithful representations of the n-qubit Pauli group:
 - they are injective (`toMatrix_inj`, `toGate_inj`), which follows from the
   trace orthogonality of Pauli matrices (`NQubitPauliOperator.trace_mul`).
 -/
+
+@[expose] public section
 
 namespace Quantum
 open Matrix

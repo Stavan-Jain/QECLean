@@ -1,6 +1,8 @@
-import Mathlib.LinearAlgebra.Dimension.Constructions
-import Mathlib.LinearAlgebra.FiniteDimensional.Defs
-import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
+module
+
+public import Mathlib.LinearAlgebra.Dimension.Constructions
+public import Mathlib.LinearAlgebra.FiniteDimensional.Defs
+public import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 
 /-!
 # Rank of the composite in an exact transfer sequence
@@ -20,6 +22,8 @@ transformation `σ`.
   when `ker τ ≤ range p`, the equality `dim (range ε) + dim Hb = dim Hc`, hence
   `dim (range ε) = dim Hc - dim Hb`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

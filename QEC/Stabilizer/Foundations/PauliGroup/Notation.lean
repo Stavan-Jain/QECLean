@@ -1,5 +1,8 @@
-import Lean.PrettyPrinter.Delaborator.Basic
-import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
+module
+
+public meta import Lean.PrettyPrinter.Delaborator.Builtins
+meta import Lean.Elab.Command
+public import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
 
 /-!
 # Physics-style construction notation for `NQubitPauliGroupElement`
@@ -75,6 +78,10 @@ at `identity` — is left to the default printer. The delaborators are `scoped`
 with the notation, so a goal only ever shows syntax the current file can parse;
 `set_option pp.notation false` (or `pp.explicit true`) recovers the raw term.
 -/
+
+public section
+
+meta section
 
 namespace Pauli
 
@@ -386,6 +393,8 @@ end Delaborator
 
 end Pauli
 
+end
+
 /-!
 ## Round-trip tests
 
@@ -485,7 +494,7 @@ open Lean Elab Command in
 /-- Display test: elaborate `stx` and check that its pretty-printed text is
 `expected` (`exact := false`: contains `expected`). Run through `run_cmd` so no
 `#`-command is needed. -/
-private def checkDisplay (stx : Syntax) (expected : String) (exact : Bool := true) :
+private meta def checkDisplay (stx : Syntax) (expected : String) (exact : Bool := true) :
     CommandElabM Unit :=
   liftTermElabM do
     let e ← Term.elabTerm stx none

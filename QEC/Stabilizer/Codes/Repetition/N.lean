@@ -1,15 +1,17 @@
-import Mathlib.Tactic
-import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrixDecidable
-import QEC.Stabilizer.Foundations.PauliGroup.Commutation
-import QEC.Stabilizer.Foundations.PauliGroup.Notation
-import QEC.Stabilizer.Framework.Core.CodeNotation
-import QEC.Stabilizer.Framework.Core.CSS.CSSCommutationLemmas
-import QEC.Stabilizer.Framework.Core.CSS.CSSDistance
-import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
-import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
-import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
-import QEC.Stabilizer.Framework.Symplectic.Presentation
-import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
+module
+
+public import Mathlib.Tactic
+public import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrixDecidable
+public import QEC.Stabilizer.Foundations.PauliGroup.Commutation
+public import QEC.Stabilizer.Foundations.PauliGroup.Notation
+public import QEC.Stabilizer.Framework.Core.CodeNotation
+public import QEC.Stabilizer.Framework.Core.CSS.CSSCommutationLemmas
+public import QEC.Stabilizer.Framework.Core.CSS.CSSDistance
+public import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
+public import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
+public import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
+public import QEC.Stabilizer.Framework.Symplectic.Presentation
+public import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
 
 /-!
 # The repetition code on `n + 2` qubits `[[n+2, 1, 1]]`
@@ -43,6 +45,8 @@ The logical basis `X̄ = X⊗ⁿ⁺²`, `Z̄ = Z⊗ⁿ⁺²` (for odd `n + 2`) i
 - Distance 1 (weight-1 logical): `code_has_distance_one`,
   `stabilizerCodeWithDistance : Code[[n+2, 1, 1]]`
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

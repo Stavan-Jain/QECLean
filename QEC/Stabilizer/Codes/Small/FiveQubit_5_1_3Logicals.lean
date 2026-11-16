@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Codes.Small.FiveQubit_5_1_3
+module
+
+public import QEC.Stabilizer.Codes.Small.FiveQubit_5_1_3
 
 /-!
 # The five-qubit code `[[5, 1, 3]]`: logical operators
@@ -15,6 +17,8 @@ with each other (five qubits, an odd number).
 - Centralizer membership `logicalX_mem_centralizer`, `logicalZ_mem_centralizer`
 - `stabilizerCodeWithLogicals : Code[[5, 1]]ₗ`
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

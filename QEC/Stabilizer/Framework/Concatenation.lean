@@ -1,10 +1,12 @@
-import QEC.Stabilizer.Framework.Concatenation.Embedding
-import QEC.Stabilizer.Framework.Concatenation.Restriction
-import QEC.Stabilizer.Framework.Concatenation.Promotion
-import QEC.Stabilizer.Framework.Concatenation.Independence
-import QEC.Stabilizer.Framework.Concatenation.Constructor
-import QEC.Stabilizer.Framework.Concatenation.Correspondence
-import QEC.Stabilizer.Framework.Concatenation.Distance
+module
+
+public import QEC.Stabilizer.Framework.Concatenation.Embedding
+public import QEC.Stabilizer.Framework.Concatenation.Restriction
+public import QEC.Stabilizer.Framework.Concatenation.Promotion
+public import QEC.Stabilizer.Framework.Concatenation.Independence
+public import QEC.Stabilizer.Framework.Concatenation.Constructor
+public import QEC.Stabilizer.Framework.Concatenation.Correspondence
+public import QEC.Stabilizer.Framework.Concatenation.Distance
 
 /-!
 # Concatenation of CSS codes

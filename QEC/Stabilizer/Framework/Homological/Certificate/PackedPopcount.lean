@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Framework.Homological.Certificate.PackedLaneShifts
-import Mathlib.Tactic.FinCases
+module
+
+public import QEC.Stabilizer.Framework.Homological.Certificate.PackedLaneShifts
+public import Mathlib.Tactic.FinCases
 
 /-!
 # Parallel popcounts on packed tables
@@ -17,6 +19,8 @@ originally contained.
   `popcount128_packF` shows that it returns the bit count of every entry
   below `2 ^ 90`.
 -/
+
+@[expose] public section
 
 namespace PackedDigits
 open Quantum.Stabilizer.Homological.F2Mask

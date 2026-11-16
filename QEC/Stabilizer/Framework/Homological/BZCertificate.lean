@@ -1,7 +1,10 @@
-import QEC.Stabilizer.Framework.Homological.F2Mask
-import Mathlib.Algebra.BigOperators.Group.List.Basic
-import Mathlib.Algebra.CharP.Two
-import Mathlib.Data.ZMod.Basic
+module
+
+public import QEC.Stabilizer.Framework.Homological.F2Mask
+public import Batteries.Data.Nat.Bitwise.Lemmas
+public import Mathlib.Algebra.BigOperators.Group.List.Basic
+public import Mathlib.Algebra.CharP.Two
+public import Mathlib.Data.ZMod.Basic
 
 /-!
 # Brouwer–Zimmermann certificates for `𝔽₂` codes
@@ -33,6 +36,8 @@ own auxiliary lemma with its own kernel cache.
 `peelOK_sound` and `kernel_eq_sum_of_peel` are the companion certificate for a
 kernel basis: Gaussian elimination written out as its elimination order.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Framework.Concatenation.Promotion
+module
+
+public import QEC.Stabilizer.Framework.Concatenation.Promotion
 
 /-!
 # Concatenation: independence of the concatenated generators
@@ -25,6 +27,8 @@ whose restrictions all vanish is `0`.
 The pieces are assembled with `rowsLinearIndependent_append_iff` for an appended
 list and `rowsLinearIndependent_map` for a mapped list.
 -/
+
+@[expose] public section
 
 namespace Quantum
 

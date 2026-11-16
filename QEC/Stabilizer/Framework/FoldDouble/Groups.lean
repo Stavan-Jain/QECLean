@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Framework.FoldDouble.OperatorImage
+module
+
+public import QEC.Stabilizer.Framework.FoldDouble.OperatorImage
 
 /-!
 # The four groups of a paired stabilizer code
@@ -39,6 +41,8 @@ The floors `d_K` (`doublingFloor`, the least weight of a doubling logical) and
 `d_P` (`logicalFoldFloor`, the least weight of a logical fold) are defined in
 `ℕ∞`, so that they are `⊤` exactly when the corresponding set is empty.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

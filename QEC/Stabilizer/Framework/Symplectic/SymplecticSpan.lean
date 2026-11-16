@@ -1,16 +1,18 @@
-import Mathlib.Data.ZMod.Basic
-import Mathlib.LinearAlgebra.Dimension.OrzechProperty
-import Mathlib.LinearAlgebra.Span.Basic
-import Mathlib.Data.List.Basic
-import Mathlib.Data.Finset.NoncommProd
-import Mathlib.Tactic
-import QEC.Stabilizer.Foundations.BinarySymplectic.Core
-import QEC.Stabilizer.Foundations.BinarySymplectic.SymplecticInner
-import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrix
-import QEC.Stabilizer.Framework.Symplectic.IndependentEquiv
-import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
-import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
-import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
+module
+
+public import Mathlib.Data.ZMod.Basic
+public import Mathlib.LinearAlgebra.Dimension.OrzechProperty
+public import Mathlib.LinearAlgebra.Span.Basic
+public import Mathlib.Data.List.Basic
+public import Mathlib.Data.Finset.NoncommProd
+public import Mathlib.Tactic
+public import QEC.Stabilizer.Foundations.BinarySymplectic.Core
+public import QEC.Stabilizer.Foundations.BinarySymplectic.SymplecticInner
+public import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrix
+public import QEC.Stabilizer.Framework.Symplectic.IndependentEquiv
+public import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
+public import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
+public import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
 
 /-!
 # Symplectic span of a generator list
@@ -39,6 +41,8 @@ they form a subspace (`mem_span_image_toSymplectic_iff`), which is spanned by
 the symplectic vectors of any generating set
 (`span_image_toSymplectic_closure`).
 -/
+
+@[expose] public section
 
 namespace Quantum
 

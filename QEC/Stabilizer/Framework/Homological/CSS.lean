@@ -1,6 +1,8 @@
-import QEC.Stabilizer.Framework.Homological.Code
-import QEC.Stabilizer.Foundations.PauliGroup
-import QEC.Stabilizer.Framework.Core
+module
+
+public import QEC.Stabilizer.Framework.Homological.Code
+public import QEC.Stabilizer.Foundations.PauliGroup
+public import QEC.Stabilizer.Framework.Core
 
 /-!
 # Chain operators of a homological code
@@ -27,6 +29,8 @@ Main results:
   the X-chain operator of its X-support chain, and a Z-type element the
   Z-chain operator of its Z-support chain.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

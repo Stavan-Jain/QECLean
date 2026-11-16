@@ -1,5 +1,7 @@
-import QEC.Foundations.Basic
-import QEC.Foundations.KetNotation
-import QEC.Foundations.Gates
-import QEC.Foundations.Tensor
-import QEC.Foundations.GateConjugation
+module
+
+public import QEC.Foundations.Basic
+public import QEC.Foundations.KetNotation
+public import QEC.Foundations.Gates
+public import QEC.Foundations.Tensor
+public import QEC.Foundations.GateConjugation

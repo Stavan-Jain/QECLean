@@ -248,7 +248,9 @@ Contributions are welcome! If you add new modules or definitions, please:
 
 1. **Import new modules in their umbrella file** (for example
    `QEC/Stabilizer/Codes/Small.lean`). Run `bash scripts/check-umbrellas.sh` to
-   catch orphaned modules.
+   catch orphaned modules. The library uses Lean's module system: a new file
+   starts with `module`, uses `public import`, and opens with
+   `@[expose] public section` (see [`CLAUDE.md`](CLAUDE.md) § "Module system").
 2. **Keep the axiom policy.** Don't use `native_decide`, `sorry`, or custom
    `axiom`s on `main`. If you need an unproven input, make it a named hypothesis
    on the theorem.

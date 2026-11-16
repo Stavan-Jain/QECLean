@@ -3,7 +3,9 @@ Copyright (c) 2026 Stavan Jain. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Stavan Jain
 -/
-import ProofWidgets.Component.HtmlDisplay
+module
+
+public import ProofWidgets.Component.HtmlDisplay
 
 /-!
 # Design tokens and stylesheet for the QEC widgets
@@ -20,6 +22,8 @@ instead of a repeated style object).
 Every card embeds the stylesheet via `styleTag`; duplicate `<style>` tags in one
 webview are idempotent, so cards stay self-contained.
 -/
+
+public meta section
 
 namespace QECWidgets
 

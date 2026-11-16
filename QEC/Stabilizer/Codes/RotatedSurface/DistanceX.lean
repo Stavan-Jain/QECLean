@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Codes.RotatedSurface.StabilizerCode
+module
+
+public import QEC.Stabilizer.Codes.RotatedSurface.StabilizerCode
 
 /-!
 # X-distance of the rotated surface code
@@ -19,6 +21,8 @@ number of qubits in every row (`sum_row_rscBoundary2`), the middle column
 `middleColChain L` has one (`sum_row_middleColChain`), and the boundaries have
 codimension one in the cycles (`rsc_finrank_cycles_eq_boundaries_add_one`).
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

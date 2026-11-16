@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Codes.Iceberg.N
-import QEC.Stabilizer.Codes.Iceberg.NLogicals
+module
+
+public import QEC.Stabilizer.Codes.Iceberg.N
+public import QEC.Stabilizer.Codes.Iceberg.NLogicals
 
 /-!
 # Iceberg codes

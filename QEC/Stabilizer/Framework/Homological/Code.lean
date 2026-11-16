@@ -1,4 +1,7 @@
-import Mathlib.Tactic
+module
+
+meta import Lean.Elab.Command
+public import Mathlib.Tactic
 
 /-!
 # Length-3 chain complexes over `ZMod 2`
@@ -33,6 +36,8 @@ The notation `dim₂ V` (scope `Homology`) abbreviates
 `Module.finrank (ZMod 2) V`.
 -/
 
+@[expose] public section
+
 /-- `dim₂ V` is `Module.finrank (ZMod 2) V`, the `𝔽₂`-dimension of a chain
 space, cycle space, or homology group. It elaborates to exactly
 `Module.finrank (ZMod 2) V`, and is printed back while the scope is open.
@@ -50,7 +55,7 @@ open Lean Elab Command in
 /-- Display test: elaborate `stx` and check that its pretty-printed text is
 `expected` (`exact := false`: contains `expected`). Run through `run_cmd` so no
 `#`-command is needed. -/
-private def checkDisplay (stx : Syntax) (expected : String) (exact : Bool := true) :
+private meta def checkDisplay (stx : Syntax) (expected : String) (exact : Bool := true) :
     CommandElabM Unit :=
   liftTermElabM do
     let e ← Term.elabTerm stx none

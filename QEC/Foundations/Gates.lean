@@ -1,9 +1,11 @@
-import Mathlib.LinearAlgebra.Matrix.Defs
-import Mathlib.LinearAlgebra.Matrix.Notation
-import Mathlib.Basic.Complex.Basic
-import Mathlib.Tactic
-import Mathlib.LinearAlgebra.UnitaryGroup
-import QEC.Foundations.KetNotation
+module
+
+public import Mathlib.LinearAlgebra.Matrix.Defs
+public import Mathlib.LinearAlgebra.Matrix.Notation
+public import Mathlib.Basic.Complex.Basic
+public import Mathlib.Tactic
+public import Mathlib.LinearAlgebra.UnitaryGroup
+public import QEC.Foundations.KetNotation
 
 /-!
 # Unitary gates as matrices
@@ -31,6 +33,8 @@ acting on finite-dimensional complex Hilbert spaces indexed by a basis type `α`
 
 Depends on `Basic.lean` for `QubitBasis`, `NQubitBasis`, and state types.
 -/
+
+@[expose] public section
 
 namespace Quantum
 open Matrix

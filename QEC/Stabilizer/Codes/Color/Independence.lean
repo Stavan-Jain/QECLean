@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Codes.Color.Geometry
-import QEC.Stabilizer.Framework.Homological.SelfDual
+module
+
+public import QEC.Stabilizer.Codes.Color.Geometry
+public import QEC.Stabilizer.Framework.Homological.SelfDual
 
 /-!
 # Independence of the face checks of the color code
@@ -13,6 +15,8 @@ nonzero coefficient in the earliest possible row would be the only such face
 at its upper qubit. Equivalently the check-combination map is injective
 (`checkCombination_injective`).
 -/
+
+@[expose] public section
 
 namespace Quantum.StabilizerGroup.ColorCode
 

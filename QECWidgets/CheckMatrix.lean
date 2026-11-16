@@ -3,8 +3,10 @@ Copyright (c) 2026 Stavan Jain. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Stavan Jain
 -/
-import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrix
-import QECWidgets.PauliStrip
+module
+
+public import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrix
+public import QECWidgets.PauliStrip
 
 /-!
 # Check-matrix heatmap
@@ -23,6 +25,8 @@ Renders a concrete generator list `L : List (NQubitPauliGroupElement n)` as:
 Use `#check_matrix gens`, or the `Check matrix` expression presenter via
 `ProofWidgets.SelectionPanel`.
 -/
+
+public meta section
 
 namespace QECWidgets
 

@@ -81,6 +81,16 @@ generators (`maxCheckRows`).
   mathlib's `linter.style.header` checks, so every content file needs the
   standard mathlib copyright block. (Files under `QEC/` dodge this only
   because the root imports them through umbrella files.)
+- **Every file is a `module` with a `public meta section`.** The copyright
+  block comes first, then `module`, then `public import` lines, the module
+  docstring, and `public meta section` (widget code runs at elaboration time,
+  so all of it is `meta`). If a widget *evaluates* a library definition rather
+  than just reducing an expression that mentions it, the defining module needs
+  a `public meta import` as well as the `public import` — `PauliEval.lean`
+  does this for the Pauli types. `Demo.lean` only uses the commands, so it has
+  an ordinary `@[expose] public section`. Write the HTML type as
+  `ProofWidgets.Html`; it is `protected`, and a bare `Html` under `open Lean`
+  means core's `Lean.Html`.
 - **Every `#`-command must log a message.** `linter.hashCommand` flags
   `#`-commands that emit nothing; the text summaries exist partly for this.
   Do not suppress the linter — emit useful text instead.

@@ -588,20 +588,74 @@ Rules of thumb:
 
 `lean-toolchain` is the single pin; mathlib tracks `master` (unpinned in
 `lakefile.toml`) and LeanArchitect is pinned to the tag matching the toolchain.
-Two things in `lakefile.toml` look arbitrary and are not:
+One thing in `lakefile.toml` looks arbitrary and is not:
 
 - **`require mathlib` must stay last.** Lake lets a later `require` win when
   two packages pin a shared dependency differently; LeanArchitect's tag pins
   batteries at the toolchain tag while mathlib master has usually moved past
   it. If mathlib's pins lose, `lake exe cache get` computes hashes that match
   nothing and falls back to building mathlib from source.
-- **`allowNonModules = true`.** mathlib is written for Lean's module system
-  and Lake warns on every non-`module` file that imports it. QEC is not ported
-  to the module system; the flag records that decision in one place.
-
 In `QECWidgets/`, ProofWidgets' HTML type is always written `ProofWidgets.Html`:
 it is `protected`, and core Lean has its own `Lean.Html`, which a bare `Html`
 under `open Lean` resolves to.
+
+## Module system
+
+Every file under `QEC/`, the root modules (`QEC.lean`, `QECLight.lean`,
+`QECBlueprint.lean`, `QECWidgets.lean`) and `QECWidgets/` is a Lean **module**.
+mathlib requires this of its importers (Lake warns otherwise), and a module can
+only import other modules, so a new file must follow the same shape or it will
+not build:
+
+```lean
+module
+
+public import Mathlib.Tactic
+public import QEC.Stabilizer.Foundations.PauliGroup
+
+/-!
+# Module docstring
+-/
+
+@[expose] public section
+
+namespace Quantum
+…
+```
+
+- **`public import`, always.** A plain `import` hides the imported names from
+  every public signature in the file. Umbrella files are `module` plus
+  `public import` lines and nothing else.
+- **`@[expose] public section`** makes every declaration public *and* keeps
+  definition bodies unfoldable downstream. The kernel `decide` proofs, `rfl`
+  lemmas and `simp [foo]` unfoldings all depend on that; do not drop
+  `@[expose]` from a file of mathematics.
+- **Imports are no longer transitive through private imports.** A lemma that
+  used to arrive via some mathlib file's internal import now fails with
+  `Unknown constant` — import its module explicitly
+  (`Mathlib.Data.List.GetD` for `List.getD_eq_getElem`,
+  `Batteries.Data.Nat.Bitwise.Lemmas` for the `Nat.xor_*` lemmas).
+- **Metaprograms are `meta`.** `syntax`, `macro`, `macro_rules`, `notation` and
+  `elab` take care of themselves, but every helper they call, and every
+  `@[app_unexpander]` / `@[app_delab]` / `@[delab]` function, must be a
+  `meta def`, and the Lean modules they use must be `meta import`ed
+  (`public meta import Lean.PrettyPrinter.Delaborator.Builtins` for
+  delaborators; a private `meta import Lean.Elab.Command` for a `run_cmd`
+  display test). Two layouts are in use:
+  - a file that is *only* notation (`Foundations/KetNotation.lean`,
+    `PauliGroup/Notation.lean`): `public section` without `@[expose]`, and the
+    implementation inside a `meta section`;
+  - notation embedded in a file of mathematics (`SymplecticInner.lean`,
+    `BBChainComplex.lean`): keep `@[expose] public section`, put the
+    implementation in a `meta section` or mark the functions `meta def`, and
+    put `@[no_expose]` on a public meta function that calls `private` helpers
+    (an exposed body may not mention a private name).
+- **`QECWidgets/`** files use `public meta section` throughout, and
+  `PauliEval.lean` both `public import`s and `public meta import`s the Pauli
+  modules, because the widgets *run* `PauliOperator` code at elaboration time.
+- **Scripts stay plain files.** `Playground.lean` and `scripts/*.lean` are not
+  in any `lean_lib`; a non-module file may import modules and sees everything,
+  proofs included, which is what `scripts/AxiomCheck.lean` relies on.
 
 ## Worktrees: reuse the main repo's prebuilt mathlib
 
@@ -899,7 +953,7 @@ umbrella (`Codes.lean`, `Framework.lean`, …). Files not in any umbrella
 are unreachable from the default `lake build` target — never compiled,
 never linted, errors silently hidden. `QuantumHamming.lean` sat in this
 orphan state with two stale `Nat.xor_*` references that `lake build`
-never surfaced. When adding a module, append the import to the immediate
+never surfaced. When adding a module, append a `public import` to the immediate
 umbrella; the chain to `Stabilizer.lean` takes care of itself.
 `bash scripts/check-umbrellas.sh` verifies the whole tree (run it after
 adding or moving modules).

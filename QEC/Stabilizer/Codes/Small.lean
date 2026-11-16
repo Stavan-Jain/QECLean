@@ -1,18 +1,20 @@
-import QEC.Stabilizer.Codes.Small.CSS_4_1_2
-import QEC.Stabilizer.Codes.Small.CSS_4_1_2Logicals
-import QEC.Stabilizer.Codes.Small.FiveQubit_5_1_3
-import QEC.Stabilizer.Codes.Small.FiveQubit_5_1_3Logicals
-import QEC.Stabilizer.Codes.Small.FourQubit_4_2_2
-import QEC.Stabilizer.Codes.Small.FourQubit_4_2_2Logicals
-import QEC.Stabilizer.Codes.Small.QuantumHamming
-import QEC.Stabilizer.Codes.Small.QuantumHammingLogicals
-import QEC.Stabilizer.Codes.Small.Shor9
-import QEC.Stabilizer.Codes.Small.Shor9Logicals
-import QEC.Stabilizer.Codes.Small.SixQubit_6_2_2
-import QEC.Stabilizer.Codes.Small.SixQubit_6_2_2Logicals
-import QEC.Stabilizer.Codes.Small.Steane7
-import QEC.Stabilizer.Codes.Small.Steane7Logicals
-import QEC.Stabilizer.Codes.Small.Steane7TransversalGates
+module
+
+public import QEC.Stabilizer.Codes.Small.CSS_4_1_2
+public import QEC.Stabilizer.Codes.Small.CSS_4_1_2Logicals
+public import QEC.Stabilizer.Codes.Small.FiveQubit_5_1_3
+public import QEC.Stabilizer.Codes.Small.FiveQubit_5_1_3Logicals
+public import QEC.Stabilizer.Codes.Small.FourQubit_4_2_2
+public import QEC.Stabilizer.Codes.Small.FourQubit_4_2_2Logicals
+public import QEC.Stabilizer.Codes.Small.QuantumHamming
+public import QEC.Stabilizer.Codes.Small.QuantumHammingLogicals
+public import QEC.Stabilizer.Codes.Small.Shor9
+public import QEC.Stabilizer.Codes.Small.Shor9Logicals
+public import QEC.Stabilizer.Codes.Small.SixQubit_6_2_2
+public import QEC.Stabilizer.Codes.Small.SixQubit_6_2_2Logicals
+public import QEC.Stabilizer.Codes.Small.Steane7
+public import QEC.Stabilizer.Codes.Small.Steane7Logicals
+public import QEC.Stabilizer.Codes.Small.Steane7TransversalGates
 
 /-!
 # Small concrete codes

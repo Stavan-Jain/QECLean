@@ -1,5 +1,7 @@
-import Mathlib.Tactic
-import QEC.Stabilizer.Codes.Toric.Chains
+module
+
+public import Mathlib.Tactic
+public import QEC.Stabilizer.Codes.Toric.Chains
 
 /-!
 # Boundary maps of the toric chain complex
@@ -30,6 +32,8 @@ The scoped notations `∂₂`, `∂₁` and `δ⁰` (scope `ToricChain`) stand f
 three maps. The lattice size stays an explicit argument, as in `∂₁ L c`, and
 the declaration names are still the ones to use in `simp` and `unfold`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

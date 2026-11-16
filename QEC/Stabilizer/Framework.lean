@@ -1,8 +1,10 @@
-import QEC.Stabilizer.Framework.Core
-import QEC.Stabilizer.Framework.Symplectic
-import QEC.Stabilizer.Framework.Homological
-import QEC.Stabilizer.Framework.Concatenation
-import QEC.Stabilizer.Framework.FoldDouble
+module
+
+public import QEC.Stabilizer.Framework.Core
+public import QEC.Stabilizer.Framework.Symplectic
+public import QEC.Stabilizer.Framework.Homological
+public import QEC.Stabilizer.Framework.Concatenation
+public import QEC.Stabilizer.Framework.FoldDouble
 
 /-!
 # Framework

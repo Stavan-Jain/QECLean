@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Codes.Color.Logicals
-import QEC.Stabilizer.Framework.Homological.SelfDualLogical
+module
+
+public import QEC.Stabilizer.Codes.Color.Logicals
+public import QEC.Stabilizer.Framework.Homological.SelfDualLogical
 
 /-!
 # The logical class of the triangular color code over `ZMod 2`
@@ -15,6 +17,8 @@ are nontrivial logical operators are those of the odd cycles
 (`chainXOperator_nontrivial_iff_odd_cycle`,
 `chainZOperator_nontrivial_iff_odd_cycle`).
 -/
+
+@[expose] public section
 
 namespace Quantum.StabilizerGroup.ColorCode
 

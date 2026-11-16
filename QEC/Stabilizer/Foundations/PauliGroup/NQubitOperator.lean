@@ -1,10 +1,12 @@
-import Mathlib.LinearAlgebra.Matrix.Defs
-import Mathlib.LinearAlgebra.Matrix.Notation
-import Mathlib.Basic.Complex.Basic
-import Mathlib.Tactic
-import Mathlib.Algebra.Group.Defs
-import QEC.Foundations.Foundations
-import QEC.Stabilizer.Foundations.PauliGroupSingle
+module
+
+public import Mathlib.LinearAlgebra.Matrix.Defs
+public import Mathlib.LinearAlgebra.Matrix.Notation
+public import Mathlib.Basic.Complex.Basic
+public import Mathlib.Tactic
+public import Mathlib.Algebra.Group.Defs
+public import QEC.Foundations.Foundations
+public import QEC.Stabilizer.Foundations.PauliGroupSingle
 
 /-!
 # N-qubit Pauli operators
@@ -16,6 +18,8 @@ import QEC.Stabilizer.Foundations.PauliGroupSingle
   constructors (`identity`, `X`, `Y`, `Z`, `set`), its matrix and gate
   (`toMatrix`, `toGate`), and its `support` and `weight`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 open Matrix

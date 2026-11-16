@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Framework.Homological.StabGroup
-import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
+module
+
+public import QEC.Stabilizer.Framework.Homological.StabGroup
+public import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
 
 /-!
 # Logical operators of a homological CSS code and homology
@@ -32,6 +34,8 @@ Z-type and an X-type element: a stabilizer element with X-type operator part is
 a product of X-checks (`xType_in_stabilizer_implies_in_XClosure`), and likewise
 for Z (`zType_in_stabilizer_implies_in_ZClosure`).
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Framework.FoldDouble.Distance
+module
+
+public import QEC.Stabilizer.Framework.FoldDouble.Distance
 
 /-!
 # The fold trichotomy bound, and doubling in weight form
@@ -37,6 +39,8 @@ necessary for the conclusion. The witness hypothesis (W) of that theorem is not
 needed either: a minimum-weight nontrivial logical operator of `F` cannot be a
 seam logical once every seam logical has weight `≥ 2 d₀`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

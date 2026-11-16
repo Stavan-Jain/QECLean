@@ -1,14 +1,16 @@
-import QEC.Foundations.Foundations
-import QEC.Stabilizer.Foundations
-import QEC.Stabilizer.Geometry
-import QEC.Stabilizer.Framework
-import QEC.Stabilizer.Codes.Toric
-import QEC.Stabilizer.Codes.RotatedSurface
-import QEC.Stabilizer.Codes.Color
-import QEC.Stabilizer.Codes.Repetition
-import QEC.Stabilizer.Codes.Iceberg
-import QEC.Stabilizer.Codes.Small
-import QEC.Stabilizer.Codes.Concat
+module
+
+public import QEC.Foundations.Foundations
+public import QEC.Stabilizer.Foundations
+public import QEC.Stabilizer.Geometry
+public import QEC.Stabilizer.Framework
+public import QEC.Stabilizer.Codes.Toric
+public import QEC.Stabilizer.Codes.RotatedSurface
+public import QEC.Stabilizer.Codes.Color
+public import QEC.Stabilizer.Codes.Repetition
+public import QEC.Stabilizer.Codes.Iceberg
+public import QEC.Stabilizer.Codes.Small
+public import QEC.Stabilizer.Codes.Concat
 
 /-!
 # QECLight

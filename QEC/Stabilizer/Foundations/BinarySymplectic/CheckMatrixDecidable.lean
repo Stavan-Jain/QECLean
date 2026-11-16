@@ -1,7 +1,9 @@
-import Mathlib.Data.ZMod.Basic
-import Mathlib.LinearAlgebra.LinearIndependent.Defs
-import Mathlib.Tactic
-import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrix
+module
+
+public import Mathlib.Data.ZMod.Basic
+public import Mathlib.LinearAlgebra.LinearIndependent.Defs
+public import Mathlib.Tactic
+public import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrix
 
 /-!
 # Decidability of `rowsLinearIndependent`
@@ -15,6 +17,8 @@ That is `2 ^ L.length` cases: fine for small codes, but out of reach for large
 ones (roughly more than 20 rows). There, use the polynomial-time certificate
 `rowsLinearIndependent_of_rankCertCheck` instead.
 -/
+
+@[expose] public section
 
 namespace Quantum
 

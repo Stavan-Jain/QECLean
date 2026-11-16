@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Framework.Homological.Certificate.PackedPopcount
+module
+
+public import QEC.Stabilizer.Framework.Homological.Certificate.PackedPopcount
 
 /-!
 # Packed rectangular tables
@@ -8,6 +10,8 @@ Packing a table row by row equals packing its flattened entries
 (`packF_broadcast_rows`) and column values (`packF_broadcast_cols`) across the
 rectangle, so one packed operation can process many rows together.
 -/
+
+@[expose] public section
 
 namespace PackedDigits
 

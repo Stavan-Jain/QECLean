@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Codes.Color.BinaryLogical
-import QEC.Stabilizer.Codes.Color.SpinSum
+module
+
+public import QEC.Stabilizer.Codes.Color.BinaryLogical
+public import QEC.Stabilizer.Codes.Color.SpinSum
 
 /-!
 # The lower bound on the weight of the odd cycles of the color code
@@ -13,6 +15,8 @@ chain plus a combination of face checks, and every cycle of odd parity has
 this form, every cycle of odd parity has weight at least `distance r`
 (`odd_cycle_weight_lower_bound`).
 -/
+
+@[expose] public section
 
 namespace Quantum.StabilizerGroup.ColorCode
 

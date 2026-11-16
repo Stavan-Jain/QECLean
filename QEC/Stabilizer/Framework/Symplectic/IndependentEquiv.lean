@@ -1,12 +1,14 @@
-import Mathlib.Data.List.OfFn
-import Mathlib.LinearAlgebra.LinearIndependent.Basic
-import Mathlib.LinearAlgebra.Finsupp.LinearCombination
-import Mathlib.LinearAlgebra.Span.Basic
-import QEC.Stabilizer.Foundations.BinarySymplectic.Core
-import QEC.Stabilizer.Foundations.BinarySymplectic.SymplecticInner
-import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrix
-import QEC.Stabilizer.Framework.Core.Stabilizer.SubgroupLemmas
-import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
+module
+
+public import Mathlib.Data.List.OfFn
+public import Mathlib.LinearAlgebra.LinearIndependent.Basic
+public import Mathlib.LinearAlgebra.Finsupp.LinearCombination
+public import Mathlib.LinearAlgebra.Span.Basic
+public import QEC.Stabilizer.Foundations.BinarySymplectic.Core
+public import QEC.Stabilizer.Foundations.BinarySymplectic.SymplecticInner
+public import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrix
+public import QEC.Stabilizer.Framework.Core.Stabilizer.SubgroupLemmas
+public import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
 
 /-!
 # From row independence to independent generators
@@ -34,6 +36,8 @@ For a list `L` of n-qubit Pauli group elements, this file provides:
 The converse of the last statement fails: the 1-qubit list `[X, Y, Z]` is an
 independent generating set, but its check-matrix rows are linearly dependent.
 -/
+
+@[expose] public section
 
 namespace Quantum
 

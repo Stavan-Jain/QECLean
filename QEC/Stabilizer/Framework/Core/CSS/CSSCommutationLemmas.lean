@@ -1,6 +1,8 @@
-import Mathlib.Tactic
-import QEC.Stabilizer.Framework.Core.CSS.CSSNoNegI
-import QEC.Stabilizer.Foundations.PauliGroup.Commutation
+module
+
+public import Mathlib.Tactic
+public import QEC.Stabilizer.Framework.Core.CSS.CSSNoNegI
+public import QEC.Stabilizer.Foundations.PauliGroup.Commutation
 
 /-!
 # Commutation of typed elements
@@ -15,6 +17,8 @@ So the Z-type generators of a CSS code commute among themselves, as do the
 X-type generators, and only the commutation of a Z-type generator with an
 X-type generator depends on the code.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace NQubitPauliGroupElement

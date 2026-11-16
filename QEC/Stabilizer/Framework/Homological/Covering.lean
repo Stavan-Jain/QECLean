@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Framework.Homological.BBChainComplex
+module
+
+public import QEC.Stabilizer.Framework.Homological.BBChainComplex
 
 /-!
 # Pushforward and pullback of `ZMod 2`-chains along a covering
@@ -32,6 +34,8 @@ Transfer of chains along a map of index types, in four layers.
    `fiberSum_bbBoundary2Fn`, `pullback_bbBoundary1Fn`,
    `pullback_bbBoundary2Fn`).
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

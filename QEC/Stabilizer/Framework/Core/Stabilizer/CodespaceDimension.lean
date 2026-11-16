@@ -1,6 +1,8 @@
-import Mathlib.LinearAlgebra.Trace
-import QEC.Stabilizer.Framework.Core.Stabilizer.Codespace
-import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
+module
+
+public import Mathlib.LinearAlgebra.Trace
+public import QEC.Stabilizer.Framework.Core.Stabilizer.Codespace
+public import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
 
 /-!
 # Dimension of a stabilizer codespace
@@ -12,6 +14,8 @@ its range, so `dim (codespace) * |S| = 2 ^ n` (`finrank_codespace_mul_card`).
 In particular a `StabilizerCode n k` has codespace dimension exactly `2 ^ k`
 (`StabilizerCode.finrank_codespace`).
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

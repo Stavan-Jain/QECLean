@@ -1,9 +1,11 @@
-import Mathlib.LinearAlgebra.Matrix.Defs
-import Mathlib.LinearAlgebra.Matrix.Notation
-import Mathlib.Algebra.Group.Subgroup.Basic
-import QEC.Foundations.Foundations
-import QEC.Stabilizer.Framework.Core.Stabilizer.Codespace
-import QEC.Stabilizer.Foundations.PauliGroup
+module
+
+public import Mathlib.LinearAlgebra.Matrix.Defs
+public import Mathlib.LinearAlgebra.Matrix.Notation
+public import Mathlib.Algebra.Group.Subgroup.Basic
+public import QEC.Foundations.Foundations
+public import QEC.Stabilizer.Framework.Core.Stabilizer.Codespace
+public import QEC.Stabilizer.Foundations.PauliGroup
 
 /-!
 # Logical gate group
@@ -20,6 +22,8 @@ Membership has two equivalent formulations:
 - `mem_logicalGateGroup_iff_conjugation`: for every `g ∈ S`, the conjugate
   `U g U†` fixes every codespace state.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

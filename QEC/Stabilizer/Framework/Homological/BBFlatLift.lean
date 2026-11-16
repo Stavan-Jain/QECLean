@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Framework.Homological.BBDoubling
+module
+
+public import QEC.Stabilizer.Framework.Homological.BBDoubling
 
 /-!
 # Cover cycles over a flat boundary
@@ -26,6 +28,8 @@ exactly.
   `|v| ≥ 2 * d`. This bounds the cycles of the dangerous sector of the doubling
   theorem that lie over the base boundary `p c`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

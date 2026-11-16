@@ -1,6 +1,8 @@
-import QEC.Stabilizer.Framework.Homological.BBEpsFree
-import Mathlib.RingTheory.Ideal.Quotient.Operations
-import Mathlib.Data.ZMod.Basic
+module
+
+public import QEC.Stabilizer.Framework.Homological.BBEpsFree
+public import Mathlib.RingTheory.Ideal.Quotient.Operations
+public import Mathlib.Data.ZMod.Basic
 
 /-!
 # The Bockstein composite vanishes on representatives
@@ -37,6 +39,8 @@ ideal membership is spelled out as an equation.
 `bockstein_element_form_deck` is the instance `R = 𝔽₂[X] ⧸ (X ^ 4)`, `ε = X`,
 which is the group algebra of `ℤ/4` with `X = 1 + σ`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

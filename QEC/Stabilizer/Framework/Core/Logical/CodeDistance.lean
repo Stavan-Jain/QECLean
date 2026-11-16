@@ -1,6 +1,8 @@
-import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
-import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
-import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
+module
+
+public import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
+public import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
+public import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
 
 /-!
 # Code distance `[[n, k, d]]`
@@ -18,6 +20,8 @@ and corrects every error of weight less than `d / 2`.
 - `StabilizerCodeWithDistance n k d`: a stabilizer code bundled with a proof
   that its distance is `d`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

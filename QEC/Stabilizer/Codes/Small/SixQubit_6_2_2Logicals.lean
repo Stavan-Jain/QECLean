@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Codes.Small.SixQubit_6_2_2
+module
+
+public import QEC.Stabilizer.Codes.Small.SixQubit_6_2_2
 
 /-!
 # The six-qubit code `C₆`, `[[6, 2, 2]]`: logical operators
@@ -24,6 +26,8 @@ type).
   `logicalZ_ℓ_mem_centralizer`
 - `stabilizerCodeWithLogicals : Code[[6, 2]]ₗ`
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

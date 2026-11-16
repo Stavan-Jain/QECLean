@@ -1,8 +1,10 @@
-import Mathlib.Data.ZMod.Basic
-import Mathlib.Tactic
-import QEC.Stabilizer.Foundations.PauliGroupSingle
-import QEC.Stabilizer.Foundations.PauliGroupSingle.Operator
-import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
+module
+
+public import Mathlib.Data.ZMod.Basic
+public import Mathlib.Tactic
+public import QEC.Stabilizer.Foundations.PauliGroupSingle
+public import QEC.Stabilizer.Foundations.PauliGroupSingle.Operator
+public import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
 
 /-!
 # Binary symplectic representation
@@ -15,6 +17,8 @@ Up to phase, a Pauli operator is a vector over `ZMod 2`:
   entries are the `X`-bits and whose last `n` entries are the `Z`-bits
   (`NQubitPauliOperator.toSymplectic`).
 -/
+
+@[expose] public section
 
 namespace Quantum
 

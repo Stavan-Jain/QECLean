@@ -1,6 +1,8 @@
-import QEC.Stabilizer.Framework.Homological.BocksteinLift
-import Mathlib.Algebra.MonoidAlgebra.Basic
-import Mathlib.GroupTheory.QuotientGroup.Basic
+module
+
+public import QEC.Stabilizer.Framework.Homological.BocksteinLift
+public import Mathlib.Algebra.MonoidAlgebra.Basic
+public import Mathlib.GroupTheory.QuotientGroup.Basic
 
 /-!
 # `EpsFree` for group algebras
@@ -22,6 +24,8 @@ Let `k` be a commutative ring, `G` an abelian group and `σ : G`, and write
   `BocksteinLift.bockstein_element_form` holds in `k[G] ⧸ ((1 + x^σ) ^ 2)`
   with no further hypothesis.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

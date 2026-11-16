@@ -1,15 +1,17 @@
-import Mathlib.Tactic
-import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrixDecidable
-import QEC.Stabilizer.Foundations.PauliGroup.Commutation
-import QEC.Stabilizer.Foundations.PauliGroup.Notation
-import QEC.Stabilizer.Framework.Core.CodeNotation
-import QEC.Stabilizer.Framework.Core.CSS.CSSCommutationLemmas
-import QEC.Stabilizer.Framework.Core.CSS.CSSDistance
-import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
-import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
-import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
-import QEC.Stabilizer.Framework.Symplectic.Presentation
-import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
+module
+
+public import Mathlib.Tactic
+public import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrixDecidable
+public import QEC.Stabilizer.Foundations.PauliGroup.Commutation
+public import QEC.Stabilizer.Foundations.PauliGroup.Notation
+public import QEC.Stabilizer.Framework.Core.CodeNotation
+public import QEC.Stabilizer.Framework.Core.CSS.CSSCommutationLemmas
+public import QEC.Stabilizer.Framework.Core.CSS.CSSDistance
+public import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
+public import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
+public import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
+public import QEC.Stabilizer.Framework.Symplectic.Presentation
+public import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
 
 /-!
 # The iceberg codes `[[2m, 2m − 2, 2]]`
@@ -48,6 +50,8 @@ The logical basis `X̄ᵢ = XᵢX₂ₘ₋₁`, `Z̄ᵢ = ZᵢZ₂ₘ₋₂` is 
 - Distance 2 (weight-1 anticommute witness, weight-2 logical):
   `code_has_distance_two`, `stabilizerCodeWithDistance : Code[[2m, 2m − 2, 2]]`
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

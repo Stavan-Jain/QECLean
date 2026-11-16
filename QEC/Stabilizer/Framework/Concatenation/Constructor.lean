@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Framework.Concatenation.Independence
+module
+
+public import QEC.Stabilizer.Framework.Concatenation.Independence
 
 /-!
 # Concatenation: the concatenated code
@@ -23,6 +25,8 @@ qubits with `k₂` logical qubits.
   concatenated code as a presentation, as a `StabilizerCode (n₁ * n₂) k₂`, and
   with its logical basis.
 -/
+
+@[expose] public section
 
 namespace Quantum.Concatenation
 

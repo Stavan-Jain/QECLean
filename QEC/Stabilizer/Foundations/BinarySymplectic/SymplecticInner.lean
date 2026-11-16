@@ -1,12 +1,16 @@
-import Mathlib.Data.ZMod.Basic
-import Mathlib.LinearAlgebra.Span.Basic
-import Mathlib.Tactic
-import QEC.Stabilizer.Foundations.BinarySymplectic.Core
-import QEC.Stabilizer.Foundations.PauliGroupSingle
-import QEC.Stabilizer.Foundations.PauliGroupSingle.Commutation
-import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
-import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
-import QEC.Stabilizer.Foundations.PauliGroup.Commutation
+module
+
+public meta import Lean.PrettyPrinter.Delaborator.Builtins
+meta import Lean.Elab.Command
+public import Mathlib.Data.ZMod.Basic
+public import Mathlib.LinearAlgebra.Span.Basic
+public import Mathlib.Tactic
+public import QEC.Stabilizer.Foundations.BinarySymplectic.Core
+public import QEC.Stabilizer.Foundations.PauliGroupSingle
+public import QEC.Stabilizer.Foundations.PauliGroupSingle.Commutation
+public import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
+public import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
+public import QEC.Stabilizer.Foundations.PauliGroup.Commutation
 
 /-!
 # Symplectic inner product
@@ -17,6 +21,8 @@ commute iff the symplectic inner product of their operator parts is `0`
 (`commutes_iff_symplectic_inner_zero`) and anticommute iff it is `1`
 (`anticommutes_iff_symplectic_inner_one`).
 -/
+
+@[expose] public section
 
 namespace Quantum
 
@@ -144,7 +150,7 @@ open Lean PrettyPrinter Delaborator SubExpr in
 `⟪p, q⟫ₛ`; any other application of `symplecticInner` keeps the default printer.
 -/
 @[scoped app_delab Quantum.NQubitPauliOperator.symplecticInner]
-def delabSymplecticInner : Delab :=
+meta def delabSymplecticInner : Delab :=
   whenPPOption getPPNotation <| whenNotPPOption getPPExplicit do
     let e ← getExpr
     guard (e.isAppOfArity ``Quantum.NQubitPauliOperator.symplecticInner 3)
@@ -163,7 +169,7 @@ open Lean Elab Command in
 /-- Display test: elaborate `stx` and check that its pretty-printed text is
 `expected` (`exact := false`: contains `expected`). Run through `run_cmd` so no
 `#`-command is needed. -/
-private def checkDisplay (stx : Syntax) (expected : String) (exact : Bool := true) :
+private meta def checkDisplay (stx : Syntax) (expected : String) (exact : Bool := true) :
     CommandElabM Unit :=
   liftTermElabM do
     let e ← Term.elabTerm stx none

@@ -1,7 +1,9 @@
-import QEC.Stabilizer.Codes.Repetition.Three
-import QEC.Stabilizer.Codes.Repetition.ThreeLogicals
-import QEC.Stabilizer.Codes.Repetition.N
-import QEC.Stabilizer.Codes.Repetition.NLogicals
+module
+
+public import QEC.Stabilizer.Codes.Repetition.Three
+public import QEC.Stabilizer.Codes.Repetition.ThreeLogicals
+public import QEC.Stabilizer.Codes.Repetition.N
+public import QEC.Stabilizer.Codes.Repetition.NLogicals
 
 /-!
 # Repetition codes

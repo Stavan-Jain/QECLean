@@ -1,14 +1,16 @@
-import QEC.Foundations.Basic
-import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
-import QEC.Stabilizer.Framework.Core.Stabilizer.Centralizer
-import QEC.Stabilizer.Framework.Core.Logical.LogicalOperatorCoset
-import QEC.Stabilizer.Framework.Core.Stabilizer.Codespace
-import QEC.Stabilizer.Framework.Core.Logical.LogicalGates
-import QEC.Stabilizer.Framework.Core.Logical.LogicalGateGroup
-import QEC.Stabilizer.Foundations.PauliGroup
-import QEC.Stabilizer.Foundations.PauliGroup.Representation
-import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
-import QEC.Stabilizer.Foundations.PauliGroup.Commutation
+module
+
+public import QEC.Foundations.Basic
+public import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
+public import QEC.Stabilizer.Framework.Core.Stabilizer.Centralizer
+public import QEC.Stabilizer.Framework.Core.Logical.LogicalOperatorCoset
+public import QEC.Stabilizer.Framework.Core.Stabilizer.Codespace
+public import QEC.Stabilizer.Framework.Core.Logical.LogicalGates
+public import QEC.Stabilizer.Framework.Core.Logical.LogicalGateGroup
+public import QEC.Stabilizer.Foundations.PauliGroup
+public import QEC.Stabilizer.Foundations.PauliGroup.Representation
+public import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
+public import QEC.Stabilizer.Foundations.PauliGroup.Commutation
 
 /-!
 # Logical operators
@@ -34,6 +36,8 @@ Main definitions and results:
 - `SameLogicalOperator L L' S`: `L` and `L'` lie in the same coset of `S`, an
   equivalence relation.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

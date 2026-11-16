@@ -1,4 +1,6 @@
-import Mathlib.Tactic
+module
+
+public import Mathlib.Tactic
 
 /-!
 # Geometry of the triangular honeycomb color code
@@ -20,6 +22,8 @@ that `numQubits r = 2 * numFaces r + 1` (`twice_numFaces`).
 indicator vector over `ZMod 2`. Pairing a chain with `incidence f` sums the
 chain over the face (`sum_incidence_mul`).
 -/
+
+@[expose] public section
 
 namespace Quantum.StabilizerGroup.ColorCode
 

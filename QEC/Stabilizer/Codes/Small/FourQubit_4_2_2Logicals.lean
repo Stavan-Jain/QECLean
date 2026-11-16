@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Codes.Small.FourQubit_4_2_2
+module
+
+public import QEC.Stabilizer.Codes.Small.FourQubit_4_2_2
 
 /-!
 # The four-qubit code `[[4, 2, 2]]`: logical operators
@@ -27,6 +29,8 @@ the other logical qubit's operators (two shared qubits, or the same type).
   `logicalZ_ℓ_mem_centralizer`
 - `stabilizerCodeWithLogicals : Code[[4, 2]]ₗ`
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

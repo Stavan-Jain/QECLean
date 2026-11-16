@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Framework.Homological.BBChainComplex
-import Mathlib.Algebra.MonoidAlgebra.Basic
+module
+
+public import QEC.Stabilizer.Framework.Homological.BBChainComplex
+public import Mathlib.Algebra.MonoidAlgebra.Basic
 
 /-!
 # Convolution is the product of the group algebra
@@ -20,6 +22,8 @@ facts proved in the group algebra apply to chains:
   `-s`, and `conv_convEquiv_one_add_single`: the element `1 + single σ 1` acts
   on chains as `v ↦ v + translate (-σ) v`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

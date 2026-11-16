@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
+module
+
+public import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
 
 /-!
 # `[[n, k, d]]` code-parameter notation
@@ -23,6 +25,8 @@ is active inside that namespace and after `open Quantum.StabilizerGroup` /
 `open scoped Quantum.StabilizerGroup`, and each form has an unexpander so goals
 and `#check` output display `Code[[7, 1]]` rather than `StabilizerCode 7 1`.
 -/
+
+@[expose] public section
 
 namespace Quantum.StabilizerGroup
 

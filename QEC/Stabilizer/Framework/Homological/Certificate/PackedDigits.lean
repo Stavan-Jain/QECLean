@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Framework.Homological.F2Mask
-import Mathlib.Data.Nat.Digits.Lemmas
+module
+
+public import QEC.Stabilizer.Framework.Homological.F2Mask
+public import Mathlib.Data.Nat.Digits.Lemmas
 
 /-!
 # Tables packed into fixed-width lanes of a natural number
@@ -33,6 +35,8 @@ for the kernel. This file relates the packed operations to the entrywise ones.
   preserved by addition (`BoundedPolynomial.add`) and by multiplication by the
   variable followed by truncation (`BoundedPolynomial.shift`).
 -/
+
+@[expose] public section
 
 namespace PackedDigits
 

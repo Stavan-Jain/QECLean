@@ -1,9 +1,11 @@
-import Mathlib.Data.Nat.Bitwise
-import Mathlib.Data.Nat.Bits
-import Mathlib.Data.ZMod.Defs
-import Mathlib.Data.Fintype.Card
-import Mathlib.Tactic.NormNum
-import Mathlib.Tactic.Ring
+module
+
+public import Mathlib.Data.Nat.Bitwise
+public import Mathlib.Data.Nat.Bits
+public import Mathlib.Data.ZMod.Defs
+public import Mathlib.Data.Fintype.Card
+public import Mathlib.Tactic.NormNum
+public import Mathlib.Tactic.Ring
 
 /-!
 # Packed-`Nat` encodings of `𝔽₂`-chains
@@ -28,6 +30,8 @@ specification of the weight. `bitCountFast` evaluates it a byte at a time from
 a packed `256`-entry table (`bitCountFast_eq`), and is the form to put inside a
 `decide`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

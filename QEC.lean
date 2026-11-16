@@ -1,5 +1,7 @@
-import QEC.Foundations.Foundations
-import QEC.Stabilizer.Stabilizer
+module
+
+public import QEC.Foundations.Foundations
+public import QEC.Stabilizer.Stabilizer
 
 /-!
 # QEC

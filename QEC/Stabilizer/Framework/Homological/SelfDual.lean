@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Framework.Homological.LogicalCorrespondence
+module
+
+public import QEC.Stabilizer.Framework.Homological.LogicalCorrespondence
 
 /-!
 # Self-dual CSS chain complexes
@@ -14,6 +16,8 @@ For this complex the two transposes are the boundary maps themselves
 dual boundaries are the cycles and boundaries (`dualCycles_eq_cycles`,
 `dualBoundaries_eq_boundaries`).
 -/
+
+@[expose] public section
 
 namespace Quantum.Stabilizer.Homological
 

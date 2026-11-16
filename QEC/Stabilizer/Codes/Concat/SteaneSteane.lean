@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Codes.Small.Steane7Logicals
-import QEC.Stabilizer.Framework.Concatenation
+module
+
+public import QEC.Stabilizer.Codes.Small.Steane7Logicals
+public import QEC.Stabilizer.Framework.Concatenation
 
 /-!
 # The concatenated Steane code `[[49, 1, 9]]`
@@ -34,6 +36,8 @@ seven-qubit Steane code, all settled by `decide` in `Steane7.lean` and
 - `stabilizerCode : Code[[49, 1]]`, `stabilizerCodeWithLogicals : Code[[49, 1]]ₗ`
 - `code_has_distance_nine`, `stabilizerCodeWithDistance : Code[[49, 1, 9]]`
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

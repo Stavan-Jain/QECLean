@@ -1,7 +1,9 @@
-import Mathlib.Tactic
-import QEC.Stabilizer.Foundations.PauliGroupSingle.Core
-import QEC.Stabilizer.Foundations.PauliGroupSingle.Operator
-import QEC.Stabilizer.Foundations.PauliGroupSingle.Element
+module
+
+public import Mathlib.Tactic
+public import QEC.Stabilizer.Foundations.PauliGroupSingle.Core
+public import QEC.Stabilizer.Foundations.PauliGroupSingle.Operator
+public import QEC.Stabilizer.Foundations.PauliGroupSingle.Element
 
 /-!
 # Commutation in the single-qubit Pauli group
@@ -11,6 +13,8 @@ whether two Pauli group elements commute is decided by the phase that
 `PauliOperator.mulOp` contributes (`commutes_iff_mulOp_phasePower`). Any two
 elements commute or anticommute (`commute_or_anticommute`).
 -/
+
+@[expose] public section
 
 namespace Quantum
 

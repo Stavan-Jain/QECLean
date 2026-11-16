@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Framework.Homological.BBDoubling
+module
+
+public import QEC.Stabilizer.Framework.Homological.BBDoubling
 
 /-!
 # A weight-6 floor for the cycles of a bivariate bicycle code
@@ -38,6 +40,8 @@ with translations; its weight is even by `cycle_support_even`; and the weights
   `StrongBaseFloor 6` of the doubling theorem, for a double cover whose base is
   the code of the bundle.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

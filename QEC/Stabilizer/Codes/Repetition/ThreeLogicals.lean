@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Codes.Repetition.Three
+module
+
+public import QEC.Stabilizer.Codes.Repetition.Three
 
 /-!
 # The 3-qubit repetition code `[[3, 1, 1]]`: logical operators
@@ -15,6 +17,8 @@ Z-type, so both commute with the stabilizer; they anticommute with each other
 - Centralizer membership `logicalX_mem_centralizer`, `logicalZ_mem_centralizer`
 - `stabilizerCodeWithLogicals : Code[[3, 1]]ₗ`
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

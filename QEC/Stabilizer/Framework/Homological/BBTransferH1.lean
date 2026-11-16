@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Framework.Homological.BBCover
-import QEC.Stabilizer.Framework.Homological.BBBocksteinRank
+module
+
+public import QEC.Stabilizer.Framework.Homological.BBCover
+public import QEC.Stabilizer.Framework.Homological.BBBocksteinRank
 
 /-!
 # The transfer maps on `H₁` of a double cover
@@ -33,6 +35,8 @@ numbers of logical qubits of the two codes.
   `dim (range ε_*) + k = k̃` and `dim (ker ε_*) = k`.
 * `epsH1_epsH1_apply`: `ε_* ∘ ε_* = 0`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

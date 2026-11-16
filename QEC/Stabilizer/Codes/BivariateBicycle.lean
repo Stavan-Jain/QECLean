@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Framework.Homological
+module
+
+public import QEC.Stabilizer.Framework.Homological
 
 /-!
 # Bivariate bicycle codes

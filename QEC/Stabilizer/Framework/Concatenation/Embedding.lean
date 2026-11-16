@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Foundations.BinarySymplectic.SymplecticInner
+module
+
+public import QEC.Stabilizer.Foundations.BinarySymplectic.SymplecticInner
 
 /-!
 # Concatenation: block indexing and block embedding
@@ -18,6 +20,8 @@ qubits by block and position, and the embedding of an operator on one block.
 - `mulOp_embedBlockOp_operators`: up to phase, embedding into a block is
   multiplicative.
 -/
+
+@[expose] public section
 
 namespace Quantum.Concatenation
 

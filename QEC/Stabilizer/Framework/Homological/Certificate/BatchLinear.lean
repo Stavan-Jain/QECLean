@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Framework.Homological.Certificate.PackedLaneShifts
-import QEC.Stabilizer.Framework.Homological.Certificate.MaskLinear
+module
+
+public import QEC.Stabilizer.Framework.Homological.Certificate.PackedLaneShifts
+public import QEC.Stabilizer.Framework.Homological.Certificate.MaskLinear
 
 /-!
 # Window reconstruction on a packed table of masks
@@ -13,6 +15,8 @@ table of zeros and ones by the row, and XORs the products.
 * `batchRecon_mem_span`: every lane of a batch reconstruction lies in the
   `F2Mask.XorSpan` of the window's rows.
 -/
+
+@[expose] public section
 
 namespace PackedDigits
 open Quantum.Stabilizer.Homological.F2Mask

@@ -1,10 +1,12 @@
-import Mathlib.LinearAlgebra.Matrix.Defs
-import Mathlib.LinearAlgebra.Matrix.Notation
-import QEC.Foundations.Foundations
-import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
-import QEC.Stabilizer.Framework.Core.Stabilizer.Centralizer
-import QEC.Stabilizer.Framework.Core.Logical.LogicalGateGroup
-import QEC.Stabilizer.Foundations.PauliGroup
+module
+
+public import Mathlib.LinearAlgebra.Matrix.Defs
+public import Mathlib.LinearAlgebra.Matrix.Notation
+public import QEC.Foundations.Foundations
+public import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
+public import QEC.Stabilizer.Framework.Core.Stabilizer.Centralizer
+public import QEC.Stabilizer.Framework.Core.Logical.LogicalGateGroup
+public import QEC.Stabilizer.Foundations.PauliGroup
 
 /-!
 # Logical gates
@@ -23,6 +25,8 @@ Main results:
   `isLogicalGate_of_generator_set_conjugation`: a unitary whose conjugation
   action maps `S`, or just a generating set of `S`, into `S` is a logical gate.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

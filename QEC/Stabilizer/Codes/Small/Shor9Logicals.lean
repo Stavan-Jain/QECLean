@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Codes.Small.Shor9
+module
+
+public import QEC.Stabilizer.Codes.Small.Shor9
 
 /-!
 # Shor's code `[[9, 1, 3]]`: logical operators
@@ -21,6 +23,8 @@ qubits, an odd number).
 - Centralizer membership `logicalX_mem_centralizer`, `logicalZ_mem_centralizer`
 - `stabilizerCodeWithLogicals : Code[[9, 1]]ₗ`
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

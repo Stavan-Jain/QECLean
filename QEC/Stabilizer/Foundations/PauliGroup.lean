@@ -1,11 +1,13 @@
-import QEC.Stabilizer.Foundations.PauliGroupSingle
-import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
-import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
-import QEC.Stabilizer.Foundations.PauliGroup.Notation
-import QEC.Stabilizer.Foundations.PauliGroup.TransversalConjugation
-import QEC.Stabilizer.Foundations.PauliGroup.Commutation
-import QEC.Stabilizer.Foundations.PauliGroup.CommutationTactics
-import QEC.Stabilizer.Foundations.PauliGroup.Representation
+module
+
+public import QEC.Stabilizer.Foundations.PauliGroupSingle
+public import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
+public import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
+public import QEC.Stabilizer.Foundations.PauliGroup.Notation
+public import QEC.Stabilizer.Foundations.PauliGroup.TransversalConjugation
+public import QEC.Stabilizer.Foundations.PauliGroup.Commutation
+public import QEC.Stabilizer.Foundations.PauliGroup.CommutationTactics
+public import QEC.Stabilizer.Foundations.PauliGroup.Representation
 
 /-!
 # The n-qubit Pauli group

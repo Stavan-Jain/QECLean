@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Codes.Color.Code
+module
+
+public import QEC.Stabilizer.Codes.Color.Code
 
 /-!
 # Spins of the color code in terms of face labels
@@ -16,6 +18,8 @@ qubit position through the labels `faceBit` of the at most three faces that
 contain it. Here `a`, `b`, `c` name the three rows of qubits of a layer, the
 lattice rows `3 * l + 1`, `3 * l + 2` and `3 * l + 3`.
 -/
+
+@[expose] public section
 
 namespace Quantum.StabilizerGroup.ColorCode
 

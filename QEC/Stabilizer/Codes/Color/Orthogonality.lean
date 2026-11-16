@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Codes.Color.FaceParity
+module
+
+public import QEC.Stabilizer.Codes.Color.FaceParity
 
 /-!
 # Orthogonality of the face checks of the color code
@@ -10,6 +12,8 @@ evenness of each face this makes the indicator vectors of the faces mutually
 orthogonal over `ZMod 2` (`incidence_orthogonal`), which is the commutation of
 the X-checks with the Z-checks.
 -/
+
+@[expose] public section
 
 namespace Quantum.StabilizerGroup.ColorCode
 

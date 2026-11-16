@@ -1,7 +1,9 @@
-import Mathlib.Tactic
-import QEC.Stabilizer.Foundations.PauliGroup.Commutation
-import QEC.Stabilizer.Foundations.BinarySymplectic.SymplecticInner
-import QEC.Stabilizer.Framework.Core.CSS.CSSPredicates
+module
+
+public import Mathlib.Tactic
+public import QEC.Stabilizer.Foundations.PauliGroup.Commutation
+public import QEC.Stabilizer.Foundations.BinarySymplectic.SymplecticInner
+public import QEC.Stabilizer.Framework.Core.CSS.CSSPredicates
 
 /-!
 # Fold and double along a qubit pairing
@@ -41,6 +43,8 @@ stabilizer code, the folded code, and the fold-and-double distance theorem —
 are developed in `FoldDouble.OperatorImage`, `FoldDouble.Groups` and
 `FoldDouble.Distance`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 

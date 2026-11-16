@@ -1,14 +1,16 @@
-import Mathlib.Tactic
-import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrixDecidable
-import QEC.Stabilizer.Foundations.PauliGroup.Commutation
-import QEC.Stabilizer.Foundations.PauliGroup.Notation
-import QEC.Stabilizer.Framework.Core.CodeNotation
-import QEC.Stabilizer.Framework.Core.CSS.CSSDistance
-import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
-import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
-import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
-import QEC.Stabilizer.Framework.Symplectic.Presentation
-import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
+module
+
+public import Mathlib.Tactic
+public import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrixDecidable
+public import QEC.Stabilizer.Foundations.PauliGroup.Commutation
+public import QEC.Stabilizer.Foundations.PauliGroup.Notation
+public import QEC.Stabilizer.Framework.Core.CodeNotation
+public import QEC.Stabilizer.Framework.Core.CSS.CSSDistance
+public import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
+public import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
+public import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
+public import QEC.Stabilizer.Framework.Symplectic.Presentation
+public import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
 
 /-!
 # Shor's code `[[9, 1, 3]]`
@@ -48,6 +50,8 @@ The logical basis `X̄ = Z⊗⁹`, `Z̄ = X⊗⁹` is in `Shor9Logicals.lean`.
   logical): `code_has_distance_three`,
   `stabilizerCodeWithDistance : Code[[9, 1, 3]]`
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

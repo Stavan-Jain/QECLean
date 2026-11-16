@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Codes.Small.CSS_4_1_2
+module
+
+public import QEC.Stabilizer.Codes.Small.CSS_4_1_2
 
 /-!
 # The LNCY code `[[4, 1, 2]]`: logical operators
@@ -18,6 +20,8 @@ each codeword). They anticommute: they meet on qubit 0 only.
 - Centralizer membership `logicalX_mem_centralizer`, `logicalZ_mem_centralizer`
 - `stabilizerCodeWithLogicals : Code[[4, 1]]ₗ`
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

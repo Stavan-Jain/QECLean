@@ -1,5 +1,7 @@
-import Lean.PrettyPrinter.Delaborator.Basic
-import QEC.Foundations.Basic
+module
+
+public meta import Lean.PrettyPrinter.Delaborator.Basic
+public import QEC.Foundations.Basic
 
 /-!
 # Dirac ket notation
@@ -41,9 +43,11 @@ them, following the same notation-in-its-own-module convention as
 `QEC/Stabilizer/Foundations/PauliGroup/Notation.lean`.
 -/
 
+public section
+
 namespace Quantum
 
-section KetNotation
+meta section KetNotation
 
 open Lean
 

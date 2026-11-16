@@ -1,5 +1,7 @@
-import QEC.Foundations.Gates
-import QEC.Foundations.Tensor
+module
+
+public import QEC.Foundations.Gates
+public import QEC.Foundations.Tensor
 
 /-!
 # Clifford conjugation tableau
@@ -46,6 +48,8 @@ as far as `Tensor.lean`'s named two-qubit operators reach (it defines no
 
 Definitions of the gates and matrices live in `Gates.lean` and `Tensor.lean`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 

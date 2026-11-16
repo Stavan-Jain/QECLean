@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Codes.Repetition.N
+module
+
+public import QEC.Stabilizer.Codes.Repetition.N
 
 /-!
 # The repetition code on `n + 2` qubits: logical operators
@@ -17,6 +19,8 @@ and its distance, exist for every `n`.
 - Centralizer membership `logicalX_mem_centralizer`, `logicalZ_mem_centralizer`
 - `stabilizerCodeWithLogicals : Code[[n+2, 1]]ₗ` (for odd `n + 2`)
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

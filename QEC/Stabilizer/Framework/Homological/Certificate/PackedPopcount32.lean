@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Framework.Homological.Certificate.PackedPopcount
+module
+
+public import QEC.Stabilizer.Framework.Homological.Certificate.PackedPopcount
 
 /-!
 # Parallel popcounts for thirty-bit masks
@@ -8,6 +10,8 @@ mask packed into thirty-two-bit lanes: `popcount32` is the executable
 operation, and `popcount32_packF` proves it correct through the generic tree
 `popcountTree`.
 -/
+
+@[expose] public section
 
 namespace PackedDigits
 

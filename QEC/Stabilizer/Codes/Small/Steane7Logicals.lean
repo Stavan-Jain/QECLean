@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Codes.Small.Steane7
+module
+
+public import QEC.Stabilizer.Codes.Small.Steane7
 
 /-!
 # The Steane code `[[7, 1, 3]]`: logical operators
@@ -18,6 +20,8 @@ and they anticommute with each other (seven qubits, an odd number).
   `minWeightLogical_anticommutes_logicalZ`
 - The logical `Y` operator `logicalY = i X̄ Z̄`, with `logicalY_eq_phase2_allY`
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

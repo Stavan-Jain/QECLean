@@ -1,6 +1,8 @@
-import Mathlib.Algebra.Group.Subgroup.Lattice
-import Mathlib.Tactic
-import QEC.Stabilizer.Foundations.PauliGroup
+module
+
+public import Mathlib.Algebra.Group.Subgroup.Lattice
+public import Mathlib.Tactic
+public import QEC.Stabilizer.Foundations.PauliGroup
 
 /-!
 # Z-type and X-type Pauli operators
@@ -30,6 +32,8 @@ Main results, in the namespace `NQubitPauliGroupElement`:
 - `z_mul_x_eq_one_of_operators_eq_identity`: a product of a Z-type and an
   X-type element whose operator part is the identity is the identity.
 -/
+
+@[expose] public section
 
 namespace Quantum
 

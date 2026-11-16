@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Framework.Homological.LogicalCorrespondence
-import QEC.Stabilizer.Codes.Toric.CodeN
+module
+
+public import QEC.Stabilizer.Framework.Homological.LogicalCorrespondence
+public import QEC.Stabilizer.Codes.Toric.CodeN
 
 /-!
 # X-type logical operators of the toric code and homology
@@ -27,6 +29,8 @@ All of them are the corresponding statements about the chain operators of
 `toricHomologicalCode L`, whose checks and stabilizer group are those of the
 toric code.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

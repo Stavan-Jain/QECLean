@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Codes.RotatedSurface.ChainComplex
-import QEC.Stabilizer.Geometry.GridIndexing
+module
+
+public import QEC.Stabilizer.Codes.RotatedSurface.ChainComplex
+public import QEC.Stabilizer.Geometry.GridIndexing
 
 /-!
 # The rotated surface code has one logical qubit
@@ -23,6 +25,8 @@ The ranks follow: `rsc_rank_boundary2`, `rsc_rank_zCutMap`,
 `rsc_rank_boundary1`, `rsc_finrank_cycles`, `rsc_finrank_boundaries` and
 `rsc_finrank_cycles_eq_boundaries_add_one`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

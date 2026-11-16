@@ -1,13 +1,15 @@
-import Mathlib.LinearAlgebra.Matrix.Defs
-import Mathlib.LinearAlgebra.Matrix.Notation
-import Mathlib.Basic.Complex.Basic
-import Mathlib.Tactic
-import Mathlib.Algebra.Star.Basic
-import QEC.Foundations.Foundations
-import QEC.Stabilizer.Foundations.PauliGroupSingle.Core
-import QEC.Stabilizer.Foundations.PauliGroupSingle.Operator
-import QEC.Stabilizer.Foundations.PauliGroupSingle.Phase
-import QEC.Stabilizer.Foundations.PauliGroupSingle.Element
+module
+
+public import Mathlib.LinearAlgebra.Matrix.Defs
+public import Mathlib.LinearAlgebra.Matrix.Notation
+public import Mathlib.Basic.Complex.Basic
+public import Mathlib.Tactic
+public import Mathlib.Algebra.Star.Basic
+public import QEC.Foundations.Foundations
+public import QEC.Stabilizer.Foundations.PauliGroupSingle.Core
+public import QEC.Stabilizer.Foundations.PauliGroupSingle.Operator
+public import QEC.Stabilizer.Foundations.PauliGroupSingle.Phase
+public import QEC.Stabilizer.Foundations.PauliGroupSingle.Element
 
 /-!
 # Matrix and gate representation of the single-qubit Pauli group
@@ -17,6 +19,8 @@ the corresponding scaled gate and matrix. Both are multiplicative
 (`toGate_mul`, `toMatrix_mul`) and preserve inverses (`toGate_inv`,
 `toMatrix_inv`).
 -/
+
+@[expose] public section
 
 namespace Quantum
 open Matrix

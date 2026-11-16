@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Framework.Homological.BZCertificate
-import Mathlib.LinearAlgebra.Pi
+module
+
+public import QEC.Stabilizer.Framework.Homological.BZCertificate
+public import Mathlib.LinearAlgebra.Pi
 
 /-!
 # Window reconstructions as linear maps
@@ -14,6 +16,8 @@ Linear maps out of a binary coordinate space are determined by their values on
 point masses (`linearMap_eq_of_single`), so a left inverse checked on point
 masses proves injectivity (`injective_of_decoder_single`).
 -/
+
+@[expose] public section
 
 namespace Quantum.Stabilizer.Homological
 

@@ -1,9 +1,11 @@
-import Mathlib.Algebra.Group.Subgroup.Basic
-import Mathlib.GroupTheory.Subgroup.Centralizer
-import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
-import QEC.Stabilizer.Framework.Core.Stabilizer.SubgroupLemmas
-import QEC.Stabilizer.Foundations.PauliGroup
-import QEC.Stabilizer.Foundations.PauliGroup.Commutation
+module
+
+public import Mathlib.Algebra.Group.Subgroup.Basic
+public import Mathlib.GroupTheory.Subgroup.Centralizer
+public import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
+public import QEC.Stabilizer.Framework.Core.Stabilizer.SubgroupLemmas
+public import QEC.Stabilizer.Foundations.PauliGroup
+public import QEC.Stabilizer.Foundations.PauliGroup.Commutation
 
 /-!
 # Centralizer of a stabilizer group
@@ -22,6 +24,8 @@ Main results:
 - `StabilizerGroup.not_mem_stabilizer_of_anticommutes_centralizer`: an element
   that anticommutes with some element of the centralizer is not in `S`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

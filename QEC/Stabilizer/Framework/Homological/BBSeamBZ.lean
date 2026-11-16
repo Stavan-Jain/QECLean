@@ -1,5 +1,8 @@
-import QEC.Stabilizer.Framework.Homological.BBDoubling
-import QEC.Stabilizer.Framework.Homological.BZCertificate
+module
+
+public import Mathlib.Data.List.GetD
+public import QEC.Stabilizer.Framework.Homological.BBDoubling
+public import QEC.Stabilizer.Framework.Homological.BZCertificate
 
 /-!
 # Brouwer–Zimmermann certificates for seam-coset floors and light boundaries
@@ -36,6 +39,8 @@ The file also writes `∂₂` as a row-sparse map (`bbRowCells`,
 `bbBoundary2Fn_eq_rowSum`), the form in which `F2Mask.kernel_eq_sum_of_peel`
 certifies the basis of `ker ∂₂` required by the field `span`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

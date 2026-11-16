@@ -1,10 +1,12 @@
-import QEC.Stabilizer.Framework.FoldDouble.Basic
-import QEC.Stabilizer.Framework.FoldDouble.OperatorImage
-import QEC.Stabilizer.Framework.FoldDouble.Groups
-import QEC.Stabilizer.Framework.FoldDouble.Distance
-import QEC.Stabilizer.Framework.FoldDouble.CoverBound
-import QEC.Stabilizer.Framework.FoldDouble.Certificates
-import QEC.Stabilizer.Framework.FoldDouble.BBCover
+module
+
+public import QEC.Stabilizer.Framework.FoldDouble.Basic
+public import QEC.Stabilizer.Framework.FoldDouble.OperatorImage
+public import QEC.Stabilizer.Framework.FoldDouble.Groups
+public import QEC.Stabilizer.Framework.FoldDouble.Distance
+public import QEC.Stabilizer.Framework.FoldDouble.CoverBound
+public import QEC.Stabilizer.Framework.FoldDouble.Certificates
+public import QEC.Stabilizer.Framework.FoldDouble.BBCover
 
 /-!
 # Fold and double

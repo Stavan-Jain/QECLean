@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Codes.Color.Code
-import QEC.Stabilizer.Framework.Homological.Distance
+module
+
+public import QEC.Stabilizer.Codes.Color.Code
+public import QEC.Stabilizer.Framework.Homological.Distance
 
 /-!
 # Transversal logical operators of the triangular color code
@@ -14,6 +16,8 @@ qubit, commute with the stabilizer group (`logicalX_mem_centralizer`,
 logical qubit of the code, packaged as `stabilizerCodeWithLogicals r`, and
 have weight `numQubits r` (`logicalX_weight`, `logicalZ_weight`).
 -/
+
+@[expose] public section
 
 namespace Quantum.StabilizerGroup.ColorCode
 

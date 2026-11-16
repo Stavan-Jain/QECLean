@@ -1,4 +1,7 @@
-import QEC.Stabilizer.Framework.Homological.Certificate.BatchLinear
+module
+
+public import Mathlib.Data.List.GetD
+public import QEC.Stabilizer.Framework.Homological.Certificate.BatchLinear
 
 /-!
 # Packed certificates given as explicit lists
@@ -13,6 +16,8 @@ multiplications by a large base. It agrees with the digit expansion
 lists of inputs and expected outputs into the statement that the window
 reconstruction `F2Mask.reconX` maps every listed input to its listed output.
 -/
+
+@[expose] public section
 
 namespace PackedDigits
 open Quantum.Stabilizer.Homological.F2Mask

@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Codes.Small.QuantumHamming
+module
+
+public import QEC.Stabilizer.Codes.Small.QuantumHamming
 
 /-!
 # Quantum Hamming codes: logical operators
@@ -19,6 +21,8 @@ pair is the whole basis: see `Steane7Logicals.lean`.
 - Anticommutation `logicalX_anticommutes_logicalZ`
 - Centralizer membership `logicalX_mem_centralizer`, `logicalZ_mem_centralizer`
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

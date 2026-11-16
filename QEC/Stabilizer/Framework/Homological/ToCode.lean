@@ -1,7 +1,9 @@
-import Mathlib.LinearAlgebra.Matrix.Rank
-import QEC.Stabilizer.Framework.Homological.StabGroup
-import QEC.Stabilizer.Framework.Homological.Presentation
-import QEC.Stabilizer.Framework.Symplectic.SymplecticImage
+module
+
+public import Mathlib.LinearAlgebra.Matrix.Rank
+public import QEC.Stabilizer.Framework.Homological.StabGroup
+public import QEC.Stabilizer.Framework.Homological.Presentation
+public import QEC.Stabilizer.Framework.Symplectic.SymplecticImage
 
 /-!
 # The stabilizer code of a homological code
@@ -63,6 +65,8 @@ The transpose argument also applies to `dualBoundary`, the transpose of `∂₂`
 `dualCycles / dualBoundaries` has the dimension of `H₁`
 (`finrank_dualCycles_eq_dualBoundaries_add_H1`).
 -/
+
+@[expose] public section
 
 namespace Quantum
 

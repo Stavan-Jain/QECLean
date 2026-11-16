@@ -1,6 +1,8 @@
-import Mathlib.Algebra.Group.Defs
-import Mathlib.Tactic
-import Mathlib.Data.Fintype.Basic
+module
+
+public import Mathlib.Algebra.Group.Defs
+public import Mathlib.Tactic
+public import Mathlib.Data.Fintype.Basic
 
 /-!
 # Single-qubit Pauli group: core types
@@ -9,6 +11,8 @@ import Mathlib.Data.Fintype.Basic
 - `PauliGroupElement`: a Pauli operator together with a phase `i ^ k`,
   `k : Fin 4`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 

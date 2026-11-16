@@ -1,9 +1,11 @@
-import QEC.Stabilizer.Foundations.PauliGroupSingle.Core
-import QEC.Stabilizer.Foundations.PauliGroupSingle.Operator
-import QEC.Stabilizer.Foundations.PauliGroupSingle.Phase
-import QEC.Stabilizer.Foundations.PauliGroupSingle.Element
-import QEC.Stabilizer.Foundations.PauliGroupSingle.Representation
-import QEC.Stabilizer.Foundations.PauliGroupSingle.Commutation
+module
+
+public import QEC.Stabilizer.Foundations.PauliGroupSingle.Core
+public import QEC.Stabilizer.Foundations.PauliGroupSingle.Operator
+public import QEC.Stabilizer.Foundations.PauliGroupSingle.Phase
+public import QEC.Stabilizer.Foundations.PauliGroupSingle.Element
+public import QEC.Stabilizer.Foundations.PauliGroupSingle.Representation
+public import QEC.Stabilizer.Foundations.PauliGroupSingle.Commutation
 
 /-!
 # The single-qubit Pauli group

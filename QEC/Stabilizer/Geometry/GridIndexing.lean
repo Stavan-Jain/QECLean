@@ -1,4 +1,6 @@
-import Mathlib.Tactic
+module
+
+public import Mathlib.Tactic
 
 /-!
 # Grid indexing
@@ -8,6 +10,8 @@ natural number. This file proves that the row-major encoding is injective
 (`rowMajor_injective`) and that indices on either side of an offset differ
 (`fin_ne_of_val_lt_offset_le`).
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

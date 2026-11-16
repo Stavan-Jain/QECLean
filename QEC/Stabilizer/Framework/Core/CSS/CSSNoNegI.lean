@@ -1,7 +1,9 @@
-import Mathlib.Tactic
-import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
-import QEC.Stabilizer.Framework.Core.Stabilizer.SubgroupLemmas
-import QEC.Stabilizer.Framework.Core.CSS.CSSPredicates
+module
+
+public import Mathlib.Tactic
+public import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
+public import QEC.Stabilizer.Framework.Core.Stabilizer.SubgroupLemmas
+public import QEC.Stabilizer.Framework.Core.CSS.CSSPredicates
 
 /-!
 # CSS generators do not generate `-I`
@@ -19,6 +21,8 @@ product has identity operator part, then `z = x = 1`
 (`NQubitPauliGroupElement.z_mul_x_eq_one_of_operators_eq_identity`); but
 `negIdentity n` has identity operator part and is not `1`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace CSS

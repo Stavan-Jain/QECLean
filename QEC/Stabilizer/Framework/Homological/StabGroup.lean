@@ -1,7 +1,9 @@
-import QEC.Stabilizer.Framework.Homological.Generators
-import QEC.Stabilizer.Framework.Core.Stabilizer.SubgroupLemmas
-import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
-import QEC.Stabilizer.Framework.Core.CSS.CSSNoNegI
+module
+
+public import QEC.Stabilizer.Framework.Homological.Generators
+public import QEC.Stabilizer.Framework.Core.Stabilizer.SubgroupLemmas
+public import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
+public import QEC.Stabilizer.Framework.Core.CSS.CSSNoNegI
 
 /-!
 # The CSS stabilizer group of a homological code
@@ -17,6 +19,8 @@ No independence of the checks is assumed here. Packaging the group as a
 `StabilizerCode` is done in `Homological.Presentation` (independent checks) and
 `Homological.ToCode` (in general).
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

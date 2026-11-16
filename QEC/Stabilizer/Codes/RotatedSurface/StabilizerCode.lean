@@ -1,6 +1,8 @@
-import QEC.Stabilizer.Codes.RotatedSurface.N
-import QEC.Stabilizer.Codes.RotatedSurface.H1Dimension
-import QEC.Stabilizer.Framework.Homological.Presentation
+module
+
+public import QEC.Stabilizer.Codes.RotatedSurface.N
+public import QEC.Stabilizer.Codes.RotatedSurface.H1Dimension
+public import QEC.Stabilizer.Framework.Homological.Presentation
 
 /-!
 # The rotated surface code as a `StabilizerCode`
@@ -32,6 +34,8 @@ The rotated surface code of odd size `L ≥ 3` encodes one logical qubit in
 * `rotatedSurfaceStabilizerCodeWithLogicals L`: the code together with this
   pair of logical operators.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

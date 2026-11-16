@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Codes.Color.Boundary
-import QEC.Stabilizer.Codes.Color.LowerBound
+module
+
+public import QEC.Stabilizer.Codes.Color.Boundary
+public import QEC.Stabilizer.Codes.Color.LowerBound
 
 /-!
 # The distance of the triangular color code
@@ -16,6 +18,8 @@ X-chain operator of the left side of the patch
 `[[3r(r+1) + 1, 1, 2r + 1]]`, and `codeOfOddDistance d` states them in terms of
 an odd distance `d` as `[[(3d² + 1)/4, 1, d]]`.
 -/
+
+@[expose] public section
 
 namespace Quantum.StabilizerGroup.ColorCode
 

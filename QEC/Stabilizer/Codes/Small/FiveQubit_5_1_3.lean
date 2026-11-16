@@ -1,14 +1,16 @@
-import Mathlib.Tactic
-import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrixDecidable
-import QEC.Stabilizer.Foundations.PauliGroup.Commutation
-import QEC.Stabilizer.Foundations.PauliGroup.Notation
-import QEC.Stabilizer.Framework.Core.CodeNotation
-import QEC.Stabilizer.Framework.Core.CSS.CSSDistance
-import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
-import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
-import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
-import QEC.Stabilizer.Framework.Symplectic.Presentation
-import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
+module
+
+public import Mathlib.Tactic
+public import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrixDecidable
+public import QEC.Stabilizer.Foundations.PauliGroup.Commutation
+public import QEC.Stabilizer.Foundations.PauliGroup.Notation
+public import QEC.Stabilizer.Framework.Core.CodeNotation
+public import QEC.Stabilizer.Framework.Core.CSS.CSSDistance
+public import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
+public import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
+public import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
+public import QEC.Stabilizer.Framework.Symplectic.Presentation
+public import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
 
 /-!
 # The five-qubit code `[[5, 1, 3]]`
@@ -45,6 +47,8 @@ The logical basis `X̄ = X⊗⁵`, `Z̄ = Z⊗⁵` is in `FiveQubit_5_1_3Logical
 - Distance 3 (weight-1 and weight-2 anticommute witnesses, weight-3 logical):
   `code_has_distance_three`, `stabilizerCodeWithDistance : Code[[5, 1, 3]]`
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

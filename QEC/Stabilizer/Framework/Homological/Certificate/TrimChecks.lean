@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Framework.Homological.Presentation
-import QEC.Stabilizer.Framework.Homological.LogicalCorrespondence
+module
+
+public import QEC.Stabilizer.Framework.Homological.Presentation
+public import QEC.Stabilizer.Framework.Homological.LogicalCorrespondence
 
 /-!
 # Trimming the checks of a homological code
@@ -19,6 +21,8 @@ nothing is lost:
 This is how a code with dependent checks is given an independent list of
 checks, as `HomologicalCode.presentation` requires.
 -/
+
+@[expose] public section
 
 namespace Quantum.Stabilizer.Homological.HomologicalCode
 open scoped BigOperators

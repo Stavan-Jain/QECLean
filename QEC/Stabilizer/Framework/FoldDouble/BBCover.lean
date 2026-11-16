@@ -1,6 +1,8 @@
-import QEC.Stabilizer.Framework.Homological.BBDeficitWall
-import QEC.Stabilizer.Framework.Homological.Distance
-import QEC.Stabilizer.Framework.FoldDouble.Distance
+module
+
+public import QEC.Stabilizer.Framework.Homological.BBDeficitWall
+public import QEC.Stabilizer.Framework.Homological.Distance
+public import QEC.Stabilizer.Framework.FoldDouble.Distance
 
 /-!
 # Fold and double for a free double cover of a bivariate bicycle code
@@ -67,6 +69,8 @@ operator. The result, `isLeast_logicalWeight_two_mul_of_foldDouble`, has
 exactly the hypotheses and the conclusion of
 `pauli_distance_eq_double_of_admissible`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

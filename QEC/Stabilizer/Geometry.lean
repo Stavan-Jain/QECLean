@@ -1,6 +1,8 @@
-import QEC.Stabilizer.Geometry.FinPeriodic
-import QEC.Stabilizer.Geometry.GridIndexing
-import QEC.Stabilizer.Geometry.CellComplexTypes
+module
+
+public import QEC.Stabilizer.Geometry.FinPeriodic
+public import QEC.Stabilizer.Geometry.GridIndexing
+public import QEC.Stabilizer.Geometry.CellComplexTypes
 
 /-!
 # Geometry

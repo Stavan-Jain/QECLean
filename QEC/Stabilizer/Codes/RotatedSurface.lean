@@ -1,12 +1,14 @@
-import QEC.Stabilizer.Codes.RotatedSurface.CellComplex
-import QEC.Stabilizer.Codes.RotatedSurface.BoundaryMaps
-import QEC.Stabilizer.Codes.RotatedSurface.ChainComplex
-import QEC.Stabilizer.Codes.RotatedSurface.H1Dimension
-import QEC.Stabilizer.Codes.RotatedSurface.N
-import QEC.Stabilizer.Codes.RotatedSurface.StabilizerCode
-import QEC.Stabilizer.Codes.RotatedSurface.DistanceX
-import QEC.Stabilizer.Codes.RotatedSurface.DistanceZ
-import QEC.Stabilizer.Codes.RotatedSurface.Distance
+module
+
+public import QEC.Stabilizer.Codes.RotatedSurface.CellComplex
+public import QEC.Stabilizer.Codes.RotatedSurface.BoundaryMaps
+public import QEC.Stabilizer.Codes.RotatedSurface.ChainComplex
+public import QEC.Stabilizer.Codes.RotatedSurface.H1Dimension
+public import QEC.Stabilizer.Codes.RotatedSurface.N
+public import QEC.Stabilizer.Codes.RotatedSurface.StabilizerCode
+public import QEC.Stabilizer.Codes.RotatedSurface.DistanceX
+public import QEC.Stabilizer.Codes.RotatedSurface.DistanceZ
+public import QEC.Stabilizer.Codes.RotatedSurface.Distance
 
 /-!
 # The rotated surface code

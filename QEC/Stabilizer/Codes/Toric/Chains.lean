@@ -1,5 +1,7 @@
-import Mathlib.Tactic
-import QEC.Stabilizer.Geometry.CellComplexTypes
+module
+
+public import Mathlib.Tactic
+public import QEC.Stabilizer.Geometry.CellComplexTypes
 
 /-!
 # Chains on the periodic square lattice
@@ -12,6 +14,8 @@ Indicator chains and supports for the chain groups `C0 L`, `C1 L`, `C2 L` of the
 * `edgeSupport c` and `edgeWeight c`: the set of edges on which a 1-chain `c`
   is nonzero, and its cardinality.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

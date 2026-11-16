@@ -1,10 +1,12 @@
-import Mathlib.Data.ZMod.Basic
-import Mathlib.LinearAlgebra.LinearIndependent.Defs
-import Mathlib.LinearAlgebra.Matrix.Defs
-import Mathlib.Tactic
-import QEC.Stabilizer.Foundations.BinarySymplectic.Core
-import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
-import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
+module
+
+public import Mathlib.Data.ZMod.Basic
+public import Mathlib.LinearAlgebra.LinearIndependent.Defs
+public import Mathlib.LinearAlgebra.Matrix.Defs
+public import Mathlib.Tactic
+public import QEC.Stabilizer.Foundations.BinarySymplectic.Core
+public import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
+public import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
 
 /-!
 # Check matrix of a list of Pauli group elements
@@ -14,6 +16,8 @@ element: the symplectic vector of that element's operator part. The elements
 are independent generators exactly when the rows are linearly independent over
 `ZMod 2` (`rowsLinearIndependent`).
 -/
+
+@[expose] public section
 
 namespace Quantum
 

@@ -1,14 +1,16 @@
-import Mathlib.Tactic
-import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrixDecidable
-import QEC.Stabilizer.Foundations.PauliGroup.Commutation
-import QEC.Stabilizer.Foundations.PauliGroup.Notation
-import QEC.Stabilizer.Framework.Core.CodeNotation
-import QEC.Stabilizer.Framework.Core.CSS.CSSDistance
-import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
-import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
-import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
-import QEC.Stabilizer.Framework.Symplectic.Presentation
-import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
+module
+
+public import Mathlib.Tactic
+public import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrixDecidable
+public import QEC.Stabilizer.Foundations.PauliGroup.Commutation
+public import QEC.Stabilizer.Foundations.PauliGroup.Notation
+public import QEC.Stabilizer.Framework.Core.CodeNotation
+public import QEC.Stabilizer.Framework.Core.CSS.CSSDistance
+public import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
+public import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
+public import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
+public import QEC.Stabilizer.Framework.Symplectic.Presentation
+public import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
 
 /-!
 # Template for a stabilizer-code formalization
@@ -39,6 +41,11 @@ actions) goes in a further file importing the logicals file, as in
 `Small/Steane7TransversalGates.lean`. Both modules must be imported by the
 umbrella file of their family (`Codes/Small.lean`, …); a module that no
 umbrella imports is never compiled.
+
+Every file uses Lean's module system, with the header of this file: `module`,
+then `public import` lines, the module docstring, and `@[expose] public section`
+before the first declaration (the `@[expose]` keeps definitions unfoldable for
+the `decide` proofs downstream). The umbrella entry is a `public import` too.
 
 ## Two routes
 
@@ -74,6 +81,8 @@ module docstring stating the logical basis and why it is one (the action on the
 codewords, the overlaps with the checks), an `## Outline`, and the same
 `namespace` / `open` lines.
 -/
+
+@[expose] public section
 
 /-!
 ## Generators

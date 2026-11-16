@@ -1,8 +1,10 @@
-import QEC.Stabilizer.Framework.Core.Stabilizer.GeneratorListLemmas
-import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
-import QEC.Stabilizer.Framework.Homological.StabGroup
-import QEC.Stabilizer.Framework.Symplectic.SupportLemmas
-import QEC.Stabilizer.Codes.Toric.ChainOps
+module
+
+public import QEC.Stabilizer.Framework.Core.Stabilizer.GeneratorListLemmas
+public import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
+public import QEC.Stabilizer.Framework.Homological.StabGroup
+public import QEC.Stabilizer.Framework.Symplectic.SupportLemmas
+public import QEC.Stabilizer.Codes.Toric.ChainOps
 
 /-!
 # The toric code: checks and stabilizer group
@@ -36,6 +38,8 @@ and so is the product of all face checks. The `StabilizerCode` of the toric
 code is therefore presented by a shorter list, in
 `QEC.Stabilizer.Codes.Toric.StabilizerCode`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

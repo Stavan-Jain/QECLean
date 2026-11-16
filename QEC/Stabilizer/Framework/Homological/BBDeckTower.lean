@@ -1,6 +1,8 @@
-import Mathlib.RingTheory.Ideal.Span
-import Mathlib.Algebra.CharP.Two
-import Mathlib.Tactic.LinearCombination
+module
+
+public import Mathlib.RingTheory.Ideal.Span
+public import Mathlib.Algebra.CharP.Two
+public import Mathlib.Tactic.LinearCombination
 
 /-!
 # Deck-trivial towers: `σ_* = id` on `H₁` forces `1 + σ ∈ (A, B)`
@@ -29,6 +31,8 @@ The main results are
 - `eps_mem_of_deckTrivial`: `ε ^ m ∈ (A, B)` for some `2 ≤ m ≤ N - 2` and
   `DeckTrivial` give `ε ∈ (A, B)`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

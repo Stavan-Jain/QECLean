@@ -1,8 +1,11 @@
-import Mathlib.Data.Matrix.Mul
-import Mathlib.Data.Nat.Bitwise
-import Mathlib.Data.ZMod.Basic
-import Mathlib.LinearAlgebra.LinearIndependent.Defs
-import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrix
+module
+
+public import Mathlib.Data.List.GetD
+public import Mathlib.Data.Matrix.Mul
+public import Mathlib.Data.Nat.Bitwise
+public import Mathlib.Data.ZMod.Basic
+public import Mathlib.LinearAlgebra.LinearIndependent.Defs
+public import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrix
 
 /-!
 # Right-inverse certificates for `rowsLinearIndependent`
@@ -31,6 +34,8 @@ The certificate `bs` (column `j` of `B` as a bitmask over the `n + n`
 symplectic columns) is untrusted data: `scripts/RankCertificateGen.lean`
 computes it by Gaussian elimination over `𝔽₂` and prints it as Lean source.
 -/
+
+@[expose] public section
 
 namespace Quantum
 

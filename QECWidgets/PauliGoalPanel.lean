@@ -3,9 +3,11 @@ Copyright (c) 2026 Stavan Jain. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Stavan Jain
 -/
-import QECWidgets.PauliStrip
-import ProofWidgets.Component.OfRpcMethod
-import ProofWidgets.Component.MakeEditLink
+module
+
+public import QECWidgets.PauliStrip
+public import ProofWidgets.Component.OfRpcMethod
+public import ProofWidgets.Component.MakeEditLink
 
 /-!
 # `pauli_strip?` — the goal as a strip view, with a `decide` suggestion
@@ -20,6 +22,8 @@ receives the goals plus the range to replace, so the edit is built against the
 live document (`MakeEditLinkProps.ofReplaceRange` needs the current
 `DocumentMeta`, which only exists server-side).
 -/
+
+public meta section
 
 namespace QECWidgets
 

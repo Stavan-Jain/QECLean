@@ -1,11 +1,13 @@
-import QEC.Stabilizer.Framework.Symplectic.IndependentEquiv
-import QEC.Stabilizer.Framework.Symplectic.SymplecticOrthogonal
-import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
-import QEC.Stabilizer.Framework.Symplectic.SymplecticImage
-import QEC.Stabilizer.Framework.Symplectic.Presentation
-import QEC.Stabilizer.Framework.Symplectic.WeightTwoInSpan
-import QEC.Stabilizer.Framework.Symplectic.SupportLemmas
-import QEC.Stabilizer.Framework.Symplectic.CentralizerStructure
+module
+
+public import QEC.Stabilizer.Framework.Symplectic.IndependentEquiv
+public import QEC.Stabilizer.Framework.Symplectic.SymplecticOrthogonal
+public import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
+public import QEC.Stabilizer.Framework.Symplectic.SymplecticImage
+public import QEC.Stabilizer.Framework.Symplectic.Presentation
+public import QEC.Stabilizer.Framework.Symplectic.WeightTwoInSpan
+public import QEC.Stabilizer.Framework.Symplectic.SupportLemmas
+public import QEC.Stabilizer.Framework.Symplectic.CentralizerStructure
 
 /-!
 # Symplectic view of stabilizer groups

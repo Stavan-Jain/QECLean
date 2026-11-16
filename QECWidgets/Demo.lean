@@ -3,13 +3,15 @@ Copyright (c) 2026 Stavan Jain. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Stavan Jain
 -/
-import QEC.Stabilizer.Codes.Small.Steane7Logicals
-import QECWidgets.PauliStrip
-import QECWidgets.PauliGoalPanel
-import QECWidgets.ToricLattice
-import QECWidgets.CheckMatrix
-import ProofWidgets.Component.Panel.SelectionPanel
-import ProofWidgets.Component.Panel.GoalTypePanel
+module
+
+public import QEC.Stabilizer.Codes.Small.Steane7Logicals
+public import QECWidgets.PauliStrip
+public import QECWidgets.PauliGoalPanel
+public import QECWidgets.ToricLattice
+public import QECWidgets.CheckMatrix
+public import ProofWidgets.Component.Panel.SelectionPanel
+public import ProofWidgets.Component.Panel.GoalTypePanel
 
 /-!
 # Widget demos
@@ -21,6 +23,8 @@ demos are compiled (and therefore cannot silently rot).
 Each `#pauli_strip` below puts a widget in the infoview when the cursor is on
 the command. The `example`s at the bottom show the in-proof panels.
 -/
+
+@[expose] public section
 
 namespace QECWidgets.Demo
 

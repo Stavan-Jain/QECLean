@@ -1,4 +1,7 @@
-import QEC.Stabilizer.Framework.Homological.Certificate.PackedDigits
+module
+
+public import QEC.Stabilizer.Framework.Homological.Certificate.PackedDigits
+public import Batteries.Data.Nat.Bitwise.Lemmas
 
 /-!
 # Sentinel-bit comparisons on packed tables
@@ -19,6 +22,8 @@ compares every entry of the table in one packed operation.
   test leaves the sentinel bit exactly in the lanes where two tables agree.
 * `packed_mask_bound`: a packed low-bit mask proves a bound on every entry.
 -/
+
+@[expose] public section
 
 namespace PackedDigits
 

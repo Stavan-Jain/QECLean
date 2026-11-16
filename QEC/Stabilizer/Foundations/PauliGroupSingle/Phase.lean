@@ -1,8 +1,10 @@
-import Mathlib.Basic.Complex.Basic
-import Mathlib.Algebra.Star.Basic
-import Mathlib.Tactic
-import QEC.Foundations.Foundations
-import QEC.Stabilizer.Foundations.PauliGroupSingle.Core
+module
+
+public import Mathlib.Basic.Complex.Basic
+public import Mathlib.Algebra.Star.Basic
+public import Mathlib.Tactic
+public import QEC.Foundations.Foundations
+public import QEC.Stabilizer.Foundations.PauliGroupSingle.Core
 
 /-!
 # Phase powers as complex numbers
@@ -12,6 +14,8 @@ The phase power `k : Fin 4` of a Pauli group element stands for the scalar
 (`phasePowerToComplex`) and as a unit complex number
 (`phasePowerToUnitComplex`).
 -/
+
+@[expose] public section
 
 namespace Quantum
 

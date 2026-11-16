@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Framework.Homological.Code
-import QEC.Stabilizer.Codes.RotatedSurface.CellComplex
+module
+
+public import QEC.Stabilizer.Framework.Homological.Code
+public import QEC.Stabilizer.Codes.RotatedSurface.CellComplex
 
 /-!
 # Boundary maps of the rotated surface code
@@ -23,6 +25,8 @@ of X-checks has an even number of qubits in every row
 (`sum_row_rscBoundary2`), and a combination of Z-checks in every column
 (`sum_col_rscZCutMap`).
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

@@ -1,13 +1,15 @@
-import Mathlib.LinearAlgebra.Matrix.Defs
-import Mathlib.LinearAlgebra.Matrix.Notation
-import Mathlib.Basic.Complex.Basic
-import Mathlib.Tactic
-import Mathlib.Algebra.Group.Defs
-import Mathlib.Algebra.Group.Nat.Even
-import Mathlib.Algebra.Ring.Parity
-import QEC.Foundations.Foundations
-import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
-import QEC.Stabilizer.Foundations.PauliGroup.Representation
+module
+
+public import Mathlib.LinearAlgebra.Matrix.Defs
+public import Mathlib.LinearAlgebra.Matrix.Notation
+public import Mathlib.Basic.Complex.Basic
+public import Mathlib.Tactic
+public import Mathlib.Algebra.Group.Defs
+public import Mathlib.Algebra.Group.Nat.Even
+public import Mathlib.Algebra.Ring.Parity
+public import QEC.Foundations.Foundations
+public import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
+public import QEC.Stabilizer.Foundations.PauliGroup.Representation
 
 /-!
 # Commutation in the n-qubit Pauli group
@@ -24,6 +26,8 @@ gives the parity characterizations:
   anticommute at an odd number of qubits;
 - `commute_or_anticommute`: one of the two always holds.
 -/
+
+@[expose] public section
 
 namespace Quantum
 open Matrix

@@ -1,7 +1,9 @@
-import QEC.Stabilizer.Framework.Homological.CSS
-import QEC.Stabilizer.Framework.Core.CSS.CSSCommutationLemmas
-import QEC.Stabilizer.Framework.Symplectic.SupportLemmas
-import QEC.Stabilizer.Foundations.BinarySymplectic.SymplecticInner
+module
+
+public import QEC.Stabilizer.Framework.Homological.CSS
+public import QEC.Stabilizer.Framework.Core.CSS.CSSCommutationLemmas
+public import QEC.Stabilizer.Framework.Symplectic.SupportLemmas
+public import QEC.Stabilizer.Foundations.BinarySymplectic.SymplecticInner
 
 /-!
 # Stabilizer generators of a homological CSS code
@@ -26,6 +28,8 @@ Commutation with a chain operator is read off the pairing
   checks commute, since `⟨∂₂ f, cutMap s⟩ = ⟨∂₁ (∂₂ f), s⟩ = 0`
   (`chainInnerProduct_boundary2_cutMap_eq_zero`).
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

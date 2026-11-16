@@ -1,5 +1,7 @@
-import Architect
-import QEC
+module
+
+public import Architect
+public import QEC
 
 /-!
 # QECBlueprint — LeanArchitect annotations for the QECLean blueprint

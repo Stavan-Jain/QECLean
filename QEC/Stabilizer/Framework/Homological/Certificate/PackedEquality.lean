@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Framework.Homological.Certificate.PackedLaneShifts
+module
+
+public import QEC.Stabilizer.Framework.Homological.Certificate.PackedLaneShifts
 
 /-!
 # Packed equality flags and strict comparison
@@ -12,6 +14,8 @@ Two more sentinel-bit comparisons on packed tables of entries below
   decrement proves `g i < f i` in every lane (`testBit_guarded_lt` is the
   scalar test).
 -/
+
+@[expose] public section
 
 namespace PackedDigits
 

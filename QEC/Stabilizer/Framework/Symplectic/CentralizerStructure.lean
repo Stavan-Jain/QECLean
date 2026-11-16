@@ -1,19 +1,21 @@
-import Mathlib.Data.ZMod.Basic
-import Mathlib.LinearAlgebra.Span.Basic
-import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
-import Mathlib.LinearAlgebra.Dimension.Constructions
-import Mathlib.Tactic
-import QEC.Stabilizer.Foundations.BinarySymplectic.Core
-import QEC.Stabilizer.Foundations.BinarySymplectic.SymplecticInner
-import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrix
-import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
-import QEC.Stabilizer.Framework.Symplectic.SymplecticImage
-import QEC.Stabilizer.Framework.Symplectic.SymplecticOrthogonal
-import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
-import QEC.Stabilizer.Framework.Core.Stabilizer.Centralizer
-import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
-import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
-import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
+module
+
+public import Mathlib.Data.ZMod.Basic
+public import Mathlib.LinearAlgebra.Span.Basic
+public import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
+public import Mathlib.LinearAlgebra.Dimension.Constructions
+public import Mathlib.Tactic
+public import QEC.Stabilizer.Foundations.BinarySymplectic.Core
+public import QEC.Stabilizer.Foundations.BinarySymplectic.SymplecticInner
+public import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrix
+public import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
+public import QEC.Stabilizer.Framework.Symplectic.SymplecticImage
+public import QEC.Stabilizer.Framework.Symplectic.SymplecticOrthogonal
+public import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
+public import QEC.Stabilizer.Framework.Core.Stabilizer.Centralizer
+public import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
+public import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
+public import QEC.Stabilizer.Foundations.PauliGroup.NQubitElement
 
 /-!
 # Classifying the centralizer of a stabilizer group
@@ -36,6 +38,8 @@ classifies the elements of the centralizer in two ways.
   orthogonal of `V ⊔ span {X̄, Z̄}` is `V` itself
   (`NQubitPauliOperator.mem_of_mem_sympOrthogonal_of_pair`).
 -/
+
+@[expose] public section
 
 namespace Quantum
 

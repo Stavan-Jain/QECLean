@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Codes.Toric.WrappingInvariants
+module
+
+public import QEC.Stabilizer.Codes.Toric.WrappingInvariants
 
 /-!
 # The dual toric complex and its wrapping numbers
@@ -40,6 +42,8 @@ A dual cycle that is not a dual boundary has weight at least `L`
 have weight `L` (`dualLoopChain_mem_toricDualBoundaries_iff`,
 `edgeWeight_dualLoopChain_one_zero`, `edgeWeight_dualLoopChain_zero_one`).
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

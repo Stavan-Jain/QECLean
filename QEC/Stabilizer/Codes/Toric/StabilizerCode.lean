@@ -1,7 +1,9 @@
-import QEC.Stabilizer.Codes.Toric.DistanceX
-import QEC.Stabilizer.Codes.Toric.DistanceZ
-import QEC.Stabilizer.Framework.Homological.ToCode
-import QEC.Stabilizer.Framework.Symplectic.Presentation
+module
+
+public import QEC.Stabilizer.Codes.Toric.DistanceX
+public import QEC.Stabilizer.Codes.Toric.DistanceZ
+public import QEC.Stabilizer.Framework.Homological.ToCode
+public import QEC.Stabilizer.Framework.Symplectic.Presentation
 
 /-!
 # The toric code as a `[[2 * L * L, 2]]` stabilizer code
@@ -33,6 +35,8 @@ independent list of checks, which presents the code.
   (`chainInnerProduct_loopChain_dualLoopChain`).
   `toricStabilizerCodeWithLogicals L` bundles the code with these operators.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

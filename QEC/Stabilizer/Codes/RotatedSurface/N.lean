@@ -1,8 +1,10 @@
-import QEC.Stabilizer.Codes.RotatedSurface.ChainComplex
-import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
-import QEC.Stabilizer.Framework.Core.CSS.CSSCommutationLemmas
-import QEC.Stabilizer.Framework.Homological.StabGroup
-import QEC.Stabilizer.Framework.Homological.LogicalCorrespondence
+module
+
+public import QEC.Stabilizer.Codes.RotatedSurface.ChainComplex
+public import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
+public import QEC.Stabilizer.Framework.Core.CSS.CSSCommutationLemmas
+public import QEC.Stabilizer.Framework.Homological.StabGroup
+public import QEC.Stabilizer.Framework.Homological.LogicalCorrespondence
 
 /-!
 # Stabilizer group of the rotated surface code
@@ -23,6 +25,8 @@ absence of `-I` are those of the homological CSS code.
   (`stabilizerGroup_toSubgroup_eq_homologicalStabilizerGroup`), so results on
   logical operators and distance of homological codes transfer to it.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

@@ -1,6 +1,8 @@
-import Mathlib.Tactic
-import QEC.Stabilizer.Foundations.PauliGroup.Commutation
-import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
+module
+
+public import Mathlib.Tactic
+public import QEC.Stabilizer.Foundations.PauliGroup.Commutation
+public import QEC.Stabilizer.Foundations.PauliGroup.NQubitOperator
 
 /-!
 # Tactics for Pauli commutation goals
@@ -26,6 +28,8 @@ Three tactics to shorten repetitive commutation proofs in stabilizer code files:
   show the filter equals a concrete finset of odd size and `simp [hfilter]` or
   `rw [hfilter]; decide`.
 -/
+
+@[expose] public section
 
 namespace Quantum.NQubitPauliGroupElement
 

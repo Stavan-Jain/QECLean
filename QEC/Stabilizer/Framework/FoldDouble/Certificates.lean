@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Framework.FoldDouble.Distance
+module
+
+public import QEC.Stabilizer.Framework.FoldDouble.Distance
 
 /-!
 # Certificates for condition (J): the averaging argument
@@ -29,6 +31,8 @@ certificates for it, all consequences of one averaging argument:
 Everything here is for X-type operators; the Z-type statements are the same
 with `X` and `Z` exchanged.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

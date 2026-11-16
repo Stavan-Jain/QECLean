@@ -1,6 +1,8 @@
-import QEC.Stabilizer.Framework.Homological.LogicalCorrespondence
-import QEC.Stabilizer.Codes.Toric.CodeN
-import QEC.Stabilizer.Codes.Toric.DualWrappingInvariants
+module
+
+public import QEC.Stabilizer.Framework.Homological.LogicalCorrespondence
+public import QEC.Stabilizer.Codes.Toric.CodeN
+public import QEC.Stabilizer.Codes.Toric.DualWrappingInvariants
 
 /-!
 # Z-type logical operators of the toric code and dual homology
@@ -28,6 +30,8 @@ All of them are the corresponding statements about the chain operators of
 `toricHomologicalCode L`, whose checks and stabilizer group are those of the
 toric code and whose dual complex is the dual toric complex.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

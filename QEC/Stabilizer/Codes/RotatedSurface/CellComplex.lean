@@ -1,4 +1,6 @@
-import Mathlib.Tactic
+module
+
+public import Mathlib.Tactic
 
 /-!
 # Cells of the rotated surface code
@@ -43,6 +45,8 @@ check acts on.
   qubits.
 * `card_ZFaceIdx_add_card_XFaceIdx`: there are `L * L - 1` checks.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

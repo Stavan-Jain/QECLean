@@ -1,6 +1,8 @@
-import QEC.Stabilizer.Framework.Concatenation.Restriction
-import QEC.Stabilizer.Framework.Core
-import QEC.Stabilizer.Framework.Symplectic
+module
+
+public import QEC.Stabilizer.Framework.Concatenation.Restriction
+public import QEC.Stabilizer.Framework.Core
+public import QEC.Stabilizer.Framework.Symplectic
 
 /-!
 # Concatenation: promotion, induced outer operators and the generator list
@@ -34,6 +36,8 @@ Concatenation encodes each qubit of an *outer* code into a block carrying an
   (`s1PerBlockList`), followed by the promoted outer generators
   (`promotedOuterList`).
 -/
+
+@[expose] public section
 
 namespace Quantum
 

@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Codes.Color.Geometry
+module
+
+public import QEC.Stabilizer.Codes.Color.Geometry
 
 /-!
 # Faces of the color code have an even number of qubits
@@ -11,6 +13,8 @@ a face on a side of the patch. Hence every face has an even number of qubits
 (`faceSupport_sum_one`), and its indicator vector is orthogonal to itself over
 `ZMod 2` (`incidence_self_orthogonal`).
 -/
+
+@[expose] public section
 
 namespace Quantum.StabilizerGroup.ColorCode
 

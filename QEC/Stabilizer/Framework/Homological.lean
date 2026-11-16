@@ -1,36 +1,38 @@
-import QEC.Stabilizer.Framework.Homological.Code
-import QEC.Stabilizer.Framework.Homological.CSS
-import QEC.Stabilizer.Framework.Homological.Generators
-import QEC.Stabilizer.Framework.Homological.StabGroup
-import QEC.Stabilizer.Framework.Homological.LogicalCorrespondence
-import QEC.Stabilizer.Framework.Homological.Distance
-import QEC.Stabilizer.Framework.Homological.Presentation
-import QEC.Stabilizer.Framework.Homological.ToCode
-import QEC.Stabilizer.Framework.Homological.SelfDual
-import QEC.Stabilizer.Framework.Homological.SelfDualLogical
-import QEC.Stabilizer.Framework.Homological.BBChainComplex
-import QEC.Stabilizer.Framework.Homological.BBLogicalQubits
-import QEC.Stabilizer.Framework.Homological.BBStabilizerCode
-import QEC.Stabilizer.Framework.Homological.Covering
-import QEC.Stabilizer.Framework.Homological.BBDuality
-import QEC.Stabilizer.Framework.Homological.BBCover
-import QEC.Stabilizer.Framework.Homological.BBDoubling
-import QEC.Stabilizer.Framework.Homological.BBSmallCycle
-import QEC.Stabilizer.Framework.Homological.BBDeckTower
-import QEC.Stabilizer.Framework.Homological.BocksteinLift
-import QEC.Stabilizer.Framework.Homological.BBEpsFree
-import QEC.Stabilizer.Framework.Homological.BBConvRing
-import QEC.Stabilizer.Framework.Homological.BBBocksteinRank
-import QEC.Stabilizer.Framework.Homological.BBTransferH1
-import QEC.Stabilizer.Framework.Homological.BBDeficitWall
-import QEC.Stabilizer.Framework.Homological.BBEpsFreeGroupAlgebra
-import QEC.Stabilizer.Framework.Homological.BBBocksteinTransport
-import QEC.Stabilizer.Framework.Homological.F2Mask
-import QEC.Stabilizer.Framework.Homological.BZCertificate
-import QEC.Stabilizer.Framework.Homological.BBSeamBZ
-import QEC.Stabilizer.Framework.Homological.BBFlatLift
-import QEC.Stabilizer.Framework.Homological.Certificate
-import QEC.Stabilizer.Framework.Homological.LiftedProduct
+module
+
+public import QEC.Stabilizer.Framework.Homological.Code
+public import QEC.Stabilizer.Framework.Homological.CSS
+public import QEC.Stabilizer.Framework.Homological.Generators
+public import QEC.Stabilizer.Framework.Homological.StabGroup
+public import QEC.Stabilizer.Framework.Homological.LogicalCorrespondence
+public import QEC.Stabilizer.Framework.Homological.Distance
+public import QEC.Stabilizer.Framework.Homological.Presentation
+public import QEC.Stabilizer.Framework.Homological.ToCode
+public import QEC.Stabilizer.Framework.Homological.SelfDual
+public import QEC.Stabilizer.Framework.Homological.SelfDualLogical
+public import QEC.Stabilizer.Framework.Homological.BBChainComplex
+public import QEC.Stabilizer.Framework.Homological.BBLogicalQubits
+public import QEC.Stabilizer.Framework.Homological.BBStabilizerCode
+public import QEC.Stabilizer.Framework.Homological.Covering
+public import QEC.Stabilizer.Framework.Homological.BBDuality
+public import QEC.Stabilizer.Framework.Homological.BBCover
+public import QEC.Stabilizer.Framework.Homological.BBDoubling
+public import QEC.Stabilizer.Framework.Homological.BBSmallCycle
+public import QEC.Stabilizer.Framework.Homological.BBDeckTower
+public import QEC.Stabilizer.Framework.Homological.BocksteinLift
+public import QEC.Stabilizer.Framework.Homological.BBEpsFree
+public import QEC.Stabilizer.Framework.Homological.BBConvRing
+public import QEC.Stabilizer.Framework.Homological.BBBocksteinRank
+public import QEC.Stabilizer.Framework.Homological.BBTransferH1
+public import QEC.Stabilizer.Framework.Homological.BBDeficitWall
+public import QEC.Stabilizer.Framework.Homological.BBEpsFreeGroupAlgebra
+public import QEC.Stabilizer.Framework.Homological.BBBocksteinTransport
+public import QEC.Stabilizer.Framework.Homological.F2Mask
+public import QEC.Stabilizer.Framework.Homological.BZCertificate
+public import QEC.Stabilizer.Framework.Homological.BBSeamBZ
+public import QEC.Stabilizer.Framework.Homological.BBFlatLift
+public import QEC.Stabilizer.Framework.Homological.Certificate
+public import QEC.Stabilizer.Framework.Homological.LiftedProduct
 
 /-!
 # Framework.Homological

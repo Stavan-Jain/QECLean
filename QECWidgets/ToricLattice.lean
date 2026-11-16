@@ -3,8 +3,10 @@ Copyright (c) 2026 Stavan Jain. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Stavan Jain
 -/
-import QEC.Stabilizer.Codes.Toric.ChainOps
-import QECWidgets.PauliStrip
+module
+
+public import QEC.Stabilizer.Codes.Toric.ChainOps
+public import QECWidgets.PauliStrip
 
 /-!
 # Toric lattice view
@@ -26,6 +28,8 @@ row-major index order).
 Chain strokes are drawn over a background-colored halo (map-style casing) so
 loops read cleanly where they cross the grid.
 -/
+
+public meta section
 
 namespace QECWidgets
 

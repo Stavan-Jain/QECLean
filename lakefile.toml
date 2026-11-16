@@ -3,12 +3,6 @@ version = "0.1.0"
 keywords = ["math"]
 defaultTargets = ["QEC"]
 
-# Mathlib is written for Lean's module system (`requiresModuleSystem`), and
-# Lake warns on every non-`module` file that imports it. QEC has not been
-# ported to the module system yet, so opt out package-wide rather than carry
-# one warning per file; drop this line when the port happens.
-allowNonModules = true
-
 [leanOptions]
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`
 autoImplicit = false

@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Codes.Toric.LogicalCorrespondenceZ
+module
+
+public import QEC.Stabilizer.Codes.Toric.LogicalCorrespondenceZ
 
 /-!
 # The Z-distance of the toric code is `L`
@@ -15,6 +17,8 @@ complex.
   `le_edgeWeight_of_not_mem_toricDualBoundaries`: a dual cycle that is not a
   dual boundary has weight at least `L`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

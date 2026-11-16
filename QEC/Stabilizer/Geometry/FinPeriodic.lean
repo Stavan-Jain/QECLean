@@ -1,4 +1,6 @@
-import Mathlib.Tactic
+module
+
+public import Mathlib.Tactic
 
 /-!
 # Cyclic successor and predecessor on `Fin L`
@@ -13,6 +15,8 @@ The cycle `Fin L` is connected: a function invariant under `next` is constant
 over `Fin L` is unchanged by shifting the index (`sum_comp_next`,
 `sum_comp_prev`). `zeroCoord L` is the coordinate `0`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

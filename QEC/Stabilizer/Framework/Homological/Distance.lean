@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Framework.Homological.LogicalCorrespondence
-import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
+module
+
+public import QEC.Stabilizer.Framework.Homological.LogicalCorrespondence
+public import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
 
 /-!
 # The CSS distance bridge for homological codes
@@ -32,6 +34,8 @@ number of cells on every line, then so has every element of `Z` outside `B`
 (`apply_ne_zero_of_finrank_le_succ`), which therefore has at least as many
 cells as there are lines (`card_le_card_support_of_fiber_sum_ne_zero`).
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

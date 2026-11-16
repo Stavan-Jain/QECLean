@@ -1,6 +1,8 @@
-import QEC.Stabilizer.Codes.Color.Spin
-import QEC.Stabilizer.Codes.Color.Logicals
-import QEC.Stabilizer.Codes.Color.Energy
+module
+
+public import QEC.Stabilizer.Codes.Color.Spin
+public import QEC.Stabilizer.Codes.Color.Logicals
+public import QEC.Stabilizer.Codes.Color.Energy
 
 /-!
 # The energy of a spin configuration as a sum over layers
@@ -17,6 +19,8 @@ its values), `sum_spinAt_eq_spinEnergy` (the sum over the qubits, layer by
 layer) and `spinLayerEnergy_eq_shellEnergy` (the three rows of qubits of a
 layer have energy `shellEnergy`).
 -/
+
+@[expose] public section
 
 namespace Quantum.StabilizerGroup.ColorCode
 

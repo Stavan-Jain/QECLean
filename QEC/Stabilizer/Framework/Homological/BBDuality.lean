@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Framework.Homological.Covering
-import QEC.Stabilizer.Framework.Homological.LogicalCorrespondence
+module
+
+public import QEC.Stabilizer.Framework.Homological.Covering
+public import QEC.Stabilizer.Framework.Homological.LogicalCorrespondence
 
 /-!
 # X/Z duality of the bivariate bicycle chain complex
@@ -27,6 +29,8 @@ the cycles that are not boundaries holds iff the same bound holds for the dual
 cycles that are not dual boundaries: the X- and Z-distances of a bivariate
 bicycle code agree at the level of chains.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Framework.Homological.Covering
+module
+
+public import QEC.Stabilizer.Framework.Homological.Covering
 
 /-!
 # Free double covers of bivariate bicycle codes
@@ -50,6 +52,8 @@ and its deck translate *sheet 1*. Everything else is derived from the bundle.
   this is the connecting map from `ker ∂₂` to `H₁` of the base complex that the
   cover induces.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

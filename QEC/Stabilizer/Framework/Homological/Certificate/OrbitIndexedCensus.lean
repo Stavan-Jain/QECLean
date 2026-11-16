@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Framework.Homological.Certificate.OrbitCensus
+module
+
+public import QEC.Stabilizer.Framework.Homological.Certificate.OrbitCensus
 
 /-!
 # Orbit censuses indexed by a finite type
@@ -8,6 +10,8 @@ census given as an injective family of canonical representatives: every member
 of the target set is carried onto one of the listed representatives by some
 group element.
 -/
+
+@[expose] public section
 
 namespace Quantum.Stabilizer.Homological.OrbitCensus
 

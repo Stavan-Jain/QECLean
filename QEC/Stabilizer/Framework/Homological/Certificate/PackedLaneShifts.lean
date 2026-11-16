@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Framework.Homological.Certificate.OrbitPackedExtra
+module
+
+public import QEC.Stabilizer.Framework.Homological.Certificate.OrbitPackedExtra
 
 /-!
 # Shifts inside the lanes of a packed table
@@ -16,6 +18,8 @@ crossed, so the masked shift acts as the entrywise shift:
 * `packF_selectBit`: one chosen bit of every entry, as a table of zeros and
   ones.
 -/
+
+@[expose] public section
 
 namespace PackedDigits
 

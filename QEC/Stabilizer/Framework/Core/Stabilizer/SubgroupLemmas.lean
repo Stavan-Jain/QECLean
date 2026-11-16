@@ -1,6 +1,8 @@
-import Mathlib.Algebra.Group.Subgroup.Lattice
-import Mathlib.GroupTheory.Subgroup.Centralizer
-import Mathlib.Tactic
+module
+
+public import Mathlib.Algebra.Group.Subgroup.Lattice
+public import Mathlib.GroupTheory.Subgroup.Centralizer
+public import Mathlib.Tactic
 
 /-!
 # Subgroup lemmas for generated subgroups
@@ -19,6 +21,8 @@ Pauli-specific content, used to build stabilizer groups from generators:
 - `Subgroup.IndependentGenerators`: no generator lies in the subgroup generated
   by the others.
 -/
+
+@[expose] public section
 
 namespace Subgroup
 

@@ -3,10 +3,12 @@ Copyright (c) 2026 Stavan Jain. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Stavan Jain
 -/
-import QECWidgets.PauliEval
-import QECWidgets.Style
-import ProofWidgets.Component.HtmlDisplay
-import ProofWidgets.Presentation.Expr
+module
+
+public import QECWidgets.PauliEval
+public import QECWidgets.Style
+public import ProofWidgets.Component.HtmlDisplay
+public import ProofWidgets.Presentation.Expr
 
 /-!
 # Pauli support strips for the infoview
@@ -28,6 +30,8 @@ Renders concrete Pauli objects as colored per-qubit strips:
 Card names are interactive (`exprName`): hover for types, click to jump to the
 definition. Look and feel comes from `QECWidgets.Style`.
 -/
+
+public meta section
 
 namespace QECWidgets
 

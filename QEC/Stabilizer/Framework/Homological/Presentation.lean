@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Framework.Homological.StabGroup
-import QEC.Stabilizer.Framework.Symplectic.Presentation
+module
+
+public import QEC.Stabilizer.Framework.Homological.StabGroup
+public import QEC.Stabilizer.Framework.Symplectic.Presentation
 
 /-!
 # Presentations of homological CSS codes with independent checks
@@ -16,6 +18,8 @@ The symplectic vector of a chain operator is computed coordinate by coordinate
 in `toSymplectic_chainXOperator_X`, `toSymplectic_chainXOperator_Z`,
 `toSymplectic_chainZOperator_X` and `toSymplectic_chainZOperator_Z`.
 -/
+
+@[expose] public section
 
 namespace Quantum.Stabilizer.Homological.HomologicalCode
 

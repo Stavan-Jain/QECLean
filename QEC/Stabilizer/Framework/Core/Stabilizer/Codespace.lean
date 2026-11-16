@@ -1,7 +1,9 @@
-import QEC.Foundations.Basic
-import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
-import QEC.Stabilizer.Foundations.PauliGroup
-import QEC.Stabilizer.Foundations.PauliGroup.Representation
+module
+
+public import QEC.Foundations.Basic
+public import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerGroup
+public import QEC.Stabilizer.Foundations.PauliGroup
+public import QEC.Stabilizer.Foundations.PauliGroup.Representation
 
 /-!
 # Codespace and stabilizer sum
@@ -19,6 +21,8 @@ every element of `S`. This file provides:
 - `StabilizerGroup.exists_smul_state_of_mem_codespaceSubmodule`: every vector of
   the codespace is a scalar multiple of a codespace state.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

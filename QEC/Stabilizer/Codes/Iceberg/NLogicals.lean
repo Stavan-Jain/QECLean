@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Codes.Iceberg.N
+module
+
+public import QEC.Stabilizer.Codes.Iceberg.N
 
 /-!
 # The iceberg codes `[[2m, 2m − 2, 2]]`: logical operators
@@ -26,6 +28,8 @@ For `m = 2` this is a basis of the four-qubit code different from the one in
 - Centralizer membership `logicalX_mem_centralizer`, `logicalZ_mem_centralizer`
 - `stabilizerCodeWithLogicals : Code[[2m, 2m − 2]]ₗ`
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

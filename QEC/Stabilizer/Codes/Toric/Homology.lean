@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Codes.Toric.BoundaryMaps
+module
+
+public import QEC.Stabilizer.Codes.Toric.BoundaryMaps
 
 /-!
 # Homology of the toric chain complex
@@ -12,6 +14,8 @@ The scoped notations `Z₁ L`, `B₁ L` and `H₁ L` (scope `ToricChain`) stand 
 these three objects. The scope `RotatedSurfaceChain` binds the same tokens to
 the rotated-surface complex, so a file opens only one of the two scopes.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

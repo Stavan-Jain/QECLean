@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Codes.RotatedSurface.DistanceZ
+module
+
+public import QEC.Stabilizer.Codes.RotatedSurface.DistanceZ
 
 /-!
 # Distance of the rotated surface code
@@ -14,6 +16,8 @@ weight at least `L` by `chainWeight_ge_L_of_nontrivial` and
 `dual_chainWeight_ge_L_of_nontrivial`. The logical X operator `logicalX L`
 attains the bound.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace StabilizerGroup

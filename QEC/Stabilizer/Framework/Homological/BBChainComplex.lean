@@ -1,4 +1,8 @@
-import QEC.Stabilizer.Framework.Homological.Distance
+module
+
+public meta import Lean.PrettyPrinter.Delaborator.Builtins
+meta import Lean.Elab.Command
+public import QEC.Stabilizer.Framework.Homological.Distance
 
 /-!
 # The bivariate bicycle chain complex
@@ -45,6 +49,8 @@ the X-check matrix is `[M_A | M_B]` and the Z-check matrix is `[M_Bᵀ | M_Aᵀ]
   1-cycle has even weight.
 -/
 
+@[expose] public section
+
 namespace Quantum
 namespace Stabilizer
 namespace Homological
@@ -70,7 +76,7 @@ Multiplicative precedence (`70`), so `(a ⋆ b) g` needs its parentheses and
 -/
 scoped infixl:70 " ⋆ " => conv
 
-section PolyNotation
+meta section PolyNotation
 
 open Lean
 
@@ -205,7 +211,7 @@ Fires only on a lambda of exactly that shape, of type
 decidability instance (a `classical` indicator would print the same but
 re-elaborate to a different term); every other lambda is left to the default
 printer. Scoped with the notation. -/
-@[scoped delab lam]
+@[scoped delab lam, no_expose]
 def delabPolyLit : Delab :=
   whenPPOption getPPNotation <| whenNotPPOption getPPExplicit do
     let e ← getExpr
@@ -580,7 +586,7 @@ open Lean Elab Command in
 /-- Display test: elaborate `stx` and check that its pretty-printed text is
 `expected` (`exact := false`: contains `expected`). Run through `run_cmd` so no
 `#`-command is needed. -/
-private def checkDisplay (stx : Syntax) (expected : String) (exact : Bool := true) :
+private meta def checkDisplay (stx : Syntax) (expected : String) (exact : Bool := true) :
     CommandElabM Unit :=
   liftTermElabM do
     let e ← Term.elabTerm stx none

@@ -1,6 +1,8 @@
-import Mathlib.GroupTheory.GroupAction.Quotient
-import Mathlib.Algebra.BigOperators.Group.Finset.Basic
-import Mathlib.SetTheory.Cardinal.Finite
+module
+
+public import Mathlib.GroupTheory.GroupAction.Quotient
+public import Mathlib.Algebra.BigOperators.Group.Finset.Basic
+public import Mathlib.SetTheory.Cardinal.Finite
 
 /-!
 # Orbit censuses for finite group actions
@@ -19,6 +21,8 @@ of `target` is a translate of a listed representative
 Orbit sizes are computed from fixed-point counts by the orbit–stabilizer
 theorem: `orbit_card_mul_fixed_card` and `orbit_card_eq_div`.
 -/
+
+@[expose] public section
 
 namespace Quantum.Stabilizer.Homological.OrbitCensus
 

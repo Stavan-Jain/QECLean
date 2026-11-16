@@ -1,5 +1,7 @@
-import QEC.Stabilizer.Framework.Homological.BBDuality
-import QEC.Stabilizer.Framework.Homological.ToCode
+module
+
+public import QEC.Stabilizer.Framework.Homological.BBDuality
+public import QEC.Stabilizer.Framework.Homological.ToCode
 
 /-!
 # The number of logical qubits of a bivariate bicycle code
@@ -34,6 +36,8 @@ one onto the other, since `reflect (a ⋆ f) = reflect a ⋆ reflect f`.
 Writing `κ = dim (ker A ⊓ ker B)`, this gives `rank ∂₂ = rank ∂₁ = |G| − κ`, so
 `dim Z₁ = 2|G| − (|G| − κ)`, `dim B₁ = |G| − κ` and `dim H₁ = 2κ`.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

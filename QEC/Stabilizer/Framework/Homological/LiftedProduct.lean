@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Framework.Homological.Distance
+module
+
+public import QEC.Stabilizer.Framework.Homological.Distance
 
 /-!
 # Non-abelian lifted product as a `HomologicalCode`
@@ -32,6 +34,8 @@ This file provides:
   grid block `m < 4` is `(α, β) = (blockRow m, blockCol m)`;
 * `mittenChainComplex A B : HomologicalCode`: the packaged complex.
 -/
+
+@[expose] public section
 
 namespace Quantum
 namespace Stabilizer

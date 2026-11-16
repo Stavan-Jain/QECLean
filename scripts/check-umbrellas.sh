@@ -15,10 +15,10 @@ while IFS= read -r dir; do
   while IFS= read -r f; do
     [ "$f" = "$umbrella" ] && continue
     mod="$(echo "${f%.lean}" | tr '/' '.')"
-    if ! grep -q "^import ${mod}$" "$umbrella"; then
+    if ! grep -Eq "^(public )?import ${mod}$" "$umbrella"; then
       # transitive: a sub-umbrella may import it (one level down)
       sub="$(dirname "$f").lean"
-      if [ -f "$sub" ] && grep -q "^import ${mod}$" "$sub"; then continue; fi
+      if [ -f "$sub" ] && grep -Eq "^(public )?import ${mod}$" "$sub"; then continue; fi
       echo "ORPHAN: $mod (not imported by $umbrella)"
       status=1
     fi

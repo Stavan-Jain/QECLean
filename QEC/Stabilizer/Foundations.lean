@@ -1,6 +1,8 @@
-import QEC.Stabilizer.Foundations.PauliGroupSingle
-import QEC.Stabilizer.Foundations.PauliGroup
-import QEC.Stabilizer.Foundations.BinarySymplectic
+module
+
+public import QEC.Stabilizer.Foundations.PauliGroupSingle
+public import QEC.Stabilizer.Foundations.PauliGroup
+public import QEC.Stabilizer.Foundations.BinarySymplectic
 
 /-!
 # Foundations

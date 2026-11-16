@@ -1,4 +1,6 @@
-import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
+module
+
+public import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
 
 /-!
 # Logical Clifford actions on one logical qubit
@@ -17,6 +19,8 @@ Each predicate is stated with gate-level conjugation `conjByGate` and has an
 equivalent matrix form (`isLogicalHadamard_iff_matrix`, `isLogicalS_iff_matrix`,
 `isLogicalSAdjoint_iff_matrix`).
 -/
+
+@[expose] public section
 
 namespace Quantum
 
