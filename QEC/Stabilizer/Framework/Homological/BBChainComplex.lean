@@ -470,7 +470,9 @@ lemma bbBoundary2Fn_translate (c : G) (f : G → ZMod 2) :
 lemma card_support_translate1 (c : G) (v : G × Fin 2 → ZMod 2) :
     (Finset.univ.filter fun p => translate1 c v p ≠ 0).card
       = (Finset.univ.filter fun p => v p ≠ 0).card :=
-  Finset.card_equiv ((Equiv.addRight c).prodCongr (Equiv.refl (Fin 2))) (by simp)
+  Finset.card_equiv ((Equiv.addRight c).prodCongr (Equiv.refl (Fin 2))) fun p => by
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+    rfl
 
 /-! ## Parity of cycles
 
@@ -520,6 +522,7 @@ variable [DecidableEq G]
 /-- The bivariate bicycle chain complex of `A`, `B` as a `HomologicalCode`:
 cells `C₀ = C₂ = G` and `C₁ = G × Fin 2`, with the boundary maps `bbBoundary1`
 and `bbBoundary2`. -/
+@[implicit_reducible]
 noncomputable def bbChainComplex (A B : G → ZMod 2) : HomologicalCode where
   C0 := G
   C1 := G × Fin 2

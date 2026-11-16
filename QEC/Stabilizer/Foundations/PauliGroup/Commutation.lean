@@ -1,6 +1,6 @@
 import Mathlib.LinearAlgebra.Matrix.Defs
 import Mathlib.LinearAlgebra.Matrix.Notation
-import Mathlib.Data.Complex.Basic
+import Mathlib.Basic.Complex.Basic
 import Mathlib.Tactic
 import Mathlib.Algebra.Group.Defs
 import Mathlib.Algebra.Group.Nat.Even
@@ -112,9 +112,9 @@ lemma mulOp_phasePower_eq_add_card (p q : NQubitPauliOperator n)
       ((q i).mulOp (p i)).phasePower + if anticommutesAt p q i then 2 else 0 := by
     intro i
     by_cases hi : anticommutesAt p q i
-    · rw [if_pos hi]
+    · rw [ite_eq_left hi]
       exact hi
-    · rw [if_neg hi, add_zero]
+    · rw [ite_eq_right hi, add_zero]
       exact (PauliOperator.mulOp_phasePower_eq_or_eq_add_two (p i) (q i)).resolve_right hi
   simp only [mulOp]
   rw [Finset.sum_congr rfl fun i _ => h i, Finset.sum_add_distrib, Finset.sum_ite,

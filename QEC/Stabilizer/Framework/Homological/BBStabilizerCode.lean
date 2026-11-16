@@ -48,6 +48,7 @@ variable (X : HomologicalCode)
 equal `n`. Cells and boundary maps are unchanged, so cycles, boundaries, and
 `H₁` are definitionally those of `X`; only `numQubits` and the qubit indexing
 `edgeEquiv` (composed with `finCongr h`) change. -/
+@[implicit_reducible]
 def withNumQubits (n : ℕ) (h : X.numQubits = n) : HomologicalCode :=
   { X with
     numQubits := n
@@ -86,6 +87,7 @@ namespace BB
 /-- The bivariate bicycle chain complex on `ZMod ℓ × ZMod m`, with its qubit
 count written as `2 * (ℓ * m)`. Same cells, boundary maps, and `H₁` as
 `bbChainComplex A B`. -/
+@[implicit_reducible]
 noncomputable def bbHomologicalCode (ℓ m : ℕ) [NeZero ℓ] [NeZero m]
     (A B : ZMod ℓ × ZMod m → ZMod 2) : HomologicalCode :=
   (bbChainComplex A B).withNumQubits (2 * (ℓ * m)) (bbNumQubits_zmod ℓ m)

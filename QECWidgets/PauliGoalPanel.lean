@@ -68,7 +68,7 @@ structure PauliSuggestionProps where
 /-- Render the main goal as a Pauli card; when it holds, append the `decide`
 suggestion link. -/
 private def suggestionBody (docMeta : DocumentMeta) (range : Lsp.Range)
-    (goals : Array Widget.InteractiveGoal) : RequestM Html := do
+    (goals : Array Widget.InteractiveGoal) : RequestM ProofWidgets.Html := do
   let some g := goals[0]?
     | return .text "No goals."
   g.ctx.val.runMetaM {} do
@@ -80,7 +80,7 @@ private def suggestionBody (docMeta : DocumentMeta) (range : Lsp.Range)
       | some (html, _) =>
         match ← pauliGoalHolds? ty with
         | some true =>
-          let link := Html.ofComponent MakeEditLink
+          let link := ProofWidgets.Html.ofComponent MakeEditLink
             (.ofReplaceRange docMeta range "decide") #[.text "replace with decide"]
           return el "div" #[] #[html,
             cls "div" "qecw-verdict" #[("style", json% { color: $(okColor) })] #[link]]
@@ -89,7 +89,8 @@ private def suggestionBody (docMeta : DocumentMeta) (range : Lsp.Range)
 open RequestM in
 /-- RPC backing `PauliSuggestionPanel`. -/
 @[server_rpc_method]
-def PauliSuggestionPanel.rpc (props : PauliSuggestionProps) : RequestM (RequestTask Html) :=
+def PauliSuggestionPanel.rpc (props : PauliSuggestionProps) :
+    RequestM (RequestTask ProofWidgets.Html) :=
   RequestM.asTask do
     let doc ← RequestM.readDoc
     let inner ← suggestionBody doc.meta props.replaceRange props.goals
@@ -117,10 +118,9 @@ def elabPauliStripTac : Tactic := fun stx => do
     (pure <| json% { replaceRange : $(toJson range) }) stx
 
 -- Like every suggestion widget, `pauli_strip?` intentionally leaves the goal
--- unchanged, so register it with the unused-tactic linter's dynamic
--- allowlist. This runs on import, covering every file that can use the
--- tactic; the `#allow_unused_tactic!` command is avoided because a silent
--- `#`-command would itself be flagged by `linter.hashCommand`.
-initialize Mathlib.Linter.UnusedTactic.allowedRef.modify (·.insert ``QECWidgets.pauliStripTac)
+-- unchanged, so register it with the unused-tactic linter's allowlist. The
+-- (non-`local`) command is global and persists across imports, covering
+-- every file that can use the tactic.
+allow_unused_tactic QECWidgets.pauliStripTac
 
 end QECWidgets

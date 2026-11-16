@@ -132,7 +132,7 @@ lemma reconX_xor (w : List (ℕ × ℕ)) (a b : ℕ) :
     rw [reconX_cons, reconX_cons, reconX_cons, ih, Nat.testBit_xor]
     cases a.testBit pr.1 <;> cases b.testBit pr.1 <;>
       simp only [Bool.xor_false, Bool.xor_true, Bool.not_true, Bool.not_false,
-        Bool.false_eq_true, if_false, if_true, Nat.zero_xor]
+        Bool.false_eq_true, ite_false, ite_true, Nat.zero_xor]
     · rw [Nat.xor_left_comm]
     · rw [Nat.xor_assoc]
     · rw [Nat.xor_assoc, Nat.xor_left_comm _ pr.2, ← Nat.xor_assoc pr.2, Nat.xor_self,
@@ -162,7 +162,7 @@ lemma ok_reconX_of_walk {ok : ℕ → Bool} (h0 : ok 0 = true) {w : List (ℕ ×
     (hlen : (w.filter fun pr => M.testBit pr.1).length ≤ t) : ok (reconX w M) = true := by
   by_cases hS : (w.filter fun pr => M.testBit pr.1).map Prod.snd = []
   · rwa [reconX, hS, xorList_nil]
-  · simpa using xorWalk_sound hw (List.filter_sublist.map _) hS (by simpa using hlen)
+  · simpa [reconX] using xorWalk_sound hw (List.filter_sublist.map _) hS (by simpa using hlen)
 
 /-- **The two-window argument.** If the pivots of the two windows are distinct
 and below `n`, every word of weight `< t₁ + t₂ + 2` is reconstructed through a
@@ -278,7 +278,7 @@ private lemma sum_map_eq_count {l : List H} {h : H} {ζ : H → ZMod 2}
       List.count_cons]
     by_cases ha : a = h
     · subst ha
-      simp only [beq_self_eq_true, if_true]
+      simp only [beq_self_eq_true, ite_true]
       push_cast
       ring
     · rw [hz a List.mem_cons_self ha]

@@ -68,7 +68,7 @@ theorem reconstruction_list_sound (width : Nat) (pairs : List (Nat × Nat))
   obtain ⟨i, hi, rfl⟩ := List.getElem_of_mem hp
   have he := congrArg (lane width i) hcheck
   rw [lane_packF _ _ _ _ (fun j _ => reconX_lt rows _ width fun q hq => (hr q hq).2),
-    lane_packF _ _ _ _ hsnd, if_pos hi, if_pos hi] at he
+    lane_packF _ _ _ _ hsnd, ite_eq_left hi, ite_eq_left hi] at he
   simpa [hi] using he
 
 end PackedDigits

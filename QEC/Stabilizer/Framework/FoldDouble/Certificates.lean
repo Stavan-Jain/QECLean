@@ -230,7 +230,7 @@ and `b₂`. -/
 lemma suppUnion_quad_one (b₁ b₂ : NQubitPauliOperator m) :
     suppUnion ({1, b₁, b₂, b₁ * b₂} : Finset (NQubitPauliOperator m)) =
       support b₁ ∪ support b₂ := by
-  simp only [suppUnion, Finset.sup_insert, Finset.sup_singleton, Finset.sup_eq_union,
+  simp only [suppUnion, Finset.sup_insert, Finset.sup_singleton,
     NQubitPauliOperator.support_one, Finset.empty_union, ← Finset.union_assoc]
   exact Finset.union_eq_left.mpr (support_mul_subset b₁ b₂)
 

@@ -60,7 +60,7 @@ lemma toSymplectic_injOn (S : StabilizerGroup n) :
 /-- The symplectic image of a stabilizer group: the `𝔽₂`-span of the symplectic
 vectors of its elements. The image is already closed under addition and
 scalars (`mem_sympImage_iff`), so the span adds nothing. -/
-def sympImage (S : StabilizerGroup n) : Submodule (ZMod 2) (Fin (n + n) → ZMod 2) :=
+noncomputable def sympImage (S : StabilizerGroup n) : Submodule (ZMod 2) (Fin (n + n) → ZMod 2) :=
   Submodule.span (ZMod 2)
     ((fun g : NQubitPauliGroupElement n => toSymplectic g.operators) '' S.toSubgroup)
 

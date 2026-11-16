@@ -40,14 +40,14 @@ variable {n : ℕ}
 @[simp] lemma mem_support_set_same_iff
     (op : NQubitPauliOperator n) (i : Fin n) (p : PauliOperator) :
     i ∈ support (set op i p) ↔ p ≠ PauliOperator.I := by
-  simp [support, set]
+  simp [set]
 
 /-- Any other index is in the support of `set op i p` iff it is in the support
 of `op`. -/
 @[simp] lemma mem_support_set_ne_iff
     (op : NQubitPauliOperator n) (i j : Fin n) (p : PauliOperator) (h : j ≠ i) :
     j ∈ support (set op i p) ↔ j ∈ support op := by
-  simp [support, set, h]
+  simp [set, h]
 
 /-- The support of `set op i p` is contained in `insert i (support op)`. -/
 lemma support_set_subset_insert (op : NQubitPauliOperator n) (i : Fin n) (p : PauliOperator) :

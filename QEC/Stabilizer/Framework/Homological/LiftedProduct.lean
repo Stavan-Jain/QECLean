@@ -139,13 +139,13 @@ variable [DecidableEq G]
 lemma lconv_delta (a : G → ZMod 2) (c x : G) :
     lconv a (fun g => if g = c then 1 else 0) x = a (x * c⁻¹) := by
   simp only [lconv_apply, mul_ite, mul_one, mul_zero, inv_mul_eq_iff_eq_mul,
-    ← mul_inv_eq_iff_eq_mul, Finset.sum_ite_eq, Finset.mem_univ, if_true]
+    ← mul_inv_eq_iff_eq_mul, Finset.sum_ite_eq, Finset.mem_univ, ite_true]
 
 /-- Right convolution of a point mass is a translated coefficient. -/
 lemma rconv_delta (b : G → ZMod 2) (c x : G) :
     rconv (fun g => if g = c then 1 else 0) b x = b (c⁻¹ * x) := by
   simp only [rconv_apply, ite_mul, one_mul, zero_mul, mul_inv_eq_iff_eq_mul,
-    ← inv_mul_eq_iff_eq_mul, Finset.sum_ite_eq, Finset.mem_univ, if_true]
+    ← inv_mul_eq_iff_eq_mul, Finset.sum_ite_eq, Finset.mem_univ, ite_true]
 
 end PointMass
 
@@ -211,7 +211,7 @@ lemma gridIdx_val_ne_four (α β : Fin 2) : ¬((gridIdx α β).val = 4) := by
 lemma lpBoundary2Fn_grid (f : Fin 2 × G → ZMod 2) (α β : Fin 2) (x : G) :
     lpBoundary2Fn A B f (gridIdx α β, x)
       = lconv (antipode (A α)) (fun g => f (β, g)) x := by
-  simp only [lpBoundary2Fn, if_neg (gridIdx_val_ne_four α β), blockRow_grid,
+  simp only [lpBoundary2Fn, ite_eq_right (gridIdx_val_ne_four α β), blockRow_grid,
     blockCol_grid]
 
 /-- `∂₂` evaluated on the shared block. -/
@@ -301,6 +301,7 @@ noncomputable def lpEdgeEquiv : (Fin 5 × G) ≃ Fin (lpNumQubits G) :=
 /-- The 1×2 non-abelian lifted product as a `HomologicalCode`: `n = 5|G|`
 qubits, X-checks `Fin 2 × G`, Z-checks `Fin 2 × G`, boundary maps
 `lpBoundary1` and `lpBoundary2`. -/
+@[implicit_reducible]
 noncomputable def mittenChainComplex [DecidableEq G] (A B : Fin 2 → G → ZMod 2) :
     HomologicalCode where
   C0 := Fin 2 × G

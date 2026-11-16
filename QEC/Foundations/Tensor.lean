@@ -396,7 +396,7 @@ lemma tensorPowMatrix_mem_unitaryGroup (n : ℕ) (G : OneQubitGate) :
         simp +decide [Matrix.mul_apply]
       have := G.2.2; aesop
     convert Finset.prod_congr rfl fun i _ => h_unitary i using 1
-    any_goals exact Finset.univ
+    on_goal 3 => exact Finset.univ
     · rw [Finset.prod_sum]
       refine Finset.sum_bij (fun p _ => fun i _ => p i) ?_ ?_ ?_ ?_ <;>
         simp +decide [Finset.mem_univ]

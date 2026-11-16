@@ -346,7 +346,7 @@ lemma le_logicalFoldFloor_iff {k : ℕ∞} :
 /-- `d_P = ⊤` exactly when there is no logical fold (`P = J`). -/
 lemma logicalFoldFloor_eq_top_iff : logicalFoldFloor e S = ⊤ ↔ ∀ b, ¬ IsLogicalFold e S b := by
   rw [logicalFoldFloor, sInf_eq_top]
-  refine ⟨fun h b hb => ENat.coe_ne_top _ (h _ ⟨b, hb, rfl⟩), ?_⟩
+  refine ⟨fun h b hb => ENat.natCast_ne_top _ (h _ ⟨b, hb, rfl⟩), ?_⟩
   rintro h _ ⟨b, hb, rfl⟩
   exact absurd hb (h b)
 
@@ -360,14 +360,14 @@ theorem doublingFloor_eq_coe_iff (dK : ℕ) :
       by_contra hemp
       rw [Set.not_nonempty_iff_eq_empty] at hemp
       rw [doublingFloor, hemp, sInf_empty] at h
-      exact ENat.top_ne_coe dK h
+      exact ENat.top_ne_natCast dK h
     obtain ⟨u, hu, hw⟩ := csInf_mem hne
     refine ⟨⟨u, hu, Nat.cast_injective (hw.trans h)⟩, ?_⟩
     rintro w ⟨v, hv, rfl⟩
-    exact ENat.coe_le_coe.mp (h ▸ doublingFloor_le e S hv)
+    exact ENat.natCast_le_natCast.mp (h ▸ doublingFloor_le e S hv)
   · obtain ⟨u, hu, rfl⟩ := h.1
     exact doublingFloor_le e S hu
-  · exact (le_doublingFloor_iff e S).mpr fun u hu => ENat.coe_le_coe.mpr (h.2 ⟨u, hu, rfl⟩)
+  · exact (le_doublingFloor_iff e S).mpr fun u hu => ENat.natCast_le_natCast.mpr (h.2 ⟨u, hu, rfl⟩)
 
 end FoldDouble
 end Stabilizer

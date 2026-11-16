@@ -1,6 +1,6 @@
 import Mathlib.LinearAlgebra.Matrix.Defs
 import Mathlib.LinearAlgebra.Matrix.Notation
-import Mathlib.Data.Complex.Basic
+import Mathlib.Basic.Complex.Basic
 import Mathlib.Tactic
 import QEC.Foundations.Foundations
 import QEC.Stabilizer.Foundations.PauliGroupSingle.Core

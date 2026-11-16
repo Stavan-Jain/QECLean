@@ -108,7 +108,7 @@ lemma trace_eq_zero_of_ne_identity (g : NQubitPauliGroupElement n)
     (h_ne_I : g.operators ≠ NQubitPauliOperator.identity n) :
     (g.toMatrix).trace = 0 := by
   have h := NQubitPauliOperator.trace_mul g.operators (NQubitPauliOperator.identity n)
-  rw [NQubitPauliOperator.identity_toMatrix, mul_one, if_neg h_ne_I] at h
+  rw [NQubitPauliOperator.identity_toMatrix, mul_one, ite_eq_right h_ne_I] at h
   rw [NQubitPauliGroupElement.toMatrix, Matrix.trace_smul, h, smul_zero]
 
 /-- The trace of the stabilizer sum is `2 ^ n`: only the identity

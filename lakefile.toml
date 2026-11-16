@@ -3,6 +3,12 @@ version = "0.1.0"
 keywords = ["math"]
 defaultTargets = ["QEC"]
 
+# Mathlib is written for Lean's module system (`requiresModuleSystem`), and
+# Lake warns on every non-`module` file that imports it. QEC has not been
+# ported to the module system yet, so opt out package-wide rather than carry
+# one warning per file; drop this line when the port happens.
+allowNonModules = true
+
 [leanOptions]
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`
 autoImplicit = false
@@ -10,19 +16,24 @@ relaxedAutoImplicit = false
 weak.linter.mathlibStandardSet = true
 maxSynthPendingDepth = 3
 
-[[require]]
-name = "mathlib"
-scope = "leanprover-community"
-
 # Blueprint extraction (https://github.com/hanwenzhu/LeanArchitect). Pinned to
 # the tag matching `lean-toolchain`; LeanArchitect publishes one tag per
-# toolchain, and its own requires (batteries, Cli) are already pinned at
-# v4.30.0-rc2 by mathlib, so adding it does not move any existing dependency.
+# toolchain. Its own requires (batteries, Cli) are shared with mathlib, whose
+# pins take precedence -- see the note on the mathlib require below.
 # Only `QECBlueprint` imports it -- see the note in QECBlueprint.lean.
 [[require]]
 name = "LeanArchitect"
 git = "https://github.com/hanwenzhu/LeanArchitect.git"
-rev = "v4.30.0-rc2"
+rev = "v4.36.0-rc2"
+
+# Keep mathlib the LAST `require`: Lake lets a later require win when two
+# packages pin the same dependency at different revisions, and LeanArchitect's
+# tag pins batteries at the toolchain tag while mathlib master has usually moved
+# past it. Mathlib's pins must win, or `lake exe cache get` computes hashes that
+# match nothing on the cache server.
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
 
 [[lean_lib]]
 name = "QEC"

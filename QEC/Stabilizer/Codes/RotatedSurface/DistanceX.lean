@@ -39,7 +39,7 @@ lemma sum_row_middleColChain (y : Fin L) :
   · simp [middleColChain]
   · rintro ⟨a, b⟩ hv hne
     obtain rfl : b = y := by simpa using hv
-    exact if_neg fun h => hne (Prod.ext (Fin.ext h) rfl)
+    exact ite_eq_right fun h => hne (Prod.ext (Fin.ext h) rfl)
 
 omit [Fact (Odd L)] [Fact (3 ≤ L)] in
 /-- A boundary has an even number of qubits in every row. -/

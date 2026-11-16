@@ -194,7 +194,7 @@ for this setup and for self-hosting a lean4web instance.
 ### Prerequisites
 
 - [Lean 4](https://lean-lang.org/) (this repo uses
-  `leanprover/lean4:v4.30.0-rc2`; see `lean-toolchain`)
+  `leanprover/lean4:v4.36.0-rc2`; see `lean-toolchain`)
 - [Lake](https://github.com/leanprover/lake), which ships with Lean, and
   mathlib, which Lake pulls in automatically
 

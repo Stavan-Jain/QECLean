@@ -180,6 +180,40 @@ content there. Same convention for the sub-umbrellas
     [qec-lab: `docs/lean-patterns.md`](https://github.com/Stavan-Jain/qec-lab/blob/main/docs/lean-patterns.md).
     Add new patterns there, not here, unless they generalize across multiple
     code shapes.
+- **Reducibility (`@[implicit_reducible]`)**: since v4.36 the unifier no longer
+  unfolds ordinary `def`s when it checks implicit arguments, instance
+  arguments, or the type of a metavariable assignment
+  (`backward.isDefEq.respectTransparency`, on by default). Two kinds of
+  definition are therefore marked `@[implicit_reducible]`, and new ones of the
+  same shape should be too:
+  - a `def` that names a function type and is then applied as a function
+    (`NQubitPauliOperator n := Fin n → PauliOperator`);
+  - every constructor of a `HomologicalCode` (`bbChainComplex`,
+    `toricHomologicalCode`, `trimChecks`, …), so that `(X).C0`, `(X).C1`,
+    `(X).C2` reduce to the concrete carrier types inside `simp`/`rw` lemmas.
+
+  The attribute keeps the definition opaque to type class *search* and to
+  `simp` indexing. Do **not** reach for
+  `set_option backward.isDefEq.respectTransparency false`. Related symptoms and
+  their fixes:
+  - `simpa using h` fails with "Type mismatch: After simplification" where the
+    two sides differ only by a definition — name the definition in the simp
+    set, or finish with `exact h`;
+  - a `simp` that unfolds something *inside* a `Finset.filter` predicate first
+    leaves `x ∈ {y | …}` stuck (the `DecidablePred` instance no longer
+    type-checks) — rewrite membership first (`Finset.mem_filter`, or a
+    dedicated `mem_…` lemma), then unfold;
+  - a `rfl`-proved `@[simp]` lemma is used by `dsimp` inside types, which can
+    make later unification fail (`norm_def` is proved by `rw` for this reason).
+- **Matrix rows are `M.row i`, not `M i`.** A partially applied matrix is not
+  type-correct at the transparency `rw`/`simp` check with, so `∑ i, M i` or
+  `Sum.elim M N` silently stops rewriting. `rowsLinearIndependent` and
+  `sympSpan` are stated with `(checkMatrix L).row`; fully applied `M i j` is
+  fine.
+- **Sets are built with `{x | p x}`.** mathlib's `Set` is a structure
+  (`Set.ofPred` / `∈`), and `setOf` is a deprecated alias that `simp` does not
+  see through. A `def` returning a `Set` or `Submodule` of group elements needs
+  `noncomputable`.
 - **Sorry markers**: `sorry  -- TODO(<short-tag>): <one-line note about goal shape>`.
   Always tag so the next session can grep for them.
 - **Global vs. `local instance` discipline**: by default, declare typeclass
@@ -549,6 +583,25 @@ Rules of thumb:
   `lake build QECBlueprint:blueprint`.
 - Renaming an annotated declaration breaks `lake build QECBlueprint` and
   nothing else. It is in the pre-push list above for exactly that reason.
+
+## Dependencies and the toolchain
+
+`lean-toolchain` is the single pin; mathlib tracks `master` (unpinned in
+`lakefile.toml`) and LeanArchitect is pinned to the tag matching the toolchain.
+Two things in `lakefile.toml` look arbitrary and are not:
+
+- **`require mathlib` must stay last.** Lake lets a later `require` win when
+  two packages pin a shared dependency differently; LeanArchitect's tag pins
+  batteries at the toolchain tag while mathlib master has usually moved past
+  it. If mathlib's pins lose, `lake exe cache get` computes hashes that match
+  nothing and falls back to building mathlib from source.
+- **`allowNonModules = true`.** mathlib is written for Lean's module system
+  and Lake warns on every non-`module` file that imports it. QEC is not ported
+  to the module system; the flag records that decision in one place.
+
+In `QECWidgets/`, ProofWidgets' HTML type is always written `ProofWidgets.Html`:
+it is `protected`, and core Lean has its own `Lean.Html`, which a bare `Html`
+under `open Lean` resolves to.
 
 ## Worktrees: reuse the main repo's prebuilt mathlib
 

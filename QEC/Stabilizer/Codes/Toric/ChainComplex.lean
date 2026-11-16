@@ -31,6 +31,7 @@ open Homological
 /-- The toric chain complex as a `HomologicalCode`: the 0-, 1- and 2-cells are
 the vertices, edges and faces of the `L × L` periodic square lattice, with the
 boundary maps `∂₁`, `∂₂` and the qubit numbering `edgeToQubitIdx`. -/
+@[implicit_reducible]
 noncomputable def toricHomologicalCode (L : ℕ) [Fact (0 < L)] : HomologicalCode where
   C0 := VtxIdx L
   C1 := EdgeIdx L

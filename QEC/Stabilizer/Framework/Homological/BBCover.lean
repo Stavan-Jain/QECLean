@@ -129,9 +129,11 @@ lemma point_dichotomy (g : G) :
 /-! ## The two chain complexes -/
 
 /-- The chain complex of the cover code. -/
+@[implicit_reducible]
 noncomputable def coverComplex : HomologicalCode := bbChainComplex D.Ac D.Bc
 
 /-- The chain complex of the base code. -/
+@[implicit_reducible]
 noncomputable def baseComplex : HomologicalCode := bbChainComplex D.Ab D.Bb
 
 /-! ## The deck translation on qubits and chains -/
@@ -529,12 +531,12 @@ lemma liftC2_decomp (z : G → ZMod 2) :
   rcases D.point_dichotomy g with hg | hg
   · have hne : g + D.deckS ≠ D.sec (D.proj g) := fun h =>
       D.deckS_ne_zero (add_eq_left.mp (h.trans hg.symm))
-    rw [if_pos hg, if_neg hne, add_zero, ← hg]
+    rw [ite_eq_left hg, ite_eq_right hne, add_zero, ← hg]
   · have hne : g ≠ D.sec (D.proj g) := fun h =>
       D.deckS_ne_zero (add_eq_left.mp (hg.symm.trans h))
     have hg' : g + D.deckS = D.sec (D.proj g) := by
       rw [hg, add_assoc, D.deckS_add_deckS, add_zero, D.proj_add_deckS, D.proj_sec]
-    rw [if_neg hne, if_pos hg', zero_add, ← hg]
+    rw [ite_eq_right hne, ite_eq_left hg', zero_add, ← hg]
 
 /-! ## The seam decomposition of a lifted stabilizer
 

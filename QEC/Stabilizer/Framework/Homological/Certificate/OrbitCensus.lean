@@ -96,7 +96,7 @@ theorem orbit_card_mul_fixed_card (a : α) :
     simp [fixed, MulAction.mem_stabilizer_iff]
   rw [← Nat.card_eq_finsetCard, ← Nat.card_eq_finsetCard, ← Nat.card_eq_fintype_card,
     ← Nat.card_congr (MulAction.orbitProdStabilizerEquivGroup G a), Nat.card_prod]
-  exact congrArg₂ _ (Nat.card_congr (Equiv.setCongr ho)) (Nat.card_congr (Equiv.setCongr hf))
+  exact congrArg₂ _ (Nat.card_congr (Set.equivOfEq ho)) (Nat.card_congr (Set.equivOfEq hf))
 
 /-- The orbit size is the order of the group divided by the number of group
 elements fixing the point. -/

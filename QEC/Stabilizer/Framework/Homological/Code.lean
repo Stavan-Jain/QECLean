@@ -122,11 +122,11 @@ lemma eq_zero_of_sum_indicator_eq_zero {ι V : Type*} [Fintype ι] [DecidableEq 
     ⟨i₀, by simpa using hi₀⟩
   obtain ⟨v, hv, hvm⟩ := hmem m
   refine (Finset.mem_filter.mp hm).2 ?_
-  rw [← hc v, Fintype.sum_eq_single m, if_pos hv, mul_one]
+  rw [← hc v, Fintype.sum_eq_single m, ite_eq_left hv, mul_one]
   intro j hjm
   by_cases hj : c j = 0
   · rw [hj, zero_mul]
-  · rw [if_neg, mul_zero]
+  · rw [ite_eq_right, mul_zero]
     exact fun hvj => hjm (hkey (le_antisymm (hvm ▸ hle j v hvj) (hmin j (by simpa using hj))))
 
 /-! ## The chain complex -/
@@ -231,14 +231,14 @@ theorem finrank_C2 :
 /-- Rank-nullity for `∂₁`: `dim C₁ = dim Z₁ + rank ∂₁`. -/
 theorem rank_nullity_boundary1 :
     dim₂ (X.C1 → ZMod 2) = dim₂ X.cycles + dim₂ (LinearMap.range X.boundary1) := by
-  simpa [cycles, add_comm] using
-    (LinearMap.finrank_range_add_finrank_ker X.boundary1).symm
+  rw [add_comm]
+  exact (LinearMap.finrank_range_add_finrank_ker X.boundary1).symm
 
 /-- Rank-nullity for `∂₂`: `dim C₂ = dim (ker ∂₂) + dim B₁`. -/
 theorem rank_nullity_boundary2 :
     dim₂ (X.C2 → ZMod 2) = dim₂ (LinearMap.ker X.boundary2) + dim₂ X.boundaries := by
-  simpa [boundaries, add_comm] using
-    (LinearMap.finrank_range_add_finrank_ker X.boundary2).symm
+  rw [add_comm]
+  exact (LinearMap.finrank_range_add_finrank_ker X.boundary2).symm
 
 /-- The dimension of homology: `dim H₁ = dim Z₁ - dim B₁`. -/
 theorem finrank_H1_eq_cycles_sub_boundaries :

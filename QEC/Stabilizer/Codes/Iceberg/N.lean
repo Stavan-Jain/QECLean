@@ -139,9 +139,9 @@ lemma rowsLinearIndependent_generatorsList (m : ℕ) [Fact (2 ≤ m)] :
     rowsLinearIndependent (generatorsList m) := by
   have hm : 0 < 2 * m := by have := Fact.out (p := 2 ≤ m); omega
   have hZ : (ZStab m).operators.toSymplectic (Fin.natAdd _ ⟨0, hm⟩) = 1 := by
-    rw [ZStab_eq_zOn, toSymplectic_zOn_natAdd, if_pos (Finset.mem_univ _)]
+    rw [ZStab_eq_zOn, toSymplectic_zOn_natAdd, ite_eq_left (Finset.mem_univ _)]
   have hX : (XStab m).operators.toSymplectic (Fin.castAdd _ ⟨0, hm⟩) = 1 := by
-    rw [XStab_eq_xOn, toSymplectic_xOn_castAdd, if_pos (Finset.mem_univ _)]
+    rw [XStab_eq_xOn, toSymplectic_xOn_castAdd, ite_eq_left (Finset.mem_univ _)]
   have hXZ : (XStab m).operators.toSymplectic (Fin.natAdd _ ⟨0, hm⟩) = 0 := by
     rw [XStab_eq_xOn, toSymplectic_xOn_natAdd]
   have h := rowsLinearIndependent_ofFn_of_pivots ![ZStab m, XStab m]

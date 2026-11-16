@@ -43,8 +43,8 @@ lemma allOnes_sum_one (r : ℕ) : ∑ q, allOnes r q = 1 := by
 /-- The all-ones chain pairs to `1` with itself. -/
 lemma allOnes_innerProduct (r : ℕ) :
     (homologicalCode r).chainInnerProduct (allOnes r) (allOnes r) = 1 := by
-  simpa only [HomologicalCode.chainInnerProduct, allOnes, _root_.mul_one] using
-    allOnes_sum_one r
+  simp only [HomologicalCode.chainInnerProduct, allOnes, _root_.mul_one]
+  exact allOnes_sum_one r
 
 /-- The all-ones chain has weight `numQubits r`. -/
 lemma allOnes_weight (r : ℕ) :

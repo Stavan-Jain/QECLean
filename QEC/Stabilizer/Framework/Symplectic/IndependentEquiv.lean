@@ -47,7 +47,7 @@ namespace NQubitPauliGroupElement
 
 /-- The set of elements appearing in the list `L`. -/
 def listToSet (L : List (NQubitPauliGroupElement n)) : Set (NQubitPauliGroupElement n) :=
-  setOf (· ∈ L)
+  {g | g ∈ L}
 
 /-- Every element of the list has phase power `0`, i.e. no global phase factor
 `i`, `-1` or `-i`. -/
@@ -150,7 +150,7 @@ theorem rowsLinearIndependent_ofFn_of_pivots {m : ℕ} (g : Fin m → NQubitPaul
     (h_lower : ∀ i j, j < i → toSymplectic (g i).operators (piv j) = 0) :
     rowsLinearIndependent (List.ofFn g) :=
   rowsLinearIndependent_of_pivots _ (fun i => piv (i.cast List.length_ofFn))
-    (fun i => by simpa [checkMatrix] using h_diag _)
+    (fun i => by simp only [checkMatrix, List.get_ofFn]; exact h_diag _)
     (fun i j hij => by simpa [checkMatrix] using h_lower _ _ hij)
 
 /-!
@@ -169,7 +169,7 @@ lemma rowsLinearIndependent_map {m : ℕ}
     (L : List (NQubitPauliGroupElement n)) :
     rowsLinearIndependent (L.map f) ↔
       LinearIndependent (ZMod 2) fun i : Fin L.length => toSymplectic (f (L.get i)).operators := by
-  have key : (fun i => checkMatrix (L.map f) i) ∘ finCongr (List.length_map f).symm =
+  have key : (checkMatrix (L.map f)).row ∘ finCongr (List.length_map f).symm =
       fun i : Fin L.length => toSymplectic (f (L.get i)).operators := by
     funext i col
     simp [checkMatrix]
@@ -182,7 +182,7 @@ lemma rowsLinearIndependent_map_of_nodup {ι : Type*}
     {g : ι → NQubitPauliGroupElement n}
     (hg : LinearIndependent (ZMod 2) fun i => toSymplectic (g i).operators)
     {l : List ι} (hl : l.Nodup) : rowsLinearIndependent (l.map g) := by
-  have key : (fun k => checkMatrix (l.map g) k) =
+  have key : (checkMatrix (l.map g)).row =
       (fun i => toSymplectic (g i).operators) ∘ fun k => l.get (k.cast (List.length_map g)) := by
     funext k col
     simp [checkMatrix]

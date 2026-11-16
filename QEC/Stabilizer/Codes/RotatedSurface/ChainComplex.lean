@@ -81,6 +81,7 @@ lemma rscQubitEquiv_apply_val (v : VtxIdx L) :
 /-- The chain complex of the rotated surface code as a `HomologicalCode`: the
 0-cells are the Z-checks, the 1-cells the qubits and the 2-cells the
 X-checks. -/
+@[implicit_reducible]
 noncomputable def rotatedSurfaceHomologicalCode [Fact (Odd L)] [Fact (3 ≤ L)] :
     HomologicalCode where
   C0 := ZFaceIdx L

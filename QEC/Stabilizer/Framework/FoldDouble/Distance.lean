@@ -219,7 +219,7 @@ theorem weight_fold_add_two_mul_residual_le {v : NQubitPauliGroupElement n}
         push_cast
         gcongr
     _ ≤ NQubitPauliGroupElement.weight v :=
-        ENat.coe_le_coe.mpr (weight_fold_add_two_mul_residualWeight_le e v)
+        ENat.natCast_le_natCast.mpr (weight_fold_add_two_mul_residualWeight_le e v)
 
 /-- The residual through a lift. For a stabilizer `s` with `fold s = b`, `m_b`
 is the least value of `wt ((u * s₀) outside supp b)` over the doubling logicals

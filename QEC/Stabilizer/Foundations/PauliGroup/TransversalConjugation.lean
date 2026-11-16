@@ -1,6 +1,6 @@
 import Mathlib.Tactic
 import Mathlib.LinearAlgebra.Matrix.Defs
-import Mathlib.Data.Complex.Basic
+import Mathlib.Basic.Complex.Basic
 import QEC.Foundations.Tensor
 import QEC.Foundations.Gates
 import QEC.Foundations.GateConjugation
@@ -98,7 +98,7 @@ lemma uniformTransversalGate_conj_op_gate_of_localRule
     conjByGate (uniformTransversalGate n G) op.toGate =
       (pointwiseImage F op).toGate := by
   apply Subtype.ext
-  simpa [conjByGate_val, pointwiseScalarProduct] using
+  simpa [conjByGate_val, pointwiseScalarProduct, tensorPowGate] using
     uniformTransversalGateMatrix_conj_op_of_localRule n G op F (fun _ => (1 : ℂ)) Dom hDom
       (fun p hp => by simpa using h_local p hp)
 

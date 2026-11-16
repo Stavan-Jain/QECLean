@@ -131,7 +131,7 @@ theorem concat_closure_no_neg_identity :
       {g | (∃ b, ∃ x ∈ D.innerX, embedBlock b x = g) ∨
            (∃ y ∈ D.outerX, promoteE D.Xbar D.Zbar y = g)} := by
     ext g
-    simp only [Set.mem_union, Set.mem_setOf_eq, listToSet, D.mem_concatGeneratorsList,
+    simp only [Set.mem_union, Set.mem_ofPred_eq, listToSet, D.mem_concatGeneratorsList,
       List.mem_append, D.inner_split.mem_iff, or_and_right, exists_or]
     rw [or_or_or_comm]
   rw [hset]

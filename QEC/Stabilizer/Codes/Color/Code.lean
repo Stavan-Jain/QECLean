@@ -36,6 +36,7 @@ noncomputable def qubitEquiv (r : ℕ) : Qubit r ≃ Fin (numQubits r) :=
 /-- The self-dual CSS chain complex of the color code: the 1-cells are the
 qubits, the 0-cells and the 2-cells are the faces, and both boundary maps are
 given by the matrix `incidence`. -/
+@[implicit_reducible]
 noncomputable def homologicalCode (r : ℕ) : HomologicalCode :=
   SelfDual.homologicalCode (@incidence r) incidence_orthogonal
     (numQubits r) (card_qubit r) (qubitEquiv r)

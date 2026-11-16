@@ -102,10 +102,10 @@ lemma AllPhaseZero_generatorsList (n : ℕ) : AllPhaseZero (generatorsList n) :=
 lemma rowsLinearIndependent_generatorsList (n : ℕ) :
     rowsLinearIndependent (generatorsList n) :=
   rowsLinearIndependent_ofFn_of_pivots (ZPair n) (fun i => Fin.natAdd (n + 2) (Fin.castSucc i))
-    (fun i => by rw [ZPair_eq_zOn, toSymplectic_zOn_natAdd, if_pos (by simp)])
+    (fun i => by rw [ZPair_eq_zOn, toSymplectic_zOn_natAdd, ite_eq_left (by simp)])
     (fun i j hij => by
       have hij := Fin.lt_def.mp hij
-      rw [ZPair_eq_zOn, toSymplectic_zOn_natAdd, if_neg]
+      rw [ZPair_eq_zOn, toSymplectic_zOn_natAdd, ite_eq_right]
       simp only [Finset.mem_insert, Finset.mem_singleton, Fin.ext_iff, Fin.val_castSucc,
         Fin.val_succ]
       omega)

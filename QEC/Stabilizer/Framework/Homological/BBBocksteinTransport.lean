@@ -337,8 +337,11 @@ theorem elementForm_of_orderFourLift {Ghat : Type}
     (convEquiv_one_add_single D.deckS).symm
   rw [← hA, hD, ← convEquiv_mul, ← convEquiv_mul] at hAz
   rw [← hB, hD, ← convEquiv_mul, ← convEquiv_mul] at hBz
+  have hqsurj : Function.Surjective (AddMonoidAlgebra.mapDomainRingHom (ZMod 2) q) := fun y => by
+    obtain ⟨x, hx⟩ := Finsupp.mapDomain_surjective hsurj y.coeff
+    exact ⟨.ofCoeff x, AddMonoidAlgebra.coeff_injective hx⟩
   obtain ⟨r, s, hrs⟩ := BocksteinLift.bockstein_element_form_of_surjective
-    (AddMonoidAlgebra.mapDomainRingHom (ZMod 2) q) (Finsupp.mapDomain_surjective hsurj) hε hε'
+    (AddMonoidAlgebra.mapDomainRingHom (ZMod 2) q) hqsurj hε hε'
     (BBEpsFree.two_eq_zero_of_algebra _ h2)
     (BBEpsFree.hann_of_epsFree (BBEpsFree.epsFree_one_add_single_of_addOrderOf h2 shat 2 horder))
     (fun x hx => one_add_single_sq shat ▸

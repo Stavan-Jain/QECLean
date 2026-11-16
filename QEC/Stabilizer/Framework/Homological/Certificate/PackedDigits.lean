@@ -178,7 +178,7 @@ lemma packF_lt (width size : Nat) (f : Nat → Nat) (hw : 0 < width)
     (hf : ∀ i < size, f i < 2 ^ width) : packF width size f < 2 ^ (width * size) := by
   have h := Nat.ofDigits_lt_base_pow_length (Nat.one_lt_two_pow hw.ne')
     (List.forall_mem_map.mpr fun i hi => hf i (List.mem_range.mp hi))
-  simpa [Nat.pow_mul] using h
+  simpa [packF, Nat.pow_mul] using h
 
 /-- A bit within a packed table lane is the same bit of the table entry. -/
 lemma testBit_packF_at (width size index bit : Nat) (f : Nat → Nat)
@@ -410,7 +410,7 @@ lemma prefixMask_eq_packF (width size count : Nat) (hw : 0 < width) (hp : count 
 lemma lowMask_eq_packF (width size : Nat) (hw : 0 < width) :
     2 ^ (width * size) - 1 = packF width size (fun _ => 2 ^ width - 1) :=
   (prefixMask_eq_packF width size size hw le_rfl).trans
-    (packF_congr _ _ _ _ fun _ hi => if_pos hi)
+    (packF_congr _ _ _ _ fun _ hi => ite_eq_left hi)
 
 /-- Multiplying the selected lanes of a table by `2 ^ shift`, truncated to the
 lane width, is one masked shift: the unselected lanes are kept, and the

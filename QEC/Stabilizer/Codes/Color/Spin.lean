@@ -50,15 +50,15 @@ private lemma faceBit_eq_sum {r : ℕ} (a : Face r → ZMod 2)
   · rw [Finset.sum_eq_single ⟨⟨l, hl⟩, ⟨j, hj⟩⟩]
     · simp
     · rintro ⟨s, t⟩ - hne
-      refine if_neg fun h => hne ?_
+      refine ite_eq_right fun h => hne ?_
       obtain rfl : s = ⟨l, hl⟩ := Fin.ext h.1
       obtain rfl : t = ⟨j, hj⟩ := Fin.ext h.2
       rfl
     · exact fun h => (h (Finset.mem_univ _)).elim
-  · refine (Finset.sum_eq_zero fun f _ => if_neg fun h => hj ?_).symm
+  · refine (Finset.sum_eq_zero fun f _ => ite_eq_right fun h => hj ?_).symm
     have := f.2.isLt
     omega
-  · refine (Finset.sum_eq_zero fun f _ => if_neg fun h => hl ?_).symm
+  · refine (Finset.sum_eq_zero fun f _ => ite_eq_right fun h => hl ?_).symm
     have := f.1.isLt
     omega
 
@@ -85,7 +85,7 @@ private lemma faceClassSum_eq_guard {r : ℕ} (a : Face r → ZMod 2)
       ¬P ∧ f.1.val = l ∧ f.2.val = j) :
     faceClassSum a k p = if P then 0 else faceBit a k l j := by
   split_ifs with hP
-  · exact Finset.sum_eq_zero fun f _ => if_neg fun hf => ((h f).mp hf).1 hP
+  · exact Finset.sum_eq_zero fun f _ => ite_eq_right fun hf => ((h f).mp hf).1 hP
   · exact faceClassSum_eq_faceBit a k p l j fun f => (h f).trans (and_iff_right hP)
 
 /-- A point with no adjacent face of row `k` has no labels to sum. -/
@@ -93,7 +93,7 @@ private lemma faceClassSum_zero {r : ℕ} (a : Face r → ZMod 2)
     (k : Fin 3) (p : Coord)
     (h : ∀ f : FaceRow r, ¬Adjacent (faceCoord (k, f)) p) :
     faceClassSum a k p = 0 :=
-  Finset.sum_eq_zero fun f _ => if_neg (h f)
+  Finset.sum_eq_zero fun f _ => ite_eq_right (h f)
 
 /-- The spin at a lattice point: `1` plus the sum of the labels of the
 adjacent faces. -/

@@ -81,11 +81,11 @@ lemma sum_sum_single_orbit_apply {T : Type*} {σ : G} {N : ℕ} (t : T → G)
   rw [Finsupp.finsetSum_apply, Finset.sum_eq_single_of_mem i₀ hi₀, Finsupp.finsetSum_apply,
     Finset.sum_eq_single_of_mem m (Finset.mem_range.mpr hm), Finsupp.single_eq_same]
   · intro j hj hjm
-    rw [Finsupp.single_apply, if_neg fun h => hjm (key i₀ j hj h).2]
+    rw [Finsupp.single_apply, ite_eq_right fun h => hjm (key i₀ j hj h).2]
   · intro i _ hi
     rw [Finsupp.finsetSum_apply]
     exact Finset.sum_eq_zero fun j hj => by
-      rw [Finsupp.single_apply, if_neg fun h => hi (key i j hj h).1]
+      rw [Finsupp.single_apply, ite_eq_right fun h => hi (key i j hj h).1]
 
 end GroupAlgebra
 
@@ -113,11 +113,11 @@ lemma span_transversal_eq_top
     ⊤ ≤ Submodule.span (AdjoinRoot ((X - C 1 : k[X]) ^ N))
         (Set.range fun i => AddMonoidAlgebra.single (t i) (1 : k)) := by
   intro s _
-  rw [← AddMonoidAlgebra.sum_single s]
+  rw [← AddMonoidAlgebra.sum_coeff_single s]
   refine Submodule.finsuppSum_mem _ _ _ _ fun g _ => ?_
   obtain ⟨⟨i, j⟩, hij⟩ := hsurj g
-  have key : AdjoinRoot.mk ((X - C 1 : k[X]) ^ N) (C (s g) * X ^ (j : ℕ)) •
-      AddMonoidAlgebra.single (t i) (1 : k) = AddMonoidAlgebra.single g (s g) := by
+  have key : AdjoinRoot.mk ((X - C 1 : k[X]) ^ N) (C (s.coeff g) * X ^ (j : ℕ)) •
+      AddMonoidAlgebra.single (t i) (1 : k) = AddMonoidAlgebra.single g (s.coeff g) := by
     rw [Algebra.smul_def, halg, map_mul, aeval_C, map_pow, aeval_X, single_pow_one, mul_assoc,
       AddMonoidAlgebra.single_mul_single, one_mul, ← Algebra.smul_def,
       AddMonoidAlgebra.smul_single', mul_one, add_comm, ← hij]
@@ -140,7 +140,7 @@ lemma linearIndependent_transversal
       fun i => AddMonoidAlgebra.single (t i) (1 : k) := by
   classical
   rcases subsingleton_or_nontrivial k with hk | hk
-  · haveI : Subsingleton (AdjoinRoot ((X - C 1 : k[X]) ^ N)) :=
+  · have : Subsingleton (AdjoinRoot ((X - C 1 : k[X]) ^ N)) :=
       AdjoinRoot.mk_surjective.subsingleton
     exact linearIndependent_of_subsingleton
   have hg : ((X - C 1 : k[X]) ^ N).Monic := (monic_X_sub_C 1).pow N
@@ -175,8 +175,10 @@ lemma linearIndependent_transversal
     rcases lt_or_ge m N with hm | hm
     · have h : (∑ i ∈ l.support, ∑ j ∈ Finset.range N,
           Finsupp.single (t i + j • σ) ((P i).coeff j) : G →₀ k) (t i₀ + m • σ)
-          = (0 : G →₀ k) (t i₀ + m • σ) :=
-        congrArg (fun v : G →₀ k => v (t i₀ + m • σ)) hsum
+          = (0 : G →₀ k) (t i₀ + m • σ) := by
+        simpa only [AddMonoidAlgebra.coeff_sum, AddMonoidAlgebra.coeff_single,
+          AddMonoidAlgebra.coeff_zero] using
+          congrArg (fun v : AddMonoidAlgebra k G => v.coeff (t i₀ + m • σ)) hsum
       rwa [sum_sum_single_orbit_apply t hinj l.support _ hi₀ hm, Finsupp.zero_apply] at h
     · exact coeff_eq_zero_of_natDegree_lt ((hdeg i₀).trans_le hm)
   rw [Finsupp.zero_apply, ← hmk i₀, hP, map_zero]
@@ -199,7 +201,7 @@ theorem epsFree_single_sub_one_of_transversal
   have hev : ((X - C 1 : k[X]) ^ N).eval₂ (algebraMap k (AddMonoidAlgebra k G))
       (AddMonoidAlgebra.single σ (1 : k)) = 0 := by
     rw [eval₂_pow, eval₂_sub, eval₂_X, eval₂_C, map_one, hεN]
-  letI : Algebra (AdjoinRoot ((X - C 1 : k[X]) ^ N)) (AddMonoidAlgebra k G) :=
+  let : Algebra (AdjoinRoot ((X - C 1 : k[X]) ^ N)) (AddMonoidAlgebra k G) :=
     (AdjoinRoot.lift (algebraMap k (AddMonoidAlgebra k G))
       (AddMonoidAlgebra.single σ (1 : k)) hev).toAlgebra
   have halg : ∀ p : k[X],
@@ -207,7 +209,7 @@ theorem epsFree_single_sub_one_of_transversal
           (AdjoinRoot.mk _ p)
         = aeval (AddMonoidAlgebra.single σ (1 : k)) p := fun p => by
     rw [RingHom.algebraMap_toAlgebra, AdjoinRoot.lift_mk, aeval_def]
-  letI : Module.Free (AdjoinRoot ((X - C 1 : k[X]) ^ N)) (AddMonoidAlgebra k G) :=
+  let : Module.Free (AdjoinRoot ((X - C 1 : k[X]) ^ N)) (AddMonoidAlgebra k G) :=
     Module.Free.of_basis (Module.Basis.mk
       (linearIndependent_transversal halg hN t he.injective)
       (span_transversal_eq_top halg t he.surjective))
@@ -236,7 +238,7 @@ lemma transversal_out_bijective {G : Type*} [AddCommGroup G] (σ : G) {N : ℕ}
         QuotientAddGroup.out_eq', QuotientAddGroup.out_eq'] at h2
     subst hq
     exact Prod.ext rfl (Fin.ext (nsmul_injOn_Iio_addOrderOf j.2 j'.2 (add_left_cancel h')))
-  · obtain ⟨h, hh⟩ := QuotientAddGroup.mk_out_eq_mul (AddSubgroup.zmultiples σ) g
+  · obtain ⟨h, hh⟩ := QuotientAddGroup.mk_out_eq_add (AddSubgroup.zmultiples σ) g
     obtain ⟨j, hj⟩ := (finEquivZMultiples (addOrderOf_pos_iff.mp hN)).surjective (-h)
     refine ⟨(QuotientAddGroup.mk g, j), ?_⟩
     have hj' : (j : ℕ) • σ = -(h : G) := congrArg Subtype.val hj

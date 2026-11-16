@@ -37,7 +37,7 @@ private lemma count_mod_three_ne_two (r : ℕ) :
     have h2 : ¬(3 * r + 1 + 1) % 3 ≠ 2 := by omega
     have h3 : (3 * r + 1 + 1 + 1) % 3 ≠ 2 := by omega
     rw [show 3 * (r + 1) + 1 = 3 * r + 1 + 1 + 1 + 1 by ring, Nat.count_succ, Nat.count_succ,
-      Nat.count_succ, ih, if_pos h1, if_neg h2, if_pos h3]
+      Nat.count_succ, ih, ite_eq_left h1, ite_eq_right h2, ite_eq_left h3]
     omega
 
 /-- The left side of the patch has `2 * r + 1` qubits: the row of a qubit
@@ -135,6 +135,6 @@ dual cycle. -/
 theorem leftBoundary_not_mem_boundaries (r : ℕ) :
     leftBoundary r ∉ (homologicalCode r).boundaries :=
   HomologicalCode.not_mem_boundaries_of_dual_witness (X := homologicalCode r) (w := allOnes r)
-    (allOnes_mem_dualCycles r) (by simpa only [allOnes, one_mul] using leftBoundary_sum_one r)
+    (allOnes_mem_dualCycles r) (by simp only [allOnes, one_mul]; exact leftBoundary_sum_one r)
 
 end Quantum.StabilizerGroup.ColorCode

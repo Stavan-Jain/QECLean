@@ -34,13 +34,14 @@ variable {G : Type} [Fintype G]
 chain space `G → ZMod 2`, sending an element to its coefficient function. -/
 noncomputable def convEquiv :
     AddMonoidAlgebra (ZMod 2) G ≃ₗ[ZMod 2] (G → ZMod 2) :=
-  Finsupp.linearEquivFunOnFinite (ZMod 2) (ZMod 2) G
+  (AddMonoidAlgebra.coeffLinearEquiv (ZMod 2)).trans
+    (Finsupp.linearEquivFunOnFinite (ZMod 2) (ZMod 2) G)
 
 @[simp] lemma convEquiv_apply (a : AddMonoidAlgebra (ZMod 2) G) (g : G) :
-    convEquiv a g = a g := rfl
+    convEquiv a g = a.coeff g := rfl
 
 @[simp] lemma convEquiv_symm_apply (a : G → ZMod 2) (g : G) :
-    (convEquiv.symm a) g = a g := rfl
+    (convEquiv.symm a).coeff g = a g := rfl
 
 /-- The monomial `single s r` of the group algebra is the point mass
 `Pi.single s r`. -/
@@ -55,7 +56,7 @@ multiplication of `𝔽₂[G]` to `conv`. -/
 lemma convEquiv_mul (a b : AddMonoidAlgebra (ZMod 2) G) :
     convEquiv (a * b) = convEquiv a ⋆ convEquiv b := by
   funext g
-  rw [convEquiv_apply, conv_apply, AddMonoidAlgebra.mul_apply_left, Finsupp.sum_fintype]
+  rw [convEquiv_apply, conv_apply, AddMonoidAlgebra.coeff_mul_apply_left, Finsupp.sum_fintype]
   · simp [sub_eq_neg_add]
   · simp
 

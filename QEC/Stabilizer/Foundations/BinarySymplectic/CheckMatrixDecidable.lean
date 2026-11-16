@@ -28,13 +28,13 @@ namespace NQubitPauliGroupElement
 zero combination is the zero vector. -/
 theorem rowsLinearIndependent_iff_forall (L : List (NQubitPauliGroupElement n)) :
     rowsLinearIndependent L ↔
-      ∀ f : Fin L.length → ZMod 2, (∑ i, f i • checkMatrix L i) = 0 → f = 0 := by
+      ∀ f : Fin L.length → ZMod 2, (∑ i, f i • (checkMatrix L).row i) = 0 → f = 0 := by
   simp only [rowsLinearIndependent, Fintype.linearIndependent_iff, funext_iff, Pi.zero_apply]
 
 /-- Row linear independence is decidable, by checking every coefficient vector
 in `(ZMod 2) ^ L.length`. -/
 instance (L : List (NQubitPauliGroupElement n)) : Decidable (rowsLinearIndependent L) :=
-  decidable_of_iff' (∀ f : Fin L.length → ZMod 2, (∑ i, f i • checkMatrix L i) = 0 → f = 0)
+  decidable_of_iff' (∀ f : Fin L.length → ZMod 2, (∑ i, f i • (checkMatrix L).row i) = 0 → f = 0)
     (rowsLinearIndependent_iff_forall L)
 
 end NQubitPauliGroupElement

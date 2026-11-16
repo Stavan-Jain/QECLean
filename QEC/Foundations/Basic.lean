@@ -1,9 +1,6 @@
 import Mathlib.LinearAlgebra.Matrix.Notation
-import Mathlib.Data.Complex.Basic
+import Mathlib.Basic.Complex.Basic
 import Mathlib.Tactic
-
-namespace Quantum
-open Matrix
 
 /-!
 # Vectors, norms, and quantum states
@@ -83,6 +80,9 @@ the Hadamard-basis `ketPlus` and `ketMinus`. The scoped Dirac notation for all
 of them (`|0⟩`, `|01⟩`, `|0101⟩`, …) lives in `KetNotation.lean`; `Gates.lean`
 builds the unitary matrices that act on these spaces.
 -/
+
+namespace Quantum
+open Matrix
 variable {α : Type*} [Fintype α] [DecidableEq α]
 
 /-- Complex amplitude vector whose computational basis is indexed by `α`: the
@@ -101,7 +101,8 @@ noncomputable def norm (v : Vector α) :=
 
 /-- Definitional unfolding of `norm`, as a `simp` lemma:
 `norm v = √(∑ᵢ ‖v i‖²)`. -/
-@[simp] lemma norm_def {v : Vector α} : norm v = Real.sqrt (∑ i, ‖v i‖^2) := rfl
+@[simp] lemma norm_def {v : Vector α} : norm v = Real.sqrt (∑ i, ‖v i‖^2) := by
+  rw [norm]
 
 /-- The norm is always non-negative. -/
 lemma norm_nonneg {v : Vector α} : 0 ≤ norm v := by

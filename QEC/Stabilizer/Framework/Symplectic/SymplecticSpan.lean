@@ -87,7 +87,7 @@ lemma span_image_toSymplectic_closure (G : Set (NQubitPauliGroupElement n)) :
 /-- The `𝔽₂`-span of the rows of the check matrix of `L`, i.e. of the symplectic
 vectors of the elements of `L`. -/
 def sympSpan (L : List (NQubitPauliGroupElement n)) : Submodule (ZMod 2) (Fin (n + n) → ZMod 2) :=
-  span (ZMod 2) (Set.range (checkMatrix L))
+  span (ZMod 2) (Set.range (checkMatrix L).row)
 
 /-- The span of the check-matrix rows equals the span of the symplectic image of
 `listToSet L`. -/
@@ -148,7 +148,8 @@ theorem rowsLinearIndependent_append_iff (A B : List (NQubitPauliGroupElement n)
         Disjoint (sympSpan A) (sympSpan B) := by
   let e : Fin A.length ⊕ Fin B.length ≃ Fin (A ++ B).length :=
     finSumFinEquiv.trans (finCongr List.length_append.symm)
-  have key : (fun i => checkMatrix (A ++ B) i) ∘ e = Sum.elim (checkMatrix A) (checkMatrix B) := by
+  have key : (checkMatrix (A ++ B)).row ∘ e =
+      Sum.elim (checkMatrix A).row (checkMatrix B).row := by
     funext s
     rcases s with i | j <;> funext col <;> simp [checkMatrix, e]
   rw [rowsLinearIndependent, ← linearIndependent_equiv e, key, linearIndependent_sum]
@@ -216,7 +217,7 @@ rows with index in `S`. -/
 private lemma toSymplectic_subsetProd
     (hC : ∀ g ∈ listToSet L, ∀ h ∈ listToSet L, g * h = h * g)
     (S : Finset (Fin L.length)) :
-    toSymplectic (subsetProd L hC S).operators = ∑ i ∈ S, checkMatrix L i := by
+    toSymplectic (subsetProd L hC S).operators = ∑ i ∈ S, (checkMatrix L).row i := by
   classical
   induction S using Finset.induction_on with
   | empty => exact toSymplectic_one_operators
@@ -260,7 +261,7 @@ theorem negIdentity_not_mem_of_indep_phase_zero_commute
   intro hneg
   obtain ⟨S, hS⟩ := exists_eq_subsetProd L hPhase hC hneg
   -- The rows with index in `S` sum to zero, so `S` is empty by independence.
-  have hsum : ∑ i ∈ S, (1 : ZMod 2) • checkMatrix L i = 0 := by
+  have hsum : ∑ i ∈ S, (1 : ZMod 2) • (checkMatrix L).row i = 0 := by
     simp only [one_smul, ← toSymplectic_subsetProd L hC S, ← hS]
     exact toSymplectic_one_operators
   have hS_empty : S = ∅ := Finset.eq_empty_of_forall_notMem fun i hi =>

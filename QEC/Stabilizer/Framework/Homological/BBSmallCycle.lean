@@ -174,6 +174,7 @@ theorem cycle_weight_ge_6
 /-! ## Consequences -/
 
 /-- The bivariate bicycle chain complex of the bundle. -/
+@[implicit_reducible]
 noncomputable def complex : HomologicalCode := bbChainComplex D.A D.B
 
 /-- The weight of a 1-chain of `complex` is the size of its support. -/

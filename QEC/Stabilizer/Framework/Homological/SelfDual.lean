@@ -70,6 +70,7 @@ variable [DecidableEq Q] [DecidableEq F]
 
 /-- The CSS chain complex of a self-orthogonal binary matrix `H`: the 0-cells
 and the 2-cells are the rows, the 1-cells the columns, numbered by `e`. -/
+@[implicit_reducible]
 def homologicalCode (H : F → Q → ZMod 2)
     (horth : ∀ f g, ∑ q, H f q * H g q = 0)
     (n : ℕ) (hcard : Fintype.card Q = n) (e : Q ≃ Fin n) : HomologicalCode where
@@ -97,7 +98,7 @@ check-combination map. -/
 theorem cutMap_eq_boundary2 :
     (homologicalCode H horth n hcard e).cutMap =
       (homologicalCode H horth n hcard e).boundary2 :=
-  LinearMap.ext fun c => funext fun q => by
+  LinearMap.ext fun (c : F → ZMod 2) => funext fun (q : Q) => by
     change (∑ f : F, c f * syndrome H (Pi.single q 1 : Q → ZMod 2) f) =
       checkCombination H c q
     simp [Pi.single_apply]
@@ -107,7 +108,7 @@ map. -/
 theorem dualBoundary_eq_boundary1 :
     (homologicalCode H horth n hcard e).dualBoundary =
       (homologicalCode H horth n hcard e).boundary1 :=
-  LinearMap.ext fun c => funext fun f => by
+  LinearMap.ext fun (c : Q → ZMod 2) => funext fun (f : F) => by
     change (∑ q : Q, c q * checkCombination H (Pi.single f 1 : F → ZMod 2) q) =
       syndrome H c f
     simp [Pi.single_apply, mul_comm]

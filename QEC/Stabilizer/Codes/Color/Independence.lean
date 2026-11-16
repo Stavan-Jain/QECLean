@@ -76,13 +76,13 @@ theorem linearIndependent_incidence (r : ℕ) :
     intro g _ hgf
     by_cases hc : c g = 0
     · rw [hc, zero_mul]
-    refine mul_eq_zero_of_right _ (if_neg fun hmem => hgf (faceCoord_injective r ?_))
+    refine mul_eq_zero_of_right _ (ite_eq_right fun hmem => hgf (faceCoord_injective r ?_))
     have ha : Adjacent (faceCoord g) (upperSite (faceCoord f)) :=
       hq ▸ (mem_faceSupport g q).mp hmem
     exact eq_of_adjacent_upperSite_of_row_eq hF (faceCoord_isFace g) ha
       ((row_le_of_adjacent_upperSite hF ha).antisymm (hmin g (by simpa using hc)))
   have hface : incidence f q = 1 :=
-    if_pos ((mem_faceSupport f q).mpr (hq ▸ adjacent_upperSite hF))
+    ite_eq_left ((mem_faceSupport f q).mpr (hq ▸ adjacent_upperSite hF))
   have hsumq := congr_fun hsum q
   simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply] at hsumq
   rw [Finset.sum_eq_single f hother (fun h => (h (Finset.mem_univ f)).elim),

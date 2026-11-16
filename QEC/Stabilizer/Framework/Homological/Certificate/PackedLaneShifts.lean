@@ -35,10 +35,10 @@ theorem packF_shiftRight_and_of_testBit (width size shift : Nat) (f g : Nat → 
   rw [Nat.testBit_and, Nat.testBit_shiftRight, testBit_packF_at width size i j _ hg hj,
     testBit_packF_at width size i j _ hout hj]
   by_cases hi : i < size
-  · simp only [hi, if_true, Nat.testBit_and, Nat.testBit_shiftRight]
+  · simp only [hi, ite_true, Nat.testBit_and, Nat.testBit_shiftRight]
     by_cases hb : j + shift < width
     · rw [show shift + (width * i + j) = width * i + (j + shift) by omega,
-        testBit_packF_at width size i (j + shift) f hf hb, if_pos hi, Nat.add_comm j shift]
+        testBit_packF_at width size i (j + shift) f hf hb, ite_eq_left hi, Nat.add_comm j shift]
     · rw [hs i hi j hj (by omega)]
       simp
   · simp [hi]
@@ -92,10 +92,10 @@ theorem masked_shiftLeft_packF (width size shift mask : Nat) (f : Nat → Nat)
     testBit_packF_at width size i j _ (fun _ _ => hm) hj,
     testBit_packF_at width size i j _ hout hj]
   by_cases hi : i < size
-  · simp only [hi, if_true, Nat.testBit_and, Nat.testBit_shiftLeft]
+  · simp only [hi, ite_true, Nat.testBit_and, Nat.testBit_shiftLeft]
     by_cases hb : shift ≤ j
     · rw [show width * i + j - shift = width * i + (j - shift) by omega,
-        testBit_packF_at width size i (j - shift) f hf (by omega), if_pos hi]
+        testBit_packF_at width size i (j - shift) f hf (by omega), ite_eq_left hi]
       simp [hb, show shift ≤ width * i + j by omega]
     · rw [hs j hj (by omega)]
       simp

@@ -37,7 +37,7 @@ lemma sum_col_middleRowChain (x : Fin L) :
   · simp [middleRowChain]
   · rintro ⟨a, b⟩ hv hne
     obtain rfl : a = x := by simpa using hv
-    exact if_neg fun h => hne (Prod.ext rfl (Fin.ext h))
+    exact ite_eq_right fun h => hne (Prod.ext rfl (Fin.ext h))
 
 /-- A dual boundary has an even number of qubits in every column. -/
 lemma sum_col_eq_zero_of_mem_dualBoundaries {c : VtxIdx L → ZMod 2}

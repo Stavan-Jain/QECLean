@@ -58,7 +58,7 @@ corner, up to the truncation at the left and at the top. -/
 private lemma pred_eq_of_blockKey_eq (hL : 0 < L) {p q : ℕ × ℕ}
     (hp : p.1 ≤ L ∧ p.2 ≤ L) (hq : q.1 ≤ L ∧ q.2 ≤ L) (h : blockKey L p = blockKey L q) :
     p.1 - 1 = q.1 - 1 ∧ p.2 - 1 = q.2 - 1 := by
-  haveI : Fact (0 < L) := ⟨hL⟩
+  have : Fact (0 < L) := ⟨hL⟩
   simpa [Prod.ext_iff, Fin.ext_iff] using
     rowMajor_injective L (a₁ := (⟨p.1 - 1, by omega⟩, ⟨p.2 - 1, by omega⟩))
       (a₂ := (⟨q.1 - 1, by omega⟩, ⟨q.2 - 1, by omega⟩)) h
@@ -108,7 +108,7 @@ theorem rscBoundary2_injective : Function.Injective (∂₂ L) := by
   refine eq_zero_of_sum_block_indicator_eq_zero (Fact.out : Odd L).pos
     blockKey_xFaceCorner_injective
     (fun xf => ⟨(xFaceCorner_bounds xf).2.1.le, (xFaceCorner_bounds xf).2.2⟩) fun v => ?_
-  simpa only [rscBoundary2_apply, xFaceSupport_eq_block] using congrFun hc v
+  simpa only [rscBoundary2_apply, xFaceSupport_eq_block, Pi.zero_apply] using congrFun hc v
 
 /-- The Z-checks are independent: `δ⁰` is injective. -/
 theorem rscZCutMap_injective : Function.Injective (δ⁰ L) := by
@@ -116,7 +116,7 @@ theorem rscZCutMap_injective : Function.Injective (δ⁰ L) := by
   refine eq_zero_of_sum_block_indicator_eq_zero (Fact.out : Odd L).pos
     blockKey_zFaceCorner_injective
     (fun zf => ⟨(zFaceCorner_bounds zf).1, (zFaceCorner_bounds zf).2.2.le⟩) fun v => ?_
-  simpa only [rscZCutMap_apply, zFaceSupport_eq_block] using congrFun hs v
+  simpa only [rscZCutMap_apply, zFaceSupport_eq_block, Pi.zero_apply] using congrFun hs v
 
 /-! ## Ranks and the dimension of `H₁` -/
 

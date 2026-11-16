@@ -110,8 +110,8 @@ lemma symplecticInner_embedBlockOp_left (b : Fin n₂) (P : NQubitPauliOperator 
     (Q : NQubitPauliOperator (n₁ * n₂)) :
     symplecticInner (embedBlockOp b P) Q = symplecticInner P (restrictBlockOp b Q) := by
   rw [symplecticInner_eq_sum_restrictBlockOp, Fintype.sum_eq_single b fun b' hb' => by
-    rw [restrictBlockOp_embedBlockOp, if_neg hb', symplecticInner_identity_left],
-    restrictBlockOp_embedBlockOp, if_pos rfl]
+    rw [restrictBlockOp_embedBlockOp, ite_eq_right hb', symplecticInner_identity_left],
+    restrictBlockOp_embedBlockOp, ite_eq_left rfl]
 
 /-- Pairing `P` with an operator embedded in block `b` is pairing the
 restriction of `P` to block `b` with it. -/
@@ -125,7 +125,7 @@ product. -/
 lemma symplecticInner_embedBlock (b : Fin n₂) (g g' : NQubitPauliGroupElement n₁) :
     ⟪embedBlock b g, embedBlock b g'⟫ₛ = ⟪g, g'⟫ₛ := by
   rw [embedBlock_operators, embedBlock_operators, symplecticInner_embedBlockOp_left,
-    restrictBlockOp_embedBlockOp, if_pos rfl]
+    restrictBlockOp_embedBlockOp, ite_eq_left rfl]
 
 /-! ## Commutation -/
 
@@ -142,7 +142,7 @@ theorem embedBlock_cross_commute {b b' : Fin n₂} (hbb : b ≠ b')
     (g g' : NQubitPauliGroupElement n₁) :
     embedBlock b g * embedBlock b' g' = embedBlock b' g' * embedBlock b g := by
   rw [commutes_iff_symplectic_inner_zero, embedBlock_operators, embedBlock_operators,
-    symplecticInner_embedBlockOp_left, restrictBlockOp_embedBlockOp, if_neg hbb,
+    symplecticInner_embedBlockOp_left, restrictBlockOp_embedBlockOp, ite_eq_right hbb,
     symplecticInner_identity_right]
 
 /-- Elements embedded in the same block commute iff the original elements
@@ -169,10 +169,10 @@ lemma toSymplectic_eq_sum_embedBlockOp_restrictBlockOp (P : NQubitPauliOperator 
   rw [Finset.sum_apply]
   refine Fin.addCases (fun q => ?_) (fun q => ?_) j
   · rw [toSymplectic_X_part, Fintype.sum_eq_single (blockOf q) fun b hb => by
-      rw [toSymplectic_X_part, embedBlockOp_restrictBlockOp_apply, if_neg hb.symm]
-      rfl, toSymplectic_X_part, embedBlockOp_restrictBlockOp_apply, if_pos rfl]
+      rw [toSymplectic_X_part, embedBlockOp_restrictBlockOp_apply, ite_eq_right hb.symm]
+      rfl, toSymplectic_X_part, embedBlockOp_restrictBlockOp_apply, ite_eq_left rfl]
   · rw [toSymplectic_Z_part, Fintype.sum_eq_single (blockOf q) fun b hb => by
-      rw [toSymplectic_Z_part, embedBlockOp_restrictBlockOp_apply, if_neg hb.symm]
-      rfl, toSymplectic_Z_part, embedBlockOp_restrictBlockOp_apply, if_pos rfl]
+      rw [toSymplectic_Z_part, embedBlockOp_restrictBlockOp_apply, ite_eq_right hb.symm]
+      rfl, toSymplectic_Z_part, embedBlockOp_restrictBlockOp_apply, ite_eq_left rfl]
 
 end Quantum.Concatenation

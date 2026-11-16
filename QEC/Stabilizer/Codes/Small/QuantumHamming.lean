@@ -251,15 +251,15 @@ lemma rowsLinearIndependent_generatorsList : rowsLinearIndependent (generatorsLi
   · induction i using Fin.addCases with
     | left a =>
       rw [Fin.append_left, Fin.append_left, ZStab, toSymplectic_zOn_natAdd,
-        if_pos ((pivot_mem_row r).mpr rfl)]
+        ite_eq_left ((pivot_mem_row r).mpr rfl)]
     | right a =>
       rw [Fin.append_right, Fin.append_right, XStab, toSymplectic_xOn_castAdd,
-        if_pos ((pivot_mem_row r).mpr rfl)]
+        ite_eq_left ((pivot_mem_row r).mpr rfl)]
   · induction i using Fin.addCases with
     | left a =>
       induction j using Fin.addCases with
       | left b =>
-        rw [Fin.append_left, Fin.append_left, ZStab, toSymplectic_zOn_natAdd, if_neg]
+        rw [Fin.append_left, Fin.append_left, ZStab, toSymplectic_zOn_natAdd, ite_eq_right]
         rw [pivot_mem_row]
         rintro rfl
         exact lt_irrefl _ hij
@@ -268,7 +268,7 @@ lemma rowsLinearIndependent_generatorsList : rowsLinearIndependent (generatorsLi
       induction j using Fin.addCases with
       | left b => rw [Fin.append_right, Fin.append_left, XStab, toSymplectic_xOn_natAdd]
       | right b =>
-        rw [Fin.append_right, Fin.append_right, XStab, toSymplectic_xOn_castAdd, if_neg]
+        rw [Fin.append_right, Fin.append_right, XStab, toSymplectic_xOn_castAdd, ite_eq_right]
         rw [pivot_mem_row]
         rintro rfl
         exact lt_irrefl _ hij

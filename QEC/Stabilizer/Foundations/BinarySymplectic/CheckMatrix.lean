@@ -31,7 +31,7 @@ def checkMatrix (L : List (NQubitPauliGroupElement n)) :
 /-- The rows of the check matrix of `L` are linearly independent over `ZMod 2`:
 no element of `L` is, up to phase, a product of the others. -/
 def rowsLinearIndependent (L : List (NQubitPauliGroupElement n)) : Prop :=
-  LinearIndependent (ZMod 2) (fun i : Fin L.length => checkMatrix L i)
+  LinearIndependent (ZMod 2) (checkMatrix L).row
 
 end NQubitPauliGroupElement
 

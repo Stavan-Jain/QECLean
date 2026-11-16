@@ -26,16 +26,17 @@ namespace QECWidgets
 open Lean ProofWidgets
 
 /-- Shorthand for `Html.element`. -/
-def el (tag : String) (attrs : Array (String × Json)) (children : Array Html) : Html :=
+def el (tag : String) (attrs : Array (String × Json)) (children : Array ProofWidgets.Html) :
+    ProofWidgets.Html :=
   .element tag attrs children
 
 /-- An element carrying only a `style` attribute. -/
-def styled (tag : String) (style : Json) (children : Array Html) : Html :=
+def styled (tag : String) (style : Json) (children : Array ProofWidgets.Html) : ProofWidgets.Html :=
   el tag #[("style", style)] children
 
 /-- An element carrying (at least) a class. React wants `className`. -/
 def cls (tag : String) (className : String) (attrs : Array (String × Json) := #[])
-    (children : Array Html := #[]) : Html :=
+    (children : Array ProofWidgets.Html := #[]) : ProofWidgets.Html :=
   el tag (#[("className", Json.str className)] ++ attrs) children
 
 /-- An accent color: hex for strokes/text, `"r, g, b"` for alpha tints. -/
@@ -144,13 +145,14 @@ def qecwCss : String :=
     |>.replace "@MH" markHex |>.replace "@AH" antiHex
 
 /-- The stylesheet as an embeddable `<style>` element. -/
-def styleTag : Html :=
+def styleTag : ProofWidgets.Html :=
   el "style" #[] #[.text qecwCss]
 
 /-- Card container shared by all widgets: stylesheet, state bar, body. The
 `accent` colors the bar (verdict green/red/amber, or an identity color); `none`
 leaves it neutral. -/
-def card (children : Array Html) (accent : Option String := none) : Html :=
+def card (children : Array ProofWidgets.Html) (accent : Option String := none) :
+    ProofWidgets.Html :=
   let bar := match accent with
     | some c => cls "div" "qecw-bar" #[("style", json% { background: $(c) })]
     | none => cls "div" "qecw-bar"
@@ -159,7 +161,7 @@ def card (children : Array Html) (accent : Option String := none) : Html :=
 /-- A dim compact header fact ("wt 4", "? 2"); the explanation lives in the
 hover tooltip, an optional color marks warnings/verdicts. -/
 def headerFact (label : String) (title : String := "")
-    (color : Option String := none) : Html :=
+    (color : Option String := none) : ProofWidgets.Html :=
   let attrs := #[("title", Json.str title)] ++
     (match color with
      | some c => #[("style", json% { color: $(c) })]
@@ -168,16 +170,16 @@ def headerFact (label : String) (title : String := "")
 
 /-- Header line: dim name on the left, compact facts on the right. The name is
 `Html` so callers can pass an interactive expression (`exprName`). -/
-def headerHtml (name : Html) (facts : Array Html) : Html :=
+def headerHtml (name : ProofWidgets.Html) (facts : Array ProofWidgets.Html) : ProofWidgets.Html :=
   cls "div" "qecw-head" #[] (#[cls "span" "qecw-name" #[] #[name]] ++ facts)
 
 /-- Interactive expression for card headers: rendered like terms in the goal
 view — hover for types and docs, click to go to the definition. -/
-def exprName (e : Expr) : MetaM Html := do
-  return Html.ofComponent InteractiveCode { fmt := ← Widget.ppExprTagged e } #[]
+def exprName (e : Expr) : MetaM ProofWidgets.Html := do
+  return ProofWidgets.Html.ofComponent InteractiveCode { fmt := ← Widget.ppExprTagged e } #[]
 
 /-- A compact one-line verdict; the full explanation lives in the tooltip. -/
-def verdictLine (color : String) (text : String) (title : String := "") : Html :=
+def verdictLine (color : String) (text : String) (title : String := "") : ProofWidgets.Html :=
   cls "div" "qecw-verdict"
     #[("title", Json.str title), ("style", json% { color: $(color) })]
     #[.text text]

@@ -58,7 +58,8 @@ theorem batchRecon_mem_span (width size coeff output : Nat) (hw : 0 < width)
       (fun _ _ => lane_lt _ _ _) rows hrows] at hcheck
   intro i hi
   rw [← hcheck, lane_packF _ _ _ _
-    (fun j _ => reconX_lt rows (lane width j coeff) width (fun p hp => (hrows p hp).2)), if_pos hi]
+    (fun j _ => reconX_lt rows (lane width j coeff) width (fun p hp => (hrows p hp).2)),
+    ite_eq_left hi]
   exact reconX_mem_span rows (lane width i coeff)
 
 end PackedDigits

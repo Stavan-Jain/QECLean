@@ -88,21 +88,21 @@ def gramBit (vp vq : PauliView) : Option Bool := Id.run do
 
 /-- One heatmap cell: a `qecw-bit` with a variant class; sizes other than the
 stylesheet's 13 px default are set inline (for wide matrices). -/
-private def bitHtml (variant : String) (title : String) (size : Nat := 13) : Html :=
+private def bitHtml (variant : String) (title : String) (size : Nat := 13) : ProofWidgets.Html :=
   let attrs := #[("title", Json.str title)] ++
     (if size == 13 then #[]
      else #[("style", json% { width: $(s!"{size}px"), height: $(s!"{size}px") })])
   cls "span" ("qecw-bit " ++ variant) attrs
 
 /-- Leading row-index label for matrix rows. -/
-private def rowIdx (i : Nat) : Html :=
+private def rowIdx (i : Nat) : ProofWidgets.Html :=
   cls "span" "qecw-rowlabel" #[] #[.text (toString i)]
 
 /-- One check-matrix row: leading generator index, X block, gap, Z block. -/
-private def matrixRow (size : Nat) (i : Nat) (v : PauliView) : Html := Id.run do
-  let mut cells : Array Html := #[rowIdx i]
-  let block (isX : Bool) : Array Html := Id.run do
-    let mut out : Array Html := #[]
+private def matrixRow (size : Nat) (i : Nat) (v : PauliView) : ProofWidgets.Html := Id.run do
+  let mut cells : Array ProofWidgets.Html := #[rowIdx i]
+  let block (isX : Bool) : Array ProofWidgets.Html := Id.run do
+    let mut out : Array ProofWidgets.Html := #[]
     for q in [0:v.numQubits] do
       let part := if isX then "X" else "Z"
       let cell := match v.ops.getD q none with
@@ -121,11 +121,11 @@ private def matrixRow (size : Nat) (i : Nat) (v : PauliView) : Html := Id.run do
 
 /-- The Gram matrix block: `k × k` commutation parities. Only anticommuting
 pairs are colored; commuting pairs stay hairline-quiet. -/
-private def gramHtml (size : Nat) (views : Array PauliView) : Html := Id.run do
+private def gramHtml (size : Nat) (views : Array PauliView) : ProofWidgets.Html := Id.run do
   let k := views.size
-  let mut rows : Array Html := #[]
+  let mut rows : Array ProofWidgets.Html := #[]
   for i in [0:k] do
-    let mut cells : Array Html := #[rowIdx i]
+    let mut cells : Array ProofWidgets.Html := #[rowIdx i]
     for j in [0:k] do
       let cell :=
         if i == j then
@@ -141,7 +141,7 @@ private def gramHtml (size : Nat) (views : Array PauliView) : Html := Id.run do
 
 /-- Render a generator list as check matrix + Gram matrix, plus a text summary,
 or `none` when the expression is not a concrete generator list. -/
-def checkMatrixRender? (e : Expr) : MetaM (Option (Html × String)) := do
+def checkMatrixRender? (e : Expr) : MetaM (Option (ProofWidgets.Html × String)) := do
   let e ← instantiateMVars e
   let some n ← genListShape? e | return none
   if n == 0 || n > maxStripQubits then return none
@@ -176,7 +176,7 @@ def checkMatrixRender? (e : Expr) : MetaM (Option (Html × String)) := do
   let header := headerHtml (← exprName e) #[verdictFact]
   let size : Nat := if n ≤ 32 then 13 else if n ≤ 80 then 9 else 5
   let blockW := n * (size + 2)
-  let blockLabel (letter color title : String) : Html :=
+  let blockLabel (letter color title : String) : ProofWidgets.Html :=
     cls "span" "qecw-micro"
       #[("title", Json.str title),
         ("style", json% {
@@ -187,7 +187,7 @@ def checkMatrixRender? (e : Expr) : MetaM (Option (Html × String)) := do
     #[blockLabel "X" xAccent.hex s!"X components (columns 0–{n - 1} of checkMatrix)",
       styled "span" (json% { width: "12px" }) #[],
       blockLabel "Z" zAccent.hex s!"Z components (columns {n}–{2 * n - 1})"]
-  let mut mat : Array Html := #[]
+  let mut mat : Array ProofWidgets.Html := #[]
   for i in [0:k] do
     mat := mat.push (matrixRow size i (views.getD i default))
   let matBox := styled "div" (json% { overflowX: "auto", paddingBottom: "2px" }) mat
@@ -207,7 +207,7 @@ def checkMatrixRender? (e : Expr) : MetaM (Option (Html × String)) := do
   return some (html, txt)
 
 /-- Presenter entry point: render or fail (failure = "not applicable"). -/
-def checkMatrixPresent (e : Expr) : MetaM Html := do
+def checkMatrixPresent (e : Expr) : MetaM ProofWidgets.Html := do
   match ← checkMatrixRender? e with
   | some (h, _) => return h
   | none => throwError "not a concrete Pauli generator list"

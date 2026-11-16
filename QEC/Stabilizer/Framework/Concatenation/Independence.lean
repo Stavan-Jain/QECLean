@@ -142,7 +142,7 @@ lemma rowsLinearIndependent_map_embedBlock (b : Fin n₂) (L : List (NQubitPauli
   have h : ⇑(blockRestrictSymp b) ∘
         (fun i : Fin L.length => toSymplectic (embedBlock b (L.get i)).operators) =
       fun i => checkMatrix L i :=
-    funext fun i => (blockRestrictSymp_embedBlock b b (L.get i)).trans (if_pos rfl)
+    funext fun i => (blockRestrictSymp_embedBlock b b (L.get i)).trans (ite_eq_left rfl)
   rw [h]
   exact hL
 
@@ -157,7 +157,7 @@ lemma blockRestrictSymp_eq_zero_of_mem_sympSpan (b : Fin n₂)
   refine (span_le (p := LinearMap.ker (blockRestrictSymp b))).mpr ?_ hv
   rintro _ ⟨e, he, rfl⟩
   obtain ⟨b', hb', g, rfl⟩ := hM e he
-  exact (blockRestrictSymp_embedBlock b' b g).trans (if_neg hb'.symm)
+  exact (blockRestrictSymp_embedBlock b' b g).trans (ite_eq_right hb'.symm)
 
 /-- Embedding a list with linearly independent rows into each of a list of
 distinct blocks gives a list with linearly independent rows. -/
@@ -247,8 +247,10 @@ lemma rowsLinearIndependent_promotedOuterList : rowsLinearIndependent D.promoted
   refine Fintype.linearIndependent_iff.mp D.rowsLinearIndependent_outer f (funext fun col => ?_)
   rw [Finset.sum_apply, Pi.zero_apply]
   refine Fin.addCases (fun b => ?_) (fun b => ?_) col
-  · simpa only [Pi.smul_apply, smul_eq_mul, checkMatrix, toSymplectic_X_part] using (hcoeff b).1
-  · simpa only [Pi.smul_apply, smul_eq_mul, checkMatrix, toSymplectic_Z_part] using (hcoeff b).2
+  · simpa only [Pi.smul_apply, smul_eq_mul, Matrix.row_apply, checkMatrix,
+      toSymplectic_X_part] using (hcoeff b).1
+  · simpa only [Pi.smul_apply, smul_eq_mul, Matrix.row_apply, checkMatrix,
+      toSymplectic_Z_part] using (hcoeff b).2
 
 /-! ## Disjointness of the two spans -/
 

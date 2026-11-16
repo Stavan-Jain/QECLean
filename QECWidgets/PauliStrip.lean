@@ -59,7 +59,7 @@ def opClass : Option PauliOperator → String
 
 /-- One qubit cell: the factor letter, a hover tooltip naming the qubit, and
 (when `marked`) a purple ring flagging the position. -/
-def cellHtml (idx : Nat) (marked : Bool) (o : Option PauliOperator) : Html :=
+def cellHtml (idx : Nat) (marked : Bool) (o : Option PauliOperator) : ProofWidgets.Html :=
   cls "span" (s!"qecw-cell {opClass o}" ++ if marked then " qecw-mark" else "")
     #[("title", Json.str s!"qubit {idx}: {opName o}")]
     #[.text (opLetter o)]
@@ -69,7 +69,7 @@ def stripRowSize : Nat := 32
 
 /-- Muted label showing the first qubit index of a row. Only rendered when a
 strip wraps into several rows — on a single-row strip it would be a lone `0`. -/
-private def rowLabel (start : Nat) : Html :=
+private def rowLabel (start : Nat) : ProofWidgets.Html :=
   cls "span" "qecw-rowlabel" #[] #[.text (toString start)]
 
 /-- Leading phase glyph for a strip: `none` for `+1` (not drawn, as in
@@ -85,20 +85,20 @@ def phaseGlyph : Option Nat → Option String
 
 /-- A phase glyph rendered as a fixed-width leading cell (fixed width so two
 strips shown together stay column-aligned even when only one has a glyph). -/
-def phaseGlyphHtml (g : String) : Html :=
+def phaseGlyphHtml (g : String) : ProofWidgets.Html :=
   cls "span" "qecw-glyph" #[("title", Json.str "global phase")] #[.text g]
 
 /-- The strip proper: rows of qubit cells. Row index labels appear only when the
 strip wraps; `marks` (when nonempty) rings the flagged positions; `leading`
 (when present) is drawn before the first row's cells. -/
 def stripHtml (v : PauliView) (marks : Array Bool := #[])
-    (leading : Option Html := none) : Html := Id.run do
+    (leading : Option ProofWidgets.Html := none) : ProofWidgets.Html := Id.run do
   let numRows := (v.numQubits + stripRowSize - 1) / stripRowSize
-  let mut rows : Array Html := #[]
+  let mut rows : Array ProofWidgets.Html := #[]
   for r in [0:numRows] do
     let start := r * stripRowSize
     let stop := min (start + stripRowSize) v.numQubits
-    let mut cells : Array Html := #[]
+    let mut cells : Array ProofWidgets.Html := #[]
     if numRows > 1 then
       cells := cells.push (rowLabel start)
     if r == 0 then
@@ -120,8 +120,9 @@ def phaseStr : Option Nat → String
 
 /-- Standard header facts for a view: weight, phase (only when the strip wraps
 and cannot carry the leading glyph), unresolved count. -/
-private def viewFacts (v : PauliView) (showPhase : Bool) : Array Html := Id.run do
-  let mut fs : Array Html := #[headerFact s!"wt {v.weight}" "number of non-identity qubits"]
+private def viewFacts (v : PauliView) (showPhase : Bool) : Array ProofWidgets.Html := Id.run do
+  let mut fs : Array ProofWidgets.Html :=
+    #[headerFact s!"wt {v.weight}" "number of non-identity qubits"]
   if showPhase && v.numQubits > stripRowSize then
     fs := fs.push (headerFact (phaseStr v.phasePower) "global phase")
   if v.numStuck > 0 then
@@ -131,7 +132,7 @@ private def viewFacts (v : PauliView) (showPhase : Bool) : Array Html := Id.run 
 /-- Single-term view: header plus strip. The phase is drawn as a leading glyph
 on single-row strips, and as a header fact on wrapped ones (a glyph would
 misalign the first row there). -/
-def stripCard (name : Html) (v : PauliView) (showPhase : Bool) : Html :=
+def stripCard (name : ProofWidgets.Html) (v : PauliView) (showPhase : Bool) : ProofWidgets.Html :=
   let leading :=
     if showPhase && v.numQubits ≤ stripRowSize then (phaseGlyph v.phasePower).map phaseGlyphHtml
     else none
@@ -174,9 +175,10 @@ private def countMarks (marks : Array Bool) : Nat :=
 card's state bar. Phase glyphs are drawn on both strips whenever either side has
 one, so the columns stay aligned; wrapped strips carry the phase in their header
 facts instead. -/
-def dualCard (nameP nameQ : Html) (vp vq : PauliView) (marks : Array Bool)
-    (verdict : Html) (showPhase : Bool) (accent : Option String := none) : Html :=
-  let glyphs : Option Html × Option Html :=
+def dualCard (nameP nameQ : ProofWidgets.Html) (vp vq : PauliView) (marks : Array Bool)
+    (verdict : ProofWidgets.Html) (showPhase : Bool) (accent : Option String := none) :
+    ProofWidgets.Html :=
+  let glyphs : Option ProofWidgets.Html × Option ProofWidgets.Html :=
     if showPhase && vp.numQubits ≤ stripRowSize then
       match phaseGlyph vp.phasePower, phaseGlyph vq.phasePower with
       | none, none => (none, none)
@@ -251,7 +253,7 @@ def maxStripQubits : Nat := 512
 /-- Render any recognized Pauli shape (term, `Anticommute`, or equality) as HTML
 plus a plain-text summary (logged by `#pauli_strip` so terminals see something
 too), or `none` when `e` is not one / is not concrete enough. -/
-def pauliRender? (e : Expr) : MetaM (Option (Html × String)) := do
+def pauliRender? (e : Expr) : MetaM (Option (ProofWidgets.Html × String)) := do
   let e ← instantiateMVars e
   match ← pauliShape? e with
   | none => return none
@@ -281,7 +283,7 @@ def pauliRender? (e : Expr) : MetaM (Option (Html × String)) := do
     return some (html, s!"lhs = {vl.letters}\nrhs = {vr.letters}\n{long}")
 
 /-- Presenter entry point: render or fail (failure = "not applicable"). -/
-def pauliPresent (e : Expr) : MetaM Html := do
+def pauliPresent (e : Expr) : MetaM ProofWidgets.Html := do
   match ← pauliRender? e with
   | some (h, _) => return h
   | none => throwError "not a concrete Pauli expression"

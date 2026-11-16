@@ -294,11 +294,11 @@ lemma weight_xOn (S : Finset (Fin n)) : weight (xOn S) = S.card := by
 
 /-- `Z` on every qubit. -/
 lemma zOn_univ : zOn (Finset.univ : Finset (Fin n)) = ⟨0, NQubitPauliOperator.Z n⟩ :=
-  congrArg (NQubitPauliGroupElement.mk 0) (funext fun k => if_pos (Finset.mem_univ k))
+  congrArg (NQubitPauliGroupElement.mk 0) (funext fun k => ite_eq_left (Finset.mem_univ k))
 
 /-- `X` on every qubit. -/
 lemma xOn_univ : xOn (Finset.univ : Finset (Fin n)) = ⟨0, NQubitPauliOperator.X n⟩ :=
-  congrArg (NQubitPauliGroupElement.mk 0) (funext fun k => if_pos (Finset.mem_univ k))
+  congrArg (NQubitPauliGroupElement.mk 0) (funext fun k => ite_eq_left (Finset.mem_univ k))
 
 open scoped Pauli in
 /-- `Z` on a single qubit. -/

@@ -181,7 +181,7 @@ lemma testBit_maskOf (x : ι → ZMod 2) (k : ℕ) :
 /-- The mask of a chain on `n` indices occupies the lowest `n` bits. -/
 lemma maskOf_lt (x : ι → ZMod 2) : maskOf e x < 2 ^ n := by
   refine Nat.lt_pow_two_of_testBit _ fun i hi => ?_
-  rw [testBit_maskOf, dif_neg (by omega)]
+  rw [testBit_maskOf, dite_eq_right (by omega)]
 
 private lemma zmod2_add_ne (a b : ZMod 2) :
     decide (a + b ≠ 0) = (decide (a ≠ 0) ^^ decide (b ≠ 0)) := by
@@ -265,7 +265,7 @@ lemma card_support_eq_bitCount [Fintype ι] (x : ι → ZMod 2) :
   · intro k hk
     obtain ⟨hk, hb⟩ : k < n ∧ (maskOf e x).testBit k = true := by simpa using hk
     refine ⟨e.symm ⟨k, hk⟩, ?_, by simp⟩
-    rw [testBit_maskOf, dif_pos hk] at hb
+    rw [testBit_maskOf, dite_eq_left hk] at hb
     simpa using hb
 
 end F2Mask

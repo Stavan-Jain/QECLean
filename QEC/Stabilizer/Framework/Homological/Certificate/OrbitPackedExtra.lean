@@ -99,7 +99,7 @@ lemma lane_guarded_sub (width size bits scalar i : Nat) (f : Nat → Nat)
   have hfit : ∀ j < size, f j + 2 ^ bits - scalar < 2 ^ width := fun j hj => by
     have := hf j hj
     omega
-  rw [packF_add, packF_sub _ _ _ _ hn, lane_packF _ _ _ _ hfit, if_pos hi]
+  rw [packF_add, packF_sub _ _ _ _ hn, lane_packF _ _ _ _ hfit, ite_eq_left hi]
   exact testBit_guarded_sub bits (f i) scalar (hf i hi) hs
 
 /-- The packed equality test leaves the sentinel bit exactly in the lanes
@@ -139,7 +139,7 @@ lemma packed_equal_mask_bit (width size bits scalar i : Nat) (f : Nat → Nat)
     · exact hp
     · exact Nat.two_pow_pos _
   rw [packed_equality_sentinels width size bits f (fun _ => scalar) hbits hf (fun _ _ => hs),
-    lane_packF _ _ _ _ hfit, if_pos hi]
+    lane_packF _ _ _ _ hfit, ite_eq_left hi]
   by_cases h : f i = scalar <;> simp [h]
 
 /-- A packed low-bit mask certifies a smaller bound on every table entry. -/
@@ -152,7 +152,7 @@ theorem packed_mask_bound (width size bits : Nat) (f : Nat → Nat)
       (Nat.pow_le_pow_right Nat.two_pos hb)
   intro i hi
   have h := congrArg (lane width i) hc
-  rw [lane_and, lane_packF _ _ _ _ hf, lane_packF _ _ _ _ hm, if_pos hi, if_pos hi,
+  rw [lane_and, lane_packF _ _ _ _ hf, lane_packF _ _ _ _ hm, ite_eq_left hi, ite_eq_left hi,
     Nat.and_two_pow_sub_one_eq_mod] at h
   rw [← h]
   exact Nat.mod_lt _ (Nat.two_pow_pos _)

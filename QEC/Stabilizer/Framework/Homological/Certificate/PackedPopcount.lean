@@ -123,7 +123,7 @@ theorem popcountTree_packF (k size bits : Nat) (f : Nat → Nat) (hbits : bits �
   rw [popcountTree_eq k size _ (packF_lt _ _ _ (Nat.two_pow_pos k) hfit)]
   refine packF_congr _ _ _ _ fun i hi => ?_
   rw [← bitCount_mod, Nat.shiftRight_eq_div_pow, ← lane_eq_div_mod, lane_packF _ _ _ _ hfit,
-    if_pos hi, show 2 ^ k = bits + (2 ^ k - bits) by omega, bitCount_extend _ _ _ (hf i hi)]
+    ite_eq_left hi, show 2 ^ k = bits + (2 ^ k - bits) by omega, bitCount_extend _ _ _ (hf i hi)]
 
 /-- A constant-digit table can be grouped into equal-sized blocks. -/
 lemma packF_constant_group (width cells size value : Nat) :

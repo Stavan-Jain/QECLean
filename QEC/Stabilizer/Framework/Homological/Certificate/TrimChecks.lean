@@ -38,6 +38,7 @@ theorem checkExtension_single {ι κ : Type} [Fintype ι] [DecidableEq ι] [Deci
 
 /-- The homological code with the qubits of `X` that keeps only the Z-checks
 selected by `v` and the X-checks selected by `f`. -/
+@[implicit_reducible]
 noncomputable def trimChecks (X : HomologicalCode)
     {V F : Type} [Fintype V] [DecidableEq V] [Fintype F] [DecidableEq F]
     (v : V → X.C0) (f : F → X.C2) : HomologicalCode where

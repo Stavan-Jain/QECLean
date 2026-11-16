@@ -182,7 +182,7 @@ lemma fiberSumFn_pullback [Fintype I] [DecidableEq J] (hσne : ∀ i, σ i ≠ i
     rw [fiberSumFn_pair hσne hfiber, Function.comp_apply, Function.comp_apply,
       (hfiber i (σ i)).mpr (Or.inr rfl)]
     exact CharTwo.add_self_eq_zero _
-  · exact Finset.sum_eq_zero fun i _ => if_neg fun h => hj ⟨i, h⟩
+  · exact Finset.sum_eq_zero fun i _ => ite_eq_right fun h => hj ⟨i, h⟩
 
 /-- The lift of a base chain along a section `sec` of `f`: supported on the
 image of `sec`, where it takes the base values. -/
@@ -201,8 +201,8 @@ lemma fiberSumFn_lift0 [Fintype I] [DecidableEq I] [DecidableEq J]
   · simp [lift0, hsec j]
   · intro i hne
     by_cases hfi : f i = j
-    · rw [if_pos hfi, lift0, if_neg (by rwa [hfi])]
-    · rw [if_neg hfi]
+    · rw [ite_eq_left hfi, lift0, ite_eq_right (by rwa [hfi])]
+    · rw [ite_eq_right hfi]
 
 /-- The kernel of the pushforward is the image of the pullback: the chains
 with zero pushforward are the deck-invariant ones, which descend. -/

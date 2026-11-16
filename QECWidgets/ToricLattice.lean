@@ -128,7 +128,7 @@ private def lineCoords (x1 y1 x2 y2 : Nat) : Array (String × Json) :=
   #[("x1", toJson x1), ("y1", toJson y1), ("x2", toJson x2), ("y2", toJson y2)]
 
 /-- A base-grid line (hairline, crisp, muted via the stylesheet). -/
-private def gridLine (x1 y1 x2 y2 : Nat) (dashed : Bool := false) : Html :=
+private def gridLine (x1 y1 x2 y2 : Nat) (dashed : Bool := false) : ProofWidgets.Html :=
   cls "line" "qecw-svg-grid"
     (lineCoords x1 y1 x2 y2 ++
       if dashed then #[("strokeDasharray", Json.str "2 4")] else #[])
@@ -136,7 +136,7 @@ private def gridLine (x1 y1 x2 y2 : Nat) (dashed : Bool := false) : Html :=
 /-- A chain edge: a background-colored halo under a colored stroke, so loops
 stay legible where they cross the grid. Wrap stubs are dotted. -/
 private def chainSeg (x1 y1 x2 y2 : Nat) (color : String) (dashed : Bool := false) :
-    Array Html :=
+    Array ProofWidgets.Html :=
   let dash : Array (String × Json) :=
     if dashed then #[("strokeDasharray", Json.str "0.1 6")] else #[]
   #[cls "line" "qecw-svg-halo" (lineCoords x1 y1 x2 y2 ++ dash),
@@ -149,14 +149,14 @@ private def chainSeg (x1 y1 x2 y2 : Nat) (color : String) (dashed : Bool := fals
 /-- Draw the lattice: base grid (with dashed wrap stubs), the chain's edges in
 the flavor color over halos, stuck edges in the warning color, vertex dots, and
 coordinate labels on small lattices. -/
-def latticeSvg (v : ChainView) (flavor : ChainFlavor) : Html := Id.run do
+def latticeSvg (v : ChainView) (flavor : ChainFlavor) : ProofWidgets.Html := Id.run do
   let L := v.L
   let s : Nat := if L ≤ 6 then 44 else if L ≤ 10 then 30 else 22
   let m : Nat := 30
   let stub := (s * 2) / 5
   let side := m + (L - 1) * s + m
   let px (i : Nat) : Nat := m + i * s
-  let mut kids : Array Html := #[]
+  let mut kids : Array ProofWidgets.Html := #[]
   -- Base grid: one solid line per row/column, plus dashed wrap stubs.
   for i in [0:L] do
     kids := kids.push (gridLine m (px i) (px (L - 1)) (px i))
@@ -191,7 +191,7 @@ def latticeSvg (v : ChainView) (flavor : ChainFlavor) : Html := Id.run do
         #[("cx", toJson (px x)), ("cy", toJson (px y)), ("r", toJson (1.75 : Float))]
   if L ≤ 12 then
     for i in [0:L] do
-      let lbl (tx ty : Nat) : Html := cls "text" "qecw-svg-label"
+      let lbl (tx ty : Nat) : ProofWidgets.Html := cls "text" "qecw-svg-label"
         #[("x", toJson tx), ("y", toJson ty), ("textAnchor", Json.str "middle")]
         #[.text (toString i)]
       kids := kids.push (lbl (px i) (m - stub - 4))
@@ -219,12 +219,12 @@ def ChainView.edgeList (v : ChainView) (maxEdges : Nat := 24) : String := Id.run
   return if parts.size > maxEdges then shown ++ " …" else shown
 
 /-- Render a recognized toric shape as HTML plus a text summary, or `none`. -/
-def toricRender? (e : Expr) : MetaM (Option (Html × String)) := do
+def toricRender? (e : Expr) : MetaM (Option (ProofWidgets.Html × String)) := do
   let e ← instantiateMVars e
   let some (flavor, L, c) ← toricShape? e | return none
   if L == 0 || L > maxToricL then return none
   let v ← chainView c L
-  let mut facts : Array Html := #[]
+  let mut facts : Array ProofWidgets.Html := #[]
   if let some letter := flavor.letter then
     facts := facts.push (headerFact letter ((flavor.label).getD "") (some flavor.color))
   facts := facts.push (headerFact s!"{v.size} edges" "edges carried by the chain")
@@ -240,7 +240,7 @@ def toricRender? (e : Expr) : MetaM (Option (Html × String)) := do
   return some (html, txt)
 
 /-- Presenter entry point: render or fail (failure = "not applicable"). -/
-def toricPresent (e : Expr) : MetaM Html := do
+def toricPresent (e : Expr) : MetaM ProofWidgets.Html := do
   match ← toricRender? e with
   | some (h, _) => return h
   | none => throwError "not a concrete toric chain expression"

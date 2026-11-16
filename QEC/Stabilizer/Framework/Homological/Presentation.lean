@@ -104,7 +104,7 @@ theorem linearIndependent_cellGenerator
       vertexStabOf, faceStabOf, toSymplectic_chainZOperator_Z,
       toSymplectic_chainXOperator_Z, mul_zero, Finset.sum_const_zero, add_zero] at hcol
     rw [linearMap_apply_eq_sum_single]
-    simpa only [singleVtx] using hcol
+    simpa only [singleVtx, Pi.zero_apply] using hcol
   have hX : X.boundary2 (fun f => c (.inr f)) = 0 := by
     ext e
     have hcol := congr_fun hsum (Fin.castAdd X.numQubits (X.edgeEquiv e))
@@ -113,7 +113,7 @@ theorem linearIndependent_cellGenerator
       vertexStabOf, faceStabOf, toSymplectic_chainZOperator_X,
       toSymplectic_chainXOperator_X, mul_zero, Finset.sum_const_zero, zero_add] at hcol
     rw [linearMap_apply_eq_sum_single]
-    simpa only [singleFace] using hcol
+    simpa only [singleFace, Pi.zero_apply] using hcol
   cases i with
   | inl v => exact congr_fun (hcut (hZ.trans (map_zero X.cutMap).symm)) v
   | inr f => exact congr_fun (hboundary (hX.trans (map_zero X.boundary2).symm)) f

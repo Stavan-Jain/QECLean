@@ -1,6 +1,6 @@
 import Mathlib.LinearAlgebra.Matrix.Defs
 import Mathlib.LinearAlgebra.Matrix.Notation
-import Mathlib.Data.Complex.Basic
+import Mathlib.Basic.Complex.Basic
 import Mathlib.Tactic
 import Mathlib.Algebra.Group.Defs
 import QEC.Foundations.Foundations
@@ -126,7 +126,7 @@ lemma toMatrix_inj (p q : NQubitPauliGroupElement n) (h : toMatrix p = toMatrix 
         PauliGroupElement.phasePowerToComplex q.phasePower *
           (q.operators.toMatrix * p.operators.toMatrix).trace := by
     simpa [toMatrix] using congrArg (fun M => (M * p.operators.toMatrix).trace) h
-  rw [NQubitPauliOperator.trace_mul, NQubitPauliOperator.trace_mul, if_pos rfl] at h_trace
+  rw [NQubitPauliOperator.trace_mul, NQubitPauliOperator.trace_mul, ite_eq_left rfl] at h_trace
   have h_ops : q.operators = p.operators := by
     by_contra hne
     simp [hne, PauliGroupElement.phasePowerToComplex_ne_zero] at h_trace

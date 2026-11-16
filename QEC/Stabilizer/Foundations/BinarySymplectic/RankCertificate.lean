@@ -216,13 +216,13 @@ theorem mul_certMatrix_eq_one {m k : ℕ} (M : Matrix (Fin m) (Fin k) (ZMod 2))
   have hsum : (M * certMatrix k m bs) i j =
       ∑ c ∈ Finset.range k,
         if (Nat.land rows[i.val] bs[j.val]).testBit c then (1 : ZMod 2) else 0 := by
-    rw [mul_apply, ← Fin.sum_univ_eq_sum_range]
+    rw [Matrix.mul_apply, ← Fin.sum_univ_eq_sum_range]
     refine Finset.sum_congr rfl fun c _ => ?_
     rw [hrow, certMatrix, List.getD_eq_getElem _ _ hi, List.getD_eq_getElem _ _ hj]
     change _ = if (rows[i.val] &&& bs[j.val]).testBit c then _ else _
     rw [Nat.testBit_land]
     cases rows[i.val].testBit c <;> cases bs[j.val].testBit c <;> simp
-  rw [hsum, ← ite_parityLow, rowsCheck_sound h i hi j hj, one_apply, zero_add]
+  rw [hsum, ← ite_parityLow, rowsCheck_sound h i hi j hj, Matrix.one_apply, zero_add]
   simp [Fin.ext_iff]
 
 /-! ## Symplectic rows as bitmasks -/
@@ -260,10 +260,10 @@ lemma toSymplectic_eq_ite (op : NQubitPauliOperator n) (c : Fin (n + n)) :
   rw [rowMask, testBit_ofBitsFrom, decide_eq_true hc, Bool.true_and, zero_add,
     NQubitPauliOperator.toSymplectic, symplecticBit]
   by_cases h : c.val < n
-  · rw [dif_pos h, dif_pos h]
+  · rw [dite_eq_left h, dite_eq_left h]
     cases op ⟨c.val, h⟩ <;> rfl
   · have h' : c.val - n < n := by omega
-    rw [dif_neg h, dif_neg h, dif_pos h']
+    rw [dite_eq_right h, dite_eq_right h, dite_eq_left h']
     cases op ⟨c.val - n, h'⟩ <;> rfl
 
 end RankCertificate

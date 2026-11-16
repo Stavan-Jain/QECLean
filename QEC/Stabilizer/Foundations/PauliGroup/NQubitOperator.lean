@@ -1,6 +1,6 @@
 import Mathlib.LinearAlgebra.Matrix.Defs
 import Mathlib.LinearAlgebra.Matrix.Notation
-import Mathlib.Data.Complex.Basic
+import Mathlib.Basic.Complex.Basic
 import Mathlib.Tactic
 import Mathlib.Algebra.Group.Defs
 import QEC.Foundations.Foundations
@@ -79,7 +79,13 @@ lemma tensorMatrix_mem_unitaryGroup {A : Fin n → Matrix QubitBasis QubitBasis 
 -/
 
 /-- An n-qubit Pauli operator: a single-qubit Pauli operator on each of the `n`
-qubits. Its matrix is the tensor product of the single-qubit Pauli matrices. -/
+qubits. Its matrix is the tensor product of the single-qubit Pauli matrices.
+
+`implicit_reducible`, so that elaboration sees through to the underlying
+function type when it checks the type of `op i` in an implicit or instance
+argument (e.g. `DecidablePred fun i => op i ≠ PauliOperator.I`), while type
+class search and `simp` indexing still treat `NQubitPauliOperator n` as opaque. -/
+@[implicit_reducible]
 def NQubitPauliOperator (n : ℕ) : Type := Fin n → PauliOperator
 
 namespace NQubitPauliOperator
