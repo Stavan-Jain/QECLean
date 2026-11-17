@@ -1,7 +1,7 @@
 # Bivariate-bicycle codes
 
 Concrete distance formalizations are maintained in
-[bb-distance-lean](https://github.com/Stavan-Jain/bb-distance-lean), which pins
+[bb-distance-lean](https://github.com/QECLean/bb-distance-lean), which pins
 QECLean to an exact commit:
 
 | Code | Parameters | Downstream import |

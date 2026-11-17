@@ -42,7 +42,7 @@ echo "==> Adding QECLean as a project"
 # lean4web requires the project folder name and its root .lean file to match.
 # QECLean's root module is QEC.lean, so the folder must be named exactly QEC.
 if [ ! -d Projects/QEC ]; then
-  git clone --branch "$QECLEAN_REF" https://github.com/Stavan-Jain/QECLean.git Projects/QEC
+  git clone --branch "$QECLEAN_REF" https://github.com/QECLean/QECLean.git Projects/QEC
 else
   git -C Projects/QEC fetch origin "$QECLEAN_REF" && git -C Projects/QEC checkout "$QECLEAN_REF" && git -C Projects/QEC pull
 fi

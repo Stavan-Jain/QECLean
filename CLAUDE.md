@@ -46,7 +46,7 @@ build/MCP workflow. Volatile or topic-scoped knowledge lives elsewhere:
   — orientation for the bivariate bicycle (BB) family: which `Framework`
   modules hold the general theory (chain complex, covers, doubling,
   certificates), and where the concrete distance proofs live (the downstream
-  repo [bb-distance-lean](https://github.com/Stavan-Jain/bb-distance-lean),
+  repo [bb-distance-lean](https://github.com/QECLean/bb-distance-lean),
   which pins this library). Read before any BB edit.
 - **[`QEC/Stabilizer/Codes/Color/README.md`](QEC/Stabilizer/Codes/Color/README.md)**
   — the triangular color-code family: interface, construction, and the shape
@@ -282,7 +282,7 @@ kernel reduction), quantifier bridges so the kernel enumerates concrete
 lambdas rather than whnf-ing a pi-`Fintype`, sparse rewrites in place of
 `Finset.sum`s, and Gaussian-style certificates where a sweep would otherwise
 be needed. The gross `[[144,12,12]]` proof in
-[bb-distance-lean](https://github.com/Stavan-Jain/bb-distance-lean) is the reference: it was converted from 135 native leaves to kernel-only, and
+[bb-distance-lean](https://github.com/QECLean/bb-distance-lean) is the reference: it was converted from 135 native leaves to kernel-only, and
 its capstones print the standard three. Read it before concluding a check
 "has to" be native.
 

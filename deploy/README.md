@@ -27,7 +27,7 @@ thing that needs 12 GB of swap.
 Everything needed is in [`.devcontainer/`](../.devcontainer):
 
 ```
-https://codespaces.new/Stavan-Jain/QECLean
+https://codespaces.new/QECLean/QECLean
 ```
 
 `setup.sh` installs the pinned toolchain, runs `lake exe cache get` for
