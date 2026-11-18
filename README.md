@@ -7,7 +7,7 @@
 QECLean is a Lean-based framework for formally specifying and verifying QEC codes. It consists of 
 
 1. Algebraic Abstractions for specifying stabilizer codes and code families
-2. Proof techniques and algorithmic infrastructure to establish [[n, k, d]] code parameters for codes and code families
+2. Proof techniques and algorithmic infrastructure to establish $[[n, k, d]]$ code parameters for codes and code families
 
 ## Overview
 
@@ -17,7 +17,7 @@ and other foundations. Import everything via `QEC`.
 
 ### Codes
 
-Our central abstraction is the type `Code[[n, k, d]]`, which is a $[[n, k, d]]$ stabilizer code together with lean proofs that it uses `n` physical qubit to encode `k` logical qubits with code distance `d`. We formalize the following codes as `Code[[n, k, d]]`s:
+Our central abstraction is the type `Code[[n, k, d]]`, which is a $[[n, k, d]]$ stabilizer code together with lean proofs that it uses $n$ physical qubit to encode $k$ logical qubits with code distance $d$. We formalize the following codes as `Code[[n, k, d]]`s:
 
 | Code | Parameters | Where |
 |---|---|---|
