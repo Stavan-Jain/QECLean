@@ -1,13 +1,14 @@
-# Quantum Error Correction in Lean
+# QECLean: Quantum Error Correction in Lean
 
 [![Lean V4](https://img.shields.io/badge/Lean-V4-blueviolet)](https://lean-lang.org/)
 [![Open in Codespaces](https://img.shields.io/badge/Codespaces-open-blue?logo=github)](https://codespaces.new/QECLean/QECLean)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![arXiv](https://img.shields.io/badge/arXiv-2611.21236-b31b1b.svg)](https://arxiv.org/abs/2611.21236)
 
 QECLean is a Lean-based framework for formally specifying and verifying QEC codes. It consists of 
 
-1. Algebraic abstractions for specifying stabilizer codes and code families
-2. Proof techniques and algorithmic infrastructure to establish $[[n, k, d]]$ code parameters for codes and code families
+1. Algebraic abstractions for specifying stabilizer codes and code families including chain complexes and check matrices
+2. Proof techniques and algorithmic infrastructure to establish $[[n, k, d]]$ code parameters for codes and code families, resulting in formalized distance proofs of the $[[2L^2, 2, L]]$ toric codes, $[[360, 12, 24]]$ and $[[144, 12, 12]]$ BB codes and the $[[150, 30, 10]]$ Mitten Code.
 
 ## Overview
 
@@ -27,17 +28,11 @@ Our central abstraction is the type `Code[[n, k, d]]`, which is a $[[n, k, d]]$ 
 | Gross (downstream) | `[[144, 12, 12]]` | [bb-distance-lean](https://github.com/QECLean/bb-distance-lean) |
 | Rotated surface code, odd `L ≥ 3` | `[[L², 1, L]]` | `Codes/RotatedSurface/` |
 | Triangular color code, every `r` | `[[3r(r+1) + 1, 1, 2r + 1]]` | `Codes/Color/` |
-| Iceberg family, `m ≥ 2` | `[[2m, 2m − 2, 2]]` | `Codes/Iceberg/N*.lean` |
 | Five-qubit perfect code (non-CSS) | `[[5, 1, 3]]` | `Codes/Small/FiveQubit_5_1_3*.lean` |
 | Steane code | `[[7, 1, 3]]` | `Codes/Small/Steane7*.lean` |
 | Concatenated Steane code | `[[49, 1, 9]]` | `Codes/Concat/SteaneSteane.lean` |
-| `C_6` (Knill) | `[[6, 2, 2]]` | `Codes/Small/SixQubit_6_2_2*.lean` |
-| `[[4, 2, 2]]` | `[[4, 2, 2]]` | `Codes/Small/FourQubit_4_2_2*.lean` |
-| LNCY code | `[[4, 1, 2]]` | `Codes/Small/CSS_4_1_2*.lean` |
 | 3-qubit repetition | `[[3, 1, 1]]` | `Codes/Repetition/Three*.lean` |
 | n-qubit repetition, `n ≥ 2` | `[[n, 1, 1]]` | `Codes/Repetition/N*.lean` |
-| Shor code | `[[9, 1, 3]]` | `Codes/Small/Shor9*.lean` |
-| Quantum Hamming, `r ≥ 3` | `[[2^r − 1, 2^r − 1 − 2r, 3]]` | `Codes/Small/QuantumHamming*.lean` |
 
 ## Project structure
 
@@ -77,8 +72,6 @@ for this setup and for self-hosting a lean4web instance.
 
 - [Lean 4](https://lean-lang.org/) (this repo uses
   `leanprover/lean4:v4.36.0-rc2`; see `lean-toolchain`)
-- [Lake](https://github.com/leanprover/lake), which ships with Lean, and
-  mathlib, which Lake pulls in automatically
 
 ### Building
 
@@ -88,12 +81,6 @@ cd QECLean
 lake exe cache get   # prebuilt mathlib
 lake build
 ```
-
-### Working with the code
-
-- Open files in your Lean 4 editor (VS Code with the Lean extension, or Emacs
-  with lean4-mode).
-- Use `#check` and `#print axioms` to explore definitions and results.
 
 ## Contributing
 
@@ -114,11 +101,6 @@ Contributions are welcome! If you add new modules or definitions, please:
 5. **Update this README** if you add a code family or rename top-level
    modules.
 
-## Acknowledgments
-
-Built using [Lean 4](https://lean-lang.org/) and
-[mathlib](https://github.com/leanprover-community/mathlib4).
-
 ## License
 
 Released under the [Apache License 2.0](LICENSE).
@@ -127,8 +109,24 @@ Released under the [Apache License 2.0](LICENSE).
 
 Our preprint providing an exposition to QECLean can be found here: [Specifying and Verifying Quantum Error-Correcting Codes](https://arxiv.org/abs/2611.21236)
 
+## Citation
+
+If you use QECLean in your research, please cite the following paper:
+
+```
+@misc{jain2026specifyingverifyingquantum,
+      title={Specifying & Verifying Quantum Error-Correcting Codes}, 
+      author={Stavan Jain and Nithin Raveendran and Aws Albarghouthi},
+      year={2026},
+      eprint={2611.21236},
+      archivePrefix={arXiv},
+      primaryClass={quant-ph},
+      url={https://arxiv.org/abs/2611.21236}, 
+}
+```
+
 ## Maintainer
 
-Maintained by Stavan Jain
+Maintained by [Stavan Jain](https://stavan-jain.github.io./)
 
 A project from the **University of Wisconsin–Madison**.
