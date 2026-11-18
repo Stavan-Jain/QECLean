@@ -6,7 +6,7 @@
 
 QECLean is a Lean-based framework for formally specifying and verifying QEC codes. It consists of 
 
-1. Algebraic Abstractions for specifying stabilizer codes and code families
+1. Algebraic abstractions for specifying stabilizer codes and code families
 2. Proof techniques and algorithmic infrastructure to establish $[[n, k, d]]$ code parameters for codes and code families
 
 ## Overview
