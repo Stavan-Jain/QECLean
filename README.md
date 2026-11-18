@@ -1,19 +1,13 @@
 # Quantum Error Correction in Lean
 
 [![Lean V4](https://img.shields.io/badge/Lean-V4-blueviolet)](https://lean-lang.org/)
-[![Blueprint](https://img.shields.io/badge/blueprint-live-success)](https://qeclean.github.io/QECLean/)
-[![Dashboard](https://img.shields.io/badge/pipeline%20dashboard-live-success)](https://stavan-jain.github.io/qec-lab/)
-[![Research: qec-lab](https://img.shields.io/badge/research-qec--lab-informational)](https://github.com/Stavan-Jain/qec-lab)
 [![Open in Codespaces](https://img.shields.io/badge/Codespaces-open-blue?logo=github)](https://codespaces.new/QECLean/QECLean)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
-This project formalizes the stabilizer formalism for quantum error correction in
-the Lean 4 proof assistant, with the long-term goal of a broad formalization of
-stabilizer codes.
+QECLean is a Lean-based framework for formally specifying and verifying QEC codes. It consists of 
 
-Along the way, it develops definitions and lemmas for reasoning about qubits,
-quantum states, and unitary operations, contributing toward a verified
-foundation for quantum computing and fault tolerance in Lean.
+1. Algebraic Abstractions for specifying stabilizer codes and code families
+2. Proof techniques and algorithmic infrastructure to establish [[n, k, d]] code parameters for codes and code families
 
 ## Overview
 
@@ -21,49 +15,16 @@ Modules are written in Lean 4 and rely on
 [mathlib](https://github.com/leanprover-community/mathlib4) for linear algebra
 and other foundations. Import everything via `QEC`.
 
-### Features
-
-- **Quantum computing foundations**: qubits, state vectors, norms, ket
-  notation, single- and two-qubit gates (Paulis, Hadamard, phase, CNOT), tensor
-  products, and the Clifford conjugation tableau.
-- **Pauli groups**: single- and n-qubit Pauli groups, matrix representations,
-  commutation theory (including tactics), and the `σ[XZZXI]` notation for
-  literal Pauli strings.
-- **Binary symplectic representation**: check matrices, the symplectic inner
-  product, symplectic span, and the equivalence between independent generators
-  and linearly independent check-matrix rows.
-- **Stabilizer framework**: stabilizer groups, codespaces, centralizers,
-  logical operators, logical gates, code distance, and CSS structure. Codes come
-  in three layers: `StabilizerCode n k` (`Code[[n, k]]`, a stabilizer group
-  with exactly `2^(n−k)` elements, so `k` is determined by the group),
-  `StabilizerCodeWithLogicals n k` (`Code[[n, k]]ₗ`, adding a chosen logical
-  basis), and `StabilizerCodeWithDistance n k d` (`Code[[n, k, d]]`, adding a
-  distance proof). Concrete codes are built from a generator list through
-  `StabilizerCode.Presentation`.
-- **Homological framework**: chain-complex (CSS) codes, the
-  logical-operator-to-homology correspondence, the transfer of chain-weight
-  bounds to Pauli weights, and the bivariate-bicycle doubling layer
-  (`Framework/Homological/BB*`): cover transfer, deck homotopy, deck towers,
-  Bockstein rank, and small-cycle base floors.
-- **Fold-and-double**: a code-agnostic distance theorem for qubit pairings
-  (`Framework/FoldDouble/`), with the bivariate-bicycle double cover as its
-  instance.
-- **CSS concatenation framework**: a parametric `[[n₁n₂, k₂, ≥ d₁d₂]]`
-  concatenation construction (`Framework/Concatenation/`), with the distance
-  exactly `d₁d₂` once a minimum-weight inner and outer logical operator are
-  given. The concatenated Steane code `[[49, 1, 9]]` is its instance.
-- **Concrete codes**: see the list below.
-
 ### Codes
 
-Every distance `d` listed in the parameters below is proved.
+Our central abstraction is the type `Code[[n, k, d]]`, which is a $[[n, k, d]]$ stabilizer code together with lean proofs that it uses `n` physical qubit to encode `k` logical qubits with code distance `d`. We formalize the following codes as `Code[[n, k, d]]`s:
 
 | Code | Parameters | Where |
 |---|---|---|
-| Mitten (downstream) | `[[150, 30, 10]]` | [mitten-distance-lean](https://github.com/QECLean/mitten-distance-lean) |
-| Gross (downstream) | `[[144, 12, 12]]` | [bb-distance-lean](https://github.com/QECLean/bb-distance-lean) |
 | Bravyi360 (downstream) | `[[360, 12, 24]]` | [bb-distance-lean](https://github.com/QECLean/bb-distance-lean) |
 | Toric code, `L ≥ 2` | `[[2L², 2, L]]` | `Codes/Toric/` |
+| Mitten (downstream) | `[[150, 30, 10]]` | [mitten-distance-lean](https://github.com/QECLean/mitten-distance-lean) |
+| Gross (downstream) | `[[144, 12, 12]]` | [bb-distance-lean](https://github.com/QECLean/bb-distance-lean) |
 | Rotated surface code, odd `L ≥ 3` | `[[L², 1, L]]` | `Codes/RotatedSurface/` |
 | Triangular color code, every `r` | `[[3r(r+1) + 1, 1, 2r + 1]]` | `Codes/Color/` |
 | Iceberg family, `m ≥ 2` | `[[2m, 2m − 2, 2]]` | `Codes/Iceberg/N*.lean` |
@@ -77,64 +38,6 @@ Every distance `d` listed in the parameters below is proved.
 | n-qubit repetition, `n ≥ 2` | `[[n, 1, 1]]` | `Codes/Repetition/N*.lean` |
 | Shor code | `[[9, 1, 3]]` | `Codes/Small/Shor9*.lean` |
 | Quantum Hamming, `r ≥ 3` | `[[2^r − 1, 2^r − 1 − 2r, 3]]` | `Codes/Small/QuantumHamming*.lean` |
-
-Each code is presented by a generator list (`StabilizerCode.Presentation`) whose
-proved obligations are generator count, linear independence of the check-matrix
-rows, pairwise commutation, and exclusion of `-I`; `Presentation.toCode` turns
-it into a `StabilizerCode`, whose stabilizer group provably has `2^(n−k)`
-elements.
-Most codes also provide a `StabilizerCodeWithLogicals` (logical operators in the
-centralizer, with the required anticommutation) and, where the distance is
-proved, a `StabilizerCodeWithDistance`. In addition, for the Steane code,
-transversal `H` and `S` are verified as the logical Hadamard and phase gates.
-
-The single-instance, repetition and Iceberg codes (`Codes/Small/`,
-`Codes/Repetition/`, `Codes/Iceberg/`) share one layout: `<Code>.lean` runs from the generators to the distance proof
-and `stabilizerCodeWithDistance`, and `<Code>Logicals.lean` adds the chosen
-logical basis and `stabilizerCodeWithLogicals`. The distance proof does not
-depend on the logical basis.
-
-## Headline results
-
-**Bivariate-bicycle distances.** The Gross `[[144,12,12]]` and Bravyi360
-`[[360,12,24]]` proofs live in
-[bb-distance-lean](https://github.com/QECLean/bb-distance-lean), together with
-their certificates and generators. That repository pins QECLean and uses its
-general homological, cover, and doubling theory. See the
-[BB foundations overview](QEC/Stabilizer/Codes/BivariateBicycle/README.md).
-
-**The toric family.** For every `L ≥ 2`, the toric code defined on a `L × L` grid is a verified
-`[[2L², 2, L]]` stabilizer code:
-
-```lean
-theorem toricCodeN_distance_eq_L (L : ℕ) [Fact (2 ≤ L)] :
-    HasCodeDistance (toricStabilizerCode L) L
-
-toricStabilizerCodeWithDistance L : StabilizerCodeWithDistance (2 * L * L) 2 L
-```
-
-The homological distance argument is mechanized:
-
-- **Chain complex.** `∂₁ ∘ ∂₂ = 0` over `𝔽₂`.
-- **Homology.** `dim(H₁) = 2` via rank-nullity on `∂₁` and `∂₂`.
-- **Wrapping invariants.** `h(c)` and `v(c)` are well defined on cycles, vanish
-  on boundaries, and give an isomorphism `H₁ ≅ 𝔽₂²`.
-- **Distance lower bound.** Any nontrivial cycle has weight `≥ L`. One of `h`
-  and `v` is `1`, which forces at least one edge in each of `L` disjoint slices.
-- **Duality.** A relabelling of the edges identifies the dual complex with the
-  primal one, so the same bound holds for nontrivial dual cycles.
-- **Transfer to Pauli operators.** The framework turns the two chain-level
-  bounds into `weight ≥ L` for every nontrivial logical operator, of any Pauli
-  type; a wrapping loop of weight `L` attains it.
-
-**The rotated surface family.** For every odd `L ≥ 3`, the rotated surface code
-is a verified `[[L², 1, L]]` code (`rotatedSurfaceCodeN_distance_eq_L`). It is
-built on the same homological framework as the toric code.
-
-**The triangular color-code family.** For every `r`, the honeycomb color code
-of distance `2r + 1` is a verified `[[3r(r+1) + 1, 1, 2r + 1]]` code
-(`ColorCode.stabilizerCodeWithDistance`). See the
-[color-code overview](QEC/Stabilizer/Codes/Color/README.md).
 
 ## Project structure
 
@@ -151,33 +54,12 @@ QEC/
                         # Iceberg, Repetition, Small, Concat
 ```
 
-Lower layers never import higher ones:
-`Foundations < {Geometry, Framework.Core} < Framework.Symplectic <
-Framework.{Homological, Concatenation} < Framework.FoldDouble < Codes`.
-
-The repo also contains these companion libraries, all outside the default
-`lake build` target:
-
-- **`QECLight`**: the library without the bivariate-bicycle family, for
-  memory-constrained environments. [`Playground.lean`](Playground.lean) imports
-  it.
-
-- **`QECWidgets`**: ProofWidgets-based infoview widgets (`#pauli_strip`,
-  `#toric_chain`, `#check_matrix`, and the `pauli_strip?` suggestion tactic).
-  See [`QECWidgets/README.md`](QECWidgets/README.md).
-
-The research program behind the library lives in the sibling repo
-[qec-lab](https://github.com/Stavan-Jain/qec-lab). It holds the bivariate-bicycle
-distance lab, the catalog-driven formalization pipeline, and the narrative
-write-ups.
-
 ## Axiom policy
 
 Everything on `main` is sorry-free and depends on exactly
 mathlib's three standard axioms: `propext`, `Classical.choice`, and
-`Quot.sound`. There is no `native_decide` and there are no custom `axiom`s;
-finite checks go through the kernel (`decide`, `decide +kernel`, or explicit
-certificates). CI enforces this over every declaration under `QEC/` with
+`Quot.sound`. There is no `native_decide` and there are no custom `axiom`s.
+CI enforces this with
 [`scripts/AxiomCheck.lean`](scripts/AxiomCheck.lean). You can check any result
 yourself with `#print axioms Your.Theorem`.
 
@@ -207,40 +89,11 @@ lake exe cache get   # prebuilt mathlib
 lake build
 ```
 
-A full build runs many kernel-checked `decide` proofs side by side, which can
-exhaust memory at Lake's default parallelism. On a <=16 GB machine, limit
-parallelism (for example `LEAN_NUM_THREADS=3 lake build`), or build `QECLight`
-instead.
-
-The companion targets and checks that CI runs are:
-
-```bash
-lake build QECLight && lake build QECBlueprint && lake build QECWidgets
-lake env lean Playground.lean
-lake env lean scripts/AxiomCheck.lean   # axiom policy, needs a completed build
-```
-
 ### Working with the code
 
 - Open files in your Lean 4 editor (VS Code with the Lean extension, or Emacs
   with lean4-mode).
-- Start with [`Playground.lean`](Playground.lean), or with
-  [`QEC/Stabilizer/Codes/_TEMPLATE.lean`](QEC/Stabilizer/Codes/_TEMPLATE.lean),
-  the canonical structure for a new code (including the code-file /
-  logicals-file split).
 - Use `#check` and `#print axioms` to explore definitions and results.
-
-#### Claude Code users (optional)
-
-This repo ships a project-scoped MCP configuration in `.mcp.json` that wires
-up the [lean-lsp MCP server](https://github.com/oOo0oOo/lean-lsp-mcp), giving
-[Claude Code](https://claude.com/claude-code) agents in-editor access to live
-proof states, mathlib search (LeanSearch, Loogle, Lean Hammer), and Lean
-diagnostics. Claude Code will prompt you to approve the server on first launch.
-
-Requirements: [`uv`](https://docs.astral.sh/uv/) on `PATH` (provides `uvx`).
-[`ripgrep`](https://github.com/BurntSushi/ripgrep) is recommended for the
-local-search tool. See [`CLAUDE.md`](CLAUDE.md) for the agent-side workflow.
 
 ## Contributing
 
@@ -269,6 +122,10 @@ Built using [Lean 4](https://lean-lang.org/) and
 ## License
 
 Released under the [Apache License 2.0](LICENSE).
+
+## Paper
+
+Our preprint providing an exposition to QECLean can be found here: [Specifying and Verifying Quantum Error-Correcting Codes](https://arxiv.org/abs/2611.21236)
 
 ## Maintainer
 
