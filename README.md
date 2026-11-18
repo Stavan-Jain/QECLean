@@ -31,8 +31,8 @@ Our central abstraction is the type `Code[[n, k, d]]`, which is a $[[n, k, d]]$ 
 | Five-qubit perfect code (non-CSS) | `[[5, 1, 3]]` | `Codes/Small/FiveQubit_5_1_3*.lean` |
 | Steane code | `[[7, 1, 3]]` | `Codes/Small/Steane7*.lean` |
 | Concatenated Steane code | `[[49, 1, 9]]` | `Codes/Concat/SteaneSteane.lean` |
-| 3-qubit repetition | `[[3, 1, 1]]` | `Codes/Repetition/Three*.lean` |
-| n-qubit repetition, `n ≥ 2` | `[[n, 1, 1]]` | `Codes/Repetition/N*.lean` |
+
+We also formalize many more more smaller, toy codes like the $[[3, 1, 1]]$ 3-qubit repetition code.
 
 ## Project structure
 
