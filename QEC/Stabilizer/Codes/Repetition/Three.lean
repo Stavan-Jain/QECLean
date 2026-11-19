@@ -96,11 +96,6 @@ def presentation : StabilizerCode.Presentation 3 1 where
 /-- The 3-qubit repetition code as a stabilizer code `[[3, 1]]`. -/
 noncomputable def stabilizerCode : Code[[3, 1]] := presentation.toCode
 
-/-- The stabilizer code's subgroup is the closure of the generator list. -/
-lemma stabilizerCode_toSubgroup_eq :
-    stabilizerCode.toStabilizerGroup.toSubgroup = Subgroup.closure (listToSet generatorsList) :=
-  rfl
-
 /-! ## Distance 1
 
 Every nontrivial logical of positive weight trivially has weight at least 1,

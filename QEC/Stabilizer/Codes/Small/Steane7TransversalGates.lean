@@ -75,7 +75,7 @@ lemma conjByGate_transversalH (g : NQubitPauliGroupElement 7)
 Z-check and the X-check on each Hamming row. -/
 theorem transversalH_isLogicalGate :
     IsLogicalGate transversalH stabilizerCode.toStabilizerGroup := by
-  refine isLogicalGate_of_generator_set_conjugation _ _ _ stabilizerCode_toSubgroup_eq
+  refine isLogicalGate_of_generator_set_conjugation _ _ _ presentation.toCode_toSubgroup
     fun g (hg : g ∈ generatorsList) => ⟨swapXZ g,
       Subgroup.subset_closure (?_ : swapXZ g ∈ generatorsList), conjByGate_transversalH g ?_⟩
   all_goals fin_cases hg <;> decide
@@ -123,7 +123,7 @@ theorem transversalS_isLogicalGate :
     IsLogicalGate transversalS stabilizerCode.toStabilizerGroup := by
   have hmem : ∀ g ∈ generatorsList, g ∈ stabilizerCode.toStabilizerGroup.toSubgroup :=
     fun g hg => Subgroup.subset_closure hg
-  refine isLogicalGate_of_generator_set_conjugation _ _ _ stabilizerCode_toSubgroup_eq
+  refine isLogicalGate_of_generator_set_conjugation _ _ _ presentation.toCode_toSubgroup
     fun g (hg : g ∈ generatorsList) => ?_
   fin_cases hg
   · exact ⟨Z1, hmem _ (by decide), conjByGate_transversalS_of_Z _ (by decide)⟩

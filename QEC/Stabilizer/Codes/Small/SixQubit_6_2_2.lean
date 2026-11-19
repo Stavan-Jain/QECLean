@@ -5,10 +5,10 @@ public import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrixDecidable
 public import QEC.Stabilizer.Foundations.PauliGroup.Commutation
 public import QEC.Stabilizer.Foundations.PauliGroup.Notation
 public import QEC.Stabilizer.Framework.Core.CodeNotation
-public import QEC.Stabilizer.Framework.Core.CSS.CSSDistance
 public import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
 public import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
 public import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
+public import QEC.Stabilizer.Framework.Symplectic.DistanceDecide
 public import QEC.Stabilizer.Framework.Symplectic.Presentation
 public import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
 
@@ -31,7 +31,7 @@ list, and pairwise commutation, phase zero and check-matrix independence are
 closed statements settled by `decide`; `−I ∉ closure` follows by
 `negIdentity_not_mem_of_indep_phase_zero_commute`.
 
-Distance 2 is `hasCodeDistance_two_of_anticommute_witness`: every weight-1
+Distance 2 is `hasCodeDistance_of_decide`, both checks decided: every weight-1
 Pauli anticommutes with a Z-check (local `X` or `Y`) or an X-check (local `Z`)
 covering its qubit, and `IIXXII` is a nontrivial logical of weight 2.
 
@@ -44,8 +44,9 @@ The logical basis `X̄₁ = IIXXII`, `X̄₂ = IXIXXI`, `Z̄₁ = ZIIZZI`,
 - Decided hypotheses: `generators_commute`, `AllPhaseZero_generatorsList`,
   `rowsLinearIndependent_generatorsList`
 - `presentation`, `stabilizerCode : Code[[6, 2]]`
-- Distance 2 (weight-1 anticommute witness, weight-2 logical):
-  `code_has_distance_two`, `stabilizerCodeWithDistance : Code[[6, 2, 2]]`
+- Distance 2 (decided weight-2 logical witness, no weight-1 logical):
+  `minWeightLogical`, `code_has_distance_two`,
+  `stabilizerCodeWithDistance : Code[[6, 2, 2]]`
 -/
 
 @[expose] public section
@@ -113,69 +114,21 @@ def presentation : StabilizerCode.Presentation 6 2 where
 /-- The `C₆` code as a stabilizer code `[[6, 2]]`. -/
 noncomputable def stabilizerCode : Code[[6, 2]] := presentation.toCode
 
-/-- The stabilizer code's subgroup is the closure of the generator list. -/
-lemma stabilizerCode_toSubgroup_eq :
-    stabilizerCode.toStabilizerGroup.toSubgroup = Subgroup.closure (listToSet generatorsList) :=
-  rfl
-
 /-! ## Distance 2
 
-### No nontrivial logical of weight 1
-
-A local `X` or `Y` anticommutes with the `Z` of `Z1` on `{0,1,2,3}` and of `Z2`
-on `{4,5}`; a local `Z` anticommutes with the `X` of `X1` on `{0,1,2,3}` and of
-`X2` on `{4,5}`. -/
-
-/-- Every weight-1 Pauli anticommutes with some generator. -/
-private lemma weight_one_anticomm_witness :
-    ∀ i : Fin 6, ∀ P : PauliOperator, P ≠ .I →
-      ∃ g ∈ generatorsList, Anticommute (weightOneAt i P) g := by
-  decide
-
-/-! ### A nontrivial logical of weight 2
-
+Distance 2 is two decided checks (`hasCodeDistance_of_decide`).
 `IIXXII` meets `Z1` on two qubits and `Z2` on none, so it commutes with every
-check; it anticommutes with `ZIIZZI` (one shared qubit), which meets `X1` and
-`X2` on two qubits each and so also commutes with every check. -/
+check, and it is not a product of checks up to phase. A local `X` or `Y`
+anticommutes with the `Z` of `Z1` on `{0,1,2,3}` or of `Z2` on `{4,5}`; a local
+`Z` with the `X` of `X1` or `X2`. -/
 
 /-- `IIXXII`: a nontrivial logical of weight 2. -/
 def minWeightLogical : NQubitPauliGroupElement 6 := σ[IIXXII]
 
-/-- `ZIIZZI`: a centralizer element anticommuting with `minWeightLogical`. -/
-def minWeightPartner : NQubitPauliGroupElement 6 := σ[ZIIZZI]
-
-/-- `IIXXII` has weight 2. -/
-lemma minWeightLogical_weight : weight minWeightLogical = 2 := by decide
-
-/-- `IIXXII` commutes with every element of the stabilizer. -/
-lemma minWeightLogical_mem_centralizer :
-    minWeightLogical ∈ centralizer stabilizerCode.toStabilizerGroup :=
-  presentation.mem_centralizer_iff.2 (by decide)
-
-/-- `ZIIZZI` commutes with every element of the stabilizer. -/
-lemma minWeightPartner_mem_centralizer :
-    minWeightPartner ∈ centralizer stabilizerCode.toStabilizerGroup :=
-  presentation.mem_centralizer_iff.2 (by decide)
-
-/-- `IIXXII` and `ZIIZZI` meet on qubit 3 only, an odd number. -/
-lemma minWeightLogical_anticommutes_minWeightPartner :
-    Anticommute minWeightLogical minWeightPartner := by decide
-
-/-- `IIXXII` is a nontrivial logical operator: it lies in the centralizer and
-anticommutes with the centralizer element `minWeightPartner`. -/
-lemma minWeightLogical_isNontrivial :
-    IsNontrivialLogicalOperator minWeightLogical stabilizerCode.toStabilizerGroup :=
-  isNontrivialLogicalOperator_of_anticommute_centralizer _ minWeightLogical_mem_centralizer
-    minWeightPartner_mem_centralizer minWeightLogical_anticommutes_minWeightPartner
-
-/-! ### The code with its distance `Code[[6, 2, 2]]` -/
-
-/-- **The `C₆` code has distance 2.** Every weight-1 Pauli anticommutes with
-some generator, and `IIXXII` is a nontrivial logical of weight 2. -/
+/-- **The `C₆` code has distance 2.** `IIXXII` is a nontrivial logical of
+weight 2, and every weight-1 Pauli anticommutes with some generator. -/
 theorem code_has_distance_two : HasCodeDistance stabilizerCode 2 :=
-  hasCodeDistance_two_of_anticommute_witness stabilizerCode (listToSet generatorsList)
-    stabilizerCode_toSubgroup_eq weight_one_anticomm_witness
-    ⟨minWeightLogical, minWeightLogical_isNontrivial, minWeightLogical_weight⟩
+  presentation.hasCodeDistance_of_decide minWeightLogical (by decide +kernel) (by decide +kernel)
 
 /-- The `C₆` code packaged with its distance. -/
 noncomputable def stabilizerCodeWithDistance : Code[[6, 2, 2]] where

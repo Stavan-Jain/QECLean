@@ -133,11 +133,6 @@ def presentation : StabilizerCode.Presentation 9 1 where
 /-- Shor's code as a stabilizer code `[[9, 1]]`. -/
 noncomputable def stabilizerCode : Code[[9, 1]] := presentation.toCode
 
-/-- The stabilizer code's subgroup is the closure of the generator list. -/
-lemma stabilizerCode_toSubgroup_eq :
-    stabilizerCode.toStabilizerGroup.toSubgroup = Subgroup.closure (listToSet generatorsList) :=
-  rfl
-
 /-! ## Distance 3
 
 Distance 3 is two decided checks (`hasCodeDistance_of_decide`). `X` on the

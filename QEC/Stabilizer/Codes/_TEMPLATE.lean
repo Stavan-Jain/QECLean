@@ -9,6 +9,7 @@ public import QEC.Stabilizer.Framework.Core.CSS.CSSDistance
 public import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
 public import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
 public import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
+public import QEC.Stabilizer.Framework.Symplectic.DistanceDecide
 public import QEC.Stabilizer.Framework.Symplectic.Presentation
 public import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
 
@@ -210,11 +211,6 @@ def presentation : StabilizerCode.Presentation 7 1 where
 
 /-- The Steane code as a stabilizer code `[[7, 1]]`. -/
 noncomputable def stabilizerCode : Code[[7, 1]] := presentation.toCode
-
-/-- The stabilizer code's subgroup is the closure of the generator list. -/
-lemma stabilizerCode_toSubgroup_eq :
-    stabilizerCode.toStabilizerGroup.toSubgroup = Subgroup.closure (listToSet generatorsList) :=
-  rfl
 ```
 
 The field `closure_no_neg_identity` (`−I` is not generated) is left out: its
@@ -226,156 +222,71 @@ The code's group `stabilizerCode.toStabilizerGroup` is the stabilizer group
 of the file: no separate `StabilizerGroup n` is built.
 Centralizer membership goes through the presentation:
 `presentation.mem_centralizer_iff` says an element is in the centralizer iff it
-commutes with every generator. `stabilizerCode_toSubgroup_eq` is how the other
-arguments get from the group to its generators: the distance closers, and
-logical gates through `isLogicalGate_of_generator_set_conjugation`.
+commutes with every generator. `presentation.toCode_toSubgroup` (`rfl`) is how
+the other arguments get from the group to its generators: the column-condition
+closers, and logical gates through
+`isLogicalGate_of_generator_set_conjugation`.
 -/
 
 /-!
 ## Distance `d`
 
-The section has three subsections: no nontrivial logical of weight below `d`,
-a nontrivial logical of weight `d`, and the code with its distance.
+**The decide closer** (`presentation.hasCodeDistance_of_decide`,
+`Framework/Symplectic/DistanceDecide.lean`) is the default for every literal
+code, CSS or not, degenerate or not. It takes a weight-`d` logical and two
+`decide +kernel` proofs:
 
-### No nontrivial logical of weight `1`, …, `d − 1`
+- `IsLogicalWitness`: the witness has weight `d`, commutes with every
+  generator, and is not a product of generators up to phase. No anticommuting
+  partner is needed.
+- `NoLogicalBelow`: every Pauli of weight `1, …, d − 1` anticommutes with some
+  generator or is a stabilizer up to phase. The second case absorbs
+  degeneracy: Shor's `Z_i Z_j` within a block passes it as a stabilizer.
 
-What goes here depends on the closer used in the last subsection.
+Use `decide +kernel`, not `decide`: the elaborator runs out of recursion depth
+on the span checks. The cost is `∑_{w < d} C(n, w) · 3 ^ w` patterns, a few
+seconds for `[[9, 1, 3]]`.
 
-**Anticommute witnesses** (`hasCodeDistance_two_of_anticommute_witness`,
-`hasCodeDistance_three_of_anticommute_witness`). Every Pauli of weight 1 (and
-of weight 2, for distance 3) anticommutes with some generator. The statements
-are closed, and `decide` checks every case. This works for any code, CSS or
-not; `Small/CSS_4_1_2.lean`, `Small/FourQubit_4_2_2.lean`,
-`Small/SixQubit_6_2_2.lean` and `Small/FiveQubit_5_1_3.lean` use it.
-
-```lean
-/-- Every weight-1 Pauli anticommutes with some generator. -/
-private lemma weight_one_anticomm_witness :
-    ∀ i : Fin 5, ∀ P : PauliOperator, P ≠ .I →
-      ∃ g ∈ generatorsList, Anticommute (weightOneAt i P) g := by
-  decide
-
-/-- Every weight-2 Pauli anticommutes with some generator. -/
-private lemma weight_two_anticomm_witness :
-    ∀ i j : Fin 5, i ≠ j → ∀ P Q : PauliOperator, P ≠ .I → Q ≠ .I →
-      ∃ g ∈ generatorsList, Anticommute (weightTwoAt i j P Q) g := by
-  decide
-```
-
-**Column condition** (`hasCodeDistance_three_of_columns`, for CSS codes).
-Present each check as the `Finset` of qubits it acts on; `zOn S` and `xOn S`
-are `Z` and `X` on `S`. The closer needs only the classical conditions on the
-two check matrices: no column is zero and no two columns coincide.
+The witness is usually a stabilizer multiple of a logical operator. The
+paragraph under the section title says which, and why it commutes with every
+generator. The sample is from the five-qubit code
+(`Small/FiveQubit_5_1_3.lean`).
 
 ```lean
-/-- The Hamming parity-check rows `r₁ = {0,1,2,4}`, `r₂ = {0,1,3,5}`,
-`r₃ = {0,2,3,6}`. -/
-def row : Fin 3 → Finset (Fin 7) := ![{0, 1, 2, 4}, {0, 1, 3, 5}, {0, 2, 3, 6}]
+/-- `IYYIX`: a nontrivial logical of weight 3. -/
+def minWeightLogical : NQubitPauliGroupElement 5 := σ[IYYIX]
 
-/-- `Z` on each Hamming row is a generator. -/
-lemma zOn_row_mem : ∀ r, zOn (row r) ∈ generatorsList := by decide
-
-/-- `X` on each Hamming row is a generator. -/
-lemma xOn_row_mem : ∀ r, xOn (row r) ∈ generatorsList := by decide
-
-/-- Every qubit lies on some Hamming row: no column is zero. -/
-lemma row_cover : ∀ i : Fin 7, ∃ r, i ∈ row r := by decide
-
-/-- Any two distinct qubits are separated by some Hamming row: no two columns
-coincide. -/
-lemma row_separate : ∀ i j : Fin 7, i ≠ j → ∃ r, (i ∈ row r ↔ j ∉ row r) := by decide
-```
-
-A code whose Z-checks and X-checks have different supports defines `zRow` and
-`xRow` and proves `zOn_zRow_mem`, `xOn_xRow_mem`, `zRow_cover`, `xRow_cover`,
-`zRow_separate`, `xRow_separate`. For a *degenerate* code, whose checks leave
-some pairs of qubits unseparated, `hasCodeDistance_three_of_columns_degenerate`
-replaces each `_separate` hypothesis by a pair condition: `X` (respectively
-`Z`) on every pair the Z-rows (respectively X-rows) do not separate is a
-stabilizer. `Small/Shor9.lean` is the example. In a parametric family the
-column conditions are proved from the shape of the columns, as
-`Small/QuantumHamming.lean` does.
-
-**Anything else.** `hasCodeDistance_of` takes `1 ≤ d`, the weight-`d` logical,
-and a proof that no element of weight `1 ≤ w < d` is a nontrivial logical.
-`interval_cases w` splits the latter into one goal per weight.
-
-### A nontrivial logical of weight `d`
-
-The witness is a centralizer element together with a *partner*: a second
-centralizer element it anticommutes with, which makes it nontrivial by
-`isNontrivialLogicalOperator_of_anticommute_centralizer`. It is usually a
-stabilizer multiple of a logical operator, and the partner the corresponding
-multiple of the conjugate logical operator. The paragraph under the subsection
-title explains the choice.
-
-```lean
-/-- `IIIXIXX`: a nontrivial logical of weight 3. -/
-def minWeightLogical : NQubitPauliGroupElement 7 := σ[IIIXIXX]
-
-/-- `IIIZIZZ`: a centralizer element anticommuting with `minWeightLogical`. -/
-def minWeightPartner : NQubitPauliGroupElement 7 := σ[IIIZIZZ]
-
-/-- `IIIXIXX` has weight 3. -/
-lemma minWeightLogical_weight : weight minWeightLogical = 3 := by decide
-
-/-- `IIIXIXX` commutes with every element of the stabilizer. -/
-lemma minWeightLogical_mem_centralizer :
-    minWeightLogical ∈ centralizer stabilizerCode.toStabilizerGroup :=
-  presentation.mem_centralizer_iff.2 (by decide)
-
-/-- `IIIZIZZ` commutes with every element of the stabilizer. -/
-lemma minWeightPartner_mem_centralizer :
-    minWeightPartner ∈ centralizer stabilizerCode.toStabilizerGroup :=
-  presentation.mem_centralizer_iff.2 (by decide)
-
-/-- `IIIXIXX` and `IIIZIZZ` meet on qubits 3, 5 and 6, an odd number. -/
-lemma minWeightLogical_anticommutes_minWeightPartner :
-    Anticommute minWeightLogical minWeightPartner := by decide
-
-/-- `IIIXIXX` is a nontrivial logical operator: it lies in the centralizer and
-anticommutes with the centralizer element `minWeightPartner`. -/
-lemma minWeightLogical_isNontrivial :
-    IsNontrivialLogicalOperator minWeightLogical stabilizerCode.toStabilizerGroup :=
-  isNontrivialLogicalOperator_of_anticommute_centralizer _ minWeightLogical_mem_centralizer
-    minWeightPartner_mem_centralizer minWeightLogical_anticommutes_minWeightPartner
-```
-
-`presentation.mem_centralizer_iff` reduces membership in the centralizer to
-commuting with each element of `generatorsList`, which `decide` checks.
-
-### The code with its distance `Code[[n, k, d]]`
-
-The distance theorem is the only `theorem` of the file. It applies the closer
-to the closure equation, the lemmas of the first subsection and the witness.
-Its docstring states the argument in one sentence.
-
-```lean
-/-- **The Steane code has distance 3.** Both check matrices are the Hamming
-matrix, whose columns are nonzero and pairwise distinct, so no Pauli of weight
-1 or 2 is a nontrivial logical; `IIIXIXX` is one of weight 3. -/
+/-- **The five-qubit code has distance 3.** `IYYIX` is a nontrivial logical of
+weight 3, and every Pauli of weight 1 or 2 anticommutes with some generator. -/
 theorem code_has_distance_three : HasCodeDistance stabilizerCode 3 :=
-  hasCodeDistance_three_of_columns row row (listToSet generatorsList) stabilizerCode
-    stabilizerCode_toSubgroup_eq zOn_row_mem xOn_row_mem row_cover row_cover row_separate
-    row_separate ⟨minWeightLogical, minWeightLogical_isNontrivial, minWeightLogical_weight⟩
+  presentation.hasCodeDistance_of_decide minWeightLogical (by decide +kernel) (by decide +kernel)
 
-/-- The Steane code packaged with its distance. -/
-noncomputable def stabilizerCodeWithDistance : Code[[7, 1, 3]] where
+/-- The five-qubit code packaged with its distance. -/
+noncomputable def stabilizerCodeWithDistance : Code[[5, 1, 3]] where
   toStabilizerCode := stabilizerCode
   hasDistance := code_has_distance_three
 ```
 
-With the anticommute witnesses the theorem reads
+For distance 2 the theorem is `code_has_distance_two`. `Small/FiveQubit_5_1_3`,
+`Small/Shor9`, `Small/FourQubit_4_2_2`, `Small/SixQubit_6_2_2` and
+`Small/CSS_4_1_2` use the decide closer; `Small/Steane7` keeps the column
+condition below, as its worked example.
 
-```lean
-theorem code_has_distance_three : HasCodeDistance stabilizerCode 3 :=
-  hasCodeDistance_three_of_anticommute_witness stabilizerCode (listToSet generatorsList)
-    stabilizerCode_toSubgroup_eq weight_one_anticomm_witness weight_two_anticomm_witness
-    ⟨minWeightLogical, minWeightLogical_isNontrivial, minWeightLogical_weight⟩
-```
+**The column condition** (`hasCodeDistance_three_of_columns`, for CSS codes)
+puts the argument on the page instead of in a decided table, and is the route
+for parametric families, which `decide` cannot evaluate. Present each check as
+the `Finset` of qubits it acts on (`zOn S`, `xOn S`); the closer needs only
+that no column of either check matrix is zero and no two coincide.
+`Small/Steane7.lean` is the worked example and `Small/QuantumHamming.lean` its
+parametric version. For a degenerate code,
+`hasCodeDistance_three_of_columns_degenerate` replaces each separation
+hypothesis by a pair condition. This route needs its own nontriviality proof
+for the witness, by `isNontrivialLogicalOperator_of_anticommute_centralizer`
+with an anticommuting partner, as in `Small/Steane7.lean`.
 
-and for distance 2 it is `code_has_distance_two`, by
-`hasCodeDistance_two_of_anticommute_witness` with the weight-1 witness alone.
+**Anything else.** `hasCodeDistance_of` takes `1 ≤ d`, the weight-`d` logical,
+and a proof that no element of weight `1 ≤ w < d` is a nontrivial logical.
+`interval_cases w` splits the latter into one goal per weight.
 -/
 
 /-!

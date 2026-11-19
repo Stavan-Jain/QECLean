@@ -131,11 +131,6 @@ def presentation : StabilizerCode.Presentation 7 1 where
 /-- The Steane code as a stabilizer code `[[7, 1]]`. -/
 noncomputable def stabilizerCode : Code[[7, 1]] := presentation.toCode
 
-/-- The stabilizer code's subgroup is the closure of the generator list. -/
-lemma stabilizerCode_toSubgroup_eq :
-    stabilizerCode.toStabilizerGroup.toSubgroup = Subgroup.closure (listToSet generatorsList) :=
-  rfl
-
 /-! ## Distance 3
 
 ### No nontrivial logical of weight 1 or 2
@@ -205,7 +200,7 @@ matrix, whose columns are nonzero and pairwise distinct, so no Pauli of weight
 1 or 2 is a nontrivial logical; `IIIXIXX` is one of weight 3. -/
 theorem code_has_distance_three : HasCodeDistance stabilizerCode 3 :=
   hasCodeDistance_three_of_columns row row (listToSet generatorsList) stabilizerCode
-    stabilizerCode_toSubgroup_eq zOn_row_mem xOn_row_mem row_cover row_cover row_separate
+    presentation.toCode_toSubgroup zOn_row_mem xOn_row_mem row_cover row_cover row_separate
     row_separate ⟨minWeightLogical, minWeightLogical_isNontrivial, minWeightLogical_weight⟩
 
 /-- The Steane code packaged with its distance. -/

@@ -421,10 +421,9 @@ These are local to this codebase — search here before assuming mathlib has the
   from `Representation.lean`. Closed identities between literal group
   elements (`Z1 * X1 = X1 * Z1`, `Anticommute (weightOneAt i P) g`) close by
   `decide`; the `Anticommute` instance is `noncomputable` because `Mul` is,
-  and `native_decide` does **not** work on it — prefer `decide`. The
-  anticommute-witness lemmas of the literal codes in `Codes/Small/`
-  (`weight_one_anticomm_witness`, `weight_two_anticomm_witness`, stated over
-  the generator list and decided whole) are the canonical users. For
+  and `native_decide` does **not** work on it — prefer `decide`. (The distance
+  checks of `Symplectic/DistanceDecide.lean` avoid it altogether: they are
+  stated with the symplectic inner product of operator parts.) For
   list-bounded statements `StabilizerCode.lean` pins `List.decidableBAll`
   instances and provides `instDecidableCommuteList`, and
   `StabilizerCode.Presentation.mem_centralizer_iff` (`Symplectic/Presentation.lean`)
@@ -449,7 +448,14 @@ These are local to this codebase — search here before assuming mathlib has the
   `IsNontrivialLogicalOperator.weight_pos` and
   `isNontrivialLogicalOperator_of_anticommute_centralizer` are the other two
   everyday lemmas about the predicate.
-- **Distance closers**: `hasCodeDistance_of_isLeast` (`CodeDistance.lean`);
+- **Distance closers**: for a literal presentation,
+  `presentation.hasCodeDistance_of_decide g (by decide +kernel) (by decide +kernel)`
+  (`Symplectic/DistanceDecide.lean`) is the whole proof, for any `d`, CSS or
+  not, degenerate or not: `g` is a weight-`d` logical that commutes with the
+  generators and lies outside their span (no partner needed), and every lighter
+  Pauli is detected or a stabilizer. Use `decide +kernel` — plain `decide`
+  exhausts recursion depth on the span checks. Otherwise:
+  `hasCodeDistance_of_isLeast` (`CodeDistance.lean`);
   `hasCodeDistance_two_of_anticommute_witness`,
   `hasCodeDistance_three_of_anticommute_witness`,
   `hasCodeDistance_three_of_columns` (`Core/CSS/CSSDistance.lean`); and, for
@@ -871,11 +877,10 @@ section:
   *Generators* → *Decided hypotheses* (pairwise commutation, phase zero and
   check-matrix independence, each one `decide`) → *The bare code*
   (`presentation`, `stabilizerCode`; `−I` is the presentation's default) →
-  *Distance* (anticommute witnesses decided over the generator list, or the
-  column condition; a minimum-weight logical with its own nontriviality
-  proof). There is no separate bundled `stabilizerGroup`: centralizer and
-  logical-gate statements use `stabilizerCode.toStabilizerGroup` and
-  `stabilizerCode_toSubgroup_eq`.
+  *Distance* (`presentation.hasCodeDistance_of_decide` on a minimum-weight
+  logical, two `decide +kernel` proofs; or the column condition). There is no
+  separate bundled `stabilizerGroup`: centralizer and logical-gate statements
+  use `stabilizerCode.toStabilizerGroup` and `presentation.toCode_toSubgroup`.
 - The **CSS route**, for parametric families whose `List.ofFn` generator lists
   `decide` cannot evaluate: generators `ZStab` / `XStab` written as `zOn S` /
   `xOn S`, *Hypotheses on the generators* proved from the supports (typing,
@@ -895,8 +900,11 @@ Concrete instantiations of the template:
 - `Small/Steane7.lean` + `Steane7Logicals.lean` — k = 1, n = 7,
   fully-supported all-X / all-Z logicals; distance 3 by the column condition.
   Every `Codes/Small/` code has the same code-file / logicals-file split.
-- `Small/FiveQubit_5_1_3.lean` — non-CSS; distance 3 by decided weight-1 and
-  weight-2 anticommute witnesses.
+- `Small/FiveQubit_5_1_3.lean` — non-CSS; distance 3 by
+  `presentation.hasCodeDistance_of_decide`, as for every literal code but
+  Steane.
+- `Small/Shor9.lean` — degenerate; the same one-line decide closer, whose
+  lower-bound check accepts the undetected weight-2 stabilizers.
 - `Small/FourQubit_4_2_2Logicals.lean` — k = 2 logical basis.
 - `Repetition/{Three,N}.lean` (+ `…Logicals.lean`) — degenerate distance-1
   cases; `N` is the smallest example of the CSS route.
