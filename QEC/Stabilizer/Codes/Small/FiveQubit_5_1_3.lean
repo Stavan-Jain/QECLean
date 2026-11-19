@@ -40,11 +40,10 @@ The logical basis `X̄ = X⊗⁵`, `Z̄ = Z⊗⁵` is in `FiveQubit_5_1_3Logical
 ## Outline
 
 - Generators `g1`–`g4` and the list `generatorsList`
-- Decided hypotheses: `generators_commute`, `AllPhaseZero_generatorsList`,
-  `rowsLinearIndependent_generatorsList`
-- `presentation`, `stabilizerCode : Code[[5, 1]]`
+- `presentation` (fields decided inline), `stabilizerCode : Code[[5, 1]]`
 - Distance 3 (decided weight-3 logical witness, no lighter logical):
-  `minWeightLogical`, `code_has_distance_three`, `stabilizerCodeWithDistance : Code[[5, 1, 3]]`
+  `minWeightLogical`, `code_has_distance_three`,
+  `stabilizerCodeWithDistance : Code[[5, 1, 3]]`
 -/
 
 @[expose] public section
@@ -74,7 +73,10 @@ def g4 : NQubitPauliGroupElement 5 := σ[ZXIXZ]
 def generatorsList : List (NQubitPauliGroupElement 5) :=
   [g1, g2, g3, g4]
 
-/-! ## Decided hypotheses
+/-! ## The bare code `Code[[5, 1]]`
+
+Four independent, pairwise commuting generators on five qubits: one logical
+qubit.
 
 Every pair of generators anticommutes locally on exactly two qubits (`g1`, `g2`
 on `{1,3}`; `g1`, `g3` on `{2,3}`; `g1`, `g4` on `{0,1}`; `g2`, `g3` on
@@ -82,33 +84,15 @@ on `{1,3}`; `g1`, `g3` on `{2,3}`; `g1`, `g4` on `{0,1}`; `g2`, `g3` on
 `decide` checks the sixteen ordered pairs, the phases, and the check-matrix
 rank. -/
 
-/-- All four generators pairwise commute. -/
-lemma generators_commute :
-    ∀ g ∈ generatorsList, ∀ h ∈ generatorsList, g * h = h * g := by
-  decide
-
-/-- Every generator has phase power 0. -/
-lemma AllPhaseZero_generatorsList : AllPhaseZero generatorsList := by
-  decide
-
-/-- The check-matrix rows of the four generators are linearly independent. -/
-lemma rowsLinearIndependent_generatorsList : rowsLinearIndependent generatorsList := by
-  decide
-
-/-! ## The bare code `Code[[5, 1]]`
-
-Four independent, pairwise commuting generators on five qubits: one logical
-qubit. -/
-
 /-- The generator list as a presentation of a `[[5, 1]]` code: its 4
 check-matrix rows are linearly independent. -/
 def presentation : StabilizerCode.Presentation 5 1 where
   hk := by decide
   generatorsList := generatorsList
   generators_length := rfl
-  generators_phaseZero := AllPhaseZero_generatorsList
-  generators_independent := rowsLinearIndependent_generatorsList
-  generators_commute := generators_commute
+  generators_phaseZero := by decide
+  generators_independent := by decide
+  generators_commute := by decide
 
 /-- The five-qubit code as a stabilizer code `[[5, 1]]`. -/
 noncomputable def stabilizerCode : Code[[5, 1]] := presentation.toCode

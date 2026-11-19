@@ -29,8 +29,8 @@ and the Pauli strings.
 Each code is split across two modules, both in the namespace
 `Quantum.StabilizerGroup.<Code>`:
 
-- `<Code>.lean` — the code and its distance, in this order: generators, decided
-  hypotheses, the bare code, the distance.
+- `<Code>.lean` — the code and its distance, in this order: generators, the
+  bare code, the distance.
   It ends in `stabilizerCodeWithDistance` and never mentions a logical basis:
   the distance witness carries its own nontriviality proof.
 - `<Code>Logicals.lean` — imports `<Code>.lean` and adds the chosen logical
@@ -55,7 +55,7 @@ the `decide` proofs downstream). The umbrella entry is a `public import` too.
   decidable statement that `decide` settles.
 - The **CSS route** is for parametric families, whose generator lists range
   over a symbolic number of qubits, which `decide` cannot evaluate. It replaces
-  the *Decided hypotheses* section by proofs from the Z/X typing of the
+  the decided presentation fields by lemmas proved from the Z/X typing of the
   generators; see the last section.
 
 ## File header
@@ -138,26 +138,32 @@ list of length exactly `n − k` with the same closure; see
 -/
 
 /-!
-## Decided hypotheses
+## The bare code `Code[[n, k]]`
 
-Three closed statements about the generator list, each settled by `decide`.
-The paragraph under the section title says why the generators commute (the
-overlap of each Z-check with each X-check is even) and how many ordered pairs
-`decide` checks.
+`StabilizerCode n k` (notation `Code[[n, k]]`) is a stabilizer group with
+`2 ^ (n − k)` elements; it mentions no generators. A concrete code is written
+down as a `StabilizerCode.Presentation n k`, whose fields are the generator
+list and three closed statements about it (pairwise commutation, phase zero,
+row independence), each settled by `decide` right in the field. No separate
+lemmas are stated for them. `Presentation.toCode` derives the cardinality from
+row independence. The paragraph under the section title counts the generators
+and the logical qubits, and says why the generators commute (the overlap of
+each Z-check with each X-check is even) and how many ordered pairs `decide`
+checks.
 
 ```lean
-/-- All six generators pairwise commute. -/
-lemma generators_commute :
-    ∀ g ∈ generatorsList, ∀ h ∈ generatorsList, g * h = h * g := by
-  decide
+/-- The generator list as a presentation of a `[[7, 1]]` code: its 6
+check-matrix rows are linearly independent. -/
+def presentation : StabilizerCode.Presentation 7 1 where
+  hk := by decide
+  generatorsList := generatorsList
+  generators_length := rfl
+  generators_phaseZero := by decide
+  generators_independent := by decide
+  generators_commute := by decide
 
-/-- Every generator has phase power 0. -/
-lemma AllPhaseZero_generatorsList : AllPhaseZero generatorsList := by
-  decide
-
-/-- The check-matrix rows of the six generators are linearly independent. -/
-lemma rowsLinearIndependent_generatorsList : rowsLinearIndependent generatorsList := by
-  decide
+/-- The Steane code as a stabilizer code `[[7, 1]]`. -/
+noncomputable def stabilizerCode : Code[[7, 1]] := presentation.toCode
 ```
 
 `generators_commute` quantifies over the list, the form taken by
@@ -186,32 +192,6 @@ it in polynomial time, as `Toric/RankCertificate.lean` does.
 Row independence is the hypothesis that ties the number of generators to `k`.
 It is stronger than independence of the generators as a set, which does not
 see a repeated generator.
--/
-
-/-!
-## The bare code `Code[[n, k]]`
-
-`StabilizerCode n k` (notation `Code[[n, k]]`) is a stabilizer group with
-`2 ^ (n − k)` elements; it mentions no generators. A concrete code is written
-down as a `StabilizerCode.Presentation n k`, whose fields are the generator
-list and the facts proved above, and `Presentation.toCode` derives the
-cardinality from row independence. The paragraph under the section title
-counts the generators and the logical qubits.
-
-```lean
-/-- The generator list as a presentation of a `[[7, 1]]` code: its 6
-check-matrix rows are linearly independent. -/
-def presentation : StabilizerCode.Presentation 7 1 where
-  hk := by decide
-  generatorsList := generatorsList
-  generators_length := rfl
-  generators_phaseZero := AllPhaseZero_generatorsList
-  generators_independent := rowsLinearIndependent_generatorsList
-  generators_commute := generators_commute
-
-/-- The Steane code as a stabilizer code `[[7, 1]]`. -/
-noncomputable def stabilizerCode : Code[[7, 1]] := presentation.toCode
-```
 
 The field `closure_no_neg_identity` (`−I` is not generated) is left out: its
 default derives it from the phase, independence and commutation fields, by
@@ -409,9 +389,10 @@ lemma listToSet_generatorsList : listToSet generatorsList = generators := by
   rfl
 ```
 
-**Hypotheses on the generators.** This section replaces *Decided hypotheses*,
-under the title `## Hypotheses on the generators`; its paragraph says why the
-checks commute and names the pivot column of each row. The Z-generators are
+**Hypotheses on the generators.** This section, which the decide route does
+not have (its presentation fields are decided inline), comes under the title
+`## Hypotheses on the generators`; its paragraph says why the checks commute
+and names the pivot column of each row. The Z-generators are
 Z-type (`IsZTypeElement_zOn`), the X-generators are X-type
 (`IsXTypeElement_xOn`), and a Z-generator commutes with an X-generator because
 their supports meet in an even number of qubits (`commutes_xOn_zOn_iff`). Two

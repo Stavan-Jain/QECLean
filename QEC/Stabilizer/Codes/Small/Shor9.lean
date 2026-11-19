@@ -41,9 +41,7 @@ The logical basis `X̄ = Z⊗⁹`, `Z̄ = X⊗⁹` is in `Shor9Logicals.lean`.
 ## Outline
 
 - Generators `Z1`–`Z6`, `X1`, `X2` and the list `generatorsList`
-- Decided hypotheses: `generators_commute`, `AllPhaseZero_generatorsList`,
-  `rowsLinearIndependent_generatorsList`
-- `presentation`, `stabilizerCode : Code[[9, 1]]`
+- `presentation` (fields decided inline), `stabilizerCode : Code[[9, 1]]`
 - Distance 3 (decided weight-3 logical witness, no lighter logical):
   `minWeightLogical`, `code_has_distance_three`,
   `stabilizerCodeWithDistance : Code[[9, 1, 3]]`
@@ -94,7 +92,10 @@ def X2 : NQubitPauliGroupElement 9 := σ[IIIXXXXXX]
 def generatorsList : List (NQubitPauliGroupElement 9) :=
   [Z1, Z2, Z3, Z4, Z5, Z6, X1, X2]
 
-/-! ## Decided hypotheses
+/-! ## The bare code `Code[[9, 1]]`
+
+Eight independent, pairwise commuting generators on nine qubits: one logical
+qubit.
 
 Each Z-check meets each X-check in either zero or two qubits, and same-type
 generators commute componentwise. `decide` checks the 64 ordered pairs and the
@@ -102,33 +103,15 @@ phases. For the check-matrix rank, eight rows on nine qubits, plain `decide`
 runs out of heartbeats, so the check is handed straight to the kernel with
 `decide +kernel`. -/
 
-/-- All eight generators pairwise commute. -/
-lemma generators_commute :
-    ∀ g ∈ generatorsList, ∀ h ∈ generatorsList, g * h = h * g := by
-  decide
-
-/-- Every generator has phase power 0. -/
-lemma AllPhaseZero_generatorsList : AllPhaseZero generatorsList := by
-  decide
-
-/-- The check-matrix rows of the eight generators are linearly independent. -/
-lemma rowsLinearIndependent_generatorsList : rowsLinearIndependent generatorsList := by
-  decide +kernel
-
-/-! ## The bare code `Code[[9, 1]]`
-
-Eight independent, pairwise commuting generators on nine qubits: one logical
-qubit. -/
-
 /-- The generator list as a presentation of a `[[9, 1]]` code: its 8
 check-matrix rows are linearly independent. -/
 def presentation : StabilizerCode.Presentation 9 1 where
   hk := by decide
   generatorsList := generatorsList
   generators_length := rfl
-  generators_phaseZero := AllPhaseZero_generatorsList
-  generators_independent := rowsLinearIndependent_generatorsList
-  generators_commute := generators_commute
+  generators_phaseZero := by decide
+  generators_independent := by decide +kernel
+  generators_commute := by decide
 
 /-- Shor's code as a stabilizer code `[[9, 1]]`. -/
 noncomputable def stabilizerCode : Code[[9, 1]] := presentation.toCode

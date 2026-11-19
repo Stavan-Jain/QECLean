@@ -36,9 +36,7 @@ The logical basis `X̄₁ = IXIX`, `X̄₂ = IIXX`, `Z̄₁ = IIZZ`, `Z̄₂ = I
 ## Outline
 
 - Generators `Z1`, `X1` and the list `generatorsList`
-- Decided hypotheses: `generators_commute`, `AllPhaseZero_generatorsList`,
-  `rowsLinearIndependent_generatorsList`
-- `presentation`, `stabilizerCode : Code[[4, 2]]`
+- `presentation` (fields decided inline), `stabilizerCode : Code[[4, 2]]`
 - Distance 2 (decided weight-2 logical witness, no weight-1 logical):
   `minWeightLogical`, `code_has_distance_two`,
   `stabilizerCodeWithDistance : Code[[4, 2, 2]]`
@@ -65,28 +63,13 @@ def X1 : NQubitPauliGroupElement 4 := σ[XXXX]
 def generatorsList : List (NQubitPauliGroupElement 4) :=
   [Z1, X1]
 
-/-! ## Decided hypotheses
+/-! ## The bare code `Code[[4, 2]]`
+
+Two independent, commuting generators on four qubits: two logical qubits.
 
 `ZZZZ` and `XXXX` anticommute locally at all four qubits — an even count, so
 they commute. `decide` checks the four ordered pairs, the phases, and the
 check-matrix rank. -/
-
-/-- The two generators commute. -/
-lemma generators_commute :
-    ∀ g ∈ generatorsList, ∀ h ∈ generatorsList, g * h = h * g := by
-  decide
-
-/-- Every generator has phase power 0. -/
-lemma AllPhaseZero_generatorsList : AllPhaseZero generatorsList := by
-  decide
-
-/-- The check-matrix rows of the two generators are linearly independent. -/
-lemma rowsLinearIndependent_generatorsList : rowsLinearIndependent generatorsList := by
-  decide
-
-/-! ## The bare code `Code[[4, 2]]`
-
-Two independent, commuting generators on four qubits: two logical qubits. -/
 
 /-- The generator list as a presentation of a `[[4, 2]]` code: its 2
 check-matrix rows are linearly independent. -/
@@ -94,9 +77,9 @@ def presentation : StabilizerCode.Presentation 4 2 where
   hk := by decide
   generatorsList := generatorsList
   generators_length := rfl
-  generators_phaseZero := AllPhaseZero_generatorsList
-  generators_independent := rowsLinearIndependent_generatorsList
-  generators_commute := generators_commute
+  generators_phaseZero := by decide
+  generators_independent := by decide
+  generators_commute := by decide
 
 /-- The `[[4, 2, 2]]` code as a stabilizer code `[[4, 2]]`. -/
 noncomputable def stabilizerCode : Code[[4, 2]] := presentation.toCode

@@ -41,9 +41,7 @@ The logical basis `X̄ = X⊗⁷`, `Z̄ = Z⊗⁷` is in `Steane7Logicals.lean`.
 
 - Generators `Z1`–`Z3`, `X1`–`X3` and the list `generatorsList`
 - CSS type of the generators: `zChecks_isZType`, `xChecks_isXType`
-- Decided hypotheses: `generators_commute`, `AllPhaseZero_generatorsList`,
-  `rowsLinearIndependent_generatorsList`
-- `presentation`, `stabilizerCode : Code[[7, 1]]`
+- `presentation` (fields decided inline), `stabilizerCode : Code[[7, 1]]`
 - Distance 3 (column condition on the Hamming rows `row`, weight-3 logical):
   `code_has_distance_three`, `stabilizerCodeWithDistance : Code[[7, 1, 3]]`
 -/
@@ -93,30 +91,15 @@ lemma xChecks_isXType : ∀ g ∈ [X1, X2, X3], IsXTypeElement g := by
   simp only [List.mem_cons, List.not_mem_nil, or_false, forall_eq_or_imp, forall_eq]
   decide
 
-/-! ## Decided hypotheses
+/-! ## The bare code `Code[[7, 1]]`
+
+Six independent, pairwise commuting generators on seven qubits: one logical
+qubit.
 
 A Z-check and an X-check meet in an even number of qubits (`r₁ ∩ r₂ = {0, 1}`,
 `r₁ ∩ r₃ = {0, 2}`, `r₂ ∩ r₃ = {0, 3}`, and each row meets itself in four), and
 same-type generators commute componentwise. `decide` checks the 36 ordered
 pairs, the phases, and the check-matrix rank. -/
-
-/-- All six generators pairwise commute. -/
-lemma generators_commute :
-    ∀ g ∈ generatorsList, ∀ h ∈ generatorsList, g * h = h * g := by
-  decide
-
-/-- Every generator has phase power 0. -/
-lemma AllPhaseZero_generatorsList : AllPhaseZero generatorsList := by
-  decide
-
-/-- The check-matrix rows of the six generators are linearly independent. -/
-lemma rowsLinearIndependent_generatorsList : rowsLinearIndependent generatorsList := by
-  decide
-
-/-! ## The bare code `Code[[7, 1]]`
-
-Six independent, pairwise commuting generators on seven qubits: one logical
-qubit. -/
 
 /-- The generator list as a presentation of a `[[7, 1]]` code: its 6
 check-matrix rows are linearly independent. -/
@@ -124,9 +107,9 @@ def presentation : StabilizerCode.Presentation 7 1 where
   hk := by decide
   generatorsList := generatorsList
   generators_length := rfl
-  generators_phaseZero := AllPhaseZero_generatorsList
-  generators_independent := rowsLinearIndependent_generatorsList
-  generators_commute := generators_commute
+  generators_phaseZero := by decide
+  generators_independent := by decide
+  generators_commute := by decide
 
 /-- The Steane code as a stabilizer code `[[7, 1]]`. -/
 noncomputable def stabilizerCode : Code[[7, 1]] := presentation.toCode

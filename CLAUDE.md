@@ -874,9 +874,9 @@ order, and the declaration names, and gives a copy-paste sample for each
 section:
 
 - The **decide route**, the default for every literal code, CSS or not:
-  *Generators* → *Decided hypotheses* (pairwise commutation, phase zero and
-  check-matrix independence, each one `decide`) → *The bare code*
-  (`presentation`, `stabilizerCode`; `−I` is the presentation's default) →
+  *Generators* → *The bare code* (`presentation`, whose commutation, phase-zero
+  and check-matrix-independence fields are each `by decide`, and
+  `stabilizerCode`; `−I` is the presentation's default) →
   *Distance* (`presentation.hasCodeDistance_of_decide` on a minimum-weight
   logical, two `decide +kernel` proofs; or the column condition). There is no
   separate bundled `stabilizerGroup`: centralizer and logical-gate statements

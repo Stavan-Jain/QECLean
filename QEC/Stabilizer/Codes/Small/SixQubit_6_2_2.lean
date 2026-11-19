@@ -41,9 +41,7 @@ The logical basis `X̄₁ = IIXXII`, `X̄₂ = IXIXXI`, `Z̄₁ = ZIIZZI`,
 ## Outline
 
 - Generators `Z1`, `Z2`, `X1`, `X2` and the list `generatorsList`
-- Decided hypotheses: `generators_commute`, `AllPhaseZero_generatorsList`,
-  `rowsLinearIndependent_generatorsList`
-- `presentation`, `stabilizerCode : Code[[6, 2]]`
+- `presentation` (fields decided inline), `stabilizerCode : Code[[6, 2]]`
 - Distance 2 (decided weight-2 logical witness, no weight-1 logical):
   `minWeightLogical`, `code_has_distance_two`,
   `stabilizerCodeWithDistance : Code[[6, 2, 2]]`
@@ -76,30 +74,15 @@ def X2 : NQubitPauliGroupElement 6 := σ[XXIIXX]
 def generatorsList : List (NQubitPauliGroupElement 6) :=
   [Z1, Z2, X1, X2]
 
-/-! ## Decided hypotheses
+/-! ## The bare code `Code[[6, 2]]`
+
+Four independent, pairwise commuting generators on six qubits: two logical
+qubits.
 
 Every Z-check meets every X-check in an even number of qubits: `Z1` and `X1`
 in `{0,1,2,3}`, `Z1` and `X2` in `{0,1}`, `Z2` and `X1` in `{0,1}`, `Z2` and
 `X2` in `{0,1,4,5}`. `decide` checks the sixteen ordered pairs, the phases, and
 the check-matrix rank. -/
-
-/-- All four generators pairwise commute. -/
-lemma generators_commute :
-    ∀ g ∈ generatorsList, ∀ h ∈ generatorsList, g * h = h * g := by
-  decide
-
-/-- Every generator has phase power 0. -/
-lemma AllPhaseZero_generatorsList : AllPhaseZero generatorsList := by
-  decide
-
-/-- The check-matrix rows of the four generators are linearly independent. -/
-lemma rowsLinearIndependent_generatorsList : rowsLinearIndependent generatorsList := by
-  decide
-
-/-! ## The bare code `Code[[6, 2]]`
-
-Four independent, pairwise commuting generators on six qubits: two logical
-qubits. -/
 
 /-- The generator list as a presentation of a `[[6, 2]]` code: its 4
 check-matrix rows are linearly independent. -/
@@ -107,9 +90,9 @@ def presentation : StabilizerCode.Presentation 6 2 where
   hk := by decide
   generatorsList := generatorsList
   generators_length := rfl
-  generators_phaseZero := AllPhaseZero_generatorsList
-  generators_independent := rowsLinearIndependent_generatorsList
-  generators_commute := generators_commute
+  generators_phaseZero := by decide
+  generators_independent := by decide
+  generators_commute := by decide
 
 /-- The `C₆` code as a stabilizer code `[[6, 2]]`. -/
 noncomputable def stabilizerCode : Code[[6, 2]] := presentation.toCode

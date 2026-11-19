@@ -33,9 +33,7 @@ The logical basis `X̄ = XXX`, `Z̄ = ZZZ` is in `ThreeLogicals.lean`.
 ## Outline
 
 - Generators `Z1`, `Z2` and the list `generatorsList`
-- Decided hypotheses: `generators_commute`, `AllPhaseZero_generatorsList`,
-  `rowsLinearIndependent_generatorsList`
-- `presentation`, `stabilizerCode : Code[[3, 1]]`
+- `presentation` (fields decided inline), `stabilizerCode : Code[[3, 1]]`
 - Distance 1 (weight-1 logical): `code_has_distance_one`,
   `stabilizerCodeWithDistance : Code[[3, 1, 1]]`
 -/
@@ -61,27 +59,12 @@ def Z2 : NQubitPauliGroupElement 3 := σ[IZZ]
 def generatorsList : List (NQubitPauliGroupElement 3) :=
   [Z1, Z2]
 
-/-! ## Decided hypotheses
+/-! ## The bare code `Code[[3, 1]]`
+
+Two independent, commuting generators on three qubits: one logical qubit.
 
 Both generators are Z-type, so they commute componentwise. `decide` checks the
 four ordered pairs, the phases, and the check-matrix rank. -/
-
-/-- The two generators commute. -/
-lemma generators_commute :
-    ∀ g ∈ generatorsList, ∀ h ∈ generatorsList, g * h = h * g := by
-  decide
-
-/-- Every generator has phase power 0. -/
-lemma AllPhaseZero_generatorsList : AllPhaseZero generatorsList := by
-  decide
-
-/-- The check-matrix rows of the two generators are linearly independent. -/
-lemma rowsLinearIndependent_generatorsList : rowsLinearIndependent generatorsList := by
-  decide
-
-/-! ## The bare code `Code[[3, 1]]`
-
-Two independent, commuting generators on three qubits: one logical qubit. -/
 
 /-- The generator list as a presentation of a `[[3, 1]]` code: its 2
 check-matrix rows are linearly independent. -/
@@ -89,9 +72,9 @@ def presentation : StabilizerCode.Presentation 3 1 where
   hk := by decide
   generatorsList := generatorsList
   generators_length := rfl
-  generators_phaseZero := AllPhaseZero_generatorsList
-  generators_independent := rowsLinearIndependent_generatorsList
-  generators_commute := generators_commute
+  generators_phaseZero := by decide
+  generators_independent := by decide
+  generators_commute := by decide
 
 /-- The 3-qubit repetition code as a stabilizer code `[[3, 1]]`. -/
 noncomputable def stabilizerCode : Code[[3, 1]] := presentation.toCode
