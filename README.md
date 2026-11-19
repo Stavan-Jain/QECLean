@@ -112,7 +112,7 @@ Contributions are welcome! If you add new modules or definitions, please:
 
 ## Citation
 
-Our preprint providing an exposition to QECLean can be found here: [Specifying and Verifying Quantum Error-Correcting Codes](https://arxiv.org/abs/2611.21236). If you use QECLean in your research, please cite as follows:
+Our preprint providing an exposition to QECLean can be found here: [Specifying and Verifying Quantum Error-Correcting Codes](https://arxiv.org/abs/2611.21236). If you use QECLean in your research, please cite the paper as follows, and name the library version you used (a `v0.x` release; see [CHANGELOG.md](CHANGELOG.md) and [CITATION.cff](CITATION.cff)):
 
 ```
 @misc{jain2026specifyingverifyingquantum,

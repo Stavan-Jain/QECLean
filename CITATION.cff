@@ -1,0 +1,42 @@
+cff-version: 1.2.0
+message: >-
+  If you use QECLean in your research, please cite the paper below, and the
+  version of the library you used.
+title: "QECLean: a Lean 4 formalization of the stabilizer formalism"
+abstract: >-
+  A Lean 4 / mathlib library formalizing stabilizer quantum error-correcting
+  codes: the Pauli group and its binary-symplectic representation, stabilizer
+  codes and their logical operators and distance, homological (CSS) codes, and
+  concrete code families with kernel-checked distance proofs.
+type: software
+authors:
+  - given-names: Stavan
+    family-names: Jain
+  - given-names: Aws
+    family-names: Albarghouthi
+version: 0.2.0
+date-released: "2026-11-19"
+license: Apache-2.0
+repository-code: "https://github.com/QECLean/QECLean"
+keywords:
+  - Lean 4
+  - mathlib
+  - formal verification
+  - quantum error correction
+  - stabilizer codes
+preferred-citation:
+  type: article
+  title: "Specifying & Verifying Quantum Error-Correcting Codes"
+  authors:
+    - given-names: Stavan
+      family-names: Jain
+    - given-names: Nithin
+      family-names: Raveendran
+    - given-names: Aws
+      family-names: Albarghouthi
+  year: 2026
+  url: "https://arxiv.org/abs/2611.21236"
+  identifiers:
+    - type: other
+      value: "arXiv:2611.21236"
+      description: arXiv preprint

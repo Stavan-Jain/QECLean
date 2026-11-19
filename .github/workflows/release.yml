@@ -1,0 +1,110 @@
+name: Release
+
+# Publishes a GitHub release for a library version tag `v0.MINOR.PATCH`.
+# See RELEASING.md for the process and CHANGELOG.md for what the numbers mean.
+#
+# The `v4.x` toolchain tags are a different scheme, created by
+# `create-release.yml`; this workflow ignores them. When the library reaches
+# 1.0, extend the tag pattern below (and keep it clear of `v4.*`).
+#
+# Nothing is rebuilt here. A release tag must sit on a `main` commit whose
+# `Lean Action CI` run (full build, axiom policy, widgets) already succeeded;
+# this workflow checks that, checks that the version is the same in the tag,
+# `lakefile.toml`, `CITATION.cff` and `CHANGELOG.md`, and publishes the
+# changelog section as the release notes.
+
+on:
+  push:
+    tags:
+      - 'v0.*'
+
+permissions:
+  contents: write  # create the release
+  actions: read    # look up the CI run of the tagged commit
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.ref_name }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Tag is a library version (v0.MINOR.PATCH)
+        run: |
+          if ! [[ "$TAG" =~ ^v0\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::$TAG is not of the form v0.MINOR.PATCH"
+            exit 1
+          fi
+          echo "VERSION=${TAG#v}" >> "$GITHUB_ENV"
+
+      - name: Tagged commit is on main
+        run: |
+          git fetch origin main
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::$TAG ($GITHUB_SHA) is not on main"
+            exit 1
+          fi
+
+      - name: Version agrees across lakefile.toml, CITATION.cff and CHANGELOG.md
+        run: |
+          status=0
+          lake_version=$(sed -n 's/^version = "\(.*\)"$/\1/p' lakefile.toml)
+          cff_version=$(sed -n 's/^version: *"\{0,1\}\([^"]*\)"\{0,1\}$/\1/p' CITATION.cff)
+          if [ "$lake_version" != "$VERSION" ]; then
+            echo "::error file=lakefile.toml::version is '$lake_version', tag is $TAG"
+            status=1
+          fi
+          if [ "$cff_version" != "$VERSION" ]; then
+            echo "::error file=CITATION.cff::version is '$cff_version', tag is $TAG"
+            status=1
+          fi
+          if ! grep -q "^## \[$VERSION\]" CHANGELOG.md; then
+            echo "::error file=CHANGELOG.md::no '## [$VERSION]' section"
+            status=1
+          fi
+          exit $status
+
+      - name: CI passed on the tagged commit
+        run: |
+          passed=$(gh run list --workflow lean_action_ci.yml --commit "$GITHUB_SHA" \
+            --status success --json databaseId --jq 'length')
+          if [ "$passed" -eq 0 ]; then
+            echo "::error::No successful 'Lean Action CI' run for $GITHUB_SHA yet."
+            echo "Wait for CI on main to finish, then re-run this workflow."
+            exit 1
+          fi
+
+      - name: Release notes from CHANGELOG.md
+        run: |
+          {
+            awk -v v="$VERSION" '
+              $0 ~ "^## \\[" v "\\]" { p = 1; next }
+              /^## \[/ { p = 0 }
+              /^\[[^]]+\]: / { next }
+              p
+            ' CHANGELOG.md
+            echo
+            echo "---"
+            echo
+            echo "Lean toolchain: \`$(cat lean-toolchain)\`"
+            echo "mathlib: \`$(jq -r '.packages[] | select(.name == "mathlib") | .rev' lake-manifest.json)\`"
+            echo
+            echo "Use it from Lake:"
+            echo
+            echo '```toml'
+            echo '[[require]]'
+            echo 'name = "QEC"'
+            echo 'git = "https://github.com/QECLean/QECLean"'
+            echo "rev = \"$TAG\""
+            echo '```'
+          } > release-notes.md
+          cat release-notes.md
+
+      - name: Publish the release
+        run: |
+          gh release create "$TAG" --verify-tag --title "QECLean $TAG" \
+            --notes-file release-notes.md --latest

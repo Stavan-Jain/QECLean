@@ -610,6 +610,16 @@ In `QECWidgets/`, ProofWidgets' HTML type is always written `ProofWidgets.Html`:
 it is `protected`, and core Lean has its own `Lean.Html`, which a bare `Html`
 under `open Lean` resolves to.
 
+## Versioning and the changelog
+
+Library versions are semver tags `v0.MINOR.PATCH`; the version lives in
+`lakefile.toml`, `CITATION.cff` and `CHANGELOG.md`, and
+`.github/workflows/release.yml` refuses a tag where they disagree. The `v4.x`
+tags are the separate, automatic toolchain tags. **Any change to the public
+API — a declaration renamed, removed, or restated — adds a line under
+`## [Unreleased]` in `CHANGELOG.md`** (*Breaking*: old name → new name). How to
+cut a release: [`RELEASING.md`](RELEASING.md).
+
 ## Module system
 
 Every file under `QEC/`, the root modules (`QEC.lean`, `QECLight.lean`,
