@@ -5,10 +5,19 @@
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![arXiv](https://img.shields.io/badge/arXiv-2611.21236-b31b1b.svg)](https://arxiv.org/abs/2611.21236)
 
-QECLean is a Lean-based framework for formally specifying and verifying QEC codes. It consists of 
+QECLean is a Lean-based framework for formally specifying and verifying quantum error-correcting (QEC) codes. It consists of:
 
-1. Algebraic abstractions for specifying stabilizer codes and code families including chain complexes and check matrices
-2. Proof techniques and algorithmic infrastructure to establish $[[n, k, d]]$ code parameters for codes and code families, resulting in formalized distance proofs of the $[[2L^2, 2, L]]$ toric codes, $[[360, 12, 24]]$ and $[[144, 12, 12]]$ BB codes and the $[[150, 30, 10]]$ Mitten Code.
+1. **Algebraic abstractions** for specifying stabilizer codes and code families, including chain complexes and check matrices.
+2. **Proof techniques** and algorithmic infrastructure for establishing the $[[n, k, d]]$ parameters of codes and code families.
+
+See our [paper](https://arxiv.org/abs/2611.21236) for technical details.
+
+**Highlights**:
+
+- **Code families**: the first mechanized distance proofs for code families, including the $[[2L^2, 2, L]]$ toric codes, rotated surface codes, and triangular color codes.
+- **Gross code**: the $[[144, 12, 12]]$ gross code of [Bravyi et al.](https://doi.org/10.1038/s41586-024-07107-7)
+- **$[[360, 12, 24]]$ BB code**: the first proof that this code of [Bravyi et al.](https://doi.org/10.1038/s41586-024-07107-7) has distance 24, previously known only as an upper bound.
+- **Mitten code**: the $[[150, 30, 10]]$ Mitten code of [Bhardwaj et al.](https://arxiv.org/abs/2607.28795)
 
 ## Overview
 
@@ -18,7 +27,7 @@ and other foundations. Import everything via `QEC`.
 
 ### Codes
 
-Our central abstraction is the type `Code[[n, k, d]]`, which is a $[[n, k, d]]$ stabilizer code together with lean proofs that it uses $n$ physical qubit to encode $k$ logical qubits with code distance $d$. We formalize the following codes as `Code[[n, k, d]]`s:
+Our central abstraction is the dependent type `Code[[n, k, d]]`, which is a $[[n, k, d]]$ stabilizer code together with lean proofs that it uses $n$ physical qubit to encode $k$ logical qubits with code distance $d$. We formalize the following codes as `Code[[n, k, d]]`s:
 
 | Code | Parameters | Where |
 |---|---|---|
