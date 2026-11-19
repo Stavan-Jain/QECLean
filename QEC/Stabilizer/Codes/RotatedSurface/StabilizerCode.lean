@@ -77,7 +77,6 @@ noncomputable def rotatedSurfacePresentation :
     have h := generators_commute L
     rw [← listToSet_generatorsList] at h
     exact h
-  closure_no_neg_identity := by rw [listToSet_generatorsList]; exact negIdentity_not_mem L
 
 /-- The rotated surface code as an `[[L * L, 1]]` stabilizer code. -/
 noncomputable def rotatedSurfaceStabilizerCode : StabilizerCode (numQubits L) 1 :=

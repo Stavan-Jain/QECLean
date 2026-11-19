@@ -69,20 +69,20 @@ Commuting with the stabilizer reduces to commuting with the two generators, a
 closed statement that `decide` settles. -/
 
 /-- `X̄₁ = IXIX` commutes with every element of the stabilizer. -/
-lemma logicalX_1_mem_centralizer : logicalX_1 ∈ centralizer stabilizerGroup :=
-  mem_centralizer_of_commute_list stabilizerGroup_toSubgroup_eq (by decide)
+lemma logicalX_1_mem_centralizer : logicalX_1 ∈ centralizer stabilizerCode.toStabilizerGroup :=
+  mem_centralizer_of_commute_list stabilizerCode_toSubgroup_eq (by decide)
 
 /-- `X̄₂ = IIXX` commutes with every element of the stabilizer. -/
-lemma logicalX_2_mem_centralizer : logicalX_2 ∈ centralizer stabilizerGroup :=
-  mem_centralizer_of_commute_list stabilizerGroup_toSubgroup_eq (by decide)
+lemma logicalX_2_mem_centralizer : logicalX_2 ∈ centralizer stabilizerCode.toStabilizerGroup :=
+  mem_centralizer_of_commute_list stabilizerCode_toSubgroup_eq (by decide)
 
 /-- `Z̄₁ = IIZZ` commutes with every element of the stabilizer. -/
-lemma logicalZ_1_mem_centralizer : logicalZ_1 ∈ centralizer stabilizerGroup :=
-  mem_centralizer_of_commute_list stabilizerGroup_toSubgroup_eq (by decide)
+lemma logicalZ_1_mem_centralizer : logicalZ_1 ∈ centralizer stabilizerCode.toStabilizerGroup :=
+  mem_centralizer_of_commute_list stabilizerCode_toSubgroup_eq (by decide)
 
 /-- `Z̄₂ = IZIZ` commutes with every element of the stabilizer. -/
-lemma logicalZ_2_mem_centralizer : logicalZ_2 ∈ centralizer stabilizerGroup :=
-  mem_centralizer_of_commute_list stabilizerGroup_toSubgroup_eq (by decide)
+lemma logicalZ_2_mem_centralizer : logicalZ_2 ∈ centralizer stabilizerCode.toStabilizerGroup :=
+  mem_centralizer_of_commute_list stabilizerCode_toSubgroup_eq (by decide)
 
 /-! ## The code with its logical basis `Code[[4, 2]]ₗ` -/
 

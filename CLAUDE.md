@@ -397,7 +397,8 @@ These are local to this codebase — search here before assuming mathlib has the
   `k` is determined by the group (`StabilizerCode.k_eq_of_toSubgroup_eq`). Concrete codes are
   built from a `StabilizerCode.Presentation n k` (`Symplectic/Presentation.lean`): the generator
   list plus `generators_length`, phase-zero, `rowsLinearIndependent` (which forces `Nodup`),
-  commutation and −I fields, all `decide`-able for literal lists, and `P.toCode` derives
+  commutation fields, all `decide`-able for literal lists (the −I field
+  `closure_no_neg_identity` defaults from them and is left out), and `P.toCode` derives
   `card_eq` from them. Anything that needs the generators (logicality via generators, `decide`
   sweeps) goes through the presentation; `Presentation.toCode_toSubgroup` (`rfl`, `@[simp]`)
   rewrites the code's subgroup to `Subgroup.closure (listToSet P.generatorsList)`.
@@ -864,19 +865,19 @@ section:
 
 - The **decide route**, the default for every literal code, CSS or not:
   *Generators* → *Decided hypotheses* (pairwise commutation, phase zero and
-  check-matrix independence, each one `decide`) → *No `−I`* (via
-  `negIdentity_not_mem_of_indep_phase_zero_commute`) → *Bundled
-  `StabilizerGroup n`* → *The bare code* (`presentation`, `stabilizerCode`) →
+  check-matrix independence, each one `decide`) → *The bare code*
+  (`presentation`, `stabilizerCode`; `−I` is the presentation's default) →
   *Distance* (anticommute witnesses decided over the generator list, or the
   column condition; a minimum-weight logical with its own nontriviality
-  proof).
+  proof). There is no separate bundled `stabilizerGroup`: centralizer and
+  logical-gate statements use `stabilizerCode.toStabilizerGroup` and
+  `stabilizerCode_toSubgroup_eq`.
 - The **CSS route**, for parametric families whose `List.ofFn` generator lists
   `decide` cannot evaluate: generators `ZStab` / `XStab` written as `zOn S` /
   `xOn S`, *Hypotheses on the generators* proved from the supports (typing,
   cross-commutation by even overlap, independence by
-  `rowsLinearIndependent_ofFn_of_pivots`), `−I` via
-  `CSS.negIdentity_not_mem_closure_union`, and the `listToSet` bridge
-  (`listToSet_append`).
+  `rowsLinearIndependent_ofFn_of_pivots`), the bare code, and the `listToSet`
+  bridge (`listToSet_append`).
 - The logicals file: logical operators → anticommutation → centralizer
   membership (`mem_centralizer_of_commute_list`) →
   `stabilizerCodeWithLogicals`, with notes for `k ≥ 2` and non-CSS codes.

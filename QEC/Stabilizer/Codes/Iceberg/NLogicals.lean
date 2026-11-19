@@ -119,12 +119,12 @@ the stabilizer by `xOn_mem_centralizer` and `zOn_mem_centralizer`. -/
 
 /-- `X̄ᵢ` commutes with every element of the stabilizer. -/
 lemma logicalX_mem_centralizer (m : ℕ) [Fact (2 ≤ m)] (i : Fin (2 * m - 2)) :
-    logicalX m i ∈ centralizer (stabilizerGroup m) :=
+    logicalX m i ∈ centralizer (stabilizerCode m).toStabilizerGroup :=
   logicalX_eq_xOn m i ▸ xOn_mem_centralizer m (even_card_pair (logIdx_ne_xAnchor m i))
 
 /-- `Z̄ᵢ` commutes with every element of the stabilizer. -/
 lemma logicalZ_mem_centralizer (m : ℕ) [Fact (2 ≤ m)] (i : Fin (2 * m - 2)) :
-    logicalZ m i ∈ centralizer (stabilizerGroup m) :=
+    logicalZ m i ∈ centralizer (stabilizerCode m).toStabilizerGroup :=
   logicalZ_eq_zOn m i ▸ zOn_mem_centralizer m (even_card_pair (logIdx_ne_zAnchor m i))
 
 /-! ## The code with its logical basis `Code[[2m, 2m − 2]]ₗ` -/

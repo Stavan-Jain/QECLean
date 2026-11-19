@@ -73,8 +73,9 @@ lemma conjByGate_transversalH (g : NQubitPauliGroupElement 7)
 
 /-- Transversal Hadamard is a logical gate of the Steane code: it exchanges the
 Z-check and the X-check on each Hamming row. -/
-theorem transversalH_isLogicalGate : IsLogicalGate transversalH stabilizerGroup := by
-  refine isLogicalGate_of_generator_set_conjugation _ _ _ stabilizerGroup_toSubgroup_eq
+theorem transversalH_isLogicalGate :
+    IsLogicalGate transversalH stabilizerCode.toStabilizerGroup := by
+  refine isLogicalGate_of_generator_set_conjugation _ _ _ stabilizerCode_toSubgroup_eq
     fun g (hg : g ∈ generatorsList) => ⟨swapXZ g,
       Subgroup.subset_closure (?_ : swapXZ g ∈ generatorsList), conjByGate_transversalH g ?_⟩
   all_goals fin_cases hg <;> decide
@@ -118,10 +119,11 @@ lemma conjByGate_transversalS_of_X {g h : NQubitPauliGroupElement 7}
 /-- Transversal `S†` is a logical gate of the Steane code: it fixes each
 Z-check and sends the X-check on a Hamming row to its product with the Z-check
 on that row. -/
-theorem transversalS_isLogicalGate : IsLogicalGate transversalS stabilizerGroup := by
-  have hmem : ∀ g ∈ generatorsList, g ∈ stabilizerGroup.toSubgroup :=
+theorem transversalS_isLogicalGate :
+    IsLogicalGate transversalS stabilizerCode.toStabilizerGroup := by
+  have hmem : ∀ g ∈ generatorsList, g ∈ stabilizerCode.toStabilizerGroup.toSubgroup :=
     fun g hg => Subgroup.subset_closure hg
-  refine isLogicalGate_of_generator_set_conjugation _ _ _ stabilizerGroup_toSubgroup_eq
+  refine isLogicalGate_of_generator_set_conjugation _ _ _ stabilizerCode_toSubgroup_eq
     fun g (hg : g ∈ generatorsList) => ?_
   fin_cases hg
   · exact ⟨Z1, hmem _ (by decide), conjByGate_transversalS_of_Z _ (by decide)⟩

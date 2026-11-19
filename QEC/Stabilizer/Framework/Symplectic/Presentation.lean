@@ -43,13 +43,12 @@ def presentation : StabilizerCode.Presentation 7 1 where
   generators_phaseZero := AllPhaseZero_generatorsList
   generators_independent := rowsLinearIndependent_generatorsList
   generators_commute := generators_commute
-  closure_no_neg_identity := negIdentity_not_mem
 
 noncomputable def stabilizerCode : Code[[7, 1]] := presentation.toCode
 ```
 
 For a literal generator list the proof fields are closed by `decide`, and
-`closure_no_neg_identity` may be omitted. A presentation whose generator list
+`closure_no_neg_identity` is left to its default. A presentation whose generator list
 is `noncomputable` must be marked `noncomputable` itself.
 `stabilizerCode.toStabilizerGroup` is definitionally
 `mkStabilizerFromGenerators 7 generatorsList …`, so statements about the

@@ -50,12 +50,12 @@ Commuting with the stabilizer reduces to commuting with the three generators, a
 closed statement that `decide` settles. -/
 
 /-- `X̄ = XXII` commutes with every element of the stabilizer. -/
-lemma logicalX_mem_centralizer : logicalX ∈ centralizer stabilizerGroup :=
-  mem_centralizer_of_commute_list stabilizerGroup_toSubgroup_eq (by decide)
+lemma logicalX_mem_centralizer : logicalX ∈ centralizer stabilizerCode.toStabilizerGroup :=
+  mem_centralizer_of_commute_list stabilizerCode_toSubgroup_eq (by decide)
 
 /-- `Z̄ = ZIZI` commutes with every element of the stabilizer. -/
-lemma logicalZ_mem_centralizer : logicalZ ∈ centralizer stabilizerGroup :=
-  mem_centralizer_of_commute_list stabilizerGroup_toSubgroup_eq (by decide)
+lemma logicalZ_mem_centralizer : logicalZ ∈ centralizer stabilizerCode.toStabilizerGroup :=
+  mem_centralizer_of_commute_list stabilizerCode_toSubgroup_eq (by decide)
 
 /-! ## The code with its logical basis `Code[[4, 1]]ₗ` -/
 

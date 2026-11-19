@@ -54,12 +54,14 @@ Commuting with the stabilizer reduces to commuting with the generators.
 Z-type, as every check is. -/
 
 /-- `X̄ = X⊗ⁿ⁺²` commutes with every element of the stabilizer. -/
-lemma logicalX_mem_centralizer (n : ℕ) : logicalX n ∈ centralizer (stabilizerGroup n) :=
+lemma logicalX_mem_centralizer (n : ℕ) :
+    logicalX n ∈ centralizer (stabilizerCode n).toStabilizerGroup :=
   minWeightPartner_mem_centralizer n
 
 /-- `Z̄ = Z⊗ⁿ⁺²` commutes with every element of the stabilizer. -/
-lemma logicalZ_mem_centralizer (n : ℕ) : logicalZ n ∈ centralizer (stabilizerGroup n) :=
-  (mem_centralizer_iff_closure _ _ (generators n) (stabilizerGroup_toSubgroup_eq n)).mpr
+lemma logicalZ_mem_centralizer (n : ℕ) :
+    logicalZ n ∈ centralizer (stabilizerCode n).toStabilizerGroup :=
+  (mem_centralizer_iff_closure _ _ (generators n) (stabilizerCode_toSubgroup_eq n)).mpr
     fun s hs => (generators_isZType n s hs).commute ⟨rfl, fun _ => Or.inr rfl⟩
 
 /-! ## The code with its logical basis `Code[[n+2, 1]]ₗ` -/

@@ -70,12 +70,14 @@ itself, an even number of qubits, so `xOn_mem_centralizer` and
 `zOn_mem_centralizer` apply. -/
 
 /-- `X̄ = X⊗ⁿ` commutes with every element of the stabilizer. -/
-lemma logicalX_mem_centralizer (hr : 3 ≤ r) : logicalX r ∈ centralizer (stabilizerGroup r hr) :=
+lemma logicalX_mem_centralizer (hr : 3 ≤ r) :
+    logicalX r ∈ centralizer (stabilizerCode r hr).toStabilizerGroup :=
   logicalX_eq_xOn r ▸
     xOn_mem_centralizer r hr fun a => (Finset.univ_inter (row r a)).symm ▸ even_card_row r hr a
 
 /-- `Z̄ = Z⊗ⁿ` commutes with every element of the stabilizer. -/
-lemma logicalZ_mem_centralizer (hr : 3 ≤ r) : logicalZ r ∈ centralizer (stabilizerGroup r hr) :=
+lemma logicalZ_mem_centralizer (hr : 3 ≤ r) :
+    logicalZ r ∈ centralizer (stabilizerCode r hr).toStabilizerGroup :=
   logicalZ_eq_zOn r ▸
     zOn_mem_centralizer r hr fun a => (Finset.univ_inter (row r a)).symm ▸ even_card_row r hr a
 
