@@ -170,7 +170,7 @@ theorem exists_stabilizerGroup_operatorImage_eq (J : Subgroup (NQubitPauliOperat
     exact ⟨rfl, hu⟩
   have hL_phase : AllPhaseZero L := fun g hg => congrArg phasePower (hL_of g hg).1
   have hL_mem : ∀ g ∈ listToSet L, g.operators ∈ J := fun g hg => hJ_of _ (hL_of g hg).2
-  have hL_comm : ∀ g ∈ listToSet L, ∀ h ∈ listToSet L, g * h = h * g := fun g hg h hh =>
+  have hL_comm : ∀ g ∈ L, ∀ h ∈ L, g * h = h * g := fun g hg h hh =>
     (commutes_iff_symplectic_inner_zero g h).mpr (hJ _ (hL_mem g hg) _ (hL_mem h hh))
   -- the check-matrix rows of `L` are the vectors of `B`, without repetition
   have hL_indep : rowsLinearIndependent L := by

@@ -138,6 +138,14 @@ generator list. -/
     P.toCode.toStabilizerGroup.toSubgroup = Subgroup.closure (listToSet P.generatorsList) :=
   rfl
 
+/-- **Centralizer membership by the generators.** An element lies in the
+centralizer of the presented code iff it commutes with every generator. For a
+literal generator list the right-hand side is a closed statement, so a code
+proves membership as `presentation.mem_centralizer_iff.2 (by decide)`. -/
+theorem mem_centralizer_iff {g : NQubitPauliGroupElement n} :
+    g ∈ centralizer P.toCode.toStabilizerGroup ↔ ∀ s ∈ P.generatorsList, s * g = g * s :=
+  mem_centralizer_iff_closure g _ _ P.toCode_toSubgroup
+
 end StabilizerCode.Presentation
 
 end StabilizerGroup

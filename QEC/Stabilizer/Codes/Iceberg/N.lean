@@ -169,10 +169,8 @@ def presentation (m : ℕ) [Fact (2 ≤ m)] : StabilizerCode.Presentation (2 * m
     omega
   generators_phaseZero := AllPhaseZero_generatorsList m
   generators_independent := rowsLinearIndependent_generatorsList m
-  generators_commute := by
-    have h := generators_commute m
-    rw [← listToSet_generatorsList] at h
-    exact h
+  generators_commute :=
+    commute_list_of_listToSet_eq (listToSet_generatorsList m) (generators_commute m)
 
 /-- The iceberg code on `2m` qubits as a stabilizer code `[[2m, 2m − 2]]`. -/
 noncomputable def stabilizerCode (m : ℕ) [Fact (2 ≤ m)] : Code[[2 * m, 2 * m - 2]] :=

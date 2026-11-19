@@ -127,10 +127,8 @@ def presentation (n : ℕ) : StabilizerCode.Presentation (n + 2) 1 where
   generators_length := List.length_ofFn
   generators_phaseZero := AllPhaseZero_generatorsList n
   generators_independent := rowsLinearIndependent_generatorsList n
-  generators_commute := by
-    have h := generators_commute n
-    rw [← listToSet_generatorsList] at h
-    exact h
+  generators_commute :=
+    commute_list_of_listToSet_eq (listToSet_generatorsList n) (generators_commute n)
 
 /-- The repetition code on `n + 2` qubits as a stabilizer code `[[n+2, 1]]`. -/
 noncomputable def stabilizerCode (n : ℕ) : Code[[n + 2, 1]] := (presentation n).toCode

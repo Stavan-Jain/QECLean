@@ -178,7 +178,7 @@ theorem negIdentity_not_mem :
 `generatorsList L`. -/
 noncomputable def stabilizerGroup : StabilizerGroup (numQubits L) :=
   StabilizerGroup.mkStabilizerFromGenerators (numQubits L) (generatorsList L)
-    (by rw [listToSet_generatorsList]; exact generators_commute L)
+    (commute_list_of_listToSet_eq (listToSet_generatorsList L) (generators_commute L))
     (by rw [listToSet_generatorsList]; exact negIdentity_not_mem L)
 
 lemma stabilizerGroup_toSubgroup_eq :

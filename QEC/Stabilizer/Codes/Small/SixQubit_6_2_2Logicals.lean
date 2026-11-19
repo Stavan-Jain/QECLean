@@ -69,19 +69,19 @@ meets it in an even number of qubits (`X̄₁`: `{2,3}` and `∅`; `X̄₂`: `{1
 
 /-- `X̄₁ = IIXXII` commutes with every element of the stabilizer. -/
 lemma logicalX_1_mem_centralizer : logicalX_1 ∈ centralizer stabilizerCode.toStabilizerGroup :=
-  mem_centralizer_of_commute_list stabilizerCode_toSubgroup_eq (by decide)
+  presentation.mem_centralizer_iff.2 (by decide)
 
 /-- `X̄₂ = IXIXXI` commutes with every element of the stabilizer. -/
 lemma logicalX_2_mem_centralizer : logicalX_2 ∈ centralizer stabilizerCode.toStabilizerGroup :=
-  mem_centralizer_of_commute_list stabilizerCode_toSubgroup_eq (by decide)
+  presentation.mem_centralizer_iff.2 (by decide)
 
 /-- `Z̄₁ = ZIIZZI` commutes with every element of the stabilizer. -/
 lemma logicalZ_1_mem_centralizer : logicalZ_1 ∈ centralizer stabilizerCode.toStabilizerGroup :=
-  mem_centralizer_of_commute_list stabilizerCode_toSubgroup_eq (by decide)
+  presentation.mem_centralizer_iff.2 (by decide)
 
 /-- `Z̄₂ = IIIIZZ` commutes with every element of the stabilizer. -/
 lemma logicalZ_2_mem_centralizer : logicalZ_2 ∈ centralizer stabilizerCode.toStabilizerGroup :=
-  mem_centralizer_of_commute_list stabilizerCode_toSubgroup_eq (by decide)
+  presentation.mem_centralizer_iff.2 (by decide)
 
 /-! ## The code with its logical basis `Code[[6, 2]]ₗ` -/
 

@@ -51,11 +51,11 @@ closed statement that `decide` settles. -/
 
 /-- `X̄ = X⊗⁵` commutes with every element of the stabilizer. -/
 lemma logicalX_mem_centralizer : logicalX ∈ centralizer stabilizerCode.toStabilizerGroup :=
-  mem_centralizer_of_commute_list stabilizerCode_toSubgroup_eq (by decide)
+  presentation.mem_centralizer_iff.2 (by decide)
 
 /-- `Z̄ = Z⊗⁵` commutes with every element of the stabilizer. -/
 lemma logicalZ_mem_centralizer : logicalZ ∈ centralizer stabilizerCode.toStabilizerGroup :=
-  mem_centralizer_of_commute_list stabilizerCode_toSubgroup_eq (by decide)
+  presentation.mem_centralizer_iff.2 (by decide)
 
 /-! ## The code with its logical basis `Code[[5, 1]]ₗ` -/
 

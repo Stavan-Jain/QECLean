@@ -147,7 +147,7 @@ overlap of each Z-check with each X-check is even) and how many ordered pairs
 ```lean
 /-- All six generators pairwise commute. -/
 lemma generators_commute :
-    ∀ g ∈ listToSet generatorsList, ∀ h ∈ listToSet generatorsList, g * h = h * g := by
+    ∀ g ∈ generatorsList, ∀ h ∈ generatorsList, g * h = h * g := by
   decide
 
 /-- Every generator has phase power 0. -/
@@ -159,15 +159,15 @@ lemma rowsLinearIndependent_generatorsList : rowsLinearIndependent generatorsLis
   decide
 ```
 
-`generators_commute` is stated over `listToSet generatorsList`, the form taken
-by `mkStabilizerFromGenerators`. Membership in
-`listToSet L` is by definition membership in `L`, so the same lemma also fills
-the field `StabilizerCode.Presentation.generators_commute`, which quantifies
-over the list. More generally, a statement about `g ∈ generatorsList` is
-accepted wherever one about `g ∈ listToSet generatorsList` is expected.
+`generators_commute` quantifies over the list, the form taken by
+`StabilizerCode.Presentation` and `mkStabilizerFromGenerators`. The set
+`listToSet generatorsList` appears only inside `Subgroup.closure`; membership
+in it is by definition membership in the list, so a statement about
+`g ∈ generatorsList` is accepted wherever one about
+`g ∈ listToSet generatorsList` is expected.
 
 The quantifiers over the list are decided by instances pinned to
-`List.decidableBAll` (`instDecidablePairwiseCommuteListToSet`,
+`List.decidableBAll` (`instDecidablePairwiseCommute`,
 `instDecidableCommuteList`, `instDecidableAllPhaseZero`); the kernel then
 checks one closed identity between literals per pair. Without a pinned
 instance, `decide` on a statement `∀ g ∈ generatorsList, …` of another shape
@@ -224,8 +224,10 @@ generator list is `noncomputable` is marked `noncomputable` too.
 
 The code's group `stabilizerCode.toStabilizerGroup` is the stabilizer group
 of the file: no separate `StabilizerGroup n` is built.
-`stabilizerCode_toSubgroup_eq` is how every later argument gets from it to the
-generators: centralizer membership through `mem_centralizer_of_commute_list`,
+Centralizer membership goes through the presentation:
+`presentation.mem_centralizer_iff` says an element is in the centralizer iff it
+commutes with every generator. `stabilizerCode_toSubgroup_eq` is how the other
+arguments get from the group to its generators: the distance closers, and
 logical gates through `isLogicalGate_of_generator_set_conjugation`.
 -/
 
@@ -320,12 +322,12 @@ lemma minWeightLogical_weight : weight minWeightLogical = 3 := by decide
 /-- `IIIXIXX` commutes with every element of the stabilizer. -/
 lemma minWeightLogical_mem_centralizer :
     minWeightLogical ∈ centralizer stabilizerCode.toStabilizerGroup :=
-  mem_centralizer_of_commute_list stabilizerCode_toSubgroup_eq (by decide)
+  presentation.mem_centralizer_iff.2 (by decide)
 
 /-- `IIIZIZZ` commutes with every element of the stabilizer. -/
 lemma minWeightPartner_mem_centralizer :
     minWeightPartner ∈ centralizer stabilizerCode.toStabilizerGroup :=
-  mem_centralizer_of_commute_list stabilizerCode_toSubgroup_eq (by decide)
+  presentation.mem_centralizer_iff.2 (by decide)
 
 /-- `IIIXIXX` and `IIIZIZZ` meet on qubits 3, 5 and 6, an odd number. -/
 lemma minWeightLogical_anticommutes_minWeightPartner :
@@ -339,7 +341,7 @@ lemma minWeightLogical_isNontrivial :
     minWeightPartner_mem_centralizer minWeightLogical_anticommutes_minWeightPartner
 ```
 
-`mem_centralizer_of_commute_list` reduces membership in the centralizer to
+`presentation.mem_centralizer_iff` reduces membership in the centralizer to
 commuting with each element of `generatorsList`, which `decide` checks.
 
 ### The code with its distance `Code[[n, k, d]]`
@@ -411,16 +413,16 @@ In a parametric family with `X̄ = X⊗ⁿ` and `Z̄ = Z⊗ⁿ` this is
 
 ## Logicals file: centralizer membership
 
-One lemma per logical operator, each by `mem_centralizer_of_commute_list`.
+One lemma per logical operator, each by `presentation.mem_centralizer_iff`.
 
 ```lean
 /-- `X̄ = X⊗⁷` commutes with every element of the stabilizer. -/
 lemma logicalX_mem_centralizer : logicalX ∈ centralizer stabilizerCode.toStabilizerGroup :=
-  mem_centralizer_of_commute_list stabilizerCode_toSubgroup_eq (by decide)
+  presentation.mem_centralizer_iff.2 (by decide)
 
 /-- `Z̄ = Z⊗⁷` commutes with every element of the stabilizer. -/
 lemma logicalZ_mem_centralizer : logicalZ ∈ centralizer stabilizerCode.toStabilizerGroup :=
-  mem_centralizer_of_commute_list stabilizerCode_toSubgroup_eq (by decide)
+  presentation.mem_centralizer_iff.2 (by decide)
 ```
 
 ## Logicals file: the code with its logical basis `Code[[n, k]]ₗ`
@@ -549,15 +551,13 @@ lemma rowsLinearIndependent_generatorsList : rowsLinearIndependent generatorsLis
 ```
 
 **The bare code.** The presentation field `generators_commute` quantifies over
-the list, so the rewrite by `listToSet_generatorsList` goes into the
-hypothesis; `closure_no_neg_identity` is again left to its default.
-`stabilizerCode_toSubgroup_eq` is stated against `subgroup`:
+the list, and `commute_list_of_listToSet_eq` transfers the set statement to it
+along `listToSet_generatorsList`; `closure_no_neg_identity` is again left to
+its default. `stabilizerCode_toSubgroup_eq` is stated against `subgroup`:
 
 ```lean
-  generators_commute := by
-    have h := generators_commute
-    rw [← listToSet_generatorsList] at h
-    exact h
+  generators_commute :=
+    commute_list_of_listToSet_eq listToSet_generatorsList generators_commute
 
 lemma stabilizerCode_toSubgroup_eq : stabilizerCode.toStabilizerGroup.toSubgroup = subgroup :=
   congrArg Subgroup.closure listToSet_generatorsList

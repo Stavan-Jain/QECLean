@@ -301,10 +301,8 @@ def presentation (hr : 3 ≤ r) :
     omega
   generators_phaseZero := AllPhaseZero_generatorsList r
   generators_independent := rowsLinearIndependent_generatorsList r
-  generators_commute := by
-    have h := generators_commute r hr
-    rw [← listToSet_generatorsList] at h
-    exact h
+  generators_commute :=
+    commute_list_of_listToSet_eq (listToSet_generatorsList r) (generators_commute r hr)
 
 /-- The quantum Hamming code as a stabilizer code
 `[[2^r − 1, 2^r − 1 − 2r]]`. -/

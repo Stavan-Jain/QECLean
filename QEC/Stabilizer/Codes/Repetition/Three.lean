@@ -68,7 +68,7 @@ four ordered pairs, the phases, and the check-matrix rank. -/
 
 /-- The two generators commute. -/
 lemma generators_commute :
-    ∀ g ∈ listToSet generatorsList, ∀ h ∈ listToSet generatorsList, g * h = h * g := by
+    ∀ g ∈ generatorsList, ∀ h ∈ generatorsList, g * h = h * g := by
   decide
 
 /-- Every generator has phase power 0. -/
@@ -124,12 +124,12 @@ lemma minWeightLogical_weight : weight minWeightLogical = 1 := by decide
 /-- `ZII` commutes with every element of the stabilizer. -/
 lemma minWeightLogical_mem_centralizer :
     minWeightLogical ∈ centralizer stabilizerCode.toStabilizerGroup :=
-  mem_centralizer_of_commute_list stabilizerCode_toSubgroup_eq (by decide)
+  presentation.mem_centralizer_iff.2 (by decide)
 
 /-- `XXX` commutes with every element of the stabilizer. -/
 lemma minWeightPartner_mem_centralizer :
     minWeightPartner ∈ centralizer stabilizerCode.toStabilizerGroup :=
-  mem_centralizer_of_commute_list stabilizerCode_toSubgroup_eq (by decide)
+  presentation.mem_centralizer_iff.2 (by decide)
 
 /-- `ZII` and `XXX` meet on qubit 0 only, an odd number. -/
 lemma minWeightLogical_anticommutes_minWeightPartner :

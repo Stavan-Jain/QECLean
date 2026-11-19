@@ -5,11 +5,11 @@ public import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrixDecidable
 public import QEC.Stabilizer.Foundations.PauliGroup.Commutation
 public import QEC.Stabilizer.Foundations.PauliGroup.Notation
 public import QEC.Stabilizer.Framework.Core.CodeNotation
-public import QEC.Stabilizer.Framework.Core.CSS.CSSDistance
 public import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
 public import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
 public import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
 public import QEC.Stabilizer.Framework.Symplectic.Presentation
+public import QEC.Stabilizer.Framework.Symplectic.DistanceDecide
 public import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
 
 /-!
@@ -28,14 +28,13 @@ independence are closed statements settled by `decide`; `−I ∉ closure` follo
 by `negIdentity_not_mem_of_indep_phase_zero_commute`.
 
 Shor's code is *degenerate*: it has weight-two errors that no check detects,
-yet its distance is three. The Z-checks form three length-3 repetition codes,
-whose check matrix has nonzero, pairwise distinct columns, so every weight-one
-or weight-two error with an `X`-component is caught. The two X-checks do not
-separate qubits within a block, so `Z_i Z_j` on two qubits of one block
-commutes with every check — but such a `Z_i Z_j` is itself a stabilizer (a `ZZ`
-check, or the product of a block's two), so it is not a logical. Distance 3 is
-`hasCodeDistance_three_of_columns_degenerate`, which is that argument; `X` on
-the first block is a nontrivial logical of weight 3.
+yet its distance is three. The two X-checks do not separate qubits within a
+block, so `Z_i Z_j` on two qubits of one block commutes with every check — but
+such a `Z_i Z_j` is itself a stabilizer (a `ZZ` check, or the product of a
+block's two), so it is not a logical. Distance 3 is `hasCodeDistance_of_decide`,
+whose lower-bound check accepts exactly that escape: every weight-one or
+weight-two Pauli is detected by some check or is a stabilizer up to phase. `X`
+on the first block is a nontrivial logical of weight 3.
 
 The logical basis `X̄ = Z⊗⁹`, `Z̄ = X⊗⁹` is in `Shor9Logicals.lean`.
 
@@ -45,8 +44,8 @@ The logical basis `X̄ = Z⊗⁹`, `Z̄ = X⊗⁹` is in `Shor9Logicals.lean`.
 - Decided hypotheses: `generators_commute`, `AllPhaseZero_generatorsList`,
   `rowsLinearIndependent_generatorsList`
 - `presentation`, `stabilizerCode : Code[[9, 1]]`
-- Distance 3 (degenerate column condition on `zRow` and `xRow`, weight-3
-  logical): `code_has_distance_three`,
+- Distance 3 (decided weight-3 logical witness, no lighter logical):
+  `minWeightLogical`, `code_has_distance_three`,
   `stabilizerCodeWithDistance : Code[[9, 1, 3]]`
 -/
 
@@ -105,7 +104,7 @@ runs out of heartbeats, so the check is handed straight to the kernel with
 
 /-- All eight generators pairwise commute. -/
 lemma generators_commute :
-    ∀ g ∈ listToSet generatorsList, ∀ h ∈ listToSet generatorsList, g * h = h * g := by
+    ∀ g ∈ generatorsList, ∀ h ∈ generatorsList, g * h = h * g := by
   decide
 
 /-- Every generator has phase power 0. -/
@@ -141,113 +140,22 @@ lemma stabilizerCode_toSubgroup_eq :
 
 /-! ## Distance 3
 
-### No nontrivial logical of weight 1 or 2
-
-Present each check as the set of qubits it acts on. The Z-check matrix has
-nonzero, pairwise distinct columns; the X-check matrix has nonzero columns,
-but no X-row separates two qubits of the same block. For those pairs, `Z` on
-the pair is a stabilizer. -/
-
-/-- The supports of the six Z-checks: adjacent pairs within each block. -/
-def zRow : Fin 6 → Finset (Fin 9) := ![{0, 1}, {1, 2}, {3, 4}, {4, 5}, {6, 7}, {7, 8}]
-
-/-- The supports of the two X-checks: the first two blocks, and the last
-two. -/
-def xRow : Fin 2 → Finset (Fin 9) := ![{0, 1, 2, 3, 4, 5}, {3, 4, 5, 6, 7, 8}]
-
-/-- `Z` on each Z-row is a generator. -/
-lemma zOn_zRow_mem : ∀ r, zOn (zRow r) ∈ generatorsList := by decide
-
-/-- `X` on each X-row is a generator. -/
-lemma xOn_xRow_mem : ∀ c, xOn (xRow c) ∈ generatorsList := by decide
-
-/-- Every qubit lies on some Z-row: no column is zero. -/
-lemma zRow_cover : ∀ i : Fin 9, ∃ r, i ∈ zRow r := by decide
-
-/-- Every qubit lies on some X-row: no column is zero. -/
-lemma xRow_cover : ∀ i : Fin 9, ∃ c, i ∈ xRow c := by decide
-
-/-- Any two distinct qubits are separated by some Z-row: no two columns
-coincide. -/
-lemma zRow_separate : ∀ i j : Fin 9, i ≠ j → ∃ r, (i ∈ zRow r ↔ j ∉ zRow r) := by decide
-
-/-- Vacuously, `X` on any pair the Z-rows do not separate is a stabilizer:
-there is no such pair. -/
-lemma xOn_pair_mem (i j : Fin 9) (hij : i ≠ j) (h : ∀ r, i ∈ zRow r ↔ j ∈ zRow r) :
-    xOn {i, j} ∈ Subgroup.closure (listToSet generatorsList) :=
-  let ⟨r, hr⟩ := zRow_separate i j hij
-  (iff_not_self ((h r).symm.trans hr)).elim
-
-/-- `Z` on any pair the X-rows do not separate is a block check: a generator
-`ZZ` on adjacent qubits, or the product of a block's two generators, `Z` on its
-outer qubits. -/
-lemma zOn_pair_mem_blockChecks : ∀ i j : Fin 9, i ≠ j → (∀ c, i ∈ xRow c ↔ j ∈ xRow c) →
-    zOn {i, j} ∈ [Z1, Z2, Z1 * Z2, Z3, Z4, Z3 * Z4, Z5, Z6, Z5 * Z6] := by
-  decide
-
-/-- Every block check is a stabilizer. -/
-lemma blockChecks_mem : ∀ s ∈ [Z1, Z2, Z1 * Z2, Z3, Z4, Z3 * Z4, Z5, Z6, Z5 * Z6],
-    s ∈ Subgroup.closure (listToSet generatorsList) := by
-  have h : ∀ g ∈ generatorsList, g ∈ Subgroup.closure (listToSet generatorsList) :=
-    fun g hg => Subgroup.subset_closure hg
-  simp only [generatorsList, List.mem_cons, List.not_mem_nil, or_false, forall_eq_or_imp,
-    forall_eq] at h ⊢
-  obtain ⟨h1, h2, h3, h4, h5, h6, -, -⟩ := h
-  exact ⟨h1, h2, Subgroup.mul_mem _ h1 h2, h3, h4, Subgroup.mul_mem _ h3 h4, h5, h6,
-    Subgroup.mul_mem _ h5 h6⟩
-
-/-- `Z` on any pair the X-rows do not separate is a stabilizer. -/
-lemma zOn_pair_mem (i j : Fin 9) (hij : i ≠ j) (h : ∀ c, i ∈ xRow c ↔ j ∈ xRow c) :
-    zOn {i, j} ∈ Subgroup.closure (listToSet generatorsList) :=
-  blockChecks_mem _ (zOn_pair_mem_blockChecks i j hij h)
-
-/-! ### A nontrivial logical of weight 3
-
-`X` on the first block `{0, 1, 2}` is `X⊗⁹ · X2`: it commutes with every check,
-and it anticommutes with `Z` on one qubit per block, `{0, 3, 6}` (= `Z⊗⁹` times
-the checks `Z2`, `Z4`, `Z6`), which also commutes with every check. -/
+Distance 3 is two decided checks (`hasCodeDistance_of_decide`). `X` on the
+first block, `{0, 1, 2}`, is `X⊗⁹ · X2`: it commutes with every check, and it
+is not a product of checks up to phase. Every weight-one and weight-two Pauli
+either anticommutes with some check or is itself a stabilizer up to phase. The
+second case is where the code's degeneracy goes: `Z_i Z_j` on two qubits of one
+block slips past both X-checks, but it is a `ZZ` check or the product of a
+block's two. -/
 
 /-- `XXXIIIIII`: a nontrivial logical of weight 3. -/
 def minWeightLogical : NQubitPauliGroupElement 9 := σ[XXXIIIIII]
 
-/-- `ZIIZIIZII`: a centralizer element anticommuting with
-`minWeightLogical`. -/
-def minWeightPartner : NQubitPauliGroupElement 9 := σ[ZIIZIIZII]
-
-/-- `XXXIIIIII` has weight 3. -/
-lemma minWeightLogical_weight : weight minWeightLogical = 3 := by decide
-
-/-- `XXXIIIIII` commutes with every element of the stabilizer. -/
-lemma minWeightLogical_mem_centralizer :
-    minWeightLogical ∈ centralizer stabilizerCode.toStabilizerGroup :=
-  mem_centralizer_of_commute_list stabilizerCode_toSubgroup_eq (by decide)
-
-/-- `ZIIZIIZII` commutes with every element of the stabilizer. -/
-lemma minWeightPartner_mem_centralizer :
-    minWeightPartner ∈ centralizer stabilizerCode.toStabilizerGroup :=
-  mem_centralizer_of_commute_list stabilizerCode_toSubgroup_eq (by decide)
-
-/-- `XXXIIIIII` and `ZIIZIIZII` meet on qubit 0 only, an odd number. -/
-lemma minWeightLogical_anticommutes_minWeightPartner :
-    Anticommute minWeightLogical minWeightPartner := by decide
-
-/-- `XXXIIIIII` is a nontrivial logical operator: it lies in the centralizer
-and anticommutes with the centralizer element `minWeightPartner`. -/
-lemma minWeightLogical_isNontrivial :
-    IsNontrivialLogicalOperator minWeightLogical stabilizerCode.toStabilizerGroup :=
-  isNontrivialLogicalOperator_of_anticommute_centralizer _ minWeightLogical_mem_centralizer
-    minWeightPartner_mem_centralizer minWeightLogical_anticommutes_minWeightPartner
-
-/-! ### The code with its distance `Code[[9, 1, 3]]` -/
-
-/-- **Shor's code has distance 3.** Both check matrices have nonzero columns,
-the Z-check columns are pairwise distinct, and `Z` on any pair the X-checks
-cannot separate is a stabilizer, so no Pauli of weight 1 or 2 is a nontrivial
-logical; `XXXIIIIII` is one of weight 3. -/
+/-- **Shor's code has distance 3.** `XXXIIIIII` is a nontrivial logical of
+weight 3, and every Pauli of weight 1 or 2 is detected by some check or is a
+stabilizer up to phase. -/
 theorem code_has_distance_three : HasCodeDistance stabilizerCode 3 :=
-  hasCodeDistance_three_of_columns_degenerate zRow xRow (listToSet generatorsList) stabilizerCode
-    stabilizerCode_toSubgroup_eq zOn_zRow_mem xOn_xRow_mem zRow_cover xRow_cover xOn_pair_mem
-    zOn_pair_mem ⟨minWeightLogical, minWeightLogical_isNontrivial, minWeightLogical_weight⟩
+  presentation.hasCodeDistance_of_decide minWeightLogical (by decide +kernel) (by decide +kernel)
 
 /-- Shor's code packaged with its distance. -/
 noncomputable def stabilizerCodeWithDistance : Code[[9, 1, 3]] where

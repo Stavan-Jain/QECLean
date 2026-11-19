@@ -72,7 +72,7 @@ check-matrix rank. -/
 
 /-- The two generators commute. -/
 lemma generators_commute :
-    ∀ g ∈ listToSet generatorsList, ∀ h ∈ listToSet generatorsList, g * h = h * g := by
+    ∀ g ∈ generatorsList, ∀ h ∈ generatorsList, g * h = h * g := by
   decide
 
 /-- Every generator has phase power 0. -/
@@ -135,12 +135,12 @@ lemma minWeightLogical_weight : weight minWeightLogical = 2 := by decide
 /-- `IXIX` commutes with every element of the stabilizer. -/
 lemma minWeightLogical_mem_centralizer :
     minWeightLogical ∈ centralizer stabilizerCode.toStabilizerGroup :=
-  mem_centralizer_of_commute_list stabilizerCode_toSubgroup_eq (by decide)
+  presentation.mem_centralizer_iff.2 (by decide)
 
 /-- `IIZZ` commutes with every element of the stabilizer. -/
 lemma minWeightPartner_mem_centralizer :
     minWeightPartner ∈ centralizer stabilizerCode.toStabilizerGroup :=
-  mem_centralizer_of_commute_list stabilizerCode_toSubgroup_eq (by decide)
+  presentation.mem_centralizer_iff.2 (by decide)
 
 /-- `IXIX` and `IIZZ` meet on qubit 3 only, an odd number. -/
 lemma minWeightLogical_anticommutes_minWeightPartner :

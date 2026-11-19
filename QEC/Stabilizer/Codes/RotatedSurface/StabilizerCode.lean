@@ -73,10 +73,8 @@ noncomputable def rotatedSurfacePresentation :
   generators_length := generatorsList_length L
   generators_phaseZero := allPhaseZero_generatorsList L
   generators_independent := rowsLinearIndependent_generatorsList L
-  generators_commute := by
-    have h := generators_commute L
-    rw [← listToSet_generatorsList] at h
-    exact h
+  generators_commute :=
+    commute_list_of_listToSet_eq (listToSet_generatorsList L) (generators_commute L)
 
 /-- The rotated surface code as an `[[L * L, 1]]` stabilizer code. -/
 noncomputable def rotatedSurfaceStabilizerCode : StabilizerCode (numQubits L) 1 :=

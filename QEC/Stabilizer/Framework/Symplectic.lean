@@ -8,6 +8,7 @@ public import QEC.Stabilizer.Framework.Symplectic.Presentation
 public import QEC.Stabilizer.Framework.Symplectic.WeightTwoInSpan
 public import QEC.Stabilizer.Framework.Symplectic.SupportLemmas
 public import QEC.Stabilizer.Framework.Symplectic.CentralizerStructure
+public import QEC.Stabilizer.Framework.Symplectic.DistanceDecide
 
 /-!
 # Symplectic view of stabilizer groups
@@ -32,6 +33,8 @@ Results connecting the binary-symplectic representation of Pauli operators
   the weight-`w` part of the centralizer lies in `sympSpan L`.
 - `SupportLemmas`: the support of `NQubitPauliOperator.set` and of Z-type and
   X-type operators.
+- `DistanceDecide`: the distance of a literal presentation by `decide` (a
+  weight-`d` logical witness, and every lighter Pauli detected or a stabilizer).
 - `CentralizerStructure`: the centralizer as the symplectic orthogonal of the
   symplectic image, and the classification of its elements for codes with one
   logical qubit.

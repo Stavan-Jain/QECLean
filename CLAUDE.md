@@ -426,9 +426,13 @@ These are local to this codebase — search here before assuming mathlib has the
   (`weight_one_anticomm_witness`, `weight_two_anticomm_witness`, stated over
   the generator list and decided whole) are the canonical users. For
   list-bounded statements `StabilizerCode.lean` pins `List.decidableBAll`
-  instances and provides `instDecidableCommuteList` /
-  `mem_centralizer_of_commute_list`, so "commutes with every generator" is a
-  one-line `by decide`.
+  instances and provides `instDecidableCommuteList`, and
+  `StabilizerCode.Presentation.mem_centralizer_iff` (`Symplectic/Presentation.lean`)
+  turns centralizer membership into commuting with each generator, so it is a
+  one-liner `presentation.mem_centralizer_iff.2 (by decide)`. Pairwise
+  commutation is stated over the list (`∀ g ∈ L, ∀ h ∈ L, …`) throughout;
+  `listToSet` appears only under `Subgroup.closure`, and a family that reasons
+  about its generators as a set bridges with `commute_list_of_listToSet_eq`.
 - `StabilizerGroup`, `.toSubgroup`, `.is_abelian`, `.one_mem`,
   `.neg_identity_not_mem`, `.codespaceSubmodule`
 - `IsNontrivialLogicalOperator` has **two** conditions (see
@@ -879,7 +883,7 @@ section:
   `rowsLinearIndependent_ofFn_of_pivots`), the bare code, and the `listToSet`
   bridge (`listToSet_append`).
 - The logicals file: logical operators → anticommutation → centralizer
-  membership (`mem_centralizer_of_commute_list`) →
+  membership (`presentation.mem_centralizer_iff`) →
   `stabilizerCodeWithLogicals`, with notes for `k ≥ 2` and non-CSS codes.
 
 Before drafting a new code file by hand or via the

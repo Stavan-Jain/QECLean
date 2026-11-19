@@ -57,10 +57,9 @@ theorem generatorsList_phaseZero : AllPhaseZero X.generatorsList := by
 
 /-- The canonical homological generators pairwise commute. -/
 theorem generatorsList_commute :
-    ∀ g ∈ X.generatorsList, ∀ h ∈ X.generatorsList, g * h = h * g := by
-  change ∀ g ∈ listToSet X.generatorsList, ∀ h ∈ listToSet X.generatorsList, g * h = h * g
-  rw [X.listToSet_generatorsList]
-  exact homologicalGenerators_commute
+    ∀ g ∈ X.generatorsList, ∀ h ∈ X.generatorsList, g * h = h * g :=
+  StabilizerGroup.commute_list_of_listToSet_eq X.listToSet_generatorsList
+    homologicalGenerators_commute
 
 /-! ## Symplectic coordinates of chain operators -/
 

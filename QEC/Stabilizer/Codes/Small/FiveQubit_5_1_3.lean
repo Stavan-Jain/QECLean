@@ -5,11 +5,11 @@ public import QEC.Stabilizer.Foundations.BinarySymplectic.CheckMatrixDecidable
 public import QEC.Stabilizer.Foundations.PauliGroup.Commutation
 public import QEC.Stabilizer.Foundations.PauliGroup.Notation
 public import QEC.Stabilizer.Framework.Core.CodeNotation
-public import QEC.Stabilizer.Framework.Core.CSS.CSSDistance
 public import QEC.Stabilizer.Framework.Core.Logical.CodeDistance
 public import QEC.Stabilizer.Framework.Core.Logical.LogicalOperators
 public import QEC.Stabilizer.Framework.Core.Stabilizer.StabilizerCode
 public import QEC.Stabilizer.Framework.Symplectic.Presentation
+public import QEC.Stabilizer.Framework.Symplectic.DistanceDecide
 public import QEC.Stabilizer.Framework.Symplectic.SymplecticSpan
 
 /-!
@@ -31,9 +31,9 @@ phase zero and check-matrix independence are closed statements settled by
 `decide`; `−I ∉ closure` follows by
 `negIdentity_not_mem_of_indep_phase_zero_commute`.
 
-Distance 3 is `hasCodeDistance_three_of_anticommute_witness`: every weight-1
-Pauli (15 cases) and every weight-2 Pauli (90 cases) anticommutes with some
-generator, and `IYYIX` is a nontrivial logical of weight 3.
+Distance 3 is `hasCodeDistance_of_decide`: `IYYIX` is a nontrivial logical of
+weight 3, and every weight-1 Pauli (15 cases) and every weight-2 Pauli
+(90 cases) anticommutes with some generator. Both are decided.
 
 The logical basis `X̄ = X⊗⁵`, `Z̄ = Z⊗⁵` is in `FiveQubit_5_1_3Logicals.lean`.
 
@@ -43,8 +43,8 @@ The logical basis `X̄ = X⊗⁵`, `Z̄ = Z⊗⁵` is in `FiveQubit_5_1_3Logical
 - Decided hypotheses: `generators_commute`, `AllPhaseZero_generatorsList`,
   `rowsLinearIndependent_generatorsList`
 - `presentation`, `stabilizerCode : Code[[5, 1]]`
-- Distance 3 (weight-1 and weight-2 anticommute witnesses, weight-3 logical):
-  `code_has_distance_three`, `stabilizerCodeWithDistance : Code[[5, 1, 3]]`
+- Distance 3 (decided weight-3 logical witness, no lighter logical):
+  `minWeightLogical`, `code_has_distance_three`, `stabilizerCodeWithDistance : Code[[5, 1, 3]]`
 -/
 
 @[expose] public section
@@ -84,7 +84,7 @@ rank. -/
 
 /-- All four generators pairwise commute. -/
 lemma generators_commute :
-    ∀ g ∈ listToSet generatorsList, ∀ h ∈ listToSet generatorsList, g * h = h * g := by
+    ∀ g ∈ generatorsList, ∀ h ∈ generatorsList, g * h = h * g := by
   decide
 
 /-- Every generator has phase power 0. -/
@@ -120,70 +120,18 @@ lemma stabilizerCode_toSubgroup_eq :
 
 /-! ## Distance 3
 
-### No nontrivial logical of weight 1 or 2
-
-For every weight-1 and weight-2 Pauli, some generator anticommutes with it. Each
-case is a closed `Anticommute` statement between literals, so `decide` settles
-the whole table. -/
-
-/-- Every weight-1 Pauli anticommutes with some generator. -/
-private lemma weight_one_anticomm_witness :
-    ∀ i : Fin 5, ∀ P : PauliOperator, P ≠ .I →
-      ∃ g ∈ generatorsList, Anticommute (weightOneAt i P) g := by
-  decide
-
-/-- Every weight-2 Pauli anticommutes with some generator. -/
-private lemma weight_two_anticomm_witness :
-    ∀ i j : Fin 5, i ≠ j → ∀ P Q : PauliOperator, P ≠ .I → Q ≠ .I →
-      ∃ g ∈ generatorsList, Anticommute (weightTwoAt i j P Q) g := by
-  decide
-
-/-! ### A nontrivial logical of weight 3
-
-`IYYIX` is the operator part of `X⊗⁵ · g1`: it commutes with every generator,
-and it anticommutes with `Z⊗⁵` (they clash on qubits 1, 2 and 4), which also
-commutes with every generator. -/
+Distance 3 is two decided checks (`hasCodeDistance_of_decide`). `IYYIX`, the
+operator part of `X⊗⁵ · g1`, commutes with every generator and is not a product
+of generators up to phase. Every weight-one and weight-two Pauli anticommutes
+with some generator. -/
 
 /-- `IYYIX`: a nontrivial logical of weight 3. -/
 def minWeightLogical : NQubitPauliGroupElement 5 := σ[IYYIX]
 
-/-- `ZZZZZ`: a centralizer element anticommuting with `minWeightLogical`. -/
-def minWeightPartner : NQubitPauliGroupElement 5 := σ[ZZZZZ]
-
-/-- `IYYIX` has weight 3. -/
-lemma minWeightLogical_weight : weight minWeightLogical = 3 := by decide
-
-/-- `IYYIX` commutes with every element of the stabilizer. -/
-lemma minWeightLogical_mem_centralizer :
-    minWeightLogical ∈ centralizer stabilizerCode.toStabilizerGroup :=
-  mem_centralizer_of_commute_list stabilizerCode_toSubgroup_eq (by decide)
-
-/-- `ZZZZZ` commutes with every element of the stabilizer. -/
-lemma minWeightPartner_mem_centralizer :
-    minWeightPartner ∈ centralizer stabilizerCode.toStabilizerGroup :=
-  mem_centralizer_of_commute_list stabilizerCode_toSubgroup_eq (by decide)
-
-/-- `IYYIX` and `ZZZZZ` anticommute locally on qubits 1, 2 and 4, an odd
-number. -/
-lemma minWeightLogical_anticommutes_minWeightPartner :
-    Anticommute minWeightLogical minWeightPartner := by decide
-
-/-- `IYYIX` is a nontrivial logical operator: it lies in the centralizer and
-anticommutes with the centralizer element `minWeightPartner`. -/
-lemma minWeightLogical_isNontrivial :
-    IsNontrivialLogicalOperator minWeightLogical stabilizerCode.toStabilizerGroup :=
-  isNontrivialLogicalOperator_of_anticommute_centralizer _ minWeightLogical_mem_centralizer
-    minWeightPartner_mem_centralizer minWeightLogical_anticommutes_minWeightPartner
-
-/-! ### The code with its distance `Code[[5, 1, 3]]` -/
-
-/-- **The five-qubit code has distance 3.** Every weight-1 and weight-2 Pauli
-anticommutes with some generator, and `IYYIX` is a nontrivial logical of
-weight 3. -/
+/-- **The five-qubit code has distance 3.** `IYYIX` is a nontrivial logical of
+weight 3, and every Pauli of weight 1 or 2 anticommutes with some generator. -/
 theorem code_has_distance_three : HasCodeDistance stabilizerCode 3 :=
-  hasCodeDistance_three_of_anticommute_witness stabilizerCode (listToSet generatorsList)
-    stabilizerCode_toSubgroup_eq weight_one_anticomm_witness weight_two_anticomm_witness
-    ⟨minWeightLogical, minWeightLogical_isNontrivial, minWeightLogical_weight⟩
+  presentation.hasCodeDistance_of_decide minWeightLogical (by decide +kernel) (by decide +kernel)
 
 /-- The five-qubit code packaged with its distance. -/
 noncomputable def stabilizerCodeWithDistance : Code[[5, 1, 3]] where
