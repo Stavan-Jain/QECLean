@@ -110,13 +110,9 @@ Contributions are welcome! If you add new modules or definitions, please:
 5. **Update this README** if you add a code family or rename top-level
    modules.
 
-## Paper
-
-Our preprint providing an exposition to QECLean can be found here: [Specifying and Verifying Quantum Error-Correcting Codes](https://arxiv.org/abs/2611.21236)
-
 ## Citation
 
-If you use QECLean in your research, please cite the following paper:
+Our preprint providing an exposition to QECLean can be found here: [Specifying and Verifying Quantum Error-Correcting Codes](https://arxiv.org/abs/2611.21236). If you use QECLean in your research, please cite as follows:
 
 ```
 @misc{jain2026specifyingverifyingquantum,
