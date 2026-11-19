@@ -12,12 +12,13 @@ QECLean is a Lean-based framework for formally specifying and verifying quantum 
 
 See our [paper](https://arxiv.org/abs/2611.21236) for technical details.
 
-**Highlights**:
+## Highlights
 
 - **Code families**: the first mechanized distance proofs for code families, including the $[[2L^2, 2, L]]$ toric codes, rotated surface codes, and triangular color codes.
 - **Gross code**: the $[[144, 12, 12]]$ gross code of [Bravyi et al.](https://doi.org/10.1038/s41586-024-07107-7)
 - **$[[360, 12, 24]]$ BB code**: the first proof that this code of [Bravyi et al.](https://doi.org/10.1038/s41586-024-07107-7) has distance 24, previously known only as an upper bound.
 - **Mitten code**: the $[[150, 30, 10]]$ Mitten code of [Bhardwaj et al.](https://arxiv.org/abs/2607.28795)
+
 
 ## Overview
 
