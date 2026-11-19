@@ -82,18 +82,6 @@ def X3 : NQubitPauliGroupElement 7 := σ[XIXXIIX]
 def generatorsList : List (NQubitPauliGroupElement 7) :=
   [Z1, Z2, Z3, X1, X2, X3]
 
-/-! ## CSS type -/
-
-/-- The three Z-checks are Z-type. -/
-lemma zChecks_isZType : ∀ g ∈ [Z1, Z2, Z3], IsZTypeElement g := by
-  simp only [List.mem_cons, List.not_mem_nil, or_false, forall_eq_or_imp, forall_eq]
-  decide
-
-/-- The three X-checks are X-type. -/
-lemma xChecks_isXType : ∀ g ∈ [X1, X2, X3], IsXTypeElement g := by
-  simp only [List.mem_cons, List.not_mem_nil, or_false, forall_eq_or_imp, forall_eq]
-  decide
-
 /-! ## Decided hypotheses
 
 A Z-check and an X-check meet in an even number of qubits (`r₁ ∩ r₂ = {0, 1}`,
